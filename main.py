@@ -151,6 +151,16 @@ def titul_pdf():  # сохранение в PDF формате титульно�
     pdf.output("titul.pdf")
 
 
+def find_in_rlist():
+    fp = my_win.lineEdit_Find_Rlist.text()
+    with db:
+        find = R_list.select().where(R_list.r_list == 100)
+        # find = R_list.select(R_list.r_list, R_list.r_fname)
+        for f in find:
+            print(f.r_list, f.r_fname)
+
+
+
 def view():  #  просмотр PDF страницы
 
     pass
@@ -214,6 +224,9 @@ my_win.comboBox_sredi.addItems(mylist)
 my_win.dateEdit_start.setDate(date.today())  # ставит сегодняшнюю дату
 my_win.dateEdit_end.setDate(date.today())
 my_win.pushButton_titul_edit.setEnabled(1)
+
+
+my_win.pushButton_find.clicked.connect(find_in_rlist)
 
 my_win.pushButton_Rlist.clicked.connect(db_r)  #  выбор и загрузка рейтинга
 

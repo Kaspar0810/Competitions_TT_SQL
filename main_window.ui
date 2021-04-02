@@ -47,9 +47,9 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>240</y>
+      <y>250</y>
       <width>601</width>
-      <height>311</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -62,9 +62,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>240</y>
+       <y>190</y>
        <width>581</width>
-       <height>61</height>
+       <height>101</height>
       </rect>
      </property>
      <property name="font">
@@ -81,20 +81,20 @@
       <enum>QFrame::Box</enum>
      </property>
     </widget>
-    <widget class="QFrame" name="frame_input">
+    <widget class="QTableView" name="tableView">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
-       <width>601</width>
-       <height>181</height>
+       <y>10</y>
+       <width>581</width>
+       <height>171</height>
       </rect>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Panel</enum>
+      <enum>QFrame::Box</enum>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+     <property name="gridStyle">
+      <enum>Qt::DashLine</enum>
      </property>
     </widget>
    </widget>
@@ -119,7 +119,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>174</height>
+       <height>139</height>
       </rect>
      </property>
      <attribute name="label">
@@ -167,7 +167,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>174</height>
+       <height>139</height>
       </rect>
      </property>
      <attribute name="label">
@@ -193,7 +193,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>174</height>
+       <height>139</height>
       </rect>
      </property>
      <attribute name="label">
@@ -206,7 +206,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>174</height>
+       <height>139</height>
       </rect>
      </property>
      <attribute name="label">
@@ -219,7 +219,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>174</height>
+       <height>139</height>
       </rect>
      </property>
      <attribute name="label">
@@ -696,6 +696,19 @@
        </rect>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_find">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>30</y>
+        <width>113</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Поиск</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -720,7 +733,7 @@
      <x>0</x>
      <y>0</y>
      <width>821</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
