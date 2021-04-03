@@ -28,7 +28,8 @@ from datetime import *
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
 from fpdf import FPDF
 from models import *
-
+from csv import reader
+import keyword
 
 FPDF.SYSTEM_TTFONTS = '/library/fonts'
 pdf = FPDF()
@@ -153,12 +154,11 @@ def titul_pdf():  # сохранение в PDF формате титульно�
 
 def find_in_rlist():
     fp = my_win.lineEdit_Find_Rlist.text()
-    with db:
-        find = R_list.select().where(R_list.r_list == 100)
-        # find = R_list.select(R_list.r_list, R_list.r_fname)
-        for f in find:
-            print(f.r_list, f.r_fname)
-
+    p = R_list.select()
+    p = p.where(R_list.r_fname ** f'%{fp}%')  # like
+    for pl in p:
+        print((pl.r_fname, pl.r_list))
+        my_win.textEdit.setText(pl.r_fname, pl.r_list)
 
 
 def view():  #  просмотр PDF страницы
@@ -194,9 +194,34 @@ def db_r():  #  Загружает рейинг лист в базу данны�
         R_list.insert_many(data).execute()
 
 
+# def parse_file(fname="2021_04_m.csv"):
+#     with open(fname) as f:
+#         csv = reader(f, delimiter=';')
+#         players_gen = (p for p in csv)
+#
+#         for p in players_gen:
+#             # r_fname = get_player(p[2])
+#             number = number(p[0])
+#             r_list = r_list(p[1])
+#             r_fname = r_fname(p[2])
+#             b_bithday = b_bithday(p[3])
+#             r_city = r_city(p[4])
+#             R_list.create(number=number, r_list=r_list, r_fname=r_fname, b_bithday=b_bithday, r_city=r_city)
+
+
+# def get_player(r_fname):
+#     if r_fname not in r_csv:
+#         r_csv[r_fname] = R_list.create(r_fname=r_fname)
+#     return r_csv[r_fname]
+
+    # r_csv = {}
+
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.show()
+
+
+
 
 def tab(tw):  # Изменяет вкладку tabWidget в зависимости
     #  от вкладки toolBox
