@@ -20,16 +20,15 @@ import sys
 import openpyxl as op
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport
-from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QTextEdit, QVBoxLayout,\
-    QDateEdit, QWidget, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
-from PyQt6.QtCore import pyqtSignal, QObject
+from PyQt6.QtCore import pyqtSignal, QObject, QEvent
 from datetime import *
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
 from fpdf import FPDF
 from models import *
 from csv import reader
-import keyword
+import keyboard
 
 FPDF.SYSTEM_TTFONTS = '/library/fonts'
 pdf = FPDF()
@@ -44,6 +43,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
 
+app = QApplication(sys.argv)
+my_win = MainWindow()
+my_win.show()
+
+
 def dbase():  # Создание DB и таблицы titul и заносит в нее название соревнования
 
     with db:
@@ -53,9 +57,9 @@ def dbase():  # Создание DB и таблицы titul и заносит в
 def db_insert_titul():  # Вставляем запись в таблицу титул
 
     with db:
-
         nazv = Titul(name=nm, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
-        kat_ref=kr, secretary=sk, kat_sek=ks).save()
+                     kat_ref=kr, secretary=sk, kat_sek=ks).save()
+
 
 def db_select_titul():  # извлекаем из таблицы данные и заполняем поля титула для редактирования
 
@@ -73,7 +77,6 @@ def db_select_titul():  # извлекаем из таблицы данные и
 
 
 def titul_made():
-
     age = my_win.lineEdit_titul_vozrast.text()
     p = age.count(" ")
     if p == 2:
@@ -96,10 +99,6 @@ def titul_made():
     titul_pdf()
     my_win.pushButton_titul_made.setEnabled(0)  # после заполнения титула выключает кнопку
     my_win.pushButton_titul_edit.setEnabled(1)
-
-
-# def titul_edit():
-#     db_select_titul()
 
 
 def titul_pdf():  # сохранение в PDF формате титульной страницы
@@ -154,19 +153,14 @@ def titul_pdf():  # сохранение в PDF формате титульно�
 
 def find_in_rlist():
     fp = my_win.lineEdit_Find_Rlist.text()
+    fp = fp.capitalize()  # Переводит первую букву в заглавную
     p = R_list.select()
-    p = p.where(R_list.r_fname ** f'%{fp}%')  # like
+    p = p.where(R_list.r_fname ** f'{fp}%')  # like
     for pl in p:
-        print((pl.r_fname, pl.r_list))
-        my_win.textEdit.setText(pl.r_fname, pl.r_list)
+        my_win.textEdit.append(pl.r_fname)  # выводит много строчный текст (append)
 
 
-def view():  #  просмотр PDF страницы
-
-    pass
-
-
-def db_r():  #  Загружает рейинг лист в базу данных
+def db_r():  # Загружает рейинг лист в базу данных
 
     fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
     filepatch = str(fname[0])
@@ -194,66 +188,46 @@ def db_r():  #  Загружает рейинг лист в базу данны�
         R_list.insert_many(data).execute()
 
 
-# def parse_file(fname="2021_04_m.csv"):
-#     with open(fname) as f:
-#         csv = reader(f, delimiter=';')
-#         players_gen = (p for p in csv)
-#
-#         for p in players_gen:
-#             # r_fname = get_player(p[2])
-#             number = number(p[0])
-#             r_list = r_list(p[1])
-#             r_fname = r_fname(p[2])
-#             b_bithday = b_bithday(p[3])
-#             r_city = r_city(p[4])
-#             R_list.create(number=number, r_list=r_list, r_fname=r_fname, b_bithday=b_bithday, r_city=r_city)
+def tab(tw):  # Изменяет вкладку tabWidget в зависимости от вкладки toolBox
 
-
-# def get_player(r_fname):
-#     if r_fname not in r_csv:
-#         r_csv[r_fname] = R_list.create(r_fname=r_fname)
-#     return r_csv[r_fname]
-
-    # r_csv = {}
-
-app = QApplication(sys.argv)
-my_win = MainWindow()
-my_win.show()
-
-
-
-
-def tab(tw):  # Изменяет вкладку tabWidget в зависимости
-    #  от вкладки toolBox
     if tw == 0:
         db_select_titul()
     my_win.tabWidget.setCurrentIndex(tw)
 
 
-my_win.toolBox.currentChanged.connect(tab)
+def page(tb):  # Изменяет вкладку toolBox в зависимости от вкладки tabWidget
 
-def page(tb):  # Изменяет вкладку toolBox в зависимости
-    # от вкладки tabWidget
     if tb == 0:
         db_select_titul()
     my_win.toolBox.setCurrentIndex(tb)
 
-my_win.tabWidget.currentChanged.connect(page)
 
+# def press_key(fp):
+#     my_win.textEdit.setText(fp)
+#     print(fp)
+#
+#
+# fp = my_win.lineEdit_Find_Rlist.text()
+# if fp == "":
+#     print("Пустая строка")
+# else:
+#     my_win.lineEdit_Find_Rlist.textChanged[str].connect(str, press_key(fp))
+
+my_win.toolBox.currentChanged.connect(tab)
+my_win.tabWidget.currentChanged.connect(page)
 
 kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 my_win.comboBox_sredi.addItems(mylist)
-my_win.dateEdit_start.setDate(date.today())  # ставит сегодняшнюю дату
-my_win.dateEdit_end.setDate(date.today())
-my_win.pushButton_titul_edit.setEnabled(1)
-
+my_win.dateEdit_start.setDate(date.today())  # ставит сегодняшнюю дату в виджете календарь
+my_win.dateEdit_end.setDate(date.today())  #
+my_win.pushButton_titul_edit.setEnabled(1)  # выключает кнопку после создания титула
 
 my_win.pushButton_find.clicked.connect(find_in_rlist)
 
-my_win.pushButton_Rlist.clicked.connect(db_r)  #  выбор и загрузка рейтинга
+my_win.pushButton_Rlist.clicked.connect(db_r)  # выбор и загрузка рейтинга
 
 my_win.pushButton_view.clicked.connect(db_r)
 # Нажатие кнопки и вызов функции "On_click"
