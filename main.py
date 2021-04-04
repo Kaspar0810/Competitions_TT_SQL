@@ -27,6 +27,7 @@ from datetime import *
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
 from fpdf import FPDF
 from models import *
+
 from csv import reader
 import keyboard
 
@@ -41,7 +42,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, *args, **kwargs):
         QMainWindow.__init__(self)
         self.setupUi(self)
-
+        self.tableWidget.setColumnCount(6)
+        self.tableWidget.setRowCount(1)
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
@@ -187,6 +189,9 @@ def db_r():  # Загружает рейинг лист в базу данных
     with db:
         R_list.insert_many(data).execute()
 
+collumn_label = ["Номер", "место", "Рейтинг", "Спортсмен", "Дата рождения", "Город"]
+my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
+
 
 def tab(tw):  # Изменяет вкладку tabWidget в зависимости от вкладки toolBox
 
@@ -194,24 +199,12 @@ def tab(tw):  # Изменяет вкладку tabWidget в зависимос�
         db_select_titul()
     my_win.tabWidget.setCurrentIndex(tw)
 
-
 def page(tb):  # Изменяет вкладку toolBox в зависимости от вкладки tabWidget
 
     if tb == 0:
         db_select_titul()
     my_win.toolBox.setCurrentIndex(tb)
 
-
-# def press_key(fp):
-#     my_win.textEdit.setText(fp)
-#     print(fp)
-#
-#
-# fp = my_win.lineEdit_Find_Rlist.text()
-# if fp == "":
-#     print("Пустая строка")
-# else:
-#     my_win.lineEdit_Find_Rlist.textChanged[str].connect(str, press_key(fp))
 
 my_win.toolBox.currentChanged.connect(tab)
 my_win.tabWidget.currentChanged.connect(page)
