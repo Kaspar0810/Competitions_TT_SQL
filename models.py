@@ -40,5 +40,6 @@ class R_list(BaseModel):
 
     class Meta:
         db_table = "r_lists"
+        order_by = "r_fname"
 
 

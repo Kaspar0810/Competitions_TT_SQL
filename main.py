@@ -29,7 +29,7 @@ from fpdf import FPDF
 from models import *
 
 from csv import reader
-import keyboard
+
 
 FPDF.SYSTEM_TTFONTS = '/library/fonts'
 pdf = FPDF()
@@ -153,13 +153,17 @@ def titul_pdf():  # сохранение в PDF формате титульно�
     pdf.output("titul.pdf")
 
 
-def find_in_rlist():
+def find_in_rlist(fp):
+    my_win.textEdit.clear()
     fp = my_win.lineEdit_Find_Rlist.text()
     fp = fp.capitalize()  # Переводит первую букву в заглавную
     p = R_list.select()
     p = p.where(R_list.r_fname ** f'{fp}%')  # like
-    for pl in p:
-        my_win.textEdit.append(pl.r_fname)  # выводит много строчный текст (append)
+    if (len(p)) == 0:
+        my_win.textEdit.setText("Нет спортсменов в рейтинг листе")
+    else:
+        for pl in p:
+            my_win.textEdit.append(pl.r_fname)  # выводит много строчный текст (append)
 
 
 def db_r():  # Загружает рейинг лист в базу данных
@@ -206,8 +210,12 @@ def page(tb):  # Изменяет вкладку toolBox в зависимост
     my_win.toolBox.setCurrentIndex(tb)
 
 
-my_win.toolBox.currentChanged.connect(tab)
+my_win.lineEdit_Find_Rlist.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
+# и вызов функции (find_in_rlist)
+
+
 my_win.tabWidget.currentChanged.connect(page)
+my_win.toolBox.currentChanged.connect(tab)
 
 kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
