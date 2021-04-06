@@ -45,6 +45,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.setColumnCount(6)
         self.tableWidget.setRowCount(1)
 
+
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.show()
@@ -154,8 +155,9 @@ def titul_pdf():  # сохранение в PDF формате титульно�
 
 
 def find_in_rlist(fp):
+    my_win.listWidget.clear()
     my_win.textEdit.clear()
-    fp = my_win.lineEdit_Find_Rlist.text()
+    fp = my_win.lineEdit_Family_name.text()
     fp = fp.capitalize()  # Переводит первую букву в заглавную
     p = R_list.select()
     p = p.where(R_list.r_fname ** f'{fp}%')  # like
@@ -163,8 +165,9 @@ def find_in_rlist(fp):
         my_win.textEdit.setText("Нет спортсменов в рейтинг листе")
     else:
         for pl in p:
-            my_win.textEdit.append(pl.r_fname)  # выводит много строчный текст (append)
-
+            full_stroka = pl.r_fname + ", " + str(pl.r_list) + ", " + pl.r_bithday + ", " + pl.r_city
+            # my_win.textEdit.append(full_stroka)  # выводит много строчный текст (append)
+            my_win.listWidget.addItem(full_stroka)
 
 def db_r():  # Загружает рейинг лист в базу данных
 
@@ -193,6 +196,10 @@ def db_r():  # Загружает рейинг лист в базу данных
     with db:
         R_list.insert_many(data).execute()
 
+
+def dclick_in_listwidget(self, item):
+    pass
+
 collumn_label = ["Номер", "место", "Рейтинг", "Спортсмен", "Дата рождения", "Город"]
 my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
 
@@ -210,9 +217,9 @@ def page(tb):  # Изменяет вкладку toolBox в зависимост
     my_win.toolBox.setCurrentIndex(tb)
 
 
-my_win.lineEdit_Find_Rlist.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
+my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
 # и вызов функции (find_in_rlist)
-
+my_win.listWidget.itemClicked.connect(dclick_in_listwidget)
 
 my_win.tabWidget.currentChanged.connect(page)
 my_win.toolBox.currentChanged.connect(tab)
@@ -226,7 +233,6 @@ my_win.dateEdit_start.setDate(date.today())  # ставит сегодняшню
 my_win.dateEdit_end.setDate(date.today())  #
 my_win.pushButton_titul_edit.setEnabled(1)  # выключает кнопку после создания титула
 
-my_win.pushButton_find.clicked.connect(find_in_rlist)
 
 my_win.pushButton_Rlist.clicked.connect(db_r)  # выбор и загрузка рейтинга
 
