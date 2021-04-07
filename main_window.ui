@@ -268,7 +268,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -409,7 +409,7 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_city">
+     <widget class="QLineEdit" name="lineEdit_city_titul">
       <property name="geometry">
        <rect>
         <x>470</x>
@@ -737,7 +737,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_city_2">
+     <widget class="QLineEdit" name="lineEdit_city_list">
       <property name="geometry">
        <rect>
         <x>10</x>
