@@ -42,6 +42,19 @@
       <string>Просмотр</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButton_db">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>113</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Создание DB</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
@@ -136,8 +149,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>169</width>
-       <height>139</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -204,14 +217,27 @@
        <string>R-лист</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>113</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Добавить</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_3">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>169</width>
-       <height>139</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -223,8 +249,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>169</width>
-       <height>139</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -236,8 +262,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>169</width>
-       <height>139</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -268,7 +294,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -757,16 +783,6 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_razryad">
-      <property name="geometry">
-       <rect>
-        <x>392</x>
-        <y>80</y>
-        <width>91</width>
-        <height>21</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="lineEdit_coach">
       <property name="geometry">
        <rect>
@@ -908,6 +924,16 @@
       </property>
       <property name="text">
        <string>Тренер(ы)</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_razryad">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>80</y>
+        <width>104</width>
+        <height>26</height>
+       </rect>
       </property>
      </widget>
     </widget>

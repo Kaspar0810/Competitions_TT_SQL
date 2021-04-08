@@ -21,14 +21,14 @@ import openpyxl as op
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport
 from PyQt6.QtWidgets import *
-from PyQt6.QtGui import *
-from PyQt6.QtCore import pyqtSignal, QObject, QEvent
+# from PyQt6.QtGui import *
+# from PyQt6.QtCore import pyqtSignal, QObject, QEvent
 from datetime import *
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
 from fpdf import FPDF
 from models import *
 
-from csv import reader
+# from csv import reader
 
 
 FPDF.SYSTEM_TTFONTS = '/library/fonts'
@@ -54,7 +54,7 @@ my_win.show()
 def dbase():  # Создание DB и таблицы titul и заносит в нее название соревнования
 
     with db:
-        db.create_tables([Titul, R_list])
+        db.create_tables([Titul, R_list, Region, City])
 
 
 def db_insert_titul():  # Вставляем запись в таблицу титул
@@ -72,7 +72,7 @@ def db_select_titul():  # извлекаем из таблицы данные и
         my_win.lineEdit_titul_vozrast.setText(tituls.vozrast)
         my_win.dateEdit_start.setDate(tituls.data_start)
         my_win.dateEdit_end.setDate(tituls.data_end)
-        my_win.lineEdit_city.setText(tituls.mesto)
+        my_win.lineEdit_city_titul.setText(tituls.mesto)
         my_win.lineEdit_refery.setText(tituls.referee)
         my_win.comboBox_kategor_ref.setCurrentText(tituls.kat_ref)
         my_win.lineEdit_sekretar.setText(tituls.secretary)
@@ -233,6 +233,7 @@ def page(tb):  # Изменяет вкладку toolBox в зависимост
 collumn_label = ["Номер", "место", "Рейтинг", "Спортсмен", "Дата рождения", "Город"]
 my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
 
+my_win.pushButton_db.clicked.connect(dbase)
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
 # и вызов функции (find_in_rlist)
@@ -246,6 +247,8 @@ my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 my_win.comboBox_sredi.addItems(mylist)
+raz = ("3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
+my_win.comboBox_razryad.addItems(raz)
 my_win.dateEdit_start.setDate(date.today())  # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_end.setDate(date.today())  #
 my_win.pushButton_titul_edit.setEnabled(1)  # выключает кнопку после создания титула
