@@ -198,6 +198,17 @@ def db_r():  # Загружает рейинг лист в базу данных
         R_list.insert_many(data).execute()
 
 
+    # reg = []
+    #
+    # for i in range(1, 86):
+    #     A = sheet['B%s' % i].value
+    #
+    #     reg.append([A])
+    #
+    # with db:
+    #     Region.insert_many(reg).execute()
+
+
 def dclick_in_listwidget():
     text = my_win.listWidget.currentItem().text()
     ds = len(text)
@@ -214,14 +225,12 @@ def dclick_in_listwidget():
     my_win.lineEdit_city_list.setText(ci)
 
 
-
-
-
 def tab(tw):  # Изменяет вкладку tabWidget в зависимости от вкладки toolBox
 
     if tw == 0:
         db_select_titul()
     my_win.tabWidget.setCurrentIndex(tw)
+
 
 def page(tb):  # Изменяет вкладку toolBox в зависимости от вкладки tabWidget
 
@@ -230,8 +239,15 @@ def page(tb):  # Изменяет вкладку toolBox в зависимост
     my_win.toolBox.setCurrentIndex(tb)
 
 
+
 collumn_label = ["Номер", "место", "Рейтинг", "Спортсмен", "Дата рождения", "Город"]
 my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
+
+with db:  # добавляет из таблицы в комбобокс регионы
+    for r in range(1, 86):
+        reg = Region.get(Region.id == r)
+        my_win.comboBox_region.addItem(reg.region)
+
 
 my_win.pushButton_db.clicked.connect(dbase)
 

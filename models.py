@@ -11,7 +11,6 @@ class BaseModel(Model):
         order_by = "id"
 
 class Titul(BaseModel):
-    # id_comp = PrimaryKeyField()
     name = CharField()
     vozrast = CharField()
     data_start = DateField()
@@ -32,7 +31,6 @@ class Titul(BaseModel):
 #         pass
 
 class R_list(BaseModel):
-    # id_r_list = PrimaryKeyField()
     number = IntegerField()
     r_list = IntegerField()
     r_fname = CharField(50)
@@ -43,23 +41,20 @@ class R_list(BaseModel):
         db_table = "r_lists"
         order_by = "r_fname"
 
+class Region(BaseModel):
+    region = CharField()
+
+    class Meta:
+        db_table = "regions"
+        order_by = "region"
 
 class City(BaseModel):
-    pass
-    # id_city = PrimaryKeyField()
-    # city = CharField(0)
-    #
-    #
-    # class Meta:
-    #     db_table = "cities"
-    #     order_by = "city"
+    city = CharField()
+    region = ForeignKeyField(Region, backref='cities')
+    # region_id = ForeignKeyField(Region)
+
+    class Meta:
+        db_table = "cities"
+        order_by = "city"
 
 
-class Region(BaseModel):
-     pass
-    # id_region = PrimaryKeyField()
-    # region = CharField()
-    # city = ForeignKeyField(City, to_field="id_city")
-    # class Meta:
-    #     db_table = "regions"
-    #     order_by = "region"
