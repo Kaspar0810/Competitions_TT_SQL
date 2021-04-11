@@ -8,7 +8,6 @@ class BaseModel(Model):
     id = PrimaryKeyField()
     class Meta:
         database = db
-        order_by = "id"
 
 class Titul(BaseModel):
     name = CharField()
@@ -24,14 +23,22 @@ class Titul(BaseModel):
     class Meta:
         db_table = "tituls"
 
-# class Listing(Model):
-#     pass
-#
-#     class Meta:
-#         pass
+class List(BaseModel):
+    num = CharField(10)
+    player = CharField(50)
+    bday = DateField()
+    rank = IntegerField()
+    city = CharField()
+    region = CharField()
+    razryad = CharField(10)
+    coach = CharField(100)
+
+    class Meta:
+        db_table = "players"
+        order_by = "player"
 
 class R_list(BaseModel):
-    number = IntegerField()
+    r_number = IntegerField()
     r_list = IntegerField()
     r_fname = CharField(50)
     r_bithday = DateField()
@@ -50,11 +57,20 @@ class Region(BaseModel):
 
 class City(BaseModel):
     city = CharField()
-    region = ForeignKeyField(Region, backref='cities')
-    # region_id = ForeignKeyField(Region)
+    # region = ForeignKeyField(Region, backref='cities')
+    region_id = ForeignKeyField(Region)
 
     class Meta:
         db_table = "cities"
         order_by = "city"
 
+class R1_list(BaseModel):
+    r1_number_ = IntegerField()
+    r1_list = IntegerField()
+    r1_fname = CharField(50)
+    r1_bithday = DateField()
+    r1_city = CharField(0)
 
+    class Meta:
+        db_table = "r1_lists"
+        order_by = "r1_fname"

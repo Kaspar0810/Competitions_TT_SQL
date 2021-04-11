@@ -42,8 +42,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, *args, **kwargs):
         QMainWindow.__init__(self)
         self.setupUi(self)
-        self.tableWidget.setColumnCount(6)
-        self.tableWidget.setRowCount(1)
+        self.tableWidget.setColumnCount(8)
+        self.tableWidget.setRowCount(12)
 
 
 app = QApplication(sys.argv)
@@ -51,10 +51,10 @@ my_win = MainWindow()
 my_win.show()
 
 
-def dbase():  # Создание DB и таблицы titul и заносит в нее название соревнования
+def dbase():  # Создание DB и таблиц
 
     with db:
-        db.create_tables([Titul, R_list, Region, City])
+        db.create_tables([Titul, R_list, Region, City, List, R1_list])
 
 
 def db_insert_titul():  # Вставляем запись в таблицу титул
@@ -77,6 +77,69 @@ def db_select_titul():  # извлекаем из таблицы данные и
         my_win.comboBox_kategor_ref.setCurrentText(tituls.kat_ref)
         my_win.lineEdit_sekretar.setText(tituls.secretary)
         my_win.comboBox_kategor_sek.setCurrentText(tituls.kat_sek)
+
+
+def db_r():  # Загружает рейинг лист в базу данных
+
+    fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
+    filepatch = str(fname[0])
+    rp = filepatch.rindex("/")
+    RPath = filepatch[rp + 1: len(filepatch)]
+    wb = op.load_workbook(RPath)
+    s = wb.sheetnames[0]
+    sheet = wb[s]
+    for r in range(2, 4500):
+        if sheet.cell(row=r, column=2).value is None:
+            break
+
+    rows = r - 1
+    data = []
+
+    for i in range(2, rows):
+        A = sheet['A%s' % i].value
+        B = sheet['B%s' % i].value
+        C = sheet['C%s' % i].value
+        D = sheet['D%s' % i].value
+        E = sheet['E%s' % i].value
+        data.append([A, B, C, D, E])
+
+    with db:
+        R_list.insert_many(data).execute()
+#  добавляет файл рейтинга за январь
+    fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R1-листа", "", "Excels files (*01_m.xlsx)")
+    filepatch = str(fname[0])
+    rp = filepatch.rindex("/")
+    RPath = filepatch[rp + 1: len(filepatch)]
+    wb = op.load_workbook(RPath)
+    s = wb.sheetnames[0]
+    sheet = wb[s]
+    for r in range(2, 4500):
+        if sheet.cell(row=r, column=2).value is None:
+            break
+
+    rows = r - 1
+    data = []
+
+    for i in range(2, rows):
+        A = sheet['A%s' % i].value
+        B = sheet['B%s' % i].value
+        C = sheet['C%s' % i].value
+        D = sheet['D%s' % i].value
+        E = sheet['E%s' % i].value
+        data.append([A, B, C, D, E])
+
+    with db:
+        R1_list.insert_many(data).execute()
+
+#  добавляет в таблицу регионы
+#     reg = []
+
+    # for i in range(1, 86):
+    #     A = sheet['B%s' % i].value
+    #
+    #     reg.append([A])
+    # with db:
+    #     Region.insert_many(reg).execute()
 
 
 def titul_made():
@@ -170,46 +233,36 @@ def find_in_rlist(fp):
             my_win.listWidget.addItem(full_stroka)
 
 
-def db_r():  # Загружает рейинг лист в базу данных
-
-    fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
-    filepatch = str(fname[0])
-    rp = filepatch.rindex("/")
-    RPath = filepatch[rp + 1: len(filepatch)]
-    wb = op.load_workbook(RPath)
-    s = wb.sheetnames[0]
-    sheet = wb[s]
-    for r in range(2, 4500):
-        if sheet.cell(row=r, column=2).value is None:
-            break
-
-    rows = r - 1
-    data = []
-
-    for i in range(2, rows):
-        A = sheet['A%s' % i].value
-        B = sheet['B%s' % i].value
-        C = sheet['C%s' % i].value
-        D = sheet['D%s' % i].value
-        E = sheet['E%s' % i].value
-        data.append([A, B, C, D, E])
+def player_add():  # добавляет игрока в список и базу
+    num = 1
+    pl = my_win.lineEdit_Family_name.text()
+    bd = my_win.lineEdit_bday.text()
+    rn = my_win.lineEdit_R.text()
+    ct = my_win.lineEdit_city_list.text()
+    rg = my_win.comboBox_region.currentText()
+    rz = my_win.comboBox_razryad.currentText()
+    ch = my_win.lineEdit_coach.text()
 
     with db:
-        R_list.insert_many(data).execute()
+        plr = List(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
+                     razryad=rz, coach=ch).save()
+        allplayer = List.select()
+        count = len(allplayer)
+    add_city()
 
+    for i in range(0, 8):
+        spisok = (num, pl, bd, rn, ct, rg, rz, ch)
+        my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
+        my_win.tableWidget.resizeColumnsToContents()
 
-    # reg = []
-    #
-    # for i in range(1, 86):
-    #     A = sheet['B%s' % i].value
-    #
-    #     reg.append([A])
-    #
-    # with db:
-    #     Region.insert_many(reg).execute()
+    my_win.lineEdit_Family_name.clear()
+    my_win.lineEdit_bday.clear()
+    my_win.lineEdit_R.clear()
+    my_win.lineEdit_city_list.clear()
+    my_win.lineEdit_coach.clear()
+    my_win.tableWidget.insertRow(1)
 
-
-def dclick_in_listwidget():
+def dclick_in_listwidget():  # Находит фамилию в рейтинге и загружают в соответсвующие поля списка
     text = my_win.listWidget.currentItem().text()
     ds = len(text)
     sz = text.index(",")
@@ -223,6 +276,15 @@ def dclick_in_listwidget():
     my_win.lineEdit_bday.setText(dr)
     my_win.lineEdit_R.setText(r)
     my_win.lineEdit_city_list.setText(ci)
+    c = City.select()  # находит город и соответсвующий ему регион
+    c = c.where(City.city ** f'{ci}')  # like
+    if (len(c)) == 0:
+        my_win.textEdit.setText("Нет такого города в базе")
+        my_win.comboBox_region.setCurrentText("")
+    else:
+        cr = City.get(City.city == ci)
+        rg = Region.get(Region.id == cr.region_id)
+        my_win.comboBox_region.setCurrentText(rg.region)
 
 
 def tab(tw):  # Изменяет вкладку tabWidget в зависимости от вкладки toolBox
@@ -239,8 +301,19 @@ def page(tb):  # Изменяет вкладку toolBox в зависимост
     my_win.toolBox.setCurrentIndex(tb)
 
 
+def add_city():  # добавляет в таблицу города и регионы
+    ci = my_win.lineEdit_city_list.text()
+    c = City.select()  # находит город и соответсвующий ему регион
+    c = c.where(City.city ** f'{ci}')  # like
+    if (len(c)) == 0:  # Если связки город-регион нет в базе то дабавляет
+        ir = my_win.comboBox_region.currentIndex()
+        ir = ir + 1
+        ct = my_win.lineEdit_city_list.text()
+        with db:
+            city = City(city=ct, region_id=ir).save()
 
-collumn_label = ["Номер", "место", "Рейтинг", "Спортсмен", "Дата рождения", "Город"]
+
+collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"]
 my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
 
 with db:  # добавляет из таблицы в комбобокс регионы
@@ -248,8 +321,7 @@ with db:  # добавляет из таблицы в комбобокс рег�
         reg = Region.get(Region.id == r)
         my_win.comboBox_region.addItem(reg.region)
 
-
-my_win.pushButton_db.clicked.connect(dbase)
+# my_win.comboBox_region.currentIndexChanged.connect(add_city)  # При смене значения получаем переназначенный id региона
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
 # и вызов функции (find_in_rlist)
@@ -267,15 +339,13 @@ raz = ("3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "
 my_win.comboBox_razryad.addItems(raz)
 my_win.dateEdit_start.setDate(date.today())  # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_end.setDate(date.today())  #
+
+my_win.pushButton_add_player.clicked.connect(player_add)  # добавляет игроков в список и базу
+my_win.pushButton_db.clicked.connect(dbase)  # создание базы данных и таблиц
 my_win.pushButton_titul_edit.setEnabled(1)  # выключает кнопку после создания титула
-
-
 my_win.pushButton_Rlist.clicked.connect(db_r)  # выбор и загрузка рейтинга
-
-my_win.pushButton_view.clicked.connect(db_r)
-# Нажатие кнопки и вызов функции "On_click"
-my_win.pushButton_titul_made.clicked.connect(titul_made)
-# вызов окна диалога выбора изображения для вставки в титул
+# my_win.pushButton_view.clicked.connect(db_r)  # Нажатие кнопки и вызов функции "On_click"
+my_win.pushButton_titul_made.clicked.connect(titul_made)  # вызов окна диалога выбора изображения для вставки в титул
 my_win.pushButton_titul_edit.clicked.connect(db_select_titul)
 
 sys.exit(app.exec())
