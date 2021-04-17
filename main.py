@@ -43,7 +43,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         self.setupUi(self)
         self.tableWidget.setColumnCount(8)
-        self.tableWidget.setRowCount(12)
+        self.tableWidget.setRowCount(1)
+        self.tableWidget.verticalHeader().hide()
 
 
 app = QApplication(sys.argv)
@@ -232,9 +233,36 @@ def find_in_rlist(fp):
             # my_win.textEdit.append(full_stroka)  # выводит много строчный текст (append)
             my_win.listWidget.addItem(full_stroka)
 
+def fill_table():
+    pass
+
+    # for i, f in enumerate(allplayer):
+    #     item = QTableWidgetItem()
+    #     item.setText(f)
+    #     my_win.tableWidget.setItem(i, 0, item)
+
+
+def fill_table():  # заполняет тяблицу QtableWidget спортсменами из db
+    player_list = List.select()
+    count = len(player_list)  # колличество записей в базе
+    my_win.tableWidget.setRowCount(count)
+    for k in range(0, count):  # цикл по списку по строкам
+        list = List.get(List.id == k + 1)
+        my_win.tableWidget.setItem(k, 0, QTableWidgetItem(list.num))
+        my_win.tableWidget.setItem(k, 1, QTableWidgetItem(list.player))
+        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(list.bday))
+        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list.rank)))
+        my_win.tableWidget.setItem(k, 4, QTableWidgetItem(list.city))
+        my_win.tableWidget.setItem(k, 5, QTableWidgetItem(list.region))
+        my_win.tableWidget.setItem(k, 6, QTableWidgetItem(list.razryad))
+        my_win.tableWidget.setItem(k, 7, QTableWidgetItem(list.coach))
+    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+
 
 def player_add():  # добавляет игрока в список и базу
-    num = 1
+    player_list = List.select()
+    count = len(player_list)
+    my_win.tableWidget.setRowCount(count + 1)
     pl = my_win.lineEdit_Family_name.text()
     bd = my_win.lineEdit_bday.text()
     rn = my_win.lineEdit_R.text()
@@ -242,25 +270,24 @@ def player_add():  # добавляет игрока в список и базу
     rg = my_win.comboBox_region.currentText()
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
-
+    num = count + 1
     with db:
         plr = List(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
                      razryad=rz, coach=ch).save()
-        allplayer = List.select()
-        count = len(allplayer)
     add_city()
+    spisok = (num, pl, bd, rn, ct, rg, rz, ch)
 
-    for i in range(0, 8):
-        spisok = (num, pl, bd, rn, ct, rg, rz, ch)
+    for i in range(0, 8):  # добавляет в tablewidget
         my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
-        my_win.tableWidget.resizeColumnsToContents()
 
     my_win.lineEdit_Family_name.clear()
     my_win.lineEdit_bday.clear()
     my_win.lineEdit_R.clear()
     my_win.lineEdit_city_list.clear()
     my_win.lineEdit_coach.clear()
-    my_win.tableWidget.insertRow(1)
+
+    my_win.tableWidget.resizeColumnsToContents()
+
 
 def dclick_in_listwidget():  # Находит фамилию в рейтинге и загружают в соответсвующие поля списка
     text = my_win.listWidget.currentItem().text()
@@ -292,6 +319,8 @@ def tab(tw):  # Изменяет вкладку tabWidget в зависимос�
     if tw == 0:
         db_select_titul()
     my_win.tabWidget.setCurrentIndex(tw)
+    if tw == 1:
+        fill_table()
 
 
 def page(tb):  # Изменяет вкладку toolBox в зависимости от вкладки tabWidget
@@ -299,6 +328,8 @@ def page(tb):  # Изменяет вкладку toolBox в зависимост
     if tb == 0:
         db_select_titul()
     my_win.toolBox.setCurrentIndex(tb)
+    if tb ==1:
+        fill_table()
 
 
 def add_city():  # добавляет в таблицу города и регионы
