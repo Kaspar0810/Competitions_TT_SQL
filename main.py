@@ -19,9 +19,10 @@ if __name__ == '__main__':
 import sys
 import openpyxl as op
 
-from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport
+from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from PyQt6.QtWidgets import *
-# from PyQt6.QtGui import *
+from PyQt6.Qt import *
+from PyQt6.QtGui import *
 # from PyQt6.QtCore import pyqtSignal, QObject, QEvent
 from datetime import *
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
@@ -42,9 +43,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, *args, **kwargs):
         QMainWindow.__init__(self)
         self.setupUi(self)
+# установка таблицы списка спортсменов QtableWidget
         self.tableWidget.setColumnCount(8)
         self.tableWidget.setRowCount(1)
         self.tableWidget.verticalHeader().hide()
+        for i in range(0, 8):  # закрашивает заголовки таблиц зеленым цветом
+            item = QtWidgets.QTableWidgetItem()
+            item.setBackground(QtGui.QColor(0, 255, 150))
+            self.tableWidget.setHorizontalHeaderItem(i, item)
+        collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"]
+        self.tableWidget.setHorizontalHeaderLabels(collumn_label)
+
+
+class TableWidgetItem(QtWidgets.QTableWidgetItem):
+    def __lt__(self, other):
+        try:
+            return float(self.text()) < float(other.text())
+        except ValueError:
+            return super().__lt__(other)
 
 
 app = QApplication(sys.argv)
@@ -143,7 +159,7 @@ def db_r():  # Загружает рейинг лист в базу данных
     #     Region.insert_many(reg).execute()
 
 
-def titul_made():
+def titul_made():  # создание тильного листа соревнования
     age = my_win.lineEdit_titul_vozrast.text()
     p = age.count(" ")
     if p == 2:
@@ -218,7 +234,7 @@ def titul_pdf():  # сохранение в PDF формате титульно�
     pdf.output("titul.pdf")
 
 
-def find_in_rlist(fp):
+def find_in_rlist(fp):  # поиск спортсмена в R-листе
     my_win.listWidget.clear()
     my_win.textEdit.clear()
     fp = my_win.lineEdit_Family_name.text()
@@ -230,19 +246,10 @@ def find_in_rlist(fp):
     else:
         for pl in p:
             full_stroka = pl.r_fname + ", " + str(pl.r_list) + ", " + pl.r_bithday + ", " + pl.r_city
-            # my_win.textEdit.append(full_stroka)  # выводит много строчный текст (append)
             my_win.listWidget.addItem(full_stroka)
 
-def fill_table():
-    pass
 
-    # for i, f in enumerate(allplayer):
-    #     item = QTableWidgetItem()
-    #     item.setText(f)
-    #     my_win.tableWidget.setItem(i, 0, item)
-
-
-def fill_table():  # заполняет тяблицу QtableWidget спортсменами из db
+def fill_table():  # заполняет таблицу QtableWidget спортсменами из db
     player_list = List.select()
     count = len(player_list)  # колличество записей в базе
     my_win.tableWidget.setRowCount(count)
@@ -344,15 +351,33 @@ def add_city():  # добавляет в таблицу города и реги
             city = City(city=ct, region_id=ir).save()
 
 
-collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"]
-my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
+def export():
+    filename = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', '', 'Excel files(*.xlsx)')
+    wb = op.Workbook()
+    sheet = wb.active
+    for column in range(my_win.tableWidget.columnCount()):
+        for row in range(my_win.tableWidget.rowCount()):
+            text = str(my_win.tableWidget.item(row, column).text())
+            # sheet.cell(row + 1, column + 1).value = text
+            sheet.cell(row + 1, column + 1, text)
+    wb.save("/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/table.xlsx")
+    # wb.ExportAsFixedFormat(0, 'D/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/table.pdf')
+
+
+def sort_R():
+    player_list = List.select()
+    count = len(player_list)  # колличество записей в базе
+    my_win.tableWidget.sortItems(3, order=QtCore.Qt.SortOrder.DescendingOrder)  # сортировка  Я-А 3-ого столбца
+    for i in range(0, count):  # отсортировывает номера строк по порядку
+        my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+
 
 with db:  # добавляет из таблицы в комбобокс регионы
     for r in range(1, 86):
         reg = Region.get(Region.id == r)
         my_win.comboBox_region.addItem(reg.region)
 
-# my_win.comboBox_region.currentIndexChanged.connect(add_city)  # При смене значения получаем переназначенный id региона
+
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
 # и вызов функции (find_in_rlist)
@@ -378,5 +403,8 @@ my_win.pushButton_Rlist.clicked.connect(db_r)  # выбор и загрузка 
 # my_win.pushButton_view.clicked.connect(db_r)  # Нажатие кнопки и вызов функции "On_click"
 my_win.pushButton_titul_made.clicked.connect(titul_made)  # вызов окна диалога выбора изображения для вставки в титул
 my_win.pushButton_titul_edit.clicked.connect(db_select_titul)
+my_win.pushButton_sort_R.clicked.connect(sort_R)
+my_win.pushButton_export.clicked.connect(export)
+
 
 sys.exit(app.exec())
