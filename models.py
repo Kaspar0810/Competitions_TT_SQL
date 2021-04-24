@@ -35,7 +35,7 @@ class List(BaseModel):
 
     class Meta:
         db_table = "players"
-        order_by = "player"
+        order_by = "rank"
 
 class R_list(BaseModel):
     r_number = IntegerField()

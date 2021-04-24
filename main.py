@@ -55,14 +55,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.setHorizontalHeaderLabels(collumn_label)
 
 
-class TableWidgetItem(QtWidgets.QTableWidgetItem):
-    def __lt__(self, other):
-        try:
-            return float(self.text()) < float(other.text())
-        except ValueError:
-            return super().__lt__(other)
-
-
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.show()
@@ -254,11 +246,14 @@ def fill_table():  # заполняет таблицу QtableWidget спортс
     count = len(player_list)  # колличество записей в базе
     my_win.tableWidget.setRowCount(count)
     for k in range(0, count):  # цикл по списку по строкам
+
         list = List.get(List.id == k + 1)
         my_win.tableWidget.setItem(k, 0, QTableWidgetItem(list.num))
         my_win.tableWidget.setItem(k, 1, QTableWidgetItem(list.player))
         my_win.tableWidget.setItem(k, 2, QTableWidgetItem(list.bday))
-        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list.rank)))
+        element = str(list.rank)
+        padded = ('    ' + element)[-4:]  # make all elements the same length
+        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(padded))
         my_win.tableWidget.setItem(k, 4, QTableWidgetItem(list.city))
         my_win.tableWidget.setItem(k, 5, QTableWidgetItem(list.region))
         my_win.tableWidget.setItem(k, 6, QTableWidgetItem(list.razryad))
@@ -352,22 +347,28 @@ def add_city():  # добавляет в таблицу города и реги
 
 
 def export():
-    filename = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', '', 'Excel files(*.xlsx)')
-    wb = op.Workbook()
-    sheet = wb.active
-    for column in range(my_win.tableWidget.columnCount()):
-        for row in range(my_win.tableWidget.rowCount()):
-            text = str(my_win.tableWidget.item(row, column).text())
-            # sheet.cell(row + 1, column + 1).value = text
-            sheet.cell(row + 1, column + 1, text)
-    wb.save("/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/table.xlsx")
-    # wb.ExportAsFixedFormat(0, 'D/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/table.pdf')
+    pass
+    # filename = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', '', 'Excel files(*.xlsx)')
+    # wb = op.Workbook()
+    # sheet = wb.active
+    # for column in range(my_win.tableWidget.columnCount()):
+    #     for row in range(my_win.tableWidget.rowCount()):
+    #         text = str(my_win.tableWidget.item(row, column).text())
+    #         # sheet.cell(row + 1, column + 1).value = text
+    #         sheet.cell(row + 1, column + 1, text)
+    # wb.save("/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/table.xlsx")
+    # wb.ExportAsFixedFormat(0, 'D/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/table.pdf'
 
 
-def sort_R():
+def sort(self):  #  сортировка таблицы QtableWidget (по рейтингу или по алфавиту)
+    sender = my_win.sender()  # сигнал от кнопки
     player_list = List.select()
     count = len(player_list)  # колличество записей в базе
-    my_win.tableWidget.sortItems(3, order=QtCore.Qt.SortOrder.DescendingOrder)  # сортировка  Я-А 3-ого столбца
+    if sender == my_win.pushButton_sort_R:  # в зависимости от сигала кнопки идет сортировка
+        my_win.tableWidget.sortItems(3, QtCore.Qt.SortOrder.DescendingOrder)  # сортировка  Я-А 3-ого столбца
+    else:
+        my_win.tableWidget.sortItems(1, QtCore.Qt.SortOrder.AscendingOrder)  # сортировка  А-Я 1-ого столбца
+
     for i in range(0, count):  # отсортировывает номера строк по порядку
         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 
@@ -376,7 +377,6 @@ with db:  # добавляет из таблицы в комбобокс рег�
     for r in range(1, 86):
         reg = Region.get(Region.id == r)
         my_win.comboBox_region.addItem(reg.region)
-
 
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
@@ -403,7 +403,8 @@ my_win.pushButton_Rlist.clicked.connect(db_r)  # выбор и загрузка 
 # my_win.pushButton_view.clicked.connect(db_r)  # Нажатие кнопки и вызов функции "On_click"
 my_win.pushButton_titul_made.clicked.connect(titul_made)  # вызов окна диалога выбора изображения для вставки в титул
 my_win.pushButton_titul_edit.clicked.connect(db_select_titul)
-my_win.pushButton_sort_R.clicked.connect(sort_R)
+my_win.pushButton_sort_R.clicked.connect(sort)
+my_win.pushButton_sort_Name.clicked.connect(sort)
 my_win.pushButton_export.clicked.connect(export)
 
 
