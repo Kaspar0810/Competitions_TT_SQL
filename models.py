@@ -6,8 +6,10 @@ db = SqliteDatabase("comp_db.db")
 
 class BaseModel(Model):
     id = PrimaryKeyField()
+
     class Meta:
         database = db
+
 
 class Titul(BaseModel):
     name = CharField()
@@ -23,7 +25,16 @@ class Titul(BaseModel):
     class Meta:
         db_table = "tituls"
 
-class List(BaseModel):
+
+class Coach(BaseModel):
+    coach = CharField()
+
+    class Meta:
+        db_table = "coachs"
+        order_by = "coach"
+
+
+class Player(BaseModel):
     num = CharField(10)
     player = CharField(50)
     bday = DateField()
@@ -31,11 +42,12 @@ class List(BaseModel):
     city = CharField()
     region = CharField()
     razryad = CharField(10)
-    coach = CharField(100)
+    coach_id = ForeignKeyField(Coach)
 
     class Meta:
         db_table = "players"
         order_by = "rank"
+
 
 class R_list(BaseModel):
     r_number = IntegerField()
@@ -48,6 +60,7 @@ class R_list(BaseModel):
         db_table = "r_lists"
         order_by = "r_fname"
 
+
 class Region(BaseModel):
     region = CharField()
 
@@ -55,14 +68,15 @@ class Region(BaseModel):
         db_table = "regions"
         order_by = "region"
 
+
 class City(BaseModel):
     city = CharField()
-    # region = ForeignKeyField(Region, backref='cities')
     region_id = ForeignKeyField(Region)
 
     class Meta:
         db_table = "cities"
         order_by = "city"
+
 
 class R1_list(BaseModel):
     r1_number_ = IntegerField()
@@ -74,3 +88,5 @@ class R1_list(BaseModel):
     class Meta:
         db_table = "r1_lists"
         order_by = "r1_fname"
+
+

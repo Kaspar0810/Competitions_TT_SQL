@@ -107,7 +107,7 @@
       <x>10</x>
       <y>0</y>
       <width>171</width>
-      <height>311</height>
+      <height>391</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -122,7 +122,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>139</height>
+       <height>219</height>
       </rect>
      </property>
      <attribute name="label">
@@ -170,7 +170,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>139</height>
+       <height>219</height>
       </rect>
      </property>
      <attribute name="label">
@@ -189,31 +189,44 @@
        <string>Добавить</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_sort_R">
+     <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>130</y>
         <width>151</width>
-        <height>32</height>
+        <height>91</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Сортировка по R</string>
+      <property name="title">
+       <string>Сортировка</string>
       </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_sort_Name">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>80</y>
-        <width>151</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Сортировка по алф</string>
-      </property>
+      <widget class="QPushButton" name="pushButton_sort_R">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>60</y>
+         <width>151</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>По рейтингу</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_sort_Name">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>30</y>
+         <width>151</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>По алфавиту</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_3">
@@ -222,7 +235,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>139</height>
+       <height>219</height>
       </rect>
      </property>
      <attribute name="label">
@@ -235,7 +248,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>139</height>
+       <height>219</height>
       </rect>
      </property>
      <attribute name="label">
@@ -248,7 +261,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>139</height>
+       <height>219</height>
       </rect>
      </property>
      <attribute name="label">
