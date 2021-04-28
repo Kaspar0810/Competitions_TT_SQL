@@ -32,10 +32,10 @@
     <widget class="QPushButton" name="pushButton_view">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>70</y>
-       <width>111</width>
-       <height>23</height>
+       <width>150</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="text">
@@ -45,10 +45,10 @@
     <widget class="QPushButton" name="pushButton_db">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>40</y>
-       <width>113</width>
-       <height>32</height>
+       <width>150</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="text">
@@ -60,8 +60,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>141</width>
-       <height>32</height>
+       <width>150</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="text">
@@ -71,10 +71,10 @@
     <widget class="QPushButton" name="pushButton_Rlist">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>100</y>
-       <width>113</width>
-       <height>32</height>
+       <width>150</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="text">
@@ -107,14 +107,21 @@
       <x>10</x>
       <y>0</y>
       <width>171</width>
-      <height>391</height>
+      <height>421</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>14</pointsize>
+      <italic>true</italic>
+     </font>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -122,7 +129,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>219</height>
+       <height>215</height>
       </rect>
      </property>
      <attribute name="label">
@@ -131,10 +138,10 @@
      <widget class="QPushButton" name="pushButton_titul_made">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>0</y>
-        <width>121</width>
-        <height>32</height>
+        <width>150</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="text">
@@ -153,10 +160,10 @@
      <widget class="QPushButton" name="pushButton_titul_edit">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>10</x>
         <y>30</y>
-        <width>121</width>
-        <height>32</height>
+        <width>150</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="text">
@@ -170,7 +177,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>219</height>
+       <height>215</height>
       </rect>
      </property>
      <attribute name="label">
@@ -229,13 +236,26 @@
       </widget>
      </widget>
     </widget>
+    <widget class="QWidget" name="page_6">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>169</width>
+       <height>215</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Система</string>
+     </attribute>
+    </widget>
     <widget class="QWidget" name="page_3">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>219</height>
+       <height>215</height>
       </rect>
      </property>
      <attribute name="label">
@@ -248,7 +268,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>219</height>
+       <height>215</height>
       </rect>
      </property>
      <attribute name="label">
@@ -261,7 +281,7 @@
        <x>0</x>
        <y>0</y>
        <width>169</width>
-       <height>219</height>
+       <height>215</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1068,6 +1088,23 @@
     </property>
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget_R_list">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>260</y>
+      <width>801</width>
+      <height>431</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>14</pointsize>
+      <italic>true</italic>
+     </font>
     </property>
    </widget>
   </widget>

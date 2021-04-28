@@ -54,8 +54,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"]
         self.tableWidget.setHorizontalHeaderLabels(collumn_label)
         self.tableWidget.isSortingEnabled()
+# установка таблицы списка R спортсменов QtableWidget_R_list
+        self.tableWidget_R_list.setColumnCount(5)
+        self.tableWidget_R_list.setRowCount(1)
+        self.tableWidget_R_list.verticalHeader().hide()
+        for i in range(0, 6):  # закрашивает заголовки таблиц зеленым цветом
+            item = QtWidgets.QTableWidgetItem()
+            item.setBackground(QtGui.QColor(0, 255, 150))
+            self.tableWidget_R_list.setHorizontalHeaderItem(i, item)
+        collumn_label = ["Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
+        self.tableWidget_R_list.setHorizontalHeaderLabels(collumn_label)
+        self.tableWidget_R_list.isSortingEnabled()
+        self.tableWidget_R_list.hide()
+        def dbase():  # Создание DB и таблиц
 
-
+            with db:
+                db.create_tables([Titul, R_list, Region, City, Player, R1_list, Coach])
 
 
 
@@ -67,10 +81,10 @@ my_win.show()
 
 
 
-def dbase():  # Создание DB и таблиц
-
-    with db:
-        db.create_tables([Titul, R_list, Region, City, Player, R1_list, Coach])
+# def dbase():  # Создание DB и таблиц
+#
+#     with db:
+#         db.create_tables([Titul, R_list, Region, City, Player, R1_list, Coach])
 
 
 def db_insert_titul():  # Вставляем запись в таблицу титул
@@ -157,16 +171,9 @@ def db_r():  # Загружает рейтинг лист в базу данны
 #     with db:
 #         Region.insert_many(reg).execute()
 
-
-def titul_made():  # создание тильного листа соревнования
-    age = my_win.lineEdit_titul_vozrast.text()
-    p = age.count(" ")
-    if p == 2:
-        god = int(age[3:5])
-        age = date.today().year - (god - 1)  # год рождения и младше могут играть
-    elif p == 4:
-        age = int(age[0:5])  # год рождения и младше могут играть
+def titul_stroka():  # переменные строк титульного листа
     global nm, vz, ds, de, ms, rf, kr, sk, ks
+
     nm = my_win.lineEdit_titul_nazvanie.text()
     vz = my_win.lineEdit_titul_vozrast.text()
     ds = my_win.dateEdit_start.text()
@@ -176,11 +183,38 @@ def titul_made():  # создание тильного листа соревно
     sk = my_win.lineEdit_sekretar.text()
     kr = my_win.comboBox_kategor_ref.currentText()
     ks = my_win.comboBox_kategor_sek.currentText()
-    dbase()
+
+
+def titul_made():  # создание тильного листа соревнования
+    age = my_win.lineEdit_titul_vozrast.text()
+    p = age.count(" ")
+    if p == 2:
+        god = int(age[3:5])
+        age = date.today().year - (god - 1)  # год рождения и младше могут играть
+    elif p == 4:
+        age = int(age[0:5])  # год рождения и младше могут играть
+    titul_stroka()
+    # dbase()
     db_insert_titul()
     titul_pdf()
     my_win.pushButton_titul_made.setEnabled(0)  # после заполнения титула выключает кнопку
     my_win.pushButton_titul_edit.setEnabled(1)
+
+
+def titul_update():  # обновляет запись титула
+
+    titul_stroka()
+    nazv = Titul.get(Titul.id == 1)
+    nazv.name = nm
+    nazv.vozrast = vz
+    nazv.data_start = ds
+    nazv.data_end = de
+    nazv.mesto = ms
+    nazv.referee = rf
+    nazv.kat_ref = kr
+    nazv.secretary = sk
+    nazv.kat_sek = ks
+    nazv.save()
 
 
 def titul_pdf():  # сохранение в PDF формате титульной страницы
@@ -269,7 +303,27 @@ def fill_table():  # заполняет таблицу QtableWidget спортс
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
+def fill_table_R_list():
+    my_win.tableWidget.hide()
+    my_win.tableWidget_R_list.show()
+    player_rlist = R_list.select()
+    count = len(player_rlist)  # колличество записей в базе
+    my_win.tableWidget_R_list.setRowCount(count)
+    for k in range(0, count):  # цикл по списку по строкам
+
+        listR = R_list.get(R_list.id == k + 1)
+        my_win.tableWidget_R_list.setItem(k, 0, QTableWidgetItem(str(listR.r_number)))
+        et = str(listR.r_list)
+        padded = ('    ' + et)[-4:]  # make all elements the same length
+        my_win.tableWidget_R_list.setItem(k, 1, QTableWidgetItem(padded))
+        my_win.tableWidget_R_list.setItem(k, 2, QTableWidgetItem(listR.r_fname))
+        my_win.tableWidget_R_list.setItem(k, 3, QTableWidgetItem(listR.r_bithday))
+        my_win.tableWidget_R_list.setItem(k, 4, QTableWidgetItem(listR.r_city))
+
+    my_win.tableWidget_R_list.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+
 def add_player():  # добавляет игрока в список и базу
+    fill_table()
     player_list = Player.select()
     count = len(player_list)
     my_win.tableWidget.setRowCount(count + 1)
@@ -290,7 +344,7 @@ def add_player():  # добавляет игрока в список и базу
     add_city()
     element = str(rn)
     rn = ('    ' + element)[-4:]  # make all elements the same length
-    spisok = (num, pl, bd, rn, ct, rg, rz, ch)
+    spisok = (str(num), pl, bd, rn, ct, rg, rz, ch)
 
     for i in range(0, 8):  # добавляет в tablewidget
         my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
@@ -342,6 +396,8 @@ def tab(tw):  # Изменяет вкладку tabWidget в зависимос�
         db_select_titul()
     my_win.tabWidget.setCurrentIndex(tw)
     if tw == 1:
+        my_win.tableWidget.show()
+        my_win.tableWidget_R_list.hide()
         fill_table()
 
 
@@ -351,6 +407,8 @@ def page(tb):  # Изменяет вкладку toolBox в зависимост
         db_select_titul()
     my_win.toolBox.setCurrentIndex(tb)
     if tb == 1:
+        my_win.tableWidget.show()
+        my_win.tableWidget_R_list.hide()
         fill_table()
 
 
@@ -367,9 +425,10 @@ def add_city():  # добавляет в таблицу города и реги
 
 
 def find_coach():  # Поиск тренера в базе
-
+    my_win.listWidget.clear()
+    my_win.textEdit.clear()
     cp = my_win.lineEdit_coach.text()
-    # cp = cp.capitalize()  # Переводит первую букву в заглавную
+    cp = cp.capitalize()  # Переводит первую букву в заглавную
     c = Coach.select()
     c = c.where(Coach.coach ** f'{cp}%')  # like
     if (len(c)) == 0:
@@ -394,16 +453,6 @@ def add_coach(ch, num):  # Если нет тренера в базе то до�
 
 def export():
     pass
-    # filename = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', '', 'Excel files(*.xlsx)')
-    # wb = op.Workbook()
-    # sheet = wb.active
-    # for column in range(my_win.tableWidget.columnCount()):
-    #     for row in range(my_win.tableWidget.rowCount()):
-    #         text = str(my_win.tableWidget.item(row, column).text())
-    #         # sheet.cell(row + 1, column + 1).value = text
-    #         sheet.cell(row + 1, column + 1, text)
-    # wb.save("/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/table.xlsx")
-    # wb.ExportAsFixedFormat(0, 'D/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/table.pdf'
 
 
 def sort(self):  #  сортировка таблицы QtableWidget (по рейтингу или по алфавиту)
@@ -434,29 +483,10 @@ def handlePreview(self):
 
 def handlePaintRequest(self, printer):
     pass
-    # document = QtGui.QTextDocument()
-    # cursor = QtGui.QTextCursor(document)
-    # table = cursor.insertTable(
-    #     self.tableWidget.rowCount(), self.tableWidget.columnCount())
-    # for row in range(table.rows()):
-    #     for col in range(table.columns()):
-    #         cursor.insertText(self.tableWidget.item(row, col).text())
-    #         cursor.movePosition(QtGui.QTextCursor.NextCell)
-    # document.print(printer)
 
-def titul_update():
+def r_listing():
     pass
-    # nazv = Titul.get(Titul.id == id)
-    # nazv.name = nm
-    # nazv.vozrast = vz
-    # nazv.data_start = ds
-    # nazv.data_end = de
-    # nazv.mesto = ms
-    # nazv.referee = rf
-    # nazv.kat_ref = kr
-    # nazv.secretary = sk
-    # nazv.kat_sek=ks
-    # nazv.save()
+
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
     # и вызов функции (find_in_rlist)
@@ -472,18 +502,18 @@ my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 my_win.comboBox_sredi.addItems(mylist)
-raz = ("3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
+raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
 my_win.comboBox_razryad.addItems(raz)
 my_win.dateEdit_start.setDate(date.today())  # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_end.setDate(date.today())  #
 
 my_win.pushButton_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
-my_win.pushButton_db.clicked.connect(dbase)  # создание базы данных и таблиц
+# my_win.pushButton_db.clicked.connect(dbase)  # создание базы данных и таблиц
 my_win.pushButton_titul_edit.setEnabled(1)  # выключает кнопку после создания титула
-my_win.pushButton_Rlist.clicked.connect(db_r)  # выбор и загрузка рейтинга
+my_win.pushButton_Rlist.clicked.connect(fill_table_R_list)  # выбор и загрузка рейтинга
 
 my_win.pushButton_titul_made.clicked.connect(titul_made)  # вызов окна диалога выбора изображения для вставки в титул
-my_win.pushButton_titul_edit.clicked.connect(db_select_titul)
+# my_win.pushButton_titul_edit.clicked.connect(db_select_titul)
 my_win.pushButton_sort_R.clicked.connect(sort)
 my_win.pushButton_sort_Name.clicked.connect(sort)
 my_win.pushButton_export.clicked.connect(export)
