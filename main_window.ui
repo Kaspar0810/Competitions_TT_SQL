@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1347</width>
-    <height>754</height>
+    <width>1388</width>
+    <height>895</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>490</y>
-      <width>171</width>
-      <height>131</height>
+      <y>440</y>
+      <width>165</width>
+      <height>148</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -29,58 +29,36 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QPushButton" name="pushButton_view">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>70</y>
-       <width>150</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Просмотр</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_db">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>150</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Создание DB</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_export">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>150</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>экспорт таблицы</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_Rlist">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>100</y>
-       <width>150</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>R-лист</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_export">
+       <property name="text">
+        <string>экспорт таблицы</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_db">
+       <property name="text">
+        <string>Создание DB</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_view">
+       <property name="text">
+        <string>Просмотр</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_Rlist">
+       <property name="text">
+        <string>R-лист</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
@@ -1114,7 +1092,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1347</width>
+     <width>1388</width>
      <height>21</height>
     </rect>
    </property>

@@ -46,8 +46,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self._createAction()
         self._createMenuBar()
+        self._connectActions()
         self.statusbar.showMessage("Ready")
-       # установка таблицы списка спортсменов QtableWidget
+        # установка таблицы списка спортсменов QtableWidget
         self.tableWidget.setColumnCount(8)
         self.tableWidget.setRowCount(1)
         self.tableWidget.verticalHeader().hide()
@@ -58,7 +59,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"]
         self.tableWidget.setHorizontalHeaderLabels(collumn_label)
         self.tableWidget.isSortingEnabled()
-# установка таблицы списка R спортсменов QtableWidget_R_list
+        # установка таблицы списка R спортсменов QtableWidget_R_list
         self.tableWidget_R_list.setColumnCount(5)
         self.tableWidget_R_list.setRowCount(1)
         self.tableWidget_R_list.verticalHeader().hide()
@@ -71,8 +72,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget_R_list.isSortingEnabled()
         self.tableWidget_R_list.hide()
         self.menuBar()
-# ============================
-# создание строки меню
+
+    # ====== создание строки меню ===========
     def _createMenuBar(self):
         menuBar = self.menuBar()
         menuBar.setNativeMenuBar(False)  # разрешает показ менюбара
@@ -85,7 +86,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         rank_Menu.addAction(self.rAction)
         rank_Menu.addAction(self.r1Action)
 
-#  создание действий меню
+    #  создание действий меню
     def _createAction(self):
         self.newAction = QAction(self)
         self.newAction.setText("Создать")
@@ -96,7 +97,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Connect File actions
         self.newAction.triggered.connect(self.newFile)
         # Connect Рейтинг actions
-        self.rAction.triggered.connect(QApplication.exit)
+        self.rAction.triggered.connect(self.r_File)
 
     def newFile(self):
         # Logic for creating a new file goes here...
@@ -106,15 +107,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Logic for creating a new file goes here...
         fill_table_R_list()
 
-
-
-
-
     # def dbase():  # Создание DB и таблиц
     #
     #     with db:
     #         db.create_tables([Titul, R_list, Region, City, Player, R1_list, Coach])
-
 
 
 app = QApplication(sys.argv)
@@ -122,7 +118,24 @@ my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.show()
 
+with db:  # добавляет из таблицы в комбобокс регионы
+    for r in range(1, 86):
+        reg = Region.get(Region.id == r)
+        my_win.comboBox_region.addItem(reg.region)
 
+#  ==== наполнение комбоксов ==========
+kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
+mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
+raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
+
+my_win.comboBox_kategor_ref.addItems(kategoria_list)
+my_win.comboBox_kategor_sek.addItems(kategoria_list)
+my_win.comboBox_sredi.addItems(mylist)
+my_win.comboBox_razryad.addItems(raz)
+
+# ставит сегодняшнюю дату в виджете календарь
+my_win.dateEdit_start.setDate(date.today())
+my_win.dateEdit_end.setDate(date.today())
 
 
 # def dbase():  # Создание DB и таблиц
@@ -179,6 +192,8 @@ def db_r():  # Загружает рейтинг лист в базу данны
     #
     # with db:
     #     R_list.insert_many(data).execute()
+
+
 #  добавляет файл рейтинга за январь
 #     fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R1-листа", "", "Excels files (*01_m.xlsx)")
 #     filepatch = str(fname[0])
@@ -366,6 +381,7 @@ def fill_table_R_list():
 
     my_win.tableWidget_R_list.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
+
 def add_player():  # добавляет игрока в список и базу
     fill_table()
     player_list = Player.select()
@@ -499,7 +515,7 @@ def export():
     pass
 
 
-def sort(self):  #  сортировка таблицы QtableWidget (по рейтингу или по алфавиту)
+def sort(self):  # сортировка таблицы QtableWidget (по рейтингу или по алфавиту)
     sender = my_win.sender()  # сигнал от кнопки
     player_list = Player.select()
     count = len(player_list)  # колличество записей в базе
@@ -512,48 +528,31 @@ def sort(self):  #  сортировка таблицы QtableWidget (по ре�
         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 
 
-with db:  # добавляет из таблицы в комбобокс регионы
-    for r in range(1, 86):
-        reg = Region.get(Region.id == r)
-        my_win.comboBox_region.addItem(reg.region)
-
-
 def handlePreview(self):
     pass
-    # dialog = QtPrintSupport.QPrintPreviewDialog()
-    # dialog.paintRequested.connect(handlePaintRequest)
-    # dialog.exec()
 
 
 def handlePaintRequest(self, printer):
     pass
 
+
 def r_listing():
     pass
 
 
-my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # отслеживает изменение текста в поле поиска
-    # и вызов функции (find_in_rlist)
-my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
-
+# ====== отслеживание изменения текста в полях ============
+my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
+
+my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
 
 my_win.tabWidget.currentChanged.connect(page)
 my_win.toolBox.currentChanged.connect(tab)
 
-kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
-my_win.comboBox_kategor_ref.addItems(kategoria_list)
-my_win.comboBox_kategor_sek.addItems(kategoria_list)
-mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
-my_win.comboBox_sredi.addItems(mylist)
-raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
-my_win.comboBox_razryad.addItems(raz)
-my_win.dateEdit_start.setDate(date.today())  # ставит сегодняшнюю дату в виджете календарь
-my_win.dateEdit_end.setDate(date.today())  #
-
+# =======  срабатывание кнопок =========
 my_win.pushButton_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 # my_win.pushButton_db.clicked.connect(dbase)  # создание базы данных и таблиц
-my_win.pushButton_titul_edit.setEnabled(1)  # выключает кнопку после создания титула
+my_win.pushButton_titul_edit.setEnabled(False)  # выключает кнопку после создания титула
 my_win.pushButton_Rlist.clicked.connect(fill_table_R_list)  # выбор и загрузка рейтинга
 
 my_win.pushButton_titul_made.clicked.connect(titul_made)  # вызов окна диалога выбора изображения для вставки в титул
@@ -563,8 +562,5 @@ my_win.pushButton_sort_Name.clicked.connect(sort)
 my_win.pushButton_export.clicked.connect(export)
 my_win.pushButton_titul_edit.clicked.connect(titul_update)
 my_win.pushButton_view.clicked.connect(handlePreview)
-
-
-
 
 sys.exit(app.exec())
