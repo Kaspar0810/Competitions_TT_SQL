@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>570</y>
+      <y>490</y>
       <width>171</width>
       <height>131</height>
      </rect>
@@ -88,7 +88,7 @@
       <x>190</x>
       <y>250</y>
       <width>821</width>
-      <height>451</height>
+      <height>371</height>
      </rect>
     </property>
     <property name="layoutDirection">
@@ -1034,7 +1034,7 @@
       <x>200</x>
       <y>261</y>
       <width>801</width>
-      <height>431</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="font">
@@ -1080,7 +1080,7 @@
       <x>1020</x>
       <y>0</y>
       <width>321</width>
-      <height>701</height>
+      <height>621</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -1096,7 +1096,7 @@
       <x>200</x>
       <y>260</y>
       <width>801</width>
-      <height>431</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="font">
@@ -1108,17 +1108,26 @@
     </property>
    </widget>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>1347</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Times New Roman</family>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

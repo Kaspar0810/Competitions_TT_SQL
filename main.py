@@ -38,12 +38,16 @@ pdf = FPDF()
 
 # Создаем собственный класс MainWindow, унаследованный от класса графического интерфейса Mainwindow
 # и класса QMainWindow
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None, *args, **kwargs):
         QMainWindow.__init__(self)
         self.setupUi(self)
-# установка таблицы списка спортсменов QtableWidget
+        self._createAction()
+        self._createMenuBar()
+        self.statusbar.showMessage("Ready")
+       # установка таблицы списка спортсменов QtableWidget
         self.tableWidget.setColumnCount(8)
         self.tableWidget.setRowCount(1)
         self.tableWidget.verticalHeader().hide()
@@ -66,10 +70,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget_R_list.setHorizontalHeaderLabels(collumn_label)
         self.tableWidget_R_list.isSortingEnabled()
         self.tableWidget_R_list.hide()
-        def dbase():  # Создание DB и таблиц
+        self.menuBar()
+# ============================
+# создание строки меню
+    def _createMenuBar(self):
+        menuBar = self.menuBar()
+        menuBar.setNativeMenuBar(False)  # разрешает показ менюбара
+        # меню Соревнования
+        fileMenu = QMenu("Соревнования", self)
+        menuBar.addMenu(fileMenu)
+        fileMenu.addAction(self.newAction)
+        # меню Рейтинг
+        rank_Menu = menuBar.addMenu("Рейтинг")
+        rank_Menu.addAction(self.rAction)
+        rank_Menu.addAction(self.r1Action)
 
-            with db:
-                db.create_tables([Titul, R_list, Region, City, Player, R1_list, Coach])
+#  создание действий меню
+    def _createAction(self):
+        self.newAction = QAction(self)
+        self.newAction.setText("Создать")
+        self.rAction = QAction("Текущий рейтинг")
+        self.r1Action = QAction("Рейтинг за январь", self)
+
+    def _connectActions(self):
+        # Connect File actions
+        self.newAction.triggered.connect(self.newFile)
+        # Connect Рейтинг actions
+        self.rAction.triggered.connect(QApplication.exit)
+
+    def newFile(self):
+        # Logic for creating a new file goes here...
+        my_win.textEdit.setText("Нажата кнопка меню соревнования")
+
+    def r_File(self):
+        # Logic for creating a new file goes here...
+        fill_table_R_list()
+
+
+
+
+
+    # def dbase():  # Создание DB и таблиц
+    #
+    #     with db:
+    #         db.create_tables([Titul, R_list, Region, City, Player, R1_list, Coach])
 
 
 
@@ -519,6 +563,8 @@ my_win.pushButton_sort_Name.clicked.connect(sort)
 my_win.pushButton_export.clicked.connect(export)
 my_win.pushButton_titul_edit.clicked.connect(titul_update)
 my_win.pushButton_view.clicked.connect(handlePreview)
+
+
 
 
 sys.exit(app.exec())
