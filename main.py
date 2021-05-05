@@ -19,6 +19,8 @@ if __name__ == '__main__':
 import sys
 import openpyxl as op
 
+
+
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from PyQt6.QtWidgets import *
 from PyQt6.Qt import *
@@ -26,15 +28,37 @@ from PyQt6.QtGui import *
 # from PyQt6.QtCore import pyqtSignal, QObject, QEvent
 from datetime import *
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
-from fpdf import FPDF
 from models import *
 
-# from csv import reader
+from reportlab.pdfgen.canvas import Canvas
+from reportlab.lib.units import inch, cm
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import Paragraph, Table, TableStyle, Image
+enc = 'UTF-8'
 
-
-FPDF.SYSTEM_TTFONTS = '/library/fonts'
-pdf = FPDF()
-
+TTFSearchPath = (
+            'c:/winnt/fonts',
+            'c:/windows/fonts',
+            '%(REPORTLAB_DIR)s/fonts',      #special
+            '%(REPORTLAB_DIR)s/../fonts',   #special
+            '%(REPORTLAB_DIR)s/../../fonts',#special
+            '%(CWD)s/fonts',                #special
+            '~/fonts',
+            '~/.fonts',
+            '%(XDG_DATA_HOME)s/fonts',
+            '~/.local/share/fonts',
+            #mac os X - from
+            '~/Library/Fonts',
+            '/Library/Fonts',
+            '/System/Library/Fonts',
+            )
+pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf', enc))
+pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf', enc))
+pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
 
 # Создаем собственный класс MainWindow, унаследованный от класса графического интерфейса Mainwindow
 # и класса QMainWindow
@@ -44,6 +68,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, *args, **kwargs):
         QMainWindow.__init__(self)
         self.setupUi(self)
+        # self.setMinimumSize(1440, 800)
         self._createAction()
         self._createMenuBar()
         self._connectActions()
@@ -63,7 +88,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget_R_list.setColumnCount(5)
         self.tableWidget_R_list.setRowCount(1)
         self.tableWidget_R_list.verticalHeader().hide()
-        for i in range(0, 6):  # закрашивает заголовки таблиц зеленым цветом
+        for i in range(0, 6):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
             item = QtWidgets.QTableWidgetItem()
             item.setBackground(QtGui.QColor(0, 255, 150))
             self.tableWidget_R_list.setHorizontalHeaderItem(i, item)
@@ -72,6 +97,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget_R_list.isSortingEnabled()
         self.tableWidget_R_list.hide()
         self.menuBar()
+    #  размещение виджета в правой стороне
+    #     self.centralwidget = QWidget()
+    #     self.setCentralWidget(self.centralwidget)
+    #     self.grid = QGridLayout(self.centralwidget)
+    #
+    #     # self.grid.setSpacing(10)
+    #     self.grid.addWidget(self.toolBox, 0, 0, 20, 1)
+    #     self.grid.addWidget(self.frame_main, 21, 0, 6, 1)
+    #     self.grid.addWidget(self.tabWidget, 0, 2, 10, 3)
+    #     self.grid.addWidget(self.frame_table, 11, 2, 16, 3)
+    #     self.grid.addWidget(self.frame_score, 0, 6, 28, 3)
+
 
     # ====== создание строки меню ===========
     def _createMenuBar(self):
@@ -105,12 +142,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def r_File(self):
         # Logic for creating a new file goes here...
+        self.statusbar.showMessage("Загружен рейтинг-лист на ткеуий месяц")
         fill_table_R_list()
-
-    # def dbase():  # Создание DB и таблиц
-    #
-    #     with db:
-    #         db.create_tables([Titul, R_list, Region, City, Player, R1_list, Coach])
 
 
 app = QApplication(sys.argv)
@@ -118,10 +151,6 @@ my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.show()
 
-with db:  # добавляет из таблицы в комбобокс регионы
-    for r in range(1, 86):
-        reg = Region.get(Region.id == r)
-        my_win.comboBox_region.addItem(reg.region)
 
 #  ==== наполнение комбоксов ==========
 kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
@@ -138,132 +167,146 @@ my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
 
 
-# def dbase():  # Создание DB и таблиц
-#
-#     with db:
-#         db.create_tables([Titul, R_list, Region, City, Player, R1_list, Coach])
-
-
-def db_insert_titul():  # Вставляем запись в таблицу титул
+def dbase():
+    """Создание DB и таблиц"""
 
     with db:
-        nazv = Titul(name=nm, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
+        db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach])
+
+    db_r()
+
+
+def db_insert_title():
+    """Вставляем запись в таблицу титул"""
+    with db:
+        nazv = Title(name=nm, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
                      kat_ref=kr, secretary=sk, kat_sek=ks).save()
 
 
-def db_select_titul():  # извлекаем из таблицы данные и заполняем поля титула для редактирования
-
+def db_select_title():
+    """извлекаем из таблицы данные и заполняем поля титула для редактирования или просмотра"""
     with db:
-        tituls = Titul.get(Titul.id == 1)
-        my_win.lineEdit_titul_nazvanie.setText(tituls.name)
-        my_win.lineEdit_titul_vozrast.setText(tituls.vozrast)
-        my_win.dateEdit_start.setDate(tituls.data_start)
-        my_win.dateEdit_end.setDate(tituls.data_end)
-        my_win.lineEdit_city_titul.setText(tituls.mesto)
-        my_win.lineEdit_refery.setText(tituls.referee)
-        my_win.comboBox_kategor_ref.setCurrentText(tituls.kat_ref)
-        my_win.lineEdit_sekretar.setText(tituls.secretary)
-        my_win.comboBox_kategor_sek.setCurrentText(tituls.kat_sek)
+        titles = Title.get(Title.id == 1)
+        my_win.lineEdit_title_nazvanie.setText(titles.name)
+        my_win.lineEdit_title_vozrast.setText(titles.vozrast)
+        my_win.dateEdit_start.setDate(titles.data_start)
+        my_win.dateEdit_end.setDate(titles.data_end)
+        my_win.lineEdit_city_title.setText(titles.mesto)
+        my_win.lineEdit_refery.setText(titles.referee)
+        my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
+        my_win.lineEdit_sekretar.setText(titles.secretary)
+        my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
 
 
-def db_r():  # Загружает рейтинг лист в базу данных
-    pass
-    # fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
-    # filepatch = str(fname[0])
-    # rp = filepatch.rindex("/")
-    # RPath = filepatch[rp + 1: len(filepatch)]
-    # wb = op.load_workbook(RPath)
-    # s = wb.sheetnames[0]
-    # sheet = wb[s]
-    # for r in range(2, 4500):
-    #     if sheet.cell(row=r, column=2).value is None:
-    #         break
+def load_listR_in_db(table_db, fname):
+    """при отсутсвии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
+    если выбор был сделан загружает в базу данных"""
+    filepatch = str(fname[0])
+    if table_db == R_list:
+        message = "Вы не выбрали файл с текущим рейтингом!" \
+                  "если хотите выйти, нажмите <Ок>" \
+                  "если хотите вернуться, нажмите <Отмена>"
+    else:
+        message = "Вы не выбрали файл с январским рейтингом!" \
+                  "если хотите выйти, нажмите <Ок>" \
+                  "если хотите вернуться, нажмите <Отмена>"
 
-    # rows = r - 1
-    # data = []
-    #
-    # for i in range(2, rows):
-    #     A = sheet['A%s' % i].value
-    #     B = sheet['B%s' % i].value
-    #     C = sheet['C%s' % i].value
-    #     D = sheet['D%s' % i].value
-    #     E = sheet['E%s' % i].value
-    #     data.append([A, B, C, D, E])
-    #
-    # with db:
-    #     R_list.insert_many(data).execute()
+    if filepatch == "":
+        reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
+                                                  QtWidgets.QMessageBox.StandardButtons.Ok,
+                                                  QtWidgets.QMessageBox.StandardButtons.Cancel)
+        if reply == QMessageBox.StandardButtons.Ok:
+            return
+        else:
+            db_r(table_db=R1_list)
+    else:
+        rp = filepatch.rindex("/")
+        RPath = filepatch[rp + 1: len(filepatch)]
+        wb = op.load_workbook(RPath)
+        s = wb.sheetnames[0]
+        sheet = wb[s]
+        for r in range(2, 4500):
+            if sheet.cell(row=r, column=2).value is None:
+                break
+        data = []
+
+        for i in range(2, r):
+            A = sheet['A%s' % i].value
+            B = sheet['B%s' % i].value
+            C = sheet['C%s' % i].value
+            D = sheet['D%s' % i].value
+            E = sheet['E%s' % i].value
+            data.append([A, B, C, D, E])
+
+        with db:
+            table_db.insert_many(data).execute()
 
 
-#  добавляет файл рейтинга за январь
-#     fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R1-листа", "", "Excels files (*01_m.xlsx)")
-#     filepatch = str(fname[0])
-#     rp = filepatch.rindex("/")
-#     RPath = filepatch[rp + 1: len(filepatch)]
-#     wb = op.load_workbook(RPath)
-#     s = wb.sheetnames[0]
-#     sheet = wb[s]
-#     for r in range(2, 4500):
-#         if sheet.cell(row=r, column=2).value is None:
-#             break
-#
-#     rows = r - 1
-#     data = []
-#
-#     for i in range(2, rows):
-#         A = sheet['A%s' % i].value
-#         B = sheet['B%s' % i].value
-#         C = sheet['C%s' % i].value
-#         D = sheet['D%s' % i].value
-#         E = sheet['E%s' % i].value
-#         data.append([A, B, C, D, E])
-#
-#     with db:
-#         R1_list.insert_many(data).execute()
+def db_r(table_db=R_list):
+    """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
+     а потом загружает список регионов базу данных"""
+    if table_db == R_list:
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
+        load_listR_in_db(table_db, fname)
+        my_win.statusbar.showMessage("Текущий рейтинг загружен")
+        table_db = R1_list
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
+        load_listR_in_db(table_db, fname)
+        my_win.statusbar.showMessage("Текущий рейтинг загружен")
+    else:
+        table_db = R1_list
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
+        load_listR_in_db(table_db, fname)
+        my_win.statusbar.showMessage("Текущий рейтинг загружен")
 
-#  добавляет в таблицу регионы
-#     reg = []
-#
-#     for i in range(1, 86):
-#         A = sheet['B%s' % i].value
-#
-#         reg.append([A])
-#     with db:
-#         Region.insert_many(reg).execute()
+    # добавляет в таблицу регионы
+    wb = op.load_workbook("регионы.xlsx")
+    s = wb.sheetnames[0]
+    sheet = wb[s]
+    reg = []
+    for i in range(1, 86):
+        A = sheet['B%s' % i].value
+        reg.append([A])
+    with db:
+        Region.insert_many(reg).execute()
 
-def titul_stroka():  # переменные строк титульного листа
+
+def title_string():  # переменные строк титульного листа
     global nm, vz, ds, de, ms, rf, kr, sk, ks
 
-    nm = my_win.lineEdit_titul_nazvanie.text()
-    vz = my_win.lineEdit_titul_vozrast.text()
+    nm = my_win.lineEdit_title_nazvanie.text()
+    vz = my_win.lineEdit_title_vozrast.text()
     ds = my_win.dateEdit_start.text()
     de = my_win.dateEdit_end.text()
-    ms = my_win.lineEdit_city_titul.text()
+    ms = my_win.lineEdit_city_title.text()
     rf = my_win.lineEdit_refery.text()
     sk = my_win.lineEdit_sekretar.text()
     kr = my_win.comboBox_kategor_ref.currentText()
     ks = my_win.comboBox_kategor_sek.currentText()
 
 
-def titul_made():  # создание тильного листа соревнования
-    age = my_win.lineEdit_titul_vozrast.text()
+def title_made():
+    """создание тильного листа соревнования"""
+    age = my_win.lineEdit_title_vozrast.text()
     p = age.count(" ")
     if p == 2:
         god = int(age[3:5])
         age = date.today().year - (god - 1)  # год рождения и младше могут играть
     elif p == 4:
         age = int(age[0:5])  # год рождения и младше могут играть
-    titul_stroka()
+    title_string()
     # dbase()
-    db_insert_titul()
-    titul_pdf()
-    my_win.pushButton_titul_made.setEnabled(0)  # после заполнения титула выключает кнопку
-    my_win.pushButton_titul_edit.setEnabled(1)
+    # db_insert_title()
+    title_pdf()
+    my_win.Button_title_made.setEnabled(0)  # после заполнения титула выключает кнопку
+    my_win.Button_title_edit.setEnabled(1)
 
 
-def titul_update():  # обновляет запись титула
+def title_update():
+    """обновляет запись титула, если был он изменен"""
 
-    titul_stroka()
-    nazv = Titul.get(Titul.id == 1)
+    title_string()
+    nazv = Title.get(Title.id == 1)
     nazv.name = nm
     nazv.vozrast = vz
     nazv.data_start = ds
@@ -276,34 +319,8 @@ def titul_update():  # обновляет запись титула
     nazv.save()
 
 
-def titul_pdf():  # сохранение в PDF формате титульной страницы
-
-    pdf = FPDF()
-    pdf.add_page()
-    message = "Хотите добавить изображение в титульный лист?"
-    reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
-                                           QtWidgets.QMessageBox.StandardButtons.Yes,
-                                           QtWidgets.QMessageBox.StandardButtons.No)
-    if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать изображение", "/desktop", "Image files (*.jpg, *.png)")
-        filepatch = str(fname[0])
-        pdf.image(filepatch, x=80, y=100)
-
-    pdf.add_font('DejaVu', '', 'DejaVuSerif.ttf', uni=True)
-    pdf.set_font("DejaVu", "", 10)
-    pdf.cell(200, 10, txt='Федерация настольного тенниса России', ln=1, align="C")
-    pdf.cell(200, 10, txt='Федерация настольного тенниса Нижегородской области', ln=2, align="C")
-    pdf.ln(20)  # ниже на 20 строк
-    pdf.add_font('DejaVu', '', 'DejaVuSerif-Italic.ttf', uni=True)
-    pdf.set_font("DejaVu", "", 22)
-    pdf.cell(200, 10, txt=my_win.lineEdit_titul_nazvanie.text(), ln=23, align="C")
-    pdf.add_font('DejaVu', 'I', 'DejaVuSerif-Italic.ttf', uni=True)
-    pdf.set_font("DejaVu", "", 18)
-    stroka_2 = ("среди " + my_win.comboBox_sredi.currentText() + " " + my_win.lineEdit_titul_vozrast.text())
-    pdf.cell(200, 10, txt=stroka_2, ln=0, align="C")
-    pdf.set_font("DejaVu", "", 14)
-    pdf.ln(150)
-    pdf.cell(200, 10, txt="г. " + my_win.lineEdit_city.text(), ln=174, align="c")
+def data_title_string(string_data):
+    """получение строки начало и конец соревнований для вставки в титульный лист"""
     months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа",
                    "сентября", "октября", "ноября", "декабря")
     datastart = my_win.dateEdit_start.text()
@@ -318,15 +335,40 @@ def titul_pdf():  # сохранение в PDF формате титульно�
     month_end = months_list[me - 1]
     if de > ds:  # получаем строку начало и конец соревнования в
         # одном месяце или два месяца если начало и конец в разных месяцах
-        stroka_data = str(ds) + " - " + str(de) + " " + month_st + " " + str(ys) + " г."
+        string_data = str(ds) + " - " + str(de) + " " + month_st + " " + str(ys) + " г."
     else:
         month_end = months_list[me - 1]
-        stroka_data = str(ds) + " " + month_st + " - " + str(de) + " " + month_end + " " + str(ys) + " г."
-    pdf.cell(200, 10, txt=stroka_data, ln=0, align="C")
-    pdf.output("titul.pdf")
+        string_data = str(ds) + " " + month_st + " - " + str(de) + " " + month_end + " " + str(ys) + " г."
+    return string_data
+
+def title_pdf(string_data):
+    """сохранение в PDF формате титульной страницы"""
+    canvas = Canvas("Title.pdf", pagesize=A4)
+    message = "Хотите добавить изображение в титульный лист?"
+    reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
+                                           QtWidgets.QMessageBox.StandardButtons.Yes,
+                                           QtWidgets.QMessageBox.StandardButtons.No)
+    if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать изображение", "/desktop", "Image files (*.jpg, *.png)")
+        filepatch = str(fname[0])
+
+    canvas.setFont("DejaVuSerif-Italic", 14)
+    canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
+    canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
+    canvas.setFont("DejaVuSerif-Italic", 20)
+    canvas.drawString(2 * cm, 23 * cm, my_win.lineEdit_title_nazvanie.text())
+    canvas.setFont("DejaVuSerif-Italic", 16)
+    canvas.drawString(2.5 * cm, 22 * cm, "среди " + my_win.comboBox_sredi.currentText() + " " + my_win.lineEdit_title_vozrast.text())
+    canvas.drawImage(filepatch, 7 * cm, 12 * cm, 6.9 * cm, 4.9 * cm)
+    canvas.setFont("DejaVuSerif-Italic", 14)
+    canvas.drawString(5.5 * cm, 5 * cm, "г. " + my_win.lineEdit_city_title.text() + " Нижегородская область")
+    canvas.drawString(7.5 * cm, 4 * cm, data_title_string(string_data))
+    # canvas.showPage()
+    canvas.save()
 
 
-def find_in_rlist(fp):  # поиск спортсмена в R-листе
+def find_in_rlist():
+    """при создании списка участников ищет спортсмена в текущем R-листе"""
     my_win.listWidget.clear()
     my_win.textEdit.clear()
     fp = my_win.lineEdit_Family_name.text()
@@ -341,7 +383,8 @@ def find_in_rlist(fp):  # поиск спортсмена в R-листе
             my_win.listWidget.addItem(full_stroka)
 
 
-def fill_table():  # заполняет таблицу QtableWidget спортсменами из db
+def fill_table():
+    """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
     player_list = Player.select()
     count = len(player_list)  # колличество записей в базе
     my_win.tableWidget.setRowCount(count)
@@ -363,6 +406,7 @@ def fill_table():  # заполняет таблицу QtableWidget спортс
 
 
 def fill_table_R_list():
+    """заполняет таблицу списком из текущего рейтинг листа"""
     my_win.tableWidget.hide()
     my_win.tableWidget_R_list.show()
     player_rlist = R_list.select()
@@ -382,7 +426,8 @@ def fill_table_R_list():
     my_win.tableWidget_R_list.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
-def add_player():  # добавляет игрока в список и базу
+def add_player():
+    """добавляет игрока в список и базу данных"""
     fill_table()
     player_list = Player.select()
     count = len(player_list)
@@ -418,8 +463,8 @@ def add_player():  # добавляет игрока в список и базу
     my_win.tableWidget.resizeColumnsToContents()
 
 
-def dclick_in_listwidget():  # Находит фамилию в рейтинге или фамилию тренера
-    # и загружают в соответсвующие поля списка
+def dclick_in_listwidget():
+    """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""
     text = my_win.listWidget.currentItem().text()
     tc = my_win.lineEdit_coach.text()  # если строка "тренер" пустая значит заполняются поля игрока
     if tc == "":
@@ -450,29 +495,43 @@ def dclick_in_listwidget():  # Находит фамилию в рейтинге
         my_win.listWidget.clear()
 
 
-def tab(tw):  # Изменяет вкладку tabWidget в зависимости от вкладки toolBox
+def tab():
+    """Изменяет вкладку tabWidget в зависимости от вкладки toolBox"""
+    tw = my_win.tabWidget.currentIndex()
+    tb = my_win.toolBox.currentIndex()
+    if tw == tb:
+        return
+    else:
+        my_win.tabWidget.setCurrentIndex(tw)
 
-    if tw == 0:
-        db_select_titul()
-    my_win.tabWidget.setCurrentIndex(tw)
-    if tw == 1:
-        my_win.tableWidget.show()
-        my_win.tableWidget_R_list.hide()
-        fill_table()
-
-
-def page(tb):  # Изменяет вкладку toolBox в зависимости от вкладки tabWidget
-
-    if tb == 0:
-        db_select_titul()
-    my_win.toolBox.setCurrentIndex(tb)
-    if tb == 1:
-        my_win.tableWidget.show()
-        my_win.tableWidget_R_list.hide()
-        fill_table()
+        if tw == 0:
+            db_select_title()
+        if tw == 1:
+            my_win.tableWidget.show()
+            my_win.tableWidget_R_list.hide()
+            fill_table()
+        my_win.toolBox.setCurrentIndex(tw)
 
 
-def add_city():  # добавляет в таблицу города и регионы
+def page():
+    """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
+    tw = my_win.tabWidget.currentIndex()
+    tb = my_win.toolBox.currentIndex()
+    if tb == tw:
+        return
+    else:
+        my_win.toolBox.setCurrentIndex(tb)
+        if tb == 0:
+            db_select_title()
+        if tb == 1:
+            my_win.tableWidget.show()
+            my_win.tableWidget_R_list.hide()
+            fill_table()
+        my_win.tabWidget.setCurrentIndex(tb)
+
+
+def add_city():
+    """добавляет в таблицу город и соответсвующий ему регион"""
     ci = my_win.lineEdit_city_list.text()
     c = City.select()  # находит город и соответсвующий ему регион
     c = c.where(City.city ** f'{ci}')  # like
@@ -515,11 +574,12 @@ def export():
     pass
 
 
-def sort(self):  # сортировка таблицы QtableWidget (по рейтингу или по алфавиту)
+def sort(self):
+    """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
     player_list = Player.select()
     count = len(player_list)  # колличество записей в базе
-    if sender == my_win.pushButton_sort_R:  # в зависимости от сигала кнопки идет сортировка
+    if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
         my_win.tableWidget.sortItems(3, QtCore.Qt.SortOrder.DescendingOrder)  # сортировка  Я-А 3-ого столбца
     else:
         my_win.tableWidget.sortItems(1, QtCore.Qt.SortOrder.AscendingOrder)  # сортировка  А-Я 1-ого столбца
@@ -528,39 +588,26 @@ def sort(self):  # сортировка таблицы QtableWidget (по рей
         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 
 
-def handlePreview(self):
-    pass
-
-
-def handlePaintRequest(self, printer):
-    pass
-
-
-def r_listing():
-    pass
-
-
 # ====== отслеживание изменения текста в полях ============
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
 
-my_win.tabWidget.currentChanged.connect(page)
-my_win.toolBox.currentChanged.connect(tab)
+my_win.tabWidget.currentChanged.connect(tab)
+my_win.toolBox.currentChanged.connect(page)
 
 # =======  срабатывание кнопок =========
-my_win.pushButton_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
-# my_win.pushButton_db.clicked.connect(dbase)  # создание базы данных и таблиц
-my_win.pushButton_titul_edit.setEnabled(False)  # выключает кнопку после создания титула
-my_win.pushButton_Rlist.clicked.connect(fill_table_R_list)  # выбор и загрузка рейтинга
+my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
+my_win.Button_db.clicked.connect(db_r)  # создание базы данных и таблиц
+my_win.Button_title_edit.setEnabled(True)  # выключает кнопку после создания титула
 
-my_win.pushButton_titul_made.clicked.connect(titul_made)  # вызов окна диалога выбора изображения для вставки в титул
-# my_win.pushButton_titul_edit.clicked.connect(db_select_titul)
-my_win.pushButton_sort_R.clicked.connect(sort)
-my_win.pushButton_sort_Name.clicked.connect(sort)
-my_win.pushButton_export.clicked.connect(export)
-my_win.pushButton_titul_edit.clicked.connect(titul_update)
-my_win.pushButton_view.clicked.connect(handlePreview)
+my_win.Button_title_made.clicked.connect(title_made)  # вызов окна диалога выбора изображения для вставки в титул
+# my_win.Button_title_edit.clicked.connect(db_select_title)
+my_win.Button_sort_R.clicked.connect(sort)
+my_win.Button_sort_Name.clicked.connect(sort)
+my_win.Button_export.clicked.connect(export)
+my_win.Button_title_edit.clicked.connect(title_pdf)
+# my_win.Button_view.clicked.connect(handlePreview)
 
 sys.exit(app.exec())

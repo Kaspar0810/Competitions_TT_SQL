@@ -11,7 +11,7 @@ class BaseModel(Model):
         database = db
 
 
-class Titul(BaseModel):
+class Title(BaseModel):
     name = CharField()
     vozrast = CharField()
     data_start = DateField()
@@ -23,7 +23,7 @@ class Titul(BaseModel):
     kat_sek = CharField(10)
 
     class Meta:
-        db_table = "tituls"
+        db_table = "titles"
 
 
 class Coach(BaseModel):
@@ -54,11 +54,23 @@ class R_list(BaseModel):
     r_list = IntegerField()
     r_fname = CharField(50)
     r_bithday = DateField()
-    r_city = CharField(0)
+    r_city = CharField(30)
 
     class Meta:
         db_table = "r_lists"
         order_by = "r_fname"
+
+
+class R1_list(BaseModel):
+    r1_number = IntegerField()
+    r1_list = IntegerField()
+    r1_fname = CharField(50)
+    r1_bithday = DateField()
+    r1_city = CharField(30)
+
+    class Meta:
+        db_table = "r1_lists"
+        order_by = "r1_fname"
 
 
 class Region(BaseModel):
@@ -78,15 +90,6 @@ class City(BaseModel):
         order_by = "city"
 
 
-class R1_list(BaseModel):
-    r1_number_ = IntegerField()
-    r1_list = IntegerField()
-    r1_fname = CharField(50)
-    r1_bithday = DateField()
-    r1_city = CharField(0)
 
-    class Meta:
-        db_table = "r1_lists"
-        order_by = "r1_fname"
 
 
