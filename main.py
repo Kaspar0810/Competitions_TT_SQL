@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
 import sys
 import openpyxl as op
-
+import pdf
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from PyQt6.QtWidgets import *
@@ -26,13 +26,20 @@ from PyQt6.QtGui import *
 from datetime import *
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
 from models import *
+from pdf import *
 
 from reportlab.pdfgen.canvas import Canvas
-from reportlab.lib.units import inch, cm
+from reportlab.lib.units import cm
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import Paragraph, Table, TableStyle, Image
+from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate
+from reportlab.lib import colors
+from reportlab.platypus.tableofcontents import TableOfContents
+from reportlab.lib.styles import ParagraphStyle as PS
+from reportlab.platypus import PageBreak
+from reportlab.pdfbase.pdfmetrics import registerFontFamily
+registerFontFamily('DejaVuSerif', normal='DejaVuSerif', bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
 enc = 'UTF-8'
 
 TTFSearchPath = (
@@ -65,11 +72,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None, *args, **kwargs):
         QMainWindow.__init__(self)
         self.setupUi(self)
-        # self.setMinimumSize(1440, 800)
+
         self._createAction()
         self._createMenuBar()
         self._connectActions()
-        self.statusbar.showMessage("Ready")
+
         # установка таблицы списка спортсменов QtableWidget
         self.tableWidget.setColumnCount(8)
         self.tableWidget.setRowCount(1)
@@ -96,7 +103,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.menuBar()
 
         self.Button_title_made.setEnabled(False)
-        self.Button_title_edit.setEnabled(False)
+
+        self.tabWidget.setCurrentIndex(0)
+        self.toolBox.setCurrentIndex(0)
+
     #  размещение виджета в правой стороне
     #     self.centralwidget = QWidget()
     #     self.setCentralWidget(self.centralwidget)
@@ -118,6 +128,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fileMenu = QMenu("Соревнования", self)
         menuBar.addMenu(fileMenu)
         fileMenu.addAction(self.newAction)
+        # меню Редактировать
+        edit_Menu = menuBar.addMenu("Редактировать")
+        #  создание подменю
+        ed_Menu = edit_Menu.addMenu("Редактор")
+        ed_Menu.addAction(self.title_Action)
+        ed_Menu.addAction(self.list_Action)
+        find_Menu = edit_Menu.addMenu("Поиск")
+        find_Menu.addAction(self.find_r_Action)
+        find_Menu.addAction(self.find_r1_Action)
+
         # меню Рейтинг
         rank_Menu = menuBar.addMenu("Рейтинг")
         rank_Menu.addAction(self.rAction)
@@ -129,6 +149,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.newAction.setText("Создать")
         self.rAction = QAction("Текущий рейтинг")
         self.r1Action = QAction("Рейтинг за январь")
+        self.title_Action = QAction("Титульный лист")  # В подменю редактор
+        self.list_Action = QAction("Список участников")
+        self.find_r_Action = QAction("Поиск в текущем рейтинге")  # В подменю поиск
+        self.find_r1_Action = QAction("Поиск в январском рейтинге")
 
     def _connectActions(self):
         # Connect File actions
@@ -180,6 +204,7 @@ my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
 
 
+
 def dbase():
     """Создание DB и таблиц"""
     with db:
@@ -208,6 +233,9 @@ def db_select_title():
         my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
         my_win.lineEdit_sekretar.setText(titles.secretary)
         my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
+
+
+db_select_title()  # при запуске заполняет титул данными из таблицы
 
 
 def load_listR_in_db(table_db, fname):
@@ -311,7 +339,6 @@ def title_made():
     # db_insert_title()
     title_pdf()
     my_win.Button_title_made.setEnabled(False)  # после заполнения титула выключает кнопку
-    my_win.Button_title_edit.setEnabled(1)
 
 
 def title_update():
@@ -352,6 +379,7 @@ def data_title_string(string_data):
         month_end = months_list[me - 1]
         string_data = str(ds) + " " + month_st + " - " + str(de) + " " + month_end + " " + str(ys) + " г."
     return string_data
+
 
 def title_pdf(string_data):
     """сохранение в PDF формате титульной страницы"""
@@ -426,6 +454,7 @@ def fill_table():
         listC = Coach.get(Coach.id == list.coach_id)
         my_win.tableWidget.setItem(k, 7, QTableWidgetItem(listC.coach))
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+    table_pdf()
 
 
 def fill_table_R_list():
@@ -468,6 +497,7 @@ def fill_table_R1_list():
         my_win.tableWidget_R_list.setItem(k, 4, QTableWidgetItem(listR.r1_city))
 
     my_win.tableWidget_R_list.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+
 
 def add_player():
     """добавляет игрока в список и базу данных"""
@@ -620,6 +650,11 @@ def add_coach(ch, num):
             cch = Coach(coach=ch, player_id=num).save()
 
 
+def find_player_in_R():
+    """если есть необходимость в поиске игрок в рейтинг листах январском или текущем"""
+    pass
+
+
 def sort(self):
     """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
@@ -642,15 +677,54 @@ def button_title_made_enable(state):
         my_win.Button_title_made.setEnabled(False)
 
 
-def button_title_edit_enable(state):
-    """включает кнопку - редактирование титула - если отмечен чекбокс, защита от случайного нажатия"""
-    if state == 2:  # если флажок установлен
-        my_win.Button_title_edit.setEnabled(True)
-        tab()
-    else:
-        my_win.Button_title_edit.setEnabled(False)
+def table_pdf():
+    """создание списка учстников в pdf файл"""
 
-# ====== отслеживание изменения текста в полях ============
+    doc = SimpleDocTemplate("table_list.pdf", pagesize=A4)
+
+    story = []  # Список данных таблицы участников
+    elements = []  # Список Заголовки столбцов таблицы
+    player_list = Player.select()
+    count = len(player_list)  # колличество записей в базе
+    kp = count + 1
+    my_win.tableWidget.setRowCount(count)
+
+    for k in range(0, count):  # цикл по списку по строкам
+        n = my_win.tableWidget.item(k, 0).text()
+        p = my_win.tableWidget.item(k, 1).text()
+        b = my_win.tableWidget.item(k, 2).text()
+        c = my_win.tableWidget.item(k, 3).text()
+        g = my_win.tableWidget.item(k, 4).text()
+        z = my_win.tableWidget.item(k, 5).text()
+        t = my_win.tableWidget.item(k, 6).text()
+        q = my_win.tableWidget.item(k, 7).text()
+
+        data = [n, p, b, c, g, z, t, q]
+        elements.append(data)
+    elements.insert(0, ["№", "Фамилия, Имя", "Дата рождени ", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"])
+    t = Table(elements, 8 * [2 * cm], kp * [0.8 * cm])  # количество столбцов и строк таблицы
+    t = Table(elements, colWidths=(None, None, None, None, None, None, None, None))  #  ширина столбцов, если None-автомтическая
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                           ('FONTSIZE', (0, 0), (-1, -1), 8),  # Использую импортированный шрифта размер
+                           ('BACKGROUND', (0, 0), (-1, kp * -1), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (-1, kp * -1), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                           ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),  # цвет и толщину внутренних линий
+                           ('BOX', (0, 0), (-1, -1), 0.25, colors.black)  # внешние границы таблицы
+                           ]))
+    h1 = PS("normal", fontSize=14, fontName="DejaVuSerif-Italic", leftIndent=0, firstLineIndent=-20)  # стиль параграфа
+    h1.spaceAfter = 10  # промежуток после заголовка
+    h1.spaceBefore = 0
+    h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50, firstLineIndent=-20)  # стиль параграфа
+    h2.spaceAfter = 20  # промежуток после заголовка
+
+    story.append(Paragraph("Всероссийский турнир Будущее России", h1))
+    story.append(Paragraph('Список участников', h2))
+    story.append(t)
+    doc.multiBuild(story)
+
+  # ====== отслеживание изменения текста в полях ============
+
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 
@@ -661,17 +735,14 @@ my_win.toolBox.currentChanged.connect(page)
 
 # =======  срабатывание кнопок =========
 my_win.checkBox.stateChanged.connect(button_title_made_enable)
-my_win.checkBox_edit.stateChanged.connect(button_title_edit_enable)
+# my_win.Button_export.clicked.connect(exporter)
 
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 
 my_win.Button_title_made.clicked.connect(title_made)  # вызов окна диалога выбора изображения для вставки в титул
-# my_win.Button_title_edit.clicked.connect(db_select_title)
+
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
-# my_win.Button_export.clicked.connect(export)
-my_win.Button_title_edit.clicked.connect(title_pdf)
-# my_win.Button_view.clicked.connect(handlePreview)
 
 sys.exit(app.exec())
 

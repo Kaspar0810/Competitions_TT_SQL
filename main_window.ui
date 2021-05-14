@@ -104,7 +104,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -147,24 +147,6 @@
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="Button_title_edit">
-      <property name="geometry">
-       <rect>
-        <x>19</x>
-        <y>40</y>
-        <width>141</width>
-        <height>40</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Courier New</family>
-       </font>
-      </property>
-      <property name="text">
-       <string>Редактировать</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="checkBox">
       <property name="geometry">
        <rect>
@@ -178,27 +160,14 @@
        <string/>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_edit">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>50</y>
-        <width>21</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>CheckBox</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="page_2">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>235</height>
       </rect>
      </property>
      <attribute name="label">
@@ -221,9 +190,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>130</y>
+        <y>110</y>
         <width>151</width>
-        <height>91</height>
+        <height>121</height>
        </rect>
       </property>
       <property name="title">
@@ -255,6 +224,19 @@
         <string>По алфавиту</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="Button_sort_mesto">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>90</y>
+         <width>151</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>По месту</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_6">
@@ -262,8 +244,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>235</height>
       </rect>
      </property>
      <attribute name="label">
@@ -275,8 +257,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>235</height>
       </rect>
      </property>
      <attribute name="label">
@@ -288,8 +270,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>235</height>
       </rect>
      </property>
      <attribute name="label">
@@ -301,8 +283,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>235</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1064,15 +1046,15 @@
      </rect>
     </property>
     <property name="sizePolicy">
-     <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
-      <horstretch>1</horstretch>
+     <sizepolicy hsizetype="Maximum" vsizetype="Ignored">
+      <horstretch>2</horstretch>
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
     <property name="font">
      <font>
-      <family>Times New Roman</family>
-      <pointsize>12</pointsize>
+      <family>DejaVu Serif</family>
+      <pointsize>11</pointsize>
       <italic>true</italic>
      </font>
     </property>
