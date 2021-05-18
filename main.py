@@ -19,6 +19,7 @@ if __name__ == '__main__':
 import sys
 import openpyxl as op
 import pdf
+import os
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from PyQt6.QtWidgets import *
@@ -128,6 +129,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fileMenu = QMenu("Соревнования", self)
         menuBar.addMenu(fileMenu)
         fileMenu.addAction(self.newAction)
+        fileMenu.addAction(self.saveAction)
+        fileMenu.addAction(self.exitAction)
         # меню Редактировать
         edit_Menu = menuBar.addMenu("Редактировать")
         #  создание подменю
@@ -147,6 +150,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def _createAction(self):
         self.newAction = QAction(self)
         self.newAction.setText("Создать")
+        self.saveAction = QAction("Сохранить")
+        self.exitAction = QAction("Выход")
         self.rAction = QAction("Текущий рейтинг")
         self.r1Action = QAction("Рейтинг за январь")
         self.title_Action = QAction("Титульный лист")  # В подменю редактор
@@ -157,6 +162,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def _connectActions(self):
         # Connect File actions
         self.newAction.triggered.connect(self.newFile)
+        self.exitAction.triggered.connect(self.exit)
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
@@ -175,6 +181,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusbar.showMessage("Загружен рейтинг-лист на январь месяц")
         fill_table_R1_list()
 
+    def exit(self):
+        exit_comp()
 
 
 app = QApplication(sys.argv)
@@ -194,6 +202,9 @@ kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
 
+months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
+               "августа", "сентября", "октября", "ноября", "декабря")
+
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
 my_win.comboBox_sredi.addItems(mylist)
@@ -205,19 +216,19 @@ my_win.dateEdit_end.setDate(date.today())
 
 
 
+
 def dbase():
     """Создание DB и таблиц"""
     with db:
         db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach])
-
     db_r()
 
 
 def db_insert_title():
     """Вставляем запись в таблицу титул"""
     with db:
-        nazv = Title(name=nm, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
-                     kat_ref=kr, secretary=sk, kat_sek=ks).save()
+        nazv = Title(name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
+                    kat_ref=kr, secretary=sk, kat_sek=ks).save()
 
 
 def db_select_title():
@@ -311,10 +322,12 @@ def db_r(table_db=R_list):  # table_db присваивает по умолча�
         Region.insert_many(reg).execute()
 
 
-def title_string():  # переменные строк титульного листа
-    global nm, vz, ds, de, ms, rf, kr, sk, ks
+def title_string():
+    """ переменные строк титульного листа """
+    global nm, vz, ds, de, ms, rf, kr, sk, ks, sr
 
     nm = my_win.lineEdit_title_nazvanie.text()
+    sr = my_win.comboBox_sredi.currentText()
     vz = my_win.lineEdit_title_vozrast.text()
     ds = my_win.dateEdit_start.text()
     de = my_win.dateEdit_end.text()
@@ -325,20 +338,64 @@ def title_string():  # переменные строк титульного ли
     ks = my_win.comboBox_kategor_sek.currentText()
 
 
+def data_title_string(months_list):
+    """получение строки начало и конец соревнований для вставки в титульный лист"""
+    datastart = my_win.dateEdit_start.text()
+    dataend = my_win.dateEdit_end.text()
+    ys = int(datastart[0:4])  # получаем число год из календаря
+    ms = int(datastart[5:7])  # получаем число месяц из календаря
+    ds = int(datastart[8:10])  # получаем число день из календаря
+    # ye = int(dataend[0:4])
+    me = int(dataend[5:7])
+    de = int(dataend[8:10])
+    month_st = months_list[ms - 1]
+    if de > ds:  # получаем строку начало и конец соревнования в
+        # одном месяце или два месяца если начало и конец в разных месяцах
+        return str(ds) + " - " + str(de) + " " + month_st + " " + str(ys) + " г."
+    else:
+        month_end = months_list[me - 1]
+        return str(ds) + " " + month_st + " - " + str(de) + " " + month_end + " " + str(ys) + " г."
+
+
+def title_pdf():
+    """сохранение в PDF формате титульной страницы"""
+    string_data = data_title_string(months_list)
+    nz = my_win.lineEdit_title_nazvanie.text()
+    sr = my_win.comboBox_sredi.currentText()
+    vz = my_win.lineEdit_title_vozrast.text()
+    ct = my_win.lineEdit_city_title.text()
+
+    message = "Хотите добавить изображение в титульный лист?"
+    reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
+                                           QtWidgets.QMessageBox.StandardButtons.Yes,
+                                           QtWidgets.QMessageBox.StandardButtons.No)
+    if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать изображение", "/desktop", "Image files (*.jpg, *.png)")
+        filepatch = str(fname[0])
+    else:
+        filepatch = None
+    pdf.title_pdf(string_data, nz, sr, vz, ct, filepatch)
+
+
 def title_made():
     """создание тильного листа соревнования"""
-    age = my_win.lineEdit_title_vozrast.text()
-    p = age.count(" ")
-    if p == 2:
-        god = int(age[3:5])
-        age = date.today().year - (god - 1)  # год рождения и младше могут играть
-    elif p == 4:
-        age = int(age[0:5])  # год рождения и младше могут играть
-    data_title_string()
-    # dbase()
-    # db_insert_title()
+    # age = my_win.lineEdit_title_vozrast.text()
+    # p = age.count(" ")
+    # if p == 2:
+    #     god = int(age[3:5])
+    #     age = date.today().year - (god - 1)  # год рождения и младше могут играть
+    # elif p == 4:
+    #     age = int(age[0:5])  # год рождения и младше могут играть
+
+    title_string()
+    if my_win.Button_title_made.text() == "Редактировать":
+        title_update()
+    else:
+        dbase()
+        db_insert_title()
     title_pdf()
-    my_win.Button_title_made.setEnabled(False)  # после заполнения титула выключает кнопку
+    my_win.checkBox.setChecked(False)  # после заполнения титула выключает чекбокс
+    my_win.Button_title_made.setText("Создать")
 
 
 def title_update():
@@ -356,66 +413,6 @@ def title_update():
     nazv.secretary = sk
     nazv.kat_sek = ks
     nazv.save()
-
-
-def data_title_string(string_data):
-    """получение строки начало и конец соревнований для вставки в титульный лист"""
-    months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа",
-                   "сентября", "октября", "ноября", "декабря")
-    datastart = my_win.dateEdit_start.text()
-    dataend = my_win.dateEdit_end.text()
-    ys = int(datastart[0:4])  # получаем число год из календаря
-    ms = int(datastart[5:7])  # получаем число месяц из календаря
-    ds = int(datastart[8:10])  # получаем число день из календаря
-    ye = int(dataend[0:4])
-    me = int(dataend[5:7])
-    de = int(dataend[8:10])
-    month_st = months_list[ms - 1]
-    month_end = months_list[me - 1]
-    if de > ds:  # получаем строку начало и конец соревнования в
-        # одном месяце или два месяца если начало и конец в разных месяцах
-        string_data = str(ds) + " - " + str(de) + " " + month_st + " " + str(ys) + " г."
-    else:
-        month_end = months_list[me - 1]
-        string_data = str(ds) + " " + month_st + " - " + str(de) + " " + month_end + " " + str(ys) + " г."
-    return string_data
-
-
-def title_pdf(string_data):
-    """сохранение в PDF формате титульной страницы"""
-    canvas = Canvas("Title.pdf", pagesize=A4)
-    message = "Хотите добавить изображение в титульный лист?"
-    reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
-                                           QtWidgets.QMessageBox.StandardButtons.Yes,
-                                           QtWidgets.QMessageBox.StandardButtons.No)
-    if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать изображение", "/desktop", "Image files (*.jpg, *.png)")
-        filepatch = str(fname[0])
-        canvas.drawImage(filepatch, 7 * cm, 12 * cm, 6.9 * cm, 4.9 * cm, mask=[0, 2, 0, 2, 0, 2])  # делает фон прозрачным
-        canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
-        canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
-        canvas.setFont("DejaVuSerif-Italic", 20)
-        canvas.drawString(2 * cm, 23 * cm, my_win.lineEdit_title_nazvanie.text())
-        canvas.setFont("DejaVuSerif-Italic", 16)
-        canvas.drawString(2.5 * cm, 22 * cm,
-                          "среди " + my_win.comboBox_sredi.currentText() + " " + my_win.lineEdit_title_vozrast.text())
-        canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(5.5 * cm, 5 * cm, "г. " + my_win.lineEdit_city_title.text() + " Нижегородская область")
-        canvas.drawString(7.5 * cm, 4 * cm, data_title_string(string_data))
-    else:
-        canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
-        canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
-        canvas.setFont("DejaVuSerif-Italic", 20)
-        canvas.drawString(2 * cm, 23 * cm, my_win.lineEdit_title_nazvanie.text())
-        canvas.setFont("DejaVuSerif-Italic", 16)
-        canvas.drawString(2.5 * cm, 22 * cm,
-                          "среди " + my_win.comboBox_sredi.currentText() + " " + my_win.lineEdit_title_vozrast.text())
-        canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(5.5 * cm, 5 * cm, "г. " + my_win.lineEdit_city_title.text() + " Нижегородская область")
-        canvas.drawString(7.5 * cm, 4 * cm, data_title_string(string_data))
-    canvas.save()
 
 
 def find_in_rlist():
@@ -580,6 +577,7 @@ def tab():
         my_win.tabWidget.setCurrentIndex(tw)
 
         if tw == 0:
+            # title_string()
             db_select_title()
         if tw == 1:
             my_win.tableWidget.show()
@@ -597,6 +595,7 @@ def page():
     else:
         my_win.toolBox.setCurrentIndex(tb)
         if tb == 0:
+            # title_string()
             db_select_title()
         if tb == 1:
             my_win.tableWidget.show()
@@ -672,6 +671,13 @@ def sort(self):
 def button_title_made_enable(state):
     """включает кнопку - создание титула - если отмечен чекбокс, защита от случайного нажатия"""
     if state == 2:  # если флажок установлен
+        title_string()
+        with db:
+            titles = Title.get(Title.id == 1)
+            if titles.name == nm and str(titles.data_start) == ds and str(titles.data_end) == de:
+                my_win.Button_title_made.setText("Редактировать")
+            else:
+                my_win.Button_title_made.setText("Создать")
         my_win.Button_title_made.setEnabled(True)
     else:
         my_win.Button_title_made.setEnabled(False)
@@ -679,8 +685,10 @@ def button_title_made_enable(state):
 
 def table_pdf():
     """создание списка учстников в pdf файл"""
-
     doc = SimpleDocTemplate("table_list.pdf", pagesize=A4)
+    tit = Title.get(Title.id == 1)
+    nz = tit.name
+    sr = "среди " + tit.sredi + " " + tit.vozrast
 
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
@@ -717,12 +725,19 @@ def table_pdf():
     h1.spaceBefore = 0
     h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50, firstLineIndent=-20)  # стиль параграфа
     h2.spaceAfter = 20  # промежуток после заголовка
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50, firstLineIndent=-20)  # стиль параграфа
+    h3.spaceAfter = 10  # промежуток после заголовка
 
-    story.append(Paragraph("Всероссийский турнир Будущее России", h1))
-    story.append(Paragraph('Список участников', h2))
+    story.append(Paragraph(nz, h1))
+    story.append(Paragraph(sr, h2))
+    story.append(Paragraph('Список участников', h3))
     story.append(t)
     doc.multiBuild(story)
 
+
+def exit_comp():
+    pass
+    print("хотите выйти")
   # ====== отслеживание изменения текста в полях ============
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
@@ -739,7 +754,7 @@ my_win.checkBox.stateChanged.connect(button_title_made_enable)
 
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 
-my_win.Button_title_made.clicked.connect(title_made)  # вызов окна диалога выбора изображения для вставки в титул
+my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
 
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)

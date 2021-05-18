@@ -13,6 +13,7 @@ class BaseModel(Model):
 
 class Title(BaseModel):
     name = CharField()
+    sredi = CharField()
     vozrast = CharField()
     data_start = DateField()
     data_end = DateField()
