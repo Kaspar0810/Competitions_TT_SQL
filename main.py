@@ -26,7 +26,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from datetime import *
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
-from models import *
+# from models import *
 from pdf import *
 
 from reportlab.pdfgen.canvas import Canvas
@@ -78,47 +78,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._createMenuBar()
         self._connectActions()
 
-        # установка таблицы списка спортсменов QtableWidget
-        self.tableWidget.setColumnCount(8)
-        self.tableWidget.setRowCount(1)
-        self.tableWidget.verticalHeader().hide()
-        for i in range(0, 8):  # закрашивает заголовки таблиц зеленым цветом
-            item = QtWidgets.QTableWidgetItem()
-            item.setBackground(QtGui.QColor(0, 255, 150))
-            self.tableWidget.setHorizontalHeaderItem(i, item)
-        collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"]
-        self.tableWidget.setHorizontalHeaderLabels(collumn_label)
-        self.tableWidget.isSortingEnabled()
-        # установка таблицы списка R спортсменов QtableWidget_R_list
-        self.tableWidget_R_list.setColumnCount(5)
-        self.tableWidget_R_list.setRowCount(1)
-        self.tableWidget_R_list.verticalHeader().hide()
-        for i in range(0, 6):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
-            item = QtWidgets.QTableWidgetItem()
-            item.setBackground(QtGui.QColor(0, 255, 150))
-            self.tableWidget_R_list.setHorizontalHeaderItem(i, item)
-        collumn_label = ["Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
-        self.tableWidget_R_list.setHorizontalHeaderLabels(collumn_label)
-        self.tableWidget_R_list.isSortingEnabled()
-        self.tableWidget_R_list.hide()
         self.menuBar()
 
         self.Button_title_made.setEnabled(False)
 
         self.tabWidget.setCurrentIndex(0)
         self.toolBox.setCurrentIndex(0)
-
-    #  размещение виджета в правой стороне
-    #     self.centralwidget = QWidget()
-    #     self.setCentralWidget(self.centralwidget)
-    #     self.grid = QGridLayout(self.centralwidget)
-    #
-    #     # self.grid.setSpacing(10)
-    #     self.grid.addWidget(self.toolBox, 0, 0, 20, 1)
-    #     self.grid.addWidget(self.frame_main, 21, 0, 6, 1)
-    #     self.grid.addWidget(self.tabWidget, 0, 2, 10, 3)
-    #     self.grid.addWidget(self.frame_table, 11, 2, 16, 3)
-    #     self.grid.addWidget(self.frame_score, 0, 6, 28, 3)
+#======================
+        # layout = QGridLayout()
+        # layout.addWidget(self.toolBox, 0, 0, 10, 1)
+        # layout.addWidget(self.frame_main, 11, 0, 5, 1)
+        # layout.addWidget(self.tabWidget, 0, 1, 7, 1)
+        # layout.addWidget(self.frame_table, 8, 1, 5, 1)
+        # layout.addWidget(self.frame_score, 0, 2, 20, 1)
+        #
+        # widget = QWidget()
+        # widget.setLayout(layout)
+        # self.setCentralWidget(widget)
+        # layout.setColumnStretch(0, 0)
+        # layout.setColumnStretch(1, 6)
 
 
     # ====== создание строки меню ===========
@@ -129,40 +107,43 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fileMenu = QMenu("Соревнования", self)
         menuBar.addMenu(fileMenu)
         fileMenu.addAction(self.newAction)
-        fileMenu.addAction(self.saveAction)
+        saveList = fileMenu.addMenu("Сохранить")
         fileMenu.addAction(self.exitAction)
+
         # меню Редактировать
-        edit_Menu = menuBar.addMenu("Редактировать")
+        editMenu = menuBar.addMenu("Редактировать")
         #  создание подменю
-        ed_Menu = edit_Menu.addMenu("Редактор")
+        saveList.addAction(self.savelist_Action)
+        ed_Menu = editMenu.addMenu("Редактор")
         ed_Menu.addAction(self.title_Action)
         ed_Menu.addAction(self.list_Action)
-        find_Menu = edit_Menu.addMenu("Поиск")
+        find_Menu = editMenu.addMenu("Поиск")
         find_Menu.addAction(self.find_r_Action)
         find_Menu.addAction(self.find_r1_Action)
 
         # меню Рейтинг
-        rank_Menu = menuBar.addMenu("Рейтинг")
-        rank_Menu.addAction(self.rAction)
-        rank_Menu.addAction(self.r1Action)
+        rankMenu = menuBar.addMenu("Рейтинг")
+        rankMenu.addAction(self.rAction)
+        rankMenu.addAction(self.r1Action)
 
     #  создание действий меню
     def _createAction(self):
         self.newAction = QAction(self)
         self.newAction.setText("Создать")
-        self.saveAction = QAction("Сохранить")
         self.exitAction = QAction("Выход")
         self.rAction = QAction("Текущий рейтинг")
         self.r1Action = QAction("Рейтинг за январь")
-        self.title_Action = QAction("Титульный лист")  # В подменю редактор
+        self.title_Action = QAction("Титульный лист")  # подменю редактор
         self.list_Action = QAction("Список участников")
-        self.find_r_Action = QAction("Поиск в текущем рейтинге")  # В подменю поиск
+        self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
+        self.savelist_Action = QAction("Список")  # подменю сохранить
 
     def _connectActions(self):
         # Connect File actions
         self.newAction.triggered.connect(self.newFile)
         self.exitAction.triggered.connect(self.exit)
+        self.savelist_Action.triggered.connect(self.saveList)
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
@@ -174,22 +155,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def r_File(self):
         # Logic for creating a new file goes here...
         self.statusbar.showMessage("Загружен рейтинг-лист на текущий месяц")
-        fill_table_R_list()
+        # fill_table_R_list()
+        load_tableWidget()
 
     def r1_File(self):
         # Logic for creating a new file goes here...
         self.statusbar.showMessage("Загружен рейтинг-лист на январь месяц")
-        fill_table_R1_list()
+        load_tableWidget()
 
     def exit(self):
         exit_comp()
 
+    def saveList(self):
+        my_win.tabWidget.setCurrentIndex(1)
+        my_win.toolBox.setCurrentIndex(1)
+        table_pdf()
+        self.statusbar.showMessage("Список участников сохранен")
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.show()
-
 
 
 with db:  # добавляет из таблицы в комбобокс регионы
@@ -247,6 +233,38 @@ def db_select_title():
 
 
 db_select_title()  # при запуске заполняет титул данными из таблицы
+
+
+def load_tableWidget():
+    """Заполняет таблицу списком или рейтингом в зависимости от выбора"""
+    sender = my_win.menuWidget().sender()  # сигнал указывающий какой пункт меню нажат
+
+    if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг-
+        z = 5
+        collumn_label = ["Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
+    elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь-
+        z = 5
+        collumn_label = ["Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
+    else:
+        z = 8
+        collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"]
+
+    my_win.tableWidget.setColumnCount(z)
+    my_win.tableWidget.setRowCount(1)
+    my_win.tableWidget.verticalHeader().hide()
+    for i in range(0, z):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+        item = QtWidgets.QTableWidgetItem()
+        item.setBackground(QtGui.QColor(0, 255, 150))
+        my_win.tableWidget.setHorizontalHeaderItem(i, item)
+    my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
+    my_win.tableWidget.isSortingEnabled()
+
+    if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг- и загружет таблицу с рейтингом
+        fill_table_R_list()
+    elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь- и загружет таблицу с рейтингом
+        fill_table_R1_list()
+    else:  # загружает таблицу со списком
+        fill_table()
 
 
 def load_listR_in_db(table_db, fname):
@@ -400,7 +418,6 @@ def title_made():
 
 def title_update():
     """обновляет запись титула, если был он изменен"""
-
     title_string()
     nazv = Title.get(Title.id == 1)
     nazv.name = nm
@@ -451,26 +468,23 @@ def fill_table():
         listC = Coach.get(Coach.id == list.coach_id)
         my_win.tableWidget.setItem(k, 7, QTableWidgetItem(listC.coach))
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
-    table_pdf()
 
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
-    my_win.tableWidget.hide()
-    my_win.tableWidget_R_list.show()
     player_rlist = R_list.select()
     count = len(player_rlist)  # колличество записей в базе
-    my_win.tableWidget_R_list.setRowCount(count)
+    my_win.tableWidget.setRowCount(count)
     for k in range(0, count):  # цикл по списку по строкам
 
         listR = R_list.get(R_list.id == k + 1)
-        my_win.tableWidget_R_list.setItem(k, 0, QTableWidgetItem(str(listR.r_number)))
+        my_win.tableWidget.setItem(k, 0, QTableWidgetItem(str(listR.r_number)))
         et = str(listR.r_list)
         padded = ('    ' + et)[-4:]  # make all elements the same length
-        my_win.tableWidget_R_list.setItem(k, 1, QTableWidgetItem(padded))
-        my_win.tableWidget_R_list.setItem(k, 2, QTableWidgetItem(listR.r_fname))
-        my_win.tableWidget_R_list.setItem(k, 3, QTableWidgetItem(listR.r_bithday))
-        my_win.tableWidget_R_list.setItem(k, 4, QTableWidgetItem(listR.r_city))
+        my_win.tableWidget.setItem(k, 1, QTableWidgetItem(padded))
+        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(listR.r_fname))
+        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(listR.r_bithday))
+        my_win.tableWidget.setItem(k, 4, QTableWidgetItem(listR.r_city))
 
     my_win.tableWidget_R_list.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
@@ -577,12 +591,11 @@ def tab():
         my_win.tabWidget.setCurrentIndex(tw)
 
         if tw == 0:
-            # title_string()
             db_select_title()
         if tw == 1:
             my_win.tableWidget.show()
             my_win.tableWidget_R_list.hide()
-            fill_table()
+            load_tableWidget()
         my_win.toolBox.setCurrentIndex(tw)
 
 
@@ -595,12 +608,11 @@ def page():
     else:
         my_win.toolBox.setCurrentIndex(tb)
         if tb == 0:
-            # title_string()
             db_select_title()
         if tb == 1:
             my_win.tableWidget.show()
             my_win.tableWidget_R_list.hide()
-            fill_table()
+            load_tableWidget()
         my_win.tabWidget.setCurrentIndex(tb)
 
 
@@ -663,7 +675,6 @@ def sort(self):
         my_win.tableWidget.sortItems(3, QtCore.Qt.SortOrder.DescendingOrder)  # сортировка  Я-А 3-ого столбца
     else:
         my_win.tableWidget.sortItems(1, QtCore.Qt.SortOrder.AscendingOrder)  # сортировка  А-Я 1-ого столбца
-
     for i in range(0, count):  # отсортировывает номера строк по порядку
         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 

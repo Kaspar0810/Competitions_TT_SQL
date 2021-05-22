@@ -44,6 +44,7 @@ class Player(BaseModel):
     region = CharField()
     razryad = CharField(10)
     coach_id = ForeignKeyField(Coach)
+    # mesto = IntegerField()
 
     class Meta:
         db_table = "players"
