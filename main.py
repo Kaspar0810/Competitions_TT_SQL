@@ -2,6 +2,7 @@
 
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+import comp_system
 
 
 def print_hi(name):
@@ -19,6 +20,7 @@ if __name__ == '__main__':
 import sys
 import openpyxl as op
 import pdf
+from PyPDF2 import PdfFileReader
 import os
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
@@ -33,37 +35,39 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.units import cm
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate
 from reportlab.lib import colors
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.platypus import PageBreak
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
+
 registerFontFamily('DejaVuSerif', normal='DejaVuSerif', bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
 enc = 'UTF-8'
 
 TTFSearchPath = (
-            'c:/winnt/fonts',
-            'c:/windows/fonts',
-            '%(REPORTLAB_DIR)s/fonts',      #special
-            '%(REPORTLAB_DIR)s/../fonts',   #special
-            '%(REPORTLAB_DIR)s/../../fonts',#special
-            '%(CWD)s/fonts',                #special
-            '~/fonts',
-            '~/.fonts',
-            '%(XDG_DATA_HOME)s/fonts',
-            '~/.local/share/fonts',
-            #mac os X - from
-            '~/Library/Fonts',
-            '/Library/Fonts',
-            '/System/Library/Fonts',
-            )
+    'c:/winnt/fonts',
+    'c:/windows/fonts',
+    '%(REPORTLAB_DIR)s/fonts',  # special
+    '%(REPORTLAB_DIR)s/../fonts',  # special
+    '%(REPORTLAB_DIR)s/../../fonts',  # special
+    '%(CWD)s/fonts',  # special
+    '~/fonts',
+    '~/.fonts',
+    '%(XDG_DATA_HOME)s/fonts',
+    '~/.local/share/fonts',
+    # mac os X - from
+    '~/Library/Fonts',
+    '/Library/Fonts',
+    '/System/Library/Fonts',
+)
 pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
+
 
 # Создаем собственный класс MainWindow, унаследованный от класса графического интерфейса Mainwindow
 # и класса QMainWindow
@@ -84,20 +88,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.tabWidget.setCurrentIndex(0)
         self.toolBox.setCurrentIndex(0)
-#======================
-        # layout = QGridLayout()
-        # layout.addWidget(self.toolBox, 0, 0, 10, 1)
-        # layout.addWidget(self.frame_main, 11, 0, 5, 1)
-        # layout.addWidget(self.tabWidget, 0, 1, 7, 1)
-        # layout.addWidget(self.frame_table, 8, 1, 5, 1)
-        # layout.addWidget(self.frame_score, 0, 2, 20, 1)
-        #
-        # widget = QWidget()
-        # widget.setLayout(layout)
-        # self.setCentralWidget(widget)
-        # layout.setColumnStretch(0, 0)
-        # layout.setColumnStretch(1, 6)
 
+    # ======================
+    # layout = QGridLayout()
+    # layout.addWidget(self.toolBox, 0, 0, 10, 1)
+    # layout.addWidget(self.frame_main, 11, 0, 5, 1)
+    # layout.addWidget(self.tabWidget, 0, 1, 7, 1)
+    # layout.addWidget(self.frame_table, 8, 1, 5, 1)
+    # layout.addWidget(self.frame_score, 0, 2, 20, 1)
+    #
+    # widget = QWidget()
+    # widget.setLayout(layout)
+    # self.setCentralWidget(widget)
+    # layout.setColumnStretch(0, 0)
+    # layout.setColumnStretch(1, 6)
 
     # ====== создание строки меню ===========
     def _createMenuBar(self):
@@ -155,7 +159,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def r_File(self):
         # Logic for creating a new file goes here...
         self.statusbar.showMessage("Загружен рейтинг-лист на текущий месяц")
-        # fill_table_R_list()
         load_tableWidget()
 
     def r1_File(self):
@@ -172,11 +175,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         table_pdf()
         self.statusbar.showMessage("Список участников сохранен")
 
+
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.show()
-
 
 with db:  # добавляет из таблицы в комбобокс регионы
     for r in range(1, 86):
@@ -187,10 +190,11 @@ with db:  # добавляет из таблицы в комбобокс рег�
 kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
-
+stages = ("Основной", "Предварительный", "Полуфиналы", "Финальный", "Суперфинал")
 months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
                "августа", "сентября", "октября", "ноября", "декабря")
 
+my_win.comboBox_1_etap.addItems(stages)
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
 my_win.comboBox_sredi.addItems(mylist)
@@ -199,8 +203,6 @@ my_win.comboBox_razryad.addItems(raz)
 # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
-
-
 
 
 def dbase():
@@ -214,7 +216,7 @@ def db_insert_title():
     """Вставляем запись в таблицу титул"""
     with db:
         nazv = Title(name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
-                    kat_ref=kr, secretary=sk, kat_sek=ks).save()
+                     kat_ref=kr, secretary=sk, kat_sek=ks).save()
 
 
 def db_select_title():
@@ -258,7 +260,7 @@ def load_tableWidget():
         my_win.tableWidget.setHorizontalHeaderItem(i, item)
     my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
     my_win.tableWidget.isSortingEnabled()
-
+    my_win.tableWidget.show()
     if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг- и загружет таблицу с рейтингом
         fill_table_R_list()
     elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь- и загружет таблицу с рейтингом
@@ -273,7 +275,7 @@ def load_listR_in_db(table_db, fname):
     filepatch = str(fname[0])
     if table_db == R_list:
         message = "Вы не выбрали файл с текущим рейтингом!" \
-                  "если хотите выйти, нажмите <Ок>"    \
+                  "если хотите выйти, нажмите <Ок>" \
                   "если хотите вернуться, нажмите <Отмена>"
     else:
         message = "Вы не выбрали файл с январским рейтингом!" \
@@ -486,28 +488,37 @@ def fill_table_R_list():
         my_win.tableWidget.setItem(k, 3, QTableWidgetItem(listR.r_bithday))
         my_win.tableWidget.setItem(k, 4, QTableWidgetItem(listR.r_city))
 
-    my_win.tableWidget_R_list.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
 def fill_table_R1_list():
     """заполняет таблицу списком из январского рейтинг листа"""
-    my_win.tableWidget.hide()
-    my_win.tableWidget_R_list.show()
     player_rlist = R1_list.select()
     count = len(player_rlist)  # колличество записей в базе
-    my_win.tableWidget_R_list.setRowCount(count)
+    my_win.tableWidget.setRowCount(count)
     for k in range(0, count):  # цикл по списку по строкам
 
         listR = R1_list.get(R1_list.id == k + 1)
-        my_win.tableWidget_R_list.setItem(k, 0, QTableWidgetItem(str(listR.r1_number)))
+        my_win.tableWidget.setItem(k, 0, QTableWidgetItem(str(listR.r1_number)))
         et = str(listR.r1_list)
         padded = ('    ' + et)[-4:]  # make all elements the same length
-        my_win.tableWidget_R_list.setItem(k, 1, QTableWidgetItem(padded))
-        my_win.tableWidget_R_list.setItem(k, 2, QTableWidgetItem(listR.r1_fname))
-        my_win.tableWidget_R_list.setItem(k, 3, QTableWidgetItem(listR.r1_bithday))
-        my_win.tableWidget_R_list.setItem(k, 4, QTableWidgetItem(listR.r1_city))
+        my_win.tableWidget.setItem(k, 1, QTableWidgetItem(padded))
+        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(listR.r1_fname))
+        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(listR.r1_bithday))
+        my_win.tableWidget.setItem(k, 4, QTableWidgetItem(listR.r1_city))
+        # progressbar(count)
+    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
-    my_win.tableWidget_R_list.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+
+def progressbar(count):
+    pass
+    # progress = QtWidgets.QProgressBar()
+    # progress.setValue(100)
+    # progress.setMinimum(0)
+    # progress.setMaximum(100)
+    # m = int(count / 100)
+    # for i in range(m, count, m):
+    #     progress.setValue(100)
 
 
 def add_player():
@@ -527,7 +538,6 @@ def add_player():
     add_coach(ch, num)
 
     with db:
-
         idc = Coach.get(Coach.coach == ch)
         plr = Player(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
                      razryad=rz, coach_id=idc).save()
@@ -584,36 +594,48 @@ def dclick_in_listwidget():
 def tab():
     """Изменяет вкладку tabWidget в зависимости от вкладки toolBox"""
     tw = my_win.tabWidget.currentIndex()
-    tb = my_win.toolBox.currentIndex()
-    if tw == tb:
-        return
-    else:
-        my_win.tabWidget.setCurrentIndex(tw)
-
-        if tw == 0:
-            db_select_title()
-        if tw == 1:
-            my_win.tableWidget.show()
-            my_win.tableWidget_R_list.hide()
-            load_tableWidget()
-        my_win.toolBox.setCurrentIndex(tw)
+    # tb = my_win.toolBox.currentIndex()
+    if tw == 0:
+        my_win.tableWidget.show()
+        db_select_title()
+    elif tw == 1:
+        my_win.tableWidget.show()
+        load_tableWidget()
+    elif tw == 2:
+        my_win.tableWidget.hide()
+    elif tw == 3:
+        my_win.tableWidget.hide()
+    elif tw == 4:
+        my_win.tableWidget.hide()
+    elif tw == 5:
+        my_win.tableWidget.hide()
+    my_win.toolBox.setCurrentIndex(tw)
 
 
 def page():
     """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
     tw = my_win.tabWidget.currentIndex()
     tb = my_win.toolBox.currentIndex()
-    if tb == tw:
-        return
-    else:
-        my_win.toolBox.setCurrentIndex(tb)
-        if tb == 0:
-            db_select_title()
-        if tb == 1:
-            my_win.tableWidget.show()
-            my_win.tableWidget_R_list.hide()
-            load_tableWidget()
-        my_win.tabWidget.setCurrentIndex(tb)
+    if tb == 0:
+        db_select_title()
+        my_win.tableWidget.show()
+    elif tb == 1:
+        my_win.tableWidget.show()
+    elif tb == 2:
+        my_win.tableWidget.hide()
+        my_win.label_11.hide()
+        my_win.label_12.hide()
+        my_win.spinBox_kol_grupp.hide()
+        player_list = Player.select()
+        count = len(player_list)
+        my_win.label_8.setText("Всего участников: " + str(count) + " чел.")
+    elif tb == 3:
+        my_win.tableWidget.hide()
+    elif tb == 4:
+        my_win.tableWidget.hide()
+    elif tb == 5:
+        my_win.tableWidget.hide()
+    my_win.tabWidget.setCurrentIndex(tb)
 
 
 def add_city():
@@ -721,8 +743,8 @@ def table_pdf():
         data = [n, p, b, c, g, z, t, q]
         elements.append(data)
     elements.insert(0, ["№", "Фамилия, Имя", "Дата рождени ", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"])
-    t = Table(elements, 8 * [2 * cm], kp * [0.8 * cm])  # количество столбцов и строк таблицы
-    t = Table(elements, colWidths=(None, None, None, None, None, None, None, None))  #  ширина столбцов, если None-автомтическая
+    t = Table(elements,
+              colWidths=(None, None, None, None, None, None, None, None))  # ширина столбцов, если None-автомтическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                            ('FONTSIZE', (0, 0), (-1, -1), 8),  # Использую импортированный шрифта размер
                            ('BACKGROUND', (0, 0), (-1, kp * -1), colors.yellow),
@@ -749,7 +771,40 @@ def table_pdf():
 def exit_comp():
     pass
     print("хотите выйти")
-  # ====== отслеживание изменения текста в полях ============
+
+
+def system():
+    """выбор системы проведения"""
+    ct = my_win.comboBox_1_etap.currentText()
+    if ct == "Основной":
+        my_win.spinBox_kol_grupp.hide()
+    elif ct == "Предварительный":
+        my_win.spinBox_kol_grupp.show()
+        my_win.label_11.show()
+
+
+def kol_game_in_grupp():
+    """подсчет кол-во групп и человек в группах"""
+    kg = my_win.spinBox_kol_grupp.text()
+    player_list = Player.select()
+    count = len(player_list)  # колличество записей в базе
+    e = int(count) % int(kg)
+    t = int(count) // int(kg)
+    g1 = (int(kg) - e)
+    g2 = str(t + 1)
+    if e == 0:
+        stroka_kol_grupp = (kg + " группы по " + str(t) + " чел.")
+    else:
+        stroka_kol_grupp = (str(g1) + " групп(а) по " + str(t) + " чел. и "
+                            + str(e) + " групп(а) по " + str(g2) + " чел.")
+    my_win.label_12.setText(stroka_kol_grupp)
+    my_win.label_12.show()
+    comp_system.table_made(kg, e, g1, g2, t)
+
+def view():
+    """просмотр PDF файлов средствами OS"""
+    os.system("open " + "table_list.pdf")
+# ====== отслеживание изменения текста в полях ============
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
@@ -758,10 +813,15 @@ my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
 
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.toolBox.currentChanged.connect(page)
+# ==================================
+my_win.spinBox_kol_grupp.textChanged.connect(kol_game_in_grupp)
+# ======== изменение индекса комбобоксов ===========
+my_win.comboBox_1_etap.currentTextChanged.connect(system)
 
 # =======  срабатывание кнопок =========
+my_win.Button_table_made.clicked.connect(kol_game_in_grupp)
 my_win.checkBox.stateChanged.connect(button_title_made_enable)
-# my_win.Button_export.clicked.connect(exporter)
+my_win.Button_export.clicked.connect(comp_system.table_made)
 
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 
@@ -769,7 +829,5 @@ my_win.Button_title_made.clicked.connect(title_made)  # записывает в 
 
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
-
+my_win.Button_view.clicked.connect(view)
 sys.exit(app.exec())
-
-
