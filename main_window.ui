@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1425</width>
-    <height>872</height>
+    <width>1364</width>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>220</x>
       <y>0</y>
       <width>801</width>
       <height>231</height>
@@ -889,7 +889,7 @@
       <x>1030</x>
       <y>10</y>
       <width>381</width>
-      <height>811</height>
+      <height>611</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -937,7 +937,7 @@
       <x>222</x>
       <y>242</y>
       <width>801</width>
-      <height>581</height>
+      <height>381</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -978,301 +978,278 @@
      <bool>true</bool>
     </attribute>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QToolBox" name="toolBox">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>12</y>
+      <width>201</width>
+      <height>461</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>180</width>
+      <height>430</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>1200</width>
+      <height>1200</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>14</pointsize>
+      <italic>true</italic>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="currentIndex">
+     <number>5</number>
+    </property>
+    <widget class="QWidget" name="page">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>199</width>
+       <height>255</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Титульный лист</string>
+     </attribute>
+     <widget class="QPushButton" name="Button_title_made">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>0</y>
+        <width>141</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Создать</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>10</y>
+        <width>21</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>199</width>
+       <height>255</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Список участников</string>
+     </attribute>
+     <widget class="QPushButton" name="Button_add_player">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>151</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Добавить</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>151</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Сортировка</string>
+      </property>
+      <widget class="QPushButton" name="Button_sort_R">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>60</y>
+         <width>151</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>По рейтингу</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="Button_sort_Name">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>30</y>
+         <width>151</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>По алфавиту</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="Button_sort_mesto">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>90</y>
+         <width>151</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>По месту</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_6">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>199</width>
+       <height>255</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Система</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="page_3">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>199</width>
+       <height>255</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Предварительный этап</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="page_5">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>199</width>
+       <height>255</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Полуфиналы</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="page_4">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>199</width>
+       <height>255</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Финальный этап</string>
+     </attribute>
+    </widget>
+   </widget>
+   <widget class="QProgressBar" name="progressBar">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>480</y>
+      <width>191</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QFrame" name="frame_main">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>11</y>
+      <y>500</y>
       <width>201</width>
-      <height>811</height>
+      <height>121</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="4,0,0,0,0">
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <item>
-      <widget class="QToolBox" name="toolBox">
-       <property name="minimumSize">
-        <size>
-         <width>180</width>
-         <height>430</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>1200</width>
-         <height>1200</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>14</pointsize>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="currentIndex">
-        <number>2</number>
-       </property>
-       <widget class="QWidget" name="page">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>197</width>
-          <height>385</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Титульный лист</string>
-        </attribute>
-        <widget class="QPushButton" name="Button_title_made">
-         <property name="geometry">
-          <rect>
-           <x>19</x>
-           <y>0</y>
-           <width>141</width>
-           <height>40</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Создать</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-         <property name="default">
-          <bool>false</bool>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="checkBox">
-         <property name="geometry">
-          <rect>
-           <x>170</x>
-           <y>10</y>
-           <width>21</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="page_2">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>98</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Список участников</string>
-        </attribute>
-        <widget class="QPushButton" name="Button_add_player">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>0</y>
-           <width>151</width>
-           <height>32</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Добавить</string>
-         </property>
-        </widget>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>110</y>
-           <width>151</width>
-           <height>121</height>
-          </rect>
-         </property>
-         <property name="title">
-          <string>Сортировка</string>
-         </property>
-         <widget class="QPushButton" name="Button_sort_R">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>60</y>
-            <width>151</width>
-            <height>32</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>По рейтингу</string>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="Button_sort_Name">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>30</y>
-            <width>151</width>
-            <height>32</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>По алфавиту</string>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="Button_sort_mesto">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>90</y>
-            <width>151</width>
-            <height>32</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>По месту</string>
-          </property>
-         </widget>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="page_6">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>197</width>
-          <height>385</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Система</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="page_3">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>98</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Предварительный этап</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="page_5">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>98</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Полуфиналы</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="page_4">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>98</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <attribute name="label">
-         <string>Финальный этап</string>
-        </attribute>
-       </widget>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QProgressBar" name="progressBar">
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="value">
-        <number>0</number>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="Button_export">
+       <property name="text">
+        <string>Создание таблиц</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QFrame" name="frame_main">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="Button_db">
+       <property name="text">
+        <string>Создание DB</string>
        </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="Button_export">
-          <property name="text">
-           <string>Создание таблиц</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="Button_db">
-          <property name="text">
-           <string>Создание DB</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="Button_view">
-          <property name="text">
-           <string>Просмотр</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </widget>
      </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="Button_view">
+       <property name="text">
+        <string>Просмотр</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -1283,7 +1260,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1425</width>
+     <width>1364</width>
      <height>21</height>
     </rect>
    </property>

@@ -799,11 +799,11 @@ def kol_game_in_grupp():
                             + str(e) + " групп(а) по " + str(g2) + " чел.")
     my_win.label_12.setText(stroka_kol_grupp)
     my_win.label_12.show()
-    comp_system.table_made(kg, e, g1, g2, t)
+    comp_system.table_made(kg, e, g2, t)
 
 def view():
     """просмотр PDF файлов средствами OS"""
-    os.system("open " + "table_list.pdf")
+    os.system("open " + "table_grup.pdf")
 # ====== отслеживание изменения текста в полях ============
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
