@@ -3,6 +3,7 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import comp_system
+import tbl_data
 
 
 def print_hi(name):
@@ -20,7 +21,6 @@ if __name__ == '__main__':
 import sys
 import openpyxl as op
 import pdf
-from PyPDF2 import PdfFileReader
 import os
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
@@ -74,7 +74,7 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', e
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
-    def __init__(self, parent=None, *args, **kwargs):
+    def __init__(self, parent=None, *args, **kwargs) -> object:
         QMainWindow.__init__(self)
         self.setupUi(self)
 
@@ -133,7 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     #  создание действий меню
     def _createAction(self):
         self.newAction = QAction(self)
-        self.newAction.setText("Создать")
+        self.newAction.setText("Создать новые")
         self.exitAction = QAction("Выход")
         self.rAction = QAction("Текущий рейтинг")
         self.r1Action = QAction("Рейтинг за январь")
@@ -155,6 +155,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def newFile(self):
         # Logic for creating a new file goes here...
         my_win.textEdit.setText("Нажата кнопка меню соревнования")
+        dbase()
 
     def r_File(self):
         # Logic for creating a new file goes here...
@@ -181,12 +182,10 @@ my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.show()
 
-with db:  # добавляет из таблицы в комбобокс регионы
-    for r in range(1, 86):
-        reg = Region.get(Region.id == r)
-        my_win.comboBox_region.addItem(reg.region)
+
 
 #  ==== наполнение комбобоксов ==========
+page_orient = ("книжная", "альбомная")
 kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
@@ -194,6 +193,7 @@ stages = ("Основной", "Предварительный", "Полуфин�
 months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
                "августа", "сентября", "октября", "ноября", "декабря")
 
+my_win.comboBox_page.addItems(page_orient)
 my_win.comboBox_1_etap.addItems(stages)
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
@@ -208,15 +208,16 @@ my_win.dateEdit_end.setDate(date.today())
 def dbase():
     """Создание DB и таблиц"""
     with db:
-        db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach])
+        db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach, System])
     db_r()
-
+    my_win.Button_title_made.setEnabled(True)
 
 def db_insert_title():
     """Вставляем запись в таблицу титул"""
+    si = System.id
     with db:
         nazv = Title(name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
-                     kat_ref=kr, secretary=sk, kat_sek=ks).save()
+                     kat_ref=kr, secretary=sk, kat_sek=ks, system_id=si).save()
 
 
 def db_select_title():
@@ -235,6 +236,33 @@ def db_select_title():
 
 
 db_select_title()  # при запуске заполняет титул данными из таблицы
+
+
+def system_update(kg):
+    """Обновляет таблицу система кол-во игроков, кол-во групп и прочее"""
+    ps = Player.select()
+    ta = len(ps)
+    sys = System.get(System.id == 1)
+    sys.total_athletes = ta
+    sys.total_grupp = kg
+    sys.save()
+
+
+def system_made():
+    """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
+    player_list = Player.select()
+    ta = len(player_list)  # колличество записей в базе
+    tg = 0
+    with db:
+        sys = System(total_athletes=ta, total_grupp=tg).save()
+
+
+def region():
+    """добавляет из таблицы в комбобокс регионы"""
+    with db:
+        for r in range(1, 86):
+            reg = Region.get(Region.id == r)
+            my_win.comboBox_region.addItem(reg.region)
 
 
 def load_tableWidget():
@@ -323,7 +351,7 @@ def db_r(table_db=R_list):  # table_db присваивает по умолча�
         table_db = R1_list
         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
         load_listR_in_db(table_db, fname)
-        my_win.statusbar.showMessage("Текущий рейтинг загружен")
+        my_win.statusbar.showMessage("Январский рейтинг загружен")
     else:
         table_db = R1_list
         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
@@ -340,7 +368,9 @@ def db_r(table_db=R_list):  # table_db присваивает по умолча�
         reg.append([A])
     with db:
         Region.insert_many(reg).execute()
-
+    region()
+    my_win.statusbar.showMessage("Список регионов загружен")
+    my_win.lineEdit_title_nazvanie.hasFocus()
 
 def title_string():
     """ переменные строк титульного листа """
@@ -362,9 +392,9 @@ def data_title_string(months_list):
     """получение строки начало и конец соревнований для вставки в титульный лист"""
     datastart = my_win.dateEdit_start.text()
     dataend = my_win.dateEdit_end.text()
-    ys = int(datastart[0:4])  # получаем число год из календаря
+    ds = int(datastart[8:10])  # получаем число год из календаря
     ms = int(datastart[5:7])  # получаем число месяц из календаря
-    ds = int(datastart[8:10])  # получаем число день из календаря
+    ys = int(datastart[0:4])  # получаем число день из календаря
     # ye = int(dataend[0:4])
     me = int(dataend[5:7])
     de = int(dataend[8:10])
@@ -411,7 +441,8 @@ def title_made():
     if my_win.Button_title_made.text() == "Редактировать":
         title_update()
     else:
-        dbase()
+        # dbase()
+        system_made()
         db_insert_title()
     title_pdf()
     my_win.checkBox.setChecked(False)  # после заполнения титула выключает чекбокс
@@ -603,6 +634,12 @@ def tab():
         load_tableWidget()
     elif tw == 2:
         my_win.tableWidget.hide()
+        my_win.label_11.hide()
+        my_win.label_12.hide()
+        my_win.spinBox_kol_grupp.hide()
+        player_list = Player.select()
+        count = len(player_list)
+        my_win.label_8.setText("Всего участников: " + str(count) + " чел.")
     elif tw == 3:
         my_win.tableWidget.hide()
     elif tw == 4:
@@ -705,6 +742,7 @@ def button_title_made_enable(state):
     """включает кнопку - создание титула - если отмечен чекбокс, защита от случайного нажатия"""
     if state == 2:  # если флажок установлен
         title_string()
+
         with db:
             titles = Title.get(Title.id == 1)
             if titles.name == nm and str(titles.data_start) == ds and str(titles.data_end) == de:
@@ -716,7 +754,7 @@ def button_title_made_enable(state):
         my_win.Button_title_made.setEnabled(False)
 
 
-def table_pdf():
+def list_player_pdf():
     """создание списка учстников в pdf файл"""
     doc = SimpleDocTemplate("table_list.pdf", pagesize=A4)
     tit = Title.get(Title.id == 1)
@@ -783,13 +821,14 @@ def system():
         my_win.label_11.show()
 
 
-def kol_game_in_grupp():
+def kol_player_in_grupp():
     """подсчет кол-во групп и человек в группах"""
-    kg = my_win.spinBox_kol_grupp.text()
+    kg = my_win.spinBox_kol_grupp.text()  # количество групп
+    system_update(kg)
     player_list = Player.select()
     count = len(player_list)  # колличество записей в базе
-    e = int(count) % int(kg)
-    t = int(count) // int(kg)
+    e = int(count) % int(kg)  # если количество участников не равно делится на группы
+    t = int(count) // int(kg)  # если количество участников равно делится на группы
     g1 = (int(kg) - e)
     g2 = str(t + 1)
     if e == 0:
@@ -799,7 +838,16 @@ def kol_game_in_grupp():
                             + str(e) + " групп(а) по " + str(g2) + " чел.")
     my_win.label_12.setText(stroka_kol_grupp)
     my_win.label_12.show()
-    comp_system.table_made(kg, e, g2, t)
+    comp_system.table_made(kg, e, g2, t, page_vid())
+
+
+def page_vid():
+    if my_win.comboBox_page.currentText() == "альбомная":
+        pv = landscape(A4)
+    else:
+        pv = A4
+    return pv
+
 
 def view():
     """просмотр PDF файлов средствами OS"""
@@ -814,14 +862,15 @@ my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.toolBox.currentChanged.connect(page)
 # ==================================
-my_win.spinBox_kol_grupp.textChanged.connect(kol_game_in_grupp)
+my_win.spinBox_kol_grupp.textChanged.connect(kol_player_in_grupp)
 # ======== изменение индекса комбобоксов ===========
 my_win.comboBox_1_etap.currentTextChanged.connect(system)
+my_win.comboBox_page.currentTextChanged.connect(page_vid)
 
 # =======  срабатывание кнопок =========
-my_win.Button_table_made.clicked.connect(kol_game_in_grupp)
+my_win.Button_table_made.clicked.connect(kol_player_in_grupp)
 my_win.checkBox.stateChanged.connect(button_title_made_enable)
-my_win.Button_export.clicked.connect(comp_system.table_made)
+my_win.Button_system_made.clicked.connect(system_made)
 
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 

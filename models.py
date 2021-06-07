@@ -11,6 +11,14 @@ class BaseModel(Model):
         database = db
 
 
+class System(BaseModel):
+    total_athletes = IntegerField()
+    total_grupp = IntegerField()
+
+    class Meta:
+        db_table = "system"
+
+
 class Title(BaseModel):
     name = CharField()
     sredi = CharField()
@@ -22,6 +30,7 @@ class Title(BaseModel):
     kat_ref = CharField(10)
     secretary = CharField()
     kat_sek = CharField(10)
+    system_id = ForeignKeyField(System)
 
     class Meta:
         db_table = "titles"
@@ -90,6 +99,8 @@ class City(BaseModel):
     class Meta:
         db_table = "cities"
         order_by = "city"
+
+
 
 
 

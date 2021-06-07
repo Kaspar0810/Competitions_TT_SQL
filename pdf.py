@@ -117,7 +117,5 @@ def title_pdf(string_data, nz, sr, vz, ct, filepatch):
     canvas.save()
 
 
-def table_made():
-    """создание 4-х таблиц по 4 участника на альбомном листе"""
-    pass
+
 

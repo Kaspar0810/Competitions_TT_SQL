@@ -1,4 +1,7 @@
+import tbl_data
 from models import *
+import pdf
+
 
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.units import cm
@@ -16,102 +19,78 @@ registerFontFamily('DejaVuSerif', normal='DejaVuSerif', bold='DejaVuSerif-Bold',
 enc = 'UTF-8'
 
 
-def kol_game(kg, count):
-    """подсчет кол-во групп и человек в группах"""
-    pass
-    # e = int(count) % int(kg)
-    # t = int(count) // int(kg)
-    # g1 = (int(kg) - e)
-    # g2 = str(t + 1)
-    # if e == 0:
-    #     stroka_kol_grupp = (kg + " группы по " + str(t) + " чел.")
-    # else:
-    #     stroka_kol_grupp = (str(g1) + " групп(а) по " + str(t) + " чел. и "
-    #                         + str(e) + " групп(а) по " + str(g2) + " чел.")
-    # return stroka_kol_grupp
 
-
-def func(canvas, psize):
+def func_zagolovok(canvas, doc):
     """создание заголовка страниц"""
     tit = Title.get(Title.id == 1)
     nz = tit.name
     ms = tit.mesto
+    sr = "среди " + tit.sredi + " " + tit.vozrast
     ds = str(tit.data_start)
+    main_referee_collegia = "Гл. судья: " + tit.referee + " судья " + tit.kat_ref + "______________          " + \
+                        "Гл. секретарь: " + tit.secretary + " судья " + tit.kat_sek + "______________"
+    (width, height) = landscape(A4)
     canvas.saveState()
 
+    canvas.setFont("DejaVuSerif-Italic", 14)
+    canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)  # центральный текст титула
     canvas.setFont("DejaVuSerif-Italic", 12)
-    (width, height) = A4
-    canvas.drawCentredString(width / 2.0, height - 1.2 * cm, nz)
-    canvas.drawRightString(width - 1 * cm, height - 1.2 * cm, ms)
-    canvas.drawString(width - 20 * cm, height - 1.2 * cm, ds)
-    # if psize == landscape(A4):
-    #     canvas.drawCentredString(width / 2.0, height - 1.2 * cm, nz)
-    #     canvas.drawRightString(width - 1 * cm, height - 1.2 * cm, ms)
-    #     canvas.drawString(width - 28 * cm, height - 1.2 * cm, ds)
-    # else:
-    #     canvas.drawCentredString(width / 2.0, height - 1.2 * cm, nz)
-    #     canvas.drawRightString(width - 1 * cm, height - 1.2 * cm, ms)
-    #     canvas.drawString(width - 20 * cm, height - 1.2 * cm, ds)
-
+    canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)  # текста титула по основным
+    canvas.drawRightString(width - 1 * cm, height - 1.5 * cm, "г. " + ms)  # город
+    canvas.drawString(0.8 * cm, height - 1.5 * cm, ds)  # дата начала
+    canvas.setFont("DejaVuSerif-Italic", 11)
+    canvas.drawCentredString(width / 2.0, height - 20 * cm, main_referee_collegia)  # текста титула по основным
     canvas.restoreState()
-    return func
+    return func_zagolovok
 
 
-def table_made(kg, e, g2, t):
+def table_made(kg, e, g2, t, pv):
     """создание таблиц по g2 участника
-    kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
-     g1 - если везде одинаковое кол-во участников"""
+    kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе """
     g2 = int(g2)
     kg = int(kg)
-
 
     if e == 0:
         t = t
     else:
         t = g2
 
-    if kg == 1 and g2 <= 16:
-        psize = A4
-        wcells = 13.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (книжная ореинтация стр)
+    if kg == 1 and t <= 16:
+        wcells = 13.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (книжная ориентация стр)
         col = ((wcells * cm,) * t)
-    elif kg == 1 and g2 <= 16 or g2 >= 10:
-        psize = landscape(A4)
-        wcells = 7.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (альбомная ореинтация стр)
+    elif kg == 1 and t <= 16 or g2 >= 10 or (kg >= 2 and t <= 6):
+        wcells = 8.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (альбомная ориентация стр)
         col = ((wcells * cm,) * t)
-    elif kg >= 2 and g2 <= 6:
-        psize = landscape(A4)
-        wcells = 7.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (альбомная ореинтация стр)
-        col = ((wcells * cm,) * t)
+    # elif kg >= 2 and t <= 6:
+    #     wcells = 8.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (альбомная ориентация стр)
+    #     col = ((wcells * cm,) * t)
 
-    doc = SimpleDocTemplate("table_grup.pdf", pagesize=psize)
+    doc = SimpleDocTemplate("table_grup.pdf", pagesize=pv)
     elements = []
 
     cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина
-    rH = (0.6 * cm)  # высота строки
+    rH = (0.4 * cm)  # высота строки
     num_columns = []  # заголовки столобцов и их нумерация в зависимости от кол-во участников
     for i in range(0, t):
         i += 1
         i = str(i)
         num_columns.append(i)
     zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
-    stroki_table = []
+#  ================= данные таблиц =============
+    tbl_1 = tbl_data.table1_data()  # если будут занаситься данные результатов
+    tbl_2 = tbl_data.table2_data()
 
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        stroki_table.append(s)
-    stroki_table.insert(0, zagolovok)
-    data1 = stroki_table
-    t1 = Table(data1, colWidths=cW, rowHeights=rH)
+    #  =========================================
+    tbl_1.insert(0, zagolovok)
+    t1 = Table(tbl_1, colWidths=cW, rowHeights=rH)
     tblstyle = []
-    # ========= стиль таблицы ================
+    # =========  цикл создания стиля таблицы ================
     for q in range(1, t + 1):  # город участника делает курсивом
         fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")  # город участника делает курсивом
         tblstyle.append(fn)
         fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1), "DejaVuSerif-Bold")  # участника делает жирным шрифтом
         tblstyle.append(fn)
-        fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')  # цетнрирование текста в ячейках])
+        fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')  # центрирование текста в ячейках)
         tblstyle.append(fn)
         fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))  # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
         tblstyle.append(fn)
@@ -128,51 +107,62 @@ def table_made(kg, e, g2, t):
 
     ts = []
     ts.append(tblstyle)
+    # ============= полный стиль таблицы ======================
     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
+                     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                      ('FONTSIZE', (0, 0), (-1, -1), 7),
-                     ('ALIGN', (0, 0), (-1, -1), 'CENTER')]
+                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                     ('FONTNAME', (0, 0), (t + 5, 0), "DejaVuSerif-Bold"),
+                     ('VALIGN', (0, 0), (t + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
                     + tblstyle +
-                    [('BACKGROUND', (0, 0), (t * 2, 0), colors.yellow),
+                    [('BACKGROUND', (0, 0), (t + 5, 0), colors.yellow),
                      ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),  # цвет шрифта в ячейках
                      ('LINEABOVE', (0, 0), (-1, 1), 1, colors.black),  # цвет линий нижней
                      ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),  # цвет и толщину внутренних линий
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)  # внешние границы таблицы
                      ])
-
+#  ============ создание таблиц и вставка данных =================
     if kg == 1:
         data = [[t1]]
         t1.setStyle(ts)
     elif kg == 2:
         t1.setStyle(ts)
-        data2 = stroki_table
-        t2 = Table(data2, colWidths=cW, rowHeights=rH)
+        tbl_2.insert(0, zagolovok)
+        t2 = Table(tbl_2, colWidths=cW, rowHeights=rH)
         t2.setStyle(ts)
         data = [[t1, t2]]
+        shell_table = Table(data, colWidths=["*"])
+        elements.append(shell_table)
     elif kg == 3 or kg == 4:
-        data2 = stroki_table
-        t2 = Table(data2, colWidths=cW, rowHeights=rH)
+        t1 = Table(tbl_1, colWidths=cW, rowHeights=rH)
+        t1.setStyle(ts)
+        t2 = Table(tbl_2, colWidths=cW, rowHeights=rH)
         t2.setStyle(ts)
+        # # tbl_3 = stroki_table
+        # t3 = Table(tbl_3, colWidths=cW, rowHeights=rH)
+        # t3.setStyle(ts)
+        # # tbl_4 = stroki_table
+        # t4 = Table(tbl_4, colWidths=cW, rowHeights=rH)
+        # t4.setStyle(ts)
+        # создание таблиц на листе
         data = [[t1, t2]]
-        data3 = stroki_table
-        t3 = Table(data3, colWidths=cW, rowHeights=rH)
-        t3.setStyle(ts)
-        data4 = stroki_table
-        t4 = Table(data4, colWidths=cW, rowHeights=rH)
-        t4.setStyle(ts)
-        data1 = [[t3, t4]]
-
+        # data1 = [[t3, t4]]
+        shell_table = Table(data, colWidths=["*"])
+        # shell_table1 = Table(data1, colWidths=["*"])
+        elements.append(shell_table)
+        # elements.append(shell_table1)
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа
     # h3.spaceAfter = 10  # промежуток после заголовка
     h4 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=550)  # стиль параграфа
     h4.spaceAfter = 10  # промежуток после заголовка
     # elements.append(Paragraph('группа', h3))
-    shell_table = Table(data, colWidths=["*"])
+    # shell_table = Table(data, colWidths=["*"])
     # shell_table1 = Table(data1, colWidths=["*"])
     # elements.append(Paragraph('группа №1', h3))
     # elements.append(Paragraph('группа №2', h4))
-    elements.append(shell_table)
+    # elements.append(shell_table)
     # elements.append(Paragraph('группа №3', h3))
     # elements.append(Paragraph('группа №4', h4))
     # elements.append(shell_table1)
-    doc.build(elements, onFirstPage=func)
+    doc.build(elements, onFirstPage=func_zagolovok)

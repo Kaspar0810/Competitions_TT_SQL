@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -308,10 +308,10 @@
        </datetime>
       </property>
       <property name="currentSection">
-       <enum>QDateTimeEdit::DaySection</enum>
+       <enum>QDateTimeEdit::YearSection</enum>
       </property>
       <property name="displayFormat">
-       <string>dd-MM-yyyy</string>
+       <string>yyyy-MM-dd</string>
       </property>
       <property name="calendarPopup">
        <bool>true</bool>
@@ -371,11 +371,11 @@
         <second>0</second>
         <year>2021</year>
         <month>1</month>
-        <day>2</day>
+        <day>1</day>
        </datetime>
       </property>
       <property name="displayFormat">
-       <string>dd-MM-yyyy</string>
+       <string>yyyy-MM-dd</string>
       </property>
       <property name="calendarPopup">
        <bool>true</bool>
@@ -384,7 +384,7 @@
        <date>
         <year>2021</year>
         <month>1</month>
-        <day>2</day>
+        <day>1</day>
        </date>
       </property>
      </widget>
@@ -794,11 +794,11 @@
        <string>Этапы соревнования</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_2">
+     <widget class="QComboBox" name="comboBox_page">
       <property name="geometry">
        <rect>
-        <x>130</x>
-        <y>100</y>
+        <x>640</x>
+        <y>40</y>
         <width>151</width>
         <height>26</height>
        </rect>
@@ -825,6 +825,12 @@
         <width>51</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>48</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_11">
@@ -864,6 +870,19 @@
       </property>
       <property name="text">
        <string>Создать</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>640</x>
+        <y>10</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Ориентация страницы</string>
       </property>
      </widget>
     </widget>
@@ -1010,7 +1029,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -1157,6 +1176,25 @@
      <attribute name="label">
       <string>Система</string>
      </attribute>
+     <widget class="QPushButton" name="Button_system_made">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>220</y>
+        <width>113</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Создать</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_3">
      <property name="geometry">
