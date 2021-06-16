@@ -20,6 +20,8 @@ enc = 'UTF-8'
 
 
 
+
+
 def func_zagolovok(canvas, doc):
     """создание заголовка страниц"""
     tit = Title.get(Title.id == 1)
@@ -44,9 +46,72 @@ def func_zagolovok(canvas, doc):
     return func_zagolovok
 
 
-def table_made(kg, e, g2, t, pv):
-    """создание таблиц по g2 участника
-    kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе """
+def t_1(ts, zagolovok, cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    tbl_1 = tbl_data.table1_data()  # данные результатов в группах
+    tbl_1.insert(0, zagolovok)
+    t1 = Table(tbl_1, colWidths=cW, rowHeights=rH)
+    t1.setStyle(ts)
+
+    return t1
+
+
+def t_2(ts, zagolovok, cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    tbl_2 = tbl_data.table2_data()  # данные результатов в группах
+    tbl_2.insert(0, zagolovok)
+    t2 = Table(tbl_2, colWidths=cW, rowHeights=rH)
+    t2.setStyle(ts)
+
+    return t2
+
+
+def t_3(ts, zagolovok, cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    tbl_3 = tbl_data.table3_data()  # данные результатов в группах
+    tbl_3.insert(0, zagolovok)
+    t3 = Table(tbl_3, colWidths=cW, rowHeights=rH)
+    t3.setStyle(ts)
+    return t3
+
+
+def t_4(ts, zagolovok, cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    tbl_4 = tbl_data.table4_data()  # данные результатов в группах
+    tbl_4.insert(0, zagolovok)
+    t4 = Table(tbl_4, colWidths=cW, rowHeights=rH)
+    t4.setStyle(ts)
+    return t4
+
+
+def t_5(ts, zagolovok, cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    tbl_5 = tbl_data.table5_data()  # данные результатов в группах
+    tbl_5.insert(0, zagolovok)
+    t5 = Table(tbl_5, colWidths=cW, rowHeights=rH)
+    t5.setStyle(ts)
+    return t5
+
+
+def t_6(ts, zagolovok, cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    tbl_6 = tbl_data.table6_data()  # данные результатов в группах
+    tbl_6.insert(0, zagolovok)
+    t6 = Table(tbl_6, colWidths=cW, rowHeights=rH)
+    t6.setStyle(ts)
+    return t6
+
+
+def table_made(pv):
+    """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
+     pv - ориентация страницы, е - если участников четно группам, т - их количество"""
+    s = System.select().order_by(System.id.desc()).get()
+    kg = s.total_group
+    ta = s.total_athletes
+    t = int(ta) // int(kg)
+    e = int(ta) % int(kg)  # если количество участников не равно делится на группы
+    g2 = str(t + 1)
+
     g2 = int(g2)
     kg = int(kg)
 
@@ -55,15 +120,14 @@ def table_made(kg, e, g2, t, pv):
     else:
         t = g2
 
-    if kg == 1 and t <= 16:
-        wcells = 13.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (книжная ориентация стр)
-        col = ((wcells * cm,) * t)
-    elif kg == 1 and t <= 16 or g2 >= 10 or (kg >= 2 and t <= 6):
-        wcells = 8.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (альбомная ориентация стр)
-        col = ((wcells * cm,) * t)
-    # elif kg >= 2 and t <= 6:
-    #     wcells = 8.4 / g2  # ширина столбцов таблицы в зависимости от колво чел (альбомная ориентация стр)
-    #     col = ((wcells * cm,) * t)
+    if pv == landscape(A4):  # альбомная ориентация стр
+        if kg == 1:
+            wcells = 13.4 / g2  # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
+        else:
+            wcells = 7.4 / g2  # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
+    else:  # книжная ориентация стр
+        wcells = 12.8 / g2  # ширина столбцов таблицы в зависимости от кол-во чел
+    col = ((wcells * cm,) * t)
 
     doc = SimpleDocTemplate("table_grup.pdf", pagesize=pv)
     elements = []
@@ -76,13 +140,7 @@ def table_made(kg, e, g2, t, pv):
         i = str(i)
         num_columns.append(i)
     zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
-#  ================= данные таблиц =============
-    tbl_1 = tbl_data.table1_data()  # если будут занаситься данные результатов
-    tbl_2 = tbl_data.table2_data()
 
-    #  =========================================
-    tbl_1.insert(0, zagolovok)
-    t1 = Table(tbl_1, colWidths=cW, rowHeights=rH)
     tblstyle = []
     # =========  цикл создания стиля таблицы ================
     for q in range(1, t + 1):  # город участника делает курсивом
@@ -122,35 +180,76 @@ def table_made(kg, e, g2, t, pv):
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)  # внешние границы таблицы
                      ])
 #  ============ создание таблиц и вставка данных =================
+
     if kg == 1:
+        t1 = t_1(ts, zagolovok, cW, rH)
         data = [[t1]]
-        t1.setStyle(ts)
+        shell_table = Table(data, colWidths=["*"])
+        elements.append(shell_table)
     elif kg == 2:
-        t1.setStyle(ts)
-        tbl_2.insert(0, zagolovok)
-        t2 = Table(tbl_2, colWidths=cW, rowHeights=rH)
-        t2.setStyle(ts)
-        data = [[t1, t2]]
-        shell_table = Table(data, colWidths=["*"])
-        elements.append(shell_table)
-    elif kg == 3 or kg == 4:
-        t1 = Table(tbl_1, colWidths=cW, rowHeights=rH)
-        t1.setStyle(ts)
-        t2 = Table(tbl_2, colWidths=cW, rowHeights=rH)
-        t2.setStyle(ts)
-        # # tbl_3 = stroki_table
-        # t3 = Table(tbl_3, colWidths=cW, rowHeights=rH)
-        # t3.setStyle(ts)
-        # # tbl_4 = stroki_table
-        # t4 = Table(tbl_4, colWidths=cW, rowHeights=rH)
-        # t4.setStyle(ts)
-        # создание таблиц на листе
-        data = [[t1, t2]]
-        # data1 = [[t3, t4]]
-        shell_table = Table(data, colWidths=["*"])
-        # shell_table1 = Table(data1, colWidths=["*"])
-        elements.append(shell_table)
-        # elements.append(shell_table1)
+        t1 = t_1(ts, zagolovok, cW, rH)
+        t2 = t_2(ts, zagolovok, cW, rH)
+        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+            data = [[t1, t2]]
+            shell_table = Table(data, colWidths=["*"])
+            elements.append(shell_table)
+        else:  # страница книжная, то таблицы размещаются обе в столбец
+            data = [[t1]]
+            data1 = [[t2]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+    elif kg == 3:
+        t1 = t_1(ts, zagolovok, cW, rH)
+        t2 = t_2(ts, zagolovok, cW, rH)
+        t3 = t_3(ts, zagolovok, cW, rH)
+        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+            data = [[t1, t2]]
+            data1 = [[t3]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+        else:  # страница книжная, то таблицы размещаются обе в столбец
+            data = [[t1]]
+            data1 = [[t2]]
+            data2 = [[t3]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+    elif kg == 4:
+        t1 = t_1(ts, zagolovok, cW, rH)
+        t2 = t_2(ts, zagolovok, cW, rH)
+        t3 = t_3(ts, zagolovok, cW, rH)
+        t4 = t_4(ts, zagolovok, cW, rH)
+        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+            data = [[t1, t2]]
+            data1 = [[t3, t4]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+        else:  # страница книжная, то таблицы размещаются обе в столбец
+            data = [[t1]]
+            data1 = [[t2]]
+            data2 = [[t3]]
+            data3 = [[t4]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            shell_table3 = Table(data3, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+            elements.append(shell_table3)
+    elif kg == 5:
+        pass
+    elif kg == 6:
+        pass
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа
     # h3.spaceAfter = 10  # промежуток после заголовка
@@ -166,3 +265,16 @@ def table_made(kg, e, g2, t, pv):
     # elements.append(Paragraph('группа №4', h4))
     # elements.append(shell_table1)
     doc.build(elements, onFirstPage=func_zagolovok)
+
+
+def tour(cp):
+    """туры таблиц по кругу в зависимости от кол-во участников"""
+    pass
+    # tour_list = []
+    # tr = [[['1-3'], ['1-2'], ['2-3']],
+    #       [['1-3', '2-4'], ['1-2', '3-4'], ['2-3', '1-4']],
+    #       [['2-4', '1-5'], ['1-4', '3-5'], ['1-3', '2-5'], ['1-2', '3-4']],
+    #       [['2-4', '1-5', '3-6'], ['1-4', '2-6', '3-5'], ['1-3', '2-5', '4-6'], ['1-2', '3-4', '5-6']]]
+    #
+    # tour_list = tr[cp]
+    # return tour_list

@@ -11,31 +11,6 @@ class BaseModel(Model):
         database = db
 
 
-class System(BaseModel):
-    total_athletes = IntegerField()
-    total_grupp = IntegerField()
-
-    class Meta:
-        db_table = "system"
-
-
-class Title(BaseModel):
-    name = CharField()
-    sredi = CharField()
-    vozrast = CharField()
-    data_start = DateField()
-    data_end = DateField()
-    mesto = CharField(20)
-    referee = CharField()
-    kat_ref = CharField(10)
-    secretary = CharField()
-    kat_sek = CharField(10)
-    system_id = ForeignKeyField(System)
-
-    class Meta:
-        db_table = "titles"
-
-
 class Coach(BaseModel):
     coach = CharField()
 
@@ -53,7 +28,7 @@ class Player(BaseModel):
     region = CharField()
     razryad = CharField(10)
     coach_id = ForeignKeyField(Coach)
-    # mesto = IntegerField()
+    mesto = IntegerField(null=True)
 
     class Meta:
         db_table = "players"
@@ -101,8 +76,74 @@ class City(BaseModel):
         order_by = "city"
 
 
+class Title(BaseModel):
+    name = CharField()
+    sredi = CharField()
+    vozrast = CharField()
+    data_start = DateField()
+    data_end = DateField()
+    mesto = CharField(20)
+    referee = CharField()
+    kat_ref = CharField(10)
+    secretary = CharField()
+    kat_sek = CharField(10)
 
 
+    class Meta:
+        db_table = "titles"
 
 
+class Result(BaseModel):
+    system_stage = CharField()
+    tours = CharField()
+    player1 = CharField()
+    player2 = CharField()
+    winner = CharField(null=True)
+    points_win = IntegerField(null=True)
+    score_win = CharField(null=True)
+    loser = CharField(null=True)
+    points_loser = IntegerField(null=True)
+    score_loser = CharField(null=True)
+    title_id = ForeignKeyField(Title)
 
+    class Meta:
+        db_table = "results"
+        opder_by = "id"
+
+
+class System(BaseModel):
+    title_id = ForeignKeyField(Title)
+    total_athletes = IntegerField()
+    total_group = IntegerField()
+    max_player = IntegerField(null=True)
+    stage = CharField()
+
+    class Meta:
+        db_table = "system"
+
+class Game_list(BaseModel):
+    number_group = CharField()
+    rank_num_player = IntegerField()
+    player_group = ForeignKeyField(Player)
+    system_id = ForeignKeyField(System)
+
+    class Meta:
+        db_table = "game_lists"
+        order_by = "number_group"
+
+
+class Tour(BaseModel):
+    person_in_group = CharField()
+    table_1 = CharField(10)
+    table_2 = CharField(10)
+    table_3 = CharField(10)
+    table_4 = CharField(10)
+    table_5 = CharField(10)
+    table_6 = CharField(10)
+    table_7 = CharField(10)
+    table_8 = CharField(10)
+    result_id = ForeignKeyField(Result)
+
+    class Meta:
+        db_table = "tours"
+        order_by = "person_in_group"
