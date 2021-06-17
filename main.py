@@ -259,16 +259,19 @@ def system_update(kg):
     sys.total_athletes = ta
     sys.total_group = kg
     sys.stage = my_win.comboBox_1_etap.currentText()
+    sys.page_vid = my_win.comboBox_page.currentText()
     sys.save()
 
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
+
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     sg = my_win.comboBox_1_etap.currentText()
-
+    page_v = my_win.comboBox_page.currentText()
     with db:
-        sys = System(title_id=t, total_athletes=0, total_group=0, max_update=0, stage=sg).save()
+        System.create_table()
+        sys = System(title_id=t, total_athletes=0, total_group=0, max_update=0, stage=sg, page_vid=page_v).save()
 
 
 def region():
@@ -461,14 +464,6 @@ def title_pdf():
 
 def title_made():
     """создание тильного листа соревнования"""
-    # age = my_win.lineEdit_title_vozrast.text()
-    # p = age.count(" ")
-    # if p == 2:
-    #     god = int(age[3:5])
-    #     age = date.today().year - (god - 1)  # год рождения и младше могут играть
-    # elif p == 4:
-    #     age = int(age[0:5])  # год рождения и младше могут играть
-
     title_string()
     if my_win.Button_title_made.text() == "Редактировать":
         title_update()
@@ -915,7 +910,6 @@ def kol_player_in_group(self):
     t = int(count) // int(kg)  # если количество участников равно делится на группы
     g1 = (int(kg) - e)
     g2 = str(t + 1)
-    # system_update(kg)
     if e == 0:  # то в группах равное количесто человек -t-
         stroka_kol_group = (kg + " группы по " + str(t) + " чел.")
     else:
@@ -923,7 +917,6 @@ def kol_player_in_group(self):
                             + str(e) + " групп(а) по " + str(g2) + " чел.")
     my_win.label_12.setText(stroka_kol_group)
     my_win.label_12.show()
-    comp_system.table_made(page_vid())
     filter()
     if sender == my_win.Button_table_made:
         system_update(kg)

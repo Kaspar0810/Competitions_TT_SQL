@@ -117,6 +117,7 @@ class System(BaseModel):
     total_group = IntegerField()
     max_player = IntegerField(null=True)
     stage = CharField()
+    page_vid = CharField()
 
     class Meta:
         db_table = "system"
