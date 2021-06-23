@@ -1,6 +1,6 @@
 import tbl_data
 from models import *
-import pdf
+# import pdf
 
 
 from reportlab.pdfgen.canvas import Canvas
@@ -32,14 +32,8 @@ def func_zagolovok(canvas, doc):
     title = Title.select().order_by(Title.id.desc()).get()
     nz = title.name
     ms = title.mesto
-    sr = "среди " + title.sredi + " " + title.vozrast
+    sr = f"среди {title.sredi} {title.vozrast}"
     ds = str(title.data_start)
-    if pv == landscape(A4):
-        main_referee_collegia = "Гл. судья: " + title.referee + " судья " + title.kat_ref + "______________          " + \
-                        "Гл. секретарь: " + title.secretary + " судья " + title.kat_sek + "______________"
-    else:
-        main_referee = "Гл. судья: " + title.referee + " судья " + title.kat_ref + "______________"
-        main_secretary = "Гл. секретарь: " + title.secretary + " судья " + title.kat_sek + "______________"
 
     canvas.saveState()
 
@@ -51,8 +45,12 @@ def func_zagolovok(canvas, doc):
     canvas.drawString(0.8 * cm, height - 1.5 * cm, ds)  # дата начала
     canvas.setFont("DejaVuSerif-Italic", 11)
     if pv == landscape(A4):
+        main_referee_collegia = f"Гл. судья: {title.referee} судья {title.kat_ref }______________  " \
+                                f"Гл. секретарь: {title.secretary} судья {title.kat_sek} ______________"
         canvas.drawCentredString(width / 2.0, height - 20 * cm, main_referee_collegia)  # текста титула по основным
     else:
+        main_referee = f"Гл. судья: {title.referee} судья {title.kat_ref} ______________"
+        main_secretary = f"Гл. секретарь: {title.secretary} судья {title.kat_sek} ______________"
         canvas.drawString(2 * cm, 3 * cm, main_referee)  # подпись главного судьи
         canvas.drawString(2 * cm, 2 * cm, main_secretary)  # подпись главного секретаря
     canvas.restoreState()
@@ -115,6 +113,24 @@ def t_6(ts, zagolovok, cW, rH):
     return t6
 
 
+def t_7(ts, zagolovok, cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    tbl_7 = tbl_data.table5_data()  # данные результатов в группах
+    tbl_7.insert(0, zagolovok)
+    t7 = Table(tbl_7, colWidths=cW, rowHeights=rH)
+    t7.setStyle(ts)
+    return t7
+
+
+def t_8(ts, zagolovok, cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    tbl_8 = tbl_data.table6_data()  # данные результатов в группах
+    tbl_8.insert(0, zagolovok)
+    t8 = Table(tbl_8, colWidths=cW, rowHeights=rH)
+    t8.setStyle(ts)
+    return t8
+
+
 def table_made(pv):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
@@ -146,7 +162,7 @@ def table_made(pv):
     elements = []
 
     cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина
-    rH = (0.4 * cm)  # высота строки
+    rH = (0.3 * cm)  # высота строки
     num_columns = []  # заголовки столобцов и их нумерация в зависимости от кол-во участников
     for i in range(0, t):
         i += 1
@@ -260,9 +276,75 @@ def table_made(pv):
             elements.append(shell_table2)
             elements.append(shell_table3)
     elif kg == 5:
-        pass
+        t1 = t_1(ts, zagolovok, cW, rH)
+        t2 = t_2(ts, zagolovok, cW, rH)
+        t3 = t_3(ts, zagolovok, cW, rH)
+        t4 = t_4(ts, zagolovok, cW, rH)
+        t5 = t_5(ts, zagolovok, cW, rH)
+        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+            data = [[t1, t2]]
+            data1 = [[t3, t4]]
+            data2 = [[t5]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+        else:  # страница книжная, то таблицы размещаются обе в столбец
+            data = [[t1]]
+            data1 = [[t2]]
+            data2 = [[t3]]
+            data3 = [[t4]]
+            data4 = [[t5]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            shell_table3 = Table(data3, colWidths=["*"])
+            shell_table4 = Table(data4, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+            elements.append(shell_table3)
+            elements.append(shell_table4)
     elif kg == 6:
-        pass
+        t1 = t_1(ts, zagolovok, cW, rH)
+        t2 = t_2(ts, zagolovok, cW, rH)
+        t3 = t_3(ts, zagolovok, cW, rH)
+        t4 = t_4(ts, zagolovok, cW, rH)
+        t5 = t_5(ts, zagolovok, cW, rH)
+        t6 = t_6(ts, zagolovok, cW, rH)
+        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+            data = [[t1, t2]]
+            data1 = [[t3, t4]]
+            data2 = [[t5, t6]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+        else:  # страница книжная, то таблицы размещаются обе в столбец
+            data = [[t1]]
+            data1 = [[t2]]
+            data2 = [[t3]]
+            data3 = [[t4]]
+            data4 = [[t5]]
+            data5 = [[t6]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            shell_table3 = Table(data3, colWidths=["*"])
+            shell_table4 = Table(data4, colWidths=["*"])
+            shell_table5 = Table(data5, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+            elements.append(shell_table3)
+            elements.append(shell_table4)
+            elements.append(shell_table5)
+
+
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа
     # h3.spaceAfter = 10  # промежуток после заголовка
@@ -279,7 +361,7 @@ def table_made(pv):
     # elements.append(shell_table1)
 
     doc = SimpleDocTemplate("table_grup.pdf", pagesize=pv)
-    doc.build(elements, onFirstPage=func_zagolovok)
+    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
 
 
 def tour(cp):

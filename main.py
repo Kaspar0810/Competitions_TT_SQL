@@ -23,6 +23,7 @@ import openpyxl as op
 import pdf
 import os
 
+
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
@@ -32,16 +33,19 @@ from main_window import Ui_MainWindow  # импортируем из модул�
 from pdf import *
 
 from reportlab.pdfgen.canvas import Canvas
+from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate
 from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.platypus import PageBreak
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER
 
 registerFontFamily('DejaVuSerif', normal='DejaVuSerif', bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
 enc = 'UTF-8'
@@ -173,7 +177,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def saveList(self):
         my_win.tabWidget.setCurrentIndex(1)
         my_win.toolBox.setCurrentIndex(1)
-        table_pdf()
+        list_player_pdf()
         self.statusbar.showMessage("Список участников сохранен")
 
 
@@ -189,12 +193,15 @@ page_orient = ("альбомная", "книжная")
 kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
-stages = ("Основной", "Предварительный", "Полуфиналы", "Финальный", "Суперфинал")
+stages1 = ("Основной", "Предварительный", "Полуфиналы", "Финальный", "Суперфинал")
+stages2 = ("Полуфиналы", "Финальный", "Суперфинал")
 months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
                "августа", "сентября", "октября", "ноября", "декабря")
 
-my_win.comboBox_page.addItems(page_orient)
-my_win.comboBox_1_etap.addItems(stages)
+my_win.comboBox_page_1.addItems(page_orient)
+my_win.comboBox_page_2.addItems(page_orient)
+my_win.comboBox_etap_1.addItems(stages1)
+my_win.comboBox_etap_2.addItems(stages2)
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
 my_win.comboBox_sredi.addItems(mylist)
@@ -246,32 +253,52 @@ def db_select_title():
 
 def system_update(kg):
     """Обновляет таблицу система кол-во игроков, кол-во групп и прочее"""
-    sys = System.get(System.id)
+    sender = my_win.sender()  # сигнал от кнопки
     ps = Player.select()
     ta = len(ps)
     e = int(ta) % int(kg)  # если количество участников не равно делится на группы
     t = int(ta) // int(kg)  # если количество участников равно делится на группы
-    if e == 0:
-        sys.max_player = t
+    title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    if sender == my_win.Button_1etap_made:
+        system = System.get(System.id == title.id)  # находит в базе запись в таблице -system- по данным соревнованиям
+        # etap_pred = system.get(System.stage == "Предварительный")  # делает выборку записи по этапу соревнований
+        if e == 0:
+            system.max_player = t
+        else:
+            system.max_player = t + 1
+        system.total_athletes = ta
+        system.total_group = kg
+        system.stage = my_win.comboBox_etap_1.currentText()
+        system.page_vid = my_win.comboBox_page_1.currentText()
     else:
-        sys.max_player = t + 1
-
-    sys.total_athletes = ta
-    sys.total_group = kg
-    sys.stage = my_win.comboBox_1_etap.currentText()
-    sys.page_vid = my_win.comboBox_page.currentText()
-    sys.save()
+        pass
+    system.save()
 
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
+    t = Title.select().order_by(Title.id.desc()).get()  # последний id соревнований (текуших)
+    ce = System.get(System.id == t.id)  # получаем id system текущих соревнований
+    cs = System.select().where(System.id == ce)  # все строки, где title_id соревнований
+    count_system = len(cs)  # полученкие количества записей (этапов) в системе
+    sg = my_win.comboBox_etap_1.currentText()
+    page_v = my_win.comboBox_page_1.currentText()
+    total_group = ce.total_group
+    total_athletes = ce.total_athletes
+    max_player = ce.max_player
+    if sg == "Основной":
+        pass
+    else:  # предварительный этап
+        for i in range(1, count_system + 1):
+            system = System(id=cs, title_id=t, total_athletes=total_athletes, total_group=total_group, max_player=max_player,
+                            stage=sg, page_vid=page_v).save()
 
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    sg = my_win.comboBox_1_etap.currentText()
-    page_v = my_win.comboBox_page.currentText()
-    with db:
-        System.create_table()
-        sys = System(title_id=t, total_athletes=0, total_group=0, max_update=0, stage=sg, page_vid=page_v).save()
+    player_in_table()
+    my_win.checkBox_2.setChecked(False)
+    my_win.checkBox_3.setChecked(False)
+    my_win.Button_system_made.setEnabled(False)
+    my_win.Button_1etap_made.setEnabled(False)
+    my_win.Button_2etap_made.setEnabled(False)
 
 
 def region():
@@ -467,13 +494,20 @@ def title_made():
     title_string()
     if my_win.Button_title_made.text() == "Редактировать":
         title_update()
+        return
     else:
         db_insert_title()
     title_pdf()
     my_win.checkBox.setChecked(False)  # после заполнения титула выключает чекбокс
     my_win.Button_title_made.setText("Создать")
     region()
-    system_made()
+    # system_made()
+    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    sg = my_win.comboBox_etap_1.currentText()
+    page_v = my_win.comboBox_page_1.currentText()
+    with db:
+        System.create_table()
+        sys = System(title_id=t, total_athletes=0, total_group=0, max_update=0, stage=sg, page_vid=page_v).save()
 
 
 def title_update():
@@ -616,6 +650,7 @@ def add_player():
     rg = my_win.comboBox_region.currentText()
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
+    ms = ""
 
     num = count + 1
     add_coach(ch, num)
@@ -623,14 +658,14 @@ def add_player():
     with db:
         idc = Coach.get(Coach.coach == ch)
         plr = Player(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-                     razryad=rz, coach_id=idc).save()
+                     razryad=rz, coach_id=idc, mesto=ms).save()
 
     add_city()
     element = str(rn)
     rn = ('    ' + element)[-4:]  # make all elements the same length
-    spisok = (str(num), pl, bd, rn, ct, rg, rz, ch)
+    spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
 
-    for i in range(0, 8):  # добавляет в tablewidget
+    for i in range(0, 9):  # добавляет в tablewidget
         my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
 
     my_win.lineEdit_Family_name.clear()
@@ -640,6 +675,7 @@ def add_player():
     my_win.lineEdit_coach.clear()
 
     my_win.tableWidget.resizeColumnsToContents()
+    list_player_pdf()
 
 
 def dclick_in_listwidget():
@@ -693,15 +729,18 @@ def tab():
         my_win.tableWidget.show()
         db_select_title()
     elif tw == 1:
-        my_win.tableWidget.show()
         region()
         load_tableWidget()
+        my_win.tableWidget.show()
     elif tw == 2:
+        my_win.Button_system_made.setEnabled(False)
+        my_win.Button_1etap_made.setEnabled(False)
+        my_win.Button_2etap_made.setEnabled(False)
         s = System.select().order_by(System.id.desc()).get()
         st = s.total_athletes
         se = s.stage
         if st > 0:
-           my_win.comboBox_1_etap.setCurrentText(se)
+           my_win.comboBox_etap_1.setCurrentText(se)
         else:
             my_win.tableWidget.hide()
             my_win.label_11.hide()
@@ -731,6 +770,9 @@ def page():
         load_tableWidget()
         my_win.tableWidget.show()
     elif tb == 2:
+        my_win.Button_system_made.setEnabled(False)
+        my_win.Button_1etap_made.setEnabled(False)
+        my_win.Button_2etap_made.setEnabled(False)
         my_win.tableWidget.hide()
         my_win.label_11.hide()
         my_win.label_12.hide()
@@ -740,7 +782,7 @@ def page():
         my_win.label_8.setText("Всего участников: " + str(count) + " чел.")
         s = System.select().order_by(System.id.desc()).get()
         se = s.stage
-        my_win.comboBox_1_etap.setCurrentText(se)
+        my_win.comboBox_etap_1.setCurrentText(se)
         # my_win.label_12.setText()
         my_win.label_12.show()
     elif tb == 3:
@@ -766,7 +808,8 @@ def add_city():
             city = City(city=ct, region_id=ir).save()
 
 
-def find_coach():  # Поиск тренера в базе
+def find_coach():
+    """поиск тренера в базе"""
     my_win.listWidget.clear()
     my_win.textEdit.clear()
     cp = my_win.lineEdit_coach.text()
@@ -816,6 +859,13 @@ def sort(self):
         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 
 
+def button_etap_made_enabled(state):
+    """включает кнопку - создание таблиц - если отмечен чекбокс, защита от случайного нажатия"""
+    if state == 2:
+        my_win.Button_1etap_made.setEnabled(True)
+        my_win.Button_2etap_made.setEnabled(True)
+
+
 def button_title_made_enable(state):
     """включает кнопку - создание титула - если отмечен чекбокс, защита от случайного нажатия"""
     if state == 2:  # если флажок установлен
@@ -830,12 +880,15 @@ def button_title_made_enable(state):
         my_win.Button_title_made.setEnabled(False)
 
 
+def button_sytem_made_enable(state):
+    """включает кнопку - создание системы - если отмечен чекбокс, защита от случайного нажатия"""
+    if state == 2:
+        my_win.Button_system_made.setEnabled(True)
+
+
 def list_player_pdf():
     """создание списка учстников в pdf файл"""
-    doc = SimpleDocTemplate("table_list.pdf", pagesize=A4)
-    tit = Title.get(Title.id == 1)
-    nz = tit.name
-    sr = "среди " + tit.sredi + " " + tit.vozrast
+    title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
 
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
@@ -854,33 +907,32 @@ def list_player_pdf():
         t = my_win.tableWidget.item(k, 6).text()
         q = my_win.tableWidget.item(k, 7).text()
         m = my_win.tableWidget.item(k, 8).text()
-
+        q = chop_line(q)
         data = [n, p, b, c, g, z, t, q, m]
         elements.append(data)
-    elements.insert(0, ["№", "Фамилия, Имя", "Дата рождени ", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)"])
+    elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
+                        "Место"])
     t = Table(elements,
-              colWidths=(None, None, None, None, None, None, None, None))  # ширина столбцов, если None-автомтическая
+              colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.7 * cm, 1.1 * cm),
+              rowHeights=0.7 * cm)  # ширина столбцов, если None-автомтическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
-                           ('FONTSIZE', (0, 0), (-1, -1), 8),  # Использую импортированный шрифта размер
+                           ('FONTSIZE', (0, 0), (-1, -1), 7),  # Использую импортированный шрифта размер
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # вериткальное выравнивание в ячейке заголовка
+                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),  # горизонтальное выравнивание в ячейке
                            ('BACKGROUND', (0, 0), (-1, kp * -1), colors.yellow),
                            ('TEXTCOLOR', (0, 0), (-1, kp * -1), colors.darkblue),
                            ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
-                           ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),  # цвет и толщину внутренних линий
+                           ('INNERGRID', (0, 0), (-1, -1), 0.05, colors.black),  # цвет и толщину внутренних линий
                            ('BOX', (0, 0), (-1, -1), 0.25, colors.black)  # внешние границы таблицы
                            ]))
-    h1 = PS("normal", fontSize=14, fontName="DejaVuSerif-Italic", leftIndent=0, firstLineIndent=-20)  # стиль параграфа
-    h1.spaceAfter = 10  # промежуток после заголовка
-    h1.spaceBefore = 0
-    h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50, firstLineIndent=-20)  # стиль параграфа
-    h2.spaceAfter = 20  # промежуток после заголовка
-    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50, firstLineIndent=-20)  # стиль параграфа
-    h3.spaceAfter = 10  # промежуток после заголовка
 
-    story.append(Paragraph(nz, h1))
-    story.append(Paragraph(sr, h2))
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150, firstLineIndent=-20)  # стиль параграфа
+    h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph('Список участников', h3))
     story.append(t)
-    doc.multiBuild(story)
+
+    doc = SimpleDocTemplate("table_list.pdf", pagesize=A4)
+    doc.build(story, onFirstPage=comp_system.func_zagolovok)
 
 
 def exit_comp():
@@ -890,7 +942,7 @@ def exit_comp():
 
 def system():
     """выбор системы проведения"""
-    ct = my_win.comboBox_1_etap.currentText()
+    ct = my_win.comboBox_etap_1.currentText()
     if ct == "Основной":
         my_win.spinBox_kol_group.hide()
         my_win.label_11.hide()
@@ -918,13 +970,13 @@ def kol_player_in_group(self):
     my_win.label_12.setText(stroka_kol_group)
     my_win.label_12.show()
     filter()
-    if sender == my_win.Button_table_made:
+    if sender == my_win.Button_1etap_made:
         system_update(kg)
-        player_in_table()
 
 
 def page_vid():
-    if my_win.comboBox_page.currentText() == "альбомная":
+    """присваивает переменной значение выборат вида страницы"""
+    if my_win.comboBox_page_1.currentText() == "альбомная":
         pv = landscape(A4)
     else:
         pv = A4
@@ -933,7 +985,21 @@ def page_vid():
 
 def view():
     """просмотр PDF файлов средствами OS"""
-    os.system("open " + "table_grup.pdf")
+    tw = my_win.tabWidget.currentIndex()
+    view_file = ""
+    if tw == 0:
+        view_file = "Title.pdf"
+    elif tw == 1:
+        view_file = "table_list.pdf"
+    elif tw == 2:
+        pass
+    elif tw == 3:  # вкладка группы
+        view_file = "table_grup.pdf"
+    elif tw == 4:
+        pass
+    elif tw == 5:
+        pass
+    os.system(f"open {view_file}")
 
 
 def player_in_table():
@@ -952,9 +1018,110 @@ def player_in_table():
             k += 1
             with db:
                 game_list = Game_list(number_group=number_group, rank_num_player=k, player_group=family_player,
-                               system_id=si).save()
+                                        system_id=si).save()
 
 
+def chop_line(q, maxline=30):
+    """перевод строки если слишком длинный список тренеров"""
+    if len(q) > maxline:
+        s1 = q.find(",", 0, maxline)
+        s2 = q.find(",", s1 + 1, maxline)
+
+        cant = len(q) // maxline
+        cant += 1
+        strline = ""
+        for k in range(1, cant):
+            index = maxline * k
+            strline += "%s\n" % (q[(index - maxline):s2 + 1])
+        strline += "%s" % (q[s2 + 1:])
+        q = strline
+        return q
+    else:
+        return q
+
+
+def proba():
+    elements = []
+    player_list = Player.select()
+    count = len(player_list)  # колличество записей в базе
+    # kp = count + 1
+    width, height = A4
+    styles = getSampleStyleSheet()
+    styleN = styles["BodyText"]
+    styleN.alignment = TA_LEFT
+    styleBH = styles["Normal"]
+    styleBH.alignment = TA_CENTER
+
+    def coord(x, y, unit=1):
+        x, y = x * unit, height - y * unit
+        return x, y
+
+    # Headers
+    num = Paragraph('''<b>№</b>''', styleBH)
+    family = Paragraph('''<b>Фамилия, Имя</b>''', styleBH)
+    bday = Paragraph('''<b>Дата рождения</b>''', styleBH)
+    rank = Paragraph('''<b>Рейтинг</b>''', styleBH)
+    city = Paragraph('''<b>Город</b>''', styleBH)
+    region = Paragraph('''<b>Регион</b>''', styleBH)
+    razryad = Paragraph('''<b>Разряд</b>''', styleBH)
+    coach = Paragraph('''<b>Тренер(ы)</b>''', styleBH)
+    mesto = Paragraph('''<b>Место</b>''', styleBH)
+
+    #==========================
+    for k in range(0, count):  # цикл по списку по строкам
+        n = my_win.tableWidget.item(k, 0).text()
+        p = my_win.tableWidget.item(k, 1).text()
+        b = my_win.tableWidget.item(k, 2).text()
+        c = my_win.tableWidget.item(k, 3).text()
+        g = my_win.tableWidget.item(k, 4).text()
+        z = my_win.tableWidget.item(k, 5).text()
+        t = my_win.tableWidget.item(k, 6).text()
+        q = my_win.tableWidget.item(k, 7).text()
+        m = my_win.tableWidget.item(k, 8).text()
+
+        n = Paragraph(n, styleN)
+        p = Paragraph(p, styleN)
+        b = Paragraph(b, styleN)
+        c = Paragraph(c, styleN)
+        g = Paragraph(g, styleN)
+        z = Paragraph(z, styleN)
+        t = Paragraph(t, styleN)
+        q = Paragraph(q, styleN)
+
+        data = [n, p, b, c, g, z, t, q, m]
+        # elements.append(data)
+    #==========================
+    # Texts
+    #     n = Paragraph(n, styleN)
+    #     p = Paragraph(p, styleN)
+    #     b = Paragraph(b, styleN)
+    #     c = Paragraph(c, styleN)
+    #     g = Paragraph(g, styleN)
+    #     z = Paragraph(z, styleN)
+    #     t = Paragraph(t, styleN)
+    #     q = Paragraph(q, styleN)
+    #     m = Paragraph(m, styleN)
+    #     elements.append(data)
+    data = [[num, family, bday, rank, city, region, razryad, coach, mesto], [n, p, b, c, g, z, t, q, m]]
+
+    t = Table(data, colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm,
+                                4.7 * cm, 1.1 * cm))
+
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                           ('FONTSIZE', (0, 0), (-1, -1), 7),  # Использую импортированный шрифта размер
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # вериткальное выравнивание в ячейке заголовка
+                           ('ALIGN', (0, 0), (8, 0), 'CENTER'),  # горизонтальное выравнивание в ячейке
+                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (8, 0), 1, colors.blue),
+                           ('INNERGRID', (0, 0), (-1, -1), 0.05, colors.black),  # цвет и толщину внутренних линий
+                           ('BOX', (0, 0), (-1, -1), 0.25, colors.black)  # внешние границы таблицы
+                           ]))
+
+    c = canvas.Canvas("a.pdf", pagesize=A4)
+    t.wrapOn(c, width, height)
+    t.drawOn(c, *coord(0.5, 20, cm))
+    c.save()
 
 # ====== отслеживание изменения текста в полях ============
 
@@ -968,14 +1135,17 @@ my_win.toolBox.currentChanged.connect(page)
 # ==================================
 my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
-my_win.comboBox_1_etap.currentTextChanged.connect(system)
-my_win.comboBox_page.currentTextChanged.connect(page_vid)
+my_win.comboBox_etap_1.currentTextChanged.connect(system)
+my_win.comboBox_page_1.currentTextChanged.connect(page_vid)
 
-# =======  нажатие кнопок =========
-my_win.Button_table_made.clicked.connect(kol_player_in_group)  # рисует таблицы группового этапа и заполняет game_list
+# =======  отслеживание переключение чекбоксов =========
 my_win.checkBox.stateChanged.connect(button_title_made_enable)  # при изменении чекбокса активирует кнопку создать
+my_win.checkBox_2.stateChanged.connect(button_etap_made_enabled)  # при изменении чекбокса активирует кнопку создать
+my_win.checkBox_3.stateChanged.connect(button_sytem_made_enable)  # при изменении чекбокса активирует кнопку создать
+# =======  нажатие кнопок =========
+my_win.Button_1etap_made.clicked.connect(kol_player_in_group)  # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_system_made.clicked.connect(system_made)  # создание системы соревнований
-# my_win.Button_export.clicked.connect(player_in_table)
+my_win.Button_proba.clicked.connect(proba)
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул

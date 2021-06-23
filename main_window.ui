@@ -771,7 +771,7 @@
        <string>Всего участников:</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_1_etap">
+     <widget class="QComboBox" name="comboBox_etap_1">
       <property name="geometry">
        <rect>
         <x>80</x>
@@ -794,7 +794,7 @@
        <string>Этапы соревнования</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_page">
+     <widget class="QComboBox" name="comboBox_page_1">
       <property name="geometry">
        <rect>
         <x>600</x>
@@ -859,7 +859,7 @@
        <string>TextLabel</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="Button_table_made">
+     <widget class="QPushButton" name="Button_1etap_made">
       <property name="geometry">
        <rect>
         <x>710</x>
@@ -883,6 +883,65 @@
       </property>
       <property name="text">
        <string>Вид страницы</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_2">
+      <property name="geometry">
+       <rect>
+        <x>740</x>
+        <y>40</y>
+        <width>21</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_etap_2">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>100</y>
+        <width>151</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>100</y>
+        <width>60</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>2-й этап:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_page_2">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>100</y>
+        <width>111</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Button_2etap_made">
+      <property name="geometry">
+       <rect>
+        <x>710</x>
+        <y>100</y>
+        <width>81</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Создать</string>
       </property>
      </widget>
     </widget>
@@ -1025,6 +1084,9 @@
     <property name="lineWidth">
      <number>2</number>
     </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
     <property name="sizeAdjustPolicy">
      <enum>QAbstractScrollArea::AdjustToContents</enum>
     </property>
@@ -1079,15 +1141,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>255</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1141,8 +1203,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>255</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1219,8 +1281,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>255</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1245,6 +1307,19 @@
        <string>Создать</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="checkBox_3">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>220</y>
+        <width>21</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_3">
      <property name="geometry">
@@ -1264,8 +1339,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>255</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1277,8 +1352,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>199</width>
+       <height>255</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1332,10 +1407,17 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="0">
       <widget class="QPushButton" name="Button_view">
        <property name="text">
         <string>Просмотр</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="Button_proba">
+       <property name="text">
+        <string>Проба</string>
        </property>
       </widget>
      </item>
