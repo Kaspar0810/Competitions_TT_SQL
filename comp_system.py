@@ -151,18 +151,19 @@ def table_made(pv):
         t = g2
 
     if pv == landscape(A4):  # альбомная ориентация стр
-        if kg == 1:
+        if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:
             wcells = 21.4 / t  # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
         else:
-            wcells = 7.4 / g2  # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
+            wcells = 7.4 / t  # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
     else:  # книжная ориентация стр
-        wcells = 12.8 / g2  # ширина столбцов таблицы в зависимости от кол-во чел
+        wcells = 12.8 / t  # ширина столбцов таблицы в зависимости от кол-во чел
     col = ((wcells * cm,) * t)
 
     elements = []
 
     cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина
-    rH = (0.3 * cm)  # высота строки
+    rH = (0.4 * cm)  # высота строки
+    # rH = None  # высота строки
     num_columns = []  # заголовки столобцов и их нумерация в зависимости от кол-во участников
     for i in range(0, t):
         i += 1
@@ -218,7 +219,7 @@ def table_made(pv):
     elif kg == 2:
         t1 = t_1(ts, zagolovok, cW, rH)
         t2 = t_2(ts, zagolovok, cW, rH)
-        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+        if pv == landscape(A4) and t in [3, 4, 5, 6]:  # страница альбомная, то таблицы размещаются обе в ряд
             data = [[t1, t2]]
             shell_table = Table(data, colWidths=["*"])
             elements.append(shell_table)
@@ -343,8 +344,98 @@ def table_made(pv):
             elements.append(shell_table3)
             elements.append(shell_table4)
             elements.append(shell_table5)
+    elif kg == 7:
+        t1 = t_1(ts, zagolovok, cW, rH)
+        t2 = t_2(ts, zagolovok, cW, rH)
+        t3 = t_3(ts, zagolovok, cW, rH)
+        t4 = t_4(ts, zagolovok, cW, rH)
+        t5 = t_5(ts, zagolovok, cW, rH)
+        t6 = t_6(ts, zagolovok, cW, rH)
+        t7 = t_7(ts, zagolovok, cW, rH)
 
+        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+            data = [[t1, t2]]
+            data1 = [[t3, t4]]
+            data2 = [[t5, t6]]
+            data3 = [[t7]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            shell_table3 = Table(data3, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+            elements.append(shell_table3)
+        else:  # страница книжная, то таблицы размещаются обе в столбец
+            data = [[t1]]
+            data1 = [[t2]]
+            data2 = [[t3]]
+            data3 = [[t4]]
+            data4 = [[t5]]
+            data5 = [[t6]]
+            data6 = [[t7]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            shell_table3 = Table(data3, colWidths=["*"])
+            shell_table4 = Table(data4, colWidths=["*"])
+            shell_table5 = Table(data5, colWidths=["*"])
+            shell_table6 = Table(data6, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+            elements.append(shell_table3)
+            elements.append(shell_table4)
+            elements.append(shell_table5)
+            elements.append(shell_table6)
+    elif kg == 8:
+        t1 = t_1(ts, zagolovok, cW, rH)
+        t2 = t_2(ts, zagolovok, cW, rH)
+        t3 = t_3(ts, zagolovok, cW, rH)
+        t4 = t_4(ts, zagolovok, cW, rH)
+        t5 = t_5(ts, zagolovok, cW, rH)
+        t6 = t_6(ts, zagolovok, cW, rH)
+        t7 = t_7(ts, zagolovok, cW, rH)
+        t8 = t_8(ts, zagolovok, cW, rH)
 
+        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+            data = [[t1, t2]]
+            data1 = [[t3, t4]]
+            data2 = [[t5, t6]]
+            data3 = [[t7, t8]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            shell_table3 = Table(data3, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+            elements.append(shell_table3)
+        else:  # страница книжная, то таблицы размещаются обе в столбец
+            data = [[t1]]
+            data1 = [[t2]]
+            data2 = [[t3]]
+            data3 = [[t4]]
+            data4 = [[t5]]
+            data5 = [[t6]]
+            data6 = [[t7]]
+            data7 = [[t8]]
+            shell_table = Table(data, colWidths=["*"])
+            shell_table1 = Table(data1, colWidths=["*"])
+            shell_table2 = Table(data2, colWidths=["*"])
+            shell_table3 = Table(data3, colWidths=["*"])
+            shell_table4 = Table(data4, colWidths=["*"])
+            shell_table5 = Table(data5, colWidths=["*"])
+            shell_table6 = Table(data6, colWidths=["*"])
+            shell_table7 = Table(data7, colWidths=["*"])
+            elements.append(shell_table)
+            elements.append(shell_table1)
+            elements.append(shell_table2)
+            elements.append(shell_table3)
+            elements.append(shell_table4)
+            elements.append(shell_table5)
+            elements.append(shell_table6)
+            elements.append(shell_table7)
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа
     # h3.spaceAfter = 10  # промежуток после заголовка
@@ -360,7 +451,7 @@ def table_made(pv):
     # elements.append(Paragraph('группа №4', h4))
     # elements.append(shell_table1)
 
-    doc = SimpleDocTemplate("table_grup.pdf", pagesize=pv)
+    doc = SimpleDocTemplate("table_group.pdf", pagesize=pv)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
 
 

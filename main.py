@@ -896,7 +896,6 @@ def list_player_pdf():
     count = len(player_list)  # колличество записей в базе
     kp = count + 1
     my_win.tableWidget.setRowCount(count)
-
     for k in range(0, count):  # цикл по списку по строкам
         n = my_win.tableWidget.item(k, 0).text()
         p = my_win.tableWidget.item(k, 1).text()
@@ -909,21 +908,24 @@ def list_player_pdf():
         m = my_win.tableWidget.item(k, 8).text()
         q = chop_line(q)
         data = [n, p, b, c, g, z, t, q, m]
+
         elements.append(data)
     elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
               colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.7 * cm, 1.1 * cm),
-              rowHeights=0.7 * cm)  # ширина столбцов, если None-автомтическая
+              rowHeights=None)  # ширина столбцов, если None-автомтическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                            ('FONTSIZE', (0, 0), (-1, -1), 7),  # Использую импортированный шрифта размер
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),  # межстрочный верхний инервал
+                           ('TOPPADDING', (0, 0), (-1, -1), 1),  # межстрочный нижний инервал
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # вериткальное выравнивание в ячейке заголовка
                            ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),  # горизонтальное выравнивание в ячейке
                            ('BACKGROUND', (0, 0), (-1, kp * -1), colors.yellow),
                            ('TEXTCOLOR', (0, 0), (-1, kp * -1), colors.darkblue),
                            ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
                            ('INNERGRID', (0, 0), (-1, -1), 0.05, colors.black),  # цвет и толщину внутренних линий
-                           ('BOX', (0, 0), (-1, -1), 0.25, colors.black)  # внешние границы таблицы
+                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)  # внешние границы таблицы
                            ]))
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150, firstLineIndent=-20)  # стиль параграфа
@@ -932,7 +934,7 @@ def list_player_pdf():
     story.append(t)
 
     doc = SimpleDocTemplate("table_list.pdf", pagesize=A4)
-    doc.build(story, onFirstPage=comp_system.func_zagolovok)
+    doc.build(story, onFirstPage=comp_system.func_zagolovok, onLaterPages=comp_system.func_zagolovok)
 
 
 def exit_comp():
@@ -994,7 +996,7 @@ def view():
     elif tw == 2:
         pass
     elif tw == 3:  # вкладка группы
-        view_file = "table_grup.pdf"
+        view_file = "table_group.pdf"
     elif tw == 4:
         pass
     elif tw == 5:
@@ -1023,6 +1025,7 @@ def player_in_table():
 
 def chop_line(q, maxline=30):
     """перевод строки если слишком длинный список тренеров"""
+
     if len(q) > maxline:
         s1 = q.find(",", 0, maxline)
         s2 = q.find(",", s1 + 1, maxline)
@@ -1039,89 +1042,6 @@ def chop_line(q, maxline=30):
     else:
         return q
 
-
-def proba():
-    elements = []
-    player_list = Player.select()
-    count = len(player_list)  # колличество записей в базе
-    # kp = count + 1
-    width, height = A4
-    styles = getSampleStyleSheet()
-    styleN = styles["BodyText"]
-    styleN.alignment = TA_LEFT
-    styleBH = styles["Normal"]
-    styleBH.alignment = TA_CENTER
-
-    def coord(x, y, unit=1):
-        x, y = x * unit, height - y * unit
-        return x, y
-
-    # Headers
-    num = Paragraph('''<b>№</b>''', styleBH)
-    family = Paragraph('''<b>Фамилия, Имя</b>''', styleBH)
-    bday = Paragraph('''<b>Дата рождения</b>''', styleBH)
-    rank = Paragraph('''<b>Рейтинг</b>''', styleBH)
-    city = Paragraph('''<b>Город</b>''', styleBH)
-    region = Paragraph('''<b>Регион</b>''', styleBH)
-    razryad = Paragraph('''<b>Разряд</b>''', styleBH)
-    coach = Paragraph('''<b>Тренер(ы)</b>''', styleBH)
-    mesto = Paragraph('''<b>Место</b>''', styleBH)
-
-    #==========================
-    for k in range(0, count):  # цикл по списку по строкам
-        n = my_win.tableWidget.item(k, 0).text()
-        p = my_win.tableWidget.item(k, 1).text()
-        b = my_win.tableWidget.item(k, 2).text()
-        c = my_win.tableWidget.item(k, 3).text()
-        g = my_win.tableWidget.item(k, 4).text()
-        z = my_win.tableWidget.item(k, 5).text()
-        t = my_win.tableWidget.item(k, 6).text()
-        q = my_win.tableWidget.item(k, 7).text()
-        m = my_win.tableWidget.item(k, 8).text()
-
-        n = Paragraph(n, styleN)
-        p = Paragraph(p, styleN)
-        b = Paragraph(b, styleN)
-        c = Paragraph(c, styleN)
-        g = Paragraph(g, styleN)
-        z = Paragraph(z, styleN)
-        t = Paragraph(t, styleN)
-        q = Paragraph(q, styleN)
-
-        data = [n, p, b, c, g, z, t, q, m]
-        # elements.append(data)
-    #==========================
-    # Texts
-    #     n = Paragraph(n, styleN)
-    #     p = Paragraph(p, styleN)
-    #     b = Paragraph(b, styleN)
-    #     c = Paragraph(c, styleN)
-    #     g = Paragraph(g, styleN)
-    #     z = Paragraph(z, styleN)
-    #     t = Paragraph(t, styleN)
-    #     q = Paragraph(q, styleN)
-    #     m = Paragraph(m, styleN)
-    #     elements.append(data)
-    data = [[num, family, bday, rank, city, region, razryad, coach, mesto], [n, p, b, c, g, z, t, q, m]]
-
-    t = Table(data, colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm,
-                                4.7 * cm, 1.1 * cm))
-
-    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
-                           ('FONTSIZE', (0, 0), (-1, -1), 7),  # Использую импортированный шрифта размер
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # вериткальное выравнивание в ячейке заголовка
-                           ('ALIGN', (0, 0), (8, 0), 'CENTER'),  # горизонтальное выравнивание в ячейке
-                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
-                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
-                           ('LINEABOVE', (0, 0), (8, 0), 1, colors.blue),
-                           ('INNERGRID', (0, 0), (-1, -1), 0.05, colors.black),  # цвет и толщину внутренних линий
-                           ('BOX', (0, 0), (-1, -1), 0.25, colors.black)  # внешние границы таблицы
-                           ]))
-
-    c = canvas.Canvas("a.pdf", pagesize=A4)
-    t.wrapOn(c, width, height)
-    t.drawOn(c, *coord(0.5, 20, cm))
-    c.save()
 
 # ====== отслеживание изменения текста в полях ============
 
@@ -1145,7 +1065,7 @@ my_win.checkBox_3.stateChanged.connect(button_sytem_made_enable)  # при из�
 # =======  нажатие кнопок =========
 my_win.Button_1etap_made.clicked.connect(kol_player_in_group)  # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_system_made.clicked.connect(system_made)  # создание системы соревнований
-my_win.Button_proba.clicked.connect(proba)
+# my_win.Button_proba.clicked.connect(proba)
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
