@@ -3,7 +3,7 @@ import comp_system
 
 def kol_player():
     """выводит максимальное коичество человек в группе t если все группы равны, а g2 если разное количество"""
-    ta = System.get(System.id == 1)
+    ta = System.select().order_by(System.id.desc()).get()
     a = ta.total_athletes
     g = ta.total_group
     e = a % g  # если количество участников равно делится на группы
@@ -30,12 +30,15 @@ def table1_data():
     pl1 = Player.get(Player.id == 1)
     pl2 = Player.get(Player.id == 2)
     pl3 = Player.get(Player.id == 5)
+    pl4 = Player.get(Player.id == 8)
     table_1[0][1] = pl1.player
     table_1[1][1] = pl1.city
     table_1[2][1] = pl2.player
     table_1[3][1] = pl2.city
     table_1[4][1] = pl3.player
     table_1[5][1] = pl3.city
+    table_1[6][1] = pl4.player
+    table_1[7][1] = pl4.city
     return table_1
 
 

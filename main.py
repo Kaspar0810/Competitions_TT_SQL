@@ -324,11 +324,11 @@ def load_tableWidget():
         collumn_label = ["Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
     elif my_win.tabWidget.currentIndex() == 3:
         z = 7
-        collumn_label = ["№ встречи", "Стадия", "Игрок_1", "Игрок_2", "Победитель", "Счет", "Счет в партии"]
+        collumn_label = ["№ встречи", "Группа", "Стадия", "Игрок_1", "Игрок_2", "Победитель", "Счет", "Счет в партии"]
     else:
         z = 9
-        collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)", "Место"]
-
+        collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
+                         "Место"]
 
     my_win.tableWidget.setColumnCount(z)
     my_win.tableWidget.setRowCount(1)
@@ -584,25 +584,21 @@ def fill_table_R1_list():
 
 
 def fill_table_results():
-    pass
     """заполняет таблицу результатов QtableWidget из db"""
     result_list = Result.select()
     count = len(result_list)  # колличество записей в базе
     my_win.tableWidget.setRowCount(count)
-    # for k in range(0, count):  # цикл по списку по строкам
+    for k in range(0, count):  # цикл по списку по строкам
 
-        # list = Player.get(Player.id == k + 1)
-        # my_win.tableWidget.setItem(k, 0, QTableWidgetItem(list.num))
-        # my_win.tableWidget.setItem(k, 1, QTableWidgetItem(list.player))
-        # my_win.tableWidget.setItem(k, 2, QTableWidgetItem(list.bday))
-        # element = str(list.rank)
-        # padded = ('    ' + element)[-4:]  # make all elements the same length
-        # my_win.tableWidget.setItem(k, 3, QTableWidgetItem(padded))
-        # my_win.tableWidget.setItem(k, 4, QTableWidgetItem(list.city))
-        # my_win.tableWidget.setItem(k, 5, QTableWidgetItem(list.region))
-        # my_win.tableWidget.setItem(k, 6, QTableWidgetItem(list.razryad))
-        # listC = Coach.get(Coach.id == list.coach_id)
-        # my_win.tableWidget.setItem(k, 7, QTableWidgetItem(listC.coach))
+        results = Result.get(Result.id == k + 1)
+        my_win.tableWidget.setItem(k, 0, QTableWidgetItem(results.tours))
+        my_win.tableWidget.setItem(k, 1, QTableWidgetItem(results.number_group))
+        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(results.system_stage))
+        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(results.player1))
+        my_win.tableWidget.setItem(k, 4, QTableWidgetItem(results.player2))
+        my_win.tableWidget.setItem(k, 5, QTableWidgetItem(results.winner))
+        my_win.tableWidget.setItem(k, 6, QTableWidgetItem(results.points_win))
+        my_win.tableWidget.setItem(k, 7, QTableWidgetItem(results.score_win))
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
@@ -720,7 +716,7 @@ def tab():
         st = s.total_athletes
         se = s.stage
         if st > 0:
-           my_win.comboBox_etap_1.setCurrentText(se)
+            my_win.comboBox_etap_1.setCurrentText(se)
         else:
             my_win.tableWidget.hide()
             my_win.label_11.hide()
@@ -765,7 +761,7 @@ def page():
         my_win.comboBox_etap_1.setCurrentText(se)
         # my_win.label_12.setText()
         my_win.label_12.show()
-    elif tb == 3:
+    elif tb == 3:  # вкладка -групппы-
         my_win.tableWidget.show()
         load_tableWidget()
     elif tb == 4:
@@ -992,32 +988,45 @@ def player_in_table():
     st = si.stage
     comp_system.table_made(page_vid())
     tdt = tbl_data.total_data_table()
+
     for p in range(0, kg):
         gr = tdt[p]
         number_group = str(p + 1) + ' группа'
         k = 0
         for i in range(0, ct * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
-            if family_player == "":
-                for m in range(0, k):
-                    tour = []
-                    cp = k - 3
-                    tour = comp_system.tour(cp)
-                    for r in range(0, k):
-                        tours = tour[r]
-                        first = int(tours[0])
-                        second = int(tours[2])
-                        pl1 = gr[first * 2 - 2][1]
-                        pl2 = gr[second * 2 - 2][1]
-                        with db:
-                            results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
-                                             tours=tours, title_id=si).save()
-                    break
+            fp = len(family_player)
+            if fp > 0:  # если строка (фамилия игрока) не пустая идет запсь в db
+                k += 1
+                with db:
+                    game_list = Game_list(number_group=number_group, rank_num_player=k, player_group=family_player,
+                                          system_id=si).save()
+            elif fp == 0 and k == 0:  # если 1-я строка (фамилия игрока) пустая выход из группы
                 break
-            k += 1
-            with db:
-                game_list = Game_list(number_group=number_group, rank_num_player=k, player_group=family_player,
-                                      system_id=si).save()
+        if fp == 0 or ct == k:  # после считывания игроков в группе идет запись игроков по турам в таблицу -result-
+            cp = k - 3
+            tour = comp_system.tour(cp)
+            game = k // 2  # кол-во игр в туре
+            if game == 1:
+                kk = k
+            else:
+                kk = k - 1
+            for r in range(0, kk):
+                tours = tour[r]  # игры тура
+                for d in range(0, game):
+                    if game == 1:  # если в группе 3 человека
+                        match = tours  # матч в туре
+                    else:
+                        match = tours[d]  # матч в туре
+                    first = int(match[0])  # игрок под номером в группе
+                    second = int(match[2])  # игрок под номером в группе
+                    pl1 = gr[first * 2 - 2][1]  # фамилия первого игрока
+                    pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
+                    with db:
+                        results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
+                                         tours=match, title_id=si).save()
+        else:
+            break
 
 
 def chop_line(q, maxline=30):
