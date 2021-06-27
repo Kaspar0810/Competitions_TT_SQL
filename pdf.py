@@ -47,9 +47,9 @@ def title_pdf(string_data, nz, sr, vz, ct, filepatch):
         canvas.setFont("DejaVuSerif-Italic", 20)
         canvas.drawString(2 * cm, 23 * cm, nz)
         canvas.setFont("DejaVuSerif-Italic", 16)
-        canvas.drawString(2.5 * cm, 22 * cm, "среди " + sr + " " + vz)
+        canvas.drawString(2.5 * cm, 22 * cm, f"среди {sr} {vz}")
         canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(5.5 * cm, 5 * cm, "г. " + ct + " Нижегородская область")
+        canvas.drawString(5.5 * cm, 5 * cm, f"г. {ct} Нижегородская область")
         canvas.drawString(7.5 * cm, 4 * cm, string_data)
     else:
         canvas.drawImage(filepatch, 7 * cm, 12 * cm, 6.9 * cm, 4.9 * cm,
@@ -60,12 +60,31 @@ def title_pdf(string_data, nz, sr, vz, ct, filepatch):
         canvas.setFont("DejaVuSerif-Italic", 20)
         canvas.drawString(2 * cm, 23 * cm, nz)
         canvas.setFont("DejaVuSerif-Italic", 16)
-        canvas.drawString(2.5 * cm, 22 * cm, "среди " + sr + " " + vz)
+        canvas.drawString(2.5 * cm, 22 * cm, f"среди {sr} {vz}")
         canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(5.5 * cm, 5 * cm, "г. " + ct + " Нижегородская область")
+        canvas.drawString(5.5 * cm, 5 * cm, f"г. {ct} Нижегородская область")
         canvas.drawString(7.5 * cm, 4 * cm, string_data)
     canvas.save()
 
 
-
+def data_title_string():
+    """получение строки начало и конец соревнований для вставки в титульный лист"""
+    months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
+                   "августа", "сентября", "октября", "ноября", "декабря")
+    title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    datastart = str(title.data_start)
+    dataend = str(title.data_end)
+    ds = datastart[8:10]  # получаем число день из календаря
+    ms = datastart[5:7]  # получаем число месяц из календаря
+    ys = datastart[0:4]  # получаем число год из календаря
+    # ye = int(dataend[0:4])
+    me = dataend[5:7]
+    de = dataend[8:10]
+    month_st = months_list[int(ms) - 1]
+    if de > ds:  # получаем строку начало и конец соревнования в
+        # одном месяце или два месяца если начало и конец в разных месяцах
+        return f"{ds}-{de} {month_st} {ys} г."
+    else:
+        month_end = months_list[int(me) - 1]
+        return f"{ds} {month_st}-{de} {month_end} {ys} г."
 

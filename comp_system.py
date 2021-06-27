@@ -1,3 +1,4 @@
+import pdf
 import tbl_data
 from models import *
 # import pdf
@@ -11,7 +12,7 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate
 from reportlab.lib import colors
 from reportlab.platypus.tableofcontents import TableOfContents
-from reportlab.lib.styles import ParagraphStyle as PS
+from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
 from reportlab.platypus import PageBreak
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 
@@ -33,7 +34,8 @@ def func_zagolovok(canvas, doc):
     nz = title.name
     ms = title.mesto
     sr = f"среди {title.sredi} {title.vozrast}"
-    ds = str(title.data_start)
+    data_comp =pdf.data_title_string()
+    # ds = str(title.data_start)
 
     canvas.saveState()
 
@@ -41,8 +43,8 @@ def func_zagolovok(canvas, doc):
     canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)  # центральный текст титула
     canvas.setFont("DejaVuSerif-Italic", 12)
     canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)  # текста титула по основным
-    canvas.drawRightString(width - 1 * cm, height - 1.5 * cm, "г. " + ms)  # город
-    canvas.drawString(0.8 * cm, height - 1.5 * cm, ds)  # дата начала
+    canvas.drawRightString(width - 1 * cm, height - 1.6 * cm, f"г. {ms}")  # город
+    canvas.drawString(0.8 * cm, height - 1.6 * cm, data_comp)  # дата начала
     canvas.setFont("DejaVuSerif-Italic", 11)
     if pv == landscape(A4):
         main_referee_collegia = f"Гл. судья: {title.referee} судья {title.kat_ref }______________  " \
@@ -162,7 +164,7 @@ def table_made(pv):
     elements = []
 
     cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина
-    rH = (0.4 * cm)  # высота строки
+    rH = (0.35 * cm)  # высота строки
     # rH = None  # высота строки
     num_columns = []  # заголовки столобцов и их нумерация в зависимости от кол-во участников
     for i in range(0, t):
@@ -210,7 +212,8 @@ def table_made(pv):
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)  # внешние границы таблицы
                      ])
 #  ============ создание таблиц и вставка данных =================
-
+    h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=150)  # стиль параграфа (номера таблиц)
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа (номера таблиц)
     if kg == 1:
         t1 = t_1(ts, zagolovok, cW, rH)
         data = [[t1]]
@@ -241,7 +244,7 @@ def table_made(pv):
             shell_table1 = Table(data1, colWidths=["*"])
             elements.append(shell_table)
             elements.append(shell_table1)
-        else:  # страница книжная, то таблицы размещаются обе в столбец
+        else:  # страница книжная, то таблицы размещаются в столбец
             data = [[t1]]
             data1 = [[t2]]
             data2 = [[t3]]
@@ -261,7 +264,9 @@ def table_made(pv):
             data1 = [[t3, t4]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
+            elements.append(Paragraph('группа 1             группа 2', h2))
             elements.append(shell_table)
+            elements.append(Paragraph('группа 3             группа 4', h2))
             elements.append(shell_table1)
         else:  # страница книжная, то таблицы размещаются обе в столбец
             data = [[t1]]
@@ -272,7 +277,9 @@ def table_made(pv):
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
             shell_table3 = Table(data3, colWidths=["*"])
+            elements.append(Paragraph('группа 1', h1))
             elements.append(shell_table)
+            elements.append(Paragraph('группа 2', h1))
             elements.append(shell_table1)
             elements.append(shell_table2)
             elements.append(shell_table3)
@@ -407,9 +414,13 @@ def table_made(pv):
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
             shell_table3 = Table(data3, colWidths=["*"])
+            elements.append(Paragraph('группа 1 группа 2', h2))
             elements.append(shell_table)
+            elements.append(Paragraph('группа 3 группа 4', h2))
             elements.append(shell_table1)
+            elements.append(Paragraph('группа 5 группа 6', h2))
             elements.append(shell_table2)
+            elements.append(Paragraph('группа 7 группа 8', h2))
             elements.append(shell_table3)
         else:  # страница книжная, то таблицы размещаются обе в столбец
             data = [[t1]]
@@ -437,32 +448,17 @@ def table_made(pv):
             elements.append(shell_table6)
             elements.append(shell_table7)
 
-    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа
-    # h3.spaceAfter = 10  # промежуток после заголовка
-    h4 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=550)  # стиль параграфа
-    h4.spaceAfter = 10  # промежуток после заголовка
-    # elements.append(Paragraph('группа', h3))
-    # shell_table = Table(data, colWidths=["*"])
-    # shell_table1 = Table(data1, colWidths=["*"])
-    # elements.append(Paragraph('группа №1', h3))
-    # elements.append(Paragraph('группа №2', h4))
-    # elements.append(shell_table)
-    # elements.append(Paragraph('группа №3', h3))
-    # elements.append(Paragraph('группа №4', h4))
-    # elements.append(shell_table1)
-
     doc = SimpleDocTemplate("table_group.pdf", pagesize=pv)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
 
 
 def tour(cp):
-    """туры таблиц по кругу в зависимости от кол-во участников"""
-    pass
-    # tour_list = []
-    # tr = [[['1-3'], ['1-2'], ['2-3']],
-    #       [['1-3', '2-4'], ['1-2', '3-4'], ['2-3', '1-4']],
-    #       [['2-4', '1-5'], ['1-4', '3-5'], ['1-3', '2-5'], ['1-2', '3-4']],
-    #       [['2-4', '1-5', '3-6'], ['1-4', '2-6', '3-5'], ['1-3', '2-5', '4-6'], ['1-2', '3-4', '5-6']]]
-    #
-    # tour_list = tr[cp]
-    # return tour_list
+    """туры таблиц по кругу в зависимости от кол-во участников -cp- кол-во участников"""
+    tour_list = []
+    tr = [['1-3', '1-2', '2-3'],
+          [['1-3', '2-4'], ['1-2', '3-4'], ['2-3', '1-4']],
+          [['2-4', '1-5'], ['1-4', '3-5'], ['1-3', '2-5'], ['1-2', '3-4']],
+          [['2-4', '1-5', '3-6'], ['1-4', '2-6', '3-5'], ['1-3', '2-5', '4-6'], ['1-2', '3-4', '5-6']]]
+
+    tour_list = tr[cp]
+    return tour_list

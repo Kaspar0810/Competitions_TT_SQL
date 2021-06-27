@@ -17,62 +17,6 @@ def kol_player():
     return t
 
 
-def player_list_pdf():
-    pass
-    """создание списка учстников в pdf файл"""
-    # doc = SimpleDocTemplate("table_list.pdf", pagesize=A4)
-    # title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    # nz = title.name
-    # sr = f"среди {title.sredi} {title.vozrast}"
-    #
-    # story = []  # Список данных таблицы участников
-    # elements = []  # Список Заголовки столбцов таблицы
-    # player_list = Player.select()
-    # count = len(player_list)  # колличество записей в базе
-    # kp = count + 1
-    # my_win.tableWidget.setRowCount(count)
-    #
-    # for k in range(0, count):  # цикл по списку по строкам
-    #     n = my_win.tableWidget.item(k, 0).text()
-    #     p = my_win.tableWidget.item(k, 1).text()
-    #     b = my_win.tableWidget.item(k, 2).text()
-    #     c = my_win.tableWidget.item(k, 3).text()
-    #     g = my_win.tableWidget.item(k, 4).text()
-    #     z = my_win.tableWidget.item(k, 5).text()
-    #     t = my_win.tableWidget.item(k, 6).text()
-    #     q = my_win.tableWidget.item(k, 7).text()
-    #     m = my_win.tableWidget.item(k, 8).text()
-    #
-    #     data = [n, p, b, c, g, z, t, q, m]
-    #     elements.append(data)
-    # elements.insert(0, ["№", "Фамилия, Имя", "Дата рождени ", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
-    #                     "Место"])
-    # t = Table(elements,
-    #           colWidths=(
-    #           None, None, None, None, None, None, None, None, None))  # ширина столбцов, если None-автомтическая
-    # t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
-    #                        ('FONTSIZE', (0, 0), (-1, -1), 8),  # Использую импортированный шрифта размер
-    #                        ('BACKGROUND', (0, 0), (-1, kp * -1), colors.yellow),
-    #                        ('TEXTCOLOR', (0, 0), (-1, kp * -1), colors.darkblue),
-    #                        ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
-    #                        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),  # цвет и толщину внутренних линий
-    #                        ('BOX', (0, 0), (-1, -1), 0.25, colors.black)  # внешние границы таблицы
-    #                        ]))
-    # h1 = PS("normal", fontSize=14, fontName="DejaVuSerif-Italic", leftIndent=0, firstLineIndent=-20)  # стиль параграфа
-    # h1.spaceAfter = 10  # промежуток после заголовка
-    # h1.spaceBefore = 0
-    # h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50, firstLineIndent=-20)  # стиль параграфа
-    # h2.spaceAfter = 20  # промежуток после заголовка
-    # h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=50, firstLineIndent=-20)  # стиль параграфа
-    # h3.spaceAfter = 10  # промежуток после заголовка
-    #
-    # story.append(Paragraph(nz, h1))
-    # story.append(Paragraph(sr, h2))
-    # story.append(Paragraph('Список участников', h3))
-    # story.append(t)
-    # doc.multiBuild(story)
-
-
 def table1_data():
     """данные результатов в таблице 1-й группы"""
     table_1 = []

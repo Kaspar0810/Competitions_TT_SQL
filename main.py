@@ -195,8 +195,8 @@ mylist = ('мальчиков и девочек', 'юношей и девуше�
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
 stages1 = ("Основной", "Предварительный", "Полуфиналы", "Финальный", "Суперфинал")
 stages2 = ("Полуфиналы", "Финальный", "Суперфинал")
-months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
-               "августа", "сентября", "октября", "ноября", "декабря")
+# months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
+#                "августа", "сентября", "октября", "ноября", "декабря")
 
 my_win.comboBox_page_1.addItems(page_orient)
 my_win.comboBox_page_2.addItems(page_orient)
@@ -450,28 +450,9 @@ def title_string():
     # return nm, vz, ds, de, ms, rf, kr, sk, ks, sr
 
 
-def data_title_string(months_list):
-    """получение строки начало и конец соревнований для вставки в титульный лист"""
-    datastart = my_win.dateEdit_start.text()
-    dataend = my_win.dateEdit_end.text()
-    ds = int(datastart[8:10])  # получаем число год из календаря
-    ms = int(datastart[5:7])  # получаем число месяц из календаря
-    ys = int(datastart[0:4])  # получаем число день из календаря
-    # ye = int(dataend[0:4])
-    me = int(dataend[5:7])
-    de = int(dataend[8:10])
-    month_st = months_list[ms - 1]
-    if de > ds:  # получаем строку начало и конец соревнования в
-        # одном месяце или два месяца если начало и конец в разных месяцах
-        return str(ds) + " - " + str(de) + " " + month_st + " " + str(ys) + " г."
-    else:
-        month_end = months_list[me - 1]
-        return str(ds) + " " + month_st + " - " + str(de) + " " + month_end + " " + str(ys) + " г."
-
-
 def title_pdf():
     """сохранение в PDF формате титульной страницы"""
-    string_data = data_title_string(months_list)
+    string_data = pdf.data_title_string()
     nz = my_win.lineEdit_title_nazvanie.text()
     sr = my_win.comboBox_sredi.currentText()
     vz = my_win.lineEdit_title_vozrast.text()
@@ -501,7 +482,6 @@ def title_made():
     my_win.checkBox.setChecked(False)  # после заполнения титула выключает чекбокс
     my_win.Button_title_made.setText("Создать")
     region()
-    # system_made()
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     sg = my_win.comboBox_etap_1.currentText()
     page_v = my_win.comboBox_page_1.currentText()
@@ -1009,6 +989,7 @@ def player_in_table():
     si = System.get(System.id)
     kg = si.total_group
     ct = si.max_player
+    st = si.stage
     comp_system.table_made(page_vid())
     tdt = tbl_data.total_data_table()
     for p in range(0, kg):
@@ -1017,10 +998,26 @@ def player_in_table():
         k = 0
         for i in range(0, ct * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
+            if family_player == "":
+                for m in range(0, k):
+                    tour = []
+                    cp = k - 3
+                    tour = comp_system.tour(cp)
+                    for r in range(0, k):
+                        tours = tour[r]
+                        first = int(tours[0])
+                        second = int(tours[2])
+                        pl1 = gr[first * 2 - 2][1]
+                        pl2 = gr[second * 2 - 2][1]
+                        with db:
+                            results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
+                                             tours=tours, title_id=si).save()
+                    break
+                break
             k += 1
             with db:
                 game_list = Game_list(number_group=number_group, rank_num_player=k, player_group=family_player,
-                                        system_id=si).save()
+                                      system_id=si).save()
 
 
 def chop_line(q, maxline=30):

@@ -95,6 +95,7 @@ class Title(BaseModel):
 
 class Result(BaseModel):
     system_stage = CharField()
+    number_group = CharField()
     tours = CharField()
     player1 = CharField()
     player2 = CharField()
