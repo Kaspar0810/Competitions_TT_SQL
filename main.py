@@ -303,7 +303,7 @@ def system_made():
 
 def region():
     """добавляет из таблицы в комбобокс регионы"""
-    if my_win.comboBox_region.currentIndex() > 0: # проверка на заполненость комбокса данными
+    if my_win.comboBox_region.currentIndex() > 0:  # проверка на заполненость комбокса данными
         return
     else:
         with db:
@@ -317,18 +317,18 @@ def load_tableWidget():
     sender = my_win.menuWidget().sender()  # сигнал указывающий какой пункт меню нажат
 
     if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг-
-        z = 5
-        collumn_label = ["Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
+        z = 6
+        column_label = ["№", "Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
     elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь-
-        z = 5
-        collumn_label = ["Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
+        z = 6
+        column_label = ["№", "Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
     elif my_win.tabWidget.currentIndex() == 3:
-        z = 7
-        collumn_label = ["№ встречи", "Группа", "Стадия", "Игрок_1", "Игрок_2", "Победитель", "Счет", "Счет в партии"]
-    else:
         z = 9
-        collumn_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
-                         "Место"]
+        column_label = ["id", "№ встречи", "Группа", "Этапы", "Игрок_1", "Игрок_2", "Победитель", "Счет", "Счет в партии"]
+    else:
+        z = 10
+        column_label = ["id", "№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
+                        "Тренер(ы)", "Место"]
 
     my_win.tableWidget.setColumnCount(z)
     my_win.tableWidget.setRowCount(1)
@@ -337,7 +337,7 @@ def load_tableWidget():
         item = QtWidgets.QTableWidgetItem()
         item.setBackground(QtGui.QColor(0, 255, 150))
         my_win.tableWidget.setHorizontalHeaderItem(i, item)
-    my_win.tableWidget.setHorizontalHeaderLabels(collumn_label)
+    my_win.tableWidget.setHorizontalHeaderLabels(column_label)
     my_win.tableWidget.isSortingEnabled()
     my_win.tableWidget.show()
     if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг- и загружет таблицу с рейтингом
@@ -347,7 +347,8 @@ def load_tableWidget():
     elif my_win.tabWidget.currentIndex() == 3:
         fill_table_results()
     else:  # загружает таблицу со списком
-        fill_table()
+        player_list = Player.select().order_by(Player.rank.desc())
+        fill_table(player_list)
 
 
 def load_listR_in_db(table_db, fname):
@@ -522,83 +523,75 @@ def find_in_rlist():
             my_win.listWidget.addItem(full_stroka)
 
 
-def fill_table():
+def fill_table(player_list=Player.select().order_by(Player.rank.desc())):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
-    player_list = Player.select()
-    count = len(player_list)  # колличество записей в базе
-    my_win.tableWidget.setRowCount(count)
-    for k in range(0, count):  # цикл по списку по строкам
+    player_selected = player_list.dicts().execute()
 
-        list = Player.get(Player.id == k + 1)
-        my_win.tableWidget.setItem(k, 0, QTableWidgetItem(list.num))
-        my_win.tableWidget.setItem(k, 1, QTableWidgetItem(list.player))
-        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(list.bday))
-        element = str(list.rank)
-        padded = ('    ' + element)[-4:]  # make all elements the same length
-        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(padded))
-        my_win.tableWidget.setItem(k, 4, QTableWidgetItem(list.city))
-        my_win.tableWidget.setItem(k, 5, QTableWidgetItem(list.region))
-        my_win.tableWidget.setItem(k, 6, QTableWidgetItem(list.razryad))
-        listC = Coach.get(Coach.id == list.coach_id)
-        my_win.tableWidget.setItem(k, 7, QTableWidgetItem(listC.coach))
-        my_win.tableWidget.setItem(k, 8, QTableWidgetItem(list.mesto))
+    row_count = (len(player_selected))  # кол-во строк в таблице
+    column_count = (len(player_selected[0]))  # кол-во столбцов в таблице
+    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+
+    for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for column in range(column_count):
+            if column == 8:  # преобразует id тренера в фамилию
+                coach_id = str(list(player_selected[row].values())[column])
+                coach = Coach.get(Coach.id == coach_id)
+                item = coach.coach
+            else:
+                item = str(list(player_selected[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+    my_win.tableWidget.hideColumn(0)  # скрывает столбец id
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+
+    for i in range(0, row_count):  # отсортировывает номера строк по порядку
+        my_win.tableWidget.setItem(i, 1, QTableWidgetItem(str(i + 1)))
 
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
-    player_rlist = R_list.select()
-    count = len(player_rlist)  # колличество записей в базе
-    my_win.tableWidget.setRowCount(count)
-    for k in range(0, count):  # цикл по списку по строкам
+    player_rlist = R_list.select().order_by(R_list.r_fname)
+    player_r = player_rlist.dicts().execute()
+    row_count = (len(player_r))  # кол-во строк в таблице
+    column_count = (len(player_r[0]))  # кол-во столбцов в таблице
+    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
-        listR = R_list.get(R_list.id == k + 1)
-        my_win.tableWidget.setItem(k, 0, QTableWidgetItem(str(listR.r_number)))
-        et = str(listR.r_list)
-        padded = ('    ' + et)[-4:]  # make all elements the same length
-        my_win.tableWidget.setItem(k, 1, QTableWidgetItem(padded))
-        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(listR.r_fname))
-        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(listR.r_bithday))
-        my_win.tableWidget.setItem(k, 4, QTableWidgetItem(listR.r_city))
+    for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(player_r[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
 def fill_table_R1_list():
     """заполняет таблицу списком из январского рейтинг листа"""
-    player_rlist = R1_list.select()
-    count = len(player_rlist)  # колличество записей в базе
-    my_win.tableWidget.setRowCount(count)
-    for k in range(0, count):  # цикл по списку по строкам
+    player_rlist = R1_list.select().order_by(R1_list.r1_fname)
+    player_r1 = player_rlist.dicts().execute()
+    row_count = (len(player_r1))  # кол-во строк в таблице
+    column_count = (len(player_r1[0]))  # кол-во столбцов в таблице
+    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
-        listR = R1_list.get(R1_list.id == k + 1)
-        my_win.tableWidget.setItem(k, 0, QTableWidgetItem(str(listR.r1_number)))
-        et = str(listR.r1_list)
-        padded = ('    ' + et)[-4:]  # make all elements the same length
-        my_win.tableWidget.setItem(k, 1, QTableWidgetItem(padded))
-        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(listR.r1_fname))
-        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(listR.r1_bithday))
-        my_win.tableWidget.setItem(k, 4, QTableWidgetItem(listR.r1_city))
-        # progressbar(count)
+    for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(player_r1[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
 def fill_table_results():
     """заполняет таблицу результатов QtableWidget из db"""
-    result_list = Result.select()
-    count = len(result_list)  # колличество записей в базе
-    my_win.tableWidget.setRowCount(count)
-    for k in range(0, count):  # цикл по списку по строкам
+    player_result = Result.select()
+    result_list = player_result.dicts().execute()
+    row_count = (len(result_list))  # кол-во строк в таблице
+    column_count = (len(result_list[0]))  # кол-во столбцов в таблице
+    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
-        results = Result.get(Result.id == k + 1)
-        my_win.tableWidget.setItem(k, 0, QTableWidgetItem(results.tours))
-        my_win.tableWidget.setItem(k, 1, QTableWidgetItem(results.number_group))
-        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(results.system_stage))
-        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(results.player1))
-        my_win.tableWidget.setItem(k, 4, QTableWidgetItem(results.player2))
-        my_win.tableWidget.setItem(k, 5, QTableWidgetItem(results.winner))
-        my_win.tableWidget.setItem(k, 6, QTableWidgetItem(results.points_win))
-        my_win.tableWidget.setItem(k, 7, QTableWidgetItem(results.score_win))
+    for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(result_list[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
@@ -705,6 +698,7 @@ def tab():
         my_win.tableWidget.show()
         db_select_title()
     elif tw == 1:
+        pass
         region()
         load_tableWidget()
         my_win.tableWidget.show()
@@ -728,6 +722,7 @@ def tab():
     elif tw == 3:  # вкладка группы
         my_win.tableWidget.show()
         load_tableWidget()
+        fill_table_results()
     elif tw == 4:
         my_win.tableWidget.hide()
     elif tw == 5:
@@ -825,14 +820,13 @@ def find_player_in_R():
 def sort(self):
     """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
-    player_list = Player.select()
-    count = len(player_list)  # колличество записей в базе
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
-        my_win.tableWidget.sortItems(3, QtCore.Qt.SortOrder.DescendingOrder)  # сортировка  Я-А 3-ого столбца
+        player_list = Player.select().order_by(Player.rank.desc())  # сортировка по рейтингу
+        fill_table(player_list)
     else:
-        my_win.tableWidget.sortItems(1, QtCore.Qt.SortOrder.AscendingOrder)  # сортировка  А-Я 1-ого столбца
-    for i in range(0, count):  # отсортировывает номера строк по порядку
-        my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+        player_list = Player.select().order_by(Player.player)  # сортировка по алфавиту
+        fill_table(player_list)
+
 
 
 def button_etap_made_enabled(state):

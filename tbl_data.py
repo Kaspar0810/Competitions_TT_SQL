@@ -55,12 +55,15 @@ def table2_data():
     pl1 = Player.get(Player.id == 3)
     pl2 = Player.get(Player.id == 4)
     pl3 = Player.get(Player.id == 6)
+    pl4 = Player.get(Player.id == 11)
     table_2[0][1] = pl1.player
     table_2[1][1] = pl1.city
     table_2[2][1] = pl2.player
     table_2[3][1] = pl2.city
     table_2[4][1] = pl3.player
     table_2[5][1] = pl3.city
+    table_2[6][1] = pl4.player
+    table_2[7][1] = pl4.city
     return table_2
 
 
