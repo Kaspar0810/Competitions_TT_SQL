@@ -195,8 +195,7 @@ mylist = ('мальчиков и девочек', 'юношей и девуше�
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
 stages1 = ("Основной", "Предварительный", "Полуфиналы", "Финальный", "Суперфинал")
 stages2 = ("Полуфиналы", "Финальный", "Суперфинал")
-# months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
-#                "августа", "сентября", "октября", "ноября", "декабря")
+
 
 my_win.comboBox_page_1.addItems(page_orient)
 my_win.comboBox_page_2.addItems(page_orient)
@@ -323,8 +322,11 @@ def load_tableWidget():
         z = 6
         column_label = ["№", "Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
     elif my_win.tabWidget.currentIndex() == 3:
-        z = 9
-        column_label = ["id", "№ встречи", "Группа", "Этапы", "Игрок_1", "Игрок_2", "Победитель", "Счет", "Счет в партии"]
+        # z = 9
+        # column_label = ["id", "№ встречи", "Группа", "Этапы", "Игрок_1", "Игрок_2", "Победитель", "Счет", "Счет в партии"]
+        z = 13
+        column_label = ["id", "Этапы", "Группа", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
+                        "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
     else:
         z = 10
         column_label = ["id", "№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
@@ -581,7 +583,7 @@ def fill_table_R1_list():
 
 def fill_table_results():
     """заполняет таблицу результатов QtableWidget из db"""
-    player_result = Result.select()
+    player_result = Result.select().order_by(Result.id)
     result_list = player_result.dicts().execute()
     row_count = (len(result_list))  # кол-во строк в таблице
     column_count = (len(result_list[0]))  # кол-во столбцов в таблице
@@ -592,6 +594,10 @@ def fill_table_results():
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
+    my_win.tableWidget.hideColumn(9)
+    my_win.tableWidget.hideColumn(10)
+    my_win.tableWidget.hideColumn(11)
+    my_win.tableWidget.hideColumn(12)
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
@@ -683,8 +689,8 @@ def filter():
     """заполняет комбобокс фильтр групп для таблицы результаты"""
     my_win.comboBox_group.clear()
     gr_txt = []
-    kg = my_win.spinBox_kol_group.text()  # количество групп
-    kg = int(kg)
+    system = System.select().order_by(System.id.desc()).get()
+    kg = int(system.total_group)  # количество групп
     for i in range(1, kg + 1):
         txt = str(i) + " группа"
         gr_txt.append(txt)
@@ -698,7 +704,7 @@ def tab():
         my_win.tableWidget.show()
         db_select_title()
     elif tw == 1:
-        pass
+        # pass
         region()
         load_tableWidget()
         my_win.tableWidget.show()
@@ -720,7 +726,9 @@ def tab():
             count = len(player_list)
             my_win.label_8.setText("Всего участников: " + str(count) + " чел.")
     elif tw == 3:  # вкладка группы
+        # pass
         my_win.tableWidget.show()
+        filter()
         load_tableWidget()
         fill_table_results()
     elif tw == 4:
@@ -758,6 +766,7 @@ def page():
         my_win.label_12.show()
     elif tb == 3:  # вкладка -групппы-
         my_win.tableWidget.show()
+        filter()
         load_tableWidget()
     elif tb == 4:
         my_win.tableWidget.hide()
@@ -826,7 +835,6 @@ def sort(self):
     else:
         player_list = Player.select().order_by(Player.player)  # сортировка по алфавиту
         fill_table(player_list)
-
 
 
 def button_etap_made_enabled(state):
