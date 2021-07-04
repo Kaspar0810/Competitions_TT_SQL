@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1685</width>
-    <height>992</height>
+    <width>1375</width>
+    <height>689</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>240</x>
       <y>0</y>
       <width>801</width>
       <height>231</height>
@@ -771,29 +771,6 @@
        <string>Всего участников:</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_etap_1">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>70</y>
-        <width>151</width>
-        <height>26</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_9">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>50</y>
-        <width>141</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Этапы соревнования</string>
-      </property>
-     </widget>
      <widget class="QComboBox" name="comboBox_page_1">
       <property name="geometry">
        <rect>
@@ -802,19 +779,6 @@
         <width>111</width>
         <height>26</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_10">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>72</y>
-        <width>60</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>1-й этап:</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="spinBox_kol_group">
@@ -898,29 +862,6 @@
        <string/>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_etap_2">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>100</y>
-        <width>151</width>
-        <height>26</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_15">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>100</y>
-        <width>60</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>2-й этап:</string>
-      </property>
-     </widget>
      <widget class="QComboBox" name="comboBox_page_2">
       <property name="geometry">
        <rect>
@@ -942,6 +883,19 @@
       </property>
       <property name="text">
        <string>Создать</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>50</y>
+        <width>141</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Этапы соревнования</string>
       </property>
      </widget>
     </widget>
@@ -968,7 +922,7 @@
       <property name="title">
        <string>Фильтр</string>
       </property>
-      <widget class="QComboBox" name="comboBox_group">
+      <widget class="QComboBox" name="comboBox_group_filter">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1014,10 +968,10 @@
    <widget class="QFrame" name="frame_score">
     <property name="geometry">
      <rect>
-      <x>1030</x>
+      <x>1050</x>
       <y>10</y>
-      <width>381</width>
-      <height>611</height>
+      <width>321</width>
+      <height>641</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -1038,34 +992,186 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QScrollArea" name="scrollArea">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>20</y>
-       <width>113</width>
-       <height>21</height>
+       <x>0</x>
+       <y>10</y>
+       <width>321</width>
+       <height>621</height>
       </rect>
      </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_2">
-     <property name="geometry">
-      <rect>
-       <x>160</x>
-       <y>20</y>
-       <width>113</width>
-       <height>21</height>
-      </rect>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
      </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>303</width>
+        <height>619</height>
+       </rect>
+      </property>
+      <widget class="QRadioButton" name="radioButton">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>60</y>
+         <width>21</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_16">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>30</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>15</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Игрок №1</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>60</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="toolButton">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>60</y>
+         <width>26</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_19">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>60</y>
+         <width>16</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>18</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_18">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>10</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>18</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Встречи</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_2">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>60</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_17">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>30</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>15</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Игрок №2</string>
+       </property>
+      </widget>
+      <widget class="Line" name="line">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>90</y>
+         <width>241</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </widget>
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
-      <x>222</x>
+      <x>240</x>
       <y>242</y>
       <width>801</width>
-      <height>381</height>
+      <height>411</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -1114,8 +1220,8 @@
      <rect>
       <x>11</x>
       <y>12</y>
-      <width>201</width>
-      <height>461</height>
+      <width>221</width>
+      <height>491</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -1148,8 +1254,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>199</width>
-       <height>255</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1203,8 +1309,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>199</width>
-       <height>255</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1281,8 +1387,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>199</width>
-       <height>255</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1291,8 +1397,8 @@
      <widget class="QPushButton" name="Button_system_made">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>220</y>
+        <x>30</x>
+        <y>260</y>
         <width>113</width>
         <height>32</height>
        </rect>
@@ -1310,8 +1416,8 @@
      <widget class="QCheckBox" name="checkBox_3">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>220</y>
+        <x>10</x>
+        <y>260</y>
         <width>21</width>
         <height>20</height>
        </rect>
@@ -1320,14 +1426,60 @@
        <string/>
       </property>
      </widget>
+     <widget class="QComboBox" name="comboBox_etap_1">
+      <property name="geometry">
+       <rect>
+        <x>69</x>
+        <y>-3</y>
+        <width>141</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>7</x>
+        <y>0</y>
+        <width>60</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>1-й этап:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>20</y>
+        <width>60</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>2-й этап:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_etap_2">
+      <property name="geometry">
+       <rect>
+        <x>69</x>
+        <y>20</y>
+        <width>141</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_3">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>199</width>
-       <height>255</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1339,8 +1491,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>199</width>
-       <height>255</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1352,8 +1504,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>199</width>
-       <height>255</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1365,8 +1517,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>480</y>
-      <width>191</width>
+      <y>510</y>
+      <width>201</width>
       <height>20</height>
      </rect>
     </property>
@@ -1381,8 +1533,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>500</y>
-      <width>201</width>
+      <y>530</y>
+      <width>221</width>
       <height>121</height>
      </rect>
     </property>
@@ -1430,7 +1582,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1685</width>
+     <width>1375</width>
      <height>21</height>
     </rect>
    </property>

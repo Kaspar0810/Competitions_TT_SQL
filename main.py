@@ -321,9 +321,7 @@ def load_tableWidget():
     elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь-
         z = 6
         column_label = ["№", "Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
-    elif my_win.tabWidget.currentIndex() == 3:
-        # z = 9
-        # column_label = ["id", "№ встречи", "Группа", "Этапы", "Игрок_1", "Игрок_2", "Победитель", "Счет", "Счет в партии"]
+    elif my_win.tabWidget.currentIndex() == 3 or my_win.toolBox.currentIndex() == 3:
         z = 13
         column_label = ["id", "Этапы", "Группа", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
                         "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
@@ -346,7 +344,7 @@ def load_tableWidget():
         fill_table_R_list()
     elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь- и загружет таблицу с рейтингом
         fill_table_R1_list()
-    elif my_win.tabWidget.currentIndex() == 3:
+    elif my_win.tabWidget.currentIndex() == 3 or my_win.toolBox.currentIndex() == 3:  # таблица результатов
         fill_table_results()
     else:  # загружает таблицу со списком
         player_list = Player.select().order_by(Player.rank.desc())
@@ -685,56 +683,21 @@ def dclick_in_listwidget():
         my_win.listWidget.clear()
 
 
-def filter():
+def combobox_filter():
     """заполняет комбобокс фильтр групп для таблицы результаты"""
-    my_win.comboBox_group.clear()
+    my_win.comboBox_group_filter.clear()
     gr_txt = []
     system = System.select().order_by(System.id.desc()).get()
     kg = int(system.total_group)  # количество групп
     for i in range(1, kg + 1):
         txt = str(i) + " группа"
         gr_txt.append(txt)
-    my_win.comboBox_group.addItems(gr_txt)
+    my_win.comboBox_group_filter.addItems(gr_txt)
 
 
 def tab():
     """Изменяет вкладку tabWidget в зависимости от вкладки toolBox"""
     tw = my_win.tabWidget.currentIndex()
-    if tw == 0:
-        my_win.tableWidget.show()
-        db_select_title()
-    elif tw == 1:
-        # pass
-        region()
-        load_tableWidget()
-        my_win.tableWidget.show()
-    elif tw == 2:
-        my_win.Button_system_made.setEnabled(False)
-        my_win.Button_1etap_made.setEnabled(False)
-        my_win.Button_2etap_made.setEnabled(False)
-        s = System.select().order_by(System.id.desc()).get()
-        st = s.total_athletes
-        se = s.stage
-        if st > 0:
-            my_win.comboBox_etap_1.setCurrentText(se)
-        else:
-            my_win.tableWidget.hide()
-            my_win.label_11.hide()
-            my_win.label_12.hide()
-            my_win.spinBox_kol_group.hide()
-            player_list = Player.select()
-            count = len(player_list)
-            my_win.label_8.setText("Всего участников: " + str(count) + " чел.")
-    elif tw == 3:  # вкладка группы
-        # pass
-        my_win.tableWidget.show()
-        filter()
-        load_tableWidget()
-        fill_table_results()
-    elif tw == 4:
-        my_win.tableWidget.hide()
-    elif tw == 5:
-        my_win.tableWidget.hide()
     my_win.toolBox.setCurrentIndex(tw)
 
 
@@ -748,7 +711,7 @@ def page():
         region()
         load_tableWidget()
         my_win.tableWidget.show()
-    elif tb == 2:
+    elif tb == 2:  # -система-
         my_win.Button_system_made.setEnabled(False)
         my_win.Button_1etap_made.setEnabled(False)
         my_win.Button_2etap_made.setEnabled(False)
@@ -761,12 +724,14 @@ def page():
         my_win.label_8.setText("Всего участников: " + str(count) + " чел.")
         s = System.select().order_by(System.id.desc()).get()
         se = s.stage
+        tg = s.total_group
+        my_win.spinBox_kol_group.setValue(tg)
         my_win.comboBox_etap_1.setCurrentText(se)
-        # my_win.label_12.setText()
+
         my_win.label_12.show()
     elif tb == 3:  # вкладка -групппы-
         my_win.tableWidget.show()
-        filter()
+        combobox_filter()
         load_tableWidget()
     elif tb == 4:
         my_win.tableWidget.hide()
@@ -842,7 +807,11 @@ def button_etap_made_enabled(state):
     if state == 2:
         my_win.Button_1etap_made.setEnabled(True)
         my_win.Button_2etap_made.setEnabled(True)
-
+        my_win.spinBox_kol_group.show()
+    else:
+        my_win.Button_1etap_made.setEnabled(False)
+        my_win.Button_2etap_made.setEnabled(False)
+        my_win.spinBox_kol_group.hide()
 
 def button_title_made_enable(state):
     """включает кнопку - создание титула - если отмечен чекбокс, защита от случайного нажатия"""
@@ -927,8 +896,8 @@ def system():
         my_win.spinBox_kol_group.hide()
         my_win.label_11.hide()
     elif ct == "Предварительный":
-        my_win.spinBox_kol_group.show()
-        my_win.spinBox_kol_group.setValue(2)
+        # my_win.spinBox_kol_group.show()
+        # my_win.spinBox_kol_group.setValue(2)
         my_win.label_11.show()
 
 
@@ -949,7 +918,6 @@ def kol_player_in_group(self):
                             + str(e) + " групп(а) по " + str(g2) + " чел.")
     my_win.label_12.setText(stroka_kol_group)
     my_win.label_12.show()
-    filter()
     if sender == my_win.Button_1etap_made:
         system_update(kg)
 
@@ -1051,6 +1019,28 @@ def chop_line(q, maxline=30):
         return q
 
 
+def result_filter_group():
+    """фильтрует таблицу -результаты- по группам"""
+    fg = my_win.comboBox_group_filter.currentText()
+    player_result = Result.select().where(Result.number_group == fg)
+    result_list = player_result.dicts().execute()
+    row_count = (len(result_list))  # кол-во строк в таблице
+    # column_count = (len(result_list[0]))  # кол-во столбцов в таблице
+    column_count = 13  # кол-во столбцов в таблице
+    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+
+    for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(result_list[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
+    my_win.tableWidget.hideColumn(9)
+    my_win.tableWidget.hideColumn(10)
+    my_win.tableWidget.hideColumn(11)
+    my_win.tableWidget.hideColumn(12)
+    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+
+
 # ====== отслеживание изменения текста в полях ============
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
@@ -1065,6 +1055,7 @@ my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 my_win.comboBox_etap_1.currentTextChanged.connect(system)
 my_win.comboBox_page_1.currentTextChanged.connect(page_vid)
+my_win.comboBox_group_filter.currentTextChanged.connect(result_filter_group)
 
 # =======  отслеживание переключение чекбоксов =========
 my_win.checkBox.stateChanged.connect(button_title_made_enable)  # при изменении чекбокса активирует кнопку создать
