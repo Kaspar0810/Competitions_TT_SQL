@@ -102,10 +102,12 @@ class Result(BaseModel):
     winner = CharField(null=True)
     points_win = IntegerField(null=True)
     score_win = CharField(null=True)
+    # score_in_game = CharField(20, null=True)
     loser = CharField(null=True)
     points_loser = IntegerField(null=True)
     score_loser = CharField(null=True)
     title_id = ForeignKeyField(Title)
+
 
     class Meta:
         db_table = "results"
