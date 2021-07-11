@@ -22,6 +22,7 @@ def table1_data():
     """данные результатов в таблице 1-й группы"""
     table_1 = []
     td = table_1
+    num_gr = "1 группа"
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
@@ -42,7 +43,7 @@ def table1_data():
     table_1[5][1] = pl3.city
     table_1[6][1] = pl4.player
     table_1[7][1] = pl4.city
-    score_in_table(td)
+    score_in_table(td, num_gr)
     return table_1
 
 
@@ -50,6 +51,7 @@ def table2_data():
     """данные результатов в таблице 2-й группы"""
     table_2 = []
     td = table_2
+    num_gr = "2 группа"
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
@@ -69,7 +71,7 @@ def table2_data():
     table_2[5][1] = pl3.city
     table_2[6][1] = pl4.player
     table_2[7][1] = pl4.city
-    score_in_table(td)  # вызывает функцию, где заносит счет в таблицу pdf
+    score_in_table(td, num_gr)  # вызывает функцию, где заносит счет в таблицу pdf
     return table_2
 
 
@@ -77,13 +79,14 @@ def table3_data():
     """данные результатов в таблице 3-й группы"""
     table_3 = []
     td = table_3
+    num_gr = "3 группа"
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_3.append(s)
-    score_in_table(td)
+    score_in_table(td, num_gr)
     return table_3
 
 
@@ -91,13 +94,14 @@ def table4_data():
     """данные результатов в таблице 4-й группы"""
     table_4 = []
     td = table_4
+    num_gr = "4 группа"
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_4.append(s)
-    score_in_table(td)
+    score_in_table(td, num_gr)
     return table_4
 
 
@@ -105,13 +109,14 @@ def table5_data():
     """данные результатов в таблице 5-й группы"""
     table_5 = []
     td = table_5
+    num_gr = "5 группа"
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_5.append(s)
-    score_in_table(td)
+    score_in_table(td, num_gr)
     return table_5
 
 
@@ -119,13 +124,14 @@ def table6_data():
     """данные результатов в таблице 6-й группы"""
     table_6 = []
     td = table_6
+    num_gr = "6 группа"
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_6.append(s)
-    score_in_table(td)
+    score_in_table(td, num_gr)
     return table_6
 
 
@@ -133,13 +139,14 @@ def table7_data():
     """данные результатов в таблице 5-й группы"""
     table_7 = []
     td = table_7
+    num_gr = "7 группа"
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_7.append(s)
-        score_in_table(td)
+        score_in_table(td, num_gr)
     return table_7
 
 
@@ -147,13 +154,14 @@ def table8_data():
     """данные результатов в таблице 6-й группы"""
     table_8 = []
     td = table_8
+    num_gr = "8 группа"
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_8.append(s)
-    score_in_table(td)
+    score_in_table(td,num_gr)
     return table_8
 
 
@@ -199,10 +207,10 @@ def total_data_table():
     return tdt
 
 
-def score_in_table(td):
+def score_in_table(td, num_gr):
     """заносит счет в таблицу группы pdf"""
     ta = System.select().order_by(System.id.desc()).get()
-    r = Result.select().where(Result.title_id == ta and Result.number_group == "1 группа")
+    r = Result.select().where(Result.title_id == ta and Result.number_group == num_gr)
     count = len(r)
     result_list = r.dicts().execute()
 
