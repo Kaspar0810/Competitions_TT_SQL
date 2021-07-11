@@ -1,6 +1,7 @@
 from models import *
 import comp_system
 
+
 def kol_player():
     """выводит максимальное коичество человек в группе t если все группы равны, а g2 если разное количество"""
     ta = System.select().order_by(System.id.desc()).get()
@@ -20,6 +21,7 @@ def kol_player():
 def table1_data():
     """данные результатов в таблице 1-й группы"""
     table_1 = []
+    td = table_1
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
@@ -40,20 +42,14 @@ def table1_data():
     table_1[5][1] = pl3.city
     table_1[6][1] = pl4.player
     table_1[7][1] = pl4.city
-    # ================
-    r = Result.get(Result.tours == "1-2")
-    table_1[0][3] = r.points_win
-    table_1[1][3] = r.score_in_game
-    table_1[2][2] = r.points_loser
-    table_1[3][2] = r.score_loser
-
-
+    score_in_table(td)
     return table_1
 
 
 def table2_data():
     """данные результатов в таблице 2-й группы"""
     table_2 = []
+    td = table_2
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
@@ -73,80 +69,91 @@ def table2_data():
     table_2[5][1] = pl3.city
     table_2[6][1] = pl4.player
     table_2[7][1] = pl4.city
+    score_in_table(td)  # вызывает функцию, где заносит счет в таблицу pdf
     return table_2
 
 
 def table3_data():
     """данные результатов в таблице 3-й группы"""
     table_3 = []
+    td = table_3
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_3.append(s)
+    score_in_table(td)
     return table_3
 
 
 def table4_data():
     """данные результатов в таблице 4-й группы"""
     table_4 = []
+    td = table_4
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_4.append(s)
+    score_in_table(td)
     return table_4
 
 
 def table5_data():
     """данные результатов в таблице 5-й группы"""
     table_5 = []
+    td = table_5
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_5.append(s)
+    score_in_table(td)
     return table_5
 
 
 def table6_data():
     """данные результатов в таблице 6-й группы"""
     table_6 = []
+    td = table_6
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_6.append(s)
-
+    score_in_table(td)
     return table_6
 
 
 def table7_data():
     """данные результатов в таблице 5-й группы"""
     table_7 = []
+    td = table_7
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_7.append(s)
+        score_in_table(td)
     return table_7
 
 
 def table8_data():
     """данные результатов в таблице 6-й группы"""
     table_8 = []
+    td = table_8
     t = kol_player()
     for k in range(1, t * 2 + 1):
         st = ['']
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_8.append(s)
-
+    score_in_table(td)
     return table_8
 
 
@@ -190,3 +197,35 @@ def total_data_table():
         if kg == 8:
             break
     return tdt
+
+
+def score_in_table(td):
+    """заносит счет в таблицу группы pdf"""
+    ta = System.select().order_by(System.id.desc()).get()
+    r = Result.select().where(Result.title_id == ta and Result.number_group == "1 группа")
+    count = len(r)
+    result_list = r.dicts().execute()
+
+    for i in range(0, count):
+        sc_game = str(list(result_list[i].values())[9])
+        if sc_game == "":
+            scg = 8
+        else:
+            scg = 9
+        tours = str(list(result_list[i].values())[3])
+        p1 = int(tours[0])
+        p2 = int(tours[2])
+        win = str(list(result_list[i].values())[6])
+        player1 = str(list(result_list[i].values())[4])
+        if win == player1:
+            if win != "":  # если победитель 1-й игрок
+                td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[7])  # очки 1-ого игрока
+                td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[scg])  # счет 1-ого игрока
+                td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[11])  # очки 2-ого игрока
+                td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[12])  # счет 2-ого игрока
+        else:
+            if win != "":  # если победитель 2-й игрок
+                td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[11])  # очки 1-ого игрока
+                td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[12])  # счет 1-ого игрока
+                td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[7])  # очки 2-ого игрока
+                td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[scg])  # счет 2-ого игрока
