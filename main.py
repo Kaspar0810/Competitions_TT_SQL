@@ -189,6 +189,7 @@ page_orient = ("альбомная", "книжная")
 kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
+res = ("все игры", "завершенные", "не сыгранные")
 stages1 = ("Основной", "Предварительный", "Полуфиналы", "Финальный", "Суперфинал")
 stages2 = ("Полуфиналы", "Финальный", "Суперфинал")
 
@@ -201,6 +202,7 @@ my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
 my_win.comboBox_sredi.addItems(mylist)
 my_win.comboBox_razryad.addItems(raz)
+my_win.comboBox_filter_played.addItems(res)
 
 # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_start.setDate(date.today())
@@ -320,8 +322,8 @@ def load_tableWidget():
         z = 6
         column_label = ["№", "Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
     elif my_win.tabWidget.currentIndex() == 3 or my_win.toolBox.currentIndex() == 3:
-        z = 13
-        column_label = ["id", "Этапы", "Группа", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
+        z = 14
+        column_label = ["id", "Этапы", "Группа", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки", "Общий счет",
                         "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
     else:
         z = 10
@@ -583,10 +585,11 @@ def fill_table_results():
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
-    my_win.tableWidget.hideColumn(9)
+    # my_win.tableWidget.hideColumn(9)
     my_win.tableWidget.hideColumn(10)
     my_win.tableWidget.hideColumn(11)
     my_win.tableWidget.hideColumn(12)
+    my_win.tableWidget.hideColumn(13)
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
@@ -674,16 +677,16 @@ def dclick_in_listwidget():
         my_win.listWidget.clear()
 
 
-def combobox_filter():
+def load_combobox_filter_group():
     """заполняет комбобокс фильтр групп для таблицы результаты"""
-    my_win.comboBox_group_filter.clear()
+    my_win.comboBox_filter_group.clear()
     gr_txt = []
     system = System.select().order_by(System.id.desc()).get()
     kg = int(system.total_group)  # количество групп
     for i in range(1, kg + 1):
         txt = str(i) + " группа"
         gr_txt.append(txt)
-    my_win.comboBox_group_filter.addItems(gr_txt)
+    my_win.comboBox_filter_group.addItems(gr_txt)
 
 
 def tab():
@@ -726,7 +729,7 @@ def page():
         my_win.Button_Ok.setDisabled(True)
         game_in_visible(state=1)
         my_win.radioButton_match_5.setChecked(True)
-        combobox_filter()
+        load_combobox_filter_group()
         load_tableWidget()
     elif tb == 4:
         my_win.tableWidget.hide()
@@ -988,7 +991,9 @@ def player_in_table():
                     second = int(match[2])  # игрок под номером в группе
                     pl1 = gr[first * 2 - 2][1]  # фамилия первого игрока
                     pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
+
                     with db:
+                        # Result.create_table()
                         results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
                                          tours=match, title_id=si).save()
         else:
@@ -1017,11 +1022,10 @@ def chop_line(q, maxline=30):
 
 def result_filter_group():
     """фильтрует таблицу -результаты- по группам"""
-    fg = my_win.comboBox_group_filter.currentText()
+    fg = my_win.comboBox_filter_group.currentText()
     player_result = Result.select().where(Result.number_group == fg)
     result_list = player_result.dicts().execute()
     row_count = (len(result_list))  # кол-во строк в таблице
-    # column_count = (len(result_list[0]))  # кол-во столбцов в таблице
     column_count = 13  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
@@ -1030,16 +1034,42 @@ def result_filter_group():
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
-    my_win.tableWidget.hideColumn(9)
     my_win.tableWidget.hideColumn(10)
     my_win.tableWidget.hideColumn(11)
     my_win.tableWidget.hideColumn(12)
+    my_win.tableWidget.hideColumn(13)
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
-# def setColortoRow(table, r, color):
-#     for j in range(table.columnCount()):
-#         table.item(r, j).setBackground(color)
+def result_filter_played():
+    """фильтрует таблицу -результаты- по сыгранным встречам"""
+    fplayed = my_win.comboBox_filter_played.currentText()
+    if fplayed == "не сыгранные":
+        sg = "осталось сыграть:"
+        player_result = Result.select().where(Result.points_win == None)
+    elif fplayed == "завершенные":
+        player_result = Result.select().where(Result.points_win >= 0)
+        sg = "всего сыграно:"
+    else:
+        player_result = Result.select()
+        sg = "всего игр:"
+
+    result_list = player_result.dicts().execute()
+    row_count = (len(result_list))  # кол-во строк в таблице
+    my_win.label_16.setText(f"{sg} {row_count}")
+    column_count = 13  # кол-во столбцов в таблице
+    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+
+    for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(result_list[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
+    my_win.tableWidget.hideColumn(10)
+    my_win.tableWidget.hideColumn(11)
+    my_win.tableWidget.hideColumn(12)
+    my_win.tableWidget.hideColumn(13)
+    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
 def game_in_visible(state):
@@ -1186,20 +1216,23 @@ def enter_score():
     if st1 > st2:
         winner = my_win.lineEdit_player1.text()
         loser = my_win.lineEdit_player2.text()
-        ts = f"{st2} : {st1}"
+        ts_winner = f"{st1} : {st2}"
+        ts_loser = f"{st2} : {st1}"
     else:
         winner = my_win.lineEdit_player2.text()
         loser = my_win.lineEdit_player1.text()
-        ts = f"{st1} : {st2}"
+        ts_winner = f"{st2} : {st1}"
+        ts_loser = f"{st1} : {st2}"
     winner_string = string_score_game()
     with db:
         result = Result.get(Result.id == id)
         result.winner = winner
         result.points_win = "2"
         result.score_win = winner_string
+        result.score_in_game = ts_winner
         result.loser = loser
         result.points_loser = "1"
-        result.score_loser = ts
+        result.score_loser = ts_loser
         result.save()
     fill_table_results()
 
@@ -1219,6 +1252,11 @@ def enter_score():
 
     my_win.lineEdit_player1.setText("")  # очищает поля фамилии игроков
     my_win.lineEdit_player2.setText("")
+    #===== вызов функции заполнения таблицы pdf группы сыгранными играми
+    # p = System.get(System.id == 1)
+    pv = landscape(A4)
+    comp_system.table_made(pv)
+
 
 
 def string_score_game():
@@ -1345,7 +1383,8 @@ my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 my_win.comboBox_etap_1.currentTextChanged.connect(system)
 my_win.comboBox_page_1.currentTextChanged.connect(page_vid)
-my_win.comboBox_group_filter.currentTextChanged.connect(result_filter_group)
+my_win.comboBox_filter_group.currentTextChanged.connect(result_filter_group)
+my_win.comboBox_filter_played.currentTextChanged.connect(result_filter_played)
 
 # =======  отслеживание переключение чекбоксов =========
 my_win.checkBox.stateChanged.connect(button_title_made_enable)  # при изменении чекбокса активирует кнопку создать

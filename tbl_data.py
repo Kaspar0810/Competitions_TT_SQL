@@ -26,11 +26,12 @@ def table1_data():
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_1.append(s)
-
+    #  id игроков 1-й таблицы
     pl1 = Player.get(Player.id == 1)
     pl2 = Player.get(Player.id == 2)
     pl3 = Player.get(Player.id == 5)
     pl4 = Player.get(Player.id == 8)
+    # занесение фамилии и города в таблицу
     table_1[0][1] = pl1.player
     table_1[1][1] = pl1.city
     table_1[2][1] = pl2.player
@@ -39,6 +40,14 @@ def table1_data():
     table_1[5][1] = pl3.city
     table_1[6][1] = pl4.player
     table_1[7][1] = pl4.city
+    # ================
+    r = Result.get(Result.tours == "1-2")
+    table_1[0][3] = r.points_win
+    table_1[1][3] = r.score_in_game
+    table_1[2][2] = r.points_loser
+    table_1[3][2] = r.score_loser
+
+
     return table_1
 
 
