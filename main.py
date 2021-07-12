@@ -1258,7 +1258,6 @@ def enter_score():
     comp_system.table_made(pv)
 
 
-
 def string_score_game():
     """создает строку со счетом победителя"""
     if my_win.radioButton_match_3.isChecked():  # зависимости от кол-во партий

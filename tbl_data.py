@@ -209,11 +209,18 @@ def total_data_table():
 
 def score_in_table(td, num_gr):
     """заносит счет в таблицу группы pdf"""
+    plr1 = 0
+    plr2 = 0
+
+    total_score = {}
+
     ta = System.select().order_by(System.id.desc()).get()
+    mp = ta.max_player
+    for s in range(1, mp + 1):
+        total_score[s] = 0
     r = Result.select().where(Result.title_id == ta and Result.number_group == num_gr)
     count = len(r)
     result_list = r.dicts().execute()
-
     for i in range(0, count):
         sc_game = str(list(result_list[i].values())[9])
         if sc_game == "":
@@ -225,15 +232,37 @@ def score_in_table(td, num_gr):
         p2 = int(tours[2])
         win = str(list(result_list[i].values())[6])
         player1 = str(list(result_list[i].values())[4])
-        if win == player1:
-            if win != "":  # если победитель 1-й игрок
+        if win != "":
+            if win == player1:
                 td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[7])  # очки 1-ого игрока
                 td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[scg])  # счет 1-ого игрока
                 td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[11])  # очки 2-ого игрока
                 td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[12])  # счет 2-ого игрока
-        else:
-            if win != "":  # если победитель 2-й игрок
+                tp1 = int(list(result_list[i].values())[7])  # очки 1-ого игрока
+                tp2 = int(list(result_list[i].values())[11])  # очки 2-ого игрока
+                plr1 = total_score[p1]  # считывает из словаря 1-ого игрока очки
+                plr2 = total_score[p2]  # считывает из словаря 2-ого игрока очки
+                plr1 = plr1 + tp1  # прибавляет очки 1-ого игрока
+                plr2 = plr2 + tp2  # прибавляет очки 2-ого игрока
+                total_score[p1] = plr1  # записывает сумму очков 1-му игроку
+                total_score[p2] = plr2  # записывает сумму очков 2-му игроку
+            else:
                 td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[11])  # очки 1-ого игрока
                 td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[12])  # счет 1-ого игрока
                 td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[7])  # очки 2-ого игрока
                 td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[scg])  # счет 2-ого игрока
+                tp1 = int(list(result_list[i].values())[11])  # очки 1-ого игрока
+                tp2 = int(list(result_list[i].values())[7])  # очки 2-ого игрока
+                plr1 = total_score[p1]  # считывает из словаря 1-ого игрока очки
+                plr2 = total_score[p2]  # считывает из словаря 2-ого игрока очки
+                plr1 = plr1 + tp1  # прибавляет очки 1-ого игрока
+                plr2 = plr2 + tp2  # прибавляет очки 2-ого игрока
+                total_score[p1] = plr1  # записывает сумму очков 1-му игроку
+                total_score[p2] = plr2  # записывает сумму очков 2-му игроку
+        else:
+            break
+    for t in range(0, mp):
+        td[t * 2][mp + 2] = total_score[t + 1]  # записывает каждому игроку сумму очков
+
+
+
