@@ -209,9 +209,6 @@ def total_data_table():
 
 def score_in_table(td, num_gr):
     """заносит счет в таблицу группы pdf"""
-    plr1 = 0
-    plr2 = 0
-
     total_score = {}
 
     ta = System.select().order_by(System.id.desc()).get()
@@ -264,5 +261,28 @@ def score_in_table(td, num_gr):
     for t in range(0, mp):
         td[t * 2][mp + 2] = total_score[t + 1]  # записывает каждому игроку сумму очков
 
-
+    rev_dict = {}
+    max_value = []
+    for y in range(0, mp):
+        max_value.append(0)
+    for key, value in total_score.items():
+        rev_dict.setdefault(value, set()).add(key)
+    result = [key for key, values in rev_dict.items() if len(values) > 1]
+    #=====================
+    if len(result) == 0:  # если нет одинакового кол-во очков
+        Keymax = max(total_score, key=total_score.get)  # ключ максимального значения
+        mv1 = total_score[Keymax]  # максимальное значение
+        td[Keymax * 2 - 2][mp + 4] = 1  # записывает 1 место игроку
+        for s in range(0, mp - 1):
+            mv = mv1
+            mv1 = max_value[s + 1]
+            for v in total_score.values():  # следующее значние по максимуму
+                if v > mv1 and v < mv:
+                    mv1 = v
+            key_list = list(total_score.keys())
+            val_list = list(total_score.values())
+            i = key_list[val_list.index(mv1)]
+            td[i * 2 - 2][mp + 4] = s + 2  # записывает место игроку
+    else:
+        print("одинаковые очки")
 

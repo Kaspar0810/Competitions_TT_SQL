@@ -1103,16 +1103,28 @@ def game_in_visible(state):
 def select_player_in_game():
     """выодит фамилии игроков встречи"""
     r = my_win.tableWidget.currentRow()
+    if my_win.tableWidget.item(r, 6).text() != "":  # если встреча сыграна, то заполняет поля общий счет
+        sc = my_win.tableWidget.item(r, 8).text()
+        pl1 = my_win.tableWidget.item(r, 4).text()
+        pl2 = my_win.tableWidget.item(r, 5).text()
+        if pl1 == my_win.tableWidget.item(r, 6).text():
+            sc1 = sc[0]
+            sc2 = sc[4]
+        else:
+            sc1 = sc[4]
+            sc2 = sc[0]
+        my_win.lineEdit_pl1_score_total.setText(sc1)
+        my_win.lineEdit_pl2_score_total.setText(sc2)
+        my_win.lineEdit_player1.setText(pl1)
+        my_win.lineEdit_player2.setText(pl2)
+        my_win.lineEdit_pl1_s1.setFocus()
+    else:
+        pl1 = my_win.tableWidget.item(r, 4).text()
+        pl2 = my_win.tableWidget.item(r, 5).text()
+        my_win.lineEdit_player1.setText(pl1)
+        my_win.lineEdit_player2.setText(pl2)
+        my_win.lineEdit_pl1_s1.setFocus()
     my_win.tableWidget.selectRow(r)
-    pl1 = my_win.tableWidget.item(r, 4).text()
-    pl2 = my_win.tableWidget.item(r, 5).text()
-    my_win.lineEdit_player1.setText(pl1)
-    my_win.lineEdit_player2.setText(pl2)
-    my_win.lineEdit_pl1_s1.setFocus()
-
-
-def score_in_game():
-    pass
 
 
 def focus():
@@ -1373,7 +1385,7 @@ my_win.lineEdit_pl2_s5.returnPressed.connect(focus)
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 
-my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
+my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)  # двойной клик по listWidget (рейтинг, тренеры)
 
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.toolBox.currentChanged.connect(page)
