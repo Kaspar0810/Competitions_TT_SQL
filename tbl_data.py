@@ -260,29 +260,59 @@ def score_in_table(td, num_gr):
             break
     for t in range(0, mp):
         td[t * 2][mp + 2] = total_score[t + 1]  # записывает каждому игроку сумму очков
+    rank_in_group(total_score, mp, td)
 
-    rev_dict = {}
+
+def rank_in_group(total_score, mp, td):
+    """выставляет места в группах соответсвеноо очкам. пока без крутиловок"""
+    rev_dict = {}  # словарь, где в качастве ключа номера групп, а значения - очки
     max_value = []
     for y in range(0, mp):
         max_value.append(0)
     for key, value in total_score.items():
         rev_dict.setdefault(value, set()).add(key)
     result = [key for key, values in rev_dict.items() if len(values) > 1]
-    #=====================
-    if len(result) == 0:  # если нет одинакового кол-во очков
-        Keymax = max(total_score, key=total_score.get)  # ключ максимального значения
-        mv1 = total_score[Keymax]  # максимальное значение
-        td[Keymax * 2 - 2][mp + 4] = 1  # записывает 1 место игроку
-        for s in range(0, mp - 1):
-            mv = mv1
-            mv1 = max_value[s + 1]
-            for v in total_score.values():  # следующее значние по максимуму
-                if v > mv1 and v < mv:
-                    mv1 = v
-            key_list = list(total_score.keys())
-            val_list = list(total_score.values())
-            i = key_list[val_list.index(mv1)]
-            td[i * 2 - 2][mp + 4] = s + 2  # записывает место игроку
+
+    key_list = list(total_score.keys())  # отдельно составляет список ключей
+    val_list = list(total_score.values())  # отдельно составляет список значений
+    sum_val = sum(val_list)
+    if sum_val == 0:
+        return
     else:
-        print("одинаковые очки")
+        if len(result) == 0:  # =========== если нет одинакового кол-во очков
+            Keymax = max(total_score, key=total_score.get)  # ключ максимального значения
+            mv1 = total_score[Keymax]  # максимальное значение
+            td[Keymax * 2 - 2][mp + 4] = 1  # записывает 1 место игроку
+            for s in range(0, mp - 1):
+                mv = mv1
+                mv1 = max_value[s + 1]
+                for v in total_score.values():  # следующее значние по максимуму
+                    if mv1 < v < mv:  # находит наибольшое из оставшихся
+                        mv1 = v
+                i = key_list[val_list.index(mv1)]  # находит ключ соответсвующий максимальному значению
+                td[i * 2 - 2][mp + 4] = s + 2  # записывает место игроку
+        else:  # =========== если одинаковое кол-во очков
+            ql = set(val_list)
+            q_list = len(ql)  # кол-во повторяющихся значений(сколько групп участников с равным кол-во очков)
+            for a in range(0, q_list):
+                key_max = max(total_score, key=total_score.get)  # ключ максимального значения (№ группы)
+                max_val1 = total_score[key_max]  # максимальное значение
+                ls = val_list.count(max_val1)
+                ik = key_max
+                for s in range(key_max, key_max + ls):
+                    iv = val_list.index(max_val1, s - 1)
+                    ik = key_list[iv]  # находит ключ соответсвующий максимальному значению
+                    td[ik * 2 - 2][mp + 4] = 1  # записывает 1 место игроку
+                mv = max_val1
+                max_val1 = 0
+                im = 0
+                for v in val_list:  # следующее значние по максимуму
+                    if max_val1 < v < mv:  # находит наибольшое из оставшихся
+                        ls = val_list.count(v)  # кол-во этих значений (очков)
+                        for x in range(0, ls):
+                            iv = val_list.index(v, im)
+                            im = iv + 1
+                            ik = key_list[iv]  # находит ключ соответсвующий максимальному значению
+                            td[ik * 2 - 2][mp + 4] = 1 + q_list  # записывает 1 место игроку
+                        return
 
