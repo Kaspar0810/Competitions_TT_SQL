@@ -298,7 +298,6 @@ def rank_in_group(total_score, mp, td):
                 key_max = max(total_score, key=total_score.get)  # ключ максимального значения (№ группы)
                 max_val1 = total_score[key_max]  # максимальное значение
                 ls = val_list.count(max_val1)
-                ik = key_max
                 for s in range(key_max, key_max + ls):
                     iv = val_list.index(max_val1, s - 1)
                     ik = key_list[iv]  # находит ключ соответсвующий максимальному значению
@@ -308,11 +307,11 @@ def rank_in_group(total_score, mp, td):
                 im = 0
                 for v in val_list:  # следующее значние по максимуму
                     if max_val1 < v < mv:  # находит наибольшое из оставшихся
-                        ls = val_list.count(v)  # кол-во этих значений (очков)
-                        for x in range(0, ls):
+                        ls1 = val_list.count(v)  # кол-во этих значений (очков)
+                        for x in range(0, ls1):
                             iv = val_list.index(v, im)
                             im = iv + 1
                             ik = key_list[iv]  # находит ключ соответсвующий максимальному значению
-                            td[ik * 2 - 2][mp + 4] = 1 + q_list  # записывает 1 место игроку
+                            td[ik * 2 - 2][mp + 4] = 1 + ls  # записывает 1 место игроку
                         return
 
