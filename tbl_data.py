@@ -260,10 +260,10 @@ def score_in_table(td, num_gr):
             break
     for t in range(0, mp):
         td[t * 2][mp + 2] = total_score[t + 1]  # записывает каждому игроку сумму очков
-    rank_in_group(total_score, mp, td)
+    rank_in_group(total_score, mp, td, num_gr)
 
 
-def rank_in_group(total_score, mp, td):
+def rank_in_group(total_score, mp, td, num_gr):
     """выставляет места в группах соответсвеноо очкам. пока без крутиловок"""
     rev_dict = {}  # словарь, где в качастве ключа номера групп, а значения - очки
     max_value = []
@@ -276,7 +276,7 @@ def rank_in_group(total_score, mp, td):
     key_list = list(total_score.keys())  # отдельно составляет список ключей
     val_list = list(total_score.values())  # отдельно составляет список значений
     sum_val = sum(val_list)
-    if sum_val == 0:
+    if sum_val == 0:  # если пустая группа то не проставляет места
         return
     else:
         if len(result) == 0:  # =========== если нет одинакового кол-во очков
@@ -298,13 +298,20 @@ def rank_in_group(total_score, mp, td):
                 key_max = max(total_score, key=total_score.get)  # ключ максимального значения (№ группы)
                 max_val1 = total_score[key_max]  # максимальное значение
                 ls = val_list.count(max_val1)
+                tr = []
                 for s in range(key_max, key_max + ls):
                     iv = val_list.index(max_val1, s - 1)
-                    ik = key_list[iv]  # находит ключ соответсвующий максимальному значению
+                    ik = key_list[iv]  # находит ключ соответсвующий максимальному значению (№ участника в группе)
                     td[ik * 2 - 2][mp + 4] = 1  # записывает 1 место игроку
+                    mesto = 1
+                    #============ всавить вызов функции подсчета крутиловки
+                    ik = str(ik)
+                    tr.append(ik)  # создает список (встречи игроков)
+                circle(ls, tr, num_gr, td, mp, mesto)
                 mv = max_val1
                 max_val1 = 0
                 im = 0
+                tr = []
                 for v in val_list:  # следующее значние по максимуму
                     if max_val1 < v < mv:  # находит наибольшое из оставшихся
                         ls1 = val_list.count(v)  # кол-во этих значений (очков)
@@ -313,5 +320,31 @@ def rank_in_group(total_score, mp, td):
                             im = iv + 1
                             ik = key_list[iv]  # находит ключ соответсвующий максимальному значению
                             td[ik * 2 - 2][mp + 4] = 1 + ls  # записывает 1 место игроку
+                            mesto = 1 + ls
+                            ik = str(ik)
+                            tr.append(ik)  # создает список (встречи игроков)
+                        circle(ls, tr, num_gr, td, mp, mesto)
                         return
 
+
+def circle(ls, tr, num_gr, td, mp, mesto):
+    """выставляет места в крутиловке -tour- встречи игроков, p1, p2 фамилии, num_gr номер группы
+    ls кол-во игроков с одинаковым кол-вом очков, mp общее кол-во ироков в группе"""
+    tour = "-".join(tr)  # делает строку встреча в туре
+    p1 = int(tour[0])
+    p2 = int(tour[2])
+    if ls == 2:
+        c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
+        # строчку номер группы в туре
+        if c.winner == c.player1:
+            points_p1 = c.points_win
+            points_p2 = c.points_loser
+            td[p1 * 2 - 2][mp + 4] = mesto  # записывает 1 место игроку
+            td[p2 * 2 - 2][mp + 4] = mesto + 1  # записывает 1 место игроку
+        else:
+            points_p1 = c.points_loser
+            points_p2 = c.points_win
+            td[p1 * 2 - 2][mp + 4] = mesto + 1  # записывает 1 место игроку
+            td[p2 * 2 - 2][mp + 4] = mesto  # записывает 1 место игроку
+        td[p1 * 2 - 2][mp + 3] = points_p1  # записывает 1 место игроку
+        td[p2 * 2 - 2][mp + 3] = points_p2  # записывает 1 место игроку
