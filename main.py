@@ -985,7 +985,15 @@ def player_in_table():
                 for d in range(0, game):
                     if game == 1:  # если в группе 3 человека
                         match = tours  # матч в туре
-                    else:
+                    elif game == 2:  # если в группе 4 человека
+                        match = tours[d]  # матч в туре
+                    # first = int(match[0])  # игрок под номером в группе
+                    # second = int(match[2])  # игрок под номером в группе
+                    # pl1 = gr[first * 2 - 2][1]  # фамилия первого игрока
+                    # pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
+                    elif game == 3:  # если в группе 5 человека
+                        match = tours[d]  # матч в туре
+                    elif game == 4:  # если в группе 6 человека
                         match = tours[d]  # матч в туре
                     first = int(match[0])  # игрок под номером в группе
                     second = int(match[2])  # игрок под номером в группе
@@ -997,7 +1005,8 @@ def player_in_table():
                         results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
                                          tours=match, title_id=si).save()
         else:
-            break
+            pass
+            print("ok")
 
 
 def chop_line(q, maxline=30):
@@ -1103,7 +1112,8 @@ def game_in_visible(state):
 def select_player_in_game():
     """выодит фамилии игроков встречи"""
     r = my_win.tableWidget.currentRow()
-    if my_win.tableWidget.item(r, 6).text() != "":  # если встреча сыграна, то заполняет поля общий счет
+    win_pole = my_win.tableWidget.item(r, 6).text()
+    if win_pole != "None" and win_pole != "":  # встреча не сыграна, то заполняет поля общий счет
         sc = my_win.tableWidget.item(r, 8).text()
         pl1 = my_win.tableWidget.item(r, 4).text()
         pl2 = my_win.tableWidget.item(r, 5).text()
@@ -1367,8 +1377,8 @@ def string_score_game():
             return winner_string
 
 
-# ====== отслеживание изменения текста в полях ============
-my_win.tableWidget.doubleClicked.connect(select_player_in_game)  # двойной клик по строке игроков в таблице -результаты-
+
+
 
 # ===== переводит фокус на полее ввода счета в партии
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
@@ -1381,11 +1391,12 @@ my_win.lineEdit_pl1_s4.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5.returnPressed.connect(focus)
-
+# ====== отслеживание изменения текста в полях ============
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
-
+# ============= двойной клик
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)  # двойной клик по listWidget (рейтинг, тренеры)
+my_win.tableWidget.doubleClicked.connect(select_player_in_game)  # двойной клик по строке игроков в таблице -результаты-
 
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.toolBox.currentChanged.connect(page)
