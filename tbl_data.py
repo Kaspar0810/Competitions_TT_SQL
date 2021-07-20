@@ -307,7 +307,7 @@ def rank_in_group(total_score, max_person, td, num_gr):
             sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
             # ql = set(val_list)
             # q_list = len(ql)  # кол-во повторяющихся значений(сколько групп участников с равным кол-во очков)
-            mesto_points = {}
+            mesto_points = {}  # словарь (ключ-очки, а значения места без учета соотншений)
             valuesList = list(sorted_tuple.values())
             unique_numbers = list(set(valuesList))
             unique_numbers.sort(reverse=True)
@@ -347,7 +347,7 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
         p1 = int(tour[0])
         p2 = int(tour[2])
         c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
-        # строчку номер группы в туре
+        # строчку номер группы и тур
         if c.winner == c.player1:
             points_p1 = c.points_win  # очки во встрече победителя
             points_p2 = c.points_loser  # очки во встрече проигравшего
@@ -414,39 +414,45 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
             pps = []
         for i in range(1, men_of_circle + 1):  # суммирует очки каждого игрока
             pp[i] = sum(pp[i])  # сумма очков
-            pg_win[i] = sum(pg_win[i])  # сумма выйгранных партий
-            pg_los[i] = sum(pg_los[i])  # сумма проигранных партий
-            # ==== еслии очки одинаковы то считать соотношение
-            x = pg_win[i] / pg_los[i]
-            x = float('{:.3f}'.format(x))
-            ps.append(x)
-            pps.append(pp[i])
 
         if pp[1] == pp[2] == pp[3]:  # сравнивает очки между собой, если они у всех равны
-            # необходимо проверить
-            d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер группы)
-            ds = {index: value for index, value in enumerate(pps)}  # получает словарь(ключ, соотношение)
-            sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
+            for i in range(1, men_of_circle + 1):  # суммирует выйгранные и проигранные партии каждого игрока
+                pg_win[i] = sum(pg_win[i])  # сумма выйгранных партий
+                pg_los[i] = sum(pg_los[i])  # сумма проигранных партий
+                x = pg_win[i] / pg_los[i]
+                x = float('{:.3f}'.format(x))
+                ps.append(x)
+                pps.append(pp[i])
 
-            for i in range(0, men_of_circle):
-                w = int(sorted_tuple.setdefault(i + 1))  # получает ключ словаря с номером группы
-                wq = sorted_tuple.setdefault(i)  # получает соотношение
-                td[w * 2 - 2][max_person + 3] = w  # записывает соотношения игроку
-                td[w * 2 - 2][max_person + 4] = i + mesto  # записывает место
+            d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер группы)
+            ds = {index: value for index, value in enumerate(ps)}  # получает словарь(ключ, соотношение)
+            sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
+            key_l = list(sorted_tuple.keys())
+            val_l = list(sorted_tuple.values())
+            vls = set(val_l)  # группирует разные значения
+            vl = len(vls)  # подсчитывает их колличество
+            m = 0
+            if vl == 1:
+                for i in tr:
+                    td[int(i) * 2 - 2][max_person + 4] = str(mesto)  # записывает место
+            else:
+                for i in val_l:
+                    w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет группу
+                    wq = int(d.setdefault(w))  # получает номер группы, соответсвующий
+                    td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
+                    td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
+                    m += 1
+# ================== надо будет добавить подсчет очков в партиях
 
         else:  # если очки равны, но внутри крутиловки у всех очки разные (без подсчета соотношений)
             d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер группы)
-            ds = {index: value for index, value in enumerate(pps)}  # получает словарь(ключ, соотношение)
-            sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
-            val_new = list(sorted_tuple.values())
-
-            for i in range(0, men_of_circle):
-                w = ds.setdefault(i)  # получает кол-во очков по ключу i в словаре ds
-                wq = int(d.setdefault(i))  # получает номер группы по ключу i в словаре d
-                mst = 0
-                for g in val_new:
-                    mst += 1
-                    if g == w:
-                        break
-                td[wq * 2 - 2][max_person + 3] = str(w)  # записывает кол-во очков игроку
-                td[wq * 2 - 2][max_person + 4] = str(mst + mesto - 1)  # записывает место
+            sorted_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}  # сортирует словарь по убываню соот
+            key_l = list(sorted_tuple.keys())
+            val_l = list(sorted_tuple.values())
+            m = 0
+            for i in val_l:
+                w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет групп
+                wq = int(d.setdefault(w - 1))  # получает номер группы, соответсвующий
+                td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
+                td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
+                m += 1
