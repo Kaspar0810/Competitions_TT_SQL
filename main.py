@@ -1113,10 +1113,12 @@ def select_player_in_game():
     """выодит фамилии игроков встречи"""
     r = my_win.tableWidget.currentRow()
     win_pole = my_win.tableWidget.item(r, 6).text()
-    if win_pole != "None" and win_pole != "":  # встреча не сыграна, то заполняет поля общий счет
+    if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
         sc = my_win.tableWidget.item(r, 8).text()
         pl1 = my_win.tableWidget.item(r, 4).text()
         pl2 = my_win.tableWidget.item(r, 5).text()
+        # if my_win.tableWidget.item(r, 8).text() != "":
+
         if pl1 == my_win.tableWidget.item(r, 6).text():
             sc1 = sc[0]
             sc2 = sc[4]

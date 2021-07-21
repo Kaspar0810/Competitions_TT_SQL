@@ -341,7 +341,6 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
     -tour- встречи игроков, p1, p2 фамилии, num_gr номер группы
     men_of_circle кол-во игроков с одинаковым кол-вом очков,
     max_person общее кол-во ироков в группе"""
-
     if men_of_circle == 2:  # кол-во человек в крутиловке (одинаковое кол-во очков)
         tour = "-".join(tr)  # делает строку встреча в туре
         p1 = int(tour[0])
@@ -375,6 +374,7 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
         tr_all.append(tr1)  # получение списка списков всех туров крутиловки
         tr_all.append(tr2)
         tr_all.append(tr3)
+        # tours_in_circle(tr, pp)
 
         for n in range(0, men_of_circle):
             tour = "-".join(tr_all[n])  # получает строку встреча в туре
@@ -424,7 +424,7 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
                 ps.append(x)
                 pps.append(pp[i])
 
-            d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер группы)
+            d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер участника)
             ds = {index: value for index, value in enumerate(ps)}  # получает словарь(ключ, соотношение)
             sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
             key_l = list(sorted_tuple.keys())
@@ -434,10 +434,11 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
             m = 0
             if vl == 1:
                 for i in tr:
+                    score_in_circle(tr_all, men_of_circle, num_gr, tr)
                     td[int(i) * 2 - 2][max_person + 4] = str(mesto)  # записывает место
             else:
                 for i in val_l:
-                    w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет группу
+                    w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет игрока
                     wq = int(d.setdefault(w))  # получает номер группы, соответсвующий
                     td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
                     td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
@@ -456,3 +457,75 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
                 td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
                 td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
                 m += 1
+    elif men_of_circle == 4:
+        pass
+
+
+def score_in_circle(tr_all, men_of_circle, num_gr, tr):
+    """подсчитывает счет по партиям в крутиловке"""
+    plr_win = {0: [], 1: [], 2: []}
+    plr_los = {0: [], 1: [], 2: []}
+    plr_ratio = {0: [], 1: [], 2: []}
+    for n in range(0, men_of_circle):
+        tour = "-".join(tr_all[n])  # получает строку встреча в туре
+        c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
+        k1 = tr_all[n][0]  # 1-й игрок в туре
+        k2 = tr_all[n][1]  # 2-й игрок в туре
+        ki1 = tr.index(k1)  # получение индекса 1-й игрока
+        ki2 = tr.index(k2)
+        g = c.score_win
+        g_len = len(g)
+        g = g[1:g_len - 1]
+        sc_game = g.split(",")
+
+        if c.winner == c.player1:  # победил 1-й игрок
+            for i in sc_game:
+                i = int(i)
+                if i < 0:
+                    plr_win[ki1].append(abs(i))
+                    plr_los[ki2].append(abs(i))
+                    if abs(i) < 10:
+                        plr_los[ki1].append(11)
+                        plr_win[ki2].append(11)
+                    else:
+                        plr_los[ki1].append(abs(i) + 2)
+                        plr_win[ki2].append(abs(i) + 2)
+                elif 0 <= i < 10:
+                    plr_win[ki1].append(11)
+                    plr_los[ki1].append(i)
+                    plr_win[ki2].append(i)
+                    plr_los[ki2].append(11)
+                elif i >= 10:
+                    plr_win[ki1].append(i + 2)
+                    plr_los[ki1].append(i)
+                    plr_win[ki2].append(i)
+                    plr_los[ki2].append(i + 2)
+        else:  # если победил 2-й игрок
+            for i in sc_game:
+                i = int(i)
+                if i < 0:  # партию проиграл
+                    plr_win[ki2].append(abs(i))
+                    plr_los[ki1].append(abs(i))
+                    if abs(i) < 10:
+                        plr_los[ki2].append(11)
+                        plr_win[ki1].append(11)
+                    else:
+                        plr_los[ki2].append(abs(i) + 2)
+                        plr_win[ki1].append(abs(i) + 2)
+                elif 0 <= i < 10:  # выйграл партию
+                    plr_win[ki2].append(11)
+                    plr_los[ki2].append(i)
+                    plr_win[ki1].append(i)
+                    plr_los[ki1].append(11)
+                elif i >= 10:  # выйграл партию на больше меньше
+                    plr_win[ki2].append(i + 2)
+                    plr_los[ki2].append(i)
+                    plr_win[ki1].append(i)
+                    plr_los[ki1].append(i + 2)
+    for n in range(0, men_of_circle):
+        plr_win[n] = sum(plr_win[n])
+        plr_los[n] = sum(plr_los[n])
+        x = plr_win[n] / plr_los[n]
+        x = float('{:.4f}'.format(x))
+        plr_ratio[n] = x
+    return plr_ratio
