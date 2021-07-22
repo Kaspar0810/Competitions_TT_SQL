@@ -194,6 +194,8 @@ stages1 = ("Основной", "Предварительный", "Полуфин
 stages2 = ("Полуфиналы", "Финальный", "Суперфинал")
 
 
+
+
 my_win.comboBox_page_1.addItems(page_orient)
 my_win.comboBox_page_2.addItems(page_orient)
 my_win.comboBox_etap_1.addItems(stages1)
@@ -731,6 +733,7 @@ def page():
         my_win.radioButton_match_5.setChecked(True)
         load_combobox_filter_group()
         load_tableWidget()
+        load_combo()
     elif tb == 4:
         my_win.tableWidget.hide()
     elif tb == 5:
@@ -1117,7 +1120,17 @@ def select_player_in_game():
         sc = my_win.tableWidget.item(r, 8).text()
         pl1 = my_win.tableWidget.item(r, 4).text()
         pl2 = my_win.tableWidget.item(r, 5).text()
-        # if my_win.tableWidget.item(r, 8).text() != "":
+        if Result.score_win != "" & Result.score_win != "None":  # если игры со счетом, от при редакитровании открывать поля
+            my_win.lineEdit_pl1_s1.setVisible(True)
+            my_win.lineEdit_pl2_s1.setVisible(True)
+            my_win.lineEdit_pl1_s2.setVisible(True)
+            my_win.lineEdit_pl2_s2.setVisible(True)
+            my_win.lineEdit_pl1_s3.setVisible(True)
+            my_win.lineEdit_pl2_s3.setVisible(True)
+            my_win.lineEdit_pl1_s4.setVisible(True)
+            my_win.lineEdit_pl2_s4.setVisible(True)
+            my_win.lineEdit_pl1_s5.setVisible(True)
+            my_win.lineEdit_pl2_s5.setVisible(True)
 
         if pl1 == my_win.tableWidget.item(r, 6).text():
             sc1 = sc[0]
@@ -1379,7 +1392,51 @@ def string_score_game():
             return winner_string
 
 
+def result_filter_name():
+    """отсортировает встречи с участие игрока"""
+    pass
+    cp = my_win.comboBox_find_name.currentText()
+    cp = cp.title()  # Переводит первую букву в заглавную
+    c = Result.select()
+    c = c.where(Result.player1 ** f'{cp}%')  # like
+    result_list = c.dicts().execute()
+    row_count = (len(result_list))  # кол-во строк в таблице
+    column_count = 13  # кол-во столбцов в таблице
+    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
+    for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(result_list[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
+
+def filter():
+    """фильтрует таблицу -результаты-"""
+    pass
+    # result_filter_group()
+    result_filter_name()
+    # if (len(c)) == 0:
+    #     # my_win.textEdit.setText("Нет тренера в базе")
+    # else:
+    #     for chp in c:
+    #         full_stroka = chp.coach
+    #         my_win.listWidget.addItem(full_stroka)
+
+
+def load_combo():
+    """загружает комбобокс фамилиями спортсменов"""
+    mp = Player.select()
+    mp_count = len(mp)
+    for i in range(1, mp_count + 1):
+        tt = Player.get(Player.id == i)
+        text = tt.player
+        my_win.comboBox_find_name.addItem(text)
+    my_win.comboBox_find_name.setCurrentText("")
+
+
+def reset_filter():
+    """сбрасывает критерии фильтрации"""
+    my_win.comboBox_find_name.setCurrentText("")
 
 
 # ===== переводит фокус на полее ввода счета в партии
@@ -1394,6 +1451,8 @@ my_win.lineEdit_pl2_s4.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5.returnPressed.connect(focus)
 # ====== отслеживание изменения текста в полях ============
+
+# my_win.lineEdit_find_name.textChanged.connect(result_filter_name)
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 # ============= двойной клик
@@ -1407,8 +1466,8 @@ my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 my_win.comboBox_etap_1.currentTextChanged.connect(system)
 my_win.comboBox_page_1.currentTextChanged.connect(page_vid)
-my_win.comboBox_filter_group.currentTextChanged.connect(result_filter_group)
-my_win.comboBox_filter_played.currentTextChanged.connect(result_filter_played)
+# my_win.comboBox_filter_group.currentTextChanged.connect(result_filter_group)
+# my_win.comboBox_filter_played.currentTextChanged.connect(result_filter_played)
 
 # =======  отслеживание переключение чекбоксов =========
 my_win.checkBox.stateChanged.connect(button_title_made_enable)  # при изменении чекбокса активирует кнопку создать
@@ -1416,9 +1475,11 @@ my_win.checkBox_2.stateChanged.connect(button_etap_made_enabled)  # при из�
 my_win.checkBox_3.stateChanged.connect(button_system_made_enable)  # при изменении чекбокса активирует кнопку создать
 my_win.checkBox_4.stateChanged.connect(game_in_visible)  # при изменении чекбокса показывает поля для ввода счета
 # =======  нажатие кнопок =========
+my_win.Button_reset_filter.clicked.connect(reset_filter)
+my_win.Button_filter.clicked.connect(filter)
 my_win.Button_1etap_made.clicked.connect(kol_player_in_group)  # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_system_made.clicked.connect(system_made)  # создание системы соревнований
-# my_win.Button_proba.clicked.connect(proba_1)
+my_win.Button_proba.clicked.connect(load_combo)
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул

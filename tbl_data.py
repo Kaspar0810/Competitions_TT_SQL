@@ -274,7 +274,7 @@ def rank_in_group(total_score, max_person, td, num_gr):
     max_value = []
 
     game_max = Result.select().where(Result.number_group == num_gr)  # определение кол-во всего игр и сыгранных
-    game_played = Result.select().where(Result.winner != "")
+    game_played = Result.select().where(Result.winner != "" and Result.number_group == num_gr)
     kol_tours_played = len(game_played)
     kol_tours_in_group = len(game_max)  # кол-во всего игр в группе
 
