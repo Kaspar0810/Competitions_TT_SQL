@@ -432,10 +432,17 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
             vls = set(val_l)  # группирует разные значения
             vl = len(vls)  # подсчитывает их колличество
             m = 0
-            if vl == 1:
-                for i in tr:
-                    score_in_circle(tr_all, men_of_circle, num_gr, tr)
-                    td[int(i) * 2 - 2][max_person + 4] = str(mesto)  # записывает место
+            if vl == 1:  # посчитывает соотношений выйгранных и проигранных мячей в партиях
+                plr_ratio = score_in_circle(tr_all, men_of_circle, num_gr, tr)
+                sorted_ratio = {k: plr_ratio[k] for k in sorted(plr_ratio, key=plr_ratio.get, reverse=True)}  # сортирует словарь по убываню соот
+                key_ratio = list(sorted_ratio.keys())  # получает список ключей отсортированного словаря
+                r = 0
+                for i in key_ratio:
+                    ratio = sorted_ratio[i]  # соотношение в крутиловке
+                    person = int(d[i])  # номер игрока
+                    td[person * 2 - 2][max_person + 3] = str(ratio)  # записывает место
+                    td[person * 2 - 2][max_person + 4] = str(mesto + r)  # записывает место
+                    r += 1
             else:
                 for i in val_l:
                     w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет игрока
@@ -526,6 +533,6 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr):
         plr_win[n] = sum(plr_win[n])
         plr_los[n] = sum(plr_los[n])
         x = plr_win[n] / plr_los[n]
-        x = float('{:.4f}'.format(x))
+        x = float('{:.3f}'.format(x))
         plr_ratio[n] = x
     return plr_ratio
