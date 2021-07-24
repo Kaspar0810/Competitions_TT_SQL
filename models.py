@@ -151,3 +151,27 @@ class Tour(BaseModel):
     class Meta:
         db_table = "tours"
         order_by = "person_in_group"
+
+
+class Choice(BaseModel):
+    player_choice = ForeignKeyField(Player)
+    family = CharField()
+    region = CharField()
+    coach = CharField()
+    rank = IntegerField()
+    basic = CharField(null=True)
+    group = CharField(null=True)
+    posev_group = IntegerField(null=True)
+    mesto_group = IntegerField(null=True)
+    semi_final = IntegerField(null=True)
+    n_group = CharField(null=True)
+    posev_sf = IntegerField(null=True)
+    mesto_semi_final = IntegerField(null=True)
+    final = CharField(null=True)
+    posev_final = IntegerField(null=True)
+    mesto_final = IntegerField(null=True)
+    super_final = CharField(null=True)
+
+    class Meta:
+        db_table = "choices"
+
