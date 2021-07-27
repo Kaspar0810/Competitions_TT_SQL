@@ -90,20 +90,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setCurrentIndex(0)
         self.toolBox.setCurrentIndex(0)
 
-    # ======================
-    # layout = QGridLayout()
-    # layout.addWidget(self.toolBox, 0, 0, 10, 1)
-    # layout.addWidget(self.frame_main, 11, 0, 5, 1)
-    # layout.addWidget(self.tabWidget, 0, 1, 7, 1)
-    # layout.addWidget(self.frame_table, 8, 1, 5, 1)
-    # layout.addWidget(self.frame_score, 0, 2, 20, 1)
-    #
-    # widget = QWidget()
-    # widget.setLayout(layout)
-    # self.setCentralWidget(widget)
-    # layout.setColumnStretch(0, 0)
-    # layout.setColumnStretch(1, 6)
-
     # ====== создание строки меню ===========
     def _createMenuBar(self):
         menuBar = self.menuBar()
@@ -111,13 +97,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню Соревнования
         fileMenu = QMenu("Соревнования", self)
         menuBar.addMenu(fileMenu)
+
         fileMenu.addAction(self.newAction)
         saveList = fileMenu.addMenu("Сохранить")
+        choice = fileMenu.addMenu("Жеребьевка")
         fileMenu.addAction(self.exitAction)
+
+
+
 
         # меню Редактировать
         editMenu = menuBar.addMenu("Редактировать")
         #  создание подменю
+        choice.addAction(self.choice_Action)
         saveList.addAction(self.savelist_Action)
         ed_Menu = editMenu.addMenu("Редактор")
         ed_Menu.addAction(self.title_Action)
@@ -143,12 +135,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
         self.savelist_Action = QAction("Список")  # подменю сохранить
+        self.choice_Action = QAction("Группы")  # подменю жеребьевка
 
     def _connectActions(self):
         # Connect File actions
         self.newAction.triggered.connect(self.newFile)
         self.exitAction.triggered.connect(self.exit)
         self.savelist_Action.triggered.connect(self.saveList)
+        self.choice_Action.triggered.connect(self.choice)
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
@@ -176,6 +170,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.toolBox.setCurrentIndex(1)
         list_player_pdf()
         self.statusbar.showMessage("Список участников сохранен")
+
+    def choice(self):
+        my_win.tabWidget.setCurrentIndex(2)
+        choice_automat()
+
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
@@ -210,7 +209,7 @@ my_win.comboBox_filter_played.addItems(res)
 my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
 
-# my_win.tableWidget.setEditTriggers(QTabWidget.)
+
 
 
 def dbase():
@@ -612,8 +611,7 @@ def fill_table_choice():
         for column in range(column_count):
             item = str(list(choice_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-
-    # my_win.tableWidget.hideColumn(0)
+    my_win.tableWidget.hideColumn(1)
     my_win.tableWidget.hideColumn(6)
     my_win.tableWidget.hideColumn(10)
     my_win.tableWidget.hideColumn(11)
@@ -716,15 +714,35 @@ def dclick_in_listwidget():
 
 def load_combobox_filter_group():
     """заполняет комбобокс фильтр групп для таблицы результаты"""
+    sender = my_win.menuWidget().sender()
     my_win.comboBox_filter_group.clear()
+    my_win.comboBox_filter_choice.clear()
+    system = System.select().order_by(System.id.desc()).get()
     gr_txt = []
     system = System.select().order_by(System.id.desc()).get()
     kg = int(system.total_group)  # количество групп
-    my_win.comboBox_filter_group.addItem("все группы")
-    for i in range(1, kg + 1):
-        txt = str(i) + " группа"
-        gr_txt.append(txt)
-    my_win.comboBox_filter_group.addItems(gr_txt)
+    if sender == my_win.choice_Action:
+        my_win.comboBox_filter_choice.addItem("все группы")
+        for i in range(1, kg + 1):
+            txt = str(i) + " группа"
+            gr_txt.append(txt)
+        my_win.comboBox_filter_choice.addItems(gr_txt)
+    else:
+        my_win.comboBox_filter_group.addItem("все группы")
+        for i in range(1, kg + 1):
+            txt = str(i) + " группа"
+            gr_txt.append(txt)
+        my_win.comboBox_filter_group.addItems(gr_txt)
+
+    # my_win.comboBox_filter_group.clear()
+    # gr_txt = []
+    # system = System.select().order_by(System.id.desc()).get()
+    # kg = int(system.total_group)  # количество групп
+    # my_win.comboBox_filter_group.addItem("все группы")
+    # for i in range(1, kg + 1):
+    #     txt = str(i) + " группа"
+    #     gr_txt.append(txt)
+    # my_win.comboBox_filter_group.addItems(gr_txt)
 
 
 def tab():
@@ -753,7 +771,7 @@ def page():
         my_win.spinBox_kol_group.hide()
         player_list = Player.select()
         count = len(player_list)
-        my_win.label_8.setText("Всего участников: " + str(count) + " чел.")
+        my_win.label_8.setText("Всего участников: " + str(count) + " человек")
         s = System.select().order_by(System.id.desc()).get()
         se = s.stage
         tg = s.total_group
@@ -928,13 +946,17 @@ def exit_comp():
 
 def system():
     """выбор системы проведения"""
-    ct = my_win.comboBox_etap_1.currentText()
+    sender = my_win.sender()
+    if sender == my_win.comboBox_etap_1:
+        ct = my_win.comboBox_etap_1.currentText()
+    elif sender == my_win.comboBox_etap_2:
+        ct = my_win.comboBox_etap_2.currentText()
+
     if ct == "Основной":
         my_win.spinBox_kol_group.hide()
         my_win.label_11.hide()
     elif ct == "Предварительный":
-        # my_win.spinBox_kol_group.show()
-        # my_win.spinBox_kol_group.setValue(2)
+        my_win.comboBox_etap_2.setVisible(True)
         my_win.label_11.show()
 
 
@@ -1049,7 +1071,6 @@ def player_in_table():
 
 def chop_line(q, maxline=30):
     """перевод строки если слишком длинный список тренеров"""
-
     if len(q) > maxline:
         s1 = q.find(",", 0, maxline)
         s2 = q.find(",", s1 + 1, maxline)
@@ -1459,7 +1480,7 @@ def filter():
     #===============
     fltr = Result.select().where(Result.tours ** f'%{fp}%')  # находит строки, где в туре есть знчение fp
     result_list = fltr.dicts().execute()
-    row_count = (len(result_list))  # кол-во строк в таблице
+    row_count = len(result_list)  # кол-во строк в таблице
     column_count = 13  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
@@ -1499,7 +1520,7 @@ def reset_filter():
     filter()
 
 
-def choice():
+def choice_table():
     """пока заполняется таблица жеребьевка"""
     # with db:
     #     db.create_tables([Choice])
@@ -1510,7 +1531,45 @@ def choice():
         cch = Coach.get(Coach.id == pl.coach_id)
         coach =cch.coach
         chc = Choice(player_choice=pl, family=pl.player, region=pl.region, coach=coach, rank=pl.rank).save()
-    # Choice.select().order_by(Choice.rank.desc())
+
+
+def choice_automat():
+    """проба автоматической жеребьевки групп"""
+
+    sys = System.select().order_by(System.id.desc()).get()  # получение последней записи в таблице соревнования
+    system = System.get(System.id == sys)  # выбирает из таблицы система последнюю запись
+    group = system.total_group
+    mp = system.total_athletes
+    player_choice = Choice.select().order_by(Choice.rank.desc())
+    choice_list = player_choice.dicts().execute()
+    h = 0
+    for k in range(1, mp + 1):
+        if k % 2 != 0:
+            start = 0
+            end = group
+            step = 1
+            p = 1
+        else:
+            start = group
+            end = 0
+            step = -1
+            p = 0
+        for i in range(start, end, step):  #  1-й посев
+            txt = str(f'{i + p} группа')
+            id = int(my_win.tableWidget.item(h, 1).text())
+            h += 1
+            with db:
+                grp = Choice.get(Choice.id == id)
+                grp.group = txt
+                grp.posev_group = k
+                grp.save()
+                if mp == h:
+                    fill_table_choice()
+                    load_combobox_filter_group()
+                    return
+
+
+
 
 
 
@@ -1526,6 +1585,11 @@ my_win.lineEdit_pl1_s4.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5.returnPressed.connect(focus)
+
+
+
+
+
 # ====== отслеживание изменения текста в полях ============
 
 # my_win.lineEdit_find_name.textChanged.connect(result_filter_name)
@@ -1535,12 +1599,14 @@ my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)  # двойной клик по listWidget (рейтинг, тренеры)
 my_win.tableWidget.doubleClicked.connect(select_player_in_game)  # двойной клик по строке игроков в таблице -результаты-
 
+
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.toolBox.currentChanged.connect(page)
 # ==================================
 my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 my_win.comboBox_etap_1.currentTextChanged.connect(system)
+my_win.comboBox_etap_2.currentTextChanged.connect(system)
 my_win.comboBox_page_1.currentTextChanged.connect(page_vid)
 # my_win.comboBox_filter_group.currentTextChanged.connect(result_filter_group)
 # my_win.comboBox_filter_played.currentTextChanged.connect(result_filter_played)
@@ -1555,7 +1621,7 @@ my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_filter.clicked.connect(filter)
 my_win.Button_1etap_made.clicked.connect(kol_player_in_group)  # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_system_made.clicked.connect(system_made)  # создание системы соревнований
-my_win.Button_proba.clicked.connect(choice)
+my_win.Button_proba.clicked.connect(choice_automat)
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул

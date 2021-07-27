@@ -305,8 +305,6 @@ def rank_in_group(total_score, max_person, td, num_gr):
         else:  # =========== если одинаковое кол-во очков
             ds = {index: value for index, value in enumerate(val_list)}  # получает словарь(ключ, очки)
             sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
-            # ql = set(val_list)
-            # q_list = len(ql)  # кол-во повторяющихся значений(сколько групп участников с равным кол-во очков)
             mesto_points = {}  # словарь (ключ-очки, а значения места без учета соотншений)
             valuesList = list(sorted_tuple.values())
             unique_numbers = list(set(valuesList))
