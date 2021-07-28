@@ -109,7 +109,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню Редактировать
         editMenu = menuBar.addMenu("Редактировать")
         #  создание подменю
-        choice.addAction(self.choice_Action)
+        choice.addAction(self.choice_gr_Action)  # подменю группы
+        choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
+        choice.addAction(self.choice_fin_Action)  # подменю финалы
         saveList.addAction(self.savelist_Action)
         ed_Menu = editMenu.addMenu("Редактор")
         ed_Menu.addAction(self.title_Action)
@@ -135,14 +137,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
         self.savelist_Action = QAction("Список")  # подменю сохранить
-        self.choice_Action = QAction("Группы")  # подменю жеребьевка
+        self.choice_gr_Action = QAction("Группы")  # подменю жеребьевка -группы-
+        self.choice_pf_Action = QAction("Полуфиналы")  # подменю жеребьевка -пполуфиналы-
+        self.choice_fin_Action = QAction("Финалы")  # подменю жеребьевка -финалы-
 
     def _connectActions(self):
         # Connect File actions
         self.newAction.triggered.connect(self.newFile)
         self.exitAction.triggered.connect(self.exit)
         self.savelist_Action.triggered.connect(self.saveList)
-        self.choice_Action.triggered.connect(self.choice)
+        self.choice_gr_Action.triggered.connect(self.choice)
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
@@ -173,7 +177,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def choice(self):
         my_win.tabWidget.setCurrentIndex(2)
-        choice_automat()
+        choice_gr_automat()
 
 
 app = QApplication(sys.argv)
@@ -721,28 +725,19 @@ def load_combobox_filter_group():
     gr_txt = []
     system = System.select().order_by(System.id.desc()).get()
     kg = int(system.total_group)  # количество групп
-    if sender == my_win.choice_Action:
+
+    if sender == my_win.choice_gr_Action or my_win.radioButton_3.isCheckable():
         my_win.comboBox_filter_choice.addItem("все группы")
         for i in range(1, kg + 1):
-            txt = str(i) + " группа"
+            txt = f"{i} группа"
             gr_txt.append(txt)
         my_win.comboBox_filter_choice.addItems(gr_txt)
     else:
         my_win.comboBox_filter_group.addItem("все группы")
         for i in range(1, kg + 1):
-            txt = str(i) + " группа"
+            txt = f"{i} группа"
             gr_txt.append(txt)
         my_win.comboBox_filter_group.addItems(gr_txt)
-
-    # my_win.comboBox_filter_group.clear()
-    # gr_txt = []
-    # system = System.select().order_by(System.id.desc()).get()
-    # kg = int(system.total_group)  # количество групп
-    # my_win.comboBox_filter_group.addItem("все группы")
-    # for i in range(1, kg + 1):
-    #     txt = str(i) + " группа"
-    #     gr_txt.append(txt)
-    # my_win.comboBox_filter_group.addItems(gr_txt)
 
 
 def tab():
@@ -765,7 +760,6 @@ def page():
         my_win.Button_system_made.setEnabled(False)
         my_win.Button_1etap_made.setEnabled(False)
         my_win.Button_2etap_made.setEnabled(False)
-        # my_win.tableWidget.hide()
         my_win.label_11.hide()
         my_win.label_12.hide()
         my_win.spinBox_kol_group.hide()
@@ -778,6 +772,7 @@ def page():
         my_win.spinBox_kol_group.setValue(tg)
         my_win.comboBox_etap_1.setCurrentText(se)
         load_tableWidget()
+        my_win.radioButton_3.setChecked(True)
         my_win.label_12.show()
     elif tb == 3:  # вкладка -групппы-
         my_win.tableWidget.show()
@@ -1401,7 +1396,7 @@ def result_filter_group():
     fg = my_win.comboBox_filter_group.currentText()
     player_result = Result.select().where(Result.number_group == fg)
     result_list = player_result.dicts().execute()
-    row_count = (len(result_list))  # кол-во строк в таблице
+    row_count = len(result_list)  # кол-во строк в таблице
     column_count = 13  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
@@ -1489,17 +1484,6 @@ def filter():
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
-    #=================
-
-
-    # # if group != "все группы":
-    # result_filter_group()
-    # # elif name != "":
-    # result_filter_name()
-    # # elif played != "все игры":
-    # result_filter_played()
-    # # result_filter_name()
-
 
 def load_combo():
     """загружает комбобокс фамилиями спортсменов"""
@@ -1533,7 +1517,7 @@ def choice_table():
         chc = Choice(player_choice=pl, family=pl.player, region=pl.region, coach=coach, rank=pl.rank).save()
 
 
-def choice_automat():
+def choice_gr_automat():
     """проба автоматической жеребьевки групп"""
 
     sys = System.select().order_by(System.id.desc()).get()  # получение последней записи в таблице соревнования
@@ -1569,6 +1553,31 @@ def choice_automat():
                     return
 
 
+def choice_filter_group():
+    """фильтрует таблицу жеребьевка по группам"""
+    fg = my_win.comboBox_filter_choice.currentText()
+    player_choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
+    choice_list = player_choice.dicts().execute()
+    row_count = len(choice_list)  # кол-во строк в таблице
+    column_count = 10  # кол-во столбцов в таблице
+    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+
+    for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(choice_list[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
+    my_win.tableWidget.hideColumn(10)
+    my_win.tableWidget.hideColumn(11)
+    my_win.tableWidget.hideColumn(12)
+    my_win.tableWidget.hideColumn(13)
+    my_win.tableWidget.hideColumn(14)
+    my_win.tableWidget.hideColumn(15)
+    my_win.tableWidget.hideColumn(16)
+    my_win.tableWidget.hideColumn(17)
+    my_win.tableWidget.hideColumn(18)
+    my_win.tableWidget.hideColumn(19)
+    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
 
@@ -1608,10 +1617,12 @@ my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 my_win.comboBox_etap_1.currentTextChanged.connect(system)
 my_win.comboBox_etap_2.currentTextChanged.connect(system)
 my_win.comboBox_page_1.currentTextChanged.connect(page_vid)
+my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
 # my_win.comboBox_filter_group.currentTextChanged.connect(result_filter_group)
 # my_win.comboBox_filter_played.currentTextChanged.connect(result_filter_played)
 
 # =======  отслеживание переключение чекбоксов =========
+my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 my_win.checkBox.stateChanged.connect(button_title_made_enable)  # при изменении чекбокса активирует кнопку создать
 my_win.checkBox_2.stateChanged.connect(button_etap_made_enabled)  # при изменении чекбокса активирует кнопку создать
 my_win.checkBox_3.stateChanged.connect(button_system_made_enable)  # при изменении чекбокса активирует кнопку создать
@@ -1621,7 +1632,7 @@ my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_filter.clicked.connect(filter)
 my_win.Button_1etap_made.clicked.connect(kol_player_in_group)  # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_system_made.clicked.connect(system_made)  # создание системы соревнований
-my_win.Button_proba.clicked.connect(choice_automat)
+my_win.Button_proba.clicked.connect(choice_gr_automat)
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
