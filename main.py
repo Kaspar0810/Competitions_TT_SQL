@@ -245,15 +245,6 @@ def db_select_title():
         my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
 
 
-# t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-#
-# if t.id > 0:
-#     print("Соревнования уже есть")
-#     db_select_title()  # при запуске заполняет титул данными из таблицы
-# else:
-#     # db_select_title()  # при запуске заполняет титул данными из таблицы
-#     print("новые сореввнования")
-
 
 def system_update(kg):
     """Обновляет таблицу система кол-во игроков, кол-во групп и прочее"""
@@ -554,8 +545,8 @@ def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
     player_rlist = R_list.select().order_by(R_list.r_fname)
     player_r = player_rlist.dicts().execute()
-    row_count = (len(player_r))  # кол-во строк в таблице
-    column_count = (len(player_r[0]))  # кол-во столбцов в таблице
+    row_count = len(player_r)  # кол-во строк в таблице
+    column_count = len(player_r[0])  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
     for row in range(row_count):  # добвляет данные из базы в TableWidget
@@ -570,8 +561,8 @@ def fill_table_R1_list():
     """заполняет таблицу списком из январского рейтинг листа"""
     player_rlist = R1_list.select().order_by(R1_list.r1_fname)
     player_r1 = player_rlist.dicts().execute()
-    row_count = (len(player_r1))  # кол-во строк в таблице
-    column_count = (len(player_r1[0]))  # кол-во столбцов в таблице
+    row_count = len(player_r1)  # кол-во строк в таблице
+    column_count = len(player_r1[0])  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
     for row in range(row_count):  # добвляет данные из базы в TableWidget
@@ -586,8 +577,8 @@ def fill_table_results():
     """заполняет таблицу результатов QtableWidget из db"""
     player_result = Result.select().order_by(Result.id)
     result_list = player_result.dicts().execute()
-    row_count = (len(result_list))  # кол-во строк в таблице
-    column_count = (len(result_list[0]))  # кол-во столбцов в таблице
+    row_count = len(result_list)  # кол-во строк в таблице
+    column_count = len(result_list[0])  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
     for row in range(row_count):  # добвляет данные из базы в TableWidget
@@ -1430,7 +1421,7 @@ def result_filter_played():
         sg = "всего игр:"
 
     result_list = player_result.dicts().execute()
-    row_count = (len(result_list))  # кол-во строк в таблице
+    row_count = len(result_list)  # кол-во строк в таблице
     my_win.label_16.setText(f"{sg} {row_count}")
     column_count = 13  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
@@ -1578,7 +1569,32 @@ def choice_filter_group():
     my_win.tableWidget.hideColumn(18)
     my_win.tableWidget.hideColumn(19)
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+    color_in_tableWidget(fg)
 
+
+def color_in_tableWidget(fg):
+    """смена цвета шрифта в QtableWidget -fg- номер группы"""
+    reg = []
+    line = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)  # выбирает все строки той группы (fg)
+    for i in line:
+        r = Choice.get(Choice.id == i)
+        region = r.region
+        region = str(region.rstrip())  # удаляет пробел в конце строки
+        reg.append(region)
+    if len(reg) != 0:
+        for x in reg:
+            count_region = reg.count(x)
+            if count_region > 1:  # если поворяющихся регионов больше одного
+                rows = my_win.tableWidget.rowCount()  # кол-во строк в отсортированной таблице
+                for i in range(rows):
+                    txt = my_win.tableWidget.item(i, 3).text()
+                    txt = txt.rstrip()  # удаляет пробел в конце строки
+                    if txt == x:
+                        my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
+                        # красный цвет
+                    else:
+                        my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в
+                        # черный цвет
 
 
 
