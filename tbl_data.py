@@ -344,7 +344,7 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
         p1 = int(tour[0])
         p2 = int(tour[2])
         c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
-        # строчку номер группы и тур
+        # строчку номер группы и тур по двум столбцам
         if c.winner == c.player1:
             points_p1 = c.points_win  # очки во встрече победителя
             points_p2 = c.points_loser  # очки во встрече проигравшего
