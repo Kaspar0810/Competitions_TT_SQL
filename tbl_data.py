@@ -69,6 +69,8 @@ def table2_data():
     pl2 = Player.get(Player.id == 4)
     pl3 = Player.get(Player.id == 6)
     pl4 = Player.get(Player.id == 11)
+    pl5 = Player.get(Player.id == 19)
+    pl6 = Player.get(Player.id == 22)
     table_2[0][1] = pl1.player
     table_2[1][1] = pl1.city
     table_2[2][1] = pl2.player
@@ -77,6 +79,10 @@ def table2_data():
     table_2[5][1] = pl3.city
     table_2[6][1] = pl4.player
     table_2[7][1] = pl4.city
+    table_2[8][1] = pl5.player
+    table_2[9][1] = pl5.city
+    table_2[10][1] = pl6.player
+    table_2[11][1] = pl6.city
     score_in_table(td, num_gr)  # вызывает функцию, где заносит счет в таблицу pdf
     return table_2
 
@@ -448,7 +454,6 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
                     td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
                     td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
                     m += 1
-# ================== надо будет добавить подсчет очков в партиях
 
         else:  # если очки равны, но внутри крутиловки у всех очки разные (без подсчета соотношений)
             d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер группы)
