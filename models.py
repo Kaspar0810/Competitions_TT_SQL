@@ -122,6 +122,7 @@ class System(BaseModel):
     stage = CharField()
     page_vid = CharField()
     label_string = CharField()
+    choice_flag = BooleanField()
 
     class Meta:
         db_table = "system"

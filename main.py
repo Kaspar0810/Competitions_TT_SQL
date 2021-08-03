@@ -108,7 +108,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         menuBar = self.menuBar()
         menuBar.setNativeMenuBar(False)  # разрешает показ менюбара
         # меню Соревнования
-        fileMenu = QMenu("Соревнования", self)
+        fileMenu = QMenu("Соревнования", self)  # основное
         menuBar.addMenu(fileMenu)
 
         fileMenu.addAction(self.newAction)
@@ -116,9 +116,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         choice = fileMenu.addMenu("Жеребьевка")
         saveList = fileMenu.addMenu("Сохранить")
         fileMenu.addAction(self.exitAction)
-
         # меню Редактировать
-        editMenu = menuBar.addMenu("Редактировать")
+        editMenu = menuBar.addMenu("Редактировать")   # основное
         #  создание подменю
         choice.addAction(self.choice_gr_Action)  # подменю группы
         choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
@@ -130,15 +129,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         find_Menu = editMenu.addMenu("Поиск")
         find_Menu.addAction(self.find_r_Action)
         find_Menu.addAction(self.find_r1_Action)
-
         # меню Рейтинг
-        rankMenu = menuBar.addMenu("Рейтинг")
-        rankMenu.addAction(self.rAction)
-        rankMenu.addAction(self.r1Action)
+        rank_Menu = menuBar.addMenu("Рейтинг")   # основное
+        rank_Menu.addAction(self.rAction)
+        rank_Menu.addAction(self.r1Action)
+        # меню помощь
+        help_Menu = menuBar.addMenu("Помощь")   # основное
+        # help_Menu.addAction(self.helpAction)
 
     #  создание действий меню
     def _createAction(self):
         self.newAction = QAction(self)
+        self.helpAction = QAction(self)
         self.newAction.setText("Создать новые")
         self.systemAction = QAction("Система соревнований")
         self.exitAction = QAction("Выход")
@@ -163,6 +165,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
+        # Connect Help actions
+        self.helpAction.triggered.connect(self.help)
 
     def newFile(self):
         # Logic for creating a new file goes here...
@@ -189,11 +193,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusbar.showMessage("Список участников сохранен")
 
     def choice(self):
-        my_win.tabWidget.setCurrentIndex(2)
-        choice_gr_automat()
+        if System.choice_flag == 1:
+            reply = QMessageBox.information(my_win, 'Уведомление', "Жеребъевка была произведена,\nесли хотите сделать "
+                                                                   "повторно\nнажмите-ОК-, если нет то - Canel-",
+                                                      QMessageBox.StandardButtons.Ok,
+                                                      QMessageBox.StandardButtons.Cancel)
+            if reply == QMessageBox.StandardButtons.Ok:
+                my_win.tabWidget.setCurrentIndex(2)
+                choice_gr_automat()
+            else:
+                return
+        else:
+            my_win.tabWidget.setCurrentIndex(2)
+            choice_gr_automat()
+
 
     def system_made(self):
         system_competition()
+
+    def help(self):
+        pass
 
 
 app = QApplication(sys.argv)
@@ -294,7 +313,7 @@ def system_made():
         for i in range(1, count_system + 1):
             system = System(id=cs, title_id=t, total_athletes=total_athletes, total_group=total_group,
                             max_player=max_player,
-                            stage=sg, page_vid=page_v, label_string="").save()
+                            stage=sg, page_vid=page_v, label_string="", choice_flag=False).save()
 
     player_in_table()
     my_win.checkBox_2.setChecked(False)
@@ -490,7 +509,8 @@ def title_made():
     page_v = my_win.comboBox_page_1.currentText()
     with db:
         System.create_table()
-        sys = System(title_id=t, total_athletes=0, total_group=0, max_update=0, stage=sg, page_vid=page_v).save()
+        sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage=sg, page_vid=page_v,
+                     label_string="", choice_flag=False).save()
 
 
 def title_update():
@@ -1608,6 +1628,8 @@ def choice_gr_automat():
     sender = my_win.sender()
     if sender == my_win.choice_gr_Action:
         load_tableWidget()
+
+        # if
         sys = System.select().order_by(System.id.desc()).get()  # получение последней записи в таблице соревнования
         system = System.get(System.id == sys)  # выбирает из таблицы система последнюю запись
         group = system.total_group
@@ -1638,6 +1660,8 @@ def choice_gr_automat():
                     if mp == h:
                         fill_table_choice()
                         return
+        system.choice_flag = True
+        system.save()
 
 
 def choice_tbl_made():
@@ -1714,7 +1738,13 @@ def hide_show_columns():
     my_win.tableWidget.hideColumn(18)
     my_win.tableWidget.hideColumn(19)
 
-
+def flag():
+    pass
+    # t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    # with db:
+    #     System.create_table()
+    #     sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
+    #                  choice_flag=False).save()
 
 # ===== переводит фокус на полее ввода счета в партии
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
@@ -1762,7 +1792,9 @@ my_win.Button_filter.clicked.connect(filter)
 my_win.Button_etap_made.clicked.connect(kol_player_in_group)  # рисует таблицы группового этапа и заполняет game_list
 # my_win.Button_system_made.clicked.connect(system_made)  # создание системы соревнований
 my_win.Button_system_made.clicked.connect(player_in_table)  # заполнение таблицы Game_list
-# my_win.Button_proba.clicked.connect(choice_made)
+
+# my_win.Button_proba.clicked.connect(flag)
+
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
