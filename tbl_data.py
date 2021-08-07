@@ -34,8 +34,8 @@ def table1_data():
     pl2 = Player.get(Player.id == 2)
     pl3 = Player.get(Player.id == 5)
     pl4 = Player.get(Player.id == 8)
-    pl5 = Player.get(Player.id == 12)
-    pl6 = Player.get(Player.id == 13)
+    # pl5 = Player.get(Player.id == 12)
+    # pl6 = Player.get(Player.id == 13)
     # занесение фамилии и города в таблицу
     table_1[0][1] = pl1.player
     table_1[1][1] = pl1.city
@@ -45,10 +45,10 @@ def table1_data():
     table_1[5][1] = pl3.city
     table_1[6][1] = pl4.player
     table_1[7][1] = pl4.city
-    table_1[8][1] = pl5.player
-    table_1[9][1] = pl5.city
-    table_1[10][1] = pl6.player
-    table_1[11][1] = pl6.city
+    # table_1[8][1] = pl5.player
+    # table_1[9][1] = pl5.city
+    # table_1[10][1] = pl6.player
+    # table_1[11][1] = pl6.city
     score_in_table(td, num_gr)
     return table_1
 
@@ -69,8 +69,8 @@ def table2_data():
     pl2 = Player.get(Player.id == 4)
     pl3 = Player.get(Player.id == 6)
     pl4 = Player.get(Player.id == 11)
-    pl5 = Player.get(Player.id == 19)
-    pl6 = Player.get(Player.id == 22)
+    # pl5 = Player.get(Player.id == 19)
+    # pl6 = Player.get(Player.id == 22)
     table_2[0][1] = pl1.player
     table_2[1][1] = pl1.city
     table_2[2][1] = pl2.player
@@ -79,10 +79,10 @@ def table2_data():
     table_2[5][1] = pl3.city
     table_2[6][1] = pl4.player
     table_2[7][1] = pl4.city
-    table_2[8][1] = pl5.player
-    table_2[9][1] = pl5.city
-    table_2[10][1] = pl6.player
-    table_2[11][1] = pl6.city
+    # table_2[8][1] = pl5.player
+    # table_2[9][1] = pl5.city
+    # table_2[10][1] = pl6.player
+    # table_2[11][1] = pl6.city
     score_in_table(td, num_gr)  # вызывает функцию, где заносит счет в таблицу pdf
     return table_2
 
@@ -173,7 +173,7 @@ def table8_data():
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_8.append(s)
-    score_in_table(td,num_gr)
+    score_in_table(td, num_gr)
     return table_8
 
 

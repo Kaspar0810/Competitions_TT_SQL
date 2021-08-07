@@ -840,9 +840,78 @@
       <widget class="QLabel" name="label_19">
        <property name="geometry">
         <rect>
-         <x>570</x>
+         <x>560</x>
          <y>7</y>
-         <width>101</width>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_23">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>28</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_tabel">
+       <property name="geometry">
+        <rect>
+         <x>163</x>
+         <y>25</y>
+         <width>111</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_27">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>28</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_28">
+       <property name="geometry">
+        <rect>
+         <x>285</x>
+         <y>28</y>
+         <width>241</width>
          <height>16</height>
         </rect>
        </property>
@@ -1831,8 +1900,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1886,8 +1955,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2078,8 +2147,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2091,8 +2160,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2104,8 +2173,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
