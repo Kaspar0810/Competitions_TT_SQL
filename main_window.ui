@@ -877,12 +877,12 @@
         <string>Этапы соревнования - </string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_tabel">
+      <widget class="QComboBox" name="comboBox_table">
        <property name="geometry">
         <rect>
          <x>163</x>
          <y>25</y>
-         <width>111</width>
+         <width>161</width>
          <height>26</height>
         </rect>
        </property>
@@ -1900,8 +1900,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -1955,8 +1955,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2147,8 +2147,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2160,8 +2160,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2173,8 +2173,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
