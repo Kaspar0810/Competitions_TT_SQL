@@ -23,7 +23,8 @@ enc = 'UTF-8'
 
 def func_zagolovok(canvas, doc):
     """создание заголовка страниц"""
-    s = System.select().order_by(System.id.desc()).get()
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     p = s.page_vid
     if p == "альбомная":
         pv = landscape(A4)
@@ -136,22 +137,28 @@ def t_8(ts, zagolovok, cW, rH):
 def table_made(pv):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
-
-    s = System.select().order_by(System.id.desc()).get()
+    # if pv == "альбомная":
+    #     pv = landscape(A4)
+    # else:
+    #     pv = A4
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     kg = s.total_group
     ta = s.total_athletes
+    # pv = s.page_vid
+    if pv == "альбомная":
+        pv = landscape(A4)
+    else:
+        pv = A4
     t = int(ta) // int(kg)
     e = int(ta) % int(kg)  # если количество участников не равно делится на группы
     g2 = str(t + 1)
-
     g2 = int(g2)
     kg = int(kg)
-
     if e == 0:
         t = t
     else:
         t = g2
-
     if pv == landscape(A4):  # альбомная ориентация стр
         if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:
             wcells = 21.4 / t  # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)

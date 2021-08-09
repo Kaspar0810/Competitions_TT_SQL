@@ -1,10 +1,12 @@
+
 from models import *
-import comp_system
+# import comp_system
 
 
 def kol_player():
-    """выводит максимальное коичество человек в группе t если все группы равны, а g2 если разное количество"""
-    ta = System.select().order_by(System.id.desc()).get()
+    """выводит максимальное количество человек в группе t если все группы равны, а g2 если разное количество"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     a = ta.total_athletes
     g = ta.total_group
     e = a % g  # если количество участников равно делится на группы
@@ -20,6 +22,9 @@ def kol_player():
 
 def table1_data():
     """данные результатов в таблице 1-й группы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    tr = len(ta)  # проверяет заполнена ли таблица
     table_1 = []
     td = table_1
     num_gr = "1 группа"
@@ -49,12 +54,16 @@ def table1_data():
     # table_1[9][1] = pl5.city
     # table_1[10][1] = pl6.player
     # table_1[11][1] = pl6.city
-    score_in_table(td, num_gr)
+    if tr != 0:
+        score_in_table(td, num_gr)
     return table_1
 
 
 def table2_data():
     """данные результатов в таблице 2-й группы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    tr = len(ta)  # проверяет заполнена ли таблица
     table_2 = []
     td = table_2
     num_gr = "2 группа"
@@ -83,12 +92,16 @@ def table2_data():
     # table_2[9][1] = pl5.city
     # table_2[10][1] = pl6.player
     # table_2[11][1] = pl6.city
-    score_in_table(td, num_gr)  # вызывает функцию, где заносит счет в таблицу pdf
+    if tr != 0:
+        score_in_table(td, num_gr)
     return table_2
 
 
 def table3_data():
     """данные результатов в таблице 3-й группы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    tr = len(ta)  # проверяет заполнена ли таблица
     table_3 = []
     td = table_3
     num_gr = "3 группа"
@@ -104,6 +117,9 @@ def table3_data():
 
 def table4_data():
     """данные результатов в таблице 4-й группы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    tr = len(ta)  # проверяет заполнена ли таблица
     table_4 = []
     td = table_4
     num_gr = "4 группа"
@@ -113,12 +129,16 @@ def table4_data():
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_4.append(s)
-    score_in_table(td, num_gr)
+    if tr != 0:
+        score_in_table(td, num_gr)
     return table_4
 
 
 def table5_data():
     """данные результатов в таблице 5-й группы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    tr = len(ta)  # проверяет заполнена ли таблица
     table_5 = []
     td = table_5
     num_gr = "5 группа"
@@ -128,12 +148,16 @@ def table5_data():
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_5.append(s)
-    score_in_table(td, num_gr)
+    if tr != 0:
+        score_in_table(td, num_gr)
     return table_5
 
 
 def table6_data():
     """данные результатов в таблице 6-й группы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    tr = len(ta)  # проверяет заполнена ли таблица
     table_6 = []
     td = table_6
     num_gr = "6 группа"
@@ -143,12 +167,16 @@ def table6_data():
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_6.append(s)
-    score_in_table(td, num_gr)
+    if tr != 0:
+        score_in_table(td, num_gr)
     return table_6
 
 
 def table7_data():
-    """данные результатов в таблице 5-й группы"""
+    """данные результатов в таблице 7-й группы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    tr = len(ta)  # проверяет заполнена ли таблица
     table_7 = []
     td = table_7
     num_gr = "7 группа"
@@ -158,12 +186,16 @@ def table7_data():
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_7.append(s)
+    if tr != 0:
         score_in_table(td, num_gr)
     return table_7
 
 
 def table8_data():
-    """данные результатов в таблице 6-й группы"""
+    """данные результатов в таблице 8-й группы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    tr = len(ta)  # проверяет заполнена ли таблица
     table_8 = []
     td = table_8
     num_gr = "8 группа"
@@ -173,15 +205,17 @@ def table8_data():
         s = (st * (t + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         table_8.append(s)
-    score_in_table(td, num_gr)
+    if tr != 0:
+        score_in_table(td, num_gr)
     return table_8
 
 
-def total_data_table():
+def total_data_table(kg):
     """создает список списков данных групп"""
     tdt = []
-    s = System.select().order_by(System.id.desc()).get()
-    kg = s.total_group
+    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    # s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    # kg = s.total_group
 
     for m in range(1, 2):
         table_1 = table1_data()
@@ -222,8 +256,8 @@ def total_data_table():
 def score_in_table(td, num_gr):
     """заносит счет в таблицу группы pdf"""
     total_score = {}
-
-    ta = System.select().order_by(System.id.desc()).get()
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     mp = ta.max_player
     for s in range(1, mp + 1):
         total_score[s] = 0
@@ -270,8 +304,12 @@ def score_in_table(td, num_gr):
                 total_score[p2] = plr2  # записывает сумму очков 2-му игроку
     for t in range(0, mp):
         td[t * 2][mp + 2] = total_score[t + 1]  # записывает каждому игроку сумму очков
-    rank_in_group(total_score, mp, td, num_gr)
-
+    gl = Game_list.select().where(Game_list.id == 1)
+    a = len(gl)
+    if a >= 1:
+        rank_in_group(total_score, mp, td, num_gr)
+    else:
+        return
 
 def rank_in_group(total_score, max_person, td, num_gr):
     """выставляет места в группах соответсвенно очкам

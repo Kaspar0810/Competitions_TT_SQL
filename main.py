@@ -193,11 +193,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusbar.showMessage("Список участников сохранен")
 
     def choice(self):
-        system = System.select().order_by(System.id.desc()).get()
-        system.get(System.id == system)
+        t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+        system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
         if system.choice_flag == True:
             reply = QMessageBox.information(my_win, 'Уведомление', "Жеребъевка была произведена,\nесли хотите сделать "
-                                                                   "повторно\nнажмите-ОК-, если нет то - Canel-",
+                                                                   "повторно\nнажмите-ОК-, если нет то - Cancel-",
                                             QMessageBox.StandardButtons.Ok,
                                             QMessageBox.StandardButtons.Cancel)
             if reply == QMessageBox.StandardButtons.Ok:
@@ -308,13 +308,13 @@ def system_made():
     total_group = ce.total_group
     total_athletes = ce.total_athletes
     max_player = ce.max_player
-    if sg == "Основной":
+    if sg == "1 таблица":
         pass
     else:  # предварительный этап
         for i in range(1, count_system + 1):
             system = System(id=cs, title_id=t, total_athletes=total_athletes, total_group=total_group,
-                            max_player=max_player,
-                            stage=sg, page_vid=page_v, label_string="", choice_flag=False).save()
+                            max_player=max_player, stage=sg, page_vid=page_v, label_string="", kol_game_string="",
+                            choice_flag=False).save()
 
     player_in_table()
     my_win.checkBox_2.setChecked(False)
@@ -603,7 +603,7 @@ def fill_table_R1_list():
 
 
 def fill_table_results():
-    """заполняет таблицу результатов QtableWidget из db"""
+    """заполняет таблицу результатов QtableWidget из db result"""
     player_result = Result.select().order_by(Result.id)
     result_list = player_result.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
@@ -622,7 +622,7 @@ def fill_table_results():
 
 
 def fill_table_choice():
-    """заполняет таблицу жеребьевка QtableWidget из db"""
+    """заполняет таблицу жеребьевка QtableWidget из db choice"""
     player_choice = Choice.select().order_by(Choice.rank.desc())
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
@@ -728,7 +728,8 @@ def load_combobox_filter_group():
     sender = my_win.menuWidget().sender()
     my_win.comboBox_filter_group.clear()
     my_win.comboBox_filter_choice.clear()
-    system = System.select().order_by(System.id.desc()).get()
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     gr_txt = []
     kg = int(system.total_group)  # количество групп
 
@@ -766,10 +767,11 @@ def page():
     if tb == 0:
         db_select_title()
         my_win.tableWidget.show()
-    elif tb == 1:
+    elif tb == 1:  # -список участников-
         region()
         load_tableWidget()
         my_win.tableWidget.show()
+        my_win.statusbar.showMessage("Список участников соревнований", 5000)
     elif tb == 2:  # -система-
         player_list = Player.select()
         count = len(player_list)
@@ -1151,6 +1153,9 @@ def kol_game_in_table_or_setka():
 
 def page_vid():
     """присваивает переменной значение выборат вида страницы"""
+    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    # s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    # pv = s.page_vid
     if my_win.comboBox_page_vid.currentText() == "альбомная":
         pv = landscape(A4)
     else:
@@ -1179,12 +1184,15 @@ def view():
 
 def player_in_table():
     """заполняет таблицу Game_list данными спортсменами из группы tdt - список списков данных из групп"""
-    si = System.get(System.id)
-    kg = si.total_group
-    ct = si.max_player
-    st = si.stage
-    comp_system.table_made(page_vid())
-    tdt = tbl_data.total_data_table()
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    kg = s.total_group
+    ct = s.max_player
+    st = s.stage
+    pv = s.page_vid
+
+    comp_system.table_made(pv)
+    tdt = tbl_data.total_data_table(kg)
 
     for p in range(0, kg):
         gr = tdt[p]
@@ -1197,7 +1205,7 @@ def player_in_table():
                 k += 1
                 with db:
                     game_list = Game_list(number_group=number_group, rank_num_player=k, player_group=family_player,
-                                          system_id=si).save()
+                                          system_id=s).save()
             elif fp == 0 and k == 0:  # если 1-я строка (фамилия игрока) пустая выход из группы
                 break
         if fp == 0 or ct == k:  # после считывания игроков в группе идет запись игроков по турам в таблицу -result-
@@ -1227,10 +1235,11 @@ def player_in_table():
                     with db:
                         # Result.create_table()
                         results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
-                                         tours=match, title_id=si).save()
+                                         tours=match, title_id=s).save()
         else:
             pass
             print("ok")
+    # comp_system.table_made()
 
 
 def chop_line(q, maxline=30):
@@ -1462,7 +1471,6 @@ def enter_score():
     my_win.lineEdit_player1.setText("")  # очищает поля фамилии игроков
     my_win.lineEdit_player2.setText("")
     # ===== вызов функции заполнения таблицы pdf группы сыгранными играми
-    # p = System.get(System.id == 1)
     pv = landscape(A4)
     comp_system.table_made(pv)
 
@@ -1716,11 +1724,11 @@ def choice_gr_automat():
     sender = my_win.sender()
     if sender == my_win.choice_gr_Action:
         load_tableWidget()
-
-        sys = System.select().order_by(System.id.desc()).get()  # получение последней записи в таблице соревнования
-        system = System.get(System.id == sys)  # выбирает из таблицы система последнюю запись
-        group = system.total_group
-        mp = system.total_athletes
+        t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+        sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+        s_id = sys.id
+        group = sys.total_group
+        mp = sys.total_athletes
         player_choice = Choice.select().order_by(Choice.rank.desc())
         choice_list = player_choice.dicts().execute()
         h = 0
@@ -1747,8 +1755,11 @@ def choice_gr_automat():
                     if mp == h:
                         fill_table_choice()
                         return
-        system.choice_flag = True
-        system.save()
+            with db:
+                system = System.get(System.id == s_id)
+                system.choice_flag = True
+                system.save()
+            player_in_table()
 
 
 def choice_tbl_made():
@@ -1836,7 +1847,6 @@ def etap_made():
 
 def total_player_table():
     """количество участников в сетке"""
-
     s = System.select().order_by(System.id.desc()).get()
     total_athletes = s.total_athletes
     str_setka = my_win.label_28.text()
