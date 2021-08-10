@@ -312,10 +312,12 @@ def system_made():
         pass
     else:  # предварительный этап
         for i in range(1, count_system + 1):
+            # system = System(id=cs, title_id=t, total_athletes=total_athletes, total_group=total_group,
+            #                 max_player=max_player, stage=sg, page_vid=page_v, label_string="", kol_game_string="",
+            #                 choice_flag=False, score_flag=False).save()
             system = System(id=cs, title_id=t, total_athletes=total_athletes, total_group=total_group,
                             max_player=max_player, stage=sg, page_vid=page_v, label_string="", kol_game_string="",
                             choice_flag=False).save()
-
     player_in_table()
     my_win.checkBox_2.setChecked(False)
     my_win.checkBox_3.setChecked(False)
@@ -511,7 +513,7 @@ def title_made():
     with db:
         System.create_table()
         sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage=sg, page_vid=page_v,
-                     label_string="", kol_game_string="", choice_flag=False).save()
+                     label_string="", kol_game_string="", choice_flag=False, score_flag=False).save()
 
 
 def title_update():
@@ -604,21 +606,34 @@ def fill_table_R1_list():
 
 def fill_table_results():
     """заполняет таблицу результатов QtableWidget из db result"""
-    player_result = Result.select().order_by(Result.id)
-    result_list = player_result.dicts().execute()
-    row_count = len(result_list)  # кол-во строк в таблице
-    column_count = len(result_list[0])  # кол-во столбцов в таблице
-    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+    result = Result.select()  # проверка есть ли записи в таблице -result-
+    count = len(result)  # если 0, то записей нет
+    if count == 0:
+        message = "Сначала надо создать систему соревнований\nзатем произвести жербъевку.\n" \
+                  "Хотите начать ее создавать?"
+        reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
+                                               QtWidgets.QMessageBox.StandardButtons.Yes,
+                                               QtWidgets.QMessageBox.StandardButtons.No)
+        if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
+            system_competition()
+        else:
+            return
+    else:
+        player_result = Result.select().order_by(Result.id)
+        result_list = player_result.dicts().execute()
+        row_count = len(result_list)  # кол-во строк в таблице
+        column_count = len(result_list[0])  # кол-во столбцов в таблице
+        my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
-    for row in range(row_count):  # добвляет данные из базы в TableWidget
-        for column in range(column_count):
-            item = str(list(result_list[row].values())[column])
-            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-    my_win.tableWidget.showColumn(6)  # поазывает столбец победитель
-    my_win.tableWidget.hideColumn(11)
-    my_win.tableWidget.hideColumn(12)
-    my_win.tableWidget.hideColumn(13)
-    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+        for row in range(row_count):  # добвляет данные из базы в TableWidget
+            for column in range(column_count):
+                item = str(list(result_list[row].values())[column])
+                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+        my_win.tableWidget.showColumn(6)  # поазывает столбец победитель
+        my_win.tableWidget.hideColumn(11)
+        my_win.tableWidget.hideColumn(12)
+        my_win.tableWidget.hideColumn(13)
+        my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
 def fill_table_choice():
@@ -761,7 +776,6 @@ def tab():
 
 def page():
     """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
-    # sender = my_win.sender()
     msgBox = QMessageBox()
     tb = my_win.toolBox.currentIndex()
     if tb == 0:
@@ -790,10 +804,14 @@ def page():
         my_win.label_15.hide()
         my_win.label_17.hide()
         my_win.label_19.hide()
+        my_win.label_23.hide()
+        my_win.label_27.hide()
+        my_win.label_28.hide()
         my_win.comboBox_etap_1.hide()
         my_win.comboBox_etap_2.hide()
         my_win.comboBox_etap_3.hide()
         my_win.spinBox_kol_group.hide()
+        my_win.comboBox_table.hide()
         if tg == 0:  # система еще не создана
             result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
                                         msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
@@ -833,10 +851,16 @@ def page():
         load_combobox_filter_group()
         my_win.radioButton_3.setChecked(True)
     elif tb == 3:  # вкладка -групппы-
+        t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+        sf = System.get(System.title_id == t)
+        state = sf.score_flag  # флаг, показывающий записывать счет в партиях или нет
+        if sf.score_flag == True:  # отмечает чекбокс в зависимости от значения в db -system-
+            my_win.checkBox_4.setChecked(True)
+        else:
+            my_win.checkBox_4.setChecked(False)
+        game_in_visible(state)  # скрывает или показывает поля ввода счета
         my_win.tableWidget.show()
-        my_win.checkBox_4.setChecked(False)
         my_win.Button_Ok.setDisabled(True)
-        game_in_visible(state=1)
         my_win.radioButton_match_5.setChecked(True)
         load_combobox_filter_group()
         load_tableWidget()
@@ -1007,7 +1031,9 @@ def system_competition():
     sender = my_win.sender()
     s = System.select().order_by(System.id.desc()).get()
     se = s.total_athletes
-    if sender == my_win.systemAction or sender == my_win.choice_gr_Action:  # нажат меню -система- или -жеребъевка-
+    if sender == my_win.systemAction or sender == my_win.choice_gr_Action or sender == my_win.tabWidget\
+            or sender == my_win.toolBox:
+        # нажат меню -система- или -жеребъевка- или вкладка -система-
         if se > 0:  # система была создана
             sb = "Система создана, теперь необходимо произвести жеребъевку. " \
                  "Войдите в меню -соревнования- и выберите -жеребъевка-"
@@ -1239,7 +1265,6 @@ def player_in_table():
         else:
             pass
             print("ok")
-    # comp_system.table_made()
 
 
 def chop_line(q, maxline=30):
@@ -1263,7 +1288,9 @@ def chop_line(q, maxline=30):
 
 def game_in_visible(state):
     """видимость полей для счета в партии"""
-    if state == 2:
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    # sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    if state == True or state == 2:  # поставлена галочка
         my_win.lineEdit_pl1_s1.setVisible(True)
         my_win.lineEdit_pl2_s1.setVisible(True)
         my_win.lineEdit_pl1_s2.setVisible(True)
@@ -1275,6 +1302,10 @@ def game_in_visible(state):
         my_win.lineEdit_pl1_s5.setVisible(True)
         my_win.lineEdit_pl2_s5.setVisible(True)
         my_win.label_22.setVisible(True)
+        sf = System.get(System.title_id == t)
+        with db:
+            sf.score_flag = True
+            sf.save()
     else:
         my_win.lineEdit_pl1_s1.setVisible(False)
         my_win.lineEdit_pl2_s1.setVisible(False)
@@ -1287,6 +1318,10 @@ def game_in_visible(state):
         my_win.lineEdit_pl1_s5.setVisible(False)
         my_win.lineEdit_pl2_s5.setVisible(False)
         my_win.label_22.setVisible(False)
+        sf = System.get(System.title_id == t)
+        with db:
+            sf.score_flag = False
+            sf.save()
 
 
 def select_player_in_game():
@@ -1779,7 +1814,7 @@ def choice_tbl_made():
 def choice_filter_group():
     """фильтрует таблицу жеребьевка по группам"""
     fg = my_win.comboBox_filter_choice.currentText()
-    player_choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
+    player_choice = Choice.select().order_by(Choice.posev_group)
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
     column_count = 10  # кол-во столбцов в таблице
@@ -1869,10 +1904,12 @@ def total_player_table():
     page_v = my_win.comboBox_page_vid.currentText()
     t = s.title_id
     ta = s.total_athletes
-
     with db:
         sys = System(title_id=t, total_athletes=ta, total_group=0, max_player=f_num, stage=fin, page_vid=page_v,
                      label_string=str_setka, kol_game_string=stroka_kol_game, choice_flag=False).save()
+    # with db:
+    #     sys = System(title_id=t, total_athletes=ta, total_group=0, max_player=f_num, stage=fin, page_vid=page_v,
+    #                  label_string=str_setka, kol_game_string=stroka_kol_game, choice_flag=False, score_flag=False).save()
     my_win.label_27.setText(stroka_kol_game)
     my_win.label_27.show()
 
@@ -1882,7 +1919,7 @@ def total_player_table():
 #     with db:
 #         System.create_table()
 #         sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
-#                      kol_game_string="", choice_flag=False).save()
+#                      kol_game_string="", choice_flag=False, score_flag=False).save()
 
 # ===== переводит фокус на полее ввода счета в партии
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
@@ -1921,6 +1958,7 @@ my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
 
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
+
 my_win.checkBox.stateChanged.connect(button_title_made_enable)  # при изменении чекбокса активирует кнопку создать
 my_win.checkBox_2.stateChanged.connect(button_etap_made_enabled)  # при изменении чекбокса активирует кнопку создать
 my_win.checkBox_3.stateChanged.connect(button_system_made_enable)  # при изменении чекбокса активирует кнопку создать

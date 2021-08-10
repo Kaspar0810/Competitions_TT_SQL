@@ -124,6 +124,7 @@ class System(BaseModel):
     label_string = CharField()
     kol_game_string = CharField()
     choice_flag = BooleanField()
+    score_flag = BooleanField()
 
     class Meta:
         db_table = "system"

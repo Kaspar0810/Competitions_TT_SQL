@@ -1,6 +1,5 @@
 
 from models import *
-# import comp_system
 
 
 def kol_player():
@@ -24,7 +23,7 @@ def table1_data():
     """данные результатов в таблице 1-й группы"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица
+    tr = len(ta)  # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
     table_1 = []
     td = table_1
     num_gr = "1 группа"
@@ -54,7 +53,7 @@ def table1_data():
     # table_1[9][1] = pl5.city
     # table_1[10][1] = pl6.player
     # table_1[11][1] = pl6.city
-    if tr != 0:
+    if tr != 0:  # если еще не была жеребъевка, то пропуск счета в группе
         score_in_table(td, num_gr)
     return table_1
 
@@ -310,6 +309,7 @@ def score_in_table(td, num_gr):
         rank_in_group(total_score, mp, td, num_gr)
     else:
         return
+
 
 def rank_in_group(total_score, max_person, td, num_gr):
     """выставляет места в группах соответсвенно очкам

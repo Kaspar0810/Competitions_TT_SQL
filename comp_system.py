@@ -137,19 +137,10 @@ def t_8(ts, zagolovok, cW, rH):
 def table_made(pv):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
-    # if pv == "альбомная":
-    #     pv = landscape(A4)
-    # else:
-    #     pv = A4
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     kg = s.total_group
     ta = s.total_athletes
-    # pv = s.page_vid
-    if pv == "альбомная":
-        pv = landscape(A4)
-    else:
-        pv = A4
     t = int(ta) // int(kg)
     e = int(ta) % int(kg)  # если количество участников не равно делится на группы
     g2 = str(t + 1)
@@ -159,12 +150,14 @@ def table_made(pv):
         t = t
     else:
         t = g2
-    if pv == landscape(A4):  # альбомная ориентация стр
+    if pv == "альбомная":  # альбомная ориентация стр
+        pv = landscape(A4)
         if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:
             wcells = 21.4 / t  # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
         else:
             wcells = 7.4 / t  # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
     else:  # книжная ориентация стр
+        pv = A4
         wcells = 12.8 / t  # ширина столбцов таблицы в зависимости от кол-во чел
     col = ((wcells * cm,) * t)
 

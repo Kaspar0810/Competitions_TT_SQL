@@ -9,6 +9,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.platypus import PageBreak
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
+from models import *
 
 registerFontFamily('DejaVuSerif', normal='DejaVuSerif', bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
 enc = 'UTF-8'
@@ -34,7 +35,6 @@ pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
-from models import *
 
 
 def title_pdf(string_data, nz, sr, vz, ct, filepatch):
