@@ -1196,6 +1196,30 @@
        <string>Жеребъевка</string>
       </property>
      </widget>
+     <widget class="QLabel" name="label_33">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>4</y>
+        <width>141</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>16</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+        <underline>true</underline>
+        <strikeout>false</strikeout>
+       </font>
+      </property>
+      <property name="text">
+       <string>Всего:</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -1969,8 +1993,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2024,8 +2048,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2239,8 +2263,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2252,8 +2276,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2265,8 +2289,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">

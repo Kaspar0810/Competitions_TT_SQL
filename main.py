@@ -206,6 +206,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if reply == QMessageBox.StandardButtons.Ok:
                 my_win.tabWidget.setCurrentIndex(2)
                 choice_gr_automat()
+                my_win.tabWidget.setCurrentIndex(3)
             else:
                 return
         else:
@@ -226,6 +227,11 @@ app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.show()
+
+
+
+
+
 
 #  ==== наполнение комбобоксов ==========
 page_orient = ("альбомная", "книжная")
@@ -380,7 +386,9 @@ def load_tableWidget():
     elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь- и загружет таблицу с рейтингом
         fill_table_R1_list()
     elif my_win.tabWidget.currentIndex() == 3:  # таблица результатов
-        fill_table_results()
+        flag = ready_choice()
+        if flag is True:
+            fill_table_results()
     elif my_win.tabWidget.currentIndex() == 2 or sender == my_win.choice_gr_Action:  # таблица жеребьевки
         fill_table_choice()
     else:  # загружает таблицу со списком
@@ -837,7 +845,9 @@ def page():
         my_win.comboBox_table_2.hide()
         my_win.spinBox_kol_group.hide()
         my_win.comboBox_table.hide()
-        if tg == 0:  # система еще не создана
+        flag = ready_system()
+
+        if flag is False:  # система еще не создана
             result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
                                         msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
             if result == msgBox.StandardButtons.Ok:
@@ -851,11 +861,19 @@ def page():
             stage = []
             table = []
             game = []
+            sum_game = []
             for i in range(last_id, st_count + 1):  # цикл по таблице -system-
                 s = System.get(System.id == i)
                 stage.append(s.stage)  # добавляет в список этап
                 table.append(s.label_string)  # добавляет в список система
                 game.append(s.kol_game_string)  # добавляет в список кол-во игр
+            count = len(game)
+            for i in range(0, count):
+                txt = game[i]
+                t = txt.find(" ")
+                txt = int(txt[0:t])
+                sum_game.append(txt)
+            total_game = sum(sum_game)
             my_win.comboBox_table.hide()
             my_win.comboBox_page_vid.setEnabled(False)
             my_win.Button_etap_made.setEnabled(False)
@@ -866,43 +884,57 @@ def page():
             my_win.label_23.setText(stage[1])
             my_win.label_28.setText(table[1])
             my_win.label_27.setText(game[1])
+            my_win.label_33.setText(f"Всего {total_game} игр")
             my_win.label_9.show()
             my_win.label_12.show()
             my_win.label_19.show()
             my_win.label_23.show()
             my_win.label_28.show()
             my_win.label_27.show()
-
+            my_win.label_33.show()
         load_tableWidget()
         load_combobox_filter_group()
         my_win.radioButton_3.setChecked(True)
     elif tb == 3:  # вкладка -групппы-
         t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
         sf = System.get(System.title_id == t)
-        state_greb = sf.choice_flag
-        if state_greb == False:
+        flag_systems = ready_system()
+        # if flag_systems is False:
+        #     result = msgBox.information(my_win, "", "Необходимо сделать жеребъевку\nпредварительного этапа.",
+        #                                 msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
+        #     if result != msgBox.StandardButtons.Ok:
+        #         return
+        #     else:
+        #         my_win.tabWidget.setCurrentIndex(2)
+        #         choice_gr_automat()
+        #         sf.choice_flag = True
+        #         sf.save()
+        flag = ready_choice()
+        if flag is False:
             result = msgBox.information(my_win, "", "Необходимо сделать жеребъевку\nпредварительного этапа.",
                                         msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-            if result == msgBox.StandardButtons.Ok:
-                # my_win.tabWidget.setCurrentIndex(2)
+            if result != msgBox.StandardButtons.Ok:
+                return
+            else:
+                my_win.tabWidget.setCurrentIndex(2)
                 choice_gr_automat()
                 sf.choice_flag = True
                 sf.save()
-            else:
-                return
-        state = sf.score_flag  # флаг, показывающий записывать счет в партиях или нет
-        if sf.score_flag == True:  # отмечает чекбокс в зависимости от значения в db -system-
-            my_win.checkBox_4.setChecked(True)
+            my_win.tabWidget.setCurrentIndex(3)
         else:
-            my_win.checkBox_4.setChecked(False)
-        game_in_visible(state)  # скрывает или показывает поля ввода счета
-        my_win.tableWidget.show()
-        my_win.Button_Ok.setDisabled(True)
-        my_win.radioButton_match_5.setChecked(True)
-        load_combobox_filter_group()
-        load_tableWidget()
-        load_combo()
-        my_win.label_16.hide()
+            state = sf.score_flag  # флаг, показывающий записывать счет в партиях или нет
+            if sf.score_flag == True:  # отмечает чекбокс в зависимости от значения в db -system-
+                my_win.checkBox_4.setChecked(True)
+            else:
+                my_win.checkBox_4.setChecked(False)
+            game_in_visible(state)  # скрывает или показывает поля ввода счета
+            my_win.tableWidget.show()
+            my_win.Button_Ok.setDisabled(True)
+            my_win.radioButton_match_5.setChecked(True)
+            load_combobox_filter_group()
+            load_tableWidget()
+            load_combo()
+            my_win.label_16.hide()
     elif tb == 4:
         my_win.tableWidget.hide()
     elif tb == 5:
@@ -1836,7 +1868,7 @@ def choice_table():
 def choice_gr_automat():
     """проба автоматической жеребьевки групп"""
     sender = my_win.sender()
-    if sender == my_win.choice_gr_Action:
+    if sender == my_win.choice_gr_Action or sender == my_win.tabWidget or sender == my_win.toolBox:
         load_tableWidget()
         t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
         sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
@@ -2044,6 +2076,19 @@ def ready_system():
         flag = False
     return flag
 
+
+def ready_choice():
+    """проверка на готовность жеребъевки групп"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    flag_greb = system.choice_flag
+    if flag_greb is True:
+        my_win.statusbar.showMessage("Жеребъевка групп сделана", 500)
+        flag = True
+    else:
+        my_win.statusbar.showMessage("Жеребъевка групп еще ны выполнена", 500)
+        flag = False
+    return flag
 
 def flag():
     pass
