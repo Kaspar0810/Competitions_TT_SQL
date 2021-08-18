@@ -87,19 +87,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Button_title_made.setEnabled(False)
 
         self.tabWidget.setCurrentIndex(0)  # текущая страница
+        #++ отключение страниц
+        self.tabWidget.setTabEnabled(2, False)
+        self.tabWidget.setTabEnabled(3, False)
+        self.tabWidget.setTabEnabled(4, False)
+        self.tabWidget.setTabEnabled(5, False)
 
-        # choice = Choice.get(Choice.id == 1)
-        # choice_tbl = choice.posev_group
-        # if choice_tbl > 0:
-        #     self.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-        #     self.tabWidget.setTabEnabled(3, False)
-        #     self.tabWidget.setTabEnabled(4, False)
-        #     self.tabWidget.setTabEnabled(5, False)
-        # else:
-        # self.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-        # self.tabWidget.setTabEnabled(3, False)
-        # self.tabWidget.setTabEnabled(4, False)
-        # self.tabWidget.setTabEnabled(5, False)
+        t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        sid_first = System.select().where(System.title_id == t)  # находит system id первого
+        count = len(sid_first)
+        s_id = System.select().order_by(System.id).get()
+        s = int(s_id.id)
+        stage = []
+        for i in range(s, count + 1):
+            system = System.get(System.id == i)
+            stage.append(system.stage)
+
+        if count > 0:
+            self.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
+            for i in stage:
+                if i == "Предварительный":
+                    self.tabWidget.setTabEnabled(3, True)
+                elif i == "Полуфиналы":
+                    self.tabWidget.setTabEnabled(4, True)
+                elif i == "1-й финал":
+                    self.tabWidget.setTabEnabled(5, True)
+        else:
+            self.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
+            self.tabWidget.setTabEnabled(3, False)
+            self.tabWidget.setTabEnabled(4, False)
+            self.tabWidget.setTabEnabled(5, False)
 
         self.toolBox.setCurrentIndex(0)
 
@@ -799,7 +816,6 @@ def tab():
     """Изменяет вкладку tabWidget в зависимости от вкладки toolBox"""
     tw = my_win.tabWidget.currentIndex()
     my_win.toolBox.setCurrentIndex(tw)
-
 
 def page():
     """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
