@@ -925,7 +925,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_30">
+      <widget class="QLabel" name="label_31">
        <property name="geometry">
         <rect>
          <x>285</x>
@@ -954,7 +954,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_31">
+      <widget class="QLabel" name="label_30">
        <property name="geometry">
         <rect>
          <x>560</x>
@@ -992,6 +992,44 @@
        </property>
        <property name="text">
         <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_34">
+       <property name="geometry">
+        <rect>
+         <x>223</x>
+         <y>28</y>
+         <width>55</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>групп:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_35">
+       <property name="geometry">
+        <rect>
+         <x>223</x>
+         <y>49</y>
+         <width>55</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>групп:</string>
        </property>
       </widget>
      </widget>
@@ -2174,6 +2212,9 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QLabel" name="label_10">
       <property name="geometry">
@@ -2210,6 +2251,9 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QLabel" name="label_17">
       <property name="geometry">
@@ -2233,6 +2277,9 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QComboBox" name="comboBox_etap_4">
       <property name="geometry">
@@ -2242,6 +2289,9 @@
         <width>146</width>
         <height>26</height>
        </rect>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_29">
