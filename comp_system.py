@@ -414,7 +414,7 @@ def table_made(pv):
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
             shell_table3 = Table(data3, colWidths=["*"])
-            elements.append(Paragraph('группа 1 группа 2', h2))
+            elements.append(Paragraph('группа 1 группа 2', h2))  # заголовки групп (надо точно позиционировать)
             elements.append(shell_table)
             elements.append(Paragraph('группа 3 группа 4', h2))
             elements.append(shell_table1)

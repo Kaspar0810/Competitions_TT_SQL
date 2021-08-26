@@ -383,7 +383,7 @@ def system_made():
     total_group = ce.total_group
     total_athletes = ce.total_athletes
     max_player = ce.max_player
-    if sg == "1 таблица":
+    if sg == "одна таблица":
         pass
     else:  # предварительный этап
         for i in range(1, count_system + 1):
@@ -1162,7 +1162,7 @@ def system_competition():
     """выбор системы проведения"""
     sender = my_win.sender()
     pv = my_win.comboBox_page_vid.currentText()
-    flag = ready_system()
+    flag_system = ready_system()
     if sender == my_win.systemAction or sender == my_win.choice_gr_Action or sender == my_win.tabWidget \
             or sender == my_win.toolBox or sender == my_win.system_edit_Action:
         # нажат меню -система- или -жеребъевка- или вкладка -система-
@@ -1194,11 +1194,15 @@ def system_competition():
             my_win.tabWidget.setCurrentIndex(2)
             # else:
             #     return
-        elif flag is True:
-            sb = "Система создана, теперь необходимо произвести жеребъевку. " \
+        elif flag_system is True:
+            flag_choice = ready_choice()
+            if flag_choice is True:
+                sb = "Система и жербъевка создана."
+            elif flag_choice is False:
+                sb = "Система создана, теперь необходимо произвести жеребъевку. " \
                  "Войдите в меню -соревнования- и выберите -жеребъевка-"
             my_win.statusbar.showMessage(sb)
-        elif flag is False:
+        elif flag_system is False:
             sb = "Выбор системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
             my_win.spinBox_kol_group.hide()
@@ -1206,7 +1210,6 @@ def system_competition():
             my_win.comboBox_etap_2.setEnabled(True)
             my_win.comboBox_etap_3.setEnabled(True)
             my_win.comboBox_etap_1.show()
-            my_win.comboBox_etap_1.setCurrentText("1 таблица")
             my_win.comboBox_etap_2.hide()
             my_win.comboBox_etap_3.hide()
             my_win.label_10.hide()
@@ -1347,7 +1350,6 @@ def kol_player_in_group():
         system.save()
     load_combobox_filter_group()
 
-
 # def kol_game_in_table_or_setka(kpt):
 #     """подсчитывает кол-во игр в группах, сетке"""
 #     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
@@ -1406,13 +1408,13 @@ def player_in_table():
     comp_system.table_made(pv)
     tdt = tbl_data.total_data_table(kg)
 
-    for p in range(0, kg):
+    for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
         gr = tdt[p]
         number_group = str(p + 1) + ' группа'
         k = 0
         for i in range(0, ct * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
-            fp = len(family_player)
+            fp = len(family_player)  # подсчет кол-во знаков в фамилия, если 0 значит игрока нет
             if fp > 0:  # если строка (фамилия игрока) не пустая идет запсь в db
                 k += 1
                 with db:
@@ -1420,7 +1422,7 @@ def player_in_table():
                                           system_id=s).save()
             elif fp == 0 and k == 0:  # если 1-я строка (фамилия игрока) пустая выход из группы
                 break
-        if fp == 0 or ct == k:  # после считывания игроков в группе идет запись игроков по турам в таблицу -result-
+        if fp != 0:  # после считывания игроков в группе идет запись игроков по турам в таблицу -result-
             cp = k - 3
             tour = comp_system.tour(cp)
             game = k // 2  # кол-во игр в туре
@@ -1445,7 +1447,6 @@ def player_in_table():
                     pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
 
                     with db:
-                        # Result.create_table()
                         results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
                                          tours=match, title_id=s).save()
         else:
@@ -1988,37 +1989,37 @@ def choice_gr_automat():
     sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     s_id = sys.id
     group = sys.total_group
-    mp = sys.total_athletes
+    mp = sys.max_player
+    tp = sys.total_athletes
     player_choice = Choice.select().order_by(Choice.rank.desc())
     h = 0
-    for k in range(1, mp + 1):
-        if k % 2 != 0:
+    for k in range(1, mp + 1):  # цикл посевов
+        if k % 2 != 0:  # направление посева с последней группы до 1-й
             start = 0
             end = group
             step = 1
             p = 1
-        else:
+        else:  # направление посева с 1-й до последней группы
             start = group
             end = 0
             step = -1
             p = 0
-        for i in range(start, end, step):  # 1-й посев
+        for i in range(start, end, step):  # №-й посев
             txt = str(f'{i + p} группа')
             id = int(my_win.tableWidget.item(h, 1).text())
             h += 1
-            with db:
+            with db:  # запись в таблицу Choice результа жеребъевки
                 grp = Choice.get(Choice.id == id)
                 grp.group = txt
                 grp.posev_group = k
                 grp.save()
-                if mp == h:
-                    fill_table_choice()
-                    return
-        with db:
-            system = System.get(System.id == s_id)
-            system.choice_flag = True
-            system.save()
-        player_in_table()
+    if tp == h:
+        fill_table_choice()
+    with db:
+        system = System.get(System.id == s_id)
+        system.choice_flag = True
+        system.save()
+    player_in_table()
 
 
 def choice_tbl_made():
@@ -2208,7 +2209,7 @@ def ready_system():
     sid_first = System.select().where(System.title_id == t)  # находит system id первого
     count = len(sid_first)
     if count > 1:
-        my_win.statusbar.showMessage("Система соревнований создана", 500)
+        my_win.statusbar.showMessage("Система соревнований создана", 5000)
         flag = True
     else:
         my_win.statusbar.showMessage("Необходимо создать систему соревнований", 500)

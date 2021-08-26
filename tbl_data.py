@@ -212,9 +212,6 @@ def table8_data():
 def total_data_table(kg):
     """создает список списков данных групп"""
     tdt = []
-    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    # s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    # kg = s.total_group
 
     for m in range(1, 2):
         table_1 = table1_data()
@@ -254,7 +251,7 @@ def total_data_table(kg):
 
 def score_in_table(td, num_gr):
     """заносит счет в таблицу группы pdf"""
-    total_score = {}
+    total_score = {}  # словарь, где ключ - номер группы, а значение - очки
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     ta = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     mp = ta.max_player
@@ -265,17 +262,17 @@ def score_in_table(td, num_gr):
     result_list = r.dicts().execute()
     for i in range(0, count):
         sc_game = str(list(result_list[i].values())[9])
-        if sc_game == "" and sc_game == "None":
+        if sc_game == "" and sc_game == "None":  # номер столбца
             scg = 8
         else:
             scg = 9
-        tours = str(list(result_list[i].values())[3])
+        tours = str(list(result_list[i].values())[3])  # номера игроков в туре
         p1 = int(tours[0])
         p2 = int(tours[2])
         win = str(list(result_list[i].values())[6])
         player1 = str(list(result_list[i].values())[4])
-        if win != "" and win != "None":
-            if win == player1:
+        if win != "" and win != "None":  # если нет сыгранной встречи данного тура
+            if win == player1:  # если победитель игрок под первым номером в туре
                 td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[7])  # очки 1-ого игрока
                 td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[scg])  # счет 1-ого игрока
                 td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[11])  # очки 2-ого игрока
@@ -288,7 +285,7 @@ def score_in_table(td, num_gr):
                 plr2 = plr2 + int(tp2)  # прибавляет очки 2-ого игрока
                 total_score[p1] = plr1  # записывает сумму очков 1-му игроку
                 total_score[p2] = plr2  # записывает сумму очков 2-му игроку
-            else:
+            else:  # если победитель игрок под вторым номером в туре
                 td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[11])  # очки 1-ого игрока
                 td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[12])  # счет 1-ого игрока
                 td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[7])  # очки 2-ого игрока
@@ -317,9 +314,9 @@ def rank_in_group(total_score, max_person, td, num_gr):
     rev_dict = {}  # словарь, где в качастве ключа очки, а значения - номера групп
     max_value = []
 
-    game_max = Result.select().where(Result.number_group == num_gr)  # определение кол-во всего игр и сыгранных
-    game_played = Result.select().where(Result.winner != "" and Result.number_group == num_gr)
-    kol_tours_played = len(game_played)
+    game_max = Result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
+    game_played = Result.select().where(Result.number_group == num_gr and Result.winner != "")
+    kol_tours_played = len(game_played)  # сколько игр сыгранных
     kol_tours_in_group = len(game_max)  # кол-во всего игр в группе
 
     for y in range(0, max_person):
@@ -349,7 +346,7 @@ def rank_in_group(total_score, max_person, td, num_gr):
         else:  # =========== если одинаковое кол-во очков
             ds = {index: value for index, value in enumerate(val_list)}  # получает словарь(ключ, очки)
             sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
-            mesto_points = {}  # словарь (ключ-очки, а значения места без учета соотншений)
+            mesto_points = {}  # словарь (ключ-очки, а значения места без учета соотношений)
             valuesList = list(sorted_tuple.values())
             unique_numbers = list(set(valuesList))
             unique_numbers.sort(reverse=True)
