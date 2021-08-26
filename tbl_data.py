@@ -312,15 +312,12 @@ def rank_in_group(total_score, max_person, td, num_gr):
     """выставляет места в группах соответсвенно очкам
     men_of_circle - кол-во человек в крутиловке"""
     rev_dict = {}  # словарь, где в качастве ключа очки, а значения - номера групп
-    max_value = []
 
     game_max = Result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
     game_played = Result.select().where(Result.number_group == num_gr and Result.winner != "")
     kol_tours_played = len(game_played)  # сколько игр сыгранных
     kol_tours_in_group = len(game_max)  # кол-во всего игр в группе
 
-    for y in range(0, max_person):
-        max_value.append(0)
     for key, value in total_score.items():
         rev_dict.setdefault(value, set()).add(key)
     result = [key for key, values in rev_dict.items() if len(values) > 1]
@@ -332,15 +329,14 @@ def rank_in_group(total_score, max_person, td, num_gr):
         return
     else:
         if len(result) == 0:  # =========== если нет одинакового кол-во очков
-            Keymax = max(total_score, key=total_score.get)  # ключ максимального значения
-            max_val_1 = total_score[Keymax]  # максимальное значение
+            Keymax = max(total_score, key=total_score.get)  # ключ максимального значения (группа)
+            m_val_1 = total_score[Keymax]  # максимальное значение (очки)
             td[Keymax * 2 - 2][max_person + 4] = 1  # записывает 1 место игроку
-            for s in range(0, max_person - 1):
+            new_list = val_list.copy()  # создает копию списка
+            for s in range(0, max_person - 1):  # цикл по игрокам группы
                 m_val = m_val_1
-                m_val_1 = max_value[s + 1]
-                for v in total_score.values():  # следующее значние по максимуму
-                    if max_val_1 < v < m_val:  # находит наибольшое из оставшихся
-                        max_val_1 = v
+                new_list.remove(m_val)  # удаляет из копии списка макс значение
+                m_val_1 = max(new_list)  # находит макс значение из оставшихся
                 i = key_list[val_list.index(m_val_1)]  # находит ключ соответсвующий максимальному значению
                 td[i * 2 - 2][max_person + 4] = s + 2  # записывает место игроку
         else:  # =========== если одинаковое кол-во очков

@@ -270,7 +270,9 @@ def tab_enabled():
         my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
         my_win.toolBox.setItemEnabled(2, True)
         for i in stage:
-            if i == "Предварительный":
+            if i == "Одна таблица":
+               pass
+            elif i == "Предварительный":
                 my_win.tabWidget.setTabEnabled(3, True)
             elif i == "Полуфиналы":
                 my_win.tabWidget.setTabEnabled(4, True)
@@ -281,7 +283,6 @@ def tab_enabled():
         my_win.tabWidget.setTabEnabled(3, False)
         my_win.tabWidget.setTabEnabled(4, False)
         my_win.tabWidget.setTabEnabled(5, False)
-    # db_select_title()
 
 
 tab_enabled()
@@ -1451,7 +1452,6 @@ def player_in_table():
                                          tours=match, title_id=s).save()
         else:
             pass
-            print("ok")
 
 
 def chop_line(q, maxline=30):
