@@ -450,14 +450,10 @@ def load_tableWidget():
         if flag is True:
             fill_table_results()
     elif my_win.tabWidget.currentIndex() == 2 or sender == my_win.choice_gr_Action:  # таблица жеребьевки
-        flag = ready_choice()
-        if flag is False:
-            fill_table_choice()
-            # result = msgBox.information(my_win, "", "Хотите сделать жеребъевку\nпредварительного этапа?",
-            #                             msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-            # if result == msgBox.StandardButtons.Ok:
-            #     my_win.statusbar.showMessage("Автоматическая жеребъевка группового этапа", 10000)
-            #     choice_gr_automat()
+        fill_table_choice()
+        # flag = ready_choice()
+        # if flag is False:
+        #     fill_table_choice()
     else:  # загружает таблицу со списком
         player_list = Player.select().order_by(Player.rank.desc())
         fill_table(player_list)
@@ -742,7 +738,7 @@ def fill_table_choice():
         for column in range(column_count):
             item = str(list(choice_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-    hide_show_columns()
+    hide_show_columns()  # скрывает или показывае столбцы
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
     for i in range(0, row_count):  # отсортировывает номера строк по порядку
         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
@@ -969,7 +965,6 @@ def page():
             my_win.label_33.show()
         load_tableWidget()
         load_combobox_filter_group()
-        my_win.radioButton_3.setChecked(True)
     elif tb == 3:  # вкладка -групппы-
         t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
         sf = System.get(System.title_id == t)
@@ -1643,6 +1638,13 @@ def score_in_game():
     my_win.lineEdit_pl1_score_total.setText(str(st1))
     my_win.lineEdit_pl2_score_total.setText(str(st2))
 
+# class ColorDelegate(QStyledItemDelegate):
+#     def paint(self, painter, option, index):
+#         if index.data() == 'Online':
+#             option.palette.setColor(QPalette.Text, QColor("green"))
+#         elif index.data() == 'Offline':
+#             option.palette.setColor(QPalette.Text, QColor("red"))
+#         QStyledItemDelegate.paint(self, painter, option, index)
 
 def enter_score():
     """заносит в таблицу -результаты- победителя, счет и т.п."""
@@ -1945,45 +1947,6 @@ def choice_table():
 
 def choice_gr_automat():
     """проба автоматической жеребьевки групп"""
-    # sender = my_win.sender()
-    # if sender == my_win.choice_gr_Action or sender == my_win.tabWidget or sender == my_win.toolBox:
-    #     load_tableWidget()
-    #     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    #     sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    #     s_id = sys.id
-    #     group = sys.total_group
-    #     mp = sys.total_athletes
-    #     player_choice = Choice.select().order_by(Choice.rank.desc())
-    #     h = 0
-    #     for k in range(1, mp + 1):
-    #         if k % 2 != 0:
-    #             start = 0
-    #             end = group
-    #             step = 1
-    #             p = 1
-    #         else:
-    #             start = group
-    #             end = 0
-    #             step = -1
-    #             p = 0
-    #         for i in range(start, end, step):  # 1-й посев
-    #             txt = str(f'{i + p} группа')
-    #             id = int(my_win.tableWidget.item(h, 1).text())
-    #             h += 1
-    #             with db:
-    #                 grp = Choice.get(Choice.id == id)
-    #                 grp.group = txt
-    #                 grp.posev_group = k
-    #                 grp.save()
-    #                 if mp == h:
-    #                     fill_table_choice()
-    #                     return
-    #         with db:
-    #             system = System.get(System.id == s_id)
-    #             system.choice_flag = True
-    #             system.save()
-    #         player_in_table()
-#==================
     load_tableWidget()
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
@@ -2039,7 +2002,10 @@ def choice_tbl_made():
 def choice_filter_group():
     """фильтрует таблицу жеребьевка по группам"""
     fg = my_win.comboBox_filter_choice.currentText()
-    player_choice = Choice.select().order_by(Choice.posev_group)
+    if fg == "все группы":
+        player_choice = Choice.select().order_by(Choice.posev_group)
+    else:
+        player_choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
     column_count = 10  # кол-во столбцов в таблице
