@@ -714,12 +714,19 @@ def fill_table_results():
         row_count = len(result_list)  # кол-во строк в таблице
         column_count = len(result_list[0])  # кол-во столбцов в таблице
         my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
-
+        row_result = []
         for row in range(row_count):  # добвляет данные из базы в TableWidget
             for column in range(column_count):
                 item = str(list(result_list[row].values())[column])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-        my_win.tableWidget.showColumn(6)  # поазывает столбец победитель
+                if column < 7:
+                    row_result.append(item)
+                    if column == 6:
+                        if item != 'None' or item != "":
+                            color_winner_in_tableWidget(row, row_result)  # окрашивание красным цветом победителя
+                            row_result.clear()
+
+        my_win.tableWidget.showColumn(6)  # показывает столбец победитель
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
         my_win.tableWidget.hideColumn(13)
@@ -1655,13 +1662,13 @@ def enter_score():
     id = my_win.tableWidget.item(r, 0).text()
     if st1 > st2:
         winner = my_win.lineEdit_player1.text()
-        my_win.tableWidget.item(r, 6).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в красный цвет
+        # my_win.tableWidget.item(r, 6).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в красный цвет
         loser = my_win.lineEdit_player2.text()
         ts_winner = f"{st1} : {st2}"
         ts_loser = f"{st2} : {st1}"
     else:
         winner = my_win.lineEdit_player2.text()
-        my_win.tableWidget.item(r, 7).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в красный цвет
+        # my_win.tableWidget.item(r, 7).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в красный цвет
         loser = my_win.lineEdit_player1.text()
         ts_winner = f"{st2} : {st1}"
         ts_loser = f"{st1} : {st2}"
@@ -2017,12 +2024,12 @@ def choice_filter_group():
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
-    color_in_tableWidget(fg)
+    color_region_in_tableWidget(fg)
     for d in range(0, row_count):  # сортирует нумерация по порядку
         my_win.tableWidget.setItem(d, 0, QTableWidgetItem(str(d + 1)))
 
 
-def color_in_tableWidget(fg):
+def color_region_in_tableWidget(fg):
     """смена цвета шрифта в QtableWidget -fg- номер группы"""
     reg = []
     line = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)  # выбирает все строки той группы (fg)
@@ -2045,6 +2052,14 @@ def color_in_tableWidget(fg):
                     else:
                         my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в
                         # черный цвет
+
+
+def color_winner_in_tableWidget(row, row_result):
+    """Смена цвета шрифта победителя на красный"""
+    if row_result[4] == row_result[6]:
+        my_win.tableWidget.item(row, 4).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
+    else:
+        my_win.tableWidget.item(row, 5).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
 
 
 def hide_show_columns():
