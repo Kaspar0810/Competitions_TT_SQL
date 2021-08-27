@@ -718,13 +718,25 @@ def fill_table_results():
         for row in range(row_count):  # добвляет данные из базы в TableWidget
             for column in range(column_count):
                 item = str(list(result_list[row].values())[column])
-                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-                if column < 7:
+                if column < 6:
                     row_result.append(item)
-                    if column == 6:
-                        if item != 'None' or item != "":
-                            color_winner_in_tableWidget(row, row_result)  # окрашивание красным цветом победителя
-                            row_result.clear()
+                    my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                elif column == 6:
+                    row_result.append(item)
+                    if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
+                        if row_result[4] == row_result[6]:
+                            my_win.tableWidget.item(row, 4).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст
+                            # в красный цвет 1-ого игрока
+                        else:
+                            my_win.tableWidget.item(row, 5).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст
+                            # в красный цвет 2-ого игрока
+                    else:
+                        my_win.tableWidget.item(row, 4).setForeground(QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
+                        my_win.tableWidget.item(row, 5).setForeground(QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
+                    row_result.clear()
+                    my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                elif column > 6:
+                    my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
         my_win.tableWidget.hideColumn(11)
@@ -1370,9 +1382,6 @@ def kol_player_in_group():
 
 def page_vid():
     """присваивает переменной значение выборат вида страницы"""
-    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    # s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    # pv = s.page_vid
     if my_win.comboBox_page_vid.currentText() == "альбомная":
         pv = landscape(A4)
     else:
@@ -1521,7 +1530,7 @@ def select_player_in_game():
         sc = my_win.tableWidget.item(r, 8).text()
         pl1 = my_win.tableWidget.item(r, 4).text()
         pl2 = my_win.tableWidget.item(r, 5).text()
-        if Result.score_win != "" & Result.score_win != "None":  # если игры со счетом, от при редакитровании открывать поля
+        if Result.score_win != "" & Result.score_win != "None":  # если игры со счетом,при редакитровании открывать поля
             my_win.lineEdit_pl1_s1.setVisible(True)
             my_win.lineEdit_pl2_s1.setVisible(True)
             my_win.lineEdit_pl1_s2.setVisible(True)
@@ -1645,13 +1654,6 @@ def score_in_game():
     my_win.lineEdit_pl1_score_total.setText(str(st1))
     my_win.lineEdit_pl2_score_total.setText(str(st2))
 
-# class ColorDelegate(QStyledItemDelegate):
-#     def paint(self, painter, option, index):
-#         if index.data() == 'Online':
-#             option.palette.setColor(QPalette.Text, QColor("green"))
-#         elif index.data() == 'Offline':
-#             option.palette.setColor(QPalette.Text, QColor("red"))
-#         QStyledItemDelegate.paint(self, painter, option, index)
 
 def enter_score():
     """заносит в таблицу -результаты- победителя, счет и т.п."""
@@ -1662,13 +1664,11 @@ def enter_score():
     id = my_win.tableWidget.item(r, 0).text()
     if st1 > st2:
         winner = my_win.lineEdit_player1.text()
-        # my_win.tableWidget.item(r, 6).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в красный цвет
         loser = my_win.lineEdit_player2.text()
         ts_winner = f"{st1} : {st2}"
         ts_loser = f"{st2} : {st1}"
     else:
         winner = my_win.lineEdit_player2.text()
-        # my_win.tableWidget.item(r, 7).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в красный цвет
         loser = my_win.lineEdit_player1.text()
         ts_winner = f"{st2} : {st1}"
         ts_loser = f"{st1} : {st2}"
@@ -1809,7 +1809,7 @@ def result_filter_group():
     """фильтрует таблицу -результаты- по группам"""
     fg = my_win.comboBox_filter_group.currentText()
     player_result = Result.select().where(Result.number_group == fg)
-    result_list = player_result.dicts().execute()
+    result_list = player_result.dicts().execute()  # получает словарь
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = 13  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
@@ -2054,12 +2054,12 @@ def color_region_in_tableWidget(fg):
                         # черный цвет
 
 
-def color_winner_in_tableWidget(row, row_result):
-    """Смена цвета шрифта победителя на красный"""
-    if row_result[4] == row_result[6]:
-        my_win.tableWidget.item(row, 4).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
-    else:
-        my_win.tableWidget.item(row, 5).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
+# def color_winner_in_tableWidget(row, row_result):
+#     """Смена цвета шрифта победителя на красный"""
+#     if row_result[4] == row_result[6]:
+#         my_win.tableWidget.item(row, 4).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
+#     else:
+#         my_win.tableWidget.item(row, 5).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
 
 
 def hide_show_columns():

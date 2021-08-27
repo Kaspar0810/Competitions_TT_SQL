@@ -314,7 +314,9 @@ def rank_in_group(total_score, max_person, td, num_gr):
     rev_dict = {}  # словарь, где в качастве ключа очки, а значения - номера групп
 
     game_max = Result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
-    game_played = Result.select().where(Result.number_group == num_gr and Result.winner != "")
+    played = Result.select().where(Result.number_group == num_gr)  # 1-й запрос на выборку с группой
+    game_played = played.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
+    # с победителями из 1-ого запроса
     kol_tours_played = len(game_played)  # сколько игр сыгранных
     kol_tours_in_group = len(game_max)  # кол-во всего игр в группе
 
