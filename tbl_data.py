@@ -11,241 +11,47 @@ def kol_player():
     e = a % g  # если количество участников равно делится на группы
     t = a // g  # если количество участников не равно делится на группы g2 наибольшое колво человек в группе
     g2 = t + 1
-
     if e == 0:
         t = t
     else:
         t = g2
     return t
 
-
-def table1_data():
-    """данные результатов в таблице 1-й группы"""
+#=============== новый вариант==================
+def table_data(kg):
+    """циклом создаем список участников каждой группы"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     ta = Result.select().where(Result.title_id == t)  # находит system id последнего
     tr = len(ta)  # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
-    table_1 = []
-    td = table_1
-    num_gr = "1 группа"
+    tbl = []  # список конкретной группы
+    tbl_tmp = []  # временный список группы tbl
+    td = []  # общий список списков групп
     t = kol_player()
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        table_1.append(s)
-    #  id игроков 1-й таблицы
-    pl1 = Player.get(Player.id == 1)
-    pl2 = Player.get(Player.id == 2)
-    pl3 = Player.get(Player.id == 5)
-    pl4 = Player.get(Player.id == 8)
-    # pl5 = Player.get(Player.id == 12)
-    # pl6 = Player.get(Player.id == 13)
-    # занесение фамилии и города в таблицу
-    table_1[0][1] = pl1.player
-    table_1[1][1] = pl1.city
-    table_1[2][1] = pl2.player
-    table_1[3][1] = pl2.city
-    table_1[4][1] = pl3.player
-    table_1[5][1] = pl3.city
-    table_1[6][1] = pl4.player
-    table_1[7][1] = pl4.city
-    # table_1[8][1] = pl5.player
-    # table_1[9][1] = pl5.city
-    # table_1[10][1] = pl6.player
-    # table_1[11][1] = pl6.city
-    if tr != 0:  # если еще не была жеребъевка, то пропуск счета в группе
-        score_in_table(td, num_gr)
-    return table_1
+    for p in range(0, kg):
+        num_gr = f"{p + 1} группа"
+        for k in range(1, t * 2 + 1):  # цикл нумерации строк
+            st = ['']
+            s = (st * (t + 4))
+            s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
+            tbl_tmp.append(s)
+
+        posev_data = player_choice_in_group(num_gr)
+        for i in range(1, t * 2 + 1, 2):
+            posev = posev_data[((i + 1) // 2) - 1]
+            tbl_tmp[i - 1][1] = posev["фамилия"]
+            tbl_tmp[i][1] = posev["регион"]
+        tbl = tbl_tmp.copy()
+        td.append(tbl)
+        tbl_tmp.clear()
+        if tr != 0:  # если еще не была жеребъевка, то пропуск счета в группе
+            score_in_table(td, num_gr)
+    return td
 
 
-def table2_data():
-    """данные результатов в таблице 2-й группы"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица
-    table_2 = []
-    td = table_2
-    num_gr = "2 группа"
-    t = kol_player()
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        table_2.append(s)
-
-    pl1 = Player.get(Player.id == 3)
-    pl2 = Player.get(Player.id == 4)
-    pl3 = Player.get(Player.id == 6)
-    pl4 = Player.get(Player.id == 11)
-    # pl5 = Player.get(Player.id == 19)
-    # pl6 = Player.get(Player.id == 22)
-    table_2[0][1] = pl1.player
-    table_2[1][1] = pl1.city
-    table_2[2][1] = pl2.player
-    table_2[3][1] = pl2.city
-    table_2[4][1] = pl3.player
-    table_2[5][1] = pl3.city
-    table_2[6][1] = pl4.player
-    table_2[7][1] = pl4.city
-    # table_2[8][1] = pl5.player
-    # table_2[9][1] = pl5.city
-    # table_2[10][1] = pl6.player
-    # table_2[11][1] = pl6.city
-    if tr != 0:
-        score_in_table(td, num_gr)
-    return table_2
-
-
-def table3_data():
-    """данные результатов в таблице 3-й группы"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица
-    table_3 = []
-    td = table_3
-    num_gr = "3 группа"
-    t = kol_player()
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        table_3.append(s)
-    score_in_table(td, num_gr)
-    return table_3
-
-
-def table4_data():
-    """данные результатов в таблице 4-й группы"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица
-    table_4 = []
-    td = table_4
-    num_gr = "4 группа"
-    t = kol_player()
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        table_4.append(s)
-    if tr != 0:
-        score_in_table(td, num_gr)
-    return table_4
-
-
-def table5_data():
-    """данные результатов в таблице 5-й группы"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица
-    table_5 = []
-    td = table_5
-    num_gr = "5 группа"
-    t = kol_player()
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        table_5.append(s)
-    if tr != 0:
-        score_in_table(td, num_gr)
-    return table_5
-
-
-def table6_data():
-    """данные результатов в таблице 6-й группы"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица
-    table_6 = []
-    td = table_6
-    num_gr = "6 группа"
-    t = kol_player()
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        table_6.append(s)
-    if tr != 0:
-        score_in_table(td, num_gr)
-    return table_6
-
-
-def table7_data():
-    """данные результатов в таблице 7-й группы"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица
-    table_7 = []
-    td = table_7
-    num_gr = "7 группа"
-    t = kol_player()
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        table_7.append(s)
-    if tr != 0:
-        score_in_table(td, num_gr)
-    return table_7
-
-
-def table8_data():
-    """данные результатов в таблице 8-й группы"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица
-    table_8 = []
-    td = table_8
-    num_gr = "8 группа"
-    t = kol_player()
-    for k in range(1, t * 2 + 1):
-        st = ['']
-        s = (st * (t + 4))
-        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-        table_8.append(s)
-    if tr != 0:
-        score_in_table(td, num_gr)
-    return table_8
-
-
+#========= новый вариант=======
 def total_data_table(kg):
-    """создает список списков данных групп"""
-    tdt = []
-
-    for m in range(1, 2):
-        table_1 = table1_data()
-        tdt.append(table_1)
-        if kg == 1:
-            break
-        table_2 = table2_data()
-        tdt.append(table_2)
-        if kg == 2:
-            break
-        table_3 = table3_data()
-        tdt.append(table_3)
-        if kg == 3:
-            break
-        table_4 = table4_data()
-        tdt.append(table_4)
-        if kg == 4:
-            break
-        table_5 = table5_data()
-        tdt.append(table_5)
-        if kg == 5:
-            break
-        table_6 = table6_data()
-        tdt.append(table_6)
-        if kg == 6:
-            break
-        table_7 = table7_data()
-        tdt.append(table_7)
-        if kg == 7:
-            break
-        table_8 = table8_data()
-        tdt.append(table_8)
-        if kg == 8:
-            break
+    """список списков всех участников групп после жеребъевки"""
+    tdt = table_data(kg)
     return tdt
 
 
@@ -572,3 +378,16 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr):
         x = float('{:.3f}'.format(x))
         plr_ratio[n] = x
     return plr_ratio
+
+
+def player_choice_in_group(num_gr):
+    """распределяет спортсменов по группам согласно жеребъевке"""
+    posev_data = []
+    choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == num_gr)
+    kol_pl = len(choice)
+    for posev in choice:
+        posev_data.append({
+            'фамилия': posev.family,
+            'регион': posev.region,
+        })
+    return posev_data

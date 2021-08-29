@@ -60,78 +60,15 @@ def func_zagolovok(canvas, doc):
     return func_zagolovok
 
 
-def t_1(ts, zagolovok, cW, rH):
+def tbl(kg, ts, zagolovok, cW, rH):
     """данные таблицы и применение стиля и добавления заголовка столбцов"""
-    tbl_1 = tbl_data.table1_data()  # данные результатов в группах
-    tbl_1.insert(0, zagolovok)
-    t1 = Table(tbl_1, colWidths=cW, rowHeights=rH)
-    t1.setStyle(ts)
-
-    return t1
-
-
-def t_2(ts, zagolovok, cW, rH):
-    """данные таблицы и применение стиля и добавления заголовка столбцов"""
-    tbl_2 = tbl_data.table2_data()  # данные результатов в группах
-    tbl_2.insert(0, zagolovok)
-    t2 = Table(tbl_2, colWidths=cW, rowHeights=rH)
-    t2.setStyle(ts)
-
-    return t2
-
-
-def t_3(ts, zagolovok, cW, rH):
-    """данные таблицы и применение стиля и добавления заголовка столбцов"""
-    tbl_3 = tbl_data.table3_data()  # данные результатов в группах
-    tbl_3.insert(0, zagolovok)
-    t3 = Table(tbl_3, colWidths=cW, rowHeights=rH)
-    t3.setStyle(ts)
-    return t3
-
-
-def t_4(ts, zagolovok, cW, rH):
-    """данные таблицы и применение стиля и добавления заголовка столбцов"""
-    tbl_4 = tbl_data.table4_data()  # данные результатов в группах
-    tbl_4.insert(0, zagolovok)
-    t4 = Table(tbl_4, colWidths=cW, rowHeights=rH)
-    t4.setStyle(ts)
-    return t4
-
-
-def t_5(ts, zagolovok, cW, rH):
-    """данные таблицы и применение стиля и добавления заголовка столбцов"""
-    tbl_5 = tbl_data.table5_data()  # данные результатов в группах
-    tbl_5.insert(0, zagolovok)
-    t5 = Table(tbl_5, colWidths=cW, rowHeights=rH)
-    t5.setStyle(ts)
-    return t5
-
-
-def t_6(ts, zagolovok, cW, rH):
-    """данные таблицы и применение стиля и добавления заголовка столбцов"""
-    tbl_6 = tbl_data.table6_data()  # данные результатов в группах
-    tbl_6.insert(0, zagolovok)
-    t6 = Table(tbl_6, colWidths=cW, rowHeights=rH)
-    t6.setStyle(ts)
-    return t6
-
-
-def t_7(ts, zagolovok, cW, rH):
-    """данные таблицы и применение стиля и добавления заголовка столбцов"""
-    tbl_7 = tbl_data.table5_data()  # данные результатов в группах
-    tbl_7.insert(0, zagolovok)
-    t7 = Table(tbl_7, colWidths=cW, rowHeights=rH)
-    t7.setStyle(ts)
-    return t7
-
-
-def t_8(ts, zagolovok, cW, rH):
-    """данные таблицы и применение стиля и добавления заголовка столбцов"""
-    tbl_8 = tbl_data.table6_data()  # данные результатов в группах
-    tbl_8.insert(0, zagolovok)
-    t8 = Table(tbl_8, colWidths=cW, rowHeights=rH)
-    t8.setStyle(ts)
-    return t8
+    dict_tbl = {}
+    td = tbl_data.table_data(kg)  # данные результатов в группах
+    for i in range(0, kg):
+        td[i].insert(0, zagolovok)
+        dict_tbl[i] = Table(td[i], colWidths=cW, rowHeights=rH)
+        dict_tbl[i].setStyle(ts)
+    return dict_tbl
 
 
 def table_made(pv):
@@ -214,40 +151,38 @@ def table_made(pv):
 #  ============ создание таблиц и вставка данных =================
     h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=150)  # стиль параграфа (номера таблиц)
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа (номера таблиц)
+    dict_table = {}
     if kg == 1:
-        t1 = t_1(ts, zagolovok, cW, rH)
-        data = [[t1]]
+        dict_table = tbl(kg, ts, zagolovok, cW, rH)
+        data = [[dict_table[0]]]
         shell_table = Table(data, colWidths=["*"])
         elements.append(shell_table)
     elif kg == 2:
-        t1 = t_1(ts, zagolovok, cW, rH)
-        t2 = t_2(ts, zagolovok, cW, rH)
+        dict_table = tbl(kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4) and t in [3, 4, 5, 6]:  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[t1, t2]]
+            data = [[dict_table[0], dict_table[1]]]
             shell_table = Table(data, colWidths=["*"])
             elements.append(shell_table)
         else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[t1]]
-            data1 = [[t2]]
+            data = [[dict_table[0]]]
+            data1 = [[dict_table[1]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             elements.append(shell_table)
             elements.append(shell_table1)
     elif kg == 3:
-        t1 = t_1(ts, zagolovok, cW, rH)
-        t2 = t_2(ts, zagolovok, cW, rH)
-        t3 = t_3(ts, zagolovok, cW, rH)
+        dict_table = tbl(kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[t1, t2]]
-            data1 = [[t3]]
+            data = [[dict_table[0], dict_table[1]]]
+            data1 = [[dict_table[2]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             elements.append(shell_table)
             elements.append(shell_table1)
         else:  # страница книжная, то таблицы размещаются в столбец
-            data = [[t1]]
-            data1 = [[t2]]
-            data2 = [[t3]]
+            data = [[dict_table[0]]]
+            data1 = [[dict_table[1]]]
+            data2 = [[dict_table[2]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -255,13 +190,10 @@ def table_made(pv):
             elements.append(shell_table1)
             elements.append(shell_table2)
     elif kg == 4:
-        t1 = t_1(ts, zagolovok, cW, rH)
-        t2 = t_2(ts, zagolovok, cW, rH)
-        t3 = t_3(ts, zagolovok, cW, rH)
-        t4 = t_4(ts, zagolovok, cW, rH)
+        dict_table = tbl(kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[t1, t2]]
-            data1 = [[t3, t4]]
+            data = [[dict_table[0], dict_table[1]]]
+            data1 = [[dict_table[2], dict_table[3]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             elements.append(Paragraph('группа 1             группа 2', h2))
@@ -269,30 +201,24 @@ def table_made(pv):
             elements.append(Paragraph('группа 3             группа 4', h2))
             elements.append(shell_table1)
         else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[t1]]
-            data1 = [[t2]]
-            data2 = [[t3]]
-            data3 = [[t4]]
+            data = [[dict_table[0]]]
+            data1 = [[dict_table[1]]]
+            data2 = [[dict_table[2]]]
+            data3 = [[dict_table[3]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
             shell_table3 = Table(data3, colWidths=["*"])
-            elements.append(Paragraph('группа 1', h1))
             elements.append(shell_table)
-            elements.append(Paragraph('группа 2', h1))
             elements.append(shell_table1)
             elements.append(shell_table2)
             elements.append(shell_table3)
     elif kg == 5:
-        t1 = t_1(ts, zagolovok, cW, rH)
-        t2 = t_2(ts, zagolovok, cW, rH)
-        t3 = t_3(ts, zagolovok, cW, rH)
-        t4 = t_4(ts, zagolovok, cW, rH)
-        t5 = t_5(ts, zagolovok, cW, rH)
+        dict_table = tbl(kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[t1, t2]]
-            data1 = [[t3, t4]]
-            data2 = [[t5]]
+            data = [[dict_table[0], dict_table[1]]]
+            data1 = [[dict_table[2], dict_table[3]]]
+            data2 = [[dict_table[4]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -300,11 +226,11 @@ def table_made(pv):
             elements.append(shell_table1)
             elements.append(shell_table2)
         else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[t1]]
-            data1 = [[t2]]
-            data2 = [[t3]]
-            data3 = [[t4]]
-            data4 = [[t5]]
+            data = [[dict_table[0]]]
+            data1 = [[dict_table[1]]]
+            data2 = [[dict_table[2]]]
+            data3 = [[dict_table[3]]]
+            data4 = [[dict_table[4]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -316,16 +242,11 @@ def table_made(pv):
             elements.append(shell_table3)
             elements.append(shell_table4)
     elif kg == 6:
-        t1 = t_1(ts, zagolovok, cW, rH)
-        t2 = t_2(ts, zagolovok, cW, rH)
-        t3 = t_3(ts, zagolovok, cW, rH)
-        t4 = t_4(ts, zagolovok, cW, rH)
-        t5 = t_5(ts, zagolovok, cW, rH)
-        t6 = t_6(ts, zagolovok, cW, rH)
+        dict_table = tbl(kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[t1, t2]]
-            data1 = [[t3, t4]]
-            data2 = [[t5, t6]]
+            data = [[dict_table[0], dict_table[1]]]
+            data1 = [[dict_table[2], dict_table[3]]]
+            data2 = [[dict_table[4], dict_table[5]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -333,12 +254,12 @@ def table_made(pv):
             elements.append(shell_table1)
             elements.append(shell_table2)
         else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[t1]]
-            data1 = [[t2]]
-            data2 = [[t3]]
-            data3 = [[t4]]
-            data4 = [[t5]]
-            data5 = [[t6]]
+            data = [[dict_table[0]]]
+            data1 = [[dict_table[1]]]
+            data2 = [[dict_table[2]]]
+            data3 = [[dict_table[3]]]
+            data4 = [[dict_table[4]]]
+            data5 = [[dict_table[5]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -352,19 +273,12 @@ def table_made(pv):
             elements.append(shell_table4)
             elements.append(shell_table5)
     elif kg == 7:
-        t1 = t_1(ts, zagolovok, cW, rH)
-        t2 = t_2(ts, zagolovok, cW, rH)
-        t3 = t_3(ts, zagolovok, cW, rH)
-        t4 = t_4(ts, zagolovok, cW, rH)
-        t5 = t_5(ts, zagolovok, cW, rH)
-        t6 = t_6(ts, zagolovok, cW, rH)
-        t7 = t_7(ts, zagolovok, cW, rH)
-
+        dict_table = tbl(kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[t1, t2]]
-            data1 = [[t3, t4]]
-            data2 = [[t5, t6]]
-            data3 = [[t7]]
+            data = [[dict_table[0], dict_table[1]]]
+            data1 = [[dict_table[2], dict_table[3]]]
+            data2 = [[dict_table[4], dict_table[5]]]
+            data3 = [[dict_table[6]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -374,13 +288,13 @@ def table_made(pv):
             elements.append(shell_table2)
             elements.append(shell_table3)
         else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[t1]]
-            data1 = [[t2]]
-            data2 = [[t3]]
-            data3 = [[t4]]
-            data4 = [[t5]]
-            data5 = [[t6]]
-            data6 = [[t7]]
+            data = [[dict_table[0]]]
+            data1 = [[dict_table[1]]]
+            data2 = [[dict_table[2]]]
+            data3 = [[dict_table[3]]]
+            data4 = [[dict_table[4]]]
+            data5 = [[dict_table[5]]]
+            data6 = [[dict_table[6]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -396,20 +310,12 @@ def table_made(pv):
             elements.append(shell_table5)
             elements.append(shell_table6)
     elif kg == 8:
-        t1 = t_1(ts, zagolovok, cW, rH)
-        t2 = t_2(ts, zagolovok, cW, rH)
-        t3 = t_3(ts, zagolovok, cW, rH)
-        t4 = t_4(ts, zagolovok, cW, rH)
-        t5 = t_5(ts, zagolovok, cW, rH)
-        t6 = t_6(ts, zagolovok, cW, rH)
-        t7 = t_7(ts, zagolovok, cW, rH)
-        t8 = t_8(ts, zagolovok, cW, rH)
-
+        dict_table = tbl(kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[t1, t2]]
-            data1 = [[t3, t4]]
-            data2 = [[t5, t6]]
-            data3 = [[t7, t8]]
+            data = [[dict_table[0], dict_table[1]]]
+            data1 = [[dict_table[2], dict_table[3]]]
+            data2 = [[dict_table[4], dict_table[5]]]
+            data3 = [[dict_table[6], dict_table[7]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -423,14 +329,14 @@ def table_made(pv):
             elements.append(Paragraph('группа 7 группа 8', h2))
             elements.append(shell_table3)
         else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[t1]]
-            data1 = [[t2]]
-            data2 = [[t3]]
-            data3 = [[t4]]
-            data4 = [[t5]]
-            data5 = [[t6]]
-            data6 = [[t7]]
-            data7 = [[t8]]
+            data = [[dict_table[0]]]
+            data1 = [[dict_table[1]]]
+            data2 = [[dict_table[2]]]
+            data3 = [[dict_table[3]]]
+            data4 = [[dict_table[4]]]
+            data5 = [[dict_table[5]]]
+            data6 = [[dict_table[6]]]
+            data7 = [[dict_table[7]]]
             shell_table = Table(data, colWidths=["*"])
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
@@ -463,3 +369,6 @@ def tour(cp):
 
     tour_list = tr[cp]
     return tour_list
+
+
+

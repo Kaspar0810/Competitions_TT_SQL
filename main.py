@@ -1418,7 +1418,7 @@ def player_in_table():
     pv = s.page_vid
 
     comp_system.table_made(pv)
-    tdt = tbl_data.total_data_table(kg)
+    tdt = tbl_data.total_data_table(kg)  # вызов функции, где получаем список всехучастников по группам
 
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
         gr = tdt[p]
@@ -2052,14 +2052,6 @@ def color_region_in_tableWidget(fg):
                     else:
                         my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в
                         # черный цвет
-
-
-# def color_winner_in_tableWidget(row, row_result):
-#     """Смена цвета шрифта победителя на красный"""
-#     if row_result[4] == row_result[6]:
-#         my_win.tableWidget.item(row, 4).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
-#     else:
-#         my_win.tableWidget.item(row, 5).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
 
 
 def hide_show_columns():
