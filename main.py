@@ -1409,7 +1409,7 @@ def view():
 
 
 def player_in_table():
-    """заполняет таблицу Game_list данными спортсменами из группы tdt - список списков данных из групп"""
+    """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     kg = s.total_group
@@ -1418,8 +1418,7 @@ def player_in_table():
     pv = s.page_vid
 
     comp_system.table_made(pv)
-    tdt = tbl_data.total_data_table(kg)  # вызов функции, где получаем список всехучастников по группам
-
+    tdt = tbl_data.table_data(kg)  # вызов функции, где получаем список всехучастников по группам
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
         gr = tdt[p]
         number_group = str(p + 1) + ' группа'

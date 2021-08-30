@@ -62,11 +62,18 @@ def func_zagolovok(canvas, doc):
 
 def tbl(kg, ts, zagolovok, cW, rH):
     """данные таблицы и применение стиля и добавления заголовка столбцов"""
+    # dict_tbl = {}
+    # td = tbl_data.table_data(kg)  # данные результатов в группах
+    # for i in range(0, kg):
+    #     td[i].insert(0, zagolovok)
+    #     dict_tbl[i] = Table(td[i], colWidths=cW, rowHeights=rH)
+    #     dict_tbl[i].setStyle(ts)
+    # return dict_tbl
     dict_tbl = {}
-    td = tbl_data.table_data(kg)  # данные результатов в группах
+    tdt = tbl_data.table_data(kg)  # данные результатов в группах
     for i in range(0, kg):
-        td[i].insert(0, zagolovok)
-        dict_tbl[i] = Table(td[i], colWidths=cW, rowHeights=rH)
+        tdt[i].insert(0, zagolovok)
+        dict_tbl[i] = Table(tdt[i], colWidths=cW, rowHeights=rH)
         dict_tbl[i].setStyle(ts)
     return dict_tbl
 
@@ -101,7 +108,7 @@ def table_made(pv):
     elements = []
 
     cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина
-    rH = (0.35 * cm)  # высота строки
+    rH = (0.34 * cm)  # высота строки
     # rH = None  # высота строки
     num_columns = []  # заголовки столобцов и их нумерация в зависимости от кол-во участников
     for i in range(0, t):
@@ -365,7 +372,12 @@ def tour(cp):
           [['1-3', '2-4'], ['1-2', '3-4'], ['2-3', '1-4']],
           [['2-4', '1-5'], ['1-4', '3-5'], ['1-3', '2-5'], ['2-3', '4-5'], ['1-2', '3-4']],
           [['2-4', '1-5', '3-6'], ['1-4', '2-6', '3-5'], ['1-3', '2-5', '4-6'], ['2-3', '1-6', '4-5'],
-           ['1-2', '3-4', '5-6']]]
+           ['1-2', '3-4', '5-6']],
+          [['2-6', '3-5', '1-7'], ['2-5', '1-6', '4-7'], ['1-5', '4-6', '3-7'], ['4-5', '2-7', '3-6'],
+           ['1-3', '2-4', '5-7'], ['1-4', '2-3', '6-7'], ['1-2', '3-4', '5-6']],
+          [['2-6', '3-5', '1-7', '4-8'], ['2-5', '1-6', '3-8', '4-7'], ['1-5', '2-8', '4-6', '3-7'],
+           ['1-8', '4-5', '2-7', '3-6'], ['1-3', '2-4', '5-7', '6-8'], ['1-4', '2-3', '6-7', '5-8'],
+           ['1-2', '3-4', '5-6', '7-8']]]
 
     tour_list = tr[cp]
     return tour_list

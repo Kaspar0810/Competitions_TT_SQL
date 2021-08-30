@@ -17,41 +17,33 @@ def kol_player():
         t = g2
     return t
 
-#=============== новый вариант==================
+
 def table_data(kg):
     """циклом создаем список участников каждой группы"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     ta = Result.select().where(Result.title_id == t)  # находит system id последнего
     tr = len(ta)  # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
-    tbl = []  # список конкретной группы
     tbl_tmp = []  # временный список группы tbl
-    td = []  # общий список списков групп
+    tdt = []
     t = kol_player()
     for p in range(0, kg):
         num_gr = f"{p + 1} группа"
-        for k in range(1, t * 2 + 1):  # цикл нумерации строк
+        posev_data = player_choice_in_group(num_gr)
+        for k in range(1, t * 2 + 1):  # цикл нумерации строк (2-е строки на каждого участника
             st = ['']
-            s = (st * (t + 4))
+            s = (st * (t + 4))  # получаем пустой список номер, фамилия или регион, клетки (колво участников)
             s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
             tbl_tmp.append(s)
-
-        posev_data = player_choice_in_group(num_gr)
         for i in range(1, t * 2 + 1, 2):
             posev = posev_data[((i + 1) // 2) - 1]
             tbl_tmp[i - 1][1] = posev["фамилия"]
             tbl_tmp[i][1] = posev["регион"]
-        tbl = tbl_tmp.copy()
-        td.append(tbl)
+        td = tbl_tmp.copy()
         tbl_tmp.clear()
+        tdt.append(td)
         if tr != 0:  # если еще не была жеребъевка, то пропуск счета в группе
             score_in_table(td, num_gr)
-    return td
-
-
-#========= новый вариант=======
-def total_data_table(kg):
-    """список списков всех участников групп после жеребъевки"""
-    tdt = table_data(kg)
+    # return td
     return tdt
 
 
@@ -384,7 +376,6 @@ def player_choice_in_group(num_gr):
     """распределяет спортсменов по группам согласно жеребъевке"""
     posev_data = []
     choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == num_gr)
-    kol_pl = len(choice)
     for posev in choice:
         posev_data.append({
             'фамилия': posev.family,
