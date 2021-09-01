@@ -2203,14 +2203,18 @@ def ready_choice():
     return flag
 
 
-def flag():
-    pass
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    with db:
-        System.create_table()
-        sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
-                     kol_game_string="", choice_flag=False, score_flag=False).save()
+# def flag():
+#     pass
+#     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+#     with db:
+#         System.create_table()
+#         sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
+#                      kol_game_string="", choice_flag=False, score_flag=False).save()
 
+
+def proba():
+    pv = A4
+    comp_system.setka_16_made()
 
 # ===== переводит фокус на полее ввода счета в партии
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
@@ -2263,7 +2267,7 @@ my_win.Button_add_player.clicked.connect(add_player)  # добавляет иг�
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
 my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
-my_win.Button_proba.clicked.connect(flag)
+my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
