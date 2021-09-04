@@ -24,7 +24,8 @@ def func_zagolovok(canvas, doc):
     """создание заголовка страниц"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    p = s.page_vid
+    # p = s.page_vid  # рабочий вариант
+    p = A4  # временно пока идет наладки таблицы (сетка 16)
     if p == "альбомная":
         pv = landscape(A4)
     else:
@@ -53,8 +54,8 @@ def func_zagolovok(canvas, doc):
     else:
         main_referee = f"Гл. судья: {title.referee} судья {title.kat_ref} ______________"
         main_secretary = f"Гл. секретарь: {title.secretary} судья {title.kat_sek} ______________"
-        canvas.drawString(2 * cm, 3 * cm, main_referee)  # подпись главного судьи
-        canvas.drawString(2 * cm, 2 * cm, main_secretary)  # подпись главного секретаря
+        canvas.drawString(2 * cm, 2 * cm, main_referee)  # подпись главного судьи
+        canvas.drawString(2 * cm, 1 * cm, main_secretary)  # подпись главного секретаря
     canvas.restoreState()
     return func_zagolovok
 
@@ -68,6 +69,15 @@ def tbl(kg, ts, zagolovok, cW, rH):
         dict_tbl[i] = Table(tdt[i], colWidths=cW, rowHeights=rH)
         dict_tbl[i].setStyle(ts)
     return dict_tbl
+
+
+def setka_16(ts):
+    """данные сетки на 16"""
+    dict_setka = {}
+    sd = tbl_data.setka_data_16()
+    dict_setka[0] = Table(sd)
+    dict_setka[0].setStyle(ts)
+    return dict_setka
 
 
 def table_made(pv):
@@ -361,30 +371,53 @@ def setka_16_made():
     elements = []
     data = []
     column = ['']
-    # column = ['', '', '', '', '', '', '', '', '', '', '']
     column_count = column * 11
 
-    # data = []
-    # # column = ['']
-    # column = ['', '', '', '', '', '', '', '', '', '', '']
-    for i in range(0, 72):
-        column_count[10] = i
+    for i in range(0, 69):
+        column_count[10] = i  # нумерация 10 столбца
         list_tmp = column_count.copy()
         data.append(list_tmp)
+    # ========= нумерация встреч сетки ==========
+    p = 0
+    for i in range(1, 33, 2):  # создание номеров игроков сетки (1-16)
+        data[i - 1][0] = str(p + 1)
+        p += 1
+    p = 0
+    for i in range(0, 29, 4):  # создание номеров встреч (1-8)
+        data[i + 1][2] = str(p + 1)
+        data[i // 2 + 40][2] = str((p + 1) * -1)  # номера проигравших 1-8
+        p += 1
+    for i in range(2, 27, 8):
+        data[i][4] = str(p + 1)  # создание номеров встреч (9-12)
+        data[i // 4 + 31][4] = str((p + 1) * -1)  # номера проигравших 9-12
+        data[i // 2 + 40][4] = str(p + 13)  # создание номеров встреч (21-24)
+        data[i // 4 + 57][4] = str((p + 13) * -1)  # номера проигравших 21-24
+        p += 1
+    for i in range(4, 21, 16):
+        data[i][6] = str(p + 1)  # создание номеров встреч (13-14)
+        data[i // 8 + 28][6] = str((p + 1) * -1)  # номера проигравших 13-14
+        data[i // 2 + 40][6] = str(p + 13)  # создание номеров встреч (25-26)
+        data[i // 8 + 54][6] = str((p + 13) * -1)  # номера проигравших 25-26
+        p += 1
+    for i in range(32, 37, 4):
+        data[i][6] = str(p + 3)  # создание номеров встреч (17-18)
+        data[i // 2 + 22][6] = str((p + 3) * -1)  # номера проигравших 17-18
+        data[i + 26][6] = str(p + 15)  # создание номеров встреч (29-30)
+        data[i // 2 + 48][6] = str((p + 15) * -1)  # номера проигравших 29-30
+        p += 1
+    for i in range(33, 40, 6):
+        data[i][8] = str(p + 3)  # создание номеров встреч (19-20)
+        data[i + 26][8] = str(p + 15)  # создание номеров встреч (31-32)
+        p += 1
+    data[8][8] = str(15)  # создание номеров встреч 15
+    data[29][8] = str(16)  # создание номеров встреч 16
+    data[44][8] = str(27)  # создание номеров встреч 27
+    data[55][8] = str(28)  # создание номеров встреч 28
 
     # ==============
     cw = ((0.4 * cm, 4.5 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm,
            0.4 * cm, 3 * cm, 0.6 * cm))
-    t = Table(data, cw, 72 * [0.35 * cm])  # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
-    # отображениее сетки
-    # tblstyle = [('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey),
-    #             ('BOX', (0, 0), (-1, -1), 0.01, colors.grey)]
-    # tblstyle = [('BOX', (0, 0), (-1, -1), 0.01, colors.grey)]
-    # for i in range(0, 68):
-    #     fn = ('FONTNAME', (9, i), (9, i), "DejaVuSerif-Italic")  # город участника делает курсивом
-    #     tblstyle.append(fn)
-    #     ('TEXTCOLOR', (9, i), (9, -i), colors.red)
-    tblstyle = []
+    t = Table(data, cw, 69 * [0.35 * cm])  # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     style = []
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки (1-й тур)
@@ -529,26 +562,28 @@ def setka_16_made():
     style.append(fn)
 
     ts = []  # стиль таблицы (список оформления строк и шрифта)
-    ts = style + tblstyle  # сложение стилей в один
-    t.setStyle(TableStyle(ts))
+    ts = style  # сложение стилей в один
+    # t.setStyle(TableStyle(ts))
 
-    # ('SPAN', (1, 0), (1, 1))])  # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца))
-
-    # t.setStyle(TableStyle([('ALIGN', (1, 1), (-2, -2), 'RIGHT'),
-    #                        ('TEXTCOLOR', (1, 1), (-2, -2), colors.red),
-    #                        ('VALIGN', (0, 0), (0, -1), 'TOP'),
-    #                        ('TEXTCOLOR', (0, 0), (0, -1), colors.blue),
-    #                        ('ALIGN', (0, -1), (-1, -1), 'CENTER'),
-    #                        ('VALIGN', (0, -1), (-1, -1), 'MIDDLE'),
-    #                        ('TEXTCOLOR', (0, -1), (-1, -1), colors.green),
-    #                        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-    #                        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-    # ]))
+    t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+                           ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif-Italic"),  #
+                           ('FONTSIZE', (0, 0), (-1, -1), 7),
+                           ('TEXTCOLOR', (1, 1), (-2, -2), colors.red),
+                           ('VALIGN', (0, 0), (0, -1), 'TOP'),
+                           ('TEXTCOLOR', (0, 0), (0, -1), colors.blue),
+                           ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           ('TEXTCOLOR', (0, 0), (-1, -1), colors.green),
+                           ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.lightgrey),
+                           ('BOX', (0, 0), (-1, -1), 0.01, colors.lightgrey)
+                           ] + ts))
 
     elements.append(t)
-    doc = SimpleDocTemplate("setka_16.pdf", pagesize=A4)
-    doc.build(elements)
-    # doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    pv = A4
+    doc = SimpleDocTemplate("setka_16.pdf", pagesize=pv)
+    # doc.build(elements)
+    # doc.build(elements, onFirstPage=func_zagolovok)
+    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     # ============
 
     # cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина

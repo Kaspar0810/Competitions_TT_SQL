@@ -1394,7 +1394,8 @@ def view():
     tw = my_win.tabWidget.currentIndex()
     view_file = ""
     if tw == 0:
-        view_file = "Title.pdf"
+        # view_file = "Title.pdf"
+        view_file = "setka_16.pdf"
     elif tw == 1:
         view_file = "table_list.pdf"
     elif tw == 2:
