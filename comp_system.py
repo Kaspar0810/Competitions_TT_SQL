@@ -372,13 +372,34 @@ def setka_16_made():
     data = []
     column = ['']
     column_count = column * 11
-
+    first_mesto = 1
     for i in range(0, 69):
-        column_count[10] = i  # нумерация 10 столбца
+        # column_count[10] = i  # нумерация 10 столбца
         list_tmp = column_count.copy()
         data.append(list_tmp)
-    # ========= нумерация встреч сетки ==========
+    # ========= места ==========
+    n = 1
+    x = 0
+    for i in range(0, 20, 2):
+        n += 1
+        i = i + x
+        data[i + 29][10] = str(first_mesto + n) + "Место"
+        if n == 3:
+            x = n = 4
+        elif n == 7:
+            n = 9
+            x = 16
+        elif n == 11:
+            n = 12
+            x = 20
+    for i in range(1, 4, 2):
+        data[i * 5 + 10][10] = str(first_mesto + i // 2) + "Место"
+        data[i // 2 + i * 2 + 45][10] = str(first_mesto + i // 2 + 8) + "Место"
+
+    data[34][10] = str(first_mesto + 4) + "Место"
+    data[60][10] = str(first_mesto + 12) + "Место"
     p = 0
+    # ========= нумерация встреч сетки ==========
     for i in range(1, 33, 2):  # создание номеров игроков сетки (1-16)
         data[i - 1][0] = str(p + 1)
         p += 1
@@ -416,7 +437,7 @@ def setka_16_made():
 
     # ==============
     cw = ((0.4 * cm, 4.5 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm,
-           0.4 * cm, 3 * cm, 0.6 * cm))
+           0.4 * cm, 3.2 * cm, 1.2 * cm))
     t = Table(data, cw, 69 * [0.35 * cm])  # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     style = []
     # =========  цикл создания стиля таблицы ================
@@ -568,12 +589,19 @@ def setka_16_made():
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif-Italic"),  #
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
-                           ('TEXTCOLOR', (1, 1), (-2, -2), colors.red),
+                           ('TEXTCOLOR', (10, 0), (10, 68), colors.red),  # 10 столбец с 0 по 68 ряд
                            ('VALIGN', (0, 0), (0, -1), 'TOP'),
-                           ('TEXTCOLOR', (0, 0), (0, -1), colors.blue),
+                           ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                           ('TEXTCOLOR', (0, 0), (-1, -1), colors.green),
+                           ('TEXTCOLOR', (1, 0), (1, 68), colors.black),
+                           ('TEXTCOLOR', (3, 0), (3, 68), colors.black),
+                           ('TEXTCOLOR', (5, 0), (5, 68), colors.black),
+                           ('TEXTCOLOR', (7, 0), (7, 68), colors.black),
+                           ('TEXTCOLOR', (2, 0), (2, 68), colors.green),
+                           ('TEXTCOLOR', (4, 0), (4, 68), colors.green),
+                           ('TEXTCOLOR', (6, 0), (6, 68), colors.green),
+                           ('TEXTCOLOR', (8, 0), (8, 68), colors.green),
                            ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.lightgrey),
                            ('BOX', (0, 0), (-1, -1), 0.01, colors.lightgrey)
                            ] + ts))
