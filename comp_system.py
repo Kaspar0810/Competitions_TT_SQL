@@ -160,7 +160,7 @@ def table_made(pv):
     #  ============ создание таблиц и вставка данных =================
     h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=150)  # стиль параграфа (номера таблиц)
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа (номера таблиц)
-    dict_table = {}
+    # dict_table = {}
     if kg == 1:
         dict_table = tbl(kg, ts, zagolovok, cW, rH)
         data = [[dict_table[0]]]
@@ -368,15 +368,25 @@ def table_made(pv):
 
 
 def setka_16_made():
+    """сетка на 16 в pdf"""
     elements = []
     data = []
     column = ['']
     column_count = column * 11
+    # добавить в аргументы функции
     first_mesto = 1
+    final = "1_финал"
+
     for i in range(0, 69):
         # column_count[10] = i  # нумерация 10 столбца
         list_tmp = column_count.copy()
         data.append(list_tmp)
+    # ===== добавить данные игроков и счета в data
+    dict_setka = setka_16(ts=0)
+    # data[0][1] = "Иванов"
+
+    # ====================
+
     # ========= места ==========
     n = 1
     x = 0
@@ -581,90 +591,34 @@ def setka_16_made():
     style.append(fn)
     fn = ('BOX', (8, 65), (8, 66), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 32
     style.append(fn)
-
-    ts = []  # стиль таблицы (список оформления строк и шрифта)
-    ts = style  # сложение стилей в один
-    # t.setStyle(TableStyle(ts))
+    for i in range(1, 8, 2):
+        fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
+        style.append(fn)
+        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 68), colors.green)  # цвет шрифта номеров встреч
+        style.append(fn)
+        fn = ('ALIGN', (i, 0), (i, 68), 'LEFT')  # выравнивание фамилий игроков по левому краю
+        style.append(fn)
+        fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')  # центрирование номеров встреч
+        style.append(fn)
+    # ts = []  # стиль таблицы (список оформления строк и шрифта)
+    ts = style   # стиль таблицы (список оформления строк и шрифта)
 
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
-                           ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif-Italic"),  #
+                           ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif-Italic"),
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
-                           ('TEXTCOLOR', (10, 0), (10, 68), colors.red),  # 10 столбец с 0 по 68 ряд
-                           ('VALIGN', (0, 0), (0, -1), 'TOP'),
-                           ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
-                           ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                           ('TEXTCOLOR', (1, 0), (1, 68), colors.black),
-                           ('TEXTCOLOR', (3, 0), (3, 68), colors.black),
-                           ('TEXTCOLOR', (5, 0), (5, 68), colors.black),
-                           ('TEXTCOLOR', (7, 0), (7, 68), colors.black),
-                           ('TEXTCOLOR', (2, 0), (2, 68), colors.green),
-                           ('TEXTCOLOR', (4, 0), (4, 68), colors.green),
-                           ('TEXTCOLOR', (6, 0), (6, 68), colors.green),
-                           ('TEXTCOLOR', (8, 0), (8, 68), colors.green),
-                           ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.lightgrey),
-                           ('BOX', (0, 0), (-1, -1), 0.01, colors.lightgrey)
+                           ('FONTNAME', (1, 0), (1, 15), "DejaVuSerif-Bold"),
+                           ('FONTSIZE', (1, 0), (1, 15), 9),
+                           ('TEXTCOLOR', (10, 0), (10, 68), colors.red),  # 10 столбец с 0 по 68 ряд (цвет места)
+                           # ('VALIGN', (0, 0), (0, -1), 'TOP'),
+                           ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),  # цвет шрифта игроков 1 ого тура
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
                            ] + ts))
 
     elements.append(t)
     pv = A4
-    doc = SimpleDocTemplate("setka_16.pdf", pagesize=pv)
-    # doc.build(elements)
-    # doc.build(elements, onFirstPage=func_zagolovok)
+    name_table_final = f"setka_16_{final}.pdf"
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    # ============
-
-    # cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина
-    # rH = (0.34 * cm)  # высота строки
-    # # rH = None  # высота строки
-    # num_columns = []  # заголовки столобцов и их нумерация в зависимости от кол-во участников
-    # # for i in range(0, t):
-    # #     i += 1
-    # #     i = str(i)
-    # #     num_columns.append(i)
-    # # zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
-    #
-    # tblstyle = []
-    # # =========  цикл создания стиля таблицы ================
-    # for q in range(1, t + 1):  # город участника делает курсивом
-    #     fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")  # город участника делает курсивом
-    #     tblstyle.append(fn)
-    #     fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1), "DejaVuSerif-Bold")  # участника делает жирным шрифтом
-    #     tblstyle.append(fn)
-    #     fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')  # центрирование текста в ячейках)
-    #     tblstyle.append(fn)
-    #     fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))  # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
-    #     tblstyle.append(fn)
-    #     fn = ('SPAN', (t + 2, q * 2 - 1), (t + 2, q * 2))  # объединяет клетки очки
-    #     tblstyle.append(fn)
-    #     fn = ('SPAN', (t + 3, q * 2 - 1), (t + 3, q * 2))  # объединяет клетки соот
-    #     tblstyle.append(fn)
-    #     fn = ('SPAN', (t + 4, q * 2 - 1), (t + 4, q * 2))  # объединяет клетки  место
-    #     tblstyle.append(fn)
-    #     fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))  # объединяет диаганальные клетки
-    #     tblstyle.append(fn)
-    #     fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2), colors.lightgreen)  # заливает диаганальные клетки
-    #     tblstyle.append(fn)
-    #
-    # ts = []
-    # ts.append(tblstyle)
-    # # ============= полный стиль таблицы ======================
-    # ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
-    #                  ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    #                  ('FONTSIZE', (0, 0), (-1, -1), 7),
-    #                  ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-    #                  ('FONTNAME', (0, 0), (t + 5, 0), "DejaVuSerif-Bold"),
-    #                  ('VALIGN', (0, 0), (t + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
-    #                 + tblstyle +
-    #                 [('BACKGROUND', (0, 0), (t + 5, 0), colors.yellow),
-    #                  ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),  # цвет шрифта в ячейках
-    #                  ('LINEABOVE', (0, 0), (-1, 1), 1, colors.black),  # цвет линий нижней
-    #                  ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),  # цвет и толщину внутренних линий
-    #                  ('BOX', (0, 0), (-1, -1), 2, colors.black)  # внешние границы таблицы
-    #                  ])
-    # #  ============ создание таблиц и вставка данных =================
-    # h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=150)  # стиль параграфа (номера таблиц)
-    # h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа (номера таблиц)
 
 
 def tour(cp):

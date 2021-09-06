@@ -781,10 +781,10 @@
       <widget class="QLabel" name="label_12">
        <property name="geometry">
         <rect>
-         <x>283</x>
+         <x>268</x>
          <y>7</y>
-         <width>241</width>
-         <height>16</height>
+         <width>315</width>
+         <height>20</height>
         </rect>
        </property>
        <property name="font">
@@ -840,9 +840,9 @@
       <widget class="QLabel" name="label_19">
        <property name="geometry">
         <rect>
-         <x>560</x>
+         <x>600</x>
          <y>7</y>
-         <width>111</width>
+         <width>70</width>
          <height>20</height>
         </rect>
        </property>
@@ -890,9 +890,9 @@
       <widget class="QLabel" name="label_27">
        <property name="geometry">
         <rect>
-         <x>560</x>
+         <x>600</x>
          <y>28</y>
-         <width>111</width>
+         <width>70</width>
          <height>20</height>
         </rect>
        </property>
@@ -909,10 +909,10 @@
       <widget class="QLabel" name="label_28">
        <property name="geometry">
         <rect>
-         <x>285</x>
+         <x>268</x>
          <y>28</y>
-         <width>241</width>
-         <height>16</height>
+         <width>315</width>
+         <height>20</height>
         </rect>
        </property>
        <property name="font">
@@ -928,10 +928,10 @@
       <widget class="QLabel" name="label_31">
        <property name="geometry">
         <rect>
-         <x>285</x>
-         <y>50</y>
-         <width>241</width>
-         <height>16</height>
+         <x>268</x>
+         <y>49</y>
+         <width>315</width>
+         <height>20</height>
         </rect>
        </property>
        <property name="font">
@@ -957,9 +957,9 @@
       <widget class="QLabel" name="label_30">
        <property name="geometry">
         <rect>
-         <x>560</x>
+         <x>600</x>
          <y>50</y>
-         <width>111</width>
+         <width>70</width>
          <height>20</height>
         </rect>
        </property>
@@ -1858,6 +1858,170 @@
      <attribute name="title">
       <string>Финалы</string>
      </attribute>
+     <widget class="QGroupBox" name="groupBox_filter_group_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>871</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="title">
+       <string>Фильтр</string>
+      </property>
+      <widget class="QComboBox" name="comboBox_filter_final">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>121</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_36">
+       <property name="geometry">
+        <rect>
+         <x>25</x>
+         <y>23</y>
+         <width>91</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>14</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>по финалам</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_filter_played_fin">
+       <property name="geometry">
+        <rect>
+         <x>141</x>
+         <y>40</y>
+         <width>131</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_37">
+       <property name="geometry">
+        <rect>
+         <x>145</x>
+         <y>23</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>14</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>по результатам</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_38">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>0</y>
+         <width>163</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_39">
+       <property name="geometry">
+        <rect>
+         <x>304</x>
+         <y>23</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>14</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>по игроку</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="Button_filter_fin">
+       <property name="geometry">
+        <rect>
+         <x>792</x>
+         <y>20</y>
+         <width>73</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Фильтр</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="Button_reset_filter_fin">
+       <property name="geometry">
+        <rect>
+         <x>792</x>
+         <y>42</y>
+         <width>73</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Сброс</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_find_name_fin">
+       <property name="geometry">
+        <rect>
+         <x>282</x>
+         <y>40</y>
+         <width>141</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </widget>
    <widget class="QFrame" name="frame_score">
