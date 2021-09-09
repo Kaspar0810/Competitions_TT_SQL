@@ -771,7 +771,7 @@ class Ui_MainWindow(object):
         self.label_37.setFont(font)
         self.label_37.setObjectName("label_37")
         self.label_38 = QtWidgets.QLabel(self.groupBox_filter_group_2)
-        self.label_38.setGeometry(QtCore.QRect(130, 0, 163, 20))
+        self.label_38.setGeometry(QtCore.QRect(130, 0, 241, 20))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(14)
@@ -990,7 +990,7 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(5)
         self.toolBox.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 

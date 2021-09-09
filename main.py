@@ -223,29 +223,47 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def choice(self):
         sender = self.sender()
+        t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+        system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+        count = len(system)
         if sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
-            t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-            system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-            if system.choice_flag == True:
-                reply = QMessageBox.information(my_win, 'Уведомление', "Жеребъевка была произведена,\nесли хотите сделать "
-                                                                       "повторно\nнажмите-ОК-, если нет то - Cancel-",
+            for stage in system:
+                if stage.stage == "Предварительный":
+                    if system.choice_flag == True:
+                        reply = QMessageBox.information(my_win, 'Уведомление',
+                                                        "Жеребъевка была произведена,\nесли хотите сделать "
+                                                        "повторно\nнажмите-ОК-, если нет то - Cancel-",
+                                                        QMessageBox.StandardButtons.Ok,
+                                                        QMessageBox.StandardButtons.Cancel)
+                        if reply == QMessageBox.StandardButtons.Ok:
+                            my_win.tabWidget.setCurrentIndex(2)
+                            choice_gr_automat()
+                            my_win.tabWidget.setCurrentIndex(3)
+                        else:
+                            return
+                    else:
+                        my_win.tabWidget.setCurrentIndex(2)
+                        choice_gr_automat()
+
+        elif sender == self.choice_fin_Action:  # нажат подменю жеребъевка финалов
+            t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+            system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+            fin = select_choice_final()
+            system = System.get(System.stage == fin)
+            if system.choice_flag == True:  # проверка флаг на жеребъевку финала
+                reply = QMessageBox.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
+                                                                       f"\nесли хотите сделать "
+                                                                       "повторно\nнажмите-ОК-, "
+                                                                       "если нет то - Cancel-",
                                                 QMessageBox.StandardButtons.Ok,
                                                 QMessageBox.StandardButtons.Cancel)
                 if reply == QMessageBox.StandardButtons.Ok:
-                    my_win.tabWidget.setCurrentIndex(2)
-                    choice_gr_automat()
-                    my_win.tabWidget.setCurrentIndex(3)
+                    choice_setka(fin)
                 else:
                     return
             else:
-                my_win.tabWidget.setCurrentIndex(2)
-                choice_gr_automat()
-        elif sender == self.choice_fin_Action:  # нажат подменю жеребъевка финалов
-            pass
-            my_win.tabWidget.setCurrentIndex(2)
-            select_choice_final()
-            # my_win.tabWidget.setCurrentIndex(2)
-            # choice_setka()
+                # ========= необходимо проверить на правильность желания жеребъевки
+                choice_setka(fin)
 
     def system_made(self):
         system_competition()
@@ -280,7 +298,7 @@ def tab_enabled():
         my_win.toolBox.setItemEnabled(2, True)
         for i in stage:
             if i == "Одна таблица":
-               pass
+                pass
             elif i == "Предварительный":
                 my_win.tabWidget.setTabEnabled(3, True)
             elif i == "Полуфиналы":
@@ -316,6 +334,7 @@ my_win.comboBox_kategor_sek.addItems(kategoria_list)
 my_win.comboBox_sredi.addItems(mylist)
 my_win.comboBox_razryad.addItems(raz)
 my_win.comboBox_filter_played.addItems(res)
+my_win.comboBox_filter_played_fin.addItems(res)
 my_win.comboBox_table.addItems(vid_setki)
 my_win.comboBox_table_2.addItems(vid_setki)
 
@@ -422,13 +441,15 @@ def region():
 def load_tableWidget():
     """Заполняет таблицу списком или рейтингом в зависимости от выбора"""
     msgBox = QMessageBox
+    tb = my_win.tabWidget.currentIndex()
     sender = my_win.menuWidget().sender()  # сигнал указывающий какой пункт меню нажат
     if sender == my_win.rAction or sender == my_win.r1Action:  # нажат пункт меню -текущий рейтинг- или -рейтинг январский
         z = 6
         column_label = ["№", "Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
     elif my_win.tabWidget.currentIndex() == 3 or my_win.tabWidget.currentIndex() == 5:
         z = 14
-        column_label = ["№", "Этапы", "Группа", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки", "Общий счет",
+        column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
+                        "Общий счет",
                         "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
     elif my_win.tabWidget.currentIndex() == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
         z = 18
@@ -457,7 +478,7 @@ def load_tableWidget():
     elif my_win.tabWidget.currentIndex() == 3 or my_win.tabWidget.currentIndex() == 5:  # таблица результатов
         flag = ready_choice()
         if flag is True:
-            fill_table_results()
+            fill_table_results(tb)
     elif my_win.tabWidget.currentIndex() == 2 or sender == my_win.choice_gr_Action:
         if sender == my_win.choice_fin_Action:  # таблица жеребьевки
             pass
@@ -697,7 +718,7 @@ def fill_table_R1_list():
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
-def fill_table_results():
+def fill_table_results(tb):
     """заполняет таблицу результатов QtableWidget из db result"""
     result = Result.select()  # проверка есть ли записи в таблице -result-
     count = len(result)  # если 0, то записей нет
@@ -723,7 +744,17 @@ def fill_table_results():
         else:
             return
     else:
-        player_result = Result.select().order_by(Result.id)
+        # надо выбрать, что загружать в звисимости от вкладки группы, пф или финалы
+        if tb == 3:
+            player_result = Result.select().order_by(Result.id)
+        elif tb == 4:
+            player_result = Result.select().order_by(Result.id)
+        elif tb == 5:
+            # player_result = Result.select().order_by(Result.id)
+            player_result = Result.select().where(Result.system_stage == "Финальный")
+            count = len(player_result)
+
+        # player_result = Result.select().order_by(Result.id)
         result_list = player_result.dicts().execute()
         row_count = len(result_list)  # кол-во строк в таблице
         column_count = len(result_list[0])  # кол-во столбцов в таблице
@@ -762,10 +793,10 @@ def fill_table_results():
 def fill_table_choice():
     """заполняет таблицу жеребьевка QtableWidget из db choice"""
     # sender = my_win.sender()
-    if my_win.tabWidget.currentIndex() == 5:
-        player_choice = Choice.select().where(Choice.final == "1-й финал")
-    else:
-        player_choice = Choice.select().order_by(Choice.rank.desc())
+    # if my_win.tabWidget.currentIndex() == 5:
+    #     player_choice = Choice.select().where(Choice.final == "1-й финал")
+    # else:
+    player_choice = Choice.select().order_by(Choice.rank.desc())
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
     column_count = len(choice_list[0])  # кол-во столбцов в таблице
@@ -863,6 +894,19 @@ def dclick_in_listwidget():
     else:  # идет заполнение поля "тренер" из listWidget
         my_win.lineEdit_coach.setText(text)
         my_win.listWidget.clear()
+
+
+def load_combobox_filter_final():
+    """заполняет комбобокс фильтр финалов для таблицы результаты"""
+    my_win.comboBox_filter_final.clear()
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+    fin = ["все финалы"]
+    for sys in system.select():
+        if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
+            if sys.choice_flag is True:
+                fin.append(sys.stage)
+    my_win.comboBox_filter_final.addItems(fin)
 
 
 def load_combobox_filter_group():
@@ -1034,9 +1078,10 @@ def page():
     elif tb == 4:
         my_win.tableWidget.hide()
     elif tb == 5:
+        my_win.label_38.hide()
         t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
         sf = System.get(System.title_id == t)
-        flag = ready_choice()
+        flag = ready_choice()  # надо проверять жеребъевку финала
         if flag is False:
             pass
         else:
@@ -1049,14 +1094,14 @@ def page():
             my_win.tableWidget.show()
             my_win.Button_Ok.setDisabled(True)
             my_win.radioButton_match_5.setChecked(True)
-            load_combobox_filter_group()
-            load_tableWidget()
+            load_combobox_filter_final()
+            # load_tableWidget()
             load_combo()
             my_win.label_16.hide()
 
         my_win.tableWidget.show()
         load_tableWidget()
-    my_win.tabWidget.setCurrentIndex(tb)
+    # my_win.tabWidget.setCurrentIndex(tb)
 
 
 def add_city():
@@ -1254,7 +1299,7 @@ def system_competition():
                 sb = "Система и жербъевка создана."
             elif flag_choice is False:
                 sb = "Система создана, теперь необходимо произвести жеребъевку. " \
-                 "Войдите в меню -соревнования- и выберите -жеребъевка-"
+                     "Войдите в меню -соревнования- и выберите -жеребъевка-"
             my_win.statusbar.showMessage(sb)
         elif flag_system is False:
             sb = "Выбор системы проведения соревнования."
@@ -1364,6 +1409,7 @@ def kol_player_in_group():
         system.save()
     load_combobox_filter_group()
 
+
 # def kol_game_in_table_or_setka(kpt):
 #     """подсчитывает кол-во игр в группах, сетке"""
 #     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
@@ -1408,6 +1454,49 @@ def view():
     os.system(f"open {view_file}")
 
 
+def player_in_setka(fin):
+    """заполняет таблицу Game_list данными спортсменами из сетки tds - список списков данных из сетки"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    s = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+    count = len(s)
+    for i in s:  # перебирает в цикле строки в табл System где последний titul_id
+        if i.stage == fin:
+            mp = i.max_player
+            mg = i.kol_game_string
+    space = mg.find(" ")
+    game = int(mg[:space])
+
+    sd = []
+    tds = comp_system.setka_16(fin)  # создание сетки со спортсменами согласно жеребъевки
+    for r in tds:
+        space = r.find(" ")  # находит пробел перед именем
+        sl = r[:space + 2]  # удаляет все после пробела кроме первой буквы имени
+        family = f'{sl}.'  # добавляет точку к имени
+        sd.append(family)
+    k = 0
+    for i in range(1, mp + 1):  # записывает в Game_List спортсменов участников сетки
+        family_player = sd[i - 1]
+        k += 1
+        with db:
+            game_list = Game_list(number_group=fin, rank_num_player=k, player_group=family_player,
+                                  system_id=s).save()
+    st = "Финальный"
+    for i in range(1, mp // 2 + 1):  # присваивает встречи 1-ого тура и записывает в тбл Results
+        num_game = i
+        pl1 = sd[i * 2 - 2]
+        pl2 = sd[i * 2 - 1]
+        if pl1 is not None and pl2 is not None:
+            with db:
+                results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
+                                 tours=num_game, title_id=s).save()
+    for i in range(mp // 2 + 1, game + 1):  # дополняет номера будущих встреч
+        pl1 = ""
+        pl2 = ""
+        with db:
+            results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
+                             tours=i, title_id=s).save()
+
+
 def player_in_table():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
@@ -1417,7 +1506,7 @@ def player_in_table():
     st = s.stage
     pv = s.page_vid
 
-    comp_system.table_made(pv)
+    comp_system.table_made(pv)  # создание таблиц групп со спортсменами согласно жеребъевки
     tdt = tbl_data.table_data(kg)  # вызов функции, где получаем список всех участников по группам
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
         gr = tdt[p]
@@ -1654,7 +1743,7 @@ def score_in_game():
     my_win.lineEdit_pl2_score_total.setText(str(st2))
 
 
-def enter_score():
+def enter_score(tb):
     """заносит в таблицу -результаты- победителя, счет и т.п."""
     st1 = int(my_win.lineEdit_pl1_score_total.text())
     st2 = int(my_win.lineEdit_pl2_score_total.text())
@@ -1682,7 +1771,7 @@ def enter_score():
         result.points_loser = "1"
         result.score_loser = ts_loser
         result.save()
-    fill_table_results()
+    fill_table_results(tb=0)
 
     my_win.lineEdit_pl1_s1.setText("")  # очищает поля ввода счета в партии
     my_win.lineEdit_pl2_s1.setText("")
@@ -1878,8 +1967,37 @@ def result_filter_name():
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
 
-def filter():
-    """фильтрует таблицу -результаты-"""
+def filter_fin():
+    """фильтрует таблицу -Result- на вкладке финалы"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    result = Result.select().where(Result.title_id == t)  # находит system id последнего
+
+    final = my_win.comboBox_filter_final.currentText()
+    name = my_win.comboBox_find_name_fin.currentText()
+    name = name.title()  # делает Заглавными буквы слов
+    played = my_win.comboBox_filter_played_fin.currentText()
+    if final == "все финалы" and played == "все игры":
+        fltr = Result.select().where(Result.system_stage == "Финальный")
+        count = len(fltr)
+        my_win.label_38.setText(f'Всего в финалах {count} игры')
+    elif final != "все финалы" and played == "не сыгранные":
+        fltr = Result.select().where(Result.number_group == final)
+        count = len(fltr)
+        my_win.label_38.setText(f'Всего в {final} не сыгранно {count} игры')
+    elif final != "все финалы" and played == "завершенные":
+        fltr_played = []
+        fltr = Result.select().where(Result.number_group == final)
+        for fl in fltr:
+            if fl.winner is not None:
+                win = fl.winner
+                fltr_played.append(win)
+        count_pl = len(fltr_played)
+        my_win.label_38.setText(f'Завершено в {final} {count_pl} игры')
+    my_win.label_38.show()
+
+
+def filter_gr():
+    """фильтрует таблицу -результаты- на вкладке группы"""
     group = my_win.comboBox_filter_group.currentText()
     name = my_win.comboBox_find_name.currentText()
     name = name.title()  # делает Заглавными буквы слов
@@ -1917,14 +2035,17 @@ def filter():
 
 
 def load_combo():
-    """загружает комбобокс фамилиями спортсменов"""
+    """загружает комбобокс поиска спортсмена на вкладке группы, пф и финалы фамилиями спортсменов"""
     mp = Player.select()
     mp_count = len(mp)
+    text = []
     for i in range(1, mp_count + 1):
         tt = Player.get(Player.id == i)
-        text = tt.player
-        my_win.comboBox_find_name.addItem(text)
+        text.append(tt.player)
+    my_win.comboBox_find_name.addItems(text)
+    my_win.comboBox_find_name_fin.addItems(text)
     my_win.comboBox_find_name.setCurrentText("")
+    my_win.comboBox_find_name_fin.setCurrentText("")
 
 
 def reset_filter():
@@ -1932,7 +2053,7 @@ def reset_filter():
     my_win.comboBox_find_name.setCurrentText("")
     my_win.comboBox_filter_played.setCurrentText("все игры")
     my_win.comboBox_filter_group.setCurrentText("все группы")
-    filter()
+    filter_gr()
 
 
 def choice_table():
@@ -1952,7 +2073,7 @@ def choice_table():
 
 
 def choice_gr_automat():
-    """проба автоматической жеребьевки групп"""
+    """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
     load_tableWidget()
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
@@ -1993,24 +2114,20 @@ def choice_gr_automat():
 
 def choice_setka(fin):
     """проба жеребъевки сетки на 16"""
-    pass
-    h = 0
     load_tableWidget()
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    for i in range(1, 17):  # №-й посев
-        # # txt = str(f'{i} финал')
-        # txt = '1 финал'
-        # id = int(my_win.tableWidget.item(h, 1).text())
-        # h += 1
+    for i in range(1, 17):  # 1-й посев
         with db:  # запись в таблицу Choice результа жеребъевки
             stk = Choice.get(Choice.id == i)
+            stk.posev_final = i
             stk.final = fin
             stk.save()
     with db:  # записывает флаг жеребъевки финала
         sys = System.get(System.stage == fin)
         sys.choice_flag = True
         sys.save()
+    player_in_setka(fin)
 
 
 def choice_tbl_made():
@@ -2077,34 +2194,18 @@ def color_region_in_tableWidget(fg):
 
 def hide_show_columns():
     """скрывает или показывает столбцы TableWidget"""
-    if my_win.tabWidget.currentIndex() == 3 or my_win.tabWidget.currentIndex() == 5:
-        my_win.tableWidget.hideColumn(1)
-        my_win.tableWidget.hideColumn(6)
-        my_win.tableWidget.hideColumn(10)
-        my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)
-        my_win.tableWidget.hideColumn(13)
-        my_win.tableWidget.hideColumn(14)
-        my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16)
-        my_win.tableWidget.hideColumn(17)
-        my_win.tableWidget.hideColumn(18)
-        my_win.tableWidget.hideColumn(19)
-    elif my_win.tabWidget.currentIndex() == 4:
-        pass
-    else:
-        my_win.tableWidget.hideColumn(1)
-        my_win.tableWidget.hideColumn(6)
-        my_win.tableWidget.hideColumn(10)
-        my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)
-        my_win.tableWidget.hideColumn(13)
-        my_win.tableWidget.hideColumn(14)
-        my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16)
-        my_win.tableWidget.hideColumn(17)
-        my_win.tableWidget.hideColumn(18)
-        my_win.tableWidget.hideColumn(19)
+    my_win.tableWidget.hideColumn(1)
+    my_win.tableWidget.hideColumn(6)
+    my_win.tableWidget.hideColumn(10)
+    my_win.tableWidget.hideColumn(11)
+    my_win.tableWidget.hideColumn(12)
+    my_win.tableWidget.hideColumn(13)
+    my_win.tableWidget.hideColumn(14)
+    my_win.tableWidget.hideColumn(15)
+    my_win.tableWidget.hideColumn(16)
+    my_win.tableWidget.hideColumn(17)
+    my_win.tableWidget.hideColumn(18)
+    my_win.tableWidget.hideColumn(19)
 
 
 def etap_made():
@@ -2246,22 +2347,17 @@ def ready_choice():
 def select_choice_final():
     """выбор жеребъевки финала"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    rc = System.select().where(System.title_id == t)
     system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
 
     fin = []
     for sys in system.select():
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
-           fin.append(sys.stage)
+            fin.append(sys.stage)
 
     fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
     if ok:
-        choice_setka(fin)
-    my_win.tabWidget.currentIndex(5)    # if fin == "1-й финал":
-        #     print("1")
-        # else:
-        #     print("2")
-    # return  fin
+        return fin
+    my_win.tabWidget.setCurrentIndex(5)
 
 
 # def flag():
@@ -2324,6 +2420,7 @@ def proba():
     pv = A4
     comp_system.setka_16_made()
 
+
 # ===== переводит фокус на полее ввода счета в партии
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s1.returnPressed.connect(focus)
@@ -2369,8 +2466,10 @@ my_win.checkBox_2.stateChanged.connect(button_etap_made_enabled)  # при из�
 my_win.checkBox_3.stateChanged.connect(button_system_made_enable)  # при изменении чекбокса активирует кнопку создать
 my_win.checkBox_4.stateChanged.connect(game_in_visible)  # при изменении чекбокса показывает поля для ввода счета
 # =======  нажатие кнопок =========
+
 my_win.Button_reset_filter.clicked.connect(reset_filter)
-my_win.Button_filter.clicked.connect(filter)
+my_win.Button_filter_fin.clicked.connect(filter_fin)
+my_win.Button_filter.clicked.connect(filter_gr)
 my_win.Button_etap_made.clicked.connect(etap_made)  # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_system_made.clicked.connect(player_in_table)  # заполнение таблицы Game_list
 my_win.Button_add_player.clicked.connect(add_player)  # добавляет игроков в список и базу

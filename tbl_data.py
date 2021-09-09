@@ -46,26 +46,21 @@ def table_data(kg):
     return tdt
 
 
-def setka_data_16():
+def setka_data_16(fin):
     """данные сетки на 16"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
+    system = System.select().where(System.title_id == t)  # находит system id последнего
+    for sys in system.select():  # проходит циклом по всем отобранным записям
+        if sys.stage == fin:
+            mp = sys.max_player
     tbl_tmp = []  # временный список группы tbl
     tds = []
-    t = kol_player()
-    for p in range(0, 10):
-        fin = f"{p + 1} финал"
-        posev_data = player_choice_in_setka(fin)
-        for i in range(1, t * 2 + 1, 2):
-            posev = posev_data[((i + 1) // 2) - 1]
-            tbl_tmp[i - 1][1] = posev["фамилия"]
-            tbl_tmp[i][1] = posev["регион"]
-        td = tbl_tmp.copy()
-        tbl_tmp.clear()
-        tds.append(td)
-        # if tr != 0:  # если еще не была жеребъевка, то пропуск счета в группе
-        #     score_in_table(td, ашт)
+    # for p in range(0, mp):
+    posev_data = player_choice_in_setka(fin)
+    for i in range(1, mp * 2 + 1, 2):
+        posev = posev_data[((i + 1) // 2) - 1]
+        family = posev['фамилия']
+        tds.append(family)
     return tds
 
 
@@ -411,8 +406,10 @@ def player_choice_in_setka(fin):
     posev_data = []
     choice = Choice.select().order_by(Choice.posev_final).where(Choice.final == fin)
     for posev in choice:
+        player = Player.get(Player.player == posev.family)
+        city = player.city
         posev_data.append({
-            'фамилия': posev.family,
-            'регион': posev.region,
+            'посев': posev.posev_final,
+            'фамилия': f'{posev.family}/ {city}'
         })
     return posev_data
