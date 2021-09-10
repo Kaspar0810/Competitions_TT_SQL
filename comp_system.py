@@ -74,11 +74,6 @@ def tbl(kg, ts, zagolovok, cW, rH):
 
 def setka_16(fin):
     """данные сетки на 16, tds - список фамилий в сетка данные"""
-    # dict_setka = {}
-    # t = Title.select().order_by(Title.id.desc()).get()
-    # sys = System.select().where(System.title_id == t)  # находит system id последнего
-    # count = len(sys)
-    # system = sys.select().where(sys.stage == fin)
     choice = Choice.select().where(Choice.final == fin)
     tds = tbl_data.setka_data_16(fin)
     return tds

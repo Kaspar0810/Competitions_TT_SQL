@@ -53,9 +53,7 @@ def setka_data_16(fin):
     for sys in system.select():  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
             mp = sys.max_player
-    tbl_tmp = []  # временный список группы tbl
     tds = []
-    # for p in range(0, mp):
     posev_data = player_choice_in_setka(fin)
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
