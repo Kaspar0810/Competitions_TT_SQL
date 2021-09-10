@@ -1579,14 +1579,16 @@ def chop_line(q, maxline=30):
         return q
 
 
-def game_in_visible(state):
+def game_in_visible(state, flag=False, final="все финалы"):
     """видимость полей для счета в партии"""
     state = my_win.checkBox.checkState()
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    fin = my_win.comboBox_filter_final.currentText()
-    flag = False
+    if flag is False:
+        fin = my_win.comboBox_filter_final.currentText()
+    else:
+        fin = final
     page = ""
-    if fin == "все финалы":
+    if fin == "все финалы" and flag is False:
         page = 5
         pass
     elif fin == "":
@@ -1672,25 +1674,29 @@ def game_in_visible(state):
 def select_player_in_game():
     """выодит фамилии игроков встречи"""
     tab = my_win.tabWidget.currentIndex()
-    my_win.lineEdit = QLineEdit(my_win)  #
     r = my_win.tableWidget.currentRow()
+    final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
+    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    fin = System.get(System.title_id == t and System.stage == final)
+
+    game_in_visible(state=False, flag=fin.score_flag, final=my_win.tableWidget.item(r, 2).text())
+
     win_pole = my_win.tableWidget.item(r, 6).text()
     if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
         sc = my_win.tableWidget.item(r, 8).text()
         pl1 = my_win.tableWidget.item(r, 4).text()
         pl2 = my_win.tableWidget.item(r, 5).text()
         if Result.score_win != "" & Result.score_win != "None":  # если игры со счетом,при редакитровании открывать поля
-            pass
-            # my_win.lineEdit_pl1_s1.setVisible(True)
-            # my_win.lineEdit_pl2_s1.setVisible(True)
-            # my_win.lineEdit_pl1_s2.setVisible(True)
-            # my_win.lineEdit_pl2_s2.setVisible(True)
-            # my_win.lineEdit_pl1_s3.setVisible(True)
-            # my_win.lineEdit_pl2_s3.setVisible(True)
-            # my_win.lineEdit_pl1_s4.setVisible(True)
-            # my_win.lineEdit_pl2_s4.setVisible(True)
-            # my_win.lineEdit_pl1_s5.setVisible(True)
-            # my_win.lineEdit_pl2_s5.setVisible(True)
+            my_win.lineEdit_pl1_s1.setVisible(True)
+            my_win.lineEdit_pl2_s1.setVisible(True)
+            my_win.lineEdit_pl1_s2.setVisible(True)
+            my_win.lineEdit_pl2_s2.setVisible(True)
+            my_win.lineEdit_pl1_s3.setVisible(True)
+            my_win.lineEdit_pl2_s3.setVisible(True)
+            my_win.lineEdit_pl1_s4.setVisible(True)
+            my_win.lineEdit_pl2_s4.setVisible(True)
+            my_win.lineEdit_pl1_s5.setVisible(True)
+            my_win.lineEdit_pl2_s5.setVisible(True)
 
         if pl1 == my_win.tableWidget.item(r, 6).text():
             sc1 = sc[0]
@@ -1706,9 +1712,16 @@ def select_player_in_game():
     else:
         pl1 = my_win.tableWidget.item(r, 4).text()
         pl2 = my_win.tableWidget.item(r, 5).text()
-        my_win.lineEdit_player1.setText(pl1)
-        my_win.lineEdit_player2.setText(pl2)
-        my_win.lineEdit_pl1_s1.setFocus()
+        if tab == 3:
+            my_win.lineEdit_player1.setText(pl1)
+            my_win.lineEdit_player2.setText(pl2)
+            my_win.lineEdit_pl1_s1.setFocus()
+        elif tab == 4:
+            pass
+        elif tab == 5:
+            my_win.lineEdit_player1_fin.setText(pl1)
+            my_win.lineEdit_player2_fin.setText(pl2)
+            my_win.lineEdit_pl1_s1_fin.setFocus()
     my_win.tableWidget.selectRow(r)
 
 
