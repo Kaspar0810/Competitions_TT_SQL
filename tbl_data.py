@@ -58,7 +58,12 @@ def setka_data_16(fin):
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
-        tds.append(family)
+        space = family.find(" ")  # находит пробел отделяющий имя от фамилии
+        line = family.find("/")  # находит черту отделяющий имя от города
+        city_slice = family[line:]  # получает отдельно город
+        family_slice = family[:space + 2]   # получает отдельно фамилия и первую букву имени
+        family_city = f'{family_slice}.{city_slice}'   # все это соединяет
+        tds.append(family_city)
     return tds
 
 

@@ -376,14 +376,14 @@ def setka_16_made(fin):
     first_mesto = 1
     final = fin
     for i in range(0, 69):
-        column_count[10] = i  # нумерация 10 столбца
+        # column_count[10] = i  # нумерация 10 столбца для удобного просмтра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
-    # ===== добавить данные игроков и счета в data
-    tds = setka_16(fin)
-    for i in range(0, 31, 2):
-        n = i - (i // 2)
-        data[i][1] = tds[n]
+    # # ===== добавить данные игроков и счета в data
+    # tds = setka_16(fin)
+    # for i in range(0, 31, 2):
+    #     n = i - (i // 2)
+    #     data[i][1] = tds[n]
 
     # ====================
 
@@ -444,7 +444,18 @@ def setka_16_made(fin):
     data[29][8] = str(16)  # создание номеров встреч 16
     data[44][8] = str(27)  # создание номеров встреч 27
     data[55][8] = str(28)  # создание номеров встреч 28
-
+    # ======= создать словарь  ключ - номер встречи, значение - номер ряда
+    dict_num_game = {}
+    for d in range(2, 11, 2):
+        for r in range(0, 69):
+            key = data[r][d]
+            if key != "":
+                dict_num_game[key] = r
+    # ===== добавить данные игроков и счета в data ==================
+    tds = setka_16(fin)
+    for i in range(0, 31, 2):
+        n = i - (i // 2)
+        data[i][1] = tds[n]
     # ==============
     cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm,
            0.4 * cm, 3.2 * cm, 1.2 * cm))
@@ -627,8 +638,8 @@ def setka_16_made(fin):
         style.append(fn)
         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')  # центрирование номеров встреч
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
 

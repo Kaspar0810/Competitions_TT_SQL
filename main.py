@@ -720,8 +720,10 @@ def fill_table_R1_list():
 
 def fill_table_results(tb):
     """заполняет таблицу результатов QtableWidget из db result"""
+    tb = my_win.tabWidget.currentIndex()
     result = Result.select()  # проверка есть ли записи в таблице -result-
     count = len(result)  # если 0, то записей нет
+    player_result = Result.select().order_by(Result.id)
     flag = ready_system()
     if flag is True and count == 0:
         message = "Надо сделать жербъевку предварительного этапа.\nХотите ее создать?"
@@ -750,11 +752,9 @@ def fill_table_results(tb):
         elif tb == 4:
             player_result = Result.select().order_by(Result.id)
         elif tb == 5:
-            # player_result = Result.select().order_by(Result.id)
             player_result = Result.select().where(Result.system_stage == "Финальный")
             count = len(player_result)
 
-        # player_result = Result.select().order_by(Result.id)
         result_list = player_result.dicts().execute()
         row_count = len(result_list)  # кол-во строк в таблице
         column_count = len(result_list[0])  # кол-во столбцов в таблице
@@ -1677,9 +1677,9 @@ def select_player_in_game():
     r = my_win.tableWidget.currentRow()
     final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    fin = System.get(System.title_id == t and System.stage == final)
-
-    game_in_visible(state=False, flag=fin.score_flag, final=my_win.tableWidget.item(r, 2).text())
+    if tab == 5:
+        fin = System.get(System.title_id == t and System.stage == final)
+        game_in_visible(state=False, flag=fin.score_flag, final=my_win.tableWidget.item(r, 2).text())
 
     win_pole = my_win.tableWidget.item(r, 6).text()
     if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
@@ -1728,111 +1728,160 @@ def select_player_in_game():
 def focus():
     """перводит фокус на следующую позицию"""
     sender = my_win.sender()  # в зависимости от сигала кнопки идет сортировка
-    if sender == my_win.lineEdit_pl1_s1:
+    if sender == my_win.lineEdit_pl1_s1 or sender == my_win.lineEdit_pl1_s1_fin:
         my_win.lineEdit_pl2_s1.setFocus()  # ставит фокус на 2-ого игрока 1-й партии
-    elif sender == my_win.lineEdit_pl2_s1:  # подсчитвает общий счет и ставит фокус на 1-ого игрока 2-й партии
+        my_win.lineEdit_pl2_s1_fin.setFocus()
+    elif sender == my_win.lineEdit_pl2_s1 or sender == my_win.lineEdit_pl2_s1_fin:  # подсчитвает общий счет и ставит
+        # фокус на 1-ого игрока 2-й партии
         score_in_game()
         my_win.lineEdit_pl1_s2.setFocus()
-    elif sender == my_win.lineEdit_pl1_s2:
+        my_win.lineEdit_pl1_s2_fin.setFocus()
+    elif sender == my_win.lineEdit_pl1_s2 or sender == my_win.lineEdit_pl1_s2_fin:
         my_win.lineEdit_pl2_s2.setFocus()  # ставит фокус на 2-ого игрока 2-й партии
-    elif sender == my_win.lineEdit_pl2_s2:  # подсчитвает общий счет и ставит фокус на 1-ого игрока 3-й партии
+        my_win.lineEdit_pl2_s2_fin.setFocus()  # ставит фокус на 2-ого игрока 2-й партии
+    elif sender == my_win.lineEdit_pl2_s2 or sender == my_win.lineEdit_pl2_s2_fin:  # подсчитвает общий счет и ставит
+        # фокус на 1-ого игрока 3-й партии
         score_in_game()
         my_win.lineEdit_pl1_s3.setFocus()
-    elif sender == my_win.lineEdit_pl1_s3:
+        my_win.lineEdit_pl1_s3_fin.setFocus()
+    elif sender == my_win.lineEdit_pl1_s3 or sender == my_win.lineEdit_pl1_s3_fin:
         my_win.lineEdit_pl2_s3.setFocus()  # ставит фокус на 2-ого игрока 3-й партии
-    elif sender == my_win.lineEdit_pl2_s3:  # подсчитвает общий счет и ставит фокус на 1-ого игрока 4-й партии
+        my_win.lineEdit_pl2_s3_fin.setFocus()  # ставит фокус на 2-ого игрока 3-й партии
+    elif sender == my_win.lineEdit_pl2_s3 or sender == my_win.lineEdit_pl2_s3_fin:  # подсчитвает общий счет и ставит
+        # фокус на 1-ого игрока 4-й партии
         score_in_game()
         my_win.lineEdit_pl1_s4.setFocus()
-    elif sender == my_win.lineEdit_pl1_s4:
+        my_win.lineEdit_pl1_s4_fin.setFocus()
+    elif sender == my_win.lineEdit_pl1_s4 or sender == my_win.lineEdit_pl1_s4_fin:
         my_win.lineEdit_pl2_s4.setFocus()  # ставит фокус на 2-ого игрока 4-й партии
-    elif sender == my_win.lineEdit_pl2_s4:  # подсчитвает общий счет и ставит фокус на 1-ого игрока 5-й партии
+        my_win.lineEdit_pl2_s4_fin.setFocus()  # ставит фокус на 2-ого игрока 4-й партии
+    elif sender == my_win.lineEdit_pl2_s4 or sender == my_win.lineEdit_pl2_s4_fin:  # подсчитвает общий счет и ставит
+        # фокус на 1-ого игрока 5-й партии
         score_in_game()
         my_win.lineEdit_pl1_s5.setFocus()
-    elif sender == my_win.lineEdit_pl1_s5:
+        my_win.lineEdit_pl1_s5_fin.setFocus()
+    elif sender == my_win.lineEdit_pl1_s5 or sender == my_win.lineEdit_pl1_s5_fin:
         my_win.lineEdit_pl2_s5.setFocus()  # ставит фокус на 2-ого игрока 5-й партии
-    elif sender == my_win.lineEdit_pl2_s5:  # подсчитвает общий счет и ставит фокус на 1-ого игрока 5-й партии
+        my_win.lineEdit_pl2_s5_fin.setFocus()  # ставит фокус на 2-ого игрока 5-й партии
+    elif sender == my_win.lineEdit_pl2_s5 or sender == my_win.lineEdit_pl2_s5_fin:  # подсчитвает общий счет и ставит
+        # фокус на 1-ого игрока 5-й партии
         score_in_game()
         my_win.Button_Ok.setFocus()
+        my_win.Button_Ok_fin.setFocus()
 
 
 def score_in_game():
     """считает общий счет в партиях"""
-
+    total_score = []
+    ts1 = []
+    ts2 = []
+    tab = my_win.tabWidget.currentIndex()
     def setfocus():
         """если один игрок уже выйграл, то переводит фокус на кнопку ОК"""
         if st1 == 3 or st2 == 3:
             my_win.Button_Ok.setEnabled(True)
+            my_win.Button_Ok_fin.setEnabled(True)
             return
-
+    s11 = s21 = s12 = s22 = s13 = s23 = s14 = s24 = s15 = s25 = 0
     # поля ввода счета в партии
-    s11 = my_win.lineEdit_pl1_s1.text()
-    s21 = my_win.lineEdit_pl2_s1.text()
-    s12 = my_win.lineEdit_pl1_s2.text()
-    s22 = my_win.lineEdit_pl2_s2.text()
-    s13 = my_win.lineEdit_pl1_s3.text()
-    s23 = my_win.lineEdit_pl2_s3.text()
-    s14 = my_win.lineEdit_pl1_s4.text()
-    s24 = my_win.lineEdit_pl2_s4.text()
-    s15 = my_win.lineEdit_pl1_s5.text()
-    s25 = my_win.lineEdit_pl2_s5.text()
-
-    if int(s11) > int(s21):
-        st1 = 1
-        st2 = 0
-    else:
-        st1 = 0
-        st2 = 1
-    if s12 == "":
+    if tab == 3:
+        s11 = my_win.lineEdit_pl1_s1.text()
+        s21 = my_win.lineEdit_pl2_s1.text()
+        s12 = my_win.lineEdit_pl1_s2.text()
+        s22 = my_win.lineEdit_pl2_s2.text()
+        s13 = my_win.lineEdit_pl1_s3.text()
+        s23 = my_win.lineEdit_pl2_s3.text()
+        s14 = my_win.lineEdit_pl1_s4.text()
+        s24 = my_win.lineEdit_pl2_s4.text()
+        s15 = my_win.lineEdit_pl1_s5.text()
+        s25 = my_win.lineEdit_pl2_s5.text()
+    elif tab == 4:
         pass
-    else:  # 2-я игра
-        if int(s12) > int(s22):
-            st1 = int(st1) + 1
-        else:
-            st2 = int(st2) + 1
-        if s13 == "":
-            pass
-        else:  # 3-я игра
-            if int(s13) > int(s23):
-                st1 = int(st1) + 1
+    elif tab == 5:
+        s11 = my_win.lineEdit_pl1_s1_fin.text()
+        s21 = my_win.lineEdit_pl2_s1_fin.text()
+        s12 = my_win.lineEdit_pl1_s2_fin.text()
+        s22 = my_win.lineEdit_pl2_s2_fin.text()
+        s13 = my_win.lineEdit_pl1_s3_fin.text()
+        s23 = my_win.lineEdit_pl2_s3_fin.text()
+        s14 = my_win.lineEdit_pl1_s4_fin.text()
+        s24 = my_win.lineEdit_pl2_s4_fin.text()
+        s15 = my_win.lineEdit_pl1_s5_fin.text()
+        s25 = my_win.lineEdit_pl2_s5_fin.text()
+# ====== новый вариант общего счета=========
+    total_score.append(s11)
+    total_score.append(s21)
+    total_score.append(s12)
+    total_score.append(s22)
+    total_score.append(s13)
+    total_score.append(s23)
+    total_score.append(s14)
+    total_score.append(s24)
+    total_score.append(s15)
+    total_score.append(s25)
+    point = 0
+    n = len(total_score)
+    for i in range(0, n, 2):
+        if total_score[i] != "":
+            sc1 = total_score[i]
+            sc2 = total_score[i + 1]
+            if int(sc1) > int(sc2):
+                point = 1
+                ts1.append(point)
             else:
-                st2 = int(st2) + 1
-            setfocus()
-            if s14 == "":
-                pass
-            else:  # 4-я игра
-                if int(s14) > int(s24):
-                    st1 = int(st1) + 1
-                else:
-                    st2 = int(st2) + 1
-                setfocus()
-                if s15 == "":
-                    pass
-                else:  # 5-я игра
-                    if int(s15) > int(s25):
-                        st1 = int(st1) + 1
-                    else:
-                        st2 = int(st2) + 1
-                    setfocus()
-
-    my_win.lineEdit_pl1_score_total.setText(str(st1))
-    my_win.lineEdit_pl2_score_total.setText(str(st2))
+                point = 1
+                ts2.append(point)
+            st1 = sum(ts1)
+            st2 = sum(ts2)
+# =========================
+    if tab == 3:
+        my_win.lineEdit_pl1_score_total.setText(str(st1))
+        my_win.lineEdit_pl2_score_total.setText(str(st2))
+    elif tab == 4:
+        pass
+    elif tab == 5:
+        my_win.lineEdit_pl1_score_total_fin.setText(str(st1))
+        my_win.lineEdit_pl2_score_total_fin.setText(str(st2))
 
 
 def enter_score(tb):
     """заносит в таблицу -результаты- победителя, счет и т.п."""
-    st1 = int(my_win.lineEdit_pl1_score_total.text())
-    st2 = int(my_win.lineEdit_pl2_score_total.text())
+    tab = my_win.tabWidget.currentIndex()
+    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    # system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+    if tab == 3:
+        st1 = int(my_win.lineEdit_pl1_score_total.text())
+        st2 = int(my_win.lineEdit_pl2_score_total.text())
+    elif tab == 4:
+        pass
+    elif tab == 5:
+        st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
+        st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
 
     r = my_win.tableWidget.currentRow()
     id = my_win.tableWidget.item(r, 0).text()
+    num_game = my_win.tableWidget.item(r, 3).text()
     if st1 > st2:
-        winner = my_win.lineEdit_player1.text()
-        loser = my_win.lineEdit_player2.text()
+        if tab == 3:
+            winner = my_win.lineEdit_player1.text()
+            loser = my_win.lineEdit_player2.text()
+        elif tab == 4:
+            pass
+        elif tab == 5:
+            winner = my_win.lineEdit_player1_fin.text()
+            loser = my_win.lineEdit_player2_fin.text()
         ts_winner = f"{st1} : {st2}"
         ts_loser = f"{st2} : {st1}"
     else:
-        winner = my_win.lineEdit_player2.text()
-        loser = my_win.lineEdit_player1.text()
+        if tab == 3:
+            winner = my_win.lineEdit_player2.text()
+            loser = my_win.lineEdit_player1.text()
+        elif tab == 4:
+            pass
+        elif tab == 5:
+            winner = my_win.lineEdit_player2_fin.text()
+            loser = my_win.lineEdit_player1_fin.text()
         ts_winner = f"{st2} : {st1}"
         ts_loser = f"{st1} : {st2}"
     winner_string = string_score_game()
@@ -1846,52 +1895,125 @@ def enter_score(tb):
         result.points_loser = "1"
         result.score_loser = ts_loser
         result.save()
+    snoska = numer_game(num_game)
+    with db:
+        result_win = Result.get(Result.tours == snoska[0])
+        if result_win.player1 is None:
+            result_win.player1 = winner
+        else:
+            result_win.player2 = winner
+        result_win.save()
+        result_los = Result.get(Result.tours == snoska[1])
+        if result_los.player1 is None:
+            result_los.player1 = loser
+        else:
+            result_los.player2 = loser
+        result_los.save()
     fill_table_results(tb=0)
+    if tab == 3:
+        my_win.lineEdit_pl1_s1.setText("")  # очищает поля ввода счета в партии
+        my_win.lineEdit_pl2_s1.setText("")
+        my_win.lineEdit_pl1_s2.setText("")
+        my_win.lineEdit_pl2_s2.setText("")
+        my_win.lineEdit_pl1_s3.setText("")
+        my_win.lineEdit_pl2_s3.setText("")
+        my_win.lineEdit_pl1_s4.setText("")
+        my_win.lineEdit_pl2_s4.setText("")
+        my_win.lineEdit_pl1_s5.setText("")
+        my_win.lineEdit_pl2_s5.clear()
+        my_win.lineEdit_pl1_score_total.clear()  # очищает поля общего счета
+        my_win.lineEdit_pl2_score_total.clear()
+        my_win.lineEdit_player1.clear()  # очищает поля фамилии игроков
+        my_win.lineEdit_player2.clear()
+    elif tab == 4:
+        pass
+    elif tab == 5:
+        my_win.lineEdit_pl1_s1_fin.clear()  # очищает поля ввода счета в партии
+        my_win.lineEdit_pl2_s1_fin.clear()
+        my_win.lineEdit_pl1_s2_fin.clear()
+        my_win.lineEdit_pl2_s2_fin.clear()
+        my_win.lineEdit_pl1_s3_fin.clear()
+        my_win.lineEdit_pl2_s3_fin.clear()
+        my_win.lineEdit_pl1_s4_fin.clear()
+        my_win.lineEdit_pl2_s4_fin.clear()
+        my_win.lineEdit_pl1_s5_fin.clear()
+        my_win.lineEdit_pl2_s5_fin.clear()
+        my_win.lineEdit_pl1_score_total_fin.clear()  # очищает поля общего счета
+        my_win.lineEdit_pl2_score_total_fin.clear()
+        my_win.lineEdit_player1_fin.clear()  # очищает поля фамилии игроков
+        my_win.lineEdit_player2_fin.clear()
 
-    my_win.lineEdit_pl1_s1.setText("")  # очищает поля ввода счета в партии
-    my_win.lineEdit_pl2_s1.setText("")
-    my_win.lineEdit_pl1_s2.setText("")
-    my_win.lineEdit_pl2_s2.setText("")
-    my_win.lineEdit_pl1_s3.setText("")
-    my_win.lineEdit_pl2_s3.setText("")
-    my_win.lineEdit_pl1_s4.setText("")
-    my_win.lineEdit_pl2_s4.setText("")
-    my_win.lineEdit_pl1_s5.setText("")
-    my_win.lineEdit_pl2_s5.setText("")
-
-    my_win.lineEdit_pl1_score_total.setText("")  # очищает поля общего счета
-    my_win.lineEdit_pl2_score_total.setText("")
-
-    my_win.lineEdit_player1.setText("")  # очищает поля фамилии игроков
-    my_win.lineEdit_player2.setText("")
     # ===== вызов функции заполнения таблицы pdf группы сыгранными играми
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    pv = system.page_vid
-    comp_system.table_made(pv)
+    etap = my_win.tableWidget.item(r, 2).text()
+    system = System.select().order_by(System.id).where(System.title_id == t and System.stage == etap).get()  # находит
+    # system id последнего
+    system_table = system.label_string
+    table_max_player = system.max_player
+    txt = system_table.find("на")
+    table = system_table[:txt - 1]
+    if system.stage == "предварительный":
+        pv = system.page_vid
+        comp_system.table_made(pv)
+    elif table == "Сетка (с розыгрышем всех мест)":
+        if table_max_player == 16:
+            pv = system.page_vid
+            comp_system.setka_16_made(fin=etap)
+        elif table_max_player == 32:
+            pass
+
+
+def numer_game(num_game):
+    """определяет куда записывать победителя и проигравшего по сноске в сетке"""
+    snoska = []
+    dict_winner = {1: 9, 2: 9, 3: 10, 4: 10, 5: 11, 6: 11, 7: 12, 8: 12, 9: 13, 10: 13, 11: 14, 12: 14, 13: 15, 14: 15,
+                   17: 19, 18: 19, 21: 25, 22: 25, 23: 26, 24: 26, 25: 27, 26: 27, 29: 31, 30: 31}
+    dict_loser = {1: 21, 2: 21, 3: 22, 4: 22, 5: 23, 6: 23, 7: 24, 8: 24, 9: 17, 10: 17, 11: 18, 12: 18, 13: 16, 14: 16,
+                  17: 20, 18: 20, 21: 29, 22: 29, 23: 30, 24: 30, 25: 28, 26: 28, 29: 32, 30: 32}
+    game_winner = dict_winner[int(num_game)]
+    snoska.append(game_winner)
+    game_loser = dict_loser[int(num_game)]
+    snoska.append(game_loser)
+    return snoska
 
 
 def string_score_game():
     """создает строку со счетом победителя"""
+    tab = my_win.tabWidget.currentIndex()
     if my_win.radioButton_match_3.isChecked():  # зависимости от кол-во партий
         g = 2
     elif my_win.radioButton_match_5.isChecked():
         g = 3
     else:
         g = 4
-    # поля ввода счета в партии
-    st1 = int(my_win.lineEdit_pl1_score_total.text())
-    st2 = int(my_win.lineEdit_pl2_score_total.text())
-    s11 = my_win.lineEdit_pl1_s1.text()
-    s21 = my_win.lineEdit_pl2_s1.text()
-    s12 = my_win.lineEdit_pl1_s2.text()
-    s22 = my_win.lineEdit_pl2_s2.text()
-    s13 = my_win.lineEdit_pl1_s3.text()
-    s23 = my_win.lineEdit_pl2_s3.text()
-    s14 = my_win.lineEdit_pl1_s4.text()
-    s24 = my_win.lineEdit_pl2_s4.text()
-    s15 = my_win.lineEdit_pl1_s5.text()
-    s25 = my_win.lineEdit_pl2_s5.text()
+    if tab == 3:
+        # поля ввода счета в партии
+        st1 = int(my_win.lineEdit_pl1_score_total.text())
+        st2 = int(my_win.lineEdit_pl2_score_total.text())
+        s11 = my_win.lineEdit_pl1_s1.text()
+        s21 = my_win.lineEdit_pl2_s1.text()
+        s12 = my_win.lineEdit_pl1_s2.text()
+        s22 = my_win.lineEdit_pl2_s2.text()
+        s13 = my_win.lineEdit_pl1_s3.text()
+        s23 = my_win.lineEdit_pl2_s3.text()
+        s14 = my_win.lineEdit_pl1_s4.text()
+        s24 = my_win.lineEdit_pl2_s4.text()
+        s15 = my_win.lineEdit_pl1_s5.text()
+        s25 = my_win.lineEdit_pl2_s5.text()
+    elif tab == 4:
+        pass
+    elif tab == 5:
+        st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
+        st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
+        s11 = my_win.lineEdit_pl1_s1_fin.text()
+        s21 = my_win.lineEdit_pl2_s1_fin.text()
+        s12 = my_win.lineEdit_pl1_s2_fin.text()
+        s22 = my_win.lineEdit_pl2_s2_fin.text()
+        s13 = my_win.lineEdit_pl1_s3_fin.text()
+        s23 = my_win.lineEdit_pl2_s3_fin.text()
+        s14 = my_win.lineEdit_pl1_s4_fin.text()
+        s24 = my_win.lineEdit_pl2_s4_fin.text()
+        s15 = my_win.lineEdit_pl1_s5_fin.text()
+        s25 = my_win.lineEdit_pl2_s5_fin.text()
     # создание строки счета победителя
     if st1 > st2:
         if int(s11) > int(s21):  # 1-й сет
@@ -2517,7 +2639,7 @@ def proba():
     comp_system.setka_16_made()
 
 
-# ===== переводит фокус на полее ввода счета в партии
+# ===== переводит фокус на поле ввода счета в партии вкладки -группа-
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s1.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s2.returnPressed.connect(focus)
@@ -2528,6 +2650,17 @@ my_win.lineEdit_pl1_s4.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5.returnPressed.connect(focus)
+# ===== переводит фокус на полее ввода счета в партии вкладки -финалы-
+my_win.lineEdit_pl1_s1_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s1_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s2_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s2_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s3_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s3_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s4_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
 
 # ====== отслеживание изменения текста в полях ============
 
@@ -2575,6 +2708,7 @@ my_win.Button_add_player.clicked.connect(add_player)  # добавляет иг�
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
 my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
+my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
 # my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_R.clicked.connect(sort)
