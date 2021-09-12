@@ -68,7 +68,8 @@ def setka_data_16(fin):
 
 
 def score_in_table(td, num_gr):
-    """заносит счет в таблицу группы pdf"""
+    """заносит счет в таблицу группы pdf
+    -td- список строки таблицы, куда пишут счет"""
     total_score = {}  # словарь, где ключ - номер группы, а значение - очки
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     ta = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
@@ -124,6 +125,44 @@ def score_in_table(td, num_gr):
         rank_in_group(total_score, mp, td, num_gr)
     else:
         return
+
+
+
+def numer_game(num_game):
+    """определяет куда записывать победителя и проигравшего по сноске в сетке, номера встреч"""
+    snoska = []
+    dict_winner = {1: 9, 2: 9, 3: 10, 4: 10, 5: 11, 6: 11, 7: 12, 8: 12, 9: 13, 10: 13, 11: 14, 12: 14, 13: 15, 14: 15,
+                   17: 19, 18: 19, 21: 25, 22: 25, 23: 26, 24: 26, 25: 27, 26: 27, 29: 31, 30: 31}
+    dict_loser = {1: 21, 2: 21, 3: 22, 4: 22, 5: 23, 6: 23, 7: 24, 8: 24, 9: 17, 10: 17, 11: 18, 12: 18, 13: 16, 14: 16,
+                  17: 20, 18: 20, 21: 29, 22: 29, 23: 30, 24: 30, 25: 28, 26: 28, 29: 32, 30: 32}
+    game_winner = dict_winner[int(num_game)]
+    snoska.append(game_winner)
+    game_loser = dict_loser[int(num_game)]
+    snoska.append(game_loser)
+    return snoska
+
+
+def score_in_setka(fin):
+    """ выставляет счет победителя и сносит на свои места в сетке"""
+    dict_setka = {}
+    match = []
+    tmp_match = []
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    result = Result.select().where(Result.title_id == t and Result.number_group == fin)  # находит system id последнего
+    for res in result:
+        num_game = int(res.tours)
+        family_win = res.winner
+        if res.winner is not None and res.winner != "":
+            snoska = numer_game(num_game)
+            tmp_match.append(snoska[0])
+            tmp_match.append(res.winner)
+            tmp_match.append(f'{res.score_in_game} {res.score_win}')
+            tmp_match.append(snoska[1])
+            tmp_match.append(res.loser)
+            match = tmp_match.copy()
+            tmp_match.clear()
+            dict_setka[num_game] = match
+    return dict_setka
 
 
 def rank_in_group(total_score, max_person, td, num_gr):

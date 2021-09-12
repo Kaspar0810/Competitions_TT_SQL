@@ -74,6 +74,7 @@ def tbl(kg, ts, zagolovok, cW, rH):
 
 def setka_16(fin):
     """данные сетки на 16, tds - список фамилий в сетка данные"""
+    dict_setka = {}
     choice = Choice.select().where(Choice.final == fin)
     tds = tbl_data.setka_data_16(fin)
     return tds
@@ -452,18 +453,40 @@ def setka_16_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    tds = setka_16(fin)
-    for i in range(0, 31, 2):
+    tds = setka_16(fin)  # список фамилия/ город 1-ого посева
+    for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
         n = i - (i // 2)
         data[i][1] = tds[n]
+    # ===== вставить результаты встреч необходим цикл по всей таблице -Result-
+    dict_setka = tbl_data.score_in_setka(fin)
+    # count = len(dict_setka)
+    key_list = []
+    val_list = []
+    for k in dict_setka.keys():
+        key_list.append(k)
+    for v in key_list:
+        val = dict_setka[v]
+        val_list.append(val)
+
+    for i in key_list:
+        match = dict_setka[i]
+        row_win = dict_num_game[str(match[0])]
+        win = match[1]
+        score = match[2]
+        row_los = dict_num_game[str(match[3])]
+        los = match[4]
+        data[row_win - 1][3] = win
+        data[row_win][3] = score
+        data[row_los - 1][3] = los
+
     # ==============
     cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm,
            0.4 * cm, 3.2 * cm, 1.2 * cm))
     t = Table(data, cw, 69 * [0.35 * cm])  # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     style = []
     # отображениее сетки
-    tblstyle = [('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey),
-                ('BOX', (0, 0), (-1, -1), 0.01, colors.grey)]
+    # tblstyle = [('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey),
+    #             ('BOX', (0, 0), (-1, -1), 0.01, colors.grey)]
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки (1-й тур)
     for q in range(1, 33, 2):  # рисует встречи 1-8

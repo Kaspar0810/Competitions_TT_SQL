@@ -1862,6 +1862,7 @@ def enter_score(tb):
     r = my_win.tableWidget.currentRow()
     id = my_win.tableWidget.item(r, 0).text()
     num_game = my_win.tableWidget.item(r, 3).text()
+    fin = my_win.tableWidget.item(r, 2).text()
     if st1 > st2:
         if tab == 3:
             winner = my_win.lineEdit_player1.text()
@@ -1895,21 +1896,22 @@ def enter_score(tb):
         result.points_loser = "1"
         result.score_loser = ts_loser
         result.save()
-    snoska = numer_game(num_game)
+    snoska = tbl_data.numer_game(num_game)
     with db:
         result_win = Result.get(Result.tours == snoska[0])
-        if result_win.player1 is None:
+        if result_win.player1 is None or result_win.player1 == "":
             result_win.player1 = winner
         else:
             result_win.player2 = winner
         result_win.save()
         result_los = Result.get(Result.tours == snoska[1])
-        if result_los.player1 is None:
+        if result_los.player1 is None or result_los.player1 == "":
             result_los.player1 = loser
         else:
             result_los.player2 = loser
         result_los.save()
     fill_table_results(tb=0)
+    # match = tbl_data.score_in_setka(snoska, num_game, fin)  # функция сноски по сетке
     if tab == 3:
         my_win.lineEdit_pl1_s1.setText("")  # очищает поля ввода счета в партии
         my_win.lineEdit_pl2_s1.setText("")
@@ -1962,18 +1964,18 @@ def enter_score(tb):
             pass
 
 
-def numer_game(num_game):
-    """определяет куда записывать победителя и проигравшего по сноске в сетке"""
-    snoska = []
-    dict_winner = {1: 9, 2: 9, 3: 10, 4: 10, 5: 11, 6: 11, 7: 12, 8: 12, 9: 13, 10: 13, 11: 14, 12: 14, 13: 15, 14: 15,
-                   17: 19, 18: 19, 21: 25, 22: 25, 23: 26, 24: 26, 25: 27, 26: 27, 29: 31, 30: 31}
-    dict_loser = {1: 21, 2: 21, 3: 22, 4: 22, 5: 23, 6: 23, 7: 24, 8: 24, 9: 17, 10: 17, 11: 18, 12: 18, 13: 16, 14: 16,
-                  17: 20, 18: 20, 21: 29, 22: 29, 23: 30, 24: 30, 25: 28, 26: 28, 29: 32, 30: 32}
-    game_winner = dict_winner[int(num_game)]
-    snoska.append(game_winner)
-    game_loser = dict_loser[int(num_game)]
-    snoska.append(game_loser)
-    return snoska
+# def numer_game(num_game):
+#     """определяет куда записывать победителя и проигравшего по сноске в сетке, номера встреч"""
+#     snoska = []
+#     dict_winner = {1: 9, 2: 9, 3: 10, 4: 10, 5: 11, 6: 11, 7: 12, 8: 12, 9: 13, 10: 13, 11: 14, 12: 14, 13: 15, 14: 15,
+#                    17: 19, 18: 19, 21: 25, 22: 25, 23: 26, 24: 26, 25: 27, 26: 27, 29: 31, 30: 31}
+#     dict_loser = {1: 21, 2: 21, 3: 22, 4: 22, 5: 23, 6: 23, 7: 24, 8: 24, 9: 17, 10: 17, 11: 18, 12: 18, 13: 16, 14: 16,
+#                   17: 20, 18: 20, 21: 29, 22: 29, 23: 30, 24: 30, 25: 28, 26: 28, 29: 32, 30: 32}
+#     game_winner = dict_winner[int(num_game)]
+#     snoska.append(game_winner)
+#     game_loser = dict_loser[int(num_game)]
+#     snoska.append(game_loser)
+#     return snoska
 
 
 def string_score_game():
