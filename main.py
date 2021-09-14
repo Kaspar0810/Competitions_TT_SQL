@@ -1454,7 +1454,7 @@ def view():
     elif tw == 4:
         pass
     elif tw == 5:
-        pass
+        view_file = "setka_16_1-й финал.pdf"
     os.system(f"open {view_file}")
 
 
@@ -1897,19 +1897,20 @@ def enter_score(tb):
         result.score_loser = ts_loser
         result.save()
     snoska = tbl_data.numer_game(num_game)
-    with db:
-        result_win = Result.get(Result.tours == snoska[0])
-        if result_win.player1 is None or result_win.player1 == "":
-            result_win.player1 = winner
-        else:
-            result_win.player2 = winner
-        result_win.save()
-        result_los = Result.get(Result.tours == snoska[1])
-        if result_los.player1 is None or result_los.player1 == "":
-            result_los.player1 = loser
-        else:
-            result_los.player2 = loser
-        result_los.save()
+    if snoska[0] != 0:
+        with db:  # записывает в db таблицу Result победителя и проигравшего
+            result_win = Result.get(Result.tours == snoska[0])  # номер id куда записвается победитель
+            if result_win.player1 is None or result_win.player1 == "":
+                result_win.player1 = winner
+            else:
+                result_win.player2 = winner
+            result_win.save()
+            result_los = Result.get(Result.tours == snoska[1])  # номер id куда записвается проигравший
+            if result_los.player1 is None or result_los.player1 == "":
+                result_los.player1 = loser
+            else:
+                result_los.player2 = loser
+            result_los.save()
     fill_table_results(tb=0)
     # match = tbl_data.score_in_setka(snoska, num_game, fin)  # функция сноски по сетке
     if tab == 3:

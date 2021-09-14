@@ -72,12 +72,12 @@ def tbl(kg, ts, zagolovok, cW, rH):
     return dict_tbl
 
 
-def setka_16(fin):
-    """данные сетки на 16, tds - список фамилий в сетка данные"""
-    dict_setka = {}
-    choice = Choice.select().where(Choice.final == fin)
-    tds = tbl_data.setka_data_16(fin)
-    return tds
+# def setka_16(fin):
+#     """данные сетки на 16, tds - список фамилий в сетка данные"""
+#     # dict_setka = {}
+#     choice = Choice.select().where(Choice.final == fin)
+#     tds = tbl_data.setka_data_16(fin)
+#     return tds
 
 
 def table_made(pv):
@@ -380,13 +380,6 @@ def setka_16_made(fin):
         # column_count[10] = i  # нумерация 10 столбца для удобного просмтра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
-    # # ===== добавить данные игроков и счета в data
-    # tds = setka_16(fin)
-    # for i in range(0, 31, 2):
-    #     n = i - (i // 2)
-    #     data[i][1] = tds[n]
-
-    # ====================
 
     # ========= места ==========
     n = 1
@@ -442,9 +435,19 @@ def setka_16_made(fin):
         data[i + 26][8] = str(p + 15)  # создание номеров встреч (31-32)
         p += 1
     data[8][8] = str(15)  # создание номеров встреч 15
+    data[25][8] = str(-15)
     data[29][8] = str(16)  # создание номеров встреч 16
+    data[31][8] = str(-16)
+    data[37][8] = str(-19)
+    data[41][8] = str(-20)
     data[44][8] = str(27)  # создание номеров встреч 27
+    data[52][8] = str(-27)
     data[55][8] = str(28)  # создание номеров встреч 28
+    data[57][8] = str(-28)
+    data[63][8] = str(-31)
+    data[67][8] = str(-32)
+
+    # ============= данные игроков и встреч и размещение по сетке =============
     # ======= создать словарь  ключ - номер встречи, значение - номер ряда
     dict_num_game = {}
     for d in range(2, 11, 2):
@@ -453,13 +456,12 @@ def setka_16_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    tds = setka_16(fin)  # список фамилия/ город 1-ого посева
+    tds = tbl_data.setka_data_16(fin)  # список фамилия/ город 1-ого посева
     for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
         n = i - (i // 2)
         data[i][1] = tds[n]
     # ===== вставить результаты встреч необходим цикл по всей таблице -Result-
-    dict_setka = tbl_data.score_in_setka(fin)
-    # count = len(dict_setka)
+    dict_setka = tbl_data.score_in_setka(fin)  # функция расстановки счетов и сносок игроков
     key_list = []
     val_list = []
     for k in dict_setka.keys():
@@ -467,26 +469,50 @@ def setka_16_made(fin):
     for v in key_list:
         val = dict_setka[v]
         val_list.append(val)
-
+    column = [[9, 10, 11, 12, 21, 22, 23, 24], [13, 14, 17, 18, 25, 26, 29, 30], [15, 16, 19, 20, 27, 28, 31, 32]]
+    row_plus = [[13, 14, 27], [15]]
+    count = len(column)
     for i in key_list:
         match = dict_setka[i]
-        row_win = dict_num_game[str(match[0])]
-        win = match[1]
-        score = match[2]
-        row_los = dict_num_game[str(match[3])]
-        los = match[4]
-        data[row_win - 1][3] = win
-        data[row_win][3] = score
-        data[row_los - 1][3] = los
+        i = str(i)
+        r = str(match[3])
+        row_rank = match[3]
+        c = match[0]
+        row_win = dict_num_game[i]  # строка победителя
+        if c != 0:
+            for u in range(0, count):  # в зависимости от встречи делает сдвиг по столобцам
+                if c in column[u]:
+                    col = u * 2 + 3
+                    break
+            for n in range(0, 2):  # корректировка значения строки
+                if c in row_plus[n]:
+                    if n == 0:
+                        row_win += 1
+                    else:
+                        row_win += 3
+                    break
+        else:  # встречи за места сдвиг на 9-й ряд
+            col = 9
+        if row_rank == -15:
+            row_win += 7
+        elif row_rank == -19 or row_rank == -31:
+            row_win += 1
+        elif row_rank == -27:
+            row_win += 3
+
+        win = match[1]  # победитель
+        score = match[2]  # счет во встречи
+        row_los = dict_num_game[r]  # строка проигравшего
+        los = match[4]  # проигравший
+        data[row_win][col] = win
+        data[row_win + 1][col] = score
+        data[row_los][col] = los
 
     # ==============
     cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm,
            0.4 * cm, 3.2 * cm, 1.2 * cm))
     t = Table(data, cw, 69 * [0.35 * cm])  # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     style = []
-    # отображениее сетки
-    # tblstyle = [('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey),
-    #             ('BOX', (0, 0), (-1, -1), 0.01, colors.grey)]
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки (1-й тур)
     for q in range(1, 33, 2):  # рисует встречи 1-8

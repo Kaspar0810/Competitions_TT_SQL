@@ -127,18 +127,31 @@ def score_in_table(td, num_gr):
         return
 
 
-
 def numer_game(num_game):
     """определяет куда записывать победителя и проигравшего по сноске в сетке, номера встреч"""
     snoska = []
+    num_game = int(num_game)
+    # решить игры за места===================
     dict_winner = {1: 9, 2: 9, 3: 10, 4: 10, 5: 11, 6: 11, 7: 12, 8: 12, 9: 13, 10: 13, 11: 14, 12: 14, 13: 15, 14: 15,
                    17: 19, 18: 19, 21: 25, 22: 25, 23: 26, 24: 26, 25: 27, 26: 27, 29: 31, 30: 31}
     dict_loser = {1: 21, 2: 21, 3: 22, 4: 22, 5: 23, 6: 23, 7: 24, 8: 24, 9: 17, 10: 17, 11: 18, 12: 18, 13: 16, 14: 16,
                   17: 20, 18: 20, 21: 29, 22: 29, 23: 30, 24: 30, 25: 28, 26: 28, 29: 32, 30: 32}
-    game_winner = dict_winner[int(num_game)]
-    snoska.append(game_winner)
-    game_loser = dict_loser[int(num_game)]
-    snoska.append(game_loser)
+    dict_loser_pdf = {1: -1, 2: -2, 3: -3, 4: -4, 5: -5, 6: -6, 7: -7, 8: -8, 9: -9, 10: -10, 11: -11, 12: -12, 13: -13,
+                      14: -14, 17: -17, 18: -18, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 29: -29, 30: -30}
+    dict_mesta = [15, 16, 19, 20, 27, 28, 31, 32]
+
+    if num_game in dict_mesta:
+        index = dict_mesta.index(num_game)
+        snoska = [0, 0]
+        game_loser = dict_mesta[index] * -1  # для отбражения в pdf (встречи с минусом)
+        snoska.append(game_loser)
+    else:
+        game_winner = dict_winner[num_game]  # номер игры победителя
+        snoska.append(game_winner)
+        game_loser = dict_loser[num_game]  # номер игры проигравшего
+        snoska.append(game_loser)
+        game_loser = dict_loser_pdf[num_game]  # для отбражения в pdf (встречи с минусом)
+        snoska.append(game_loser)
     return snoska
 
 
@@ -149,6 +162,7 @@ def score_in_setka(fin):
     tmp_match = []
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     result = Result.select().where(Result.title_id == t and Result.number_group == fin)  # находит system id последнего
+
     for res in result:
         num_game = int(res.tours)
         family_win = res.winner
@@ -157,7 +171,7 @@ def score_in_setka(fin):
             tmp_match.append(snoska[0])
             tmp_match.append(res.winner)
             tmp_match.append(f'{res.score_in_game} {res.score_win}')
-            tmp_match.append(snoska[1])
+            tmp_match.append(snoska[2])
             tmp_match.append(res.loser)
             match = tmp_match.copy()
             tmp_match.clear()
