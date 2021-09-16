@@ -1082,24 +1082,8 @@ def page():
         if fin == "Все финалы":
             my_win.label_38.hide()
             my_win.checkBox_5.setChecked(False)
-
-        # game_in_visible(state)  # скрывает или показывает поля ввода счета
-        # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-        # sf = System.get(System.title_id == t)
-        # final = System.get(System.title_id == t and System.stage == fin)
-        # flag = final.choice_flag
-        # # flag = ready_choice()  # надо проверять жеребъевку финала
-        # if flag is False:
-        #     pass
-        # else:
-        #     state = sf.score_flag  # флаг, показывающий записывать счет в партиях или нет
-        #     if sf.score_flag == True:  # отмечает чекбокс в зависимости от значения в db -system-
-        #         my_win.checkBox_5.setChecked(True)
-        #     else:
-        #         my_win.checkBox_5.setChecked(False)
-        #     game_in_visible(state)  # скрывает или показывает поля ввода счета
         my_win.tableWidget.show()
-        my_win.Button_Ok.setDisabled(True)
+        my_win.Button_Ok_fin.setDisabled(True)
         my_win.radioButton_match_5.setChecked(True)
         load_combobox_filter_final()
         load_combo()
@@ -1844,10 +1828,6 @@ def score_in_game():
                 st2 = sum(ts2)
             else:
                 return
-            #     result = msgBox.information(my_win, "", "Проверьте правильность ввода\n счета в партии!",
-            #                              msgBox.StandardButtons.Ok)
-            #     return
-# =========================
     if tab == 3:
         # вставить функцию на проверку правильности ввода счета
         my_win.lineEdit_pl1_score_total.setText(str(st1))
@@ -1911,28 +1891,6 @@ def control_score(sc1, sc2):
                                 msgBox.StandardButtons.Ok)
     elif flag == True:
         return flag
-
-
-    # elif sc1 >= 11 and sc2 == sc1 - 2:
-    #     flag = True
-    # elif sc1 >= 11 and sc2 == sc1 + 2:
-    #     flag = True
-    # elif sc2 >= 11 and sc1 == sc1 - 2:
-    #     flag = True
-    # elif sc2 >= 11 and sc1 == sc1 + 2:
-    #     flag = True
-    # elif 9 >= sc1 >= 0 and sc2 == 11:
-    #     flag = True
-    # elif 9 >= sc2 >= 0 and sc1 == 11:
-    #     flag = True
-    # elif sc1 >= 11 and sc2 == sc1 - 1:
-    #     flag = False
-    # elif sc2 >= 11 and sc1 == sc2 - 1:
-    #     flag = False
-
-    # return flag
-
-
 
 
 def enter_score():
@@ -2252,7 +2210,7 @@ def filter_fin():
     msgBox = QMessageBox
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     result = Result.select().where(Result.title_id == t)  # находит system id последнего
-
+    num_game_fin = my_win.lineEdit_num_game_fin.text()
     final = my_win.comboBox_filter_final.currentText()
     name = my_win.comboBox_find_name_fin.currentText()
     name = name.title()  # делает Заглавными буквы слов
@@ -2262,15 +2220,17 @@ def filter_fin():
         if name == "":
             count = len(fltr)
             my_win.label_38.setText(f'Всего в финалах {count} игры')
+            for i in range(0, count):
+                my_win.tableWidget.showRow(i)
         else:  # выбор по фамилии спортсмена
-            fltr = Result.select().where(Result.system_stage == "Финальный" and Result.player1 == name)
-            # result = msgBox.question(my_win, "", "Встреча с этим спортсменом найдена?\n"
-            #                                      "или хотите продолжить поиск?\n",
-            #                          msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-            # if result == msgBox.StandardButtons.Ok:
-            #     fltr = Result.select().where(Result.system_stage == "Финальный" and Result.player2 == name)
-            # else:
-            #     return
+            row = 0
+            fltr = Result.select().where(Result.system_stage == "Финальный")
+            for result_name in fltr:
+                row += 1
+                if result_name.player1 == name or result_name.player2 == name:
+                    pass
+                else:
+                    my_win.tableWidget.hideRow(row - 1)
     elif final != "все финалы" and played == "не сыгранные":
         fltr = Result.select().where(Result.number_group == final)
         count = len(fltr)
@@ -2284,8 +2244,16 @@ def filter_fin():
                 fltr_played.append(win)
         count_pl = len(fltr_played)
         my_win.label_38.setText(f'Завершено в {final} {count_pl} игры')
+    elif final != "все финалы" and num_game_fin != "":
+        fltr = Result.select().where(Result.number_group == final)
+        row = 0
+        for result_list in fltr:
+            row += 1
+            if result_list.tours != num_game_fin:
+                my_win.tableWidget.hideRow(row - 1)
+    result_list = fltr.dicts().execute()
+
     my_win.label_38.show()
-    # result_list = fltr.dict().execute()
     row_count = len(fltr)  # кол-во строк в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
@@ -2354,6 +2322,7 @@ def reset_filter():
         my_win.comboBox_find_name_fin.setCurrentText("")
         my_win.comboBox_filter_played_fin.setCurrentText("все игры")
         my_win.comboBox_filter_final.setCurrentText("все финалы")
+        my_win.lineEdit_num_game_fin.setText("")
         filter_fin()
 
 
