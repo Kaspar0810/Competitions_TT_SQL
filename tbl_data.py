@@ -179,11 +179,28 @@ def score_in_setka(fin):
     return dict_setka
 
 
+def result_rank_group(num_gr, player_rank_group):
+    """записывает места из группы в таблицу -Result-"""
+    if len(player_rank_group) > 0:
+        t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+        choice = Choice.select().where(Choice.group == num_gr)
+        count = len(choice)
+        for ch in choice:
+            for i in range(0, count):
+                if ch.posev_group == player_rank_group[i][0]:
+                    with db:
+                        ch.mesto_group = player_rank_group[i][1]
+                        ch.save()
+
+
 def rank_in_group(total_score, max_person, td, num_gr):
     """выставляет места в группах соответсвенно очкам
-    men_of_circle - кол-во человек в крутиловке"""
+    men_of_circle - кол-во человек в крутиловке
+    player_rank_group - список списков номер игрока - место"""
     rev_dict = {}  # словарь, где в качастве ключа очки, а значения - номера групп
-
+    # player_rank = []
+    player_rank_group = []
     game_max = Result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
     played = Result.select().where(Result.number_group == num_gr)  # 1-й запрос на выборку с группой
     game_played = played.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
@@ -205,6 +222,8 @@ def rank_in_group(total_score, max_person, td, num_gr):
             Keymax = max(total_score, key=total_score.get)  # ключ максимального значения (группа)
             m_val_1 = total_score[Keymax]  # максимальное значение (очки)
             td[Keymax * 2 - 2][max_person + 4] = 1  # записывает 1 место игроку
+            player_rank_group.append([td[Keymax * 2 - 2][max_person + 4], 1])  # список номер игрока в группе и 1
+                # место для занесения в таблицу -Choice-
             new_list = val_list.copy()  # создает копию списка
             for s in range(0, max_person - 1):  # цикл по игрокам группы
                 m_val = m_val_1
@@ -212,6 +231,8 @@ def rank_in_group(total_score, max_person, td, num_gr):
                 m_val_1 = max(new_list)  # находит макс значение из оставшихся
                 i = key_list[val_list.index(m_val_1)]  # находит ключ соответсвующий максимальному значению
                 td[i * 2 - 2][max_person + 4] = s + 2  # записывает место игроку
+                player_rank_group.append([td[i * 2 - 2][max_person + 4], s + 2])  # список номер игрока в группе и его
+                # место для занесения в таблицу -Choice-
         else:  # =========== если одинаковое кол-во очков
             ds = {index: value for index, value in enumerate(val_list)}  # получает словарь(ключ, очки)
             sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
@@ -226,7 +247,8 @@ def rank_in_group(total_score, max_person, td, num_gr):
                 m_new = val_list.count(e)  # сколько раз встречается значение
                 mesto_points[e] = mesto  # записывает в словарь пары (очки - место)
                 mesto = mesto + m_new  #
-            for t in range(0, max_person):  # цикл записи группа место (без уточнения мест в крутиловке)
+            # for t in range(0, max_person):  # цикл записи группа место (без уточнения мест в крутиловке)
+            for t in range(0, q_list):  # цикл записи группа место (без уточнения мест в крутиловке)
                 wr = val_list[t]  # очки игрока
                 wk = key_list[t]  # номер группы
                 w = mesto_points.setdefault(wr)  # находит ключ соответсвующий кол-во очков (место)
@@ -241,7 +263,9 @@ def rank_in_group(total_score, max_person, td, num_gr):
                     num_player = rev_dict.get(wr)
                     for x in num_player:
                         tr.append(str(x))  # создает список (встречи игроков)
-                    circle(men_of_circle, tr, num_gr, td, max_person, mesto)
+                player_rank = circle(men_of_circle, tr, num_gr, td, max_person, mesto)
+                player_rank_group = player_rank + player_rank_group
+    result_rank_group(num_gr, player_rank_group)
 
 
 def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
@@ -249,6 +273,7 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
     -tour- встречи игроков, p1, p2 фамилии, num_gr номер группы
     men_of_circle кол-во игроков с одинаковым кол-вом очков,
     max_person общее кол-во ироков в группе"""
+    player_rank = []
     if men_of_circle == 2:  # кол-во человек в крутиловке (одинаковое кол-во очков)
         tour = "-".join(tr)  # делает строку встреча в туре
         p1 = int(tour[0])
@@ -260,13 +285,17 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
             points_p2 = c.points_loser  # очки во встрече проигравшего
             td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
             td[p2 * 2 - 2][max_person + 4] = mesto + 1  # записывает место проигравшему
+            player_rank.append([p1, mesto])
+            player_rank.append([p2, mesto + 1])
         else:
             points_p1 = c.points_loser
             points_p2 = c.points_win
-            td[p1 * 2 - 2][max_person + 4] = mesto + 1  # очки во встрече победителя
-            td[p2 * 2 - 2][max_person + 4] = mesto  # очки во встрече проигравшего
-        td[p1 * 2 - 2][max_person + 3] = points_p1  # записывает место победителю
-        td[p2 * 2 - 2][max_person + 3] = points_p2  # записывает место проигравшему
+            td[p1 * 2 - 2][max_person + 4] = mesto + 1  # записывает место победителю
+            td[p2 * 2 - 2][max_person + 4] = mesto  # записывает место проигравшему
+            player_rank.append([p1, mesto + 1])
+            player_rank.append([p2, mesto])
+        td[p1 * 2 - 2][max_person + 3] = points_p1  # очки во встрече победителя
+        td[p2 * 2 - 2][max_person + 3] = points_p2  # очки во встрече проигравшего
     elif men_of_circle == 3:
         tr_all = []
         game_p1 = []
@@ -373,7 +402,7 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
                 m += 1
     elif men_of_circle == 4:
         pass
-
+    return player_rank
 
 def score_in_circle(tr_all, men_of_circle, num_gr, tr):
     """подсчитывает счет по партиям в крутиловке"""
@@ -469,3 +498,8 @@ def player_choice_in_setka(fin):
             'фамилия': f'{posev.family}/ {city}'
         })
     return posev_data
+
+
+# def result_rank_group(num_group, max_player):
+#     """записывает места из группы в таблицу -Result-"""
+#     pass

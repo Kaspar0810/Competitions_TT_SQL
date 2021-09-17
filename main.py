@@ -484,11 +484,6 @@ def load_tableWidget():
             pass
         else:
             fill_table_choice()
-    # elif my_win.tabWidget.currentIndex() == 5:
-    #     flag = ready_choice()
-    #     if flag is True:
-    #         fill_table_results()
-    #     # fill_table_choice()
     else:  # загружает таблицу со списком
         player_list = Player.select().order_by(Player.rank.desc())
         fill_table(player_list)
@@ -784,6 +779,7 @@ def fill_table_results(tb):
                     my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
+        my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
         my_win.tableWidget.hideColumn(13)
@@ -1141,6 +1137,7 @@ def add_coach(ch, num):
 def find_player_in_R():
     """если есть необходимость в поиске игрок в рейтинг листах январском или текущем"""
     pass
+
 
 
 def sort(self):
@@ -2466,6 +2463,7 @@ def hide_show_columns():
     """скрывает или показывает столбцы TableWidget"""
     my_win.tableWidget.hideColumn(1)
     my_win.tableWidget.hideColumn(6)
+    # my_win.tableWidget.hideColumn(9)
     my_win.tableWidget.hideColumn(10)
     my_win.tableWidget.hideColumn(11)
     my_win.tableWidget.hideColumn(12)
