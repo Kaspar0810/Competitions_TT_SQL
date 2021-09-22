@@ -720,7 +720,7 @@ def fill_table_results(tb):
     count = len(result)  # если 0, то записей нет
     player_result = Result.select().order_by(Result.id)
     flag = ready_system()
-    if flag is True and count == 0:
+    if flag is False and count == 0:
         message = "Надо сделать жербъевку предварительного этапа.\nХотите ее создать?"
         reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
                                                QtWidgets.QMessageBox.StandardButtons.Yes,
@@ -729,7 +729,6 @@ def fill_table_results(tb):
             choice_gr_automat()
         else:
             return
-
     elif flag is False and count == 0:
         message = "Сначала надо создать систему соревнований\nзатем произвести жербъевку.\n" \
                   "Хотите начать ее создавать?"
@@ -1490,7 +1489,7 @@ def player_in_table():
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     kg = s.total_group
-    ct = s.max_player
+    # ct = s.max_player
     st = s.stage
     pv = s.page_vid
 
@@ -1498,9 +1497,10 @@ def player_in_table():
     tdt = tbl_data.table_data(kg)  # вызов функции, где получаем список всех участников по группам
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
         gr = tdt[p]
+        count_player = len(gr) // 2
         number_group = str(p + 1) + ' группа'
         k = 0
-        for i in range(0, ct * 2 - 1, 2):
+        for i in range(0, count_player * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
             fp = len(family_player)  # подсчет кол-во знаков в фамилия, если 0 значит игрока нет
             if fp > 0:  # если строка (фамилия игрока) не пустая идет запсь в db
@@ -2351,6 +2351,7 @@ def choice_gr_automat():
     player_choice = Choice.select().order_by(Choice.rank.desc())
     h = 0
     for k in range(1, mp + 1):  # цикл посевов
+        # вставить проверку на окончание посева
         if k % 2 != 0:  # направление посева с последней группы до 1-й
             start = 0
             end = group
@@ -2362,14 +2363,15 @@ def choice_gr_automat():
             step = -1
             p = 0
         for i in range(start, end, step):  # №-й посев
-            txt = str(f'{i + p} группа')
-            id = int(my_win.tableWidget.item(h, 1).text())
-            h += 1
-            with db:  # запись в таблицу Choice результа жеребъевки
-                grp = Choice.get(Choice.id == id)
-                grp.group = txt
-                grp.posev_group = k
-                grp.save()
+            if h < tp:
+                txt = str(f'{i + p} группа')
+                id = int(my_win.tableWidget.item(h, 1).text())
+                h += 1
+                with db:  # запись в таблицу Choice результа жеребъевки
+                    grp = Choice.get(Choice.id == id)
+                    grp.group = txt
+                    grp.posev_group = k
+                    grp.save()
     if tp == h:
         fill_table_choice()
     with db:

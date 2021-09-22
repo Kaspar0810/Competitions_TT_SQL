@@ -29,12 +29,13 @@ def table_data(kg):
     for p in range(0, kg):
         num_gr = f"{p + 1} группа"
         posev_data = player_choice_in_group(num_gr)
-        for k in range(1, t * 2 + 1):  # цикл нумерации строк (2-е строки на каждого участника
+        count_player_group = len(posev_data)
+        for k in range(1, count_player_group * 2 + 1):  # цикл нумерации строк (2-е строки на каждого участника
             st = ['']
             s = (st * (t + 4))  # получаем пустой список номер, фамилия или регион, клетки (колво участников)
             s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
             tbl_tmp.append(s)
-        for i in range(1, t * 2 + 1, 2):
+        for i in range(1, count_player_group * 2 + 1, 2):
             posev = posev_data[((i + 1) // 2) - 1]
             tbl_tmp[i - 1][1] = posev["фамилия"]
             tbl_tmp[i][1] = posev["регион"]
