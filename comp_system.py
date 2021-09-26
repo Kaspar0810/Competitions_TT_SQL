@@ -25,8 +25,8 @@ def func_zagolovok(canvas, doc):
     """создание заголовка страниц"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    # p = s.page_vid  # рабочий вариант
-    p = A4  # временно пока идет наладки таблицы (сетка 16)
+    p = s.page_vid  # рабочий вариант
+    # p = A4  # временно пока идет наладки таблицы (сетка 16)
     if p == "альбомная":
         pv = landscape(A4)
     else:
@@ -89,8 +89,10 @@ def table_made(pv):
     ta = s.total_athletes
     t = int(ta) // int(kg)
     e = int(ta) % int(kg)  # если количество участников не равно делится на группы
-    g2 = str(t + 1)
-    g2 = int(g2)
+    # g2 = str(t + 1)
+    # g2 = int(g2)
+    g2 = t + 1
+    # g2 = int(g2)
     kg = int(kg)
     if e == 0:
         t = t

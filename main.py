@@ -1040,7 +1040,7 @@ def page():
             my_win.label_32.show()
             my_win.label_33.show()
         load_tableWidget()
-        load_combobox_filter_group()
+        # load_combobox_filter_group()
     elif tb == 3:  # вкладка -групппы-
         t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
         sf = System.get(System.title_id == t)
@@ -1136,7 +1136,6 @@ def add_coach(ch, num):
 def find_player_in_R():
     """если есть необходимость в поиске игрок в рейтинг листах январском или текущем"""
     pass
-
 
 
 def sort(self):
@@ -1373,8 +1372,6 @@ def kol_player_in_group():
     my_win.label_19.show()
     my_win.Button_etap_made.setEnabled(True)
     if sender == my_win.Button_etap_made:
-        # my_win.label_11.show()
-        # my_win.label_11.setText(f"{kg} групп:")
         my_win.Button_etap_made.setEnabled(False)
         my_win.comboBox_page_vid.setEnabled(False)
         my_win.spinBox_kol_group.hide()
@@ -1489,7 +1486,6 @@ def player_in_table():
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     kg = s.total_group
-    # ct = s.max_player
     st = s.stage
     pv = s.page_vid
 
@@ -1497,9 +1493,9 @@ def player_in_table():
     tdt = tbl_data.table_data(kg)  # вызов функции, где получаем список всех участников по группам
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
         gr = tdt[p]
-        count_player = len(gr) // 2
+        count_player = len(gr) // 2  # маскимальное кол-во участников в группе
         number_group = str(p + 1) + ' группа'
-        k = 0
+        k = 0  # кол-во спортсменов в группе
         for i in range(0, count_player * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
             fp = len(family_player)  # подсчет кол-во знаков в фамилия, если 0 значит игрока нет
@@ -1508,37 +1504,25 @@ def player_in_table():
                 with db:
                     game_list = Game_list(number_group=number_group, rank_num_player=k, player_group=family_player,
                                           system_id=s).save()
-            elif fp == 0 and k == 0:  # если 1-я строка (фамилия игрока) пустая выход из группы
-                break
-        if fp != 0:  # после считывания игроков в группе идет запись игроков по турам в таблицу -result-
+        if fp == 0 and k != 0 or k == count_player:  # если 1-я строка (фамилия игрока) пустая выход из группы
             cp = k - 3
             tour = comp_system.tour(cp)
-            game = k // 2  # кол-во игр в туре
-            if game == 1:
-                kk = k
-            else:
-                kk = k - 1
+            kk = len(tour)  # кол-во туров
+            game = len(tour[0])  # кол-во игр в туре
             for r in range(0, kk):
                 tours = tour[r]  # игры тура
-                for d in range(0, game):
+                for d in range(0, game):  # цикл по играм тура
                     if game == 1:  # если в группе 3 человека
                         match = tours  # матч в туре
-                    elif game == 2:  # если в группе 4 человека
-                        match = tours[d]  # матч в туре
-                    elif game == 3:  # если в группе 5 человека
-                        match = tours[d]  # матч в туре
-                    elif game == 4:  # если в группе 6 человека
+                    else:  # в группе более 3 спортсменов
                         match = tours[d]  # матч в туре
                     first = int(match[0])  # игрок под номером в группе
                     second = int(match[2])  # игрок под номером в группе
                     pl1 = gr[first * 2 - 2][1]  # фамилия первого игрока
                     pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
-
                     with db:
                         results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
                                          tours=match, title_id=s).save()
-        else:
-            pass
 
 
 def chop_line(q, maxline=30):
@@ -1562,7 +1546,7 @@ def chop_line(q, maxline=30):
 
 def game_in_visible(state, flag=False, final="все финалы"):
     """видимость полей для счета в партии"""
-    state = my_win.checkBox.checkState()
+    # state = my_win.checkBox.checkState()
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     if flag is False:
         fin = my_win.comboBox_filter_final.currentText()
@@ -1611,7 +1595,7 @@ def game_in_visible(state, flag=False, final="все финалы"):
             my_win.lineEdit_pl1_s5_fin.setVisible(True)
             my_win.lineEdit_pl2_s5_fin.setVisible(True)
             my_win.label_40.setVisible(True)
-                # получить какой финал заносится
+            # получить какой финал заносится
             # sf = System.get(System.title_id == t)
             # with db:
             #     sf.score_flag = True
@@ -1852,7 +1836,7 @@ def control_score(sc1, sc2):
     if sc1 > 35 or sc2 > 35:
         result = msgBox.question(my_win, "", "Вы уверенны в правильности счета в партии?\n"
                                              f"{sc1} : {sc2}",
-                         msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
+                                 msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
         if result == msgBox.StandardButtons.Ok:
             flag = True
         elif result == msgBox.StandardButtons.Cancel:
@@ -1885,7 +1869,7 @@ def control_score(sc1, sc2):
 
     if flag == False:
         result = msgBox.information(my_win, "", "Проверьте правильность ввода\n счета в партии!",
-                                msgBox.StandardButtons.Ok)
+                                    msgBox.StandardButtons.Ok)
     elif flag == True:
         return flag
 
@@ -2001,7 +1985,6 @@ def enter_score():
         pv = system.page_vid
         comp_system.table_made(pv)
     elif system.stage == etap:
-        # etap = my_win.tableWidget.item(r, 2).text()
         system_table = system.label_string
         table_max_player = system.max_player
         txt = system_table.find("на")
@@ -2152,37 +2135,37 @@ def string_score_game():
 
 # def result_filter_played():
 #     pass
-    # """фильтрует таблицу -результаты- по сыгранным встречам"""
-    # sender = my_win.sender()
-    # fplayed = my_win.comboBox_filter_played.currentText()
-    # if sender == my_win.Button_reset_filter:
-    #     my_win.comboBox_filter_played.setCurrentText("все игры")
-    #     fplayed = "все игры"
-    # if fplayed == "не сыгранные":
-    #     sg = "осталось сыграть:"
-    #     player_result = Result.select().where(Result.points_win == None)
-    # elif fplayed == "завершенные":
-    #     player_result = Result.select().where(Result.points_win >= 0)
-    #     sg = "всего сыграно:"
-    # else:
-    #     player_result = Result.select()
-    #     sg = "всего игр:"
-    # result_list = player_result.dicts().execute()
-    # row_count = len(result_list)  # кол-во строк в таблице
-    # my_win.label_16.setText(f"{sg} {row_count}")
-    # column_count = 13  # кол-во столбцов в таблице
-    # my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
-    #
-    # for row in range(row_count):  # добвляет данные из базы в TableWidget
-    #     for column in range(column_count):
-    #         item = str(list(result_list[row].values())[column])
-    #         my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-    #
-    # my_win.tableWidget.hideColumn(10)
-    # my_win.tableWidget.hideColumn(11)
-    # my_win.tableWidget.hideColumn(12)
-    # my_win.tableWidget.hideColumn(13)
-    # my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+# """фильтрует таблицу -результаты- по сыгранным встречам"""
+# sender = my_win.sender()
+# fplayed = my_win.comboBox_filter_played.currentText()
+# if sender == my_win.Button_reset_filter:
+#     my_win.comboBox_filter_played.setCurrentText("все игры")
+#     fplayed = "все игры"
+# if fplayed == "не сыгранные":
+#     sg = "осталось сыграть:"
+#     player_result = Result.select().where(Result.points_win == None)
+# elif fplayed == "завершенные":
+#     player_result = Result.select().where(Result.points_win >= 0)
+#     sg = "всего сыграно:"
+# else:
+#     player_result = Result.select()
+#     sg = "всего игр:"
+# result_list = player_result.dicts().execute()
+# row_count = len(result_list)  # кол-во строк в таблице
+# my_win.label_16.setText(f"{sg} {row_count}")
+# column_count = 13  # кол-во столбцов в таблице
+# my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+#
+# for row in range(row_count):  # добвляет данные из базы в TableWidget
+#     for column in range(column_count):
+#         item = str(list(result_list[row].values())[column])
+#         my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+#
+# my_win.tableWidget.hideColumn(10)
+# my_win.tableWidget.hideColumn(11)
+# my_win.tableWidget.hideColumn(12)
+# my_win.tableWidget.hideColumn(13)
+# my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
 def result_filter_name():
@@ -2499,12 +2482,16 @@ def total_game_table(kpt, fin, pv, cur_index):
 
         if cur_index == 1:
             vt = "Сетка (-2) на"
+            my_win.comboBox_page_vid.setCurrentText("книжная")
         elif cur_index == 2:
             vt = "Сетка (с розыгрышем всех мест) на"
+            my_win.comboBox_page_vid.setCurrentText("книжная")
         elif cur_index == 3:
             vt = "Сетка (с играми за 1-3 места) на"
+            my_win.comboBox_page_vid.setCurrentText("книжная")
         elif cur_index == 4:
             vt = "Круговая таблица на"
+        pv = my_win.comboBox_page_vid.currentText()
         str_setka = f"{vt} {player_in_final} участников"
         s = System.select().order_by(System.id.desc()).get()
         total_athletes = s.total_athletes
