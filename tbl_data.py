@@ -1,6 +1,8 @@
 
 from models import *
 from itertools import *
+from collections import Counter
+
 
 def kol_player():
     """выводит максимальное количество человек в группе t если все группы равны, а g2 если разное количество"""
@@ -211,7 +213,6 @@ def rank_in_group(total_score, max_person, td, num_gr):
     player_rank_group - список списков номер игрока - место
     num_player - """
     rev_dict = {}  # словарь, где в качастве ключа очки, а значения - номера групп
-    # player_rank = []
     player_rank_group = []
     game_max = Result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
     played = Result.select().where(Result.number_group == num_gr)  # 1-й запрос на выборку с группой
@@ -304,16 +305,17 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
     """выставляет места в крутиловке
     -tour- встречи игроков, p1, p2 фамилии, num_gr номер группы
     men_of_circle кол-во игроков с одинаковым кол-вом очков,
-    max_person общее кол-во игроков в группе"""
+    max_person общее кол-во игроков в группе
+    player_rank - список (номер игроков и их места)"""
+
     player_rank = []
     tr_all = []
-    # game_p1 = []
-    # game_p2 = []
     ps = []
     pps = []
     pp = {}
     pg_win = {}
     pg_los = {}
+    pp_all = []
 
     for r in range(1, men_of_circle + 1):
         pp[r] = []
@@ -323,31 +325,12 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
         i = list(i)
         tr_all.append(i)
 
-    if men_of_circle == 2:  # кол-во человек в крутиловке (одинаковое кол-во очков)
-        tour = "-".join(tr)  # делает строку встреча в туре
-        p1 = int(tour[0])
-        p2 = int(tour[2])
-        c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
-        # строчку номер группы и тур по двум столбцам
-        if c.winner == c.player1:
-            points_p1 = c.points_win  # очки во встрече победителя
-            points_p2 = c.points_loser  # очки во встрече проигравшего
-            td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
-            td[p2 * 2 - 2][max_person + 4] = mesto + 1  # записывает место проигравшему
-            player_rank.append([p1, mesto])
-            player_rank.append([p2, mesto + 1])
-        else:
-            points_p1 = c.points_loser
-            points_p2 = c.points_win
-            td[p1 * 2 - 2][max_person + 4] = mesto + 1  # записывает место победителю
-            td[p2 * 2 - 2][max_person + 4] = mesto  # записывает место проигравшему
-            player_rank.append([p1, mesto + 1])
-            player_rank.append([p2, mesto])
-        td[p1 * 2 - 2][max_person + 3] = points_p1  # очки во встрече победителя
-        td[p2 * 2 - 2][max_person + 3] = points_p2  # очки во встрече проигравшего
+    count_game_circle = len(tr_all)
 
-    elif men_of_circle > 2:  # 3 спортсмена в крутиловке
-        for n in range(0, men_of_circle):
+    if men_of_circle == 2:  # у двоих человек одинаковое кол-во очков, определяем по личной победе
+        circle_2_player(tr, td, max_person, mesto, player_rank, num_gr)
+    elif men_of_circle > 2:  # 3 или больше спортсмена в крутиловке
+        for n in range(0, count_game_circle):
             tour = "-".join(tr_all[n])  # получает строку встреча в туре
             k1 = tr_all[n][0]  # 1-й игрок в туре
             k2 = tr_all[n][1]  # 2-й игрок в туре
@@ -357,65 +340,131 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto):
 
         for i in range(1, men_of_circle + 1):  # суммирует очки каждого игрока
             pp[i] = sum(pp[i])  # сумма очков
+            pp_all.append(pp[i])
+
+        lst = Counter(pp_all).keys()  # ищет уникальные значения (очки игроков в крутиловке)
+        uniq = len(lst)
 
         if men_of_circle == 3:
-            if pp[1] == pp[2] == pp[3]:  # сравнивает очки между собой, если они у всех равны
-                for i in range(1, men_of_circle + 1):  # суммирует выйгранные и проигранные партии каждого игрока
-                    pg_win[i] = sum(pg_win[i])  # сумма выйгранных партий
-                    pg_los[i] = sum(pg_los[i])  # сумма проигранных партий
-                    x = pg_win[i] / pg_los[i]
-                    x = float('{:.3f}'.format(x))
-                    ps.append(x)
-                    pps.append(pp[i])
+            circle_3_player(uniq, tr, td, max_person, mesto, player_rank, num_gr, ps, tr_all, men_of_circle,
+                            pg_win, pg_los, pp, pps)
+        elif men_of_circle == 4:  # ищет вариант крутиловки (2 + 2) или (1 + 3)
+            tmp = []  # временный список
+            count_list = []  # список списков (кол-во очков, их повторяемость)
+            count_l = []
+            group_dict = {}
+            for z in lst:
+                n = pp_all.count(z)  # определяет кол-во вс
+                count_l.clear()
+                count_l.append(z)
+                count_l.append(n)
+                tmp = count_l.copy()
+                count_list.append(tmp)
+            count_list.sort(reverse=True)
+            for x in range(0, men_of_circle):
+                group_dict[tr[x]] = pp_all[x]
+            ret = count_list[0][1]
+            k_list = list(group_dict.keys())  # отдельно составляет список ключей (группы)
+            v_list = list(group_dict.values())  # отдельно составляет список значений (очки)
 
-                d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер участника)
-                ds = {index: value for index, value in enumerate(ps)}  # получает словарь(ключ, соотношение)
-                sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
-                key_l = list(sorted_tuple.keys())
-                val_l = list(sorted_tuple.values())
-                vls = set(val_l)  # группирует разные значения
-                vl = len(vls)  # подсчитывает их колличество
-                m = 0
-                if vl == 1:  # посчитывает соотношений выйгранных и проигранных мячей в партиях
-                    plr_ratio = score_in_circle(tr_all, men_of_circle, num_gr, tr)
-                    sorted_ratio = {k: plr_ratio[k] for k in sorted(plr_ratio, key=plr_ratio.get, reverse=True)}  # сортирует словарь по убываню соот
-                    key_ratio = list(sorted_ratio.keys())  # получает список ключей отсортированного словаря
-                    r = 0
-                    for i in key_ratio:
-                        ratio = sorted_ratio[i]  # соотношение в крутиловке
-                        person = int(d[i])  # номер игрока
-                        td[person * 2 - 2][max_person + 3] = str(ratio)  # записывает соотношение
-                        td[person * 2 - 2][max_person + 4] = str(mesto + r)  # записывает место
-                        player_rank.append([person, mesto + r])
-                        r += 1
-                else:
-                    for i in val_l:
-                        w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет игрока
-                        wq = int(d.setdefault(w))  # получает номер группы, соответсвующий
-                        td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
-                        td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
-                        #  вставить запись мест в -Choice-
-                        player_rank.append([wq, m + mesto])
-                        m += 1
-            else:  # если очки равны, но внутри крутиловки у всех очки разные (без подсчета соотношений)
-                d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер группы)
-                sorted_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}  # сортирует словарь по убываню соот
-                key_l = list(sorted_tuple.keys())
-                val_l = list(sorted_tuple.values())
-                m = 0
-                for i in val_l:
-                    w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет групп
-                    wq = int(d.setdefault(w - 1))  # получает номер группы, соответсвующий
-                    td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
-                    td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
-                    m += 1
-        elif men_of_circle == 4:
-            pass
-        return player_rank
+            if ret == 2:
+                tur = []
+                for y in range(0, ret):
+                    for x in group_dict.keys():
+                        max_zn = count_list[y][0]  # максимальное значение (очков игрока в крутиловке)
+                        if group_dict[x] == max_zn:  # если у игрока кол-во очков равно max_zn, то дабавляет в тур
+                            tur.append(x)
+                            tr = tur.copy()
+                    circle_2_player(tr, td, max_person, mesto, player_rank, num_gr)
+                    tur.clear()
+                    mesto = mesto + ret  # меняет место на новое
+            elif ret == 3:
+                circle_3_player()
+    return player_rank
+
+
+def circle_2_player(tr, td, max_person, mesto, player_rank, num_gr):
+    """крутиловка из 2-ух человек"""
+    tour = "-".join(tr)  # делает строку встреча в туре
+    p1 = int(tour[0])
+    p2 = int(tour[2])
+    c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
+    # строчку номер группы и тур по двум столбцам
+    if c.winner == c.player1:
+        points_p1 = c.points_win  # очки во встрече победителя
+        points_p2 = c.points_loser  # очки во встрече проигравшего
+        td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
+        td[p2 * 2 - 2][max_person + 4] = mesto + 1  # записывает место проигравшему
+        player_rank.append([p1, mesto])
+        player_rank.append([p2, mesto + 1])
+    else:
+        points_p1 = c.points_loser
+        points_p2 = c.points_win
+        td[p1 * 2 - 2][max_person + 4] = mesto + 1  # записывает место победителю
+        td[p2 * 2 - 2][max_person + 4] = mesto  # записывает место проигравшему
+        player_rank.append([p1, mesto + 1])
+        player_rank.append([p2, mesto])
+    td[p1 * 2 - 2][max_person + 3] = points_p1  # очки во встрече победителя
+    td[p2 * 2 - 2][max_person + 3] = points_p2  # очки во встрече проигравшего
+
+
+def circle_3_player(uniq, tr, td, max_person, mesto, player_rank, num_gr, ps, tr_all, men_of_circle,
+                    pg_win, pg_los, pp, pps):
+    """в крутиловке 3-и спортсмена"""
+    if uniq == 1:  # у всех трех участников равное кол-во очков
+        for k in range(1, men_of_circle + 1):  # суммирует выйгранные и проигранные партии каждого игрока
+                pg_win[k] = sum(pg_win[k])  # сумма выйгранных партий
+                pg_los[k] = sum(pg_los[k])  # сумма проигранных партий
+                x = pg_win[k] / pg_los[k]
+                x = float('{:.3f}'.format(x))
+                ps.append(x)
+                pps.append(pp[k])
+        d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер участника)
+        ds = {index: value for index, value in enumerate(ps)}  # получает словарь(ключ, соотношение)
+        sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
+        key_l = list(sorted_tuple.keys())
+        val_l = list(sorted_tuple.values())
+        vls = set(val_l)  # группирует разные значения
+        vl = len(vls)  # подсчитывает их колличество
+        m = 0
+        if vl == 1:  # подсчитывает соотношения выйгранных и проигранных мячей в партиях
+            plr_ratio = score_in_circle(tr_all, men_of_circle, num_gr, tr)
+            sorted_ratio = {k: plr_ratio[k] for k in
+                            sorted(plr_ratio, key=plr_ratio.get, reverse=True)}  # сортирует словарь по убываню соот
+            key_ratio = list(sorted_ratio.keys())  # получает список ключей отсортированного словаря
+            r = 0
+            for i in key_ratio:
+                ratio = sorted_ratio[i]  # соотношение в крутиловке
+                person = int(d[i])  # номер игрока
+                td[person * 2 - 2][max_person + 3] = str(ratio)  # записывает соотношение
+                td[person * 2 - 2][max_person + 4] = str(mesto + r)  # записывает место
+                player_rank.append([person, mesto + r])  # добавляет в список группа, место, чтоб занести в таблицу Choice
+                r += 1
+        else:
+            for i in val_l:
+                w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет игрока
+                wq = int(d.setdefault(w))  # получает номер группы, соответсвующий
+                td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
+                td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
+                player_rank.append([wq, m + mesto])  # добавляет в список группа, место, чтоб занести в таблицу Choice
+                m += 1
+    else:
+        d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер группы)
+        sorted_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}  # сортирует словарь по убываню соот
+        key_l = list(sorted_tuple.keys())
+        val_l = list(sorted_tuple.values())
+        m = 0
+        for i in val_l:
+            w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет групп
+            wq = int(d.setdefault(w - 1))  # получает номер группы, соответсвующий
+            td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
+            td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
+            player_rank.append([wq, m + mesto])  # добавляет в список группа, место, чтоб занести в таблицу Choice
+            m += 1
 
 
 def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
-    """"""
+    """сумма очков кажого игрока в крутиловке"""
     c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
     # данную встречу
     if c.winner == c.player1:  # победил 1-й игрок
@@ -443,8 +492,6 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
     pg_los[ki1 + 1].append(p1_game_los)
     pg_win[ki2 + 1].append(p2_game_win)
     pg_los[ki2 + 1].append(p2_game_los)
-    # ps = []
-    # pps = []
 
 
 def score_in_circle(tr_all, men_of_circle, num_gr, tr):

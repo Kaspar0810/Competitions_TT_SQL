@@ -1829,10 +1829,12 @@ def score_in_game():
 def control_score(sc1, sc2):
     """проверка на правильность ввода счета"""
     msgBox = QMessageBox
-    sc1 = int(sc1)
-    sc2 = int(sc2)
+    # sc1 = int(sc1)
+    # sc2 = int(sc2)
     if sc1 == '' or sc2 == '':
         flag = False
+    sc1 = int(sc1)
+    sc2 = int(sc2)
     if sc1 > 35 or sc2 > 35:
         result = msgBox.question(my_win, "", "Вы уверенны в правильности счета в партии?\n"
                                              f"{sc1} : {sc2}",
