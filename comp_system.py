@@ -710,7 +710,7 @@ def setka_16_made(fin):
     name_table_final = f"setka_16_{final}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-
+    return tds
 
 def tour(cp):
     """туры таблиц по кругу в зависимости от кол-во участников -cp- кол-во участников"""

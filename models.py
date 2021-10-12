@@ -124,7 +124,8 @@ class System(BaseModel):
     label_string = CharField()
     kol_game_string = CharField()
     choice_flag = BooleanField()
-    score_flag = BooleanField()
+    score_flag = IntegerField()
+    visible_game = BooleanField()
 
     class Meta:
         db_table = "system"
@@ -178,4 +179,17 @@ class Choice(BaseModel):
 
     class Meta:
         db_table = "choices"
+
+class Delete_player(BaseModel):
+    player = CharField(50)
+    bday = DateField()
+    rank = IntegerField()
+    city = CharField()
+    region = CharField()
+    razryad = CharField(10)
+    coach = CharField(75)
+
+    class Meta:
+        db_table = "delete_players"
+
 
