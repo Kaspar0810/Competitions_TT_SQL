@@ -797,17 +797,12 @@ def fill_table_results(tb):
 
 
 def fill_table_choice():
-    """заполняет таблицу жеребьевка QtableWidget из db choice"""
-    # sender = my_win.sender()
-    # if my_win.tabWidget.currentIndex() == 5:
-    #     player_choice = Choice.select().where(Choice.final == "1-й финал")
-    # else:
+    """заполняет таблицу жеребъевки"""
     player_choice = Choice.select().order_by(Choice.rank.desc())
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
     column_count = len(choice_list[0])  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
-
     for row in range(row_count):  # добвляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(choice_list[row].values())[column])
@@ -859,6 +854,11 @@ def add_player():
         spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
         for i in range(0, 9):  # добавляет в tablewidget
             my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
+        load_tableWidget()  # заново обновляет список
+        player_list = Player.select()  # выделяет все строки базы данных
+        count = len(player_list)  # подсчитывает новое кол-во игроков
+        my_win.label_46.setText(f"Всего: {count} участников")
+        my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
         # num = count + 1
         with db:
@@ -979,6 +979,9 @@ def page():
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
+        player_list = Player.select()
+        count = len(player_list)
+        my_win.label_46.setText(f"Всего: {count} участников")
     elif tb == 2:  # -система-
         player_list = Player.select()
         count = len(player_list)
@@ -1868,6 +1871,17 @@ def delete_player():
                                        region=region, razryad=razryad, coach_id=coach_id).save()
             player = Player.get(Player.player == my_win.tableWidget.item(r, 2).text())
             player.delete_instance()
+        my_win.lineEdit_Family_name.clear()
+        my_win.lineEdit_bday.clear()
+        my_win.lineEdit_R.clear()
+        my_win.lineEdit_city_list.clear()
+        my_win.lineEdit_coach.clear()
+        load_tableWidget()
+        player_list = Player.select()
+        count = len(player_list)
+        my_win.label_46.setText(f"Всего: {count} участников")
+    else:
+        return
 
 
 def focus():

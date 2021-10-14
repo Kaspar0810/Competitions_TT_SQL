@@ -2949,8 +2949,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3015,13 +3015,24 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>160</y>
+        <y>146</y>
         <width>151</width>
         <height>121</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <italic>true</italic>
+       </font>
+      </property>
       <property name="title">
        <string>Сортировка</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
       </property>
       <widget class="QPushButton" name="Button_sort_R">
        <property name="geometry">
@@ -3031,6 +3042,11 @@
          <width>151</width>
          <height>32</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+        </font>
        </property>
        <property name="text">
         <string>По рейтингу</string>
@@ -3045,6 +3061,13 @@
          <height>32</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>По алфавиту</string>
        </property>
@@ -3058,6 +3081,11 @@
          <height>32</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+        </font>
+       </property>
        <property name="text">
         <string>По месту</string>
        </property>
@@ -3067,7 +3095,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>0</y>
+        <y>30</y>
         <width>151</width>
         <height>66</height>
        </rect>
@@ -3075,6 +3103,12 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QPushButton" name="Button_add_edit_player">
+         <property name="font">
+          <font>
+           <family>Courier New</family>
+           <italic>true</italic>
+          </font>
+         </property>
          <property name="text">
           <string>Добавить</string>
          </property>
@@ -3082,6 +3116,12 @@
        </item>
        <item>
         <widget class="QPushButton" name="Button_del_player">
+         <property name="font">
+          <font>
+           <family>Courier New</family>
+           <italic>true</italic>
+          </font>
+         </property>
          <property name="text">
           <string>Удалить</string>
          </property>
@@ -3092,8 +3132,8 @@
      <widget class="QCheckBox" name="checkBox_6">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>130</y>
+        <x>15</x>
+        <y>268</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -3113,14 +3153,36 @@
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QLabel" name="label_46">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>-9</y>
+        <width>191</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>14</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Всего</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_6">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3268,8 +3330,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3281,8 +3343,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3294,8 +3356,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
