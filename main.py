@@ -155,13 +155,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         find_Menu = editMenu.addMenu("Поиск")
         find_Menu.addAction(self.find_r_Action)
         find_Menu.addAction(self.find_r1_Action)
+
         # меню Рейтинг
         rank_Menu = menuBar.addMenu("Рейтинг")  # основное
         rank_Menu.addAction(self.rAction)
         rank_Menu.addAction(self.r1Action)
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
-        # help_Menu.addAction(self.helpAction)
+
 
     #  создание действий меню
     def _createAction(self):
@@ -455,6 +456,10 @@ def load_tableWidget():
         column_label = ["№", "id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
+    elif sender == my_win.checkBox_6.checkState() == True:
+        z = 9
+        column_label = ["№", "id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
+                        "Тренер(ы)"]
     else:
         z = 10
         column_label = ["№", "id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
@@ -472,8 +477,10 @@ def load_tableWidget():
     my_win.tableWidget.show()
     if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг- и загружет таблицу с рейтингом
         fill_table_R_list()
-    elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь- и загружет таблицу с рейтингом
+    elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь- и загружает таблицу с рейтингом
         fill_table_R1_list()
+    elif my_win.checkBox_6.checkState() == True:  # нажат пункт  -просмотр удаленных игроков-
+        del_player_table()
     elif my_win.tabWidget.currentIndex() == 3 or my_win.tabWidget.currentIndex() == 5:  # таблица результатов
         flag = ready_choice()
         if flag is True:
@@ -485,11 +492,12 @@ def load_tableWidget():
             fill_table_choice()
     else:  # загружает таблицу со списком
         player_list = Player.select().order_by(Player.rank.desc())
+        # player_list = Delete_player.select()
         fill_table(player_list)
 
 
 def load_listR_in_db(table_db, fname):
-    """при отсутсвии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
+    """при отсутствии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
     если выбор был сделан загружает в базу данных"""
     filepatch = str(fname[0])
     if table_db == R_list:
@@ -621,7 +629,7 @@ def title_made():
     with db:
         System.create_table()
         sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage=sg, page_vid=page_v,
-                     label_string="", kol_game_string="", choice_flag=False, score_flag=False).save()
+                     label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
 
 
 def title_update():
@@ -652,32 +660,36 @@ def find_in_rlist():
         my_win.textEdit.setText("Нет спортсменов в рейтинг листе")
     else:
         for pl in p:
-            full_stroka = pl.r_fname + ", " + str(pl.r_list) + ", " + pl.r_bithday + ", " + pl.r_city
+            full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
             my_win.listWidget.addItem(full_stroka)
 
 
-def fill_table(player_list=Player.select().order_by(Player.rank.desc())):
+def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
     player_selected = player_list.dicts().execute()
 
     row_count = len(player_selected)  # кол-во строк в таблице
-    column_count = len(player_selected[0])  # кол-во столбцов в таблице
-    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+    if row_count != 0:  # список удаленных игроков пуст
+        column_count = len(player_selected[0])  # кол-во столбцов в таблице
+        my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
-    for row in range(row_count):  # добвляет данные из базы в TableWidget
-        for column in range(column_count):
-            if column == 8:  # преобразует id тренера в фамилию
-                coach_id = str(list(player_selected[row].values())[column])
-                coach = Coach.get(Coach.id == coach_id)
-                item = coach.coach
-            else:
-                item = str(list(player_selected[row].values())[column])
-            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-    my_win.tableWidget.hideColumn(1)  # скрывает столбец id
-    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+        for row in range(row_count):  # добавляет данные из базы в TableWidget
+            for column in range(column_count):
+                if column == 8:  # преобразует id тренера в фамилию
+                    coach_id = str(list(player_selected[row].values())[column])
+                    coach = Coach.get(Coach.id == coach_id)
+                    item = coach.coach
+                else:
+                    item = str(list(player_selected[row].values())[column])
+                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+        my_win.tableWidget.hideColumn(1)  # скрывает столбец id
+        my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
-    for i in range(0, row_count):  # отсортировывает номера строк по порядку
-        my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+        for i in range(0, row_count):  # отсортировывает номера строк по порядку
+            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+    else:
+        my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+        my_win.statusbar.showMessage("Удаленных участников соревнований нет", 10000)
 
 
 def fill_table_R_list():
@@ -819,7 +831,6 @@ def progressbar(count):
 
 def add_player():
     """добавляет игрока в список и базу данных"""
-    fill_table()
     player_list = Player.select()
     count = len(player_list)
     my_win.tableWidget.setRowCount(count + 1)
@@ -831,31 +842,45 @@ def add_player():
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
     ms = ""
+    if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
+        # таблицы -удаленные-
+        row = my_win.tableWidget.currentRow()
+        num = count + 1
+        with db:
+            player = Delete_player.get(Delete_player.player == my_win.tableWidget.item(row, 2).text())
+            player.delete_instance()
+            idc = Coach.get(Coach.coach == ch)
+            # plr = Player(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
+            #              razryad=rz, coach_id=idc, mesto=ms).save()
+            plr = Player(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
+                         razryad=rz, coach_id=idc, mesto=ms).save()
+        element = str(rn)
+        rn = ('    ' + element)[-4:]  # make all elements the same length
+        spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
+        for i in range(0, 9):  # добавляет в tablewidget
+            my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
+    else:  # просто редактирует игрока
+        # num = count + 1
+        with db:
+            idc = Coach.get(Coach.coach == ch)
+            plr = Player.get(Player.player == pl)
+            plr.player=pl
+            plr.bday=bd
+            plr.rank=rn
+            plr.city=ct
+            plr.region=rg
+            plr.razryad=rz
+            plr.coach_id=idc
+            plr.save()
 
-    num = count + 1
-    add_coach(ch, num)
+        my_win.lineEdit_Family_name.clear()
+        my_win.lineEdit_bday.clear()
+        my_win.lineEdit_R.clear()
+        my_win.lineEdit_city_list.clear()
+        my_win.lineEdit_coach.clear()
 
-    with db:
-        idc = Coach.get(Coach.coach == ch)
-        plr = Player(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-                     razryad=rz, coach_id=idc, mesto=ms).save()
-
-    add_city()
-    element = str(rn)
-    rn = ('    ' + element)[-4:]  # make all elements the same length
-    spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
-
-    for i in range(0, 9):  # добавляет в tablewidget
-        my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
-
-    my_win.lineEdit_Family_name.clear()
-    my_win.lineEdit_bday.clear()
-    my_win.lineEdit_R.clear()
-    my_win.lineEdit_city_list.clear()
-    my_win.lineEdit_coach.clear()
-
-    my_win.tableWidget.resizeColumnsToContents()
-    list_player_pdf()
+        my_win.tableWidget.resizeColumnsToContents()
+        list_player_pdf()
 
 
 def dclick_in_listwidget():
@@ -951,8 +976,8 @@ def page():
         region()
         load_tableWidget()
         my_win.tableWidget.show()
-        # my_win.Button_add_edit_player.setEnabled(False)
         my_win.Button_del_player.setEnabled(False)
+        my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
     elif tb == 2:  # -система-
         player_list = Player.select()
@@ -1042,7 +1067,6 @@ def page():
             my_win.label_32.show()
             my_win.label_33.show()
         load_tableWidget()
-        # load_combobox_filter_group()
     elif tb == 3:  # вкладка -групппы-
         my_win.radioButton_7.setEnabled(False)
         my_win.radioButton_6.setEnabled(False)
@@ -1732,23 +1756,41 @@ def game_in_visible(state, flag=0, final="все финалы"):
 
 def select_player_in_list():
     """выводит данные игрока в поля редактирования или удаления"""
+    # reg_n = Region.select()
+    # for i in reg_n:
+    #     region = i.region
+    #     region.strip()
+    #     with db:
+    #         i.region=region
+    #         i.save()
+
     r = my_win.tableWidget.currentRow()
     family = my_win.tableWidget.item(r, 2).text()
     birthday = my_win.tableWidget.item(r, 3).text()
     rank = my_win.tableWidget.item(r, 4).text()
     city = my_win.tableWidget.item(r, 5).text()
     region = my_win.tableWidget.item(r, 6).text()
+    rn = len(region)
     razrayd = my_win.tableWidget.item(r, 7).text()
     coach = my_win.tableWidget.item(r, 8).text()
+    # region_id = Region.get(Region.region == region)
+    # reg_id = region_id.id
     my_win.lineEdit_Family_name.setText(family)
     my_win.lineEdit_bday.setText(birthday)
     my_win.lineEdit_R.setText(rank)
     my_win.lineEdit_city_list.setText(city)
     my_win.comboBox_region.setCurrentText(region)
+    # my_win.comboBox_region.setCurrentIndex(reg_id - 1)
     my_win.comboBox_razryad.setCurrentText(razrayd)
     my_win.lineEdit_coach.setText(coach)
-    my_win.Button_del_player.setEnabled(True)
-    my_win.Button_add_edit_player.setText("Редактировать")
+    my_win.Button_add_edit_player.setEnabled(True)
+    if my_win.checkBox_6.isChecked(): # отмечен флажок -удаленные-
+        my_win.Button_del_player.setEnabled(False)
+        my_win.Button_add_edit_player.setText("Восстановить")
+    else:
+        my_win.Button_del_player.setEnabled(True)
+        my_win.Button_add_edit_player.setEnabled(True)
+        my_win.Button_add_edit_player.setText("Редактировать")
 
 
 def select_player_in_game():
@@ -1769,44 +1811,46 @@ def select_player_in_game():
         state = fin.visible_game
         game_in_visible(state=state, flag=fin.score_flag, final=my_win.tableWidget.item(r, 2).text())
 
-    win_pole = my_win.tableWidget.item(r, 6).text()  # поле победителя (если заполнено, значит встреча сыграна)
-    if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
-        sc = my_win.tableWidget.item(r, 8).text()
-        pl1 = my_win.tableWidget.item(r, 4).text()
-        pl2 = my_win.tableWidget.item(r, 5).text()
-        if pl1 == my_win.tableWidget.item(r, 6).text():
-            sc1 = sc[0]
-            sc2 = sc[4]
-        else:
-            sc1 = sc[4]
-            sc2 = sc[0]
-        my_win.lineEdit_pl1_score_total.setText(sc1)
-        my_win.lineEdit_pl2_score_total.setText(sc2)
-        my_win.lineEdit_player1.setText(pl1)
-        my_win.lineEdit_player2.setText(pl2)
-        my_win.lineEdit_pl1_s1.setFocus()
-    else:
-        pl1 = my_win.tableWidget.item(r, 4).text()
-        pl2 = my_win.tableWidget.item(r, 5).text()
-        if tab == 3:
-            my_win.radioButton_7.setEnabled(True)
-            my_win.radioButton_6.setEnabled(True)
+    if tab == 3 or tab == 4 or tab == 5:
+        win_pole = my_win.tableWidget.item(r, 6).text()  # поле победителя (если заполнено, значит встреча сыграна)
+        if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
+            sc = my_win.tableWidget.item(r, 8).text()
+            pl1 = my_win.tableWidget.item(r, 4).text()
+            pl2 = my_win.tableWidget.item(r, 5).text()
+            if pl1 == my_win.tableWidget.item(r, 6).text():
+                sc1 = sc[0]
+                sc2 = sc[4]
+            else:
+                sc1 = sc[4]
+                sc2 = sc[0]
+            my_win.lineEdit_pl1_score_total.setText(sc1)
+            my_win.lineEdit_pl2_score_total.setText(sc2)
             my_win.lineEdit_player1.setText(pl1)
             my_win.lineEdit_player2.setText(pl2)
             my_win.lineEdit_pl1_s1.setFocus()
-        elif tab == 4:
-            pass
-        elif tab == 5:
-            my_win.lineEdit_player1_fin.setText(pl1)
-            my_win.lineEdit_player2_fin.setText(pl2)
-            my_win.lineEdit_pl1_s1_fin.setFocus()
-    my_win.tableWidget.selectRow(r)
+        else:
+            pl1 = my_win.tableWidget.item(r, 4).text()
+            pl2 = my_win.tableWidget.item(r, 5).text()
+            if tab == 3:
+                my_win.radioButton_7.setEnabled(True)
+                my_win.radioButton_6.setEnabled(True)
+                my_win.lineEdit_player1.setText(pl1)
+                my_win.lineEdit_player2.setText(pl2)
+                my_win.lineEdit_pl1_s1.setFocus()
+            elif tab == 4:
+                pass
+            elif tab == 5:
+                my_win.lineEdit_player1_fin.setText(pl1)
+                my_win.lineEdit_player2_fin.setText(pl2)
+                my_win.lineEdit_pl1_s1_fin.setFocus()
+        my_win.tableWidget.selectRow(r)
 
 
 def delete_player():
     """удаляет игрока из списка и заносит его в архив"""
     msgBox = QMessageBox
     r = my_win.tableWidget.currentRow()
+    num = my_win.tableWidget.item(r, 1).text()
     player_del = my_win.tableWidget.item(r, 2).text()
     player_city_del = my_win.tableWidget.item(r, 5).text()
     birthday = my_win.tableWidget.item(r, 3).text()
@@ -1814,13 +1858,14 @@ def delete_player():
     region = my_win.tableWidget.item(r, 6).text()
     razryad = my_win.tableWidget.item(r, 7).text()
     coach = my_win.tableWidget.item(r, 8).text()
+    coach_id = Coach.get(Coach.coach == coach)
     result = msgBox.question(my_win, "", f"Вы действительно хотите удалить\n"
                                          f" {player_del} город {player_city_del}?",
                              msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
     if result == msgBox.StandardButtons.Ok:
         with db:
-            del_player = Delete_player(player=player_del, bday=birthday, rank=rank, city=player_city_del,
-                                       region=region, razryad=razryad, coach=coach).save()
+            del_player = Delete_player(num=num, player=player_del, bday=birthday, rank=rank, city=player_city_del,
+                                       region=region, razryad=razryad, coach_id=coach_id).save()
             player = Player.get(Player.player == my_win.tableWidget.item(r, 2).text())
             player.delete_instance()
 
@@ -2754,21 +2799,68 @@ def select_choice_final():
 
 # def proba():
 #     """добавление столбца в существующую таблицу"""
-    # my_db = SqliteDatabase('comp_db.db')
-    # migrator = SqliteMigrator(my_db)
-    # visible_game = BooleanField(default=False)
+#     ALTER TABLE Customers
+#     DROP COLUMN Email;
+#     my_db = SqliteDatabase('comp_db.db')
+#     migrator = SqliteMigrator(my_db)
+#     # visible_game = BooleanField(default=False)
+#
+#     migrate(migrator.add_column('System', 'visible_game', visible_game))
+
+    # PRAGMA foreign_keys=off
     #
-    # migrate(
-    #     migrator.add_column('System', 'visible_game', visible_game))
+    # BEGIN TRANSACTION
+    #
+    # ALTER TABLE table1 RENAME TO _table1_old
+    #
+    # CREATE TABLE table1 (
+    # ( column1 datatype [ NULL | NOT NULL ],
+    #   column2 datatype [ NULL | NOT NULL ],
+    #   ...
+    # )
+    #
+    # INSERT INTO table1 (column1, column2, ... column_n)
+    #   SELECT column1, column2, ... column_n
+    #   FROM _table1_old
+    #
+    # COMMIT
+    #
+    # PRAGMA foreign_keys=on
+
+
 
     #=========================
     # t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     # with db:
-    #     Delete_player.create_table()
+    #     Player.create_table()
         # System.create_table()
         # sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
         #              kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
 
+
+def del_player_table():
+    """таблица удаленных игроков на данных соревнованиях"""
+    if my_win.checkBox_6.isChecked():
+        my_win.tableWidget.hideColumn(9)
+        player_list = Delete_player.select()
+        count = len(player_list)
+        if count == 0:
+            my_win.statusbar.showMessage("Удаленных участников соревнований нет", 10000)
+            fill_table(player_list)
+        else:
+            fill_table(player_list)
+            my_win.statusbar.showMessage("Список удаленных участников соревнований", 10000)
+            if my_win.lineEdit_Family_name.text() != "":
+                my_win.Button_add_edit_player.setText("Восстановить")
+                my_win.Button_add_edit_player.setEnabled(True)
+            else:
+                my_win.Button_add_edit_player.setEnabled(False)
+    else:
+        player_list = Player.select()
+        fill_table(player_list)
+        my_win.Button_add_edit_player.setText("Добавить")
+        my_win.Button_add_edit_player.setEnabled(True)
+        my_win.statusbar.showMessage("Список участников соревнований", 10000)
 
 
 def kol_player_in_final():
@@ -2892,7 +2984,7 @@ my_win.checkBox_2.stateChanged.connect(button_etap_made_enabled)  # при из�
 my_win.checkBox_3.stateChanged.connect(button_system_made_enable)  # при изменении чекбокса активирует кнопку создать
 my_win.checkBox_4.stateChanged.connect(game_in_visible)  # при изменении чекбокса показывает поля для ввода счета
 my_win.checkBox_5.stateChanged.connect(game_in_visible)  # при изменении чекбокса показывает поля для ввода счета финала
-
+my_win.checkBox_6.stateChanged.connect(del_player_table)  # при изменении чекбокса показывает список удаленных игроков
 # =======  нажатие кнопок =========
 
 my_win.Button_reset_filter.clicked.connect(reset_filter)

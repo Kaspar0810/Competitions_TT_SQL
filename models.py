@@ -181,13 +181,14 @@ class Choice(BaseModel):
         db_table = "choices"
 
 class Delete_player(BaseModel):
+    num = CharField(10)
     player = CharField(50)
     bday = DateField()
     rank = IntegerField()
     city = CharField()
     region = CharField()
     razryad = CharField(10)
-    coach = CharField(75)
+    coach_id = ForeignKeyField(Coach)
 
     class Meta:
         db_table = "delete_players"
