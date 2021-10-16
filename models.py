@@ -20,7 +20,6 @@ class Coach(BaseModel):
 
 
 class Player(BaseModel):
-    num = CharField(10)
     player = CharField(50)
     bday = DateField()
     rank = IntegerField()
@@ -181,8 +180,8 @@ class Choice(BaseModel):
         db_table = "choices"
 
 class Delete_player(BaseModel):
-    num = CharField(10)
-    player = CharField(50)
+    player_del = ForeignKeyField(Player)
+    player = CharField()
     bday = DateField()
     rank = IntegerField()
     city = CharField()

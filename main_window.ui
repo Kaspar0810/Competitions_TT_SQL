@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -2942,7 +2942,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -3181,8 +3181,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3330,8 +3330,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3343,8 +3343,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3356,8 +3356,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">

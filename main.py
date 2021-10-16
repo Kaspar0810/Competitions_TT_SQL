@@ -22,13 +22,15 @@ import sys
 import openpyxl as op
 import pdf
 import os
+import start_form
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from datetime import *
+
+from start_form import Ui_Form
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
-# from models import *
 from pdf import *
 
 from reportlab.pdfgen.canvas import Canvas
@@ -70,6 +72,24 @@ pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
+
+
+class StartWindow(QWidget):
+    def __init__(self):
+        super(StartWindow, self).__init__()
+        self.setWindowTitle('Добро пожаловать в программу Competitions_TT')
+        self.setMinimumWidth(400)
+        self.setMinimumHeight(250)
+        self.button = QPushButton(self)
+        self.button.setText('Ok')
+        self.button.show()
+        self.button.clicked.connect(self.next)
+        my_win.hide()
+
+    def next(self):
+        self.close()
+        my_win.show()
+
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -162,8 +182,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         rank_Menu.addAction(self.r1Action)
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
-
-
     #  создание действий меню
     def _createAction(self):
         self.newAction = QAction(self)
@@ -281,6 +299,9 @@ my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.show()
 
+w1 = StartWindow()
+w1.show()
+
 
 def tab_enabled():
     """Включает вкладки в зависимости от создании системы и жеребъевки"""
@@ -313,7 +334,7 @@ def tab_enabled():
         my_win.tabWidget.setTabEnabled(5, False)
 
 
-tab_enabled()
+# tab_enabled()
 
 #  ==== наполнение комбобоксов ==========
 page_orient = ("альбомная", "книжная")
@@ -347,8 +368,12 @@ my_win.dateEdit_end.setDate(date.today())
 def dbase():
     """Создание DB и таблиц"""
     with db:
-        db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach, System, Result, Game_list, Choice, Delete_player])
-    db_r()
+        db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach, System,
+                          Result, Game_list, Choice, Delete_player])
+    db_r()  # при первичном запуске заполнение рейтинг листов и регионов
+    system = System(title_id=1, total_athletes=0, total_group=0,
+                    max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
+                    choice_flag=False, score_flag=5, visible_game=False).save()
     my_win.Button_title_made.setEnabled(True)
 
 
@@ -569,7 +594,7 @@ def db_r(table_db=R_list):  # table_db присваивает по умолча�
         Region.insert_many(reg).execute()
     region()
     sb = "Список регионов загружен"
-    sb.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
+    # sb.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
     my_win.statusbar.showMessage("Список регионов загружен", 5000)  # показывает статус бар на 5 секунд
     my_win.lineEdit_title_nazvanie.hasFocus()
 
@@ -837,17 +862,17 @@ def add_player():
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
     ms = ""
+    idc = Coach.get(Coach.coach == ch)
+    num = count + 1
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
-        num = count + 1
+        # num = count + 1
         with db:
             player = Delete_player.get(Delete_player.player == my_win.tableWidget.item(row, 2).text())
+            pl_id = player.player_id
             player.delete_instance()
-            idc = Coach.get(Coach.coach == ch)
-            # plr = Player(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-            #              razryad=rz, coach_id=idc, mesto=ms).save()
-            plr = Player(num=num, player=pl, bday=bd, rank=rn, city=ct, region=rg,
+            plr = Player(num=num, player_id=pl_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, mesto=ms).save()
         element = str(rn)
         rn = ('    ' + element)[-4:]  # make all elements the same length
@@ -860,18 +885,23 @@ def add_player():
         my_win.label_46.setText(f"Всего: {count} участников")
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
-        # num = count + 1
-        with db:
-            idc = Coach.get(Coach.coach == ch)
-            plr = Player.get(Player.player == pl)
-            plr.player=pl
-            plr.bday=bd
-            plr.rank=rn
-            plr.city=ct
-            plr.region=rg
-            plr.razryad=rz
-            plr.coach_id=idc
-            plr.save()
+        txt = my_win.Button_add_edit_player.text()
+        if txt == "Редактировать":
+            with db:
+                plr = Player.get(Player.player == pl)
+                plr.player=pl
+                plr.bday=bd
+                plr.rank=rn
+                plr.city=ct
+                plr.region=rg
+                plr.razryad=rz
+                plr.coach_id=idc
+                plr.save()
+        elif txt == "Добавить":
+            num = count + 1
+            with db:
+                player = Player(num=num, player=pl, bday=bd, rank=rn, city=ct,
+                                region=rg, razrayd=rz, coach_id=idc ).save()
 
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
@@ -992,7 +1022,9 @@ def page():
         s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
         # соревнования
         last_id = s.id
-        # tg = s.total_group
+        #=================== добавил заполнение комбокоск
+        load_combobox_filter_group()
+        #===============
         my_win.label_9.hide()
         my_win.label_10.hide()
         my_win.label_11.hide()
@@ -1852,12 +1884,13 @@ def select_player_in_game():
 def delete_player():
     """удаляет игрока из списка и заносит его в архив"""
     msgBox = QMessageBox
+
     r = my_win.tableWidget.currentRow()
-    num = my_win.tableWidget.item(r, 1).text()
     player_del = my_win.tableWidget.item(r, 2).text()
-    player_city_del = my_win.tableWidget.item(r, 5).text()
+    player_id = Player.get(Player.player == player_del)
     birthday = my_win.tableWidget.item(r, 3).text()
     rank = my_win.tableWidget.item(r, 4).text()
+    player_city_del = my_win.tableWidget.item(r, 5).text()
     region = my_win.tableWidget.item(r, 6).text()
     razryad = my_win.tableWidget.item(r, 7).text()
     coach = my_win.tableWidget.item(r, 8).text()
@@ -1867,7 +1900,7 @@ def delete_player():
                              msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
     if result == msgBox.StandardButtons.Ok:
         with db:
-            del_player = Delete_player(num=num, player=player_del, bday=birthday, rank=rank, city=player_city_del,
+            del_player = Delete_player(player_id=player_id, player=player_del, bday=birthday, rank=rank, city=player_city_del,
                                        region=region, razryad=razryad, coach_id=coach_id).save()
             player = Player.get(Player.player == my_win.tableWidget.item(r, 2).text())
             player.delete_instance()
@@ -2542,10 +2575,12 @@ def choice_gr_automat():
         for i in range(start, end, step):  # №-й посев
             if h < tp:
                 txt = str(f'{i + p} группа')
-                id = int(my_win.tableWidget.item(h, 1).text())
+                id = int(my_win.tableWidget.item(h, 1).text())  # ищет id игрока
+                ch_id = Choice.get(Choice.player_choice == id)  # находит id таблицы choice, соответсвующий игроку
+                choice_id = ch_id.id
                 h += 1
                 with db:  # запись в таблицу Choice результа жеребъевки
-                    grp = Choice.get(Choice.id == id)
+                    grp = Choice.get(Choice.id == choice_id)
                     grp.group = txt
                     grp.posev_group = k
                     grp.save()
@@ -2583,7 +2618,7 @@ def choice_tbl_made():
     choice = Choice.select()
     chc = len(choice)
     if chc == 0:
-        for i in range(1, pl + 1):
+        for i in Player:
             pl = Player.get(Player.id == i)
             cch = Coach.get(Coach.id == pl.coach_id)
             coach = cch.coach
@@ -2608,7 +2643,7 @@ def choice_filter_group():
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
-    color_region_in_tableWidget(fg)
+    # color_region_in_tableWidget(fg)
     for d in range(0, row_count):  # сортирует нумерация по порядку
         my_win.tableWidget.setItem(d, 0, QTableWidgetItem(str(d + 1)))
 
@@ -2616,16 +2651,19 @@ def choice_filter_group():
 def color_region_in_tableWidget(fg):
     """смена цвета шрифта в QtableWidget -fg- номер группы"""
     reg = []
+    rid = []
     line = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)  # выбирает все строки той группы (fg)
     for i in line:
         r = Choice.get(Choice.id == i)
+        r_id = r.id
         region = r.region
         region = str(region.rstrip())  # удаляет пробел в конце строки
         reg.append(region)
+        rid.append(r_id)
     if len(reg) != 0:
         for x in reg:
             count_region = reg.count(x)
-            if count_region > 1:  # если поворяющихся регионов больше одного
+            if count_region > 1:  # если повторяющихся регионов больше одного
                 rows = my_win.tableWidget.rowCount()  # кол-во строк в отсортированной таблице
                 for i in range(rows):
                     txt = my_win.tableWidget.item(i, 3).text()
@@ -2846,7 +2884,7 @@ def select_choice_final():
     #=========================
     # t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     # with db:
-    #     Player.create_table()
+    #     Delete_player.create_table()
         # System.create_table()
         # sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
         #              kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
@@ -2937,6 +2975,19 @@ def no_play():
     else:
         print("неявился 2-й игрок")
 
+
+def load_combobox_filter_group():
+    """заполняет кмобобокс фильтер групп"""
+    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    # соревнования
+    # =================== добавил заполнение комбокоск
+    tg = s.total_group
+    my_win.comboBox_filter_choice.addItem("все группы")
+    for i in range(1, tg + 1):
+        my_win.comboBox_filter_choice.addItem(f"{i} группа")
+
+
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s1.returnPressed.connect(focus)
@@ -3013,7 +3064,8 @@ my_win.Button_title_made.clicked.connect(title_made)  # записывает в 
 my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
 my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
 my_win.Button_del_player.clicked.connect(delete_player)
-# my_win.Button_proba.clicked.connect(proba)
+
+my_win.Button_proba.clicked.connect(dbase)
 
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
