@@ -22,7 +22,6 @@ import sys
 import openpyxl as op
 import pdf
 import os
-import start_form
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from PyQt6.QtWidgets import *
@@ -74,24 +73,6 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
 
 
-class StartWindow(QWidget):
-    def __init__(self):
-        super(StartWindow, self).__init__()
-        self.setWindowTitle('Добро пожаловать в программу Competitions_TT')
-        self.setMinimumWidth(400)
-        self.setMinimumHeight(250)
-        self.button = QPushButton(self)
-        self.button.setText('Ok')
-        self.button.show()
-        self.button.clicked.connect(self.next)
-        my_win.hide()
-
-    def next(self):
-        self.close()
-        my_win.show()
-
-
-
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None, *args, **kwargs) -> object:
@@ -120,33 +101,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(3, False)
         self.toolBox.setItemEnabled(4, False)
         self.toolBox.setItemEnabled(5, False)
-
-        # t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-        # sid_first = System.select().where(System.title_id == t)  # находит system id первого
-        # count = len(sid_first)
-        # s_id = System.select().order_by(System.id).get()
-        # s = int(s_id.id)
-        # stage = []
-        # for i in range(s, count + 1):
-        #     system = System.get(System.id == i)
-        #     stage.append(system.stage)
-        #
-        # if count > 0:
-        #     self.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-        #     for i in stage:
-        #         if i == "Предварительный":
-        #             self.tabWidget.setTabEnabled(3, True)
-        #         elif i == "Полуфиналы":
-        #             self.tabWidget.setTabEnabled(4, True)
-        #         elif i == "1-й финал":
-        #             self.tabWidget.setTabEnabled(5, True)
-        # else:
-        #     self.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-        #     self.tabWidget.setTabEnabled(3, False)
-        #     self.tabWidget.setTabEnabled(4, False)
-        #     self.tabWidget.setTabEnabled(5, False)
-
-        # self.toolBox.setCurrentIndex(0)
 
     # ====== создание строки меню ===========
     def _createMenuBar(self):
@@ -297,10 +251,142 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
-my_win.show()
+# my_win.show()
 
-w1 = StartWindow()
-w1.show()
+class StartWindow(QMainWindow, Ui_Form):
+    """Стартовое окно приветствия"""
+    def __init__(self):
+        super(StartWindow, self).__init__()
+        self.setupUi(self)  # загружает настройки формы(окна) из QT
+        self.setWindowTitle('Добро пожаловать в COMPETITIONS_TT')
+        self.Button_open.clicked.connect(self.open)
+        self.Button_new.clicked.connect(self.new)
+        dbase()
+
+    def open(self):
+        self.close()
+        my_win.show()
+
+    def new(self):
+        """запускает новые соревнования"""
+        db_r()  # при первичном запуске заполнение рейтинг листов и регионов
+        title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
+                      kat_ref="", secretary="", kat_sek="").save()
+        t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        title_id = t_id.id
+        system = System(title_id=title_id, total_athletes=0, total_group=0,
+                        max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
+                        choice_flag=False, score_flag=5, visible_game=False).save()
+        self.close()
+        my_win.show()
+
+
+def dbase():
+    """Создание DB и таблиц"""
+    with db:
+        db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach, System,
+                              Result, Game_list, Choice, Delete_player])
+    # db_r()  # при первичном запуске заполнение рейтинг листов и регионов
+    # system = System(title_id=1, total_athletes=0, total_group=0,
+    #                     max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
+    #                     choice_flag=False, score_flag=5, visible_game=False).save()
+    # my_win.Button_title_made.setEnabled(True)
+
+
+def db_r(table_db=R_list):  # table_db присваивает по умолчанию значение R_list
+    """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
+     а потом загружает список регионов базу данных"""
+    # my_win.show()
+    if table_db == R_list:
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
+        load_listR_in_db(table_db, fname)
+        my_win.statusbar.showMessage("Текущий рейтинг загружен")
+        table_db = R1_list
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
+        load_listR_in_db(table_db, fname)
+        my_win.statusbar.showMessage("Январский рейтинг загружен")
+    else:
+        table_db = R1_list
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
+        load_listR_in_db(table_db, fname)
+        my_win.statusbar.showMessage("Текущий рейтинг загружен")
+
+    # добавляет в таблицу регионы
+    wb = op.load_workbook("регионы.xlsx")
+    s = wb.sheetnames[0]
+    sheet = wb[s]
+    reg = []
+    for i in range(1, 86):
+        a = sheet['B%s' % i].value
+        reg.append([a])
+    with db:
+        Region.insert_many(reg).execute()
+    region()
+    sb = "Список регионов загружен"
+    # sb.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
+    my_win.statusbar.showMessage("Список регионов загружен", 5000)  # показывает статус бар на 5 секунд
+    my_win.lineEdit_title_nazvanie.hasFocus()
+
+
+def load_listR_in_db(table_db, fname):
+    """при отсутствии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
+    если выбор был сделан загружает в базу данных"""
+    filepatch = str(fname[0])
+    if table_db == R_list:
+        message = "Вы не выбрали файл с текущим рейтингом!" \
+                  "если хотите выйти, нажмите <Ок>" \
+                  "если хотите вернуться, нажмите <Отмена>"
+    else:
+        message = "Вы не выбрали файл с январским рейтингом!" \
+                  "если хотите выйти, нажмите <Ок>" \
+                  "если хотите вернуться, нажмите <Отмена>"
+
+    if filepatch == "":
+        reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
+                                                  QtWidgets.QMessageBox.StandardButtons.Ok,
+                                                  QtWidgets.QMessageBox.StandardButtons.Cancel)
+        if reply == QMessageBox.StandardButtons.Ok:
+            return
+        else:
+            db_r(table_db=R1_list)
+    else:
+        rp = filepatch.rindex("/")
+        RPath = filepatch[rp + 1: len(filepatch)]
+        wb = op.load_workbook(RPath)
+        s = wb.sheetnames[0]
+        sheet = wb[s]
+        for r in range(2, 4500):
+            if sheet.cell(row=r, column=2).value is None:
+                break
+        data = []
+
+        for i in range(2, r):
+            A = sheet['A%s' % i].value
+            B = sheet['B%s' % i].value
+            C = sheet['C%s' % i].value
+            D = sheet['D%s' % i].value
+            E = sheet['E%s' % i].value
+            data.append([A, B, C, D, E])
+
+        with db:
+            table_db.insert_many(data).execute()
+
+
+def region():
+    """добавляет из таблицы в комбобокс регионы"""
+    if my_win.comboBox_region.currentIndex() > 0:  # проверка на заполненость комбокса данными
+        return
+    else:
+        with db:
+            for r in range(1, 86):
+                reg = Region.get(Region.id == r)
+                my_win.comboBox_region.addItem(reg.region)
+
+
+
+fir_window = StartWindow()  # Создаём объект класса ExampleApp
+fir_window.show()  # Показываем окно
+# app.exec()  # и запускаем приложение
 
 
 def tab_enabled():
@@ -365,21 +451,32 @@ my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
 
 
-def dbase():
-    """Создание DB и таблиц"""
-    with db:
-        db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach, System,
-                          Result, Game_list, Choice, Delete_player])
-    db_r()  # при первичном запуске заполнение рейтинг листов и регионов
-    system = System(title_id=1, total_athletes=0, total_group=0,
-                    max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
-                    choice_flag=False, score_flag=5, visible_game=False).save()
-    my_win.Button_title_made.setEnabled(True)
+# def dbase():
+#     """Создание DB и таблиц"""
+#     with db:
+#         db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach, System,
+#                           Result, Game_list, Choice, Delete_player])
+#     db_r()  # при первичном запуске заполнение рейтинг листов и регионов
+#     system = System(title_id=1, total_athletes=0, total_group=0,
+#                     max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
+#                     choice_flag=False, score_flag=5, visible_game=False).save()
+#     my_win.Button_title_made.setEnabled(True)
 
 
-def db_insert_title():
+def db_insert_title(title_str):
     """Вставляем запись в таблицу титул"""
-    nazv = Title(name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
+    nm = title_str[0]
+    sr = title_str[1]
+    vz = title_str[2]
+    ds = title_str[3]
+    de = title_str[4]
+    ms = title_str[5]
+    rf = title_str[6]
+    kr = title_str[7]
+    sk = title_str[8]
+    ks = title_str[9]
+    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    nazv = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
                  kat_ref=kr, secretary=sk, kat_sek=ks).save()
 
 
@@ -402,29 +499,6 @@ def system_edit():
     """редактирование системы"""
     system_made()
 
-
-# def system_update(kg, stroka_kol_group):
-#     """Обновляет таблицу система кол-во игроков, кол-во групп и прочее"""
-#     sender = my_win.sender()  # сигнал от кнопки
-#     ps = Player.select()
-#     ta = len(ps)
-#     e = int(ta) % int(kg)  # если количество участников не равно делится на группы
-#     t = int(ta) // int(kg)  # если количество участников равно делится на группы
-#     title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-#     if sender == my_win.Button_etap_made:
-#         system = System.get(System.id == title.id)  # находит в базе запись в таблице -system- по данным соревнованиям
-#         if e == 0:
-#             system.max_player = t
-#         else:
-#             system.max_player = t + 1
-#         system.total_athletes = ta
-#         system.total_group = kg
-#         system.stage = my_win.comboBox_etap_1.currentText()
-#         system.page_vid = my_win.comboBox_page_vid.currentText()
-#         system.label_string = stroka_kol_group
-#     else:
-#         pass
-#     system.save()
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
@@ -452,15 +526,15 @@ def system_made():
     my_win.Button_2etap_made.setEnabled(False)
 
 
-def region():
-    """добавляет из таблицы в комбобокс регионы"""
-    if my_win.comboBox_region.currentIndex() > 0:  # проверка на заполненость комбокса данными
-        return
-    else:
-        with db:
-            for r in range(1, 86):
-                reg = Region.get(Region.id == r)
-                my_win.comboBox_region.addItem(reg.region)
+# def region():
+#     """добавляет из таблицы в комбобокс регионы"""
+#     if my_win.comboBox_region.currentIndex() > 0:  # проверка на заполненость комбокса данными
+#         return
+#     else:
+#         with db:
+#             for r in range(1, 86):
+#                 reg = Region.get(Region.id == r)
+#                 my_win.comboBox_region.addItem(reg.region)
 
 
 def load_tableWidget():
@@ -521,88 +595,87 @@ def load_tableWidget():
         fill_table(player_list)
 
 
-def load_listR_in_db(table_db, fname):
-    """при отсутствии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
-    если выбор был сделан загружает в базу данных"""
-    filepatch = str(fname[0])
-    if table_db == R_list:
-        message = "Вы не выбрали файл с текущим рейтингом!" \
-                  "если хотите выйти, нажмите <Ок>" \
-                  "если хотите вернуться, нажмите <Отмена>"
-    else:
-        message = "Вы не выбрали файл с январским рейтингом!" \
-                  "если хотите выйти, нажмите <Ок>" \
-                  "если хотите вернуться, нажмите <Отмена>"
+# def load_listR_in_db(table_db, fname):
+#     """при отсутствии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
+#     если выбор был сделан загружает в базу данных"""
+#     filepatch = str(fname[0])
+#     if table_db == R_list:
+#         message = "Вы не выбрали файл с текущим рейтингом!" \
+#                   "если хотите выйти, нажмите <Ок>" \
+#                   "если хотите вернуться, нажмите <Отмена>"
+#     else:
+#         message = "Вы не выбрали файл с январским рейтингом!" \
+#                   "если хотите выйти, нажмите <Ок>" \
+#                   "если хотите вернуться, нажмите <Отмена>"
+#
+#     if filepatch == "":
+#         reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
+#                                                   QtWidgets.QMessageBox.StandardButtons.Ok,
+#                                                   QtWidgets.QMessageBox.StandardButtons.Cancel)
+#         if reply == QMessageBox.StandardButtons.Ok:
+#             return
+#         else:
+#             db_r(table_db=R1_list)
+#     else:
+#         rp = filepatch.rindex("/")
+#         RPath = filepatch[rp + 1: len(filepatch)]
+#         wb = op.load_workbook(RPath)
+#         s = wb.sheetnames[0]
+#         sheet = wb[s]
+#         for r in range(2, 4500):
+#             if sheet.cell(row=r, column=2).value is None:
+#                 break
+#         data = []
+#
+#         for i in range(2, r):
+#             A = sheet['A%s' % i].value
+#             B = sheet['B%s' % i].value
+#             C = sheet['C%s' % i].value
+#             D = sheet['D%s' % i].value
+#             E = sheet['E%s' % i].value
+#             data.append([A, B, C, D, E])
+#
+#         with db:
+#             table_db.insert_many(data).execute()
 
-    if filepatch == "":
-        reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
-                                                  QtWidgets.QMessageBox.StandardButtons.Ok,
-                                                  QtWidgets.QMessageBox.StandardButtons.Cancel)
-        if reply == QMessageBox.StandardButtons.Ok:
-            return
-        else:
-            db_r(table_db=R1_list)
-    else:
-        rp = filepatch.rindex("/")
-        RPath = filepatch[rp + 1: len(filepatch)]
-        wb = op.load_workbook(RPath)
-        s = wb.sheetnames[0]
-        sheet = wb[s]
-        for r in range(2, 4500):
-            if sheet.cell(row=r, column=2).value is None:
-                break
-        data = []
 
-        for i in range(2, r):
-            A = sheet['A%s' % i].value
-            B = sheet['B%s' % i].value
-            C = sheet['C%s' % i].value
-            D = sheet['D%s' % i].value
-            E = sheet['E%s' % i].value
-            data.append([A, B, C, D, E])
-
-        with db:
-            table_db.insert_many(data).execute()
-
-
-def db_r(table_db=R_list):  # table_db присваивает по умолчанию значение R_list
-    """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
-     а потом загружает список регионов базу данных"""
-    if table_db == R_list:
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
-        load_listR_in_db(table_db, fname)
-        my_win.statusbar.showMessage("Текущий рейтинг загружен")
-        table_db = R1_list
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
-        load_listR_in_db(table_db, fname)
-        my_win.statusbar.showMessage("Январский рейтинг загружен")
-    else:
-        table_db = R1_list
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
-        load_listR_in_db(table_db, fname)
-        my_win.statusbar.showMessage("Текущий рейтинг загружен")
-
-    # добавляет в таблицу регионы
-    wb = op.load_workbook("регионы.xlsx")
-    s = wb.sheetnames[0]
-    sheet = wb[s]
-    reg = []
-    for i in range(1, 86):
-        a = sheet['B%s' % i].value
-        reg.append([a])
-    with db:
-        Region.insert_many(reg).execute()
-    region()
-    sb = "Список регионов загружен"
-    # sb.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-    my_win.statusbar.showMessage("Список регионов загружен", 5000)  # показывает статус бар на 5 секунд
-    my_win.lineEdit_title_nazvanie.hasFocus()
+# def db_r(table_db=R_list):  # table_db присваивает по умолчанию значение R_list
+#     """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
+#      а потом загружает список регионов базу данных"""
+#     if table_db == R_list:
+#         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
+#         load_listR_in_db(table_db, fname)
+#         my_win.statusbar.showMessage("Текущий рейтинг загружен")
+#         table_db = R1_list
+#         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
+#         load_listR_in_db(table_db, fname)
+#         my_win.statusbar.showMessage("Январский рейтинг загружен")
+#     else:
+#         table_db = R1_list
+#         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
+#         load_listR_in_db(table_db, fname)
+#         my_win.statusbar.showMessage("Текущий рейтинг загружен")
+#
+#     # добавляет в таблицу регионы
+#     wb = op.load_workbook("регионы.xlsx")
+#     s = wb.sheetnames[0]
+#     sheet = wb[s]
+#     reg = []
+#     for i in range(1, 86):
+#         a = sheet['B%s' % i].value
+#         reg.append([a])
+#     with db:
+#         Region.insert_many(reg).execute()
+#     region()
+#     sb = "Список регионов загружен"
+#     # sb.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
+#     my_win.statusbar.showMessage("Список регионов загружен", 5000)  # показывает статус бар на 5 секунд
+#     my_win.lineEdit_title_nazvanie.hasFocus()
 
 
 def title_string():
     """ переменные строк титульного листа """
-    global nm, vz, ds, de, ms, rf, kr, sk, ks, sr
-
+    title_str = []
     nm = my_win.lineEdit_title_nazvanie.text()
     sr = my_win.comboBox_sredi.currentText()
     vz = my_win.lineEdit_title_vozrast.text()
@@ -613,7 +686,17 @@ def title_string():
     sk = my_win.lineEdit_sekretar.text()
     kr = my_win.comboBox_kategor_ref.currentText()
     ks = my_win.comboBox_kategor_sek.currentText()
-    # return nm, vz, ds, de, ms, rf, kr, sk, ks, sr
+    title_str.append(nm)
+    title_str.append(sr)
+    title_str.append(vz)
+    title_str.append(ds)
+    title_str.append(de)
+    title_str.append(ms)
+    title_str.append(rf)
+    title_str.append(sk)
+    title_str.append(kr)
+    title_str.append(ks)
+    return title_str
 
 
 def title_pdf():
@@ -638,28 +721,39 @@ def title_pdf():
 
 def title_made():
     """создание тильного листа соревнования"""
-    title_string()
+    title_str = title_string()
     if my_win.Button_title_made.text() == "Редактировать":
         title_update()
         return
     else:
-        db_insert_title()
+        db_insert_title(title_str)
     title_pdf()
     my_win.checkBox.setChecked(False)  # после заполнения титула выключает чекбокс
     my_win.Button_title_made.setText("Создать")
     region()
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    sg = my_win.comboBox_etap_1.currentText()
-    page_v = my_win.comboBox_page_1.currentText()
+    s = System.select().order_by(System.id.desc()).get()  # получение последнего id системы соревнования
+    # sg = my_win.comboBox_etap_1.currentText()
+    # page_v = my_win.comboBox_page_1.currentText()
     with db:
         System.create_table()
-        sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage=sg, page_vid=page_v,
+        sys = System(id=s, title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="",
                      label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
 
 
 def title_update():
     """обновляет запись титула, если был он изменен"""
-    title_string()
+    title_str = title_string()
+    nm = title_str[0]
+    sr = title_str[1]
+    vz = title_str[2]
+    ds = title_str[3]
+    de = title_str[4]
+    ms = title_str[5]
+    rf = title_str[6]
+    kr = title_str[7]
+    sk = title_str[8]
+    ks = title_str[9]
     nazv = Title.select().order_by(Title.id.desc()).get()
     nazv.name = nm
     nazv.vozrast = vz
@@ -1238,7 +1332,10 @@ def button_etap_made_enabled(state):
 def button_title_made_enable(state):
     """включает кнопку - создание титула - если отмечен чекбокс, защита от случайного нажатия"""
     if state == 2:  # если флажок установлен
-        title_string()
+        title_str = title_string()
+        nm = title_str[0]
+        ds = title_str[3]
+        de = title_str[4]
         t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         if t.name == nm and str(t.data_start) == ds and str(t.data_end) == de:
             my_win.Button_title_made.setText("Редактировать")
