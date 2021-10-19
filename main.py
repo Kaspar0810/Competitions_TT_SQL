@@ -251,7 +251,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
-# my_win.show()
+
 
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
@@ -261,7 +261,25 @@ class StartWindow(QMainWindow, Ui_Form):
         self.setWindowTitle('Добро пожаловать в COMPETITIONS_TT')
         self.Button_open.clicked.connect(self.open)
         self.Button_new.clicked.connect(self.new)
+        self.Button_old.clicked.connect(self.old_comp)
+        self.LinkButton.clicked.connect(self.last_comp)
         dbase()
+        count = len(Title.select())
+        if count == 0:
+            self.LinkButton.setText("Список прошедших соревнований пуст")
+            self.LinkButton.setEnabled(False)
+            self.Button_open.setEnabled(False)
+            self.Button_old.setEnabled(False)
+        else:
+            t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+            last_comp = t_id.name
+            self.LinkButton.setText(f"{last_comp}")
+
+
+    def last_comp(self):
+        """открытие последних соревнований"""
+        db_select_title()
+        self.open()
 
     def open(self):
         self.close()
@@ -269,16 +287,20 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def new(self):
         """запускает новые соревнования"""
-        db_r()  # при первичном запуске заполнение рейтинг листов и регионов
+        # db_r()  # при первичном запуске заполнение рейтинг листов и регионов
         title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
                       kat_ref="", secretary="", kat_sek="").save()
         t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         title_id = t_id.id
+        db_r()
         system = System(title_id=title_id, total_athletes=0, total_group=0,
                         max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
                         choice_flag=False, score_flag=5, visible_game=False).save()
         self.close()
         my_win.show()
+
+    def old_comp(self):
+        pass
 
 
 def dbase():
@@ -286,17 +308,11 @@ def dbase():
     with db:
         db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach, System,
                               Result, Game_list, Choice, Delete_player])
-    # db_r()  # при первичном запуске заполнение рейтинг листов и регионов
-    # system = System(title_id=1, total_athletes=0, total_group=0,
-    #                     max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
-    #                     choice_flag=False, score_flag=5, visible_game=False).save()
-    # my_win.Button_title_made.setEnabled(True)
 
 
 def db_r(table_db=R_list):  # table_db присваивает по умолчанию значение R_list
     """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
      а потом загружает список регионов базу данных"""
-    # my_win.show()
     if table_db == R_list:
         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
         load_listR_in_db(table_db, fname)
@@ -323,7 +339,6 @@ def db_r(table_db=R_list):  # table_db присваивает по умолча�
         Region.insert_many(reg).execute()
     region()
     sb = "Список регионов загружен"
-    # sb.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
     my_win.statusbar.showMessage("Список регионов загружен", 5000)  # показывает статус бар на 5 секунд
     my_win.lineEdit_title_nazvanie.hasFocus()
 
@@ -386,41 +401,42 @@ def region():
 
 fir_window = StartWindow()  # Создаём объект класса ExampleApp
 fir_window.show()  # Показываем окно
-# app.exec()  # и запускаем приложение
 
 
 def tab_enabled():
     """Включает вкладки в зависимости от создании системы и жеребъевки"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    sid_first = System.select().where(System.title_id == t)  # находит system id первого
-    count = len(sid_first)
-    s_id = System.select().order_by(System.id).get()
-    s = int(s_id.id)
-    stage = []  #
-    for i in range(s, count + 1):
-        system = System.get(System.id == i)
-        stage.append(system.stage)
+    count_title = len(Title.select())
+    if count_title != 0:
+        t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        sid_first = System.select().where(System.title_id == t)  # находит system id первого
+        count = len(sid_first)
+        s_id = System.select().order_by(System.id).get()
+        s = int(s_id.id)
+        stage = []  #
+        for i in range(s, count + 1):
+            system = System.get(System.id == i)
+            stage.append(system.stage)
 
-    if count > 0:
-        my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-        my_win.toolBox.setItemEnabled(2, True)
-        for i in stage:
-            if i == "Одна таблица":
-                pass
-            elif i == "Предварительный":
-                my_win.tabWidget.setTabEnabled(3, True)
-            elif i == "Полуфиналы":
-                my_win.tabWidget.setTabEnabled(4, True)
-            elif i == "1-й финал":
-                my_win.tabWidget.setTabEnabled(5, True)
-    else:
-        my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-        my_win.tabWidget.setTabEnabled(3, False)
-        my_win.tabWidget.setTabEnabled(4, False)
-        my_win.tabWidget.setTabEnabled(5, False)
+        if count > 0:
+            my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
+            my_win.toolBox.setItemEnabled(2, True)
+            for i in stage:
+                if i == "Одна таблица":
+                    pass
+                elif i == "Предварительный":
+                    my_win.tabWidget.setTabEnabled(3, True)
+                elif i == "Полуфиналы":
+                    my_win.tabWidget.setTabEnabled(4, True)
+                elif i == "1-й финал":
+                    my_win.tabWidget.setTabEnabled(5, True)
+        else:
+            my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
+            my_win.tabWidget.setTabEnabled(3, False)
+            my_win.tabWidget.setTabEnabled(4, False)
+            my_win.tabWidget.setTabEnabled(5, False)
 
 
-# tab_enabled()
+tab_enabled()
 
 #  ==== наполнение комбобоксов ==========
 page_orient = ("альбомная", "книжная")
@@ -449,18 +465,6 @@ my_win.comboBox_table_2.addItems(vid_setki)
 # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
-
-
-# def dbase():
-#     """Создание DB и таблиц"""
-#     with db:
-#         db.create_tables([Title, R_list, Region, City, Player, R1_list, Coach, System,
-#                           Result, Game_list, Choice, Delete_player])
-#     db_r()  # при первичном запуске заполнение рейтинг листов и регионов
-#     system = System(title_id=1, total_athletes=0, total_group=0,
-#                     max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
-#                     choice_flag=False, score_flag=5, visible_game=False).save()
-#     my_win.Button_title_made.setEnabled(True)
 
 
 def db_insert_title(title_str):
@@ -526,17 +530,6 @@ def system_made():
     my_win.Button_2etap_made.setEnabled(False)
 
 
-# def region():
-#     """добавляет из таблицы в комбобокс регионы"""
-#     if my_win.comboBox_region.currentIndex() > 0:  # проверка на заполненость комбокса данными
-#         return
-#     else:
-#         with db:
-#             for r in range(1, 86):
-#                 reg = Region.get(Region.id == r)
-#                 my_win.comboBox_region.addItem(reg.region)
-
-
 def load_tableWidget():
     """Заполняет таблицу списком или рейтингом в зависимости от выбора"""
     msgBox = QMessageBox
@@ -560,8 +553,8 @@ def load_tableWidget():
         column_label = ["№", "id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
-        z = 10
-        column_label = ["№", "id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
+        z = 9
+        column_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
     my_win.tableWidget.setColumnCount(z)
@@ -591,86 +584,9 @@ def load_tableWidget():
             fill_table_choice()
     else:  # загружает таблицу со списком
         player_list = Player.select().order_by(Player.rank.desc())
-        # player_list = Delete_player.select()
-        fill_table(player_list)
-
-
-# def load_listR_in_db(table_db, fname):
-#     """при отсутствии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
-#     если выбор был сделан загружает в базу данных"""
-#     filepatch = str(fname[0])
-#     if table_db == R_list:
-#         message = "Вы не выбрали файл с текущим рейтингом!" \
-#                   "если хотите выйти, нажмите <Ок>" \
-#                   "если хотите вернуться, нажмите <Отмена>"
-#     else:
-#         message = "Вы не выбрали файл с январским рейтингом!" \
-#                   "если хотите выйти, нажмите <Ок>" \
-#                   "если хотите вернуться, нажмите <Отмена>"
-#
-#     if filepatch == "":
-#         reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
-#                                                   QtWidgets.QMessageBox.StandardButtons.Ok,
-#                                                   QtWidgets.QMessageBox.StandardButtons.Cancel)
-#         if reply == QMessageBox.StandardButtons.Ok:
-#             return
-#         else:
-#             db_r(table_db=R1_list)
-#     else:
-#         rp = filepatch.rindex("/")
-#         RPath = filepatch[rp + 1: len(filepatch)]
-#         wb = op.load_workbook(RPath)
-#         s = wb.sheetnames[0]
-#         sheet = wb[s]
-#         for r in range(2, 4500):
-#             if sheet.cell(row=r, column=2).value is None:
-#                 break
-#         data = []
-#
-#         for i in range(2, r):
-#             A = sheet['A%s' % i].value
-#             B = sheet['B%s' % i].value
-#             C = sheet['C%s' % i].value
-#             D = sheet['D%s' % i].value
-#             E = sheet['E%s' % i].value
-#             data.append([A, B, C, D, E])
-#
-#         with db:
-#             table_db.insert_many(data).execute()
-
-
-# def db_r(table_db=R_list):  # table_db присваивает по умолчанию значение R_list
-#     """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
-#      а потом загружает список регионов базу данных"""
-#     if table_db == R_list:
-#         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
-#         load_listR_in_db(table_db, fname)
-#         my_win.statusbar.showMessage("Текущий рейтинг загружен")
-#         table_db = R1_list
-#         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
-#         load_listR_in_db(table_db, fname)
-#         my_win.statusbar.showMessage("Январский рейтинг загружен")
-#     else:
-#         table_db = R1_list
-#         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
-#         load_listR_in_db(table_db, fname)
-#         my_win.statusbar.showMessage("Текущий рейтинг загружен")
-#
-#     # добавляет в таблицу регионы
-#     wb = op.load_workbook("регионы.xlsx")
-#     s = wb.sheetnames[0]
-#     sheet = wb[s]
-#     reg = []
-#     for i in range(1, 86):
-#         a = sheet['B%s' % i].value
-#         reg.append([a])
-#     with db:
-#         Region.insert_many(reg).execute()
-#     region()
-#     sb = "Список регионов загружен"
-#     # sb.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-#     my_win.statusbar.showMessage("Список регионов загружен", 5000)  # показывает статус бар на 5 секунд
-#     my_win.lineEdit_title_nazvanie.hasFocus()
+        count = len(player_list)
+        if count != 0:
+            fill_table(player_list)
 
 
 def title_string():
@@ -794,14 +710,14 @@ def fill_table(player_list):
 
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
-                if column == 8:  # преобразует id тренера в фамилию
+                if column == 7:  # преобразует id тренера в фамилию
                     coach_id = str(list(player_selected[row].values())[column])
                     coach = Coach.get(Coach.id == coach_id)
                     item = coach.coach
                 else:
                     item = str(list(player_selected[row].values())[column])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-        my_win.tableWidget.hideColumn(1)  # скрывает столбец id
+        # my_win.tableWidget.hideColumn(0)  # скрывает столбец id
         my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
@@ -1412,7 +1328,6 @@ def exit_comp():
 def system_competition():
     """выбор системы проведения"""
     sender = my_win.sender()
-    # pv = my_win.comboBox_page_vid.currentText()
     flag_system = ready_system()
     if sender == my_win.systemAction or sender == my_win.choice_gr_Action or sender == my_win.tabWidget \
             or sender == my_win.toolBox or sender == my_win.system_edit_Action:
@@ -1470,8 +1385,22 @@ def system_competition():
             my_win.label_27.hide()
             my_win.label_28.hide()
             my_win.comboBox_table.hide()
-            choice_tbl_made()  # заполнение db списком для жеребъевки
-            my_win.tabWidget.setCurrentIndex(2)
+            player = Player.select()
+            count = len(player)
+            if count != 0:
+                choice_tbl_made()  # заполнение db списком для жеребъевки
+                my_win.tabWidget.setCurrentIndex(2)
+            else:
+                reply = QMessageBox.information(my_win, 'Уведомление',
+                                                "У Вас нет ни одного спортсмена.\nСначала необходимо создать "
+                                                "список участников соревнований.\n Перейти к созданию списка?",
+                                                QMessageBox.StandardButtons.Ok,
+                                                QMessageBox.StandardButtons.Cancel)
+                if reply == QMessageBox.StandardButtons.Ok:
+                    my_win.tabWidget.setCurrentIndex(1)
+                    my_win.lineEdit_Family_name.setFocus()
+                else:
+                    return
     elif sender == my_win.tabWidget:
         my_win.spinBox_kol_group.hide()
         my_win.comboBox_etap_1.setEnabled(True)
@@ -2710,6 +2639,7 @@ def choice_setka(fin):
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребъевки"""
+    message = QMessageBox
     pl = Player.select()
     pl = len(pl)
     choice = Choice.select()
