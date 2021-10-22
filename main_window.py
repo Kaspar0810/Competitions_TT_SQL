@@ -698,6 +698,8 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.checkBox_4.setFont(font)
         self.checkBox_4.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
+        self.checkBox_4.setCheckable(True)
+        self.checkBox_4.setChecked(False)
         self.checkBox_4.setObjectName("checkBox_4")
         self.groupBox_filter_group = QtWidgets.QGroupBox(self.tab_2)
         self.groupBox_filter_group.setGeometry(QtCore.QRect(10, 134, 871, 71))
@@ -1307,8 +1309,8 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
-        self.toolBox.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(3)
+        self.toolBox.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
