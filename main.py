@@ -261,8 +261,9 @@ class StartWindow(QMainWindow, Ui_Form):
         self.setWindowTitle('Добро пожаловать в COMPETITIONS_TT')
         self.Button_open.clicked.connect(self.open)
         self.Button_new.clicked.connect(self.new)
-        self.Button_old.clicked.connect(self.old_comp)
+        self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp)
+
         dbase()
         count = len(Title.select())
         if count == 0:
@@ -271,23 +272,33 @@ class StartWindow(QMainWindow, Ui_Form):
             self.Button_open.setEnabled(False)
             self.Button_old.setEnabled(False)
         else:
-            t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-            last_comp = t_id.name
-            self.LinkButton.setText(f"{last_comp}")
-
+            t_id = Title.select().order_by(Title.id.desc())  # получение последней записи в таблице
+            n = 6
+            for i in t_id:
+                n -= 1
+                old_title = Title.get(Title.id == i)
+                last_comp = old_title.name
+                if n == 5:
+                    self.LinkButton.setText(f"{last_comp}")
+                else:
+                    if last_comp != "":
+                        self.comboBox.addItem(last_comp)
+                    else:
+                        return
 
     def last_comp(self):
         """открытие последних соревнований"""
         db_select_title()
-        self.open()
+        self.close()
+        my_win.show()
 
     def open(self):
+        db_select_title()
         self.close()
         my_win.show()
 
     def new(self):
         """запускает новые соревнования"""
-        # db_r()  # при первичном запуске заполнение рейтинг листов и регионов
         title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
                       kat_ref="", secretary="", kat_sek="").save()
         t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
@@ -299,8 +310,11 @@ class StartWindow(QMainWindow, Ui_Form):
         self.close()
         my_win.show()
 
-    def old_comp(self):
+    def r_load(self):
         pass
+        # db_select_title()
+        # self.open()
+
 
 
 def dbase():
@@ -487,8 +501,13 @@ def db_insert_title(title_str):
 
 def db_select_title():
     """извлекаем из таблицы данные и заполняем поля титула для редактирования или просмотра"""
-    with db:
+    sender = fir_window.sender()  # от какой кнопки сигнал
+    if sender.text() != "Открыть":
         titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    else:  # сигнал от кнопки с текстом -открыть-
+        index = fir_window.comboBox.currentText()
+        titles = Title.get(Title.name == index)
+    with db:
         my_win.lineEdit_title_nazvanie.setText(titles.name)
         my_win.lineEdit_title_vozrast.setText(titles.vozrast)
         my_win.dateEdit_start.setDate(titles.data_start)
@@ -2976,6 +2995,8 @@ def no_play():
 
 
 
+
+
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s1.returnPressed.connect(focus)
@@ -3022,6 +3043,8 @@ my_win.comboBox_page_vid.currentTextChanged.connect(page_vid)
 my_win.comboBox_filter_final.currentTextChanged.connect(game_in_visible)
 # my_win.comboBox_table.currentTextChanged.connect(total_player_table)
 my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
+
+
 # my_win.comboBox_filter_group.currentTextChanged.connect(result_filter_group)
 # my_win.comboBox_filter_played.currentTextChanged.connect(result_filter_played)
 
