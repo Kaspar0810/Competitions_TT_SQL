@@ -261,10 +261,12 @@ class StartWindow(QMainWindow, Ui_Form):
         self.setWindowTitle('Добро пожаловать в COMPETITIONS_TT')
         self.Button_open.clicked.connect(self.open)
         self.Button_new.clicked.connect(self.new)
+        self.Button_old.clicked.connect(self.load_old)
         self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp)
 
         dbase()
+        t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         count = len(Title.select())
         if count == 0:
             self.LinkButton.setText("Список прошедших соревнований пуст")
@@ -272,19 +274,10 @@ class StartWindow(QMainWindow, Ui_Form):
             self.Button_open.setEnabled(False)
             self.Button_old.setEnabled(False)
         else:
-            t_id = Title.select().order_by(Title.id.desc())  # получение последней записи в таблице
-            n = 6
-            for i in t_id:
-                n -= 1
-                old_title = Title.get(Title.id == i)
-                last_comp = old_title.name
-                if n == 5:
-                    self.LinkButton.setText(f"{last_comp}")
-                else:
-                    if last_comp != "":
-                        self.comboBox.addItem(last_comp)
-                    else:
-                        return
+            id = t_id.id
+            old_title = Title.get(Title.id == id)
+            last_comp = old_title.name
+            self.LinkButton.setText(f"{last_comp}")
 
     def last_comp(self):
         """открытие последних соревнований"""
@@ -315,6 +308,22 @@ class StartWindow(QMainWindow, Ui_Form):
         # db_select_title()
         # self.open()
 
+    def load_old(self):
+        """загружает в комбобокс архивные соревнования"""
+        self.label_4.show()
+        t_id = Title.select().order_by(Title.id.desc())  # получение последней записи в таблице
+        n = 6
+        for i in t_id:
+            old_comp = i.name
+            data_start = i.data_start
+            data_finish = i.data_end
+            n -= 1
+            if n != 5:
+                if old_comp != "":
+                    self.comboBox.addItem(old_comp)
+                    self.label_4.setText(f"сроки: с {data_start} по {data_finish}")
+                else:
+                    return
 
 
 def dbase():
@@ -603,7 +612,10 @@ def load_tableWidget():
         else:
             fill_table_choice()
     else:  # загружает таблицу со списком
-        player_list = Player.select().order_by(Player.rank.desc())
+        name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+        t = Title.get(Title.name == name_comp)  # получает эту строку в db
+        title_id = t.id  # получает его id
+        player_list = Player.select().where(Player.title_id == title_id).order_by(Player.rank.desc())
         count = len(player_list)
         if count != 0:
             fill_table(player_list)
@@ -1028,7 +1040,9 @@ def page():
     """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
     msgBox = QMessageBox()
     tb = my_win.toolBox.currentIndex()
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    name_comp = my_win.lineEdit_title_nazvanie.text()
+    t = Title.get(Title.name == name_comp)
+    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     sf = System.get(System.title_id == t)
     if tb == 0:
         db_select_title()
@@ -1040,14 +1054,17 @@ def page():
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
-        player_list = Player.select()
+        title = Title.get(Title.name == my_win.lineEdit_title_nazvanie.text())
+        title_id = title.id
+        player_list = Player.select().where(Player.title_id == title_id)
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
     elif tb == 2:  # -система-
         player_list = Player.select()
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
-        t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+        t = Title.get(Title.name == my_win.lineEdit_title_nazvanie.text())
+        # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
         st = System.select().where(System.title_id == t)
         st_count = len(st)
         s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
@@ -2981,8 +2998,11 @@ def kol_player_in_final():
 
 
 # def proba():
-#     pv = A4
-#     comp_system.setka_16_made()
+#     with db:
+#        Player.create_table()
+
+    # pv = A4
+    # comp_system.setka_16_made()
 
 
 def no_play():
@@ -3078,7 +3098,7 @@ my_win.Button_Ok.clicked.connect(enter_score)  # записывает в баз�
 my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
 my_win.Button_del_player.clicked.connect(delete_player)
 
-my_win.Button_proba.clicked.connect(dbase)
+# my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)

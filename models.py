@@ -19,21 +19,6 @@ class Coach(BaseModel):
         order_by = "coach"
 
 
-class Player(BaseModel):
-    player = CharField(50)
-    bday = DateField()
-    rank = IntegerField()
-    city = CharField()
-    region = CharField()
-    razryad = CharField(10)
-    coach_id = ForeignKeyField(Coach)
-    mesto = IntegerField(null=True)
-
-    class Meta:
-        db_table = "players"
-        order_by = "rank"
-
-
 class R_list(BaseModel):
     r_number = IntegerField()
     r_list = IntegerField()
@@ -92,6 +77,22 @@ class Title(BaseModel):
         db_table = "titles"
 
 
+class Player(BaseModel):
+    player = CharField(50)
+    bday = DateField()
+    rank = IntegerField()
+    city = CharField()
+    region = CharField()
+    razryad = CharField(10)
+    coach_id = ForeignKeyField(Coach)
+    mesto = IntegerField(null=True)
+    title_id = ForeignKeyField(Title)
+
+    class Meta:
+        db_table = "players"
+        order_by = "rank"
+
+
 class Result(BaseModel):
     system_stage = CharField()
     number_group = CharField()
@@ -128,6 +129,7 @@ class System(BaseModel):
 
     class Meta:
         db_table = "system"
+
 
 class Game_list(BaseModel):
     number_group = CharField()
@@ -178,6 +180,7 @@ class Choice(BaseModel):
 
     class Meta:
         db_table = "choices"
+
 
 class Delete_player(BaseModel):
     player_del = ForeignKeyField(Player)
