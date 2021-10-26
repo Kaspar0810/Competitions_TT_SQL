@@ -83,7 +83,7 @@ class Player(BaseModel):
     rank = IntegerField()
     city = CharField()
     region = CharField()
-    razryad = CharField(10)
+    razryad = CharField()
     coach_id = ForeignKeyField(Coach)
     mesto = IntegerField(null=True)
     title_id = ForeignKeyField(Title)

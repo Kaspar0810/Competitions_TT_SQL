@@ -511,11 +511,14 @@ def db_insert_title(title_str):
 def db_select_title():
     """извлекаем из таблицы данные и заполняем поля титула для редактирования или просмотра"""
     sender = fir_window.sender()  # от какой кнопки сигнал
-    if sender.text() != "Открыть":
+    if sender == my_win.toolBox:
+        titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    elif sender.text() != "Открыть":
         titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     else:  # сигнал от кнопки с текстом -открыть-
         index = fir_window.comboBox.currentText()
         titles = Title.get(Title.name == index)
+
     with db:
         my_win.lineEdit_title_nazvanie.setText(titles.name)
         my_win.lineEdit_title_vozrast.setText(titles.vozrast)
@@ -578,11 +581,11 @@ def load_tableWidget():
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
     elif sender == my_win.checkBox_6.checkState() == True:
-        z = 9
+        z = 10
         column_label = ["№", "id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
-        z = 9
+        z = 10  # кол-во столбцов должно быть равно (fill_table -column_count-)
         column_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
@@ -596,7 +599,7 @@ def load_tableWidget():
     my_win.tableWidget.setHorizontalHeaderLabels(column_label)
     my_win.tableWidget.isSortingEnabled()
     my_win.tableWidget.show()
-    if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг- и загружет таблицу с рейтингом
+    if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг- и загружает таблицу с рейтингом
         fill_table_R_list()
     elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь- и загружает таблицу с рейтингом
         fill_table_R1_list()
@@ -749,7 +752,6 @@ def fill_table(player_list):
                 else:
                     item = str(list(player_selected[row].values())[column])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-        # my_win.tableWidget.hideColumn(0)  # скрывает столбец id
         my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
@@ -893,7 +895,10 @@ def progressbar(count):
 
 def add_player():
     """добавляет игрока в список и базу данных"""
-    player_list = Player.select()
+    name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+    t = Title.get(Title.name == name_comp)  # получает эту строку в db
+    title_id = t.id  # получает его id
+    player_list = Player.select().where(Player.title_id == title_id)
     count = len(player_list)
     my_win.tableWidget.setRowCount(count + 1)
     pl = my_win.lineEdit_Family_name.text()
@@ -903,19 +908,19 @@ def add_player():
     rg = my_win.comboBox_region.currentText()
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
+    num = count + 1
+    add_coach(ch, num)
     ms = ""
     idc = Coach.get(Coach.coach == ch)
-    num = count + 1
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
-        # num = count + 1
         with db:
             player = Delete_player.get(Delete_player.player == my_win.tableWidget.item(row, 2).text())
             pl_id = player.player_id
             player.delete_instance()
-            plr = Player(num=num, player_id=pl_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-                         razryad=rz, coach_id=idc, mesto=ms).save()
+            plr = Player(player_id=pl_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
+                         razryad=rz, coach_id=idc, mesto=ms, title_id=title_id).save()
         element = str(rn)
         rn = ('    ' + element)[-4:]  # make all elements the same length
         spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
@@ -940,18 +945,18 @@ def add_player():
                 plr.coach_id=idc
                 plr.save()
         elif txt == "Добавить":
-            num = count + 1
             with db:
-                player = Player(num=num, player=pl, bday=bd, rank=rn, city=ct,
-                                region=rg, razrayd=rz, coach_id=idc ).save()
+                player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
+                                coach_id=idc, title_id=title_id ).save()
 
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
         my_win.lineEdit_R.clear()
         my_win.lineEdit_city_list.clear()
         my_win.lineEdit_coach.clear()
-
+        my_win.label_46.setText(f"Всего: {count + 1} участников")
         my_win.tableWidget.resizeColumnsToContents()
+        fill_table(player_list)
         list_player_pdf()
 
 
@@ -1005,7 +1010,10 @@ def load_combobox_filter_group():
     sender = my_win.menuWidget().sender()
     my_win.comboBox_filter_group.clear()
     my_win.comboBox_filter_choice.clear()
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    name_comp = my_win.lineEdit_title_nazvanie.text()
+    t = Title.get(Title.name == name_comp)
+    title_id = t.id
+    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     gr_txt = []
     kg = int(system.total_group)  # количество групп
@@ -1042,7 +1050,7 @@ def page():
     tb = my_win.toolBox.currentIndex()
     name_comp = my_win.lineEdit_title_nazvanie.text()
     t = Title.get(Title.name == name_comp)
-    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    title_id = t.id
     sf = System.get(System.title_id == t)
     if tb == 0:
         db_select_title()
@@ -1054,17 +1062,14 @@ def page():
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
-        title = Title.get(Title.name == my_win.lineEdit_title_nazvanie.text())
-        title_id = title.id
         player_list = Player.select().where(Player.title_id == title_id)
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
     elif tb == 2:  # -система-
-        player_list = Player.select()
+        player_list = Player.select().where(Player.title_id == title_id)
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
-        t = Title.get(Title.name == my_win.lineEdit_title_nazvanie.text())
-        # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+
         st = System.select().where(System.title_id == t)
         st_count = len(st)
         s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
@@ -1233,9 +1238,9 @@ def add_coach(ch, num):
         return
     for c in coach:
         coa = Coach.select().where(Coach.coach == ch)
-
         if bool(coa):
             my_win.textEdit.setText("Такой тренер(ы) существует")
+            return
         else:
             cch = Coach(coach=ch, player_id=num).save()
 
@@ -1248,10 +1253,13 @@ def find_player_in_R():
 def sort(self):
     """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
+    name_comp = my_win.lineEdit_title_nazvanie.text()
+    t = Title.get(Title.name == name_comp)
+    title_id = t.id
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
-        player_list = Player.select().order_by(Player.rank.desc())  # сортировка по рейтингу
+        player_list = Player.select().where(Player.title_id == title_id).order_by(Player.rank.desc())  # сортировка по рейтингу
     else:
-        player_list = Player.select().order_by(Player.player)  # сортировка по алфавиту
+        player_list = Player.select().where(Player.title_id == title_id).order_by(Player.player)  # сортировка по алфавиту
     fill_table(player_list)
 
 
@@ -1296,11 +1304,12 @@ def button_system_made_enable(state):
 def list_player_pdf():
     """создание списка учстников в pdf файл"""
     title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    title_id = title.id
 
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
-    player_list = Player.select()
-    count = len(player_list)  # колличество записей в базе
+    player_list = Player.select().where(Player.title_id == title_id)
+    count = len(player_list)  # количество записей в базе
     kp = count + 1
     my_win.tableWidget.setRowCount(count)
     for k in range(0, count):  # цикл по списку по строкам
