@@ -2,9 +2,11 @@
 
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+import dbm
+
 import comp_system
 import tbl_data
-
+import sqlite3
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -22,6 +24,8 @@ import sys
 import openpyxl as op
 import pdf
 import os
+
+# from playhouse.sqlite_ext import SqliteExtDatabase, backup_to_file, backup
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from PyQt6.QtWidgets import *
@@ -186,7 +190,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         load_tableWidget()
 
     def exit(self):
-        exit_comp()
+        backup()
 
     def saveList(self):
         my_win.tabWidget.setCurrentIndex(1)
@@ -3024,6 +3028,20 @@ def no_play():
 
 
 
+def backup():
+    """резервное копирование базы данных"""
+    try:
+        db = sqlite3.connect('comp_db.db')
+        db_backup = sqlite3.connect('comp_db_backup.db')
+        with db_backup:
+            db.backup(db_backup, pages=3, progress=None)
+        print("Резервное копирование выполнено успешно")
+    except sqlite3.Error as error:
+        print("Ошибка при резервном копировании: ", error)
+    finally:
+        if (db_backup):
+            db_backup.close()
+            db.close()
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
