@@ -3,6 +3,7 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import dbm
+import numpy as np
 
 import comp_system
 import tbl_data
@@ -21,6 +22,8 @@ if __name__ == '__main__':
 from playhouse.migrate import *
 
 import sys
+import xlrd
+import pandas as pd
 import openpyxl as op
 import pdf
 import os
@@ -309,8 +312,25 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def r_load(self):
         pass
-        # db_select_title()
-        # self.open()
+
+        data = []
+        data_tmp = []
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xls *.xlsx)")
+        filepatch = str(fname[0])
+        rp = filepatch.rindex("/")
+        RPath = filepatch[rp + 1: len(filepatch)]
+
+        excel_data = pd.read_excel(RPath)  # читает  excel файл Pandas
+        data_pandas = pd.DataFrame(excel_data)  # получает Dataframe
+        column = data_pandas.columns.ravel().tolist()  # создает список заголовков столбцов
+        count = len(data_pandas)  # кол-во строк в excel файле
+        for i in range(0, count):  # цикл по строкам
+            for col in column: # цикл по столбцам
+                val = data_pandas.iloc[i][col]
+                data_tmp.append(val)  # получает временный список строки
+            data.append(data_tmp.copy())  # добавляет в список Data
+            data_tmp.clear()  # очищает временный список
+
 
     def load_old(self):
         """загружает в комбобокс архивные соревнования"""
@@ -341,16 +361,16 @@ def db_r(table_db=R_list):  # table_db присваивает по умолча�
     """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
      а потом загружает список регионов базу данных"""
     if table_db == R_list:
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx)")
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*.xlsx *.xls)")
         load_listR_in_db(table_db, fname)
         my_win.statusbar.showMessage("Текущий рейтинг загружен")
         table_db = R1_list
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx *_01*.xls)")
         load_listR_in_db(table_db, fname)
         my_win.statusbar.showMessage("Январский рейтинг загружен")
     else:
         table_db = R1_list
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx)")
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", "Excels files (*_01*.xlsx *_01*.xls)")
         load_listR_in_db(table_db, fname)
         my_win.statusbar.showMessage("Текущий рейтинг загружен")
 
@@ -394,25 +414,24 @@ def load_listR_in_db(table_db, fname):
         else:
             db_r(table_db=R1_list)
     else:
-        rlist = table_db.delete().execute()
+        data = []
+        data_tmp = []
 
+        rlist = table_db.delete().execute()
         rp = filepatch.rindex("/")
         RPath = filepatch[rp + 1: len(filepatch)]
-        wb = op.load_workbook(RPath)
-        s = wb.sheetnames[0]
-        sheet = wb[s]
-        for r in range(2, 4500):
-            if sheet.cell(row=r, column=2).value is None:
-                break
-        data = []
 
-        for i in range(2, r):
-            A = sheet['A%s' % i].value
-            B = sheet['B%s' % i].value
-            C = sheet['C%s' % i].value
-            D = sheet['D%s' % i].value
-            E = sheet['E%s' % i].value
-            data.append([A, B, C, D, E])
+        excel_data = pd.read_excel(RPath)  # читает  excel файл Pandas
+        data_pandas = pd.DataFrame(excel_data)  # получает Dataframe
+        column = data_pandas.columns.ravel().tolist()  # создает список заголовков столбцов
+        count = len(data_pandas)  # кол-во строк в excel файле
+        for i in range(0, count):  # цикл по строкам
+            for col in column:  # цикл по столбцам
+                val = data_pandas.iloc[i][col]
+                data_tmp.append(val)  # получает временный список строки
+            data.append(data_tmp.copy())  # добавляет в список Data
+            data_tmp.clear()  # очищает временный список
+
         with db:
             table_db.insert_many(data).execute()
 
@@ -3035,13 +3054,14 @@ def backup():
         db_backup = sqlite3.connect('comp_db_backup.db')
         with db_backup:
             db.backup(db_backup, pages=3, progress=None)
-        print("Резервное копирование выполнено успешно")
+        my_win.statusbar.showMessage("Резервное копирование базы данных завершено успешно", 5000)  # показывает статус бар на 5 секунд
     except sqlite3.Error as error:
-        print("Ошибка при резервном копировании: ", error)
+        my_win.statusbar.showMessage("Ошибка при копировании базы данных", 5000)  # показывает статус бар на 5 секунд
     finally:
         if (db_backup):
             db_backup.close()
             db.close()
+            my_win.close()
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
