@@ -1,8 +1,8 @@
-import comp_system
+# import comp_system
 import pdf
 import tbl_data
 from models import *
-# import pdf
+
 
 
 from reportlab.pdfgen.canvas import Canvas
@@ -64,7 +64,7 @@ def func_zagolovok(canvas, doc):
 def tbl(kg, ts, zagolovok, cW, rH):
     """данные таблицы и применение стиля и добавления заголовка столбцов"""
     dict_tbl = {}
-    tdt = tbl_data.table_data(kg)  # данные результатов в группах
+    tdt = tbl_data.table_data(kg, title_id=1)  # данные результатов в группах
     for i in range(0, kg):
         tdt[i].insert(0, zagolovok)
         dict_tbl[i] = Table(tdt[i], colWidths=cW, rowHeights=rH)
@@ -80,19 +80,16 @@ def tbl(kg, ts, zagolovok, cW, rH):
 #     return tds
 
 
-def table_made(pv):
+def table_made(pv, title_id):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    s = System.select().order_by(System.id).where(System.title_id == title_id).get()  # находит system id последнего
     kg = s.total_group
     ta = s.total_athletes
     t = int(ta) // int(kg)
     e = int(ta) % int(kg)  # если количество участников не равно делится на группы
-    # g2 = str(t + 1)
-    # g2 = int(g2)
     g2 = t + 1
-    # g2 = int(g2)
     kg = int(kg)
     if e == 0:
         t = t
@@ -712,6 +709,7 @@ def setka_16_made(fin):
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     return tds
 
+
 def tour(cp):
     """туры таблиц по кругу в зависимости от кол-во участников -cp- кол-во участников"""
     tour_list = []
@@ -728,3 +726,5 @@ def tour(cp):
 
     tour_list = tr[cp]
     return tour_list
+
+

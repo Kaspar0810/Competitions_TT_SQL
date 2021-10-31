@@ -177,6 +177,7 @@ class Choice(BaseModel):
     posev_final = IntegerField(null=True)
     mesto_final = IntegerField(null=True)
     super_final = CharField(null=True)
+    title_id = ForeignKeyField(Title)
 
     class Meta:
         db_table = "choices"

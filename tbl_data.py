@@ -1,4 +1,4 @@
-
+# import main
 from models import *
 from itertools import *
 from collections import Counter
@@ -11,7 +11,7 @@ def kol_player():
     a = ta.total_athletes
     g = ta.total_group
     e = a % g  # если количество участников равно делится на группы
-    t = a // g  # если количество участников не равно делится на группы g2 наибольшое колво человек в группе
+    t = a // g  # если количество участников не равно делится на группы, g2 наибольшое кол-во человек в группе
     g2 = t + 1
     if e == 0:
         t = t
@@ -20,10 +20,14 @@ def kol_player():
     return t
 
 
-def table_data(kg):
+def table_data(kg, title_id):
     """циклом создаем список участников каждой группы"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = Result.select().where(Result.title_id == t)  # находит system id последнего
+    # name_comp = main.my_win.lineEdit_title_nazvanie.text()
+    # # name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
+    # t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
+    # title_id = t.id
+    # title_id = Title.select().order_by(Title.id).get()
+    ta = Result.select().where(Result.title_id == title_id)  # находит system id последнего
     tr = len(ta)  # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
     tbl_tmp = []  # временный список группы tbl
     tdt = []
@@ -33,9 +37,9 @@ def table_data(kg):
         posev_data = player_choice_in_group(num_gr)
         count_player_group = len(posev_data)
         # for k in range(1, count_player_group * 2 + 1):  # цикл нумерации строк (2-е строки на каждого участника
-        for k in range(1, y * 2 + 1):  # цикл нумерации строк (2-е строки на каждого участника
+        for k in range(1, y * 2 + 1):  # цикл нумерации строк (по 2-е строки на каждого участника)
             st = ['']
-            s = (st * (y + 4))  # получаем пустой список номер, фамилия или регион, клетки (колво участников)
+            s = (st * (y + 4))  # получаем пустой список (номер, фамилия и регион, клетки (кол-во уч), оч, соот, место)
             s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
             tbl_tmp.append(s)
         for i in range(1, count_player_group * 2 + 1, 2):
@@ -45,7 +49,7 @@ def table_data(kg):
         td = tbl_tmp.copy()
         tbl_tmp.clear()
         tdt.append(td)
-        if tr != 0:  # если еще не была жеребъевка, то пропуск счета в группе
+        if tr != 0:  # если еще не была жеребьевка, то пропуск счета в группе
             score_in_table(td, num_gr)
     return tdt
 
