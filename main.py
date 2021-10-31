@@ -2189,8 +2189,10 @@ def control_score(sc1, sc2):
 def enter_score():
     """заносит в таблицу -результаты- победителя, счет и т.п."""
     tab = my_win.tabWidget.currentIndex()
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+    name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+    t = Title.get(Title.name == name_comp)  # получает эту строку в db
+    title_id = t.id  # получает его id
+    system = System.select().order_by(System.id).where(System.title_id == title_id)  # находит system id последнего
     if tab == 3:
         st1 = int(my_win.lineEdit_pl1_score_total.text())
         st2 = int(my_win.lineEdit_pl2_score_total.text())
@@ -2295,7 +2297,7 @@ def enter_score():
 
     if system.stage == "Предварительный":
         pv = system.page_vid
-        comp_system.table_made(pv)
+        comp_system.table_made(pv, title_id)
     elif system.stage == etap:
         system_table = system.label_string
         table_max_player = system.max_player
@@ -2731,8 +2733,8 @@ def choice_filter_group():
     if fg == "все группы":
         player_choice = Choice.select().where(Choice.title_id == title_id)
     else:
-        player_choice = Choice.select().order_by(Choice.posev_group).\
-            where(Choice.group == fg and Choice.title_id == title_id)
+        p_choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
+        player_choice = p_choice.select().where(Choice.title_id == title_id)
     count = len(player_choice)
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице

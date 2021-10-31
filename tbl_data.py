@@ -215,7 +215,10 @@ def rank_in_group(total_score, max_person, td, num_gr):
     """выставляет места в группах соответсвенно очкам
     men_of_circle - кол-во человек в крутиловке
     player_rank_group - список списков номер игрока - место
-    num_player - """
+    num_player -
+    player_group - кол-во участников в группе"""
+    pl_group = Choice.select().where(Choice.group == num_gr)
+    player_group = len(pl_group)
     rev_dict = {}  # словарь, где в качастве ключа очки, а значения - номера групп
     player_rank_group = []
     game_max = Result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
@@ -242,13 +245,12 @@ def rank_in_group(total_score, max_person, td, num_gr):
             player_rank_group.append([td[Keymax * 2 - 2][max_person + 4], 1])  # список номер игрока в группе и 1
                 # место для занесения в таблицу -Choice-
             new_list = val_list.copy()  # создает копию списка
-            for s in range(0, max_person - 1):  # цикл по игрокам группы
+            for s in range(0, player_group - 1):  # цикл по игрокам группы
                 m_val = m_val_1
                 new_list.remove(m_val)  # удаляет из копии списка макс значение
                 m_val_1 = max(new_list)  # находит макс значение из оставшихся
                 i = key_list[val_list.index(m_val_1)]  # находит ключ соответсвующий максимальному значению
                 td[i * 2 - 2][max_person + 4] = s + 2  # записывает место игроку
-                # player_rank_group.append([td[i * 2 - 2][max_person + 4], s + 2])  # список номер игрока в группе и его
                 # место для занесения в таблицу -Choice-
                 player_rank_group.append([int(td[i * 2 - 2][0]), s + 2])
         else:  # =========== если одинаковое кол-во очков
