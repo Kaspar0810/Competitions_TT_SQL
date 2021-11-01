@@ -608,7 +608,7 @@ def load_tableWidget():
                         "Общий счет",
                         "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
     elif my_win.tabWidget.currentIndex() == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
-        z = 18
+        z = 19
         column_label = ["№", "id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
@@ -2186,32 +2186,63 @@ def control_score(sc1, sc2):
         return flag
 
 
-def enter_score():
+def enter_score(none_player=0):
     """заносит в таблицу -результаты- победителя, счет и т.п."""
+
     tab = my_win.tabWidget.currentIndex()
     name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
     t = Title.get(Title.name == name_comp)  # получает эту строку в db
     title_id = t.id  # получает его id
     system = System.select().order_by(System.id).where(System.title_id == title_id)  # находит system id последнего
+
     if tab == 3:
-        st1 = int(my_win.lineEdit_pl1_score_total.text())
-        st2 = int(my_win.lineEdit_pl2_score_total.text())
+        if none_player == 0:
+            st1 = int(my_win.lineEdit_pl1_score_total.text())
+            st2 = int(my_win.lineEdit_pl2_score_total.text())
+            w = 2
+            l = 1
+        else:
+            if none_player == 1:
+                st1 = "L"
+                st2 = "W"
+            elif none_player == 2:
+                st1 = "W"
+                st2 = "L"
+            w = 2
+            l = 0
+            my_win.lineEdit_pl1_score_total.setText(st1)
+            my_win.lineEdit_pl2_score_total.setText(st2)
     elif tab == 4:
         pass
     elif tab == 5:
-        st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
-        st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
+        if none_player == 0:
+            st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
+            st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
+            w = 2
+            l = 1
+        else:
+            if none_player == 1:
+                st1 = "L"
+                st2 = "W"
+            elif none_player == 2:
+                st1 = "W"
+                st2 = "L"
+            w = 2
+            l = 0
+            my_win.lineEdit_pl1_score_total_fin.setText(st1)
+            my_win.lineEdit_pl2_score_total_fin.setText(st2)
 
     r = my_win.tableWidget.currentRow()
     id = my_win.tableWidget.item(r, 0).text()
     num_game = my_win.tableWidget.item(r, 3).text()
     fin = my_win.tableWidget.item(r, 2).text()
-    if st1 > st2:
+
+    if st1 > st2 or none_player == 2:
         if tab == 3:
             winner = my_win.lineEdit_player1.text()
             loser = my_win.lineEdit_player2.text()
         elif tab == 4:
-            pass
+             pass
         elif tab == 5:
             winner = my_win.lineEdit_player1_fin.text()
             loser = my_win.lineEdit_player2_fin.text()
@@ -2224,19 +2255,26 @@ def enter_score():
         elif tab == 4:
             pass
         elif tab == 5:
-            winner = my_win.lineEdit_player2_fin.text()
-            loser = my_win.lineEdit_player1_fin.text()
+                winner = my_win.lineEdit_player2_fin.text()
+                loser = my_win.lineEdit_player1_fin.text()
         ts_winner = f"{st2} : {st1}"
         ts_loser = f"{st1} : {st2}"
-    winner_string = string_score_game()
+    if none_player == 0:
+        winner_string = string_score_game()
+    else:
+        if none_player == 1:
+            winner_string = ts_winner
+        else:
+            winner_string = ts_loser
+
     with db:
         result = Result.get(Result.id == id)
         result.winner = winner
-        result.points_win = "2"
+        result.points_win = w
         result.score_win = winner_string
         result.score_in_game = ts_winner
         result.loser = loser
-        result.points_loser = "1"
+        result.points_loser = l
         result.score_loser = ts_loser
         result.save()
     if tab == 5:
@@ -2644,7 +2682,6 @@ def choice_table():
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
     load_tableWidget()
-    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
     t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
     title_id = t.id
@@ -2653,7 +2690,8 @@ def choice_gr_automat():
     group = sys.total_group
     mp = sys.max_player
     tp = sys.total_athletes
-    player_choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.title_id == title_id)
+    pl_choice = Choice.select().where(Choice.title_id == title_id)
+    player_choice = pl_choice.select().order_by(Choice.rank.desc())
     h = 0
     for k in range(1, mp + 1):  # цикл посевов
         # вставить проверку на окончание посева
@@ -2708,10 +2746,11 @@ def choice_setka(fin):
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребъевки"""
-    name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
-    t = Title.get(Title.name == name_comp)  # получает эту строку в db
-    title_id = t.id  # получает его id
-    player = Player.select().where(Player.title_id == title_id)
+    name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
+    t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
+    title_id = t.id
+
+    player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title_id)
     count = len(player)
     choice = Choice.select().where(Choice.title_id == title_id)
     chc = len(choice)
@@ -2747,7 +2786,7 @@ def choice_filter_group():
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
         my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
-        # color_region_in_tableWidget(fg)
+        color_region_in_tableWidget(fg)
         for d in range(0, row_count):  # сортирует нумерация по порядку
             my_win.tableWidget.setItem(d, 0, QTableWidgetItem(str(d + 1)))
 
@@ -2756,28 +2795,30 @@ def color_region_in_tableWidget(fg):
     """смена цвета шрифта в QtableWidget -fg- номер группы"""
     reg = []
     rid = []
-    line = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)  # выбирает все строки той группы (fg)
-    for i in line:
-        r = Choice.get(Choice.id == i)
-        r_id = r.id
-        region = r.region
-        region = str(region.rstrip())  # удаляет пробел в конце строки
-        reg.append(region)
-        rid.append(r_id)
-    if len(reg) != 0:
-        for x in reg:
-            count_region = reg.count(x)
-            if count_region > 1:  # если повторяющихся регионов больше одного
-                rows = my_win.tableWidget.rowCount()  # кол-во строк в отсортированной таблице
-                for i in range(rows):
-                    txt = my_win.tableWidget.item(i, 3).text()
-                    txt = txt.rstrip()  # удаляет пробел в конце строки
-                    if txt == x:
-                        my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
-                        # красный цвет
-                    else:
-                        my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в
-                        # черный цвет
+    if fg != "все группы":
+        line = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)  # выбирает все строки той группы (fg)
+        count = len(line)
+        for i in line:
+            r = Choice.get(Choice.id == i)
+            r_id = r.id
+            region = r.region
+            region = str(region.rstrip())  # удаляет пробел в конце строки
+            reg.append(region)
+            rid.append(r_id)
+        if len(reg) != 0:
+            for x in reg:
+                count_region = reg.count(x)
+                if count_region > 1:  # если повторяющихся регионов больше одного
+                    rows = my_win.tableWidget.rowCount()  # кол-во строк в отсортированной таблице
+                    for i in range(rows):
+                        txt = my_win.tableWidget.item(i, 3).text()
+                        txt = txt.rstrip()  # удаляет пробел в конце строки
+                        if txt == x:
+                            my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
+                            # красный цвет
+                        else:
+                            my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в
+                            # черный цвет
 
 
 def hide_show_columns():
@@ -3082,11 +3123,11 @@ def kol_player_in_final():
 def no_play():
     """победа по неявке соперника"""
     sender = my_win.sender()
-    if sender == my_win.radioButton_6:
-        print("неявился 1-й игрок")
+    if sender == my_win.radioButton_6 or sender == my_win.radioButton_4:
+        none_player = 1
     else:
-        print("неявился 2-й игрок")
-
+        none_player = 2
+    enter_score(none_player)
 
 
 def backup():
@@ -3167,8 +3208,8 @@ my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
 
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
-my_win.radioButton_6.toggled.connect(no_play)
-my_win.radioButton_7.toggled.connect(no_play)
+my_win.radioButton_6.toggled.connect(no_play)  # поражение по неявке
+my_win.radioButton_7.toggled.connect(no_play)  # поражение по неявке
 my_win.radioButton_match_3.toggled.connect(match_score_db)
 my_win.radioButton_match_5.toggled.connect(match_score_db)
 my_win.radioButton_match_7.toggled.connect(match_score_db)
