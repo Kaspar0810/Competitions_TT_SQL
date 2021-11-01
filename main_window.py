@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1396, 698)
+        MainWindow.resize(1407, 702)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -733,7 +733,7 @@ class Ui_MainWindow(object):
         self.label_25.setFont(font)
         self.label_25.setObjectName("label_25")
         self.label_16 = QtWidgets.QLabel(self.groupBox_filter_group)
-        self.label_16.setGeometry(QtCore.QRect(130, 0, 163, 20))
+        self.label_16.setGeometry(QtCore.QRect(130, 0, 231, 20))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(14)
@@ -1299,7 +1299,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1396, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1407, 21))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setItalic(True)
@@ -1309,7 +1309,7 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(5)
+        self.tabWidget.setCurrentIndex(3)
         self.toolBox.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 

@@ -2266,7 +2266,6 @@ def enter_score(none_player=0):
             winner_string = ts_winner
         else:
             winner_string = ts_loser
-
     with db:
         result = Result.get(Result.id == id)
         result.winner = winner
@@ -2311,6 +2310,8 @@ def enter_score(none_player=0):
         my_win.lineEdit_player1.clear()  # очищает поля фамилии игроков
         my_win.lineEdit_player2.clear()
         etap = my_win.tableWidget.item(r, 1).text()
+        my_win.radioButton_6.setChecked(False)
+        my_win.radioButton_7.setChecked(False)
     elif tab == 4:
         pass
     elif tab == 5:
@@ -2600,19 +2601,19 @@ def filter_gr():
     if group == "все группы" and my_win.comboBox_find_name.currentText() != "":
         fltr = Result.select().where(Result.player1 == name)
         fltr1 = Result.select().where(Result.player2 == name)
-        f = len(fltr)
-        # if f == 0:
-        #     fltr = Result.select().where(Result.player2 == name)
+
     elif group == "все группы" and played == "все игры":
         fltr = Result.select()
     elif group == "все группы" and played == "завершенные":
         fltr = Result.select().where(Result.points_win == 2)
     elif group != "все группы" and played == "завершенные":
-        fltr = Result.select().where(Result.number_group == group and Result.points_win == 2)
+        fl = Result.select().where(Result.number_group == group)
+        fltr = fl.select().where(Result.points_win == 2)
     elif group != "все группы" and played == "не сыгранные":
-        fltr = Result.select().where(Result.number_group == group and Result.points_win == None)
+        fl = Result.select().where(Result.number_group == group)
+        fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
     elif group == "все группы" and played == "не сыгранные":
-        fltr = Result.select().where(Result.points_win != 2 or Result.points_win == None)
+        fltr = Result.select().where(Result.points_win != 2 and Result.points_win == None)
     elif group != "все группы" and played == "все игры":
         fltr = Result.select().where(Result.number_group == group)
 

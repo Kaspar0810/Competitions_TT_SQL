@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1396</width>
-    <height>698</height>
+    <width>1407</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>3</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -1924,7 +1924,7 @@
         <rect>
          <x>130</x>
          <y>0</y>
-         <width>163</width>
+         <width>231</width>
          <height>20</height>
         </rect>
        </property>
@@ -3440,7 +3440,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1396</width>
+     <width>1407</width>
      <height>21</height>
     </rect>
    </property>
