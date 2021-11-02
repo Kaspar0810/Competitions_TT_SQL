@@ -2139,8 +2139,7 @@ def score_in_game():
 def control_score(sc1, sc2):
     """проверка на правильность ввода счета"""
     msgBox = QMessageBox
-    # sc1 = int(sc1)
-    # sc2 = int(sc2)
+
     if sc1 == '' or sc2 == '':
         flag = False
     sc1 = int(sc1)
@@ -2152,7 +2151,6 @@ def control_score(sc1, sc2):
         if result == msgBox.StandardButtons.Ok:
             flag = True
         elif result == msgBox.StandardButtons.Cancel:
-            # flag = False
             return
     if sc1 == 11:
         if 9 >= sc2 >= 0:
@@ -2348,6 +2346,7 @@ def enter_score(none_player=0):
                 comp_system.setka_16_made(fin=etap)
             elif table_max_player == 32:
                 pass
+    filter_gr(pl)
 
 
 def string_score_game():
@@ -2591,16 +2590,19 @@ def filter_fin():
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
 
-def filter_gr():
+def filter_gr(pl=False):
     """фильтрует таблицу -результаты- на вкладке группы"""
+    msgBox = QMessageBox
     group = my_win.comboBox_filter_group.currentText()
     name = my_win.comboBox_find_name.currentText()
     name = name.title()  # делает Заглавными буквы слов
     played = my_win.comboBox_filter_played.currentText()
 
     if group == "все группы" and my_win.comboBox_find_name.currentText() != "":
-        fltr = Result.select().where(Result.player1 == name)
-        fltr1 = Result.select().where(Result.player2 == name)
+        if pl == False:
+            fltr = Result.select().where(Result.player1 == name)
+        else:
+            fltr = Result.select().where(Result.player2 == name)
 
     elif group == "все группы" and played == "все игры":
         fltr = Result.select()
@@ -2633,6 +2635,19 @@ def filter_gr():
         for column in range(column_count):
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
+    if my_win.comboBox_find_name.currentText() != "" and pl == False:
+        result = msgBox.question(my_win, "", "Продолжить поиск игр с участием\n"
+                                             f"{name} ?",
+                                 msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
+        if result == msgBox.StandardButtons.Ok:
+            pl = True
+            filter_gr(pl)
+        elif result == msgBox.StandardButtons.Cancel:
+            my_win.comboBox_find_name.clear()
+            return
+    else:
+        my_win.comboBox_find_name.clear()
 
 
 def load_combo():
