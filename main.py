@@ -855,7 +855,7 @@ def fill_table_results(tb):
     else:
         # надо выбрать, что загружать в зависимости от вкладки группы, пф или финалы
         if tb == 3:
-            player_result = Result.select().order_by(Result.id)
+            player_result = Result.select().order_by(Result.id).where(Result.system_stage == "Предварительный")
         elif tb == 4:
             player_result = Result.select().order_by(Result.id)
         elif tb == 5:
@@ -1089,7 +1089,6 @@ def page():
     """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
     msgBox = QMessageBox()
     tb = my_win.toolBox.currentIndex()
-
     sf = System.get(System.title_id == title_id())
     if tb == 0:
         db_select_title()
@@ -1108,15 +1107,14 @@ def page():
         player_list = Player.select().where(Player.title_id == title_id)
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
-
-        st = System.select().where(System.title_id == t)
+        st = System.select().where(System.title_id == title_id())
         st_count = len(st)
-        s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+        s = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
         # соревнования
         last_id = s.id
-        #=================== добавил заполнение комбобокс
+
         load_combobox_filter_group()
-        #===============
+
         my_win.label_9.hide()
         my_win.label_10.hide()
         my_win.label_11.hide()
@@ -1603,7 +1601,7 @@ def view():
     elif tw == 4:
         pass
     elif tw == 5:
-        view_file = "setka_16_1-й финал.pdf"
+        view_file = "setka_16_1_финал.pdf"
     os.system(f"open {view_file}")
 
 
@@ -2041,11 +2039,20 @@ def select_player_in_game():
             else:
                 sc1 = sc[4]
                 sc2 = sc[0]
-            my_win.lineEdit_pl1_score_total.setText(sc1)
-            my_win.lineEdit_pl2_score_total.setText(sc2)
-            my_win.lineEdit_player1.setText(pl1)
-            my_win.lineEdit_player2.setText(pl2)
-            my_win.lineEdit_pl1_s1.setFocus()
+            if tab == 3:
+                my_win.lineEdit_pl1_score_total.setText(sc1)
+                my_win.lineEdit_pl2_score_total.setText(sc2)
+                my_win.lineEdit_player1.setText(pl1)
+                my_win.lineEdit_player2.setText(pl2)
+                my_win.lineEdit_pl1_s1.setFocus()
+            elif tab == 4:
+                pass
+            else:
+                my_win.lineEdit_pl1_score_total_fin.setText(sc1)
+                my_win.lineEdit_pl2_score_total_fin.setText(sc2)
+                my_win.lineEdit_player1_fin.setText(pl1)
+                my_win.lineEdit_player2_fin.setText(pl2)
+                my_win.lineEdit_pl1_s1_fin.setFocus()
         else:
             pl1 = my_win.tableWidget.item(r, 4).text()
             pl2 = my_win.tableWidget.item(r, 5).text()
@@ -2950,13 +2957,13 @@ def choice_setka(fin):
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребъевки"""
-    name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
-    t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
-    title_id = t.id
+    # name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
+    # t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
+    # title_id = t.id
 
-    player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title_id)
+    player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title_id())
     count = len(player)
-    choice = Choice.select().where(Choice.title_id == title_id)
+    choice = Choice.select().where(Choice.title_id == title_id())
     chc = len(choice)
     if chc == 0:
         for i in player:
@@ -3186,8 +3193,8 @@ def ready_choice():
 
 def select_choice_final():
     """выбор жеребьевки финала"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    system = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    # t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
 
     fin = []
     for sys in system.select():

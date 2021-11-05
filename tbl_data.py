@@ -58,7 +58,7 @@ def setka_data_16(fin):
     """данные сетки на 16"""
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     system = System.select().where(System.title_id == t)  # находит system id последнего
-    for sys in system.select():  # проходит циклом по всем отобранным записям
+    for sys in system:  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
             mp = sys.max_player
     tds = []
@@ -583,17 +583,32 @@ def player_choice_in_group(num_gr):
 
 
 def player_choice_in_setka(fin):
-    """распределяет спортсменов в сетке согласно жеребъевке"""
+    """распределяет спортсменов в сетке согласно жеребьевке"""
     posev_data = []
-    choice = Choice.select().order_by(Choice.posev_final).where(Choice.final == fin)
-    for posev in choice:
+    first_posev = []
+    second_posev = []
+    choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == 1)
+    choice_second = Choice.select().order_by(Choice.group).where(Choice.mesto_group == 2)
+    first_number = [1, 16, 8, 9, 4, 5, 12, 13]
+    second_number = [10, 3, 11, 7, 14, 15, 2, 6]
+    n = 0
+    k = 0
+    for posev in choice_first:
         player = Player.get(Player.player == posev.family)
         city = player.city
-        posev_data.append({
-            'посев': posev.posev_final,
-            'фамилия': f'{posev.family}/ {city}'
-        })
+        for i in range(n, n + 1):
+            first_posev.append({'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
+            n += 1
+    for posev in choice_second:
+        player = Player.get(Player.player == posev.family)
+        city = player.city
+        for k in range(k, k + 1):
+            second_posev.append({'посев': second_number[k], 'фамилия': f'{posev.family}/ {city}'})
+            k += 1
+    posev_data = first_posev + second_posev
+    posev_data = sorted(posev_data, key=lambda i: i['посев'])  # сортировка (списка словарей) по ключу словаря -посев-
     return posev_data
+
 
 
 # def result_rank_group(num_group, max_player):
