@@ -204,9 +204,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def choice(self):
         sender = self.sender()
-        t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-        system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
-        count = len(system)
+        # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+        system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
         if sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
             for stage in system:
                 if stage.stage == "Предварительный":
@@ -227,8 +226,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         choice_gr_automat()
 
         elif sender == self.choice_fin_Action:  # нажат подменю жеребъевка финалов
-            t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-            system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+            # t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+            # system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
             fin = select_choice_final()
             system = System.get(System.stage == fin)
             if system.choice_flag == True:  # проверка флаг на жеребъевку финала
@@ -2939,20 +2938,22 @@ def choice_gr_automat():
 
 def choice_setka(fin):
     """проба жеребъевки сетки на 16"""
-    load_tableWidget()
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    sys = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    for i in range(1, 17):  # 1-й посев
-        with db:  # запись в таблицу Choice результа жеребъевки
-            stk = Choice.get(Choice.id == i)
-            stk.posev_final = i
-            stk.final = fin
-            stk.save()
+    sys = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
+    system = sys.get(System.stage == fin)
+    flag = system.choice_flag
+    if flag is True:  # перед повторной жеребьевкой
+        del_choice = Game_list.select().where(Game_list.number_group == fin)
+        for i in del_choice:
+            i.delete_instance()  # удаляет строки финала (fin) из таблицы -Game_list
+        del_result = Result.select().where(Result.number_group == fin)
+        for i in del_result:
+            i.delete_instance() # удаляет строки финала (fin) из таблицы -Result-
     with db:  # записывает флаг жеребъевки финала
         sys = System.get(System.stage == fin)
         sys.choice_flag = True
         sys.save()
     player_in_setka(fin)
+    load_tableWidget()
 
 
 def choice_tbl_made():
@@ -3136,11 +3137,11 @@ def total_game_table(kpt, fin, pv, cur_index):
 
 def clear_db_before_edit():
     """очищает таблицы при повторном создании системы"""
-    name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
-    t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
-    title_id = t.id
+    # name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
+    # t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
+    # title_id = t.id
     sid_last = System.select().order_by(System.id.desc()).get()  # получает последний id системы
-    sid_first = System.select().order_by(System.id).where(System.title_id == title_id).get()  # находит system id первого
+    sid_first = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id первого
     sf = sid_first.id
     sl = sid_last.id
     for i in range(sf, sl + 1):  # удаляет все записи
