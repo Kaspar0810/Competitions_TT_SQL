@@ -19,7 +19,7 @@ class Coach(BaseModel):
         order_by = "coach"
 
 
-class R_list(BaseModel):
+class R_list_m(BaseModel):
     r_number = IntegerField()
     r_list = IntegerField()
     r_fname = CharField(50)
@@ -27,11 +27,23 @@ class R_list(BaseModel):
     r_city = CharField(30)
 
     class Meta:
-        db_table = "r_lists"
+        db_table = "r_lists_m"
         order_by = "r_fname"
 
 
-class R1_list(BaseModel):
+class R_list_d(BaseModel):
+    r_number = IntegerField()
+    r_list = IntegerField()
+    r_fname = CharField(50)
+    r_bithday = DateField()
+    r_city = CharField(30)
+
+    class Meta:
+        db_table = "r_lists_d"
+        order_by = "r_fname"
+
+
+class R1_list_m(BaseModel):
     r1_number = IntegerField()
     r1_list = IntegerField()
     r1_fname = CharField(50)
@@ -39,7 +51,19 @@ class R1_list(BaseModel):
     r1_city = CharField(30)
 
     class Meta:
-        db_table = "r1_lists"
+        db_table = "r1_lists_m"
+        order_by = "r1_fname"
+
+
+class R1_list_d(BaseModel):
+    r1_number = IntegerField()
+    r1_list = IntegerField()
+    r1_fname = CharField(50)
+    r1_bithday = DateField()
+    r1_city = CharField(30)
+
+    class Meta:
+        db_table = "r1_lists_d"
         order_by = "r1_fname"
 
 
@@ -71,7 +95,7 @@ class Title(BaseModel):
     kat_ref = CharField(10)
     secretary = CharField()
     kat_sek = CharField(10)
-
+    gamer = CharField(20)
 
     class Meta:
         db_table = "titles"

@@ -6,8 +6,8 @@ from collections import Counter
 
 def kol_player():
     """выводит максимальное количество человек в группе t если все группы равны, а g2 если разное количество"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    ta = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
+    title = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    ta = System.select().order_by(System.id).where(System.title_id == title).get()  # находит system id последнего
     a = ta.total_athletes
     g = ta.total_group
     e = a % g  # если количество участников равно делится на группы
@@ -22,11 +22,6 @@ def kol_player():
 
 def table_data(kg, title_id):
     """циклом создаем список участников каждой группы"""
-    # name_comp = main.my_win.lineEdit_title_nazvanie.text()
-    # # name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
-    # t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
-    # title_id = t.id
-    # title_id = Title.select().order_by(Title.id).get()
     ta = Result.select().where(Result.title_id == title_id)  # находит system id последнего
     tr = len(ta)  # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
     tbl_tmp = []  # временный список группы tbl
