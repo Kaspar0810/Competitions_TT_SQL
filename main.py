@@ -204,7 +204,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def choice(self):
         sender = self.sender()
-        # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+        gamer = my_win.lineEdit_title_gamer.text()
         system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
         if sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
             for stage in system:
@@ -257,7 +257,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
-my_win.setWindowTitle(f"Соревнования по настольному теннису")
+my_win.setWindowTitle("Соревнования по настольному теннису")
+
+
+# class PbWidget(QtWidgets.QProgressBar):
+#     def __init__(self, parent=None, total=0):
+#         super(PbWidget, self).__init__()
+#         self.setMinimum(1)
+#         self.setMaximum(total)
+#         self._active = False
+#
+#     def update_bar(self, to_add_number):
+#         while True:
+#             time.sleep(0.01)
+#             value = self.value() + to_add_number
+#             self.setValue(value)
+#             QtGui.qApp.processEvents()
+#             if (not self._active or value >= self.maximum()):
+#                 break
+#         self._active = False
+#
+#     def closeEvent(self, event):
+#         self._active = False
+
+
 
 
 class StartWindow(QMainWindow, Ui_Form):
@@ -272,13 +295,17 @@ class StartWindow(QMainWindow, Ui_Form):
         self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp)
 
+        self.pb = QProgressBar()
+        self.pb.setMinimum(0)
+        self.pb.setMaximum(100)
+
         dbase()
         count = len(Title.select())
         if count != 0:
             t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
             id = t_id.id
             old_title = Title.get(Title.id == id)
-            last_comp = old_title.name
+            last_comp = old_title.full_name
             self.LinkButton.setText(f"{last_comp}")
         else:
             self.LinkButton.setText("Список прошедших соревнований пуст")
@@ -288,14 +315,15 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def last_comp(self):
         """открытие последних соревнований"""
-        db_select_title()
-        tab_enabled()
+        gamer = db_select_title()
+        tab_enabled(gamer)
         self.close()
         my_win.show()
 
     def open(self):
-        db_select_title()
+        gamer = db_select_title()
         self.close()
+        my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
         my_win.show()
 
     def new(self):
@@ -304,7 +332,7 @@ class StartWindow(QMainWindow, Ui_Form):
         gamer, ok = QInputDialog.getItem(my_win, "Участники", "Выберите категорию спортсменов", gamer, 0, False)
 
         title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
-                      kat_ref="", secretary="", kat_sek="", gamer=gamer).save()
+                      kat_ref="", secretary="", kat_sek="", gamer=gamer, full_name="").save()
         t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         title_id = t_id.id
         db_r(gamer)
@@ -312,7 +340,7 @@ class StartWindow(QMainWindow, Ui_Form):
                         max_player=0, stage="", page_vid="", label_string="", kol_game_string="",
                         choice_flag=False, score_flag=5, visible_game=False).save()
         self.close()
-        tab_enabled()
+        tab_enabled(gamer)
         my_win.show()
 
     def r_load(self):
@@ -344,15 +372,18 @@ class StartWindow(QMainWindow, Ui_Form):
         n = 6
         for i in t_id:
             old_comp = i.name
+            gamer = i.gamer
             data_start = i.data_start
             data_finish = i.data_end
             n -= 1
             if n != 5:
                 if old_comp != "":
-                    self.comboBox.addItem(old_comp)
+                    self.comboBox.addItem(f"{old_comp}. {gamer}")
                     self.label_4.setText(f"сроки: с {data_start} по {data_finish}")
                 else:
                     return
+
+
 
 
 def dbase():
@@ -532,12 +563,12 @@ my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
 
 
-def tab_enabled():
-    """Включает вкладки в зависимости от создании системы и жеребъевки"""
+def tab_enabled(gamer):
+    """Включает вкладки в зависимости от создании системы и жеребьевки"""
     count_title = len(Title.select())
+    if gamer == "":
+        gamer = my_win.lineEdit_title_gamer.text()
     if count_title != 0:
-        title = Title.get(Title.id == title_id())
-        gamer = title.gamer
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
         system = System.select().where(System.title_id == title_id())  # находит system id первого
         count = len(system)
@@ -545,7 +576,6 @@ def tab_enabled():
         for i in system:
             st = i.stage
             stage.append(st)
-
         if count > 0:
             my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
             my_win.toolBox.setItemEnabled(2, True)
@@ -560,7 +590,7 @@ def tab_enabled():
                 elif i == "Полуфиналы":
                     my_win.tabWidget.setTabEnabled(4, True)
                 elif i == "1-й финал" or i == "финальный":
-                    system = System.get(System.id == title_id() and System.stage == "финальный")
+                    system = System.get(System.id == title_id() and System.stage == i)
                     flag = system.choice_flag
                     if flag is True:
                         my_win.tabWidget.setTabEnabled(5, True)
@@ -583,9 +613,11 @@ def db_insert_title(title_str):
     kr = title_str[7]
     sk = title_str[8]
     ks = title_str[9]
+    gm = title_str[10]
+    fn = title_str[11]
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     nazv = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
-                 kat_ref=kr, secretary=sk, kat_sek=ks).save()
+                 kat_ref=kr, secretary=sk, kat_sek=ks, gamer=gm, full_name=fn).save()
 
 
 def db_select_title():
@@ -593,12 +625,21 @@ def db_select_title():
     sender = fir_window.sender()  # от какой кнопки сигнал
     if sender == my_win.toolBox:
         titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        name = titles.name
+        gamer = titles.gamer
+        full_name = titles.full_name
     elif sender.text() != "Открыть":
         titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        name = titles.name
+        gamer = titles.gamer
+        full_name = titles.full_name
     else:  # сигнал от кнопки с текстом -открыть-
-        index = fir_window.comboBox.currentText()
-        titles = Title.get(Title.name == index)
-
+        txt = fir_window.comboBox.currentText()
+        key = txt.rindex(".")
+        gamer = txt[39:]
+        name = txt[:36]
+        # titles = Title.get(Title.name == name and Title.gamer == gamer)
+        titles = Title.get(Title.full_name == full_name)
     with db:
         my_win.lineEdit_title_nazvanie.setText(titles.name)
         my_win.lineEdit_title_vozrast.setText(titles.vozrast)
@@ -609,6 +650,8 @@ def db_select_title():
         my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
         my_win.lineEdit_sekretar.setText(titles.secretary)
         my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
+        my_win.lineEdit_title_gamer.setText(titles.gamer)
+    return gamer
 
 
 def system_edit():
@@ -645,6 +688,7 @@ def system_made():
 def load_tableWidget():
     """Заполняет таблицу списком или рейтингом в зависимости от выбора"""
     msgBox = QMessageBox
+    gamer = my_win.lineEdit_title_gamer.text()
     tb = my_win.tabWidget.currentIndex()
     sender = my_win.menuWidget().sender()  # сигнал указывающий какой пункт меню нажат
     if sender == my_win.rAction or sender == my_win.r1Action:  # нажат пункт меню -текущий рейтинг- или -рейтинг январский
@@ -695,10 +739,7 @@ def load_tableWidget():
         else:
             fill_table_choice()
     else:  # загружает таблицу со списком
-        name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
-        t = Title.get(Title.name == name_comp)  # получает эту строку в db
-        title_id = t.id  # получает его id
-        player_list = Player.select().where(Player.title_id == title_id).order_by(Player.rank.desc())
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())
         count = len(player_list)
         if count != 0:
             fill_table(player_list)
@@ -707,6 +748,8 @@ def load_tableWidget():
 def title_string():
     """ переменные строк титульного листа """
     title_str = []
+    title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    # gm = title.gamer
     nm = my_win.lineEdit_title_nazvanie.text()
     sr = my_win.comboBox_sredi.currentText()
     vz = my_win.lineEdit_title_vozrast.text()
@@ -717,6 +760,8 @@ def title_string():
     sk = my_win.lineEdit_sekretar.text()
     kr = my_win.comboBox_kategor_ref.currentText()
     ks = my_win.comboBox_kategor_sek.currentText()
+    gm = title.gamer
+    fn = f"{nm}. {ds}. {gm}"
 
     title_str.append(nm)
     title_str.append(sr)
@@ -728,6 +773,8 @@ def title_string():
     title_str.append(kr)
     title_str.append(sk)
     title_str.append(ks)
+    title_str.append(gm)
+    title_str.append(fn)
     return title_str
 
 
@@ -765,8 +812,7 @@ def title_made():
     region()
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     s = System.select().order_by(System.id.desc()).get()  # получение последнего id системы соревнования
-    # sg = my_win.comboBox_etap_1.currentText()
-    # page_v = my_win.comboBox_page_1.currentText()
+
     with db:
         System.create_table()
         sys = System(id=s, title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="",
@@ -952,9 +998,7 @@ def fill_table_results(tb):
 
 def fill_table_choice():
     """заполняет таблицу жеребьевки"""
-    # name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
-    # t = Title.get(Title.name == name_comp)  # получает эту строку в db
-    # title_id = t.id  # получает его idолучает его id
+    gamer = my_win.lineEdit_title_gamer.text()
     player_choice = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc())
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
@@ -1092,6 +1136,7 @@ def load_combobox_filter_final():
 
 def load_combobox_filter_group():
     """заполняет комбобокс фильтр групп для таблицы результаты"""
+    gamer = my_win.lineEdit_title_gamer.text()
     etap = []
     gr_txt = []
     sender = my_win.menuWidget().sender()
@@ -1138,8 +1183,9 @@ def tab():
 def page():
     """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
     msgBox = QMessageBox()
+    gamer = my_win.lineEdit_title_gamer.text()
     tb = my_win.toolBox.currentIndex()
-    sf = System.get(System.title_id == title_id())
+    sf = System.select().where(System.title_id == title_id())
     if tb == 0:
         db_select_title()
         my_win.tableWidget.show()
@@ -1157,11 +1203,11 @@ def page():
         player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
-        st = System.select().where(System.title_id == title_id())
-        st_count = len(st)
-        s = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
+        # st = System.select().where(System.title_id == title_id(gamer))
+        st_count = len(sf)
+        # s = System.select().order_by(System.id).where(System.title_id == ).get()  # находит system id последнего
         # соревнования
-        last_id = s.id
+        # last_id = sf.id
         if st_count != 1:
             load_combobox_filter_group()
 
@@ -1188,6 +1234,7 @@ def page():
         my_win.comboBox_table_2.hide()
         my_win.spinBox_kol_group.hide()
         my_win.comboBox_table.hide()
+
         flag = ready_system()
 
         if flag is False:  # система еще не создана
@@ -1205,11 +1252,10 @@ def page():
             table = []
             game = []
             sum_game = []
-            for i in range(last_id, last_id + st_count):  # цикл по таблице -system-
-                s = System.get(System.id == i)
-                stage.append(s.stage)  # добавляет в список этап
-                table.append(s.label_string)  # добавляет в список система
-                game.append(s.kol_game_string)  # добавляет в список кол-во игр
+            for i in sf:  # цикл по таблице -system-
+                stage.append(i.stage)  # добавляет в список этап
+                table.append(i.label_string)  # добавляет в список система
+                game.append(i.kol_game_string)  # добавляет в список кол-во игр
             count = len(game)
             for i in range(0, count):  # подсчитывает сумму игр
                 txt = game[i]
@@ -1565,6 +1611,7 @@ def system_competition():
 def kol_player_in_group():
     """подсчет кол-во групп и человек в группах"""
     sender = my_win.sender()  # сигнал от кнопки
+    gamer = my_win.lineEdit_title_gamer.text()
     kg = my_win.spinBox_kol_group.text()  # количество групп
     player_list = Player.select().where(Player.title_id == title_id())
     count = len(player_list)  # колличество записей в базе
@@ -1701,6 +1748,7 @@ def player_in_setka(fin):
 
 def player_in_table():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп"""
+    gamer = my_win.lineEdit_title_gamer.text()
     s = System.select().where(System.title_id == title_id()).get()  # находит system id последнего
     kg = s.total_group
     st = s.stage
@@ -1741,7 +1789,7 @@ def player_in_table():
                     pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
                     with db:
                         results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
-                                         tours=match, title_d=title_id()).save()
+                                         tours=match, title_id=title_id()).save()
 
 
 def chop_line(q, maxline=30):
@@ -1767,6 +1815,7 @@ def match_score_db():
     """кол-во партий и запись счета партий по умолчанию в db"""
     etap = []
     kol_set = []
+    gamer = my_win.lineEdit_title_gamer.text()
     tab = my_win.tabWidget.currentIndex()
     system = System.select().where(System.title_id == title_id())
 
@@ -1870,6 +1919,7 @@ def game_in_visible(state_check, match=5):
     """видимость полей для счета в партии, flag показывает из скольки партий играется матч,
     state_check - нажат чекбокс (видимость полей счета или нет), если 2 значит нажат"""
     tab = my_win.tabWidget.currentIndex()
+    gamer = my_win.lineEdit_title_gamer.text()
     sf = System.get(System.title_id == title_id())
 
     if tab == 3:
@@ -2936,9 +2986,7 @@ def choice_table():
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
     load_tableWidget()
-    # name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
-    # t = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
-    # title_id = t.id
+    gamer = my_win.lineEdit_title_gamer.text()
     sys = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
     s_id = sys.id
     group = sys.total_group
@@ -3002,6 +3050,7 @@ def choice_setka(fin):
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребъевки"""
+    gamer = my_win.lineEdit_title_gamer.text()
     player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title_id())
     count = len(player)
     choice = Choice.select().where(Choice.title_id == title_id())
@@ -3017,9 +3066,7 @@ def choice_tbl_made():
 
 def choice_filter_group():
     """фильтрует таблицу жеребьевка по группам"""
-    # name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
-    # t = Title.get(Title.name == name_comp)  # получает эту строку в db
-    # title_id = t.id  # получает его id
+    gamer = my_win.lineEdit_title_gamer.text()
     fg = my_win.comboBox_filter_choice.currentText()
     if fg == "все группы":
         player_choice = Choice.select().where(Choice.title_id == title_id())
@@ -3103,6 +3150,7 @@ def etap_made():
 def total_game_table(kpt, fin, pv, cur_index):
     """количество участников в сетке и кол-во игр"""
     msgBox = QMessageBox
+    gamer = my_win.lineEdit_title_gamer.text()
     system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
     total_player = system.total_athletes
     if kpt != 0:  # подсчет кол-во игр из выбора кол-ва игроков вышедших из группы и системы финала
@@ -3162,7 +3210,7 @@ def total_game_table(kpt, fin, pv, cur_index):
                                      msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
             if result == msgBox.StandardButtons.Ok:
                 choice_gr_automat()
-                tab_enabled()
+                tab_enabled(gamer)
             else:
                 return
         else:
@@ -3198,6 +3246,7 @@ def clear_db_before_edit():
 
 def ready_system():
     """проверка на готовность системы"""
+    gamer = my_win.lineEdit_title_gamer.text()
     sid_first = System.select().where(System.title_id == title_id())  # находит system id первого
     count = len(sid_first)
     if count > 1:
@@ -3211,6 +3260,7 @@ def ready_system():
 
 def ready_choice():
     """проверка на готовность жеребьевки групп"""
+    gamer = my_win.lineEdit_title_gamer.text()
     system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
     flag_greb = system.choice_flag
     if flag_greb is True:
@@ -3391,9 +3441,13 @@ def backup():
 
 def title_id():
     """возвращает title id в зависимости от соревнования"""
-    name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
-    t = Title.get(Title.name == name_comp)  # получает эту строку в db
-    title_id = t.id  # получает его id
+    name = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+    data = my_win.dateEdit_start.text()
+    gamer = my_win.lineEdit_title_gamer.text()
+    t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
+    count = len(t)
+    title = t.select().where(Title.gamer == gamer).get()
+    title_id = title.id  # получает его id
     return title_id
 
 
@@ -3483,7 +3537,7 @@ my_win.Button_system_made.clicked.connect(player_in_table)  # заполнени
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
-my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
+my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в партиb встречи
 my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
 my_win.Button_del_player.clicked.connect(delete_player)
 

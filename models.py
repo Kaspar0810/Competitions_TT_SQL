@@ -96,6 +96,7 @@ class Title(BaseModel):
     secretary = CharField()
     kat_sek = CharField(10)
     gamer = CharField(20)
+    full_name = CharField()
 
     class Meta:
         db_table = "titles"
