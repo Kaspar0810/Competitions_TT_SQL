@@ -88,3 +88,16 @@ def data_title_string():
         month_end = months_list[int(me) - 1]
         return f"{ds} {month_st}-{de} {month_end} {ys} г."
 
+
+# def title_id_last():
+#     """возвращает title id в зависимости от соревнования"""
+#
+#     name = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+#     data = my_win.dateEdit_start.text()
+#     gamer = my_win.lineEdit_title_gamer.text()
+#     t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
+#     count = len(t)
+#     title = t.select().where(Title.gamer == gamer).get()
+#     title_id = title.id  # получает его id
+#     return title_id
+

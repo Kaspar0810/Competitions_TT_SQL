@@ -23,21 +23,21 @@ enc = 'UTF-8'
 
 def func_zagolovok(canvas, doc):
     """создание заголовка страниц"""
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    s = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
-    p = s.page_vid  # рабочий вариант
+    title = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+
+    # s = System.select().order_by(System.id).where(System.title_id == title).get()  # находит system id последнего
+    # p = s.page_vid  # рабочий вариант
     # p = A4  # временно пока идет наладки таблицы (сетка 16)
-    if p == "альбомная":
-        pv = landscape(A4)
-    else:
-        pv = A4
+    # if p == "альбомная":
+    #     pv = landscape(A4)
+    # else:
+    pv = A4
     (width, height) = pv
-    title = Title.select().order_by(Title.id.desc()).get()
+
     nz = title.name
     ms = title.mesto
     sr = f"среди {title.sredi} {title.vozrast}"
     data_comp = pdf.data_title_string()
-    # ds = str(title.data_start)
 
     canvas.saveState()
 
@@ -357,7 +357,49 @@ def table_made(pv, title_id):
     doc = SimpleDocTemplate("table_group.pdf", pagesize=pv)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
 
+#=============
+# def made_pdf():
+#     def header(canvas, doc, content):
+#         canvas.saveState()
+#         w, h = content.wrap(doc.width, doc.topMargin)
+#         content.drawOn(canvas, doc.leftMargin, doc.height + doc.bottomMargin + doc.topMargin - h)
+#         canvas.restoreState()
+#
+#     def footer(canvas, doc, content):
+#         canvas.saveState()
+#         w, h = content.wrap(doc.width, doc.bottomMargin)
+#         content.drawOn(canvas, doc.leftMargin, h)
+#         canvas.restoreState()
+#
+#     def header_and_footer(canvas, doc, header_content, footer_content):
+#         header(canvas, doc, header_content)
+#         footer(canvas, doc, footer_content)
+#
+#     styles = getSampleStyleSheet()
+#
+#     filename = "out.pdf"
+#
+#     PAGESIZE = A4
+#
+#     pdf = SimpleDocTemplate(filename, pagesize=PAGESIZE,
+#             leftMargin = 2.2 * cm,
+#             rightMargin = 2.2 * cm,
+#             topMargin = 1.5 * cm,
+#             bottomMargin = 2.5 * cm)
+#
+#     frame = Frame(pdf.leftMargin, pdf.bottomMargin, pdf.width, pdf.height, id='normal')
+#
+#     header_content = Paragraph("This is a header. testing testing testing  ", styles['Normal'])
+#     footer_content = Paragraph("This is a footer. It goes on every page.  ", styles['Normal'])
+#
+#     template = PageTemplate(id='test', frames=frame, onPage=partial(header_and_footer, header_content=header_content,
+#                                                                     footer_content=footer_content))
+#
+#     pdf.addPageTemplates([template])
+#
+#     pdf.build([Paragraph("This is content")])
 
+#==========
 def setka_16_made(fin):
     """сетка на 16 в pdf"""
     elements = []
@@ -696,7 +738,9 @@ def setka_16_made(fin):
 
     elements.append(t)
     pv = A4
-    name_table_final = f"setka_16_{final}.pdf"
+    znak = final.rfind("-")
+    f = final[:znak]
+    name_table_final = f"setka_16_{f}_финал.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     return tds

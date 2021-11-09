@@ -1,4 +1,4 @@
-# import main
+
 from models import *
 from itertools import *
 from collections import Counter
@@ -606,6 +606,17 @@ def player_choice_in_setka(fin):
 
 
 
+# def title_id_last():
+#     """возвращает title id в зависимости от соревнования"""
+#
+#     name = my.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+#     data = my_win.dateEdit_start.text()
+#     gamer = my_win.lineEdit_title_gamer.text()
+#     t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
+#     count = len(t)
+#     title = t.select().where(Title.gamer == gamer).get()
+#     title_id = title.id  # получает его id
+#     return title_id
 # def result_rank_group(num_group, max_player):
 #     """записывает места из группы в таблицу -Result-"""
 #     pass

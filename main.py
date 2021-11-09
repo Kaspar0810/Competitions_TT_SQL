@@ -2,7 +2,7 @@
 
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-import dbm
+# import dbm
 import numpy as np
 
 import comp_system
@@ -46,7 +46,7 @@ from reportlab.lib.units import cm
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate
+from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate, PageTemplate
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus.tableofcontents import TableOfContents
@@ -54,6 +54,10 @@ from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.platypus import PageBreak
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER
+
+from reportlab.platypus.frames import Frame
+from functools import partial
+
 
 registerFontFamily('DejaVuSerif', normal='DejaVuSerif', bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
 enc = 'UTF-8'
@@ -1433,9 +1437,9 @@ def button_system_made_enable(state):
 
 def list_player_pdf():
     """создание списка учстников в pdf файл"""
-    name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
-    title = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
-    title_id = title.id
+    # name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
+    # title = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
+    title_id = title.id()
 
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
@@ -1915,9 +1919,10 @@ def match_score_db():
         game_in_visible(state_check, match)
 
 
-def game_in_visible(state_check, match=5):
+def game_in_visible(state_check, match=5, final="1-й финал"):
     """видимость полей для счета в партии, flag показывает из скольки партий играется матч,
     state_check - нажат чекбокс (видимость полей счета или нет), если 2 значит нажат"""
+
     tab = my_win.tabWidget.currentIndex()
     gamer = my_win.lineEdit_title_gamer.text()
     sf = System.get(System.title_id == title_id())
@@ -1938,7 +1943,12 @@ def game_in_visible(state_check, match=5):
     elif tab == 4:
         pass
     elif tab == 5:
-        system = sf.get(System.stage == "1-й финал")
+        r = my_win.tableWidget.currentRow()
+        if r == -1:
+            final == "1-й финал"
+        else:
+            final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
+        system = sf.get(System.stage == final)
         state = system.visible_game
         if state_check == 0 or state_check is False:  # изменяет состояние на Bool в зависимости от цифрового кода CheckBox
             state_check = False
@@ -2118,7 +2128,7 @@ def select_player_in_game():
         final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
         fin = System.get(System.title_id == title_id() and System.stage == final)
         state_check = fin.visible_game
-        game_in_visible(state_check=state_check)
+        game_in_visible(state_check=state_check, final=final)
 
     if tab == 3 or tab == 4 or tab == 5:
         win_pole = my_win.tableWidget.item(r, 6).text()  # поле победителя (если заполнено, значит встреча сыграна)
@@ -2828,8 +2838,7 @@ def result_filter_name():
 def filter_fin():
     """фильтрует таблицу -Result- на вкладке финалы"""
     msgBox = QMessageBox
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    result = Result.select().where(Result.title_id == t)  # находит system id последнего
+    result = Result.select().where(Result.title_id == title_id())  # находит system id последнего
     num_game_fin = my_win.lineEdit_num_game_fin.text()
     final = my_win.comboBox_filter_final.currentText()
     name = my_win.comboBox_find_name_fin.currentText()
@@ -2851,8 +2860,9 @@ def filter_fin():
                     pass
                 else:
                     my_win.tableWidget.hideRow(row - 1)
-    elif final != "все финалы" and played == "не сыгранные":
-        fltr = Result.select().where(Result.number_group == final)
+    elif final != "все финалы" and played == "не сыгранные":  # один из финалов встречи которые не сыгранные
+        fl = Result.select().where(Result.number_group == final)
+        fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
         count = len(fltr)
         my_win.label_38.setText(f'Всего в {final} не сыгранно {count} игры')
     elif final != "все финалы" and played == "завершенные":
@@ -2864,6 +2874,10 @@ def filter_fin():
                 fltr_played.append(win)
         count_pl = len(fltr_played)
         my_win.label_38.setText(f'Завершено в {final} {count_pl} игры')
+    elif final != "все финалы" and played == "все игры":
+        fltr = Result.select().where(Result.number_group == final)
+        count = len(fltr)
+        my_win.label_38.setText(f'Всего в {final} {count} игры')
     elif final != "все финалы" and num_game_fin != "":
         fltr = Result.select().where(Result.number_group == final)
         row = 0
@@ -2875,7 +2889,13 @@ def filter_fin():
 
     my_win.label_38.show()
     row_count = len(fltr)  # кол-во строк в таблице
+    column_count = 13  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+
+    for row in range(row_count):  # добавляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(result_list[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
 
 def filter_gr(pl=False):
@@ -2891,7 +2911,6 @@ def filter_gr(pl=False):
             fltr = Result.select().where(Result.player1 == name)
         else:
             fltr = Result.select().where(Result.player2 == name)
-
     elif group == "все группы" and played == "все игры":
         fltr = Result.select()
     elif group == "все группы" and played == "завершенные":
@@ -2919,7 +2938,7 @@ def filter_gr(pl=False):
     column_count = 13  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
-    for row in range(row_count):  # добвляет данные из базы в TableWidget
+    for row in range(row_count):  # добавляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
@@ -3451,6 +3470,46 @@ def title_id():
     return title_id
 
 
+# def made_pdf():
+#     def header(canvas, doc, content):
+#         canvas.saveState()
+#         w, h = content.wrap(doc.width, doc.topMargin)
+#         content.drawOn(canvas, doc.leftMargin, doc.height + doc.bottomMargin + doc.topMargin - h)
+#         canvas.restoreState()
+#
+#     def footer(canvas, doc, content):
+#         canvas.saveState()
+#         w, h = content.wrap(doc.width, doc.bottomMargin)
+#         content.drawOn(canvas, doc.leftMargin, h)
+#         canvas.restoreState()
+#
+#     def header_and_footer(canvas, doc, header_content, footer_content):
+#         header(canvas, doc, header_content)
+#         footer(canvas, doc, footer_content)
+#
+#     styles = getSampleStyleSheet()
+#
+#     filename = "out.pdf"
+#
+#     PAGESIZE = A4
+#
+#     pdf = SimpleDocTemplate(filename, pagesize=PAGESIZE,
+#             leftMargin = 2.2 * cm,
+#             rightMargin = 2.2 * cm,
+#             topMargin = 1.5 * cm,
+#             bottomMargin = 2.5 * cm)
+#
+#     frame = Frame(pdf.leftMargin, pdf.bottomMargin, pdf.width, pdf.height, id='normal')
+#
+#     header_content = Paragraph("This is a header. testing testing testing  ", styles['Normal'])
+#     footer_content = Paragraph("This is a footer. It goes on every page.  ", styles['Normal'])
+#
+#     template = PageTemplate(id='test', frames=frame, onPage=partial(header_and_footer, header_content=header_content,
+#                                                                     footer_content=footer_content))
+#
+#     pdf.addPageTemplates([template])
+#
+#     pdf.build([Paragraph("This is content")])
 
 
 
@@ -3537,11 +3596,11 @@ my_win.Button_system_made.clicked.connect(player_in_table)  # заполнени
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
-my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в партиb встречи
+my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в партии встречи
 my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(proba)
+# my_win.Button_proba.clicked.connect(made_pdf)
 
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
