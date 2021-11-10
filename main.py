@@ -2575,18 +2575,20 @@ def enter_score(none_player=0):
         snoska = tbl_data.numer_game(num_game)
         if snoska[0] != 0:
             with db:  # записывает в db таблицу Result победителя и проигравшего
-                result_win = Result.get(Result.tours == snoska[0])  # номер id куда записывается победитель
-                if result_win.player1 is None or result_win.player1 == "":
-                    result_win.player1 = winner
-                else:
-                    result_win.player2 = winner
-                result_win.save()
-                result_los = Result.get(Result.tours == snoska[1])  # номер id куда записывается проигравший
-                if result_los.player1 is None or result_los.player1 == "":
-                    result_los.player1 = loser
-                else:
-                    result_los.player2 = loser
-                result_los.save()
+                player = winner
+                for k in range(0, 2):
+                    res = Result.select().where(Result.number_group == fin)  # номер id куда записывается победитель
+                    for result in res:
+                        id = result.tours
+                        if int(id) == snoska[k]:
+                            if result.player1 is None or result.player1 == "":
+                                result.player1 = player
+                            else:
+                                result.player2 = player
+                            result.save()
+                            player = loser
+                            break
+                    # player = loser
     fill_table_results(tb=0)
 
     if tab == 3:
@@ -2604,7 +2606,8 @@ def enter_score(none_player=0):
         my_win.lineEdit_pl2_score_total.clear()
         my_win.lineEdit_player1.clear()  # очищает поля фамилии игроков
         my_win.lineEdit_player2.clear()
-        etap = my_win.tableWidget.item(r, 1).text()
+        fin = my_win.tableWidget.item(r, 1).text()
+        # etap = my_win.tableWidget.item(r, 1).text()
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
     elif tab == 4:
@@ -2624,16 +2627,15 @@ def enter_score(none_player=0):
         my_win.lineEdit_pl2_score_total_fin.clear()
         my_win.lineEdit_player1_fin.clear()  # очищает поля фамилии игроков
         my_win.lineEdit_player2_fin.clear()
-        etap = my_win.tableWidget.item(r, 2).text()
+        # etap = my_win.tableWidget.item(r, 2).text()
     # ===== вызов функции заполнения таблицы pdf группы сыгранными играми
-
-    system = System.select().order_by(System.id).where(System.title_id == title_id() and System.stage == etap).get()  # находит
+    system = System.select().order_by(System.id).where(System.title_id == title_id() and System.stage == fin).get()  # находит
 
     if system.stage == "Предварительный":
         pv = system.page_vid
         comp_system.table_made(pv, title_id())
         filter_gr(pl=False)
-    elif system.stage == etap:
+    elif system.stage == fin:
         system_table = system.label_string
         table_max_player = system.max_player
         txt = system_table.find("на")
@@ -2641,7 +2643,7 @@ def enter_score(none_player=0):
         if table == "Сетка (с розыгрышем всех мест)":
             if table_max_player == 16:
                 pv = system.page_vid
-                comp_system.setka_16_made(fin=etap)
+                comp_system.setka_16_made(fin=fin)
             elif table_max_player == 32:
                 pass
         filter_fin()
@@ -2759,63 +2761,6 @@ def string_score_game():
                 (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
             winner_string = f"({n1},{n2},{n3},{n4},{n5})"
             return winner_string
-
-
-# def result_filter_group():
-#     """фильтрует таблицу -результаты- по группам"""
-#     fg = my_win.comboBox_filter_group.currentText()
-#     player_result = Result.select().where(Result.number_group == fg)
-#     result_list = player_result.dicts().execute()  # получает словарь
-#     row_count = len(result_list)  # кол-во строк в таблице
-#     column_count = 13  # кол-во столбцов в таблице
-#     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
-#
-#     for row in range(row_count):  # добвляет данные из базы в TableWidget
-#         for column in range(column_count):
-#             item = str(list(result_list[row].values())[column])
-#             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-#
-#     my_win.tableWidget.hideColumn(11)
-#     my_win.tableWidget.hideColumn(12)
-#     my_win.tableWidget.hideColumn(13)
-#     my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
-#     for d in range(0, row_count):  # сортирует нумерация по порядку
-#         my_win.tableWidget.setItem(d, 0, QTableWidgetItem(str(d + 1)))
-
-
-# def result_filter_played():
-#     pass
-# """фильтрует таблицу -результаты- по сыгранным встречам"""
-# sender = my_win.sender()
-# fplayed = my_win.comboBox_filter_played.currentText()
-# if sender == my_win.Button_reset_filter:
-#     my_win.comboBox_filter_played.setCurrentText("все игры")
-#     fplayed = "все игры"
-# if fplayed == "не сыгранные":
-#     sg = "осталось сыграть:"
-#     player_result = Result.select().where(Result.points_win == None)
-# elif fplayed == "завершенные":
-#     player_result = Result.select().where(Result.points_win >= 0)
-#     sg = "всего сыграно:"
-# else:
-#     player_result = Result.select()
-#     sg = "всего игр:"
-# result_list = player_result.dicts().execute()
-# row_count = len(result_list)  # кол-во строк в таблице
-# my_win.label_16.setText(f"{sg} {row_count}")
-# column_count = 13  # кол-во столбцов в таблице
-# my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
-#
-# for row in range(row_count):  # добвляет данные из базы в TableWidget
-#     for column in range(column_count):
-#         item = str(list(result_list[row].values())[column])
-#         my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-#
-# my_win.tableWidget.hideColumn(10)
-# my_win.tableWidget.hideColumn(11)
-# my_win.tableWidget.hideColumn(12)
-# my_win.tableWidget.hideColumn(13)
-# my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
 
 
 def result_filter_name():

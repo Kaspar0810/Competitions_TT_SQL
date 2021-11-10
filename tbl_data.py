@@ -162,7 +162,7 @@ def numer_game(num_game):
         snoska.append(game_winner)
         game_loser = dict_loser[num_game]  # номер игры проигравшего
         snoska.append(game_loser)
-        game_loser = dict_loser_pdf[num_game]  # для отбражения в pdf (встречи с минусом)
+        game_loser = dict_loser_pdf[num_game]  # для отображения в pdf (встречи с минусом)
         snoska.append(game_loser)
     return snoska
 
