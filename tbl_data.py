@@ -61,12 +61,15 @@ def setka_data_16(fin):
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
-        space = family.find(" ")  # находит пробел отделяющий имя от фамилии
-        line = family.find("/")  # находит черту отделяющий имя от города
-        city_slice = family[line:]  # получает отдельно город
-        family_slice = family[:space + 2]   # получает отдельно фамилия и первую букву имени
-        family_city = f'{family_slice}.{city_slice}'   # все это соединяет
-        tds.append(family_city)
+        if family != "bye":
+            space = family.find(" ")  # находит пробел отделяющий имя от фамилии
+            line = family.find("/")  # находит черту отделяющий имя от города
+            city_slice = family[line:]  # получает отдельно город
+            family_slice = family[:space + 2]   # получает отдельно фамилия и первую букву имени
+            family_city = f'{family_slice}.{city_slice}'   # все это соединяет
+            tds.append(family_city)
+        else:
+            tds.append(family)
     return tds
 
 
@@ -582,10 +585,18 @@ def player_choice_in_setka(fin):
     posev_data = []
     first_posev = []
     second_posev = []
-    choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == 1)
-    choice_second = Choice.select().order_by(Choice.group).where(Choice.mesto_group == 2)
+    # вставить функцию выбора мест в группах для посева в сетке
+    if fin == "1-й финал":
+        mesto_first_poseva = 1
+        mesto_second_poseva = 2
+    elif fin == "2-й финал":
+        mesto_first_poseva = 3
+        mesto_second_poseva = 4
+    choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+    choice_second = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
     first_number = [1, 16, 8, 9, 4, 5, 12, 13]
     second_number = [10, 3, 11, 7, 14, 15, 2, 6]
+    count_sec_num = len(second_number)
     n = 0
     k = 0
     for posev in choice_first:
@@ -600,6 +611,11 @@ def player_choice_in_setka(fin):
         for k in range(k, k + 1):
             second_posev.append({'посев': second_number[k], 'фамилия': f'{posev.family}/ {city}'})
             k += 1
+    if k != count_sec_num:
+        no_gamer = second_number[k:]
+        for m in no_gamer:
+            second_posev.append({'посев': m, 'фамилия': 'bye'})
+
     posev_data = first_posev + second_posev
     posev_data = sorted(posev_data, key=lambda i: i['посев'])  # сортировка (списка словарей) по ключу словаря -посев-
     return posev_data

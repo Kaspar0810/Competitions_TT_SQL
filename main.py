@@ -1717,15 +1717,19 @@ def player_in_setka(fin):
     game = int(mg[:space])
     sd_full = []
     sd = []
-    tds = comp_system.setka_16_made(fin)  # создание сетки со спортсменами согласно жеребъевки
+    tds = comp_system.setka_16_made(fin)  # создание сетки со спортсменами согласно жеребьевки
     for r in tds:
-        space = r.find(" ")  # находит пробел перед именем
-        symbol = r.find("/")  # находит черту отделяющий город
-        sl = r[:space + 2]  # удаляет все после пробела кроме первой буквы имени
-        sl_full = r[:symbol]
-        family = f'{sl}.'  # добавляет точку к имени
-        sd.append(family)
-        sd_full.append(sl_full)
+        if r != "bye":
+            space = r.find(" ")  # находит пробел перед именем
+            symbol = r.find("/")  # находит черту отделяющий город
+            sl = r[:space + 2]  # удаляет все после пробела кроме первой буквы имени
+            sl_full = r[:symbol]
+            family = f'{sl}.'  # добавляет точку к имени
+            sd.append(family)
+            sd_full.append(sl_full)
+        else:
+            sd.append(r)
+            sd_full.append(r)
     k = 0
     for i in range(1, mp + 1):  # записывает в Game_List спортсменов участников сетки
         family_player = sd[i - 1]
@@ -1944,7 +1948,7 @@ def game_in_visible(state_check, match=5, final="1-й финал"):
         pass
     elif tab == 5:
         r = my_win.tableWidget.currentRow()
-        if r == -1:
+        if r == -1 or r == 0:
             final == "1-й финал"
         else:
             final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
@@ -2943,7 +2947,7 @@ def choice_table():
         result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
                                     msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
         if result == msgBox.StandardButtons.Ok:
-            choice_tbl_made()  # заполняет db жеребъевка
+            choice_tbl_made()  # заполняет db жеребьевка
             system_competition()  # создает систему соревнований
 
 
@@ -3004,7 +3008,7 @@ def choice_setka(fin):
         del_result = Result.select().where(Result.number_group == fin)
         for i in del_result:
             i.delete_instance() # удаляет строки финала (fin) из таблицы -Result-
-    with db:  # записывает флаг жеребъевки финала
+    with db:  # записывает флаг жеребьевки финала
         sys = System.get(System.stage == fin)
         sys.choice_flag = True
         sys.save()
