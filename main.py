@@ -141,11 +141,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         find_Menu = editMenu.addMenu("Поиск")
         find_Menu.addAction(self.find_r_Action)
         find_Menu.addAction(self.find_r1_Action)
-
         # меню Рейтинг
         rank_Menu = menuBar.addMenu("Рейтинг")  # основное
         rank_Menu.addAction(self.rAction)
         rank_Menu.addAction(self.r1Action)
+        # меню просмотр
+        view_Menu = menuBar.addMenu("Просмотр")
+        view_Menu.addAction(self.all_comp_Action)
+        view_Menu.addAction(self.view_gr_Action)
+        view_Menu.addAction(self.view_pf_Action)
+        view_Menu.addAction(self.view_final_Action)
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
     #  создание действий меню
@@ -164,8 +169,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
         self.savelist_Action = QAction("Список")  # подменю сохранить
         self.choice_gr_Action = QAction("Группы")  # подменю жеребьевка -группы-
-        self.choice_pf_Action = QAction("Полуфиналы")  # подменю жеребьевка -пполуфиналы-
+        self.choice_pf_Action = QAction("Полуфиналы")  # подменю жеребьевка -полуфиналы-
         self.choice_fin_Action = QAction("Финалы")  # подменю жеребьевка -финалы-
+        self.all_comp_Action = QAction("Полные соревнования")
+        self.view_gr_Action = QAction("Группы")
+        self.view_pf_Action = QAction("Полуфиналы")
+        self.view_final_Action = QAction("Финалы")
 
     def _connectActions(self):
         # Connect File actions
@@ -2141,11 +2150,19 @@ def select_player_in_game():
             pl1 = my_win.tableWidget.item(r, 4).text()
             pl2 = my_win.tableWidget.item(r, 5).text()
             if pl1 == my_win.tableWidget.item(r, 6).text():
-                sc1 = sc[0]
-                sc2 = sc[4]
+                if sc != "": # если в сетке недостающие игроки (bye), то нет счета
+                    sc1 = sc[0]
+                    sc2 = sc[4]
+                else:  # оставляет поля общий счет пустыми
+                    sc1 = ""
+                    sc2 = ""
             else:
-                sc1 = sc[4]
-                sc2 = sc[0]
+                if sc != "":  # если в сетке недостающие игроки (bye), то нет счета
+                    sc1 = sc[4]
+                    sc2 = sc[0]
+                else:
+                    sc1 = ""
+                    sc2 = ""
             if tab == 3:
                 my_win.lineEdit_pl1_score_total.setText(sc1)
                 my_win.lineEdit_pl2_score_total.setText(sc2)
@@ -2215,7 +2232,8 @@ def delete_player():
 
 
 def focus():
-    """переводит фокус на следующую позицию"""
+    """переводит фокус на следующую позицию
+    sum_total_game список (1-й колво очков которые надо набрать, 2-й сколько уже набрали)"""
 
     sender = my_win.sender()  # в зависимости от сигала кнопки идет сортировка
     #=============
@@ -2517,54 +2535,69 @@ def enter_score(none_player=0):
     elif tab == 4:
         pass
     elif tab == 5:
-        if none_player == 0:
-            st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
-            st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
-            w = 2
-            l = 1
+        if my_win.lineEdit_player1_fin.text() == "bye" or my_win.lineEdit_player2_fin.text() == "bye":
+            if my_win.lineEdit_player1_fin.text() != "bye":
+                winner = my_win.lineEdit_player1_fin.text()
+                loser = my_win.lineEdit_player2_fin.text()
+            else:
+                winner = my_win.lineEdit_player2_fin.text()
+                loser = my_win.lineEdit_player1_fin.text()
+            w = ""
+            l = ""
+            winner_string = ""
+            ts_winner = ""
+            ts_loser = ""
         else:
-            if none_player == 1:
-                st1 = "L"
-                st2 = "W"
-            elif none_player == 2:
-                st1 = "W"
-                st2 = "L"
-            w = 2
-            l = 0
-            my_win.lineEdit_pl1_score_total_fin.setText(st1)
-            my_win.lineEdit_pl2_score_total_fin.setText(st2)
+            if none_player == 0:
+                st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
+                st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
+                w = 2
+                l = 1
+            else:
+                if none_player == 1:
+                    st1 = "L"
+                    st2 = "W"
+                elif none_player == 2:
+                    st1 = "W"
+                    st2 = "L"
+                w = 2
+                l = 0
+                my_win.lineEdit_pl1_score_total_fin.setText(st1)
+                my_win.lineEdit_pl2_score_total_fin.setText(st2)
 
-    r = my_win.tableWidget.currentRow()
-    id = my_win.tableWidget.item(r, 0).text()
-    num_game = my_win.tableWidget.item(r, 3).text()
-    fin = my_win.tableWidget.item(r, 2).text()
+        r = my_win.tableWidget.currentRow()
+        id = my_win.tableWidget.item(r, 0).text()
+        num_game = my_win.tableWidget.item(r, 3).text()
+        fin = my_win.tableWidget.item(r, 2).text()
 
-    if st1 > st2 or none_player == 2:
-        if tab == 3:
-            winner = my_win.lineEdit_player1.text()
-            loser = my_win.lineEdit_player2.text()
-        elif tab == 4:
-             pass
-        elif tab == 5:
-            winner = my_win.lineEdit_player1_fin.text()
-            loser = my_win.lineEdit_player2_fin.text()
-        ts_winner = f"{st1} : {st2}"
-        ts_loser = f"{st2} : {st1}"
-    else:
-        if tab == 3:
-            winner = my_win.lineEdit_player2.text()
-            loser = my_win.lineEdit_player1.text()
-        elif tab == 4:
-            pass
-        elif tab == 5:
-            winner = my_win.lineEdit_player2_fin.text()
-            loser = my_win.lineEdit_player1_fin.text()
-        ts_winner = f"{st2} : {st1}"
-        ts_loser = f"{st1} : {st2}"
-    if none_player == 0:
-        winner_string = string_score_game()
-    else:
-        winner_string = ts_winner
+        if my_win.lineEdit_player1_fin.text() != "bye" and my_win.lineEdit_player2_fin.text() != "bye":
+            if st1 > st2 or none_player == 2:
+                if tab == 3:
+                    winner = my_win.lineEdit_player1.text()
+                    loser = my_win.lineEdit_player2.text()
+                elif tab == 4:
+                     pass
+                elif tab == 5:
+                    winner = my_win.lineEdit_player1_fin.text()
+                    loser = my_win.lineEdit_player2_fin.text()
+                ts_winner = f"{st1} : {st2}"
+                ts_loser = f"{st2} : {st1}"
+            else:
+                if tab == 3:
+                    winner = my_win.lineEdit_player2.text()
+                    loser = my_win.lineEdit_player1.text()
+                elif tab == 4:
+                    pass
+                elif tab == 5:
+                    winner = my_win.lineEdit_player2_fin.text()
+                    loser = my_win.lineEdit_player1_fin.text()
+                ts_winner = f"{st2} : {st1}"
+                ts_loser = f"{st1} : {st2}"
+            if none_player == 0:
+                winner_string = string_score_game()
+            else:
+                winner_string = ts_winner
+
     with db:
         result = Result.get(Result.id == id)
         result.winner = winner
@@ -2794,7 +2827,10 @@ def filter_fin():
     name = name.title()  # делает Заглавными буквы слов
     played = my_win.comboBox_filter_played_fin.currentText()
     fltr = Result.select().where(Result.system_stage == "Финальный")
-    if final == "все финалы" and played == "все игры":
+    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
+    fin = []
+
+    if final == "все финалы" and played == "все игры" and num_game_fin == "" :
         if name == "":
             count = len(fltr)
             my_win.label_38.setText(f'Всего в финалах {count} игры')
@@ -2809,12 +2845,12 @@ def filter_fin():
                     pass
                 else:
                     my_win.tableWidget.hideRow(row - 1)
-    elif final != "все финалы" and played == "не сыгранные":  # один из финалов встречи которые не сыгранные
+    elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "":  # один из финалов встречи которые не сыгранные
         fl = Result.select().where(Result.number_group == final)
         fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
         count = len(fltr)
         my_win.label_38.setText(f'Всего в {final} не сыгранно {count} игры')
-    elif final != "все финалы" and played == "завершенные":
+    elif final != "все финалы" and played == "завершенные" and num_game_fin == "":
         fltr_played = []
         fltr = Result.select().where(Result.number_group == final)
         for fl in fltr:
@@ -2823,17 +2859,42 @@ def filter_fin():
                 fltr_played.append(win)
         count_pl = len(fltr_played)
         my_win.label_38.setText(f'Завершено в {final} {count_pl} игры')
-    elif final != "все финалы" and played == "все игры":
+    elif final != "все финалы" and played == "все игры" and num_game_fin == "":
         fltr = Result.select().where(Result.number_group == final)
         count = len(fltr)
         my_win.label_38.setText(f'Всего в {final} {count} игры')
-    elif final != "все финалы" and num_game_fin != "":
-        fltr = Result.select().where(Result.number_group == final)
+    elif final == "все финалы" and played == "завершенные" and num_game_fin == "":
+        fltr_played = []
+        fltr = Result.select().where(Result.system_stage == "Финальный")
+        for fl in fltr:
+            if fl.winner is not None:
+                win = fl.winner
+                fltr_played.append(win)
+        count_pl = len(fltr_played)
+        my_win.label_38.setText(f' Всего сыграно во всех финалах {count_pl} игры')
+    else:
+        if final != "все финалы" and num_game_fin != "":
+            fltr = Result.select().where(Result.number_group == final)
+        else:
+            for sys in system:  # отбирает финалы с сеткой
+                if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
+                    txt = sys.label_string
+                    txt = txt[:5]
+                    if txt == "Сетка":
+                        fin.append(sys.stage)
+            fin, ok = QInputDialog.getItem(my_win, "Финалы", "Выберите финал, где искать номер встречи.", fin, 0, False)
+            fltr = Result.select().where(Result.number_group == fin)
         row = 0
         for result_list in fltr:
             row += 1
-            if result_list.tours != num_game_fin:
-                my_win.tableWidget.hideRow(row - 1)
+            if result_list.tours == num_game_fin:
+                num_game_fin = int(num_game_fin)
+                r = num_game_fin - 1
+                my_win.tableWidget.selectRow(r)
+                item = my_win.tableWidget.item(r, 5)
+                my_win.tableWidget.scrollToItem(item)  # переводит выделенную строку в видимую часть экрана
+                break
+
     result_list = fltr.dicts().execute()
 
     my_win.label_38.show()
@@ -3546,7 +3607,7 @@ my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет 
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
 my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в партии встречи
-my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в парти встречи
+my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в партии встречи
 my_win.Button_del_player.clicked.connect(delete_player)
 
 # my_win.Button_proba.clicked.connect(made_pdf)
