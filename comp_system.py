@@ -407,8 +407,8 @@ def setka_16_made(fin):
     column = ['']
     column_count = column * 11
     # добавить в аргументы функции
-    first_mesto = 1
     final = fin
+    first_mesto = mesto_in_final(fin)
     for i in range(0, 69):
         # column_count[10] = i  # нумерация 10 столбца для удобного просмтра таблицы
         list_tmp = column_count.copy()
@@ -764,3 +764,29 @@ def tour(cp):
     return tour_list
 
 
+def mesto_in_final(fin):
+    """с какого номера расставляются места в финале, в зависимости от его номера и кол-во участников
+    fin - финал"""
+    final = []
+    mesto = {}
+    tmp = []
+    title = Title.select().order_by(Title.id.desc()).get()
+    system = System.select().order_by(System.id).where(System.title_id == title)  # находит system id последнего
+    first = 1
+    k = 0
+    for sys in system:
+        fin = sys.stage
+        if fin != "Предварительный":
+            if fin != "Полуфиналы":
+                tmp.append(fin)
+                if k >= 1:
+                    tmp.append(first + final[k - 1][2])
+                else:
+                    tmp.append(first)
+                tmp.append(sys.max_player)
+                k += 1
+            final.append(tmp.copy())
+            tmp.clear()
+            mesto[fin] = final[k - 1][1]
+    first_mesto = mesto[fin]
+    return first_mesto
