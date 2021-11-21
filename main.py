@@ -1052,9 +1052,9 @@ def add_player():
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
     num = count + 1
-    space = pl.find(" ")  # находит пробел отделяющий имя от фамилии
-    family_slice = pl[:space + 2]  # получает отдельно фамилия и первую букву имени
-    fn = f"{family_slice}./ {ct}"
+    # space = pl.find(" ")  # находит пробел отделяющий имя от фамилии
+    # family_slice = pl[:space + 2]  # получает отдельно фамилия и первую букву имени
+    fn = f"{pl}/ {ct}"
 
     add_coach(ch, num)
     ms = ""
@@ -3337,9 +3337,9 @@ def select_choice_final():
     #     player_id = pl.id
     #     city = pl.city
     #     name = pl.player
-    #     space = name.find(" ")  # находит пробел отделяющий имя от фамилии
-    #     family_slice = name[:space + 2]  # получает отдельно фамилия и первую букву имени
-    #     fn = f"{family_slice}./ {city}"
+    #     # space = name.find(" ")  # находит пробел отделяющий имя от фамилии
+    #     # family_slice = name[:space + 2]  # получает отдельно фамилия и первую букву имени
+    #     fn = f"{name}/ {city}"
     #     with db:
     #         pl.full_name = fn
     #         pl.save()

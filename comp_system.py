@@ -489,8 +489,10 @@ def setka_16_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    tds = tbl_data.setka_data_16(fin)  # список фамилия/ город 1-ого посева
-    tbl_data.full_player_id()
+    # tds = tbl_data.setka_data_16(fin)  # список фамилия/ город 1-ого посева
+    all_list = tbl_data.setka_data_16(fin)  # список фамилия/ город 1-ого посева
+    tds = all_list[0]
+    id_name_city = all_list[1]
     for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
         n = i - (i // 2)
         data[i][1] = tds[n]

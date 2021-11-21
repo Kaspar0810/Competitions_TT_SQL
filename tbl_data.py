@@ -51,16 +51,20 @@ def table_data(kg, title_id):
 
 def setka_data_16(fin):
     """данные сетки на 16"""
+    id_ful_name = {}
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     system = System.select().where(System.title_id == t)  # находит system id последнего
     for sys in system:  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
             mp = sys.max_player
     tds = []
+    all_list = []
     posev_data = player_choice_in_setka(fin)
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
+        id_f_name = full_player_id(family)
+        id_ful_name[id_f_name["name"]] = id_f_name["id"]  # словарь ключ - полное имя/ город, значение - id
         if family != "bye":
             space = family.find(" ")  # находит пробел отделяющий имя от фамилии
             line = family.find("/")  # находит черту отделяющий имя от города
@@ -70,23 +74,26 @@ def setka_data_16(fin):
             tds.append(family_city)
         else:
             tds.append(family)
-    return tds
+    all_list.append(tds)
+    all_list.append(id_ful_name)
+    # return tds
+    return all_list
 
 
-def full_player_id():
+def full_player_id(family):
     """получает словарь -фамилия игрока и его город и соответствующий ему id в таблице Players"""
-    id_full_name = {}
+    full_name = {}
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    player = Player.select().where(Player.title_id == t)
-    for pl in player:
-        player_id = pl.id
-        city = pl.city
-        name = pl.player
-        space = name.find(" ")  # находит пробел отделяющий имя от фамилии
-        family_slice = name[:space + 2]  # получает отдельно фамилия и первую букву имени
-        id_full_name["name"] = f"{family_slice}./ {city}"
-        id_full_name["id"] = player_id
+    plr = Player.get(Player.title_id == t and Player.full_name == family)
+    id_player = plr.id
+    city = plr.city
+    name = plr.player
+    space = name.find(" ")  # находит пробел отделяющий имя от фамилии
+    family_slice = name[:space + 2]  # получает отдельно фамилия и первую букву имени
+    full_name["name"] = f"{family_slice}./ {city}"
+    full_name["id"] = id_player
 
+    return full_name
 
 
 def score_in_table(td, num_gr):
