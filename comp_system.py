@@ -410,7 +410,7 @@ def setka_16_made(fin):
     final = fin
     first_mesto = mesto_in_final(fin)
     for i in range(0, 69):
-        # column_count[10] = i  # нумерация 10 столбца для удобного просмтра таблицы
+        # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
 
@@ -490,6 +490,7 @@ def setka_16_made(fin):
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
     tds = tbl_data.setka_data_16(fin)  # список фамилия/ город 1-ого посева
+    tbl_data.full_player_id()
     for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
         n = i - (i // 2)
         data[i][1] = tds[n]
@@ -504,16 +505,30 @@ def setka_16_made(fin):
         val_list.append(val)
     column = [[9, 10, 11, 12, 21, 22, 23, 24], [13, 14, 17, 18, 25, 26, 29, 30], [15, 16, 19, 20, 27, 28, 31, 32]]
     row_plus = [[13, 14, 27], [15]]
+    #======= list mest
+    mesta_list = [15, -15, 16, -16, 19, -19,  20, -20, 27, -27, 28, -28, 31, -31, 32, -32]
+    #============
     count = len(column)
+    # записать в базу данных в списки места финальные
     for i in key_list:
         match = dict_setka[i]
         i = str(i)
         r = str(match[3])
         row_rank = match[3]
+        #===== определение мест и запись в db
+        if row_rank in mesta_list:
+            index = mesta_list.index(row_rank)
+            mesto = first_mesto + index
+            pl1 = match[1]
+            pl1_mesto = mesto - 1
+            pl2 = match[4]
+            pl2_mesto = mesto
+
+
         c = match[0]
         row_win = dict_num_game[i]  # строка победителя
         if c != 0:
-            for u in range(0, count):  # в зависимости от встречи делает сдвиг по столобцам
+            for u in range(0, count):  # в зависимости от встречи делает сдвиг по столбцам
                 if c in column[u]:
                     col = u * 2 + 3
                     break

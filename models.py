@@ -96,7 +96,7 @@ class Title(BaseModel):
     secretary = CharField()
     kat_sek = CharField(10)
     gamer = CharField(20)
-    full_name = CharField()
+    full_name_comp = CharField()
 
     class Meta:
         db_table = "titles"
@@ -111,6 +111,7 @@ class Player(BaseModel):
     razryad = CharField()
     coach_id = ForeignKeyField(Coach)
     mesto = IntegerField(null=True)
+    full_name = CharField()
     title_id = ForeignKeyField(Title)
 
     class Meta:

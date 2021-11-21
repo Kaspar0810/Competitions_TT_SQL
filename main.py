@@ -318,7 +318,7 @@ class StartWindow(QMainWindow, Ui_Form):
             t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
             id = t_id.id
             old_title = Title.get(Title.id == id)
-            last_comp = old_title.full_name
+            last_comp = old_title.full_name_comp
             self.LinkButton.setText(f"{last_comp}")
         else:
             self.LinkButton.setText("Список прошедших соревнований пуст")
@@ -345,7 +345,7 @@ class StartWindow(QMainWindow, Ui_Form):
         gamer, ok = QInputDialog.getItem(my_win, "Участники", "Выберите категорию спортсменов", gamer, 0, False)
 
         title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
-                      kat_ref="", secretary="", kat_sek="", gamer=gamer, full_name="").save()
+                      kat_ref="", secretary="", kat_sek="", gamer=gamer, full_name_comp="").save()
         t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         title_id = t_id.id
         db_r(gamer)
@@ -645,14 +645,14 @@ def db_select_title():
         titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         name = titles.name
         gamer = titles.gamer
-        full_name = titles.full_name
+        full_name = titles.full_name_comp
     else:  # сигнал от кнопки с текстом -открыть-
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[39:]
         name = txt[:36]
         # titles = Title.get(Title.name == name and Title.gamer == gamer)
-        titles = Title.get(Title.full_name == full_name)
+        titles = Title.get(Title.full_name_comp == full_name)
     with db:
         my_win.lineEdit_title_nazvanie.setText(titles.name)
         my_win.lineEdit_title_vozrast.setText(titles.vozrast)
@@ -867,8 +867,8 @@ def find_in_rlist():
     my_win.textEdit.clear()
     fp = my_win.lineEdit_Family_name.text()
     fp = fp.capitalize()  # Переводит первую букву в заглавную
-    p = R_list.select()
-    p = p.where(R_list.r_fname ** f'{fp}%')  # like
+    p = R_list_m.select()
+    p = p.where(R_list_m.r_fname ** f'{fp}%')  # like
     if (len(p)) == 0:
         my_win.textEdit.setText("Нет спортсменов в рейтинг листе")
     else:
@@ -906,7 +906,7 @@ def fill_table(player_list):
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
-    player_rlist = R_list.select().order_by(R_list.r_fname)
+    player_rlist = R_list_m.select().order_by(R_list_m.r_fname)
     player_r = player_rlist.dicts().execute()
     row_count = len(player_r)  # кол-во строк в таблице
     column_count = len(player_r[0])  # кол-во столбцов в таблице
@@ -922,13 +922,13 @@ def fill_table_R_list():
 
 def fill_table_R1_list():
     """заполняет таблицу списком из январского рейтинг листа"""
-    player_rlist = R1_list.select().order_by(R1_list.r1_fname)
+    player_rlist = R1_list_m.select().order_by(R1_list_m.r1_fname)
     player_r1 = player_rlist.dicts().execute()
     row_count = len(player_r1)  # кол-во строк в таблице
     column_count = len(player_r1[0])  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
-    for row in range(row_count):  # добвляет данные из базы в TableWidget
+    for row in range(row_count):  # добавляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(player_r1[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
@@ -1052,6 +1052,10 @@ def add_player():
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
     num = count + 1
+    space = pl.find(" ")  # находит пробел отделяющий имя от фамилии
+    family_slice = pl[:space + 2]  # получает отдельно фамилия и первую букву имени
+    fn = f"{family_slice}./ {ct}"
+
     add_coach(ch, num)
     ms = ""
     idc = Coach.get(Coach.coach == ch)
@@ -1086,11 +1090,12 @@ def add_player():
                 plr.region=rg
                 plr.razryad=rz
                 plr.coach_id=idc
+                plr.full_name=fn
                 plr.save()
         elif txt == "Добавить":
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
-                                coach_id=idc, title_id=title_id() ).save()
+                                coach_id=idc, full_name=fn, title_id=title_id() ).save()
 
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
@@ -1445,14 +1450,14 @@ def button_system_made_enable(state):
 
 
 def list_player_pdf():
-    """создание списка учстников в pdf файл"""
+    """создание списка участников в pdf файл"""
     # name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
     # title = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
-    title_id = title.id()
+    # title_id = title_id()
 
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
-    player_list = Player.select().where(Player.title_id == title_id)
+    player_list = Player.select().where(Player.title_id == title_id())
     count = len(player_list)  # количество записей в базе
     kp = count + 1
     my_win.tableWidget.setRowCount(count)
@@ -1474,7 +1479,7 @@ def list_player_pdf():
                         "Место"])
     t = Table(elements,
               colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.7 * cm, 1.1 * cm),
-              rowHeights=None)  # ширина столбцов, если None-автомтическая
+              rowHeights=None)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                            ('FONTSIZE', (0, 0), (-1, -1), 7),  # Использую импортированный шрифта размер
                            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),  # межстрочный верхний инервал
@@ -2565,12 +2570,12 @@ def enter_score(none_player=0):
                 my_win.lineEdit_pl1_score_total_fin.setText(st1)
                 my_win.lineEdit_pl2_score_total_fin.setText(st2)
 
-        r = my_win.tableWidget.currentRow()
-        id = my_win.tableWidget.item(r, 0).text()
-        num_game = my_win.tableWidget.item(r, 3).text()
-        fin = my_win.tableWidget.item(r, 2).text()
+    r = my_win.tableWidget.currentRow()
+    id = my_win.tableWidget.item(r, 0).text()
+    num_game = my_win.tableWidget.item(r, 3).text()
+    fin = my_win.tableWidget.item(r, 2).text()
 
-        if my_win.lineEdit_player1_fin.text() != "bye" and my_win.lineEdit_player2_fin.text() != "bye":
+    if my_win.lineEdit_player1_fin.text() != "bye" and my_win.lineEdit_player2_fin.text() != "bye":
             if st1 > st2 or none_player == 2:
                 if tab == 3:
                     winner = my_win.lineEdit_player1.text()
@@ -2734,7 +2739,7 @@ def string_score_game():
             n2 = s22
         else:
             n2 = str(f"-{s12}")
-        if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st2 == 0 and st2 == 2):  # из 3-х партий 2-0
+        if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st2 == 0 and st1 == 2):  # из 3-х партий 2-0
             winner_string = f"({n1},{n2})"
             return winner_string
         if int(s13) > int(s23):  # 3-й сет
@@ -2766,12 +2771,12 @@ def string_score_game():
         if int(s11) < int(s21):  # 1-й сет
             n1 = s11
         else:
-            n1 = str(f"-{s12}")
+            n1 = str(f"-{s21}")
         if int(s12) < int(s22):  # 2-й сет
             n2 = s12
         else:
             n2 = str(f"-{s22}")
-        if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st2 == 0 and st2 == 2):  # из 3-х партий 2-0
+        if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st1 == 0 and st2 == 2):  # из 3-х партий 2-0
             winner_string = f"({n1},{n2})"
             return winner_string
         if int(s13) < int(s23):  # 3-й сет
@@ -3321,35 +3326,23 @@ def select_choice_final():
 #     """добавление столбца в существующую таблицу"""
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
+#     full_name = CharField(default='')  # новый столбец, его поле и значение по умолчанию
 #     with db:
-#         migrate(migrator.add_column('Title', 'gamer', gamer))
-    # ALTER TABLE titles
-    # my_db = SqliteDatabase('comp_db.db')
-    # migrator = SqliteMigrator(my_db)
-    # # visible_game = BooleanField(default=False)
-
-    # migrate(migrator.add_column('Title', 'gamer', gamer))
-#=================================
-    # PRAGMA foreign_keys=off
-    #
-    # BEGIN TRANSACTION
-    #
-    # ALTER TABLE table1 RENAME TO _table1_old
-    #
-    # CREATE TABLE table1 (
-    # ( column1 datatype [ NULL | NOT NULL ],
-    #   column2 datatype [ NULL | NOT NULL ],
-    #   ...
-    # )
-    #
-    # INSERT INTO table1 (column1, column2, ... column_n)
-    #   SELECT column1, column2, ... column_n
-    #   FROM _table1_old
-    #
-    # COMMIT
-    #
-    # PRAGMA foreign_keys=on
-
+#         migrate(migrator.add_column('players', 'full_name', full_name))
+#====================================
+    # id_full_name = {}
+    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    # player = Player.select().where(Player.title_id == t)
+    # for pl in player:
+    #     player_id = pl.id
+    #     city = pl.city
+    #     name = pl.player
+    #     space = name.find(" ")  # находит пробел отделяющий имя от фамилии
+    #     family_slice = name[:space + 2]  # получает отдельно фамилия и первую букву имени
+    #     fn = f"{family_slice}./ {city}"
+    #     with db:
+    #         pl.full_name = fn
+    #         pl.save()
 
 
     #=========================
@@ -3437,8 +3430,7 @@ def kol_player_in_final():
 #     with db:
 #        Player.create_table()
 
-    # pv = A4
-    # comp_system.setka_16_made()
+
 
 
 def no_play():
@@ -3610,7 +3602,7 @@ my_win.Button_Ok.clicked.connect(enter_score)  # записывает в баз�
 my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в партии встречи
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(made_pdf)
+# my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
