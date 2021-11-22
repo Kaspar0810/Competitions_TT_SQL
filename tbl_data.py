@@ -78,11 +78,9 @@ def setka_data_16(fin):
             tds.append(family_city)
         else:
             tds.append(family)
-        # id_name[]
     all_list.append(tds)
     all_list.append(id_ful_name)
     all_list.append(id_name)
-    # return tds
     return all_list
 
 
@@ -104,7 +102,7 @@ def full_player_id(family):
     name_list = []
     name_list.append(full_name)
     name_list.append(short_name)
-    # return full_name
+
     return name_list
 
 
@@ -116,8 +114,6 @@ def score_in_table(td, num_gr):
     ta = System.select().order_by(System.id).where(System.title_id == t).get()  # находит system id последнего
     mp = ta.max_player
 
-    # for s in range(1, mp + 1):
-    #     total_score[s] = 0
     r = Result.select().where(Result.title_id == ta and Result.number_group == num_gr)
     choice = Choice.select().where(Choice.group == num_gr)  # фильтрует по группе
     count = len(r)
@@ -165,8 +161,7 @@ def score_in_table(td, num_gr):
                 plr2 = plr2 + int(tp2)  # прибавляет очки 2-ого игрока
                 total_score[p1] = plr1  # записывает сумму очков 1-му игроку
                 total_score[p2] = plr2  # записывает сумму очков 2-му игроку
-    # for t in range(0, mp):  # записывает очки не зависимо от кол-во игроков в группе
-    #     td[t * 2][mp + 2] = total_score[t + 1]  # записывает каждому игроку сумму очков
+
     for t in range(0, count_player):  # записывает очки в зависимости от кол-во игроков в группе
         td[t * 2][mp + 2] = total_score[t + 1]  # записывает каждому игроку сумму очков
     gl = Game_list.select().where(Game_list.id == 1)
@@ -233,7 +228,7 @@ def result_rank_group(num_gr, player_rank_group):
     """записывает места из группы в таблицу -Choice-"""
     if len(player_rank_group) > 0:
         t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-        # system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
+
         choice = Choice.select().where(Choice.group == num_gr)
         count = len(choice)
         for ch in choice:

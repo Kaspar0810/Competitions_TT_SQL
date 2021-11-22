@@ -718,11 +718,11 @@ def load_tableWidget():
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
     elif sender == my_win.checkBox_6.checkState() == True:
-        z = 10
+        z = 11
         column_label = ["№", "id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
-        z = 10  # кол-во столбцов должно быть равно (fill_table -column_count-)
+        z = 11  # кол-во столбцов должно быть равно (fill_table -column_count-)
         column_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
@@ -1401,13 +1401,14 @@ def find_player_in_R():
 def sort(self):
     """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
-    name_comp = my_win.lineEdit_title_nazvanie.text()
-    t = Title.get(Title.name == name_comp)
-    title_id = t.id
+
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
-        player_list = Player.select().where(Player.title_id == title_id).order_by(Player.rank.desc())  # сортировка по рейтингу
-    else:
-        player_list = Player.select().where(Player.title_id == title_id).order_by(Player.player)  # сортировка по алфавиту
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
+    elif sender == my_win.Button_sort_Name:
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алфавиту
+    elif sender == my_win.Button_sort_mesto:
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(
+            Player.mesto)  # сортировка по месту
     fill_table(player_list)
 
 
@@ -3587,8 +3588,6 @@ my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по не�
 my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
 my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
 
-
-
 my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_reset_filter_fin.clicked.connect(reset_filter)
 my_win.Button_filter_fin.clicked.connect(filter_fin)
@@ -3603,7 +3602,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в б�
 my_win.Button_del_player.clicked.connect(delete_player)
 
 # my_win.Button_proba.clicked.connect(proba)
-
+my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
 my_win.Button_view.clicked.connect(view)
