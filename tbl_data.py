@@ -502,7 +502,7 @@ def circle_3_player(uniq, tr, td, max_person, mesto, player_rank, num_gr, ps, tr
 
 
 def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
-    """сумма очков кажого игрока в крутиловке"""
+    """сумма очков каждого игрока в крутиловке"""
     c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
     # данную встречу
     if c.winner == c.player1:  # победил 1-й игрок
@@ -616,7 +616,7 @@ def player_choice_in_group(num_gr):
 
 def player_choice_in_setka(fin):
     """распределяет спортсменов в сетке согласно жеребьевке"""
-    posev_data = []
+    # posev_data = []
     first_posev = []
     second_posev = []
     # вставить функцию выбора мест в группах для посева в сетке
@@ -655,18 +655,3 @@ def player_choice_in_setka(fin):
     return posev_data
 
 
-
-# def title_id_last():
-#     """возвращает title id в зависимости от соревнования"""
-#
-#     name = my.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
-#     data = my_win.dateEdit_start.text()
-#     gamer = my_win.lineEdit_title_gamer.text()
-#     t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
-#     count = len(t)
-#     title = t.select().where(Title.gamer == gamer).get()
-#     title_id = title.id  # получает его id
-#     return title_id
-# def result_rank_group(num_group, max_player):
-#     """записывает места из группы в таблицу -Result-"""
-#     pass

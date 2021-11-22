@@ -800,10 +800,10 @@ def mesto_in_final(fin):
     first = 1
     k = 0
     for sys in system:
-        fin = sys.stage
-        if fin != "Предварительный":
-            if fin != "Полуфиналы":
-                tmp.append(fin)
+        f = sys.stage
+        if f != "Предварительный":
+            if f != "Полуфиналы":
+                tmp.append(f)
                 if k >= 1:
                     tmp.append(first + final[k - 1][2])
                 else:
@@ -812,6 +812,6 @@ def mesto_in_final(fin):
                 k += 1
             final.append(tmp.copy())
             tmp.clear()
-            mesto[fin] = final[k - 1][1]
+            mesto[f] = final[k - 1][1]
     first_mesto = mesto[fin]
     return first_mesto
