@@ -489,10 +489,10 @@ def setka_16_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    # tds = tbl_data.setka_data_16(fin)  # список фамилия/ город 1-ого посева
     all_list = tbl_data.setka_data_16(fin)  # список фамилия/ город 1-ого посева
     tds = all_list[0]
     id_name_city = all_list[1]
+    id_sh_name = all_list[2]
     for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
         n = i - (i // 2)
         data[i][1] = tds[n]
@@ -514,6 +514,10 @@ def setka_16_made(fin):
     # записать в базу данных в списки места финальные
     for i in key_list:
         match = dict_setka[i]
+        pl_win = match[1]
+        pl_los = match[4]
+        id_win = id_sh_name[f"{pl_win}"]
+        id_los = id_sh_name[f"{pl_los}"]
         i = str(i)
         r = str(match[3])
         row_rank = match[3]
@@ -525,8 +529,12 @@ def setka_16_made(fin):
             pl1_mesto = mesto - 1
             pl2 = match[4]
             pl2_mesto = mesto
-
-
+            player = Player.get(Player.id == id_win)  # записывает места в таблицу -Player-
+            player.mesto = pl1_mesto
+            player.save()
+            player = Player.get(Player.id == id_los)
+            player.mesto = pl2_mesto
+            player.save()
         c = match[0]
         row_win = dict_num_game[i]  # строка победителя
         if c != 0:

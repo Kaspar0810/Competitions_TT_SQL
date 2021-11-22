@@ -52,6 +52,7 @@ def table_data(kg, title_id):
 def setka_data_16(fin):
     """данные сетки на 16"""
     id_ful_name = {}
+    id_name = {}
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     system = System.select().where(System.title_id == t)  # находит system id последнего
     for sys in system:  # проходит циклом по всем отобранным записям
@@ -64,7 +65,10 @@ def setka_data_16(fin):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
         id_f_name = full_player_id(family)
-        id_ful_name[id_f_name["name"]] = id_f_name["id"]  # словарь ключ - полное имя/ город, значение - id
+        id_f_n = id_f_name[0]
+        id_s_n = id_f_name[1]
+        id_ful_name[id_f_n["name"]] = id_f_n["id"]  # словарь ключ - полное имя/ город, значение - id
+        id_name[id_s_n["name"]] = id_s_n["id"]
         if family != "bye":
             space = family.find(" ")  # находит пробел отделяющий имя от фамилии
             line = family.find("/")  # находит черту отделяющий имя от города
@@ -74,8 +78,10 @@ def setka_data_16(fin):
             tds.append(family_city)
         else:
             tds.append(family)
+        # id_name[]
     all_list.append(tds)
     all_list.append(id_ful_name)
+    all_list.append(id_name)
     # return tds
     return all_list
 
@@ -83,6 +89,7 @@ def setka_data_16(fin):
 def full_player_id(family):
     """получает словарь -фамилия игрока и его город и соответствующий ему id в таблице Players"""
     full_name = {}
+    short_name = {}
     t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     plr = Player.get(Player.title_id == t and Player.full_name == family)
     id_player = plr.id
@@ -92,8 +99,13 @@ def full_player_id(family):
     family_slice = name[:space + 2]  # получает отдельно фамилия и первую букву имени
     full_name["name"] = f"{family_slice}./ {city}"
     full_name["id"] = id_player
-
-    return full_name
+    short_name["name"] = f"{family_slice}."
+    short_name["id"] = id_player
+    name_list = []
+    name_list.append(full_name)
+    name_list.append(short_name)
+    # return full_name
+    return name_list
 
 
 def score_in_table(td, num_gr):
