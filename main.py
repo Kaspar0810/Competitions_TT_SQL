@@ -636,22 +636,22 @@ def db_insert_title(title_str):
 def db_select_title():
     """извлекаем из таблицы данные и заполняем поля титула для редактирования или просмотра"""
     sender = fir_window.sender()  # от какой кнопки сигнал
-    if sender == my_win.toolBox:
-        titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-        name = titles.name
-        gamer = titles.gamer
-        full_name = titles.full_name
-    elif sender.text() != "Открыть":
+    full_name = ""
+    if sender == my_win.toolBox or sender.text() != "Открыть":
         titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         name = titles.name
         gamer = titles.gamer
         full_name = titles.full_name_comp
+    # elif sender.text() != "Открыть":
+    #     titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    #     name = titles.name
+    #     gamer = titles.gamer
+    #     full_name = titles.full_name_comp
     else:  # сигнал от кнопки с текстом -открыть-
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[39:]
         name = txt[:36]
-        # titles = Title.get(Title.name == name and Title.gamer == gamer)
         titles = Title.get(Title.full_name_comp == full_name)
     with db:
         my_win.lineEdit_title_nazvanie.setText(titles.name)
@@ -714,12 +714,12 @@ def load_tableWidget():
                         "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
     elif my_win.tabWidget.currentIndex() == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
         z = 19
-        column_label = ["№", "id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
+        column_label = ["№", "Id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
-    elif sender == my_win.checkBox_6.checkState() == True:
+    elif sender == my_win.checkBox_6.checkState() is True:
         z = 10
-        column_label = ["№", "id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
+        column_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
         z = 11  # кол-во столбцов должно быть равно (fill_table -column_count-)
@@ -740,7 +740,7 @@ def load_tableWidget():
         fill_table_R_list()
     elif sender == my_win.r1Action:  # нажат пункт меню -рейтинг за январь- и загружает таблицу с рейтингом
         fill_table_R1_list()
-    elif my_win.checkBox_6.checkState() == True:  # нажат пункт  -просмотр удаленных игроков-
+    elif my_win.checkBox_6.checkState() is True:  # нажат пункт  -просмотр удаленных игроков-
         del_player_table()
     elif my_win.tabWidget.currentIndex() == 3 or my_win.tabWidget.currentIndex() == 5:  # таблица результатов
         flag = ready_choice()
@@ -751,11 +751,13 @@ def load_tableWidget():
             pass
         else:
             fill_table_choice()
+            hide_show_columns(tb)
     else:  # загружает таблицу со списком
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())
         count = len(player_list)
         if count != 0:
             fill_table(player_list)
+            hide_show_columns(tb)
 
 
 def title_string():
@@ -1022,7 +1024,6 @@ def fill_table_choice():
             for column in range(column_count):
                 item = str(list(choice_list[row].values())[column])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-        hide_show_columns()  # скрывает или показывает столбцы
         my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
             my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
@@ -1452,10 +1453,6 @@ def button_system_made_enable(state):
 
 def list_player_pdf():
     """создание списка участников в pdf файл"""
-    # name_comp = my_win.lineEdit_title_nazvanie.text()  # получение название соревнований
-    # title = Title.get(Title.name == name_comp)  # номер строки соревнования в Title
-    # title_id = title_id()
-
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
     player_list = Player.select().where(Player.title_id == title_id())
@@ -2240,94 +2237,196 @@ def delete_player():
 def focus():
     """переводит фокус на следующую позицию
     sum_total_game список (1-й колво очков которые надо набрать, 2-й сколько уже набрали)"""
-
+    msgBox = QMessageBox
     sender = my_win.sender()  # в зависимости от сигала кнопки идет сортировка
-    #=============
     system = System.select().where(System.title_id == title_id())
-    #=============
     tab = my_win.tabWidget.currentIndex()
     if tab == 3:
         sys = system.select().where(System.stage == "Предварительный").get()
         sf = sys.score_flag  # флаг из скольки партий играется матч
         if sender == my_win.lineEdit_pl1_s1:
-            my_win.lineEdit_pl2_s1.setFocus()
+            if my_win.lineEdit_pl1_s1.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl1_s1.setFocus()
+            else:
+                 my_win.lineEdit_pl2_s1.setFocus()
         elif sender == my_win.lineEdit_pl2_s1:
-            sum_total_game = score_in_game()  # подсчет очков в партии
-            my_win.lineEdit_pl1_s2.setFocus()
+            if my_win.lineEdit_pl2_s1.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s1.setFocus()
+            else:
+                sum_total_game = score_in_game()  # подсчет очков в партии
+                my_win.lineEdit_pl1_s2.setFocus()
         elif sender == my_win.lineEdit_pl1_s2:
-            my_win.lineEdit_pl2_s2.setFocus()
+            if my_win.lineEdit_pl1_s2.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl1_s2.setFocus()
+            else:
+                my_win.lineEdit_pl2_s2.setFocus()
         elif sender == my_win.lineEdit_pl2_s2:  # нажал ентер на счете 2-ого игрока 2-й партии
-            sum_total_game = score_in_game()
-            if sum_total_game[0] != sum_total_game[1]:
+            if my_win.lineEdit_pl2_s2.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s2.setFocus()
+            else:
+                sum_total_game = score_in_game()
+                if sum_total_game[0] != sum_total_game[1]:
+                    my_win.lineEdit_pl1_s3.setFocus()
+                else:
+                    my_win.Button_Ok.setFocus()
+        elif sender == my_win.lineEdit_pl1_s3:
+            if my_win.lineEdit_pl1_s3.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl1_s3.setFocus()
             else:
-                my_win.Button_Ok.setFocus()
-        elif sender == my_win.lineEdit_pl1_s3:
-            my_win.lineEdit_pl2_s3.setFocus()
+                my_win.lineEdit_pl2_s3.setFocus()
         elif sender == my_win.lineEdit_pl2_s3:  # нажал ентер на счете 2-ого игрока 3-й партии
-            sum_total_game = score_in_game()
-            if sum_total_game[0] != sum_total_game[1]:
+            if my_win.lineEdit_pl2_s3.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s3.setFocus()
+            else:
+                sum_total_game = score_in_game()
+                if sum_total_game[0] != sum_total_game[1]:
+                    my_win.lineEdit_pl1_s4.setFocus()
+                else:
+                    my_win.Button_Ok.setFocus()
+        elif sender == my_win.lineEdit_pl1_s4:
+            if my_win.lineEdit_pl1_s4.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl1_s4.setFocus()
             else:
-                my_win.Button_Ok.setFocus()
-        elif sender == my_win.lineEdit_pl1_s4:
-            my_win.lineEdit_pl2_s4.setFocus()
+                my_win.lineEdit_pl2_s4.setFocus()
         elif sender == my_win.lineEdit_pl2_s4:  # нажал ентер на счете 2-ого игрока 4-й партии
-            sum_total_game = score_in_game()
-            if sum_total_game[0] != sum_total_game[1]:
+            if my_win.lineEdit_pl2_s4.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s4.setFocus()
+            else:
+                sum_total_game = score_in_game()
+                if sum_total_game[0] != sum_total_game[1]:
+                    my_win.lineEdit_pl1_s5.setFocus()
+                else:
+                    my_win.Button_Ok.setFocus()
+        elif sender == my_win.lineEdit_pl1_s5:
+            if my_win.lineEdit_pl1_s5.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl1_s5.setFocus()
             else:
-                my_win.Button_Ok.setFocus()
-        elif sender == my_win.lineEdit_pl1_s5:
-            my_win.lineEdit_pl2_s5.setFocus()
+                my_win.lineEdit_pl2_s5.setFocus()
         elif sender == my_win.lineEdit_pl2_s5:  # нажал ентер на счете 2-ого игрока 5-й партии
-            sum_total_game = score_in_game()
-            if sum_total_game[0] != sum_total_game[1]:
-                my_win.Button_Ok.setFocus()
+            if my_win.lineEdit_pl2_s5.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s5.setFocus()
             else:
-                my_win.Button_Ok.setFocus()
+                sum_total_game = score_in_game()
+                if sum_total_game[0] != sum_total_game[1]:
+                    my_win.Button_Ok.setFocus()
+                else:
+                    my_win.Button_Ok.setFocus()
     elif tab == 5:
         r = my_win.tableWidget.currentRow()
         final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
         sys = system.select().where(System.stage == final).get()
         sf = sys.score_flag  # флаг из скольки партий играется матч
-        if sender == my_win.lineEdit_pl1_s1_fin:
-            my_win.lineEdit_pl2_s1_fin.setFocus()
-        elif sender == my_win.lineEdit_pl2_s1_fin:
-            sum_total_game = score_in_game()  # подсчет очков в партии
-            my_win.lineEdit_pl1_s2_fin.setFocus()
+        if sender == my_win.lineEdit_pl1_s1_fin:  # 1-й игрок 1-я партия
+            if my_win.lineEdit_pl1_s1_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl1_s1_fin.setFocus()
+            else:
+                my_win.lineEdit_pl2_s1_fin.setFocus()
+        elif sender == my_win.lineEdit_pl2_s1_fin:  # 2-й игрок 1-я партия
+            if my_win.lineEdit_pl2_s1_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s1_fin.setFocus()
+            else:
+                sum_total_game = score_in_game()  # подсчет очков в партии
+                my_win.lineEdit_pl1_s2_fin.setFocus()
         elif sender == my_win.lineEdit_pl1_s2_fin:  # нажал ентер на счете 2-ого игрока 2-й партии
-            my_win.lineEdit_pl2_s2_fin.setFocus()
+            if my_win.lineEdit_pl1_s2_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl1_s2_fin.setFocus()
+            else:
+                my_win.lineEdit_pl2_s2_fin.setFocus()
         elif sender == my_win.lineEdit_pl2_s2_fin:
-            sum_total_game = score_in_game()  # подсчет очков в партии
-            if sum_total_game[0] != sum_total_game[1]:
+            if my_win.lineEdit_pl2_s2_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s2_fin.setFocus()
+            else:
+                sum_total_game = score_in_game()  # подсчет очков в партии
+                # ====================
+                count = len(sum_total_game)
+                if count == 0:
+                    my_win.lineEdit_pl2_s2_fin.setFocus()
+                else:
+                # =====================
+                    if sum_total_game[0] != sum_total_game[1]:
+                        my_win.lineEdit_pl1_s3_fin.setFocus()  # переводит фокус на следующее поле
+                    else:
+                        my_win.Button_Ok_fin.setFocus()  # переводит фокус на кнопку -ОК-
+        elif sender == my_win.lineEdit_pl1_s3_fin:
+            if my_win.lineEdit_pl1_s3_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl1_s3_fin.setFocus()
             else:
-                my_win.Button_Ok_fin.setFocus()
-        elif sender == my_win.lineEdit_pl1_s3_fin:
-            my_win.lineEdit_pl2_s3_fin.setFocus()
+                my_win.lineEdit_pl2_s3_fin.setFocus()
         elif sender == my_win.lineEdit_pl2_s3_fin:  # нажал ентер на счете 2-ого игрока 3-й партии
-            sum_total_game = score_in_game()  # подсчет очков в партии
-            if sum_total_game[0] != sum_total_game[1]:
+            if my_win.lineEdit_pl2_s3_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")  # если забыл написать счет и нажал ентер
+                my_win.lineEdit_pl2_s3_fin.setFocus()
+            else:
+                sum_total_game = score_in_game()  # подсчет очков в партии
+                #====================
+                count = len(sum_total_game)
+                if count == 0:
+                    my_win.lineEdit_pl2_s3_fin.setFocus()
+                else:
+                #=====================
+                    if sum_total_game[0] != sum_total_game[1]:
+                        my_win.lineEdit_pl1_s4_fin.setFocus()
+                    else:
+                        my_win.Button_Ok_fin.setFocus()
+        elif sender == my_win.lineEdit_pl1_s4_fin:
+            if my_win.lineEdit_pl1_s4_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl1_s4_fin.setFocus()
             else:
-                my_win.Button_Ok_fin.setFocus()
-        elif sender == my_win.lineEdit_pl1_s4_fin:
-            my_win.lineEdit_pl2_s4_fin.setFocus()
+                my_win.lineEdit_pl2_s4_fin.setFocus()
         elif sender == my_win.lineEdit_pl2_s4_fin:  # нажал ентер на счете 2-ого игрока 4-й партии
-            sum_total_game = score_in_game()  # подсчет очков в партии
-            if sum_total_game[0] != sum_total_game[1]:
-                my_win.lineEdit_pl1_s5_fin.setFocus()
+            if my_win.lineEdit_pl2_s4_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s4_fin.setFocus()
             else:
-                my_win.Button_Ok_fin.setFocus()
+                sum_total_game = score_in_game()  # подсчет очков в партии
+                # ====================
+                count = len(sum_total_game)
+                if count == 0:
+                    my_win.lineEdit_pl2_s4_fin.setFocus()
+                else:
+                # =====================
+                    if sum_total_game[0] != sum_total_game[1]:
+                        my_win.lineEdit_pl1_s5_fin.setFocus()
+                    else:
+                        my_win.Button_Ok_fin.setFocus()
         elif sender == my_win.lineEdit_pl1_s5_fin:
-            my_win.lineEdit_pl2_s5_fin.setFocus()
-        elif sender == my_win.lineEdit_pl2_s5_fin:  # нажал ентер на счете 2-ого игрока 5-й партии
-            sum_total_game = score_in_game()  # подсчет очков в партии
-            if sum_total_game[0] != sum_total_game[1]:
+            if my_win.lineEdit_pl1_s5_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl1_s5_fin.setFocus()
             else:
-                my_win.Button_Ok_fin.setFocus()
+                my_win.lineEdit_pl2_s5_fin.setFocus()
+        elif sender == my_win.lineEdit_pl2_s5_fin:  # нажал ентер на счете 2-ого игрока 5-й партии
+            if my_win.lineEdit_pl2_s5_fin.text() == "":
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
+                my_win.lineEdit_pl2_s5_fin.setFocus()
+            else:
+                sum_total_game = score_in_game()  # подсчет очков в партии
+                # ====================
+                count = len(sum_total_game)
+                if count == 0:
+                    my_win.lineEdit_pl2_s5_fin.setFocus()
+                else:
+                # =====================
+                    if sum_total_game[0] != sum_total_game[1]:
+                        my_win.lineEdit_pl1_s5_fin.setFocus()
+                    else:
+                        my_win.Button_Ok_fin.setFocus()
 
 
 def score_in_game():
@@ -2431,7 +2530,8 @@ def score_in_game():
             sc1 = total_score[i]
             sc2 = total_score[i + 1]
             flag = control_score(sc1, sc2)
-            if flag == True:
+
+            if flag is True:
                 if int(sc1) > int(sc2):
                     point = 1
                     ts1.append(point)
@@ -2440,41 +2540,47 @@ def score_in_game():
                     ts2.append(point)
                 st1 = sum(ts1)
                 st2 = sum(ts2)
-            else:
-                return
-    if tab == 3:
-        my_win.lineEdit_pl1_score_total.setText(str(st1))
-        my_win.lineEdit_pl2_score_total.setText(str(st2))
-        if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
-            my_win.Button_Ok.setEnabled(True)  # если игрок набрал макс очки активиоует кнопку ОК и переводит на нее фокус
-            my_win.Button_Ok.setFocus()
-        total_game.append(st1)
-        total_game.append(st2)
-        max_score = max(total_game)  # находит максимальное число очков из сыгранных партий
-        sum_total_game.append(max_game)  # добавляет в список максимальное число очков которые надо набрать
-        sum_total_game.append(max_score)  # добавляет в список максимальное число очков которые уже набрал игрок
-    elif tab == 4:
-        pass
-    elif tab == 5:
-        my_win.lineEdit_pl1_score_total_fin.setText(str(st1))
-        my_win.lineEdit_pl2_score_total_fin.setText(str(st2))
-        if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
-            my_win.Button_Ok_fin.setEnabled(True)  # если игрок набрал макс очки активиоует кнопку ОК и переводит на нее фокус
-            my_win.Button_Ok_fin.setFocus()
-        total_game.append(st1)
-        total_game.append(st2)
-        max_score = max(total_game)  # находит максимальное число очков из сыгранных партий
-        sum_total_game.append(max_game)  # добавляет в список максимальное число очков которые надо набрать
-        sum_total_game.append(max_score)  # добавляет в список максимальное число очков которые уже набрал игрок
+                #==============
+                if tab == 3:
+                    my_win.lineEdit_pl1_score_total.setText(str(st1))
+                    my_win.lineEdit_pl2_score_total.setText(str(st2))
+                    if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
+                        my_win.Button_Ok.setEnabled(True)  # если игрок набрал макс очки активиоует кнопку ОК и переводит на нее фокус
+                        my_win.Button_Ok.setFocus()
+                    total_game.append(st1)
+                    total_game.append(st2)
+                    max_score = max(total_game)  # находит максимальное число очков из сыгранных партий
+                    sum_total_game.append(max_game)  # добавляет в список максимальное число очков которые надо набрать
+                    sum_total_game.append(max_score)  # добавляет в список максимальное число очков которые уже набрал игрок
+                elif tab == 4:
+                    pass
+                elif tab == 5:
+                    my_win.lineEdit_pl1_score_total_fin.setText(str(st1))
+                    my_win.lineEdit_pl2_score_total_fin.setText(str(st2))
+                    if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
+                        my_win.Button_Ok_fin.setEnabled(True)  # если игрок набрал макс очки активирует кнопку ОК и переводит на нее фокус
+                        my_win.Button_Ok_fin.setFocus()
+                    total_game.append(st1)
+                    total_game.append(st2)
+                    max_score = max(total_game)  # находит максимальное число очков из сыгранных партий
+                    if i == 0:
+                        sum_total_game.append(max_game)  # добавляет в список максимальное число очков которые надо набрать
+                        sum_total_game.append(max_score)  # добавляет в список максимальное число очков которые уже набрал игрок
+                    else:
+                        sum_total_game[0] = max_game
+                        sum_total_game[1] = max_score
+                 #===============
+            elif flag is False:
+                # желательно сюда ввести чтобы фокус ставился на туже ячейку
+                sum_total_game = []
+
     return sum_total_game
 
 
 def control_score(sc1, sc2):
     """проверка на правильность ввода счета"""
     msgBox = QMessageBox
-    if sc1 == '' or sc2 == '':
-        msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-        return
+
     sc1 = int(sc1)
     sc2 = int(sc2)
     if sc1 > 35 or sc2 > 35:
@@ -2513,6 +2619,8 @@ def control_score(sc1, sc2):
     if flag == False:
         result = msgBox.information(my_win, "", "Проверьте правильность ввода\n счета в партии!",
                                     msgBox.StandardButtons.Ok)
+        flag = False
+        return flag
     elif flag == True:
         return flag
 
@@ -2650,7 +2758,6 @@ def enter_score(none_player=0):
         my_win.lineEdit_player1.clear()  # очищает поля фамилии игроков
         my_win.lineEdit_player2.clear()
         fin = my_win.tableWidget.item(r, 1).text()
-        # etap = my_win.tableWidget.item(r, 1).text()
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
     elif tab == 4:
@@ -2670,7 +2777,6 @@ def enter_score(none_player=0):
         my_win.lineEdit_pl2_score_total_fin.clear()
         my_win.lineEdit_player1_fin.clear()  # очищает поля фамилии игроков
         my_win.lineEdit_player2_fin.clear()
-        # etap = my_win.tableWidget.item(r, 2).text()
     # ===== вызов функции заполнения таблицы pdf группы сыгранными играми
     system = System.select().order_by(System.id).where(System.title_id == title_id() and System.stage == fin).get()  # находит
 
@@ -2807,7 +2913,7 @@ def string_score_game():
 
 
 def result_filter_name():
-    """отсортировает встречи с участие игрока"""
+    """отсортировывает встречи с участием игрока"""
     cp = my_win.comboBox_find_name.currentText()
     cp = cp.title()  # Переводит первую букву в заглавную
     c = Result.select()
@@ -2817,7 +2923,7 @@ def result_filter_name():
     column_count = 13  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
 
-    for row in range(row_count):  # добвляет данные из базы в TableWidget
+    for row in range(row_count):  # добавляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
@@ -3064,7 +3170,7 @@ def choice_gr_automat():
 
 
 def choice_setka(fin):
-    """проба жеребъевки сетки на 16"""
+    """проба жеребьевки сетки на 16"""
     sys = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
     system = sys.get(System.stage == fin)
     flag = system.choice_flag
@@ -3155,11 +3261,15 @@ def color_region_in_tableWidget(fg):
                             # черный цвет
 
 
-def hide_show_columns():
+def hide_show_columns(tb):
     """скрывает или показывает столбцы TableWidget"""
-    my_win.tableWidget.hideColumn(1)
+    if tb == 2:
+        my_win.tableWidget.hideColumn(1)
+        my_win.tableWidget.showColumn(9)
+    elif tb == 1:
+        my_win.tableWidget.showColumn(1)
+        my_win.tableWidget.hideColumn(9)
     my_win.tableWidget.hideColumn(6)
-    # my_win.tableWidget.hideColumn(9)
     my_win.tableWidget.hideColumn(10)
     my_win.tableWidget.hideColumn(11)
     my_win.tableWidget.hideColumn(12)

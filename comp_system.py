@@ -516,8 +516,10 @@ def setka_16_made(fin):
         match = dict_setka[i]
         pl_win = match[1]
         pl_los = match[4]
-        id_win = id_sh_name[f"{pl_win}"]
-        id_los = id_sh_name[f"{pl_los}"]
+        if pl_win != "bye":
+            id_win = id_sh_name[f"{pl_win}"]
+        if pl_los != "bye":
+            id_los = id_sh_name[f"{pl_los}"]
         i = str(i)
         r = str(match[3])
         row_rank = match[3]

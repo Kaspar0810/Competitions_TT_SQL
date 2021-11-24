@@ -64,12 +64,18 @@ def setka_data_16(fin):
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
-        id_f_name = full_player_id(family)
-        id_f_n = id_f_name[0]
-        id_s_n = id_f_name[1]
-        id_ful_name[id_f_n["name"]] = id_f_n["id"]  # словарь ключ - полное имя/ город, значение - id
-        id_name[id_s_n["name"]] = id_s_n["id"]
+        # id_f_name = full_player_id(family)
+        # id_f_n = id_f_name[0]
+        # id_s_n = id_f_name[1]
+        # id_ful_name[id_f_n["name"]] = id_f_n["id"]  # словарь ключ - полное имя/ город, значение - id
+        # id_name[id_s_n["name"]] = id_s_n["id"]
         if family != "bye":
+            id_f_name = full_player_id(family)
+            id_f_n = id_f_name[0]
+            id_s_n = id_f_name[1]
+            id_ful_name[id_f_n["name"]] = id_f_n["id"]  # словарь ключ - полное имя/ город, значение - id
+            id_name[id_s_n["name"]] = id_s_n["id"]
+            #=================
             space = family.find(" ")  # находит пробел отделяющий имя от фамилии
             line = family.find("/")  # находит черту отделяющий имя от города
             city_slice = family[line:]  # получает отдельно город
