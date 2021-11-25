@@ -578,6 +578,7 @@ my_win.dateEdit_end.setDate(date.today())
 
 def tab_enabled(gamer):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
+    sender = my_win.sender()
     count_title = len(Title.select())
     if gamer == "":
         gamer = my_win.lineEdit_title_gamer.text()
@@ -630,30 +631,27 @@ def db_insert_title(title_str):
     fn = title_str[11]
     t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     nazv = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
-                 kat_ref=kr, secretary=sk, kat_sek=ks, gamer=gm, full_name=fn).save()
+                 kat_ref=kr, secretary=sk, kat_sek=ks, gamer=gm, full_name_comp=fn).save()
 
 
 def db_select_title():
     """извлекаем из таблицы данные и заполняем поля титула для редактирования или просмотра"""
     sender = fir_window.sender()  # от какой кнопки сигнал
-    full_name = ""
     if sender == my_win.toolBox or sender.text() != "Открыть":
         titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         name = titles.name
         gamer = titles.gamer
         full_name = titles.full_name_comp
-    # elif sender.text() != "Открыть":
-    #     titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    #     name = titles.name
-    #     gamer = titles.gamer
-    #     full_name = titles.full_name_comp
     else:  # сигнал от кнопки с текстом -открыть-
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[39:]
-        name = txt[:36]
+        name = txt[:37]
+        sroki= fir_window.label_4.text()
+        data = sroki[9:19]
+        full_name = f"{name}.{data}.{gamer}"
         titles = Title.get(Title.full_name_comp == full_name)
-    with db:
+
         my_win.lineEdit_title_nazvanie.setText(titles.name)
         my_win.lineEdit_title_vozrast.setText(titles.vozrast)
         my_win.dateEdit_start.setDate(titles.data_start)
@@ -764,7 +762,7 @@ def title_string():
     """ переменные строк титульного листа """
     title_str = []
     title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    # gm = title.gamer
+
     nm = my_win.lineEdit_title_nazvanie.text()
     sr = my_win.comboBox_sredi.currentText()
     vz = my_win.lineEdit_title_vozrast.text()
@@ -776,7 +774,7 @@ def title_string():
     kr = my_win.comboBox_kategor_ref.currentText()
     ks = my_win.comboBox_kategor_sek.currentText()
     gm = title.gamer
-    fn = f"{nm}. {ds}. {gm}"
+    fn = f"{nm}.{ds}.{gm}"
 
     title_str.append(nm)
     title_str.append(sr)
@@ -3574,12 +3572,16 @@ def backup():
 def title_id():
     """возвращает title id в зависимости от соревнования"""
     name = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
-    data = my_win.dateEdit_start.text()
-    gamer = my_win.lineEdit_title_gamer.text()
-    t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
-    count = len(t)
-    title = t.select().where(Title.gamer == gamer).get()
-    title_id = title.id  # получает его id
+    if name != "":
+        data = my_win.dateEdit_start.text()
+        gamer = my_win.lineEdit_title_gamer.text()
+        t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
+        count = len(t)
+        title = t.select().where(Title.gamer == gamer).get()
+        title_id = title.id  # получает его id
+    else:
+        t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        title_id = t_id
     return title_id
 
 
