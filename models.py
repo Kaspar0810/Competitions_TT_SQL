@@ -210,7 +210,6 @@ class Choice(BaseModel):
 
 
 class Delete_player(BaseModel):
-    player_del = ForeignKeyField(Player)
     player = CharField()
     bday = DateField()
     rank = IntegerField()
@@ -218,6 +217,9 @@ class Delete_player(BaseModel):
     region = CharField()
     razryad = CharField(10)
     coach_id = ForeignKeyField(Coach)
+    full_name = CharField()
+    player_del = ForeignKeyField(Player)
+    title_id = ForeignKeyField(Title)
 
     class Meta:
         db_table = "delete_players"

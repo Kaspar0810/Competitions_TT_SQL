@@ -652,16 +652,17 @@ def db_select_title():
         full_name = f"{name}.{data}.{gamer}"
         titles = Title.get(Title.full_name_comp == full_name)
 
-        my_win.lineEdit_title_nazvanie.setText(titles.name)
-        my_win.lineEdit_title_vozrast.setText(titles.vozrast)
-        my_win.dateEdit_start.setDate(titles.data_start)
-        my_win.dateEdit_end.setDate(titles.data_end)
-        my_win.lineEdit_city_title.setText(titles.mesto)
-        my_win.lineEdit_refery.setText(titles.referee)
-        my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
-        my_win.lineEdit_sekretar.setText(titles.secretary)
-        my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
-        my_win.lineEdit_title_gamer.setText(titles.gamer)
+    my_win.lineEdit_title_nazvanie.setText(titles.name)
+    my_win.lineEdit_title_vozrast.setText(titles.vozrast)
+    my_win.dateEdit_start.setDate(titles.data_start)
+    my_win.dateEdit_end.setDate(titles.data_end)
+    my_win.lineEdit_city_title.setText(titles.mesto)
+    my_win.lineEdit_refery.setText(titles.referee)
+    my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
+    my_win.lineEdit_sekretar.setText(titles.secretary)
+    my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
+    my_win.lineEdit_title_gamer.setText(titles.gamer)
+    tab_enabled(gamer)
     return gamer
 
 
@@ -863,12 +864,19 @@ def title_update():
 
 def find_in_rlist():
     """при создании списка участников ищет спортсмена в текущем R-листе"""
+    t_id = Title.get(Title.id == title_id())
+    gamer = t_id.gamer
+    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+        r_list = R_list_d
+    else:
+        r_list = R_list_m
+
     my_win.listWidget.clear()
     my_win.textEdit.clear()
     fp = my_win.lineEdit_Family_name.text()
     fp = fp.capitalize()  # Переводит первую букву в заглавную
-    p = R_list_m.select()
-    p = p.where(R_list_m.r_fname ** f'{fp}%')  # like
+    p = r_list.select()
+    p = p.where(r_list.r_fname ** f'{fp}%')  # like
     if (len(p)) == 0:
         my_win.textEdit.setText("Нет спортсменов в рейтинг листе")
     else:
@@ -880,6 +888,9 @@ def find_in_rlist():
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
     player_selected = player_list.dicts().execute()
+
+    for p in player_list:
+        player = p.player
 
     row_count = len(player_selected)  # кол-во строк в таблице
     if row_count != 0:  # список удаленных игроков пуст
@@ -1062,11 +1073,11 @@ def add_player():
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
         with db:
-            player = Delete_player.get(Delete_player.player == my_win.tableWidget.item(row, 2).text())
-            pl_id = player.player_id
-            player.delete_instance()
+            player_del = Delete_player.get(Delete_player.player == my_win.tableWidget.item(row, 1).text())
+            pl_id = player_del.player_del_id
+            player_del.delete_instance()
             plr = Player(player_id=pl_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-                         razryad=rz, coach_id=idc, mesto=ms, title_id=title_id).save()
+                         razryad=rz, coach_id=idc, full_name = fn, mesto=ms, title_id=title_id()).save()
         element = str(rn)
         rn = ('    ' + element)[-4:]  # make all elements the same length
         spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
@@ -2100,14 +2111,24 @@ def game_in_visible(state_check, match=5, final="1-й финал"):
 def select_player_in_list():
     """выводит данные игрока в поля редактирования или удаления"""
     r = my_win.tableWidget.currentRow()
-    family = my_win.tableWidget.item(r, 2).text()
-    birthday = my_win.tableWidget.item(r, 3).text()
-    rank = my_win.tableWidget.item(r, 4).text()
-    city = my_win.tableWidget.item(r, 5).text()
-    region = my_win.tableWidget.item(r, 6).text()
+    # family = my_win.tableWidget.item(r, 2).text()
+    # birthday = my_win.tableWidget.item(r, 3).text()
+    # rank = my_win.tableWidget.item(r, 4).text()
+    # city = my_win.tableWidget.item(r, 5).text()
+    # region = my_win.tableWidget.item(r, 6).text()
+    # rn = len(region)
+    # razrayd = my_win.tableWidget.item(r, 7).text()
+    # coach = my_win.tableWidget.item(r, 8).text()
+#========================
+    family = my_win.tableWidget.item(r, 1).text()
+    birthday = my_win.tableWidget.item(r, 2).text()
+    rank = my_win.tableWidget.item(r, 3).text()
+    city = my_win.tableWidget.item(r, 4).text()
+    region = my_win.tableWidget.item(r, 5).text()
     rn = len(region)
-    razrayd = my_win.tableWidget.item(r, 7).text()
-    coach = my_win.tableWidget.item(r, 8).text()
+    razrayd = my_win.tableWidget.item(r, 6).text()
+    coach = my_win.tableWidget.item(r, 7).text()
+#================================
     my_win.lineEdit_Family_name.setText(family)
     my_win.lineEdit_bday.setText(birthday)
     my_win.lineEdit_R.setText(rank)
@@ -2199,25 +2220,30 @@ def select_player_in_game():
 def delete_player():
     """удаляет игрока из списка и заносит его в архив"""
     msgBox = QMessageBox
-
+    t_id = title_id()
     r = my_win.tableWidget.currentRow()
-    player_del = my_win.tableWidget.item(r, 2).text()
+#=================
+    player_del = my_win.tableWidget.item(r, 1).text()
     player_id = Player.get(Player.player == player_del)
-    birthday = my_win.tableWidget.item(r, 3).text()
-    rank = my_win.tableWidget.item(r, 4).text()
-    player_city_del = my_win.tableWidget.item(r, 5).text()
-    region = my_win.tableWidget.item(r, 6).text()
-    razryad = my_win.tableWidget.item(r, 7).text()
-    coach = my_win.tableWidget.item(r, 8).text()
+    birthday = my_win.tableWidget.item(r, 2).text()
+    rank = my_win.tableWidget.item(r, 3).text()
+    player_city_del = my_win.tableWidget.item(r, 4).text()
+    region = my_win.tableWidget.item(r, 5).text()
+    razryad = my_win.tableWidget.item(r, 6).text()
+    coach = my_win.tableWidget.item(r, 7).text()
+    full_name = f"{player_del}/ {player_city_del}"
+#=================
     coach_id = Coach.get(Coach.coach == coach)
     result = msgBox.question(my_win, "", f"Вы действительно хотите удалить\n"
                                          f" {player_del} город {player_city_del}?",
                              msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
     if result == msgBox.StandardButtons.Ok:
         with db:
-            del_player = Delete_player(player_id=player_id, player=player_del, bday=birthday, rank=rank, city=player_city_del,
-                                       region=region, razryad=razryad, coach_id=coach_id).save()
-            player = Player.get(Player.player == my_win.tableWidget.item(r, 2).text())
+            del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
+                                       region=region, razryad=razryad, coach_id=coach_id, full_name =full_name,
+                                       player=player_del, title_id=t_id).save()
+
+            player = Player.get(Player.player == my_win.tableWidget.item(r, 1).text())
             player.delete_instance()
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
@@ -3435,12 +3461,11 @@ def select_choice_final():
 #     """добавление столбца в существующую таблицу"""
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
-#     full_name = CharField(default='')  # новый столбец, его поле и значение по умолчанию
+#     title_id = ForeignKeyField(Title, unique=True, default=u)  # новый столбец, его поле и значение по умолчанию
 #     with db:
-#         migrate(migrator.add_column('players', 'full_name', full_name))
+#         migrate(migrator.add_column('delete_players', 'title_id', title_id))
 #====================================
     # id_full_name = {}
-    # t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
     # player = Player.select().where(Player.title_id == t)
     # for pl in player:
     #     player_id = pl.id
@@ -3458,6 +3483,7 @@ def select_choice_final():
     # t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
     # with db:
     #     Delete_player.create_table()
+    #========================
         # System.create_table()
         # sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
         #              kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
@@ -3481,7 +3507,7 @@ def del_player_table():
             else:
                 my_win.Button_add_edit_player.setEnabled(False)
     else:
-        player_list = Player.select()
+        player_list = Player.select().where(Player.title_id == title_id())
         fill_table(player_list)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.Button_add_edit_player.setEnabled(True)
@@ -3714,6 +3740,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в б�
 my_win.Button_del_player.clicked.connect(delete_player)
 
 # my_win.Button_proba.clicked.connect(proba)
+
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)

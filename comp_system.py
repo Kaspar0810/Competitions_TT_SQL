@@ -797,8 +797,11 @@ def mesto_in_final(fin):
     final = []
     mesto = {}
     tmp = []
-    title = Title.select().order_by(Title.id.desc()).get()
-    system = System.select().order_by(System.id).where(System.title_id == title)  # находит system id последнего
+    # title = Title.select().order_by(Title.id.desc()).get()
+    # system = System.select().order_by(System.id).where(System.title_id == title)  # находит system id последнего
+
+    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
+
     first = 1
     k = 0
     for sys in system:
@@ -817,3 +820,20 @@ def mesto_in_final(fin):
             mesto[f] = final[k - 1][1]
     first_mesto = mesto[fin]
     return first_mesto
+
+
+
+def title_id():
+    """возвращает title id в зависимости от соревнования"""
+    name = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+    if name != "":
+        data = my_win.dateEdit_start.text()
+        gamer = my_win.lineEdit_title_gamer.text()
+        t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
+        count = len(t)
+        title = t.select().where(Title.gamer == gamer).get()
+        title_id = title.id  # получает его id
+    else:
+        t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        title_id = t_id
+    return title_id
