@@ -118,18 +118,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def _createMenuBar(self):
         menuBar = self.menuBar()
         menuBar.setNativeMenuBar(False)  # разрешает показ менюбара
+
         # меню Соревнования
         fileMenu = QMenu("Соревнования", self)  # основное
         menuBar.addMenu(fileMenu)
 
-        fileMenu.addAction(self.newAction)
-        fileMenu.addAction(self.systemAction)
+        go_to = fileMenu.addMenu("Перейти к")  # подменю с выбором (addMenu добавляет к пункту возможность выбора)
+        fileMenu.addSeparator()  # вставляет разделительную черту
+        fileMenu.addAction(self.systemAction)  # подменю без выбора (addAction создает сразу действие)
         choice = fileMenu.addMenu("Жеребьевка")
         saveList = fileMenu.addMenu("Сохранить")
+        fileMenu.addSeparator()
         fileMenu.addAction(self.exitAction)
         # меню Редактировать
         editMenu = menuBar.addMenu("Редактировать")  # основное
         #  создание подменю
+        go_to.addAction(self.go_to_Action)  # подменю выбора соревнования
         choice.addAction(self.choice_gr_Action)  # подменю группы
         choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
         choice.addAction(self.choice_fin_Action)  # подменю финалы
@@ -155,9 +159,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         help_Menu = menuBar.addMenu("Помощь")  # основное
     #  создание действий меню
     def _createAction(self):
-        self.newAction = QAction(self)
         self.helpAction = QAction(self)
-        self.newAction.setText("Создать новые")
         self.systemAction = QAction("Система соревнований")
         self.exitAction = QAction("Выход")
         self.rAction = QAction("Текущий рейтинг")
@@ -175,16 +177,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_gr_Action = QAction("Группы")
         self.view_pf_Action = QAction("Полуфиналы")
         self.view_final_Action = QAction("Финалы")
+        self.go_to_Action = QAction("пусто")
 
     def _connectActions(self):
         # Connect File actions
-        self.newAction.triggered.connect(self.newFile)
+        # self.newAction.triggered.connect(self.newFile)
         self.systemAction.triggered.connect(self.system_made)
         self.system_edit_Action.triggered.connect(self.system_edit)
         self.exitAction.triggered.connect(self.exit)
         self.savelist_Action.triggered.connect(self.saveList)
         self.choice_gr_Action.triggered.connect(self.choice)
         self.choice_fin_Action.triggered.connect(self.choice)
+
+        self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
@@ -194,7 +199,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def newFile(self):
         # Logic for creating a new file goes here...
         my_win.textEdit.setText("Нажата кнопка меню соревнования")
-        dbase()
+        gamer = db_select_title()
 
     def r_File(self):
         # Logic for creating a new file goes here...
@@ -239,8 +244,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         choice_gr_automat()
 
         elif sender == self.choice_fin_Action:  # нажат подменю жеребъевка финалов
-            # t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-            # system = System.select().order_by(System.id).where(System.title_id == t)  # находит system id последнего
             fin = select_choice_final()
             system = System.get(System.stage == fin)
             if system.choice_flag == True:  # проверка флаг на жеребъевку финала
@@ -267,33 +270,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def help(self):
         pass
 
+    def open(self):
+        go_to()
+        # db_select_title()
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
-
-
-# class PbWidget(QtWidgets.QProgressBar):
-#     def __init__(self, parent=None, total=0):
-#         super(PbWidget, self).__init__()
-#         self.setMinimum(1)
-#         self.setMaximum(total)
-#         self._active = False
-#
-#     def update_bar(self, to_add_number):
-#         while True:
-#             time.sleep(0.01)
-#             value = self.value() + to_add_number
-#             self.setValue(value)
-#             QtGui.qApp.processEvents()
-#             if (not self._active or value >= self.maximum()):
-#                 break
-#         self._active = False
-#
-#     def closeEvent(self, event):
-#         self._active = False
-
-
 
 
 class StartWindow(QMainWindow, Ui_Form):
@@ -395,8 +378,6 @@ class StartWindow(QMainWindow, Ui_Form):
                     self.label_4.setText(f"сроки: с {data_start} по {data_finish}")
                 else:
                     return
-
-
 
 
 def dbase():
@@ -507,43 +488,6 @@ fir_window = StartWindow()  # Создаём объект класса ExampleAp
 fir_window.show()  # Показываем окно
 
 
-# def tab_enabled():
-#     """Включает вкладки в зависимости от создании системы и жеребъевки"""
-#     count_title = len(Title.select())
-#     if count_title != 0:
-#         # name_comp = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
-#         # t = Title.get(Title.name == name_comp)  # получает эту строку в db
-#         # title_id = t.id  # получает его id
-#         t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-#         sid_first = System.select().where(System.title_id == t)  # находит system id первого
-#         count = len(sid_first)
-#         s_id = System.select().order_by(System.id).get()
-#         s = int(s_id.id)
-#         stage = []  #
-#         for i in range(s, count + 1):
-#             system = System.get(System.id == i)
-#             stage.append(system.stage)
-#
-#         if count > 0:
-#             my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-#             my_win.toolBox.setItemEnabled(2, True)
-#             for i in stage:
-#                 if i == "Одна таблица":
-#                     pass
-#                 elif i == "Предварительный":
-#                     my_win.tabWidget.setTabEnabled(3, True)
-#                 elif i == "Полуфиналы":
-#                     my_win.tabWidget.setTabEnabled(4, True)
-#                 elif i == "1-й финал":
-#                     my_win.tabWidget.setTabEnabled(5, True)
-#         else:
-#             my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-#             my_win.tabWidget.setTabEnabled(3, False)
-#             my_win.tabWidget.setTabEnabled(4, False)
-#             my_win.tabWidget.setTabEnabled(5, False)
-
-
-# tab_enabled()
 
 #  ==== наполнение комбобоксов ==========
 page_orient = ("альбомная", "книжная")
@@ -579,10 +523,22 @@ my_win.dateEdit_end.setDate(date.today())
 def tab_enabled(gamer):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
     sender = my_win.sender()
+    title = title_id()
     count_title = len(Title.select())
+        #============== вставляет в меня выбора название другого соревнования
+    t_id = Title.select().order_by(Title.id.desc())  # получает все Title, отсортированные Я-А
+    n = 6
+    for i in t_id:
+        t = i.id
+        old_comp = i.name
+        old_data = i.data_start
+        old_gamer = i.gamer
+        comp = f"{old_comp}.{old_data}.{old_gamer}"
+        if title != t:  # сравнивает id открытых соревнований и открываемых и меняет надпись в меню
+            my_win.go_to_Action.setText(comp)
     if gamer == "":
         gamer = my_win.lineEdit_title_gamer.text()
-    if count_title != 0:
+    if count_title != 0:  # когда создаются новые соревноания
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
         system = System.select().where(System.title_id == title_id())  # находит system id первого
         count = len(system)
@@ -590,29 +546,38 @@ def tab_enabled(gamer):
         for i in system:
             st = i.stage
             stage.append(st)
-        if count > 0:
-            my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-            my_win.toolBox.setItemEnabled(2, True)
-            for i in stage:
-                if i == "Одна таблица":
-                    pass
-                elif i == "Предварительный":
-                    system = System.get(System.id == title_id() and System.stage == i)
-                    flag = system.choice_flag
-                    if flag is True:
-                        my_win.tabWidget.setTabEnabled(3, True)
-                elif i == "Полуфиналы":
-                    my_win.tabWidget.setTabEnabled(4, True)
-                elif i == "1-й финал" or i == "финальный":
-                    system = System.get(System.id == title_id() and System.stage == i)
-                    flag = system.choice_flag
-                    if flag is True:
-                        my_win.tabWidget.setTabEnabled(5, True)
+        count_stage = len(stage)
+        if count_stage > 1:  # если система еще не создана, то выключает отдельные вкладки при переходе на другое сорев
+            if count > 0:
+                my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
+                my_win.toolBox.setItemEnabled(2, True)
+                for i in stage:
+                    if i == "Одна таблица":
+                        pass
+                    elif i == "Предварительный":
+                        system = System.get(System.id == title_id() and System.stage == i)
+                        flag = system.choice_flag
+                        if flag is True:
+                            my_win.tabWidget.setTabEnabled(3, True)
+                    elif i == "Полуфиналы":
+                        my_win.tabWidget.setTabEnabled(4, True)
+                    elif i == "1-й финал" or i == "финальный":
+                        system = System.get(System.id == title_id() and System.stage == i)
+                        flag = system.choice_flag
+                        if flag is True:
+                            my_win.tabWidget.setTabEnabled(5, True)
+                my_win.tabWidget.setCurrentIndex(0)
         else:
             my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
             my_win.tabWidget.setTabEnabled(3, False)
             my_win.tabWidget.setTabEnabled(4, False)
             my_win.tabWidget.setTabEnabled(5, False)
+            my_win.tabWidget.setCurrentIndex(0)
+    else:
+        my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
+        my_win.tabWidget.setTabEnabled(3, False)
+        my_win.tabWidget.setTabEnabled(4, False)
+        my_win.tabWidget.setTabEnabled(5, False)
 
 
 def db_insert_title(title_str):
@@ -634,15 +599,52 @@ def db_insert_title(title_str):
                  kat_ref=kr, secretary=sk, kat_sek=ks, gamer=gm, full_name_comp=fn).save()
 
 
+def go_to():
+    """переход на предыдущие соревнования и обратно при нажатии меню -перейти к-"""
+    full_name = my_win.go_to_Action.text()  # полное название к которым переходим
+    tit = Title.get(Title.id == title_id())
+    name = tit.name
+    data = tit.data_start
+    gamer_current = tit.gamer
+    full_name_current = f"{name}.{data}.{gamer_current}"  # полное название текущих соревнований
+    my_win.go_to_Action.setText(full_name_current)  # присваиваем новый текст соревнований в меню -перейти к-
+    titles = Title.get(Title.full_name_comp == full_name)
+    gamer = titles.gamer
+    my_win.lineEdit_title_nazvanie.setText(titles.name)
+    my_win.lineEdit_title_vozrast.setText(titles.vozrast)
+    my_win.dateEdit_start.setDate(titles.data_start)
+    my_win.dateEdit_end.setDate(titles.data_end)
+    my_win.lineEdit_city_title.setText(titles.mesto)
+    my_win.lineEdit_refery.setText(titles.referee)
+    my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
+    my_win.lineEdit_sekretar.setText(titles.secretary)
+    my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
+    my_win.lineEdit_title_gamer.setText(titles.gamer)
+    tab_enabled(gamer)
+    my_win.tabWidget.setCurrentIndex(0)
+    player_list = Player.select().where(Player.title_id == title_id())
+    fill_table(player_list)  # заполняет TableWidget списком игроков
+
+
 def db_select_title():
     """извлекаем из таблицы данные и заполняем поля титула для редактирования или просмотра"""
     sender = fir_window.sender()  # от какой кнопки сигнал
-    if sender == my_win.toolBox or sender.text() != "Открыть":
-        titles = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+
+    if sender == my_win.go_to_Action:  # переход к соревнованиям из меню основного окна
+        full_name = my_win.go_to_Action.text()  # полное название к которым переходим
+        tit = Title.get(Title.id == title_id())
+        name = tit.name
+        data = tit.data_start
+        gamer_current = tit.gamer
+        full_name_current = f"{name}.{data}.{gamer_current}"  # полное название текущих соревнований
+        my_win.go_to_Action.setText(full_name_current)   # присваиваем новый текст соревнований в меню -перейти к-
+        titles = Title.get(Title.full_name_comp == full_name)
+        gamer = titles.gamer
+    elif sender == my_win.toolBox or sender.text() != "Открыть":
+        titles = Title.get(Title.id == title_id())
         name = titles.name
         gamer = titles.gamer
-        full_name = titles.full_name_comp
-    else:  # сигнал от кнопки с текстом -открыть-
+    else:  # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[39:]
@@ -1217,6 +1219,8 @@ def page():
     if tb == 0:
         db_select_title()
         my_win.tableWidget.show()
+        player_list = Player.select().where(Player.title_id == title_id())
+        fill_table(player_list)  # заполняет TableWidget списком игроков
     elif tb == 1:  # -список участников-
         region()
         load_tableWidget()
