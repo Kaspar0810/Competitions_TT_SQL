@@ -797,8 +797,6 @@ def mesto_in_final(fin):
     final = []
     mesto = {}
     tmp = []
-    # title = Title.select().order_by(Title.id.desc()).get()
-    # system = System.select().order_by(System.id).where(System.title_id == title)  # находит system id последнего
 
     system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
 
@@ -820,7 +818,6 @@ def mesto_in_final(fin):
             mesto[f] = final[k - 1][1]
     first_mesto = mesto[fin]
     return first_mesto
-
 
 
 def title_id():

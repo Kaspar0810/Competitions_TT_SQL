@@ -212,7 +212,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         load_tableWidget()
 
     def exit(self):
-        backup()
+        exit_comp()
 
     def saveList(self):
         my_win.tabWidget.setCurrentIndex(1)
@@ -290,6 +290,7 @@ class StartWindow(QMainWindow, Ui_Form):
         self.Button_old.clicked.connect(self.load_old)
         self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp)
+        self.Button_open.setEnabled(False)
 
         self.pb = QProgressBar()
         self.pb.setMinimum(0)
@@ -378,7 +379,8 @@ class StartWindow(QMainWindow, Ui_Form):
                     self.label_4.setText(f"сроки: с {data_start} по {data_finish}")
                 else:
                     return
-
+        if fir_window.comboBox.currentText() != "":
+            fir_window.Button_open.setEnabled(True)
 
 def dbase():
     """Создание DB и таблиц"""
@@ -718,8 +720,8 @@ def load_tableWidget():
         column_label = ["№", "Id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
-    elif sender == my_win.checkBox_6.checkState() is True:
-        z = 10
+    elif my_win.checkBox_6.isChecked():
+        z = 11
         column_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
@@ -890,15 +892,13 @@ def find_in_rlist():
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
     player_selected = player_list.dicts().execute()
-
-    for p in player_list:
-        player = p.player
-
+    # for p in player_list:
+    # for p in player_selected:
+    #     player = p.player
     row_count = len(player_selected)  # кол-во строк в таблице
     if row_count != 0:  # список удаленных игроков пуст
         column_count = len(player_selected[0])  # кол-во столбцов в таблице
         my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
-
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
                 if column == 7:  # преобразует id тренера в фамилию
@@ -909,7 +909,6 @@ def fill_table(player_list):
                     item = str(list(player_selected[row].values())[column])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
         my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
-
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
             my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
     else:
@@ -1064,8 +1063,6 @@ def add_player():
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
     num = count + 1
-    # space = pl.find(" ")  # находит пробел отделяющий имя от фамилии
-    # family_slice = pl[:space + 2]  # получает отдельно фамилия и первую букву имени
     fn = f"{pl}/ {ct}"
 
     add_coach(ch, num)
@@ -1080,13 +1077,11 @@ def add_player():
             player_del.delete_instance()
             plr = Player(player_id=pl_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name = fn, mesto=ms, title_id=title_id()).save()
-        element = str(rn)
-        rn = ('    ' + element)[-4:]  # make all elements the same length
         spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
         for i in range(0, 9):  # добавляет в tablewidget
             my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
         load_tableWidget()  # заново обновляет список
-        player_list = Player.select()  # выделяет все строки базы данных
+        player_list = Player.select().where(Player.title_id == title_id())  # выделяет все строки базы данных
         count = len(player_list)  # подсчитывает новое кол-во игроков
         my_win.label_46.setText(f"Всего: {count} участников")
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
@@ -1107,17 +1102,21 @@ def add_player():
         elif txt == "Добавить":
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
-                                coach_id=idc, full_name=fn, title_id=title_id() ).save()
-
+                                coach_id=idc, mesto="", full_name=fn, title_id=title_id() ).save()
+        spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
+        for i in range(0, 9):  # добавляет в tablewidget
+            my_win.tableWidget.setItem(count + 1, i, QTableWidgetItem(spisok[i]))
+        load_tableWidget()  # заново обновляет список
+        my_win.label_46.setText(f"Всего: {count + 1} участников")
+        player_list = Player.select().where(Player.title_id == title_id())
+        list_player_pdf(player_list)
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
         my_win.lineEdit_R.clear()
         my_win.lineEdit_city_list.clear()
         my_win.lineEdit_coach.clear()
-        my_win.label_46.setText(f"Всего: {count + 1} участников")
-        my_win.tableWidget.resizeColumnsToContents()
-        fill_table(player_list)
-        list_player_pdf()
+
+
 
 
 def dclick_in_listwidget():
@@ -1424,6 +1423,7 @@ def sort(self):
         player_list = Player.select().where(Player.title_id == title_id()).order_by(
             Player.mesto)  # сортировка по месту
     fill_table(player_list)
+    list_player_pdf(player_list)
 
 
 def button_etap_made_enabled(state):
@@ -1464,11 +1464,13 @@ def button_system_made_enable(state):
         my_win.Button_system_made.setEnabled(True)
 
 
-def list_player_pdf():
+def list_player_pdf(player_list):
     """создание списка участников в pdf файл"""
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
-    player_list = Player.select().where(Player.title_id == title_id())
+    tit = Title.get(Title.id == title_id())
+
+    gamer = tit.gamer
     count = len(player_list)  # количество записей в базе
     kp = count + 1
     my_win.tableWidget.setRowCount(count)
@@ -1507,7 +1509,7 @@ def list_player_pdf():
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
             firstLineIndent=-20)  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
-    story.append(Paragraph('Список участников', h3))
+    story.append(Paragraph(f'Список участников. {gamer}', h3))
     story.append(t)
 
     doc = SimpleDocTemplate("table_list.pdf", pagesize=A4)
@@ -1515,8 +1517,15 @@ def list_player_pdf():
 
 
 def exit_comp():
-    pass
-    print("хотите выйти")
+    """нажата кнопка -выход-"""
+    msgBox = QMessageBox
+    result = msgBox.question(my_win, "", "Вы действительно хотите выйти из программы?",
+                             msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
+    if result == msgBox.StandardButtons.Ok:
+        my_win.close()
+        backup()
+    else:
+        pass
 
 
 def system_competition():
@@ -2254,8 +2263,8 @@ def delete_player():
         my_win.lineEdit_R.clear()
         my_win.lineEdit_city_list.clear()
         my_win.lineEdit_coach.clear()
-        load_tableWidget()
-        player_list = Player.select()
+        # load_tableWidget()
+        player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
     else:
@@ -3496,13 +3505,14 @@ def select_choice_final():
 def del_player_table():
     """таблица удаленных игроков на данных соревнованиях"""
     if my_win.checkBox_6.isChecked():
-        my_win.tableWidget.hideColumn(9)
+        my_win.tableWidget.hideColumn(8)
         player_list = Delete_player.select()
         count = len(player_list)
         if count == 0:
             my_win.statusbar.showMessage("Удаленных участников соревнований нет", 10000)
             fill_table(player_list)
         else:
+            load_tableWidget()
             fill_table(player_list)
             my_win.statusbar.showMessage("Список удаленных участников соревнований", 10000)
             if my_win.lineEdit_Family_name.text() != "":
@@ -3513,6 +3523,7 @@ def del_player_table():
     else:
         player_list = Player.select().where(Player.title_id == title_id())
         fill_table(player_list)
+        my_win.tableWidget.showColumn(8)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.Button_add_edit_player.setEnabled(True)
         my_win.statusbar.showMessage("Список участников соревнований", 10000)
