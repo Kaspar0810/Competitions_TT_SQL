@@ -3506,7 +3506,7 @@ def del_player_table():
     """таблица удаленных игроков на данных соревнованиях"""
     if my_win.checkBox_6.isChecked():
         my_win.tableWidget.hideColumn(8)
-        player_list = Delete_player.select()
+        player_list = Delete_player.select().where(Delete_player.title_id == title_id())
         count = len(player_list)
         if count == 0:
             my_win.statusbar.showMessage("Удаленных участников соревнований нет", 10000)
