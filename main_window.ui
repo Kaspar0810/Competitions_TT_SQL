@@ -1158,6 +1158,35 @@
         <string>TextLabel</string>
        </property>
       </widget>
+      <widget class="QComboBox" name="comboBox_one_table">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>3</y>
+         <width>161</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_50">
+       <property name="geometry">
+        <rect>
+         <x>247</x>
+         <y>6</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QFrame" name="frame_2">
       <property name="geometry">
@@ -3094,8 +3123,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3271,8 +3300,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3420,8 +3449,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3433,8 +3462,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3446,8 +3475,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>219</width>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">

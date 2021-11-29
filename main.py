@@ -515,7 +515,7 @@ my_win.comboBox_filter_played.addItems(res)
 my_win.comboBox_filter_played_fin.addItems(res)
 my_win.comboBox_table.addItems(vid_setki)
 my_win.comboBox_table_2.addItems(vid_setki)
-
+my_win.comboBox_one_table.addItems(vid_setki)
 
 # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_start.setDate(date.today())
@@ -1117,8 +1117,6 @@ def add_player():
         my_win.lineEdit_coach.clear()
 
 
-
-
 def dclick_in_listwidget():
     """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""
     text = my_win.listWidget.currentItem().text()
@@ -1234,11 +1232,7 @@ def page():
         player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
-        # st = System.select().where(System.title_id == title_id(gamer))
         st_count = len(sf)
-        # s = System.select().order_by(System.id).where(System.title_id == ).get()  # находит system id последнего
-        # соревнования
-        # last_id = sf.id
         if st_count != 1:
             load_combobox_filter_group()
 
@@ -1258,6 +1252,7 @@ def page():
         my_win.label_32.hide()
         my_win.label_34.hide()
         my_win.label_35.hide()
+        my_win.label_50.hide()
         my_win.comboBox_etap_1.hide()
         my_win.comboBox_etap_2.hide()
         my_win.comboBox_etap_3.hide()
@@ -1265,6 +1260,7 @@ def page():
         my_win.comboBox_table_2.hide()
         my_win.spinBox_kol_group.hide()
         my_win.comboBox_table.hide()
+        my_win.comboBox_one_table.hide()
 
         flag = ready_system()
 
@@ -1534,7 +1530,7 @@ def system_competition():
     flag_system = ready_system()
     if sender == my_win.systemAction or sender == my_win.choice_gr_Action or sender == my_win.tabWidget \
             or sender == my_win.toolBox or sender == my_win.system_edit_Action:
-        # нажат меню -система- или -жеребъевка- или вкладка -система-
+        # нажат меню -система- или -жеребьевка- или вкладка -система-
         if sender == my_win.system_edit_Action:
             sb = "Изменение системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
@@ -1559,17 +1555,15 @@ def system_competition():
             my_win.label_32.hide()
             my_win.comboBox_table.hide()
             my_win.comboBox_table_2.hide()
-            choice_tbl_made()  # заполнение db списком для жеребъевки
+            choice_tbl_made()  # заполнение db списком для жеребьевки
             my_win.tabWidget.setCurrentIndex(2)
-            # else:
-            #     return
         elif flag_system is True:
             flag_choice = ready_choice()
             if flag_choice is True:
-                sb = "Система и жербъевка создана."
+                sb = "Система и жербьевка создана."
             elif flag_choice is False:
-                sb = "Система создана, теперь необходимо произвести жеребъевку. " \
-                     "Войдите в меню -соревнования- и выберите -жеребъевка-"
+                sb = "Система создана, теперь необходимо произвести жеребьевку. " \
+                     "Войдите в меню -соревнования- и выберите -жеребьевка-"
             my_win.statusbar.showMessage(sb)
         elif flag_system is False:
             sb = "Выбор системы проведения соревнования."
@@ -1588,7 +1582,7 @@ def system_competition():
             my_win.label_27.hide()
             my_win.label_28.hide()
             my_win.comboBox_table.hide()
-            player = Player.select()
+            player = Player.select().where(Player.title_id == title_id())
             count = len(player)
             if count != 0:
                 choice_tbl_made()  # заполнение db списком для жеребъевки
@@ -1618,6 +1612,7 @@ def system_competition():
     elif sender == my_win.comboBox_etap_1:
         ct = my_win.comboBox_etap_1.currentText()
         if ct == "Одна таблица":
+            my_win.comboBox_one_table.show()
             my_win.spinBox_kol_group.hide()
             my_win.label_11.hide()
         elif ct == "Предварительный":
@@ -1646,18 +1641,24 @@ def system_competition():
         my_win.comboBox_etap_3.setEnabled(False)
 
 
+def one_table():
+    """система соревнований из одной таблицы"""
+    pass
+
+
+
 def kol_player_in_group():
     """подсчет кол-во групп и человек в группах"""
     sender = my_win.sender()  # сигнал от кнопки
     gamer = my_win.lineEdit_title_gamer.text()
     kg = my_win.spinBox_kol_group.text()  # количество групп
     player_list = Player.select().where(Player.title_id == title_id())
-    count = len(player_list)  # колличество записей в базе
+    count = len(player_list)  # количество записей в базе
     e1 = int(count) % int(kg)  # остаток отделения, если 0, то участники равно делится на группы
     p = int(count) // int(kg)  # если количество участников равно делится на группы (кол-во групп)
     g1 = int(kg) - e1  # кол-во групп, где наименьшее кол-во спортсменов
     p2 = str(p + 1)  # кол-во человек в группе с наибольшим их количеством
-    if e1 == 0:  # то в группах равное количесто человек -e1-
+    if e1 == 0:  # то в группах равное количество человек -e1-
         stroka_kol_group = f"{kg} группы по {str(p)} чел."
         skg = int((p * (p - 1) / 2) * int(kg))
         mp = p
@@ -3321,6 +3322,8 @@ def hide_show_columns(tb):
 
 def etap_made():
     """создание этапов соревнований"""
+    if my_win.comboBox_one_table.currentText() == "Круговая система":
+        one_table()
     if my_win.comboBox_etap_1.currentText() == "Предварительный" and my_win.comboBox_etap_2.isHidden():
         kol_player_in_group()
     elif my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
@@ -3534,46 +3537,55 @@ def kol_player_in_final():
     sender = my_win.sender()
     pv = my_win.comboBox_page_vid.currentText()
     fin = ""
-    if sender is None:
-        return
-    elif sender == my_win.comboBox_table:
-        cur_index = my_win.comboBox_table.currentIndex()
-        ct = my_win.comboBox_etap_2.currentText()
-        if ct == "Полуфиналы":
-            my_win.label_23.setText("Полуфиналы")
-        elif ct == "Финальный":
-            my_win.label_23.setText("Финальный этап")
-            fin = "1-й финал"
-    elif sender == my_win.comboBox_table_2:
-        cur_index = my_win.comboBox_table_2.currentIndex()
-        ct = my_win.comboBox_etap_3.currentText()
-        if ct == "Финальный":
-            my_win.label_32.setText("Финальный этап")
-            fin = "2-й финал"
-    kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников,\nвыходящих "
-                                                              f"из группы в {fin}")
-    list = total_game_table(kpt, fin, pv, cur_index)  # возвращает из функции несколько значения в списке
-    if ok:
+    if sender == my_win.comboBox_one_table:
+        if my_win.comboBox_one_table.currentText() == "Круговая система":
+            player = Player.select().where(Player.title_id == title_id())
+            count = len(player)
+            kol_game = count // 2 * (count - 1)
+            my_win.label_50.show()
+            my_win.label_19.show()
+            my_win.label_19.setText(f"{kol_game} игр.")
+            my_win.label_50.setText(f"круговая таблица на {count} чел.")
+            my_win.comboBox_one_table.hide()
+    else:
         if sender == my_win.comboBox_table:
-            my_win.label_27.show()
-            my_win.label_27.setText(list[3])  # пишет кол-во игр 2-ого этапа
-            my_win.label_28.show()
-            my_win.label_28.setText(list[0])
-            if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-                my_win.statusbar.showMessage("Система создана.", 10000)
-            else:
-                my_win.comboBox_table.hide()
+            cur_index = my_win.comboBox_table.currentIndex()
+            ct = my_win.comboBox_etap_2.currentText()
+            if ct == "Полуфиналы":
+                my_win.label_23.setText("Полуфиналы")
+            elif ct == "Финальный":
+                my_win.label_23.setText("Финальный этап")
+                fin = "1-й финал"
         elif sender == my_win.comboBox_table_2:
-            my_win.label_30.setText(list[3])
-            my_win.label_30.show()
-            my_win.label_31.setText(list[0])
-            my_win.label_31.show()
-            if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-                my_win.statusbar("Система создана.", 10000)
-            else:
-                my_win.comboBox_table_2.hide()
-        my_win.Button_etap_made.setEnabled(True)
-        my_win.comboBox_page_vid.setEnabled(True)
+            cur_index = my_win.comboBox_table_2.currentIndex()
+            ct = my_win.comboBox_etap_3.currentText()
+            if ct == "Финальный":
+                my_win.label_32.setText("Финальный этап")
+                fin = "2-й финал"
+        kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников,\nвыходящих "
+                                                                  f"из группы в {fin}")
+        list = total_game_table(kpt, fin, pv, cur_index)  # возвращает из функции несколько значения в списке
+        if ok:
+            if sender == my_win.comboBox_table:
+                my_win.label_27.show()
+                my_win.label_27.setText(list[3])  # пишет кол-во игр 2-ого этапа
+                my_win.label_28.show()
+                my_win.label_28.setText(list[0])
+                if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
+                    my_win.statusbar.showMessage("Система создана.", 10000)
+                else:
+                    my_win.comboBox_table.hide()
+            elif sender == my_win.comboBox_table_2:
+                my_win.label_30.setText(list[3])
+                my_win.label_30.show()
+                my_win.label_31.setText(list[0])
+                my_win.label_31.show()
+                if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
+                    my_win.statusbar("Система создана.", 10000)
+                else:
+                    my_win.comboBox_table_2.hide()
+            my_win.Button_etap_made.setEnabled(True)
+            my_win.comboBox_page_vid.setEnabled(True)
 
 
 # def proba():
@@ -3706,6 +3718,8 @@ my_win.toolBox.currentChanged.connect(page)
 # ==================================
 my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
+
+my_win.comboBox_one_table.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_2.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_etap_1.currentTextChanged.connect(system_competition)
