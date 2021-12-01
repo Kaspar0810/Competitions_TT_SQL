@@ -77,16 +77,21 @@ def table_made(pv, title_id):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
     s = System.select().order_by(System.id).where(System.title_id == title_id).get()  # находит system id последнего
-    kg = s.total_group
+    stage = s.stage
     ta = s.total_athletes
-    t = int(ta) // int(kg)
-    e = int(ta) % int(kg)  # если количество участников не равно делится на группы
-    g2 = t + 1
-    kg = int(kg)
-    if e == 0:
-        t = t
+    if stage != "Круговая система":
+        kg = s.total_group
+        t = int(ta) // int(kg)
+        e = int(ta) % int(kg)  # если количество участников не равно делится на группы
+        g2 = t + 1
+        kg = int(kg)
+        if e == 0:
+            t = t
+        else:
+            t = g2
     else:
-        t = g2
+        kg = 1
+        t = ta
     if pv == "альбомная":  # альбомная ориентация стр
         pv = landscape(A4)
         if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:

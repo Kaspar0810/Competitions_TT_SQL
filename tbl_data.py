@@ -26,26 +26,32 @@ def table_data(kg, title_id):
     tr = len(ta)  # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
     tbl_tmp = []  # временный список группы tbl
     tdt = []
-    y = kol_player()
-    for p in range(0, kg):
-        num_gr = f"{p + 1} группа"
-        posev_data = player_choice_in_group(num_gr)
+    if kg == 1:
+        posev_data = player_choice_one_table()
         count_player_group = len(posev_data)
-        # for k in range(1, count_player_group * 2 + 1):  # цикл нумерации строк (2-е строки на каждого участника
-        for k in range(1, y * 2 + 1):  # цикл нумерации строк (по 2-е строки на каждого участника)
-            st = ['']
-            s = (st * (y + 4))  # получаем пустой список (номер, фамилия и регион, клетки (кол-во уч), оч, соот, место)
-            s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
-            tbl_tmp.append(s)
-        for i in range(1, count_player_group * 2 + 1, 2):
-            posev = posev_data[((i + 1) // 2) - 1]
-            tbl_tmp[i - 1][1] = posev["фамилия"]
-            tbl_tmp[i][1] = posev["регион"]
-        td = tbl_tmp.copy()
-        tbl_tmp.clear()
-        tdt.append(td)
-        if tr != 0:  # если еще не была жеребьевка, то пропуск счета в группе
-            score_in_table(td, num_gr)
+        num_gr = 1
+        y = count_player_group
+    else:
+        y = kol_player()
+        for p in range(0, kg):
+            num_gr = f"{p + 1} группа"
+            posev_data = player_choice_in_group(num_gr)
+            count_player_group = len(posev_data)
+
+    for k in range(1, y * 2 + 1):  # цикл нумерации строк (по 2-е строки на каждого участника)
+        st = ['']
+        s = (st * (y + 4))  # получаем пустой список (номер, фамилия и регион, клетки (кол-во уч), оч, соот, место)
+        s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
+        tbl_tmp.append(s)
+    for i in range(1, count_player_group * 2 + 1, 2):
+        posev = posev_data[((i + 1) // 2) - 1]
+        tbl_tmp[i - 1][1] = posev["фамилия"]
+        tbl_tmp[i][1] = posev["регион"]
+    td = tbl_tmp.copy()
+    tbl_tmp.clear()
+    tdt.append(td)
+    if tr != 0:  # если еще не была жеребьевка, то пропуск счета в группе
+        score_in_table(td, num_gr)
     return tdt
 
 
@@ -607,6 +613,18 @@ def player_choice_in_group(num_gr):
     """распределяет спортсменов по группам согласно жеребьевке"""
     posev_data = []
     choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == num_gr)
+    for posev in choice:
+        posev_data.append({
+            'фамилия': posev.family,
+            'регион': posev.region,
+        })
+    return posev_data
+
+
+def player_choice_one_table():
+    """список спортсменов одной таблицы"""
+    posev_data = []
+    choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.basic == "Одна таблица")
     for posev in choice:
         posev_data.append({
             'фамилия': posev.family,

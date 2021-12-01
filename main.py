@@ -677,17 +677,20 @@ def system_edit():
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
-    t = Title.select().order_by(Title.id.desc()).get()  # последний id соревнований (текуших)
-    ce = System.get(System.id == t.id)  # получаем id system текущих соревнований
+    # t = Title.select().where(Title.id == title_id()) # последний id соревнований (текуших)
+    ce = System.select().where(System.title_id == title_id()).get()  # находит system id последнего
+    # ce = System.get(System.id == t.id)  # получаем id system текущих соревнований
     cs = System.select().where(System.id == ce)  # все строки, где title_id соревнований
-    count_system = len(cs)  # полученкие количества записей (этапов) в системе
+    count_system = len(cs)  # получение количества записей (этапов) в системе
     sg = my_win.comboBox_etap_1.currentText()
     page_v = my_win.comboBox_page_1.currentText()
     total_group = ce.total_group
     total_athletes = ce.total_athletes
     max_player = ce.max_player
     if sg == "одна таблица":
-        pass
+        system = System(id=cs, title_id=t, total_athletes=total_athletes, total_group=0,
+                        max_player=0, stage=sg, page_vid=page_v, label_string="", kol_game_string="",
+                        choice_flag=False, score_flag=5, visible_game=False).save()
     else:  # предварительный этап
         for i in range(1, count_system + 1):
             system = System(id=cs, title_id=t, total_athletes=total_athletes, total_group=total_group,
@@ -1615,8 +1618,10 @@ def system_competition():
             my_win.comboBox_one_table.show()
             my_win.spinBox_kol_group.hide()
             my_win.label_11.hide()
+            my_win.label_9.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
+            my_win.comboBox_one_table.hide()
             my_win.label_9.show()
             my_win.label_9.setText("Предварительный этап")
             my_win.label_11.show()
@@ -1642,9 +1647,33 @@ def system_competition():
 
 
 def one_table():
-    """система соревнований из одной таблицы"""
-    pass
-
+    """система соревнований из одной таблицы запись в System"""
+    if my_win.comboBox_one_table.currentText() == "Круговая система":
+        t_id = title_id()
+        system = System.get(System.title_id == t_id)
+        sys_id = system.id
+        player = Player.select().where(Player.title_id == t_id)
+        count = len(player)
+        kol_game = count // 2 * (count - 1)
+    load_tableWidget()
+    stage = my_win.comboBox_etap_1.currentText()
+    choice = Choice.select().where(Choice.title_id == t_id)
+    for i in choice:
+        i.basic = stage
+        i.save()
+    sg = my_win.comboBox_one_table.currentText()
+    pl_choice = Choice.select().where(Choice.title_id == t_id)
+    page_v = my_win.comboBox_page_vid.currentText()
+    string_table = my_win.label_50.text()
+    player_choice = pl_choice.select().order_by(Choice.rank.desc())
+    system.title_id = t_id
+    system.total_athletes = count
+    system.total_group = 1
+    system.stage = sg
+    system.label_string = string_table
+    system.kol_game_string = kol_game
+    system.page_vid = page_v
+    system.save()
 
 
 def kol_player_in_group():
@@ -1826,8 +1855,9 @@ def player_in_table():
                         match = tour[d]  # матч в туре
                     else:  # в группе более 3 спортсменов
                         match = tours[d]  # матч в туре
-                    first = int(match[0])  # игрок под номером в группе
-                    second = int(match[2])  # игрок под номером в группе
+                        znak = match.find("-")
+                    first = int(match[:znak])  # игрок под номером в группе
+                    second = int(match[znak + 1:])  # игрок под номером в группе
                     pl1 = gr[first * 2 - 2][1]  # фамилия первого игрока
                     pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
                     with db:
@@ -3322,7 +3352,7 @@ def hide_show_columns(tb):
 
 def etap_made():
     """создание этапов соревнований"""
-    if my_win.comboBox_one_table.currentText() == "Круговая система":
+    if my_win.comboBox_etap_1.currentText() == "Одна таблица":
         one_table()
     if my_win.comboBox_etap_1.currentText() == "Предварительный" and my_win.comboBox_etap_2.isHidden():
         kol_player_in_group()
@@ -3545,8 +3575,10 @@ def kol_player_in_final():
             my_win.label_50.show()
             my_win.label_19.show()
             my_win.label_19.setText(f"{kol_game} игр.")
-            my_win.label_50.setText(f"круговая таблица на {count} чел.")
+            my_win.label_33.setText(f"Всего: {kol_game} игр.")
+            my_win.label_50.setText(f"{count} человек по круговой системе.")
             my_win.comboBox_one_table.hide()
+
     else:
         if sender == my_win.comboBox_table:
             cur_index = my_win.comboBox_table.currentIndex()
