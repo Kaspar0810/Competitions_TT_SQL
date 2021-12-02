@@ -31,7 +31,7 @@ def func_zagolovok(canvas, doc):
     # if p == "альбомная":
     #     pv = landscape(A4)
     # else:
-    pv = A4
+    pv = landscape(A4)
     (width, height) = pv
 
     nz = title.name
@@ -79,7 +79,7 @@ def table_made(pv, title_id):
     s = System.select().order_by(System.id).where(System.title_id == title_id).get()  # находит system id последнего
     stage = s.stage
     ta = s.total_athletes
-    if stage != "Круговая система":
+    if stage != "Одна таблица":
         kg = s.total_group
         t = int(ta) // int(kg)
         e = int(ta) % int(kg)  # если количество участников не равно делится на группы
@@ -106,9 +106,12 @@ def table_made(pv, title_id):
     elements = []
 
     cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина
-    rH = (0.34 * cm)  # высота строки
+    if kg == 1:
+        rH = (0.5 * cm)  # высота строки
+    else:
+        rH = (0.34 * cm)  # высота строки
     # rH = None  # высота строки
-    num_columns = []  # заголовки столобцов и их нумерация в зависимости от кол-во участников
+    num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
     for i in range(0, t):
         i += 1
         i = str(i)
@@ -845,7 +848,6 @@ def tour(cp):
           ['1-8', '2-3', '4-5', '6-7', '10-11', '12-13', '14-15', '9-16'],
           ['1-2', '3-4', '5-6', '7-8', '9-10', '11-12', '13-14', '15-16']]]
 
-
     tour_list = tr[cp]
     return tour_list
 
@@ -878,13 +880,15 @@ def mesto_in_final(fin):
     first_mesto = mesto[fin]
     return first_mesto
 
+#+++++++++++++++
 
 def title_id():
     """возвращает title id в зависимости от соревнования"""
-    name = my_win.lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+    name = lineEdit_title_nazvanie.text()  # определяет название соревнований из титула
+    # name =   # определяет название соревнований из титула
     if name != "":
-        data = my_win.dateEdit_start.text()
-        gamer = my_win.lineEdit_title_gamer.text()
+        data = main.dateEdit_start.text()
+        gamer = main.lineEdit_title_gamer.text()
         t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
         count = len(t)
         title = t.select().where(Title.gamer == gamer).get()
@@ -893,3 +897,5 @@ def title_id():
         t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
         title_id = t_id
     return title_id
+#
+#

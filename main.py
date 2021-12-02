@@ -22,7 +22,6 @@ if __name__ == '__main__':
 from playhouse.migrate import *
 
 import sys
-import xlrd
 import pandas as pd
 import openpyxl as op
 import pdf
@@ -677,12 +676,12 @@ def system_edit():
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
-    # t = Title.select().where(Title.id == title_id()) # последний id соревнований (текуших)
-    ce = System.select().where(System.title_id == title_id()).get()  # находит system id последнего
+    t = Title.select().where(Title.id == title_id()) # последний id соревнований (текуших)
+    ce = System.select().where(System.title_id == t).get()  # находит system id последнего
     # ce = System.get(System.id == t.id)  # получаем id system текущих соревнований
     cs = System.select().where(System.id == ce)  # все строки, где title_id соревнований
     count_system = len(cs)  # получение количества записей (этапов) в системе
-    sg = my_win.comboBox_etap_1.currentText()
+    sg = my_win.comboBox_one_table.currentText()
     page_v = my_win.comboBox_page_1.currentText()
     total_group = ce.total_group
     total_athletes = ce.total_athletes
@@ -1654,11 +1653,13 @@ def one_table():
         sys_id = system.id
         player = Player.select().where(Player.title_id == t_id)
         count = len(player)
-        kol_game = count // 2 * (count - 1)
+        kol_game = f"{count // 2 * (count - 1)} игр"
+    elif my_win.comboBox_one_table.currentText() == "Чистая сетка (с розыгрышем всех мест)":
+        pass
     load_tableWidget()
     stage = my_win.comboBox_etap_1.currentText()
     choice = Choice.select().where(Choice.title_id == t_id)
-    for i in choice:
+    for i in choice:  # записывает в таблицу Choice
         i.basic = stage
         i.save()
     sg = my_win.comboBox_one_table.currentText()
@@ -1669,7 +1670,7 @@ def one_table():
     system.title_id = t_id
     system.total_athletes = count
     system.total_group = 1
-    system.stage = sg
+    system.stage = stage
     system.label_string = string_table
     system.kol_game_string = kol_game
     system.page_vid = page_v
@@ -3288,7 +3289,7 @@ def choice_filter_group():
     column_count = 10  # кол-во столбцов в таблице
     my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
     if row_count != 0:
-        for row in range(row_count):  # добвляет данные из базы в TableWidget
+        for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
                 item = str(list(choice_list[row].values())[column])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
@@ -3370,7 +3371,6 @@ def total_game_table(kpt, fin, pv, cur_index):
     total_player = system.total_athletes
     if kpt != 0:  # подсчет кол-во игр из выбора кол-ва игроков вышедших из группы и системы финала
         player_in_final = system.total_group * kpt
-
         if cur_index == 1:
             vt = "Сетка (-2) на"
             my_win.comboBox_page_vid.setCurrentText("книжная")
