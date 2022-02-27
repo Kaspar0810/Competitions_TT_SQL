@@ -97,6 +97,8 @@ class Title(BaseModel):
     kat_sek = CharField(10)
     gamer = CharField(20)
     full_name_comp = CharField()
+    pdf_comp = BlobField()
+    short_name_comp = CharField()
 
     class Meta:
         db_table = "titles"
@@ -133,7 +135,7 @@ class Result(BaseModel):
     points_loser = IntegerField(null=True)
     score_loser = CharField(null=True)
     title_id = ForeignKeyField(Title)
-
+    round = CharField(20)
 
     class Meta:
         db_table = "results"
@@ -146,12 +148,15 @@ class System(BaseModel):
     total_group = IntegerField()
     max_player = IntegerField(null=True)
     stage = CharField()
+    type_table = CharField(30)
     page_vid = CharField()
     label_string = CharField()
     kol_game_string = CharField()
     choice_flag = BooleanField()
     score_flag = IntegerField()
     visible_game = BooleanField()
+    stage_exit = CharField(15)
+    mesta_exit = IntegerField()
 
     class Meta:
         db_table = "system"
@@ -162,27 +167,11 @@ class Game_list(BaseModel):
     rank_num_player = IntegerField()
     player_group = ForeignKeyField(Player)
     system_id = ForeignKeyField(System)
+    title_id = ForeignKeyField(Title)
 
     class Meta:
         db_table = "game_lists"
         order_by = "number_group"
-
-
-class Tour(BaseModel):
-    person_in_group = CharField()
-    table_1 = CharField(10)
-    table_2 = CharField(10)
-    table_3 = CharField(10)
-    table_4 = CharField(10)
-    table_5 = CharField(10)
-    table_6 = CharField(10)
-    table_7 = CharField(10)
-    table_8 = CharField(10)
-    result_id = ForeignKeyField(Result)
-
-    class Meta:
-        db_table = "tours"
-        order_by = "person_in_group"
 
 
 class Choice(BaseModel):
