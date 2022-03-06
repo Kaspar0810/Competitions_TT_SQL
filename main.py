@@ -2892,7 +2892,8 @@ def control_score(sc1, sc2):
 
 
 def enter_score(none_player=0):
-    """заносит в таблицу -результаты- победителя, счет и т.п."""
+    """заносит в таблицу -результаты- победителя, счет и т.п. sc_total [партии выигранные, проигранные, очки победителя
+     очки проигравшего"""
 
     tab = my_win.tabWidget.currentIndex()
     r = my_win.tableWidget.currentRow()
@@ -2926,10 +2927,10 @@ def enter_score(none_player=0):
             sc_total = setka_type(none_player)
         else: # по кругу
             sc_total = circle_type(none_player, stage)
-    st1 = sc_total[0]
-    st2 = sc_total[1]
-    w = sc_total[2]
-    l = sc_total[3]
+    st1 = sc_total[0]  # партия выигранные
+    st2 = sc_total[1]  # партии проигранные
+    w = sc_total[2]  # очки победителя
+    l = sc_total[3]  # очки проигравшего
     if my_win.lineEdit_player1_fin.text() != "bye" and my_win.lineEdit_player2_fin.text() != "bye":
         if st1 > st2 or none_player == 2:  # выиграл 1-й участник
             if tab == 3:
@@ -4897,7 +4898,7 @@ def full_player_id(family):
 
 
 def score_in_table(td, num_gr):
-    """заносит счет в таблицу группы pdf
+    """заносит счет и места в таблицу группы или таблицу по кругу pdf
     -td- список строки таблицы, куда пишут счет"""
     td_color = []
     total_score = {}  # словарь, где ключ - номер участника группы, а значение - очки
@@ -4982,7 +4983,10 @@ def score_in_table(td, num_gr):
     #===== если сыграны все игры группе то выставляет места =========
     count_game = (count_player * (count_player - 1)) // 2
     result_id = Result.select().where(Result.title_id == title_id())
-    result = result_id.select().where(Result.number_group == num_gr)
+    if num_gr == "Одна таблица":
+        result = result_id.select().where(Result.system_stage == num_gr)
+    else:
+        result = result_id.select().where(Result.number_group == num_gr)
     a = 0
     for r in result:
         if r.points_win == 2:
@@ -5331,9 +5335,12 @@ def circle_2_player(tr, td, max_person, mesto, num_gr):
         p1 = p2
         p2 = p_tmp
         tour = f"{p1}-{p2}"
-
-    c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
+    if num_gr != "Одна таблица":
+        c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
     # строчку номер группы и тур по двум столбцам
+    else:
+        c = Result.select().where((Result.system_stage == num_gr) & (Result.tours == tour)).get()  # ищет в базе
+        # строчку номер группы и тур по двум столбцам
     if c.winner == c.player1:
         points_p1 = c.points_win  # очки во встрече победителя
         points_p2 = c.points_loser  # очки во встрече проигравшего
