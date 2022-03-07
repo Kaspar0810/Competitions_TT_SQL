@@ -667,7 +667,8 @@ def db_insert_title(title_str):
                                                                                " отбражения в названии файла при "
                                                                                "сохранении,\nиспользуете латинские буквы"
                                                                                " без пробелов.\n"
-                                                                               "В формате название_дата, месяц, год и кто"
+                                                                               "В формате название, возраст участников_дата,"
+                                                                               " месяц, год и кто "
                                                                                "играет.")
     if ok:
         t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
@@ -881,7 +882,7 @@ def title_string():
 
 def title_pdf():
     """сохранение в PDF формате титульной страницы"""
-    string_data = pdf.data_title_string()
+    string_data = data_title_string()
     nz = my_win.lineEdit_title_nazvanie.text()
     sr = my_win.comboBox_sredi.currentText()
     vz = my_win.lineEdit_title_vozrast.text()
@@ -896,7 +897,37 @@ def title_pdf():
         filepatch = str(fname[0])
     else:
         filepatch = None
-    pdf.title_pdf(string_data, nz, sr, vz, ct, filepatch)
+
+    t_id = title_id()
+    short_name = t_id.short_name_comp
+    name_table = f"one_table_{short_name}.pdf"
+
+    canvas = Canvas(f"title_{short_name}.pdf", pagesize=A4)
+    if filepatch == None:
+        canvas.setFont("DejaVuSerif-Italic", 14)
+        canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
+        canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
+        canvas.setFont("DejaVuSerif-Italic", 20)
+        canvas.drawString(2 * cm, 23 * cm, nz)
+        canvas.setFont("DejaVuSerif-Italic", 16)
+        canvas.drawString(2.5 * cm, 22 * cm, f"среди {sr} {vz}")
+        canvas.setFont("DejaVuSerif-Italic", 14)
+        canvas.drawString(5.5 * cm, 5 * cm, f"г. {ct} Нижегородская область")
+        canvas.drawString(7.5 * cm, 4 * cm, string_data)
+    else:
+        canvas.drawImage(filepatch, 7 * cm, 12 * cm, 6.9 * cm, 4.9 * cm,
+                         mask=[0, 2, 0, 2, 0, 2])  # делает фон прозрачным
+        canvas.setFont("DejaVuSerif-Italic", 14)
+        canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
+        canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
+        canvas.setFont("DejaVuSerif-Italic", 20)
+        canvas.drawString(2 * cm, 23 * cm, nz)
+        canvas.setFont("DejaVuSerif-Italic", 16)
+        canvas.drawString(2.5 * cm, 22 * cm, f"среди {sr} {vz}")
+        canvas.setFont("DejaVuSerif-Italic", 14)
+        canvas.drawString(5.5 * cm, 5 * cm, f"г. {ct} Нижегородская область")
+        canvas.drawString(7.5 * cm, 4 * cm, string_data)
+    canvas.save()
 
 
 def title_made():
@@ -920,6 +951,28 @@ def title_made():
                      label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
 
 
+def data_title_string():
+    """получение строки начало и конец соревнований для вставки в титульный лист"""
+    months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
+                   "августа", "сентября", "октября", "ноября", "декабря")
+    title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    datastart = str(title.data_start)
+    dataend = str(title.data_end)
+    ds = datastart[8:10]  # получаем число день из календаря
+    ms = datastart[5:7]  # получаем число месяц из календаря
+    ys = datastart[0:4]  # получаем число год из календаря
+    # ye = int(dataend[0:4])
+    me = dataend[5:7]
+    de = dataend[8:10]
+    month_st = months_list[int(ms) - 1]
+    if de > ds:  # получаем строку начало и конец соревнования в
+        # одном месяце или два месяца если начало и конец в разных месяцах
+        return f"{ds}-{de} {month_st} {ys} г."
+    else:
+        month_end = months_list[int(me) - 1]
+        return f"{ds} {month_st}-{de} {month_end} {ys} г."
+
+#===============
 def title_update():
     """обновляет запись титула, если был он изменен"""
     title_str = title_string()
@@ -1199,8 +1252,9 @@ def add_player():
         for i in range(0, 9):  # добавляет в tablewidget
             my_win.tableWidget.setItem(count + 1, i, QTableWidgetItem(spisok[i]))
         load_tableWidget()  # заново обновляет список
-        my_win.label_46.setText(f"Всего: {count + 1} участников")
         player_list = Player.select().where(Player.title_id == title_id())
+        count = len(player_list)  # подсчитывает новое кол-во игроков
+        my_win.label_46.setText(f"Всего: {count} участников")
         list_player_pdf(player_list)
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
@@ -3054,7 +3108,7 @@ def enter_score(none_player=0):
                     setka_16_made(fin=fin)
                 elif table_max_player == 32:
                     pass
-            filter_fin()
+        filter_fin()
 
 
 def setka_type(none_player):
@@ -3286,7 +3340,7 @@ def filter_fin(pl=False):
     name = name.title()  # делает Заглавными буквы слов
     played = my_win.comboBox_filter_played_fin.currentText()
     system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
-    # fltr = Result.select().where(Result.title_id == title_id() and Result.system_stage = "Финальный")
+
     fin = []
     if final == "Одна таблица":
         fltr = Result.select().where(Result.title_id == title_id() and Result.system_stage == "Одна таблица")
@@ -3519,12 +3573,31 @@ def choice_table():
             system_competition()  # создает систему соревнований
 
 
+def test_choice_group():
+    "новая система жеребьевки групп"
+    posev = []
+    load_tableWidget()
+    sys = System.get(System.title_id == title_id() and System.stage == "Предварительный")
+    s_id = sys.id
+    group = sys.total_group
+    max_player = sys.max_player
+    total_player = sys.total_athletes
+    pl_choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.title_id == title_id())
+    h = 0
+    for k in range (1, max_player + 1):
+        start = 1
+        end = group
+        for i in range(start, end):
+            id = int(my_win.tableWidget.item(h, 1).text())  # ищет id игрока
+            posev.append(id)
+
+
+
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
     load_tableWidget()
-    gamer = my_win.lineEdit_title_gamer.text()
-    # sys = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
-    sys =System.get(System.title_id == title_id() and System.stage == "Предварительный")
+    # gamer = my_win.lineEdit_title_gamer.text()
+    sys = System.get(System.title_id == title_id() and System.stage == "Предварительный")
     s_id = sys.id
     group = sys.total_group
     mp = sys.max_player
@@ -3532,6 +3605,7 @@ def choice_gr_automat():
     pl_choice = Choice.select().where(Choice.title_id == title_id())
     player_choice = pl_choice.select().order_by(Choice.rank.desc())
     h = 0
+
     for k in range(1, mp + 1):  # цикл посевов
         # вставить проверку на окончание посева
         if k % 2 != 0:  # направление посева с последней группы до 1-й
@@ -3589,7 +3663,6 @@ def choice_setka(fin):
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребьевки"""
-    # gamer = my_win.lineEdit_title_gamer.text()
     title = title_id()
     player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title)
     system = System.select().where(System.title_id == title)
@@ -5860,7 +5933,7 @@ my_win.Button_Ok.clicked.connect(enter_score)  # записывает в баз�
 my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в партии встречи
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(proba)
+my_win.Button_proba.clicked.connect(test_choice_group)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
