@@ -21,11 +21,11 @@ import sqlite3
 import sys
 import pandas as pd
 import openpyxl as op
-import pdf
+import models
 import os
 from itertools import *
 from collections import Counter
-
+from models import *
 # from playhouse.sqlite_ext import SqliteExtDatabase, backup_to_file, backup
 
 from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
@@ -35,7 +35,7 @@ from datetime import *
 
 from start_form import Ui_Form
 from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
-from pdf import *
+
 
 #==========
 from reportlab.pdfgen.canvas import Canvas
