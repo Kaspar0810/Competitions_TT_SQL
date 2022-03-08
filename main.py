@@ -23,6 +23,7 @@ import pandas as pd
 import openpyxl as op
 import models
 import os
+import datetime
 from itertools import *
 from collections import Counter
 from models import *
@@ -417,17 +418,23 @@ class StartWindow(QMainWindow, Ui_Form):
         for i in t_id:
             old_comp = i.name
             gamer = i.gamer
-            data_start = i.data_start
-            data_finish = i.data_end
             n -= 1
             if n != 5:
                 if old_comp != "":
                     self.comboBox.addItem(f"{old_comp}. {gamer}")
-                    self.label_4.setText(f"сроки: с {data_start} по {data_finish}")
                 else:
                     return
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
+            t_id = Title.select().order_by(Title.id.desc()).get()
+            k = (t_id.id) - 1
+            title = Title.get(Title.id == k)
+            old_comp = title.name
+            gamer = title.gamer
+            data_start = title.data_start
+            data_finish = title.data_end
+            fir_window.comboBox.setCurrentText(f"{old_comp}. {gamer}")
+            fir_window.label_4.setText(f"сроки: с {data_start} по {data_finish}")
 
 def dbase():
     """Создание DB и таблиц"""
@@ -488,9 +495,9 @@ def control_R_list(fname, gamer):
     filepatch = str(fname[0])
     znak = filepatch.rfind("/")
     month_vybor = filepatch[znak + 6:znak + 8]
-    d = datetime.today()
-    current_montn = str(d.month)
-    if current_montn != month_vybor:
+    d = date.today()
+    current_month = d.strftime("%m")
+    if current_month != month_vybor:
         message = "Вы выбрали файл не с актуальным рейтингом!\nесли все равно хотите его использовать, нажмите <Ок>\nесли хотите вернуться, нажмите <Отмена>"
         reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
                                                   QtWidgets.QMessageBox.StandardButtons.Ok,
@@ -553,6 +560,17 @@ def region():
 fir_window = StartWindow()  # Создаём объект класса ExampleApp
 fir_window.show()  # Показываем окно
 
+def change_sroki():
+    """изменение текста label формы стартового окна в зависимости от выбора соревнования"""
+    t_id = Title.select().order_by(Title.id.desc()).get()
+    k = t_id.id - 1
+    tit = Title.get(Title.id == k)
+    index = fir_window.comboBox.currentIndex()
+    id = k - index
+    title = Title.get(Title.id == id)
+    data_start = title.data_start
+    data_finish = title.data_end
+    fir_window.label_4.setText(f"сроки: с {data_start} по {data_finish}")
 
 
 #  ==== наполнение комбобоксов ==========
@@ -589,19 +607,26 @@ my_win.dateEdit_end.setDate(date.today())
 def tab_enabled(gamer):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
     sender = my_win.sender()
-    title = title_id()
+    title = title_id()  # id текущего соревнования
     count_title = len(Title.select())
-        #============== вставляет в меня выбора название другого соревнования
-    t_id = Title.select().order_by(Title.id.desc())  # получает все Title, отсортированные Я-А
+    tit = Title.select().order_by(Title.id.desc()).get()  # получает последний title.id
+    t_next = tit.id
     n = 6
-    for i in t_id:
-        t = i.id
-        old_comp = i.name
-        old_data = i.data_start
-        old_gamer = i.gamer
-        comp = f"{old_comp}.{old_data}.{old_gamer}"
-        if title != t:  # сравнивает id открытых соревнований и открываемых и меняет надпись в меню
-            my_win.go_to_Action.setText(comp)
+    if sender == fir_window.LinkButton:  # если переход со стартового окна последение соревнование
+        t = t_next - 1
+        t_id = Title.get(Title.id == t)
+    else:
+        if t_next > title:
+            t_id = Title.get(Title.id == t_next)
+        else:
+            t_id = Title.get(Title.id == t_next - 1)
+
+    old_comp = t_id.name
+    old_data = t_id.data_start
+    old_gamer = t_id.gamer
+    comp = f"{old_comp}.{old_data}.{old_gamer}"
+    my_win.go_to_Action.setText(comp)
+
     if gamer == "":
         gamer = my_win.lineEdit_title_gamer.text()
     if count_title != 0:  # когда создаются новые соревнования
@@ -725,6 +750,7 @@ def db_select_title():
         name = titles.name
         gamer = titles.gamer
     else:  # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
+        change_sroki()
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[39:]
@@ -898,11 +924,10 @@ def title_pdf():
     else:
         filepatch = None
 
-    t_id = title_id()
+    t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
-    name_table = f"one_table_{short_name}.pdf"
-
     canvas = Canvas(f"title_{short_name}.pdf", pagesize=A4)
+    
     if filepatch == None:
         canvas.setFont("DejaVuSerif-Italic", 14)
         canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
@@ -972,7 +997,7 @@ def data_title_string():
         month_end = months_list[int(me) - 1]
         return f"{ds} {month_st}-{de} {month_end} {ys} г."
 
-#===============
+
 def title_update():
     """обновляет запись титула, если был он изменен"""
     title_str = title_string()
@@ -3592,7 +3617,6 @@ def test_choice_group():
             posev.append(id)
 
 
-
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
     load_tableWidget()
@@ -3801,16 +3825,17 @@ def total_game_table(kpt, fin, pv, cur_index):
         str_setka = f"{vt} {player_in_final} участников"
         s = System.select().order_by(System.id.desc()).get()
         total_athletes = s.total_athletes
-
+        stage_exit = ""
         stroka_kol_game = f"{total_games} игр"
-
         if total_athletes > player_in_final:
             final = fin
         else:
+            stage_exit = "Предварительный"
             final = "финальный"
+
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=0, kol_game_string=stroka_kol_game,
                         max_player=player_in_final, stage=final, type_table=type_table, page_vid=pv, label_string=str_setka,
-                        choice_flag=0, score_flag=5, visible_game=False).save()
+                        choice_flag=0, score_flag=5, visible_game=False, stage_exit=stage_exit).save()
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
     else:  # нажата кнопка создания этапа, если еще не все игроки посеяны в финал, то продолжает этапы соревнования
         sys_last = System.select().where(System.title_id == title_id() and System.stage ** '%финал')  # отбирает записи, где
@@ -3862,21 +3887,25 @@ def clear_db_before_edit():
     for i in system:  # удаляет все записи
         i.delete_instance()
     sys = System(title_id=t_id, total_athletes=0, total_group=0, max_player=0, stage="", type_table="", page_vid="",
-                 label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
+                 label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=False,
+                 stage_exit="", mesta_exit="").save()
 
     gl = Game_list.select().where(Game_list.title_id == t_id)
-    g_count = len(gl)
-    for i in range(1, g_count + 1):
+    # g_count = len(gl)
+    # for i in range(1, g_count + 1):
+    for i in gl:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
     chc = Choice.select().where(Choice.title_id == t_id)
-    ch_count = len(chc)
-    for i in range(1, ch_count + 1):
+    # ch_count = len(chc)
+    # # for i in range(1, ch_count + 1):
+    for i in chc:
         ch_d = Choice.get(Choice.id == i)
         ch_d.delete_instance()
     rs = Result.select().where(Result.title_id == t_id)
-    r_count = len(rs)
-    for i in range(1, r_count + 1):
+    # r_count = len(rs)
+    # for i in range(1, r_count + 1):
+    for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
 
@@ -4078,7 +4107,7 @@ def func_zagolovok(canvas, doc):
     nz = title.name
     ms = title.mesto
     sr = f"среди {title.sredi} {title.vozrast}"
-    data_comp = pdf.data_title_string()
+    data_comp = data_title_string()
 
     canvas.saveState()
     canvas.setFont("DejaVuSerif-Italic", 14)
@@ -5882,6 +5911,7 @@ my_win.toolBox.currentChanged.connect(page)
 my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 
+fir_window.comboBox.currentTextChanged.connect(change_sroki)
 my_win.comboBox_one_table.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_2.currentTextChanged.connect(kol_player_in_final)
