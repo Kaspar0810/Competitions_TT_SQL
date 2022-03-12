@@ -4,57 +4,59 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 
+from reportlab.pdfbase.pdfmetrics import registerFontFamily
+from reportlab.platypus import PageBreak
+from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
+from reportlab.platypus.tableofcontents import TableOfContents
+from reportlab.lib import colors
+from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.units import cm
+from reportlab.pdfgen.canvas import Canvas
+# импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
+from main_window import Ui_MainWindow
+from start_form import Ui_Form
+from datetime import *
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
+from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
+from models import *
+from collections import Counter
+from itertools import *
+import datetime
+import os
+import models
+import openpyxl as op
+import pandas as pd
+import sys
+import sqlite3
+from playhouse.migrate import *
+
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
-from playhouse.migrate import *
 
 # import tbl_data
-import sqlite3
-import sys
-import pandas as pd
-import openpyxl as op
-import models
-import os
-import datetime
-from itertools import *
-from collections import Counter
-from models import *
 # from playhouse.sqlite_ext import SqliteExtDatabase, backup_to_file, backup
 
-from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
-from PyQt6.QtWidgets import *
-from PyQt6.QtGui import *
-from datetime import *
 
-from start_form import Ui_Form
-from main_window import Ui_MainWindow  # импортируем из модуля (графического интерфейса main_window) класс Ui_MainWindow
-
-
-#==========
-from reportlab.pdfgen.canvas import Canvas
-from reportlab.lib.units import cm
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfbase import pdfmetrics
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate
-from reportlab.lib import colors
-from reportlab.platypus.tableofcontents import TableOfContents
-from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
-from reportlab.platypus import PageBreak
-from reportlab.pdfbase.pdfmetrics import registerFontFamily
+# ==========
 # from reportlab.rl_settings import defaultPageSize
-#==========
+# ==========
 # defaultPageSize = A4
 
-registerFontFamily('DejaVuSerif', normal='DejaVuSerif', bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
+registerFontFamily('DejaVuSerif', normal='DejaVuSerif',
+                   bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
 enc = 'UTF-8'
 
 TTFSearchPath = (
@@ -76,8 +78,10 @@ TTFSearchPath = (
 pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
-pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
-pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
+pdfmetrics.registerFont(
+    TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
+pdfmetrics.registerFont(
+    TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -118,9 +122,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fileMenu = QMenu("Соревнования", self)  # основное
         menuBar.addMenu(fileMenu)
 
-        go_to = fileMenu.addMenu("Перейти к")  # подменю с выбором (addMenu добавляет к пункту возможность выбора)
+        # подменю с выбором (addMenu добавляет к пункту возможность выбора)
+        go_to = fileMenu.addMenu("Перейти к")
         fileMenu.addSeparator()  # вставляет разделительную черту
-        fileMenu.addAction(self.systemAction)  # подменю без выбора (addAction создает сразу действие)
+        # подменю без выбора (addAction создает сразу действие)
+        fileMenu.addAction(self.systemAction)
         choice = fileMenu.addMenu("Жеребьевка")
         saveList = fileMenu.addMenu("Сохранить")
         fileMenu.addSeparator()
@@ -160,6 +166,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
     #  создание действий меню
+
     def _createAction(self):
         self.helpAction = QAction(self)
         self.systemAction = QAction("Система соревнований")
@@ -169,12 +176,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.title_Action = QAction("Титульный лист")  # подменю редактор
         self.list_Action = QAction("Список участников")
         self.system_edit_Action = QAction("Система соревнования")
-        self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
+        self.find_r_Action = QAction(
+            "Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
         self.savelist_Action = QAction("Список")  # подменю сохранить
-        self.choice_gr_Action = QAction("Группы")  # подменю жеребьевка -группы-
-        self.choice_pf_Action = QAction("Полуфиналы")  # подменю жеребьевка -полуфиналы-
-        self.choice_fin_Action = QAction("Финалы")  # подменю жеребьевка -финалы-
+        # подменю жеребьевка -группы-
+        self.choice_gr_Action = QAction("Группы")
+        # подменю жеребьевка -полуфиналы-
+        self.choice_pf_Action = QAction("Полуфиналы")
+        self.choice_fin_Action = QAction(
+            "Финалы")  # подменю жеребьевка -финалы-
         self.all_comp_Action = QAction("Полные соревнования")
         self.view_list_Action = QAction("Список участников")
         self.view_gr_Action = QAction("Группы")
@@ -182,7 +193,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.view_one_table_Action = QAction("Одна таблица")
         self.go_to_Action = QAction("пусто")
-        #======== подменю финалы ============= сделать в зависимости от кол-во финалов остальные невидимые
+        # ======== подменю финалы ============= сделать в зависимости от кол-во финалов остальные невидимые
 
         self.view_fin1_Action = QAction("1-финал")
         self.view_fin2_Action = QAction("2-финал")
@@ -264,7 +275,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         choice_gr_automat()
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
-            system = System.get(System.title_id == title_id() and System.stage == fin)
+            system = System.get(System.title_id == title_id()
+                                and System.stage == fin)
             type = system.type_table
             if fin is not None:
                 sys = System.get(System.stage == fin)
@@ -309,6 +321,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def view(self):
         view()
 
+
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
@@ -322,6 +335,7 @@ my_win.setWindowTitle("Соревнования по настольному те
 
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
+
     def __init__(self):
         super(StartWindow, self).__init__()
         self.setupUi(self)  # загружает настройки формы(окна) из QT
@@ -340,7 +354,8 @@ class StartWindow(QMainWindow, Ui_Form):
         dbase()
         count = len(Title.select())
         if count != 0:
-            t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+            # получение последней записи в таблице
+            t_id = Title.select().order_by(Title.id.desc()).get()
             id = t_id.id
             old_title = Title.get(Title.id == id)
             last_comp = old_title.full_name_comp
@@ -370,13 +385,16 @@ class StartWindow(QMainWindow, Ui_Form):
         result = msgBox.question(my_win, "", "Вы действительно хотите создать новые соревнования?",
                                  msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
         if result == msgBox.StandardButtons.Ok:
-            gamer = ("Мальчики", "Девочки", "Юноши", "Девушки", "Мужчины", "Женщины")
-            gamer, ok = QInputDialog.getItem(my_win, "Участники", "Выберите категорию спортсменов", gamer, 0, False)
+            gamer = ("Мальчики", "Девочки", "Юноши",
+                     "Девушки", "Мужчины", "Женщины")
+            gamer, ok = QInputDialog.getItem(
+                my_win, "Участники", "Выберите категорию спортсменов", gamer, 0, False)
 
             title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
                           kat_ref="", secretary="", kat_sek="", gamer=gamer, full_name_comp="", pdf_comp="",
                           short_name_comp="").save()
-            t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+            # получение последней записи в таблице
+            t_id = Title.select().order_by(Title.id.desc()).get()
             title_id = t_id.id
             db_r(gamer)
             system = System(title_id=title_id, total_athletes=0, total_group=0, max_player=0, stage="", type_table="",
@@ -413,7 +431,8 @@ class StartWindow(QMainWindow, Ui_Form):
     def load_old(self):
         """загружает в комбобокс архивные соревнования"""
         self.label_4.show()
-        t_id = Title.select().order_by(Title.id.desc())  # получение последней записи в таблице
+        # получение последней записи в таблице
+        t_id = Title.select().order_by(Title.id.desc())
         n = 6
         for i in t_id:
             old_comp = i.name
@@ -434,13 +453,15 @@ class StartWindow(QMainWindow, Ui_Form):
             data_start = title.data_start
             data_finish = title.data_end
             fir_window.comboBox.setCurrentText(f"{old_comp}. {gamer}")
-            fir_window.label_4.setText(f"сроки: с {data_start} по {data_finish}")
+            fir_window.label_4.setText(
+                f"сроки: с {data_start} по {data_finish}")
+
 
 def dbase():
     """Создание DB и таблиц"""
     with db:
         db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
-                              Result, Game_list, Choice, Delete_player])
+                          Result, Game_list, Choice, Delete_player])
 
 
 def db_r(gamer):  # table_db присваивает по умолчанию значение R_list
@@ -453,9 +474,11 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     else:
         table_db = R_list_d
         ext = f"(*_w.xlsx, *_w.xls)"
-    fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", f"Excels files {ext}")
+    fname = QFileDialog.getOpenFileName(
+        my_win, "Выбрать файл R-листа", "", f"Excels files {ext}")
     if fname == ("", ""):
-        title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        # получение последней записи в таблице
+        title = Title.select().order_by(Title.id.desc()).get()
         system = System.get(Title.id == title)
         system.delete_instance()
         title.delete_instance()
@@ -469,11 +492,13 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     else:
         table_db = R1_list_d
         ext = "(*01_w.xlsx, *01_w.xls)"
-    fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл R-листа", "", f"Excels files {ext}")
+    fname = QFileDialog.getOpenFileName(
+        my_win, "Выбрать файл R-листа", "", f"Excels files {ext}")
     load_listR_in_db(fname, table_db)
     my_win.statusbar.showMessage("Январский рейтинг загружен")
     # добавляет в таблицу регионы
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    # получение последней записи в таблице
+    t = Title.select().order_by(Title.id.desc()).get()
     title = t.id
     if title == 1:
         wb = op.load_workbook("регионы.xlsx")
@@ -486,7 +511,8 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
         with db:
             Region.insert_many(reg).execute()
     region()
-    my_win.statusbar.showMessage("Список регионов загружен", 5000)  # показывает статус бар на 5 секунд
+    # показывает статус бар на 5 секунд
+    my_win.statusbar.showMessage("Список регионов загружен", 5000)
     my_win.lineEdit_title_nazvanie.hasFocus()
 
 
@@ -535,7 +561,8 @@ def load_listR_in_db(fname, table_db):
 
         excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
         data_pandas = pd.DataFrame(excel_data)  # получает Dataframe
-        column = data_pandas.columns.ravel().tolist()  # создает список заголовков столбцов
+        # создает список заголовков столбцов
+        column = data_pandas.columns.ravel().tolist()
         count = len(data_pandas)  # кол-во строк в excel файле
         for i in range(0, count):  # цикл по строкам
             for col in column:  # цикл по столбцам
@@ -557,8 +584,10 @@ def region():
                 reg = Region.get(Region.id == r)
                 my_win.comboBox_region.addItem(reg.region)
 
+
 fir_window = StartWindow()  # Создаём объект класса ExampleApp
 fir_window.show()  # Показываем окно
+
 
 def change_sroki():
     """изменение текста label формы стартового окна в зависимости от выбора соревнования"""
@@ -577,12 +606,15 @@ def change_sroki():
 page_orient = ("альбомная", "книжная")
 kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
-raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р", "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
+raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р",
+       "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
 res = ("все игры", "завершенные", "не сыгранные")
-stages1 = ("", "Одна таблица", "Предварительный", "Полуфиналы", "Финальный", "Суперфинал")
+stages1 = ("", "Одна таблица", "Предварительный",
+           "Полуфиналы", "Финальный", "Суперфинал")
 stages2 = ("", "Полуфиналы", "Финальный", "Суперфинал")
 stages3 = ("", "Финальный", "Суперфинал")
-vid_setki = ("", "Сетка (-2)", "Сетка (с розыгрышем всех мест)", "Сетка (за 1-3 место)", "Круговая система")
+vid_setki = ("", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
+             "Сетка (за 1-3 место)", "Круговая система")
 
 
 my_win.comboBox_page_vid.addItems(page_orient)
@@ -640,29 +672,34 @@ def tab_enabled(gamer):
         count_stage = len(stage)
         if count_stage >= 1:  # если система еще не создана, то выключает отдельные вкладки при переходе на другое сорев
             if count > 0:
-                my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
+                # выключает отдельные вкладки
+                my_win.tabWidget.setTabEnabled(2, True)
                 my_win.toolBox.setItemEnabled(2, True)
                 for i in stage:
                     if i == "Одна таблица":
-                        system = System.get(System.title_id == title and System.stage == i)
+                        system = System.get(
+                            System.title_id == title and System.stage == i)
                         flag = system.choice_flag
                         if flag is True:
                             my_win.tabWidget.setTabEnabled(5, True)
                     elif i == "Предварительный":
-                        system = System.get(System.id == title and System.stage == i)
+                        system = System.get(
+                            System.id == title and System.stage == i)
                         flag = system.choice_flag
                         if flag is True:
                             my_win.tabWidget.setTabEnabled(3, True)
                     elif i == "Полуфиналы":
                         my_win.tabWidget.setTabEnabled(4, True)
                     elif i == "1-й финал" or i == "финальный":
-                        system = System.get(System.id == title_id() and System.stage == i)
+                        system = System.get(
+                            System.id == title_id() and System.stage == i)
                         flag = system.choice_flag
                         if flag is True:
                             my_win.tabWidget.setTabEnabled(5, True)
                 my_win.tabWidget.setCurrentIndex(0)
         else:
-            my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
+            # выключает отдельные вкладки
+            my_win.tabWidget.setTabEnabled(2, True)
             my_win.tabWidget.setTabEnabled(3, False)
             my_win.tabWidget.setTabEnabled(4, False)
             my_win.tabWidget.setTabEnabled(5, False)
@@ -688,15 +725,16 @@ def db_insert_title(title_str):
     ks = title_str[9]
     gm = title_str[10]
     fn = title_str[11]
-    short_name, ok = QInputDialog.getText (my_win, "Краткое имя соревнования", "Создайте краткое имя соревнования,\nдля"
-                                                                               " отбражения в названии файла при "
-                                                                               "сохранении,\nиспользуете латинские буквы"
-                                                                               " без пробелов.\n"
-                                                                               "В формате название, возраст участников_дата,"
-                                                                               " месяц, год и кто "
-                                                                               "играет.")
+    short_name, ok = QInputDialog.getText(my_win, "Краткое имя соревнования", "Создайте краткое имя соревнования,\nдля"
+                                          " отбражения в названии файла при "
+                                          "сохранении,\nиспользуете латинские буквы"
+                                          " без пробелов.\n"
+                                          "В формате название, возраст участников_дата,"
+                                          " месяц, год и кто "
+                                          "играет.")
     if ok:
-        t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        # получение последней записи в таблице
+        t = Title.select().order_by(Title.id.desc()).get()
         nazv = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
                      kat_ref=kr, secretary=sk, kat_sek=ks, gamer=gm, full_name_comp=fn, pdf_comp="",
                      short_name_comp=short_name).save()
@@ -711,8 +749,10 @@ def go_to():
     name = tit.name
     data = tit.data_start
     gamer_current = tit.gamer
-    full_name_current = f"{name}.{data}.{gamer_current}"  # полное название текущих соревнований
-    my_win.go_to_Action.setText(full_name_current)  # присваиваем новый текст соревнований в меню -перейти к-
+    # полное название текущих соревнований
+    full_name_current = f"{name}.{data}.{gamer_current}"
+    # присваиваем новый текст соревнований в меню -перейти к-
+    my_win.go_to_Action.setText(full_name_current)
     titles = Title.get(Title.full_name_comp == full_name)
     gamer = titles.gamer
     my_win.lineEdit_title_nazvanie.setText(titles.name)
@@ -741,21 +781,24 @@ def db_select_title():
         name = tit.name
         data = tit.data_start
         gamer_current = tit.gamer
-        full_name_current = f"{name}.{data}.{gamer_current}"  # полное название текущих соревнований
-        my_win.go_to_Action.setText(full_name_current)   # присваиваем новый текст соревнований в меню -перейти к-
+        # полное название текущих соревнований
+        full_name_current = f"{name}.{data}.{gamer_current}"
+        # присваиваем новый текст соревнований в меню -перейти к-
+        my_win.go_to_Action.setText(full_name_current)
         titles = Title.get(Title.full_name_comp == full_name)
         gamer = titles.gamer
     elif sender == my_win.toolBox or sender.text() != "Открыть":
         titles = Title.get(Title.id == title_id())
         name = titles.name
         gamer = titles.gamer
-    else:  # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
+    # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
+    else:
         change_sroki()
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[39:]
         name = txt[:37]
-        sroki= fir_window.label_4.text()
+        sroki = fir_window.label_4.text()
         data = sroki[9:19]
         full_name = f"{name}.{data}.{gamer}"
         titles = Title.get(Title.full_name_comp == full_name)
@@ -781,9 +824,12 @@ def system_edit():
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
-    t = Title.select().where(Title.id == title_id()) # последний id соревнований (текуших)
-    ce = System.select().where(System.title_id == t).get()  # находит system id последнего
-    cs = System.select().where(System.id == ce)  # все строки, где title_id соревнований
+    t = Title.select().where(Title.id == title_id()
+                             )  # последний id соревнований (текуших)
+    # находит system id последнего
+    ce = System.select().where(System.title_id == t).get()
+    # все строки, где title_id соревнований
+    cs = System.select().where(System.id == ce)
     count_system = len(cs)  # получение количества записей (этапов) в системе
     sg = my_win.comboBox_one_table.currentText()
     page_v = my_win.comboBox_page_1.currentText()
@@ -812,10 +858,13 @@ def load_tableWidget():
     msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
     tb = my_win.tabWidget.currentIndex()
-    sender = my_win.menuWidget().sender()  # сигнал указывающий какой пункт меню нажат
-    if sender == my_win.rAction or sender == my_win.r1Action:  # нажат пункт меню -текущий рейтинг- или -рейтинг январский
+    # сигнал указывающий какой пункт меню нажат
+    sender = my_win.menuWidget().sender()
+    # нажат пункт меню -текущий рейтинг- или -рейтинг январский
+    if sender == my_win.rAction or sender == my_win.r1Action:
         z = 6
-        column_label = ["№", "Место", "  Рейтинг", "Фамилия Имя", "Дата рождения", "Город"]
+        column_label = ["№", "Место", "  Рейтинг",
+                        "Фамилия Имя", "Дата рождения", "Город"]
     elif my_win.tabWidget.currentIndex() == 3 or my_win.tabWidget.currentIndex() == 5:
         z = 15
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
@@ -866,7 +915,8 @@ def load_tableWidget():
             fill_table_choice()
             hide_show_columns(tb)
     else:  # загружает таблицу со списком
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())
+        player_list = Player.select().where(
+            Player.title_id == title_id()).order_by(Player.rank.desc())
         count = len(player_list)
         if count != 0:
             fill_table(player_list)
@@ -876,7 +926,8 @@ def load_tableWidget():
 def title_string():
     """ переменные строк титульного листа """
     title_str = []
-    title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    # получение последней записи в таблице
+    title = Title.select().order_by(Title.id.desc()).get()
 
     nm = my_win.lineEdit_title_nazvanie.text()
     sr = my_win.comboBox_sredi.currentText()
@@ -919,7 +970,8 @@ def title_pdf():
                                            QtWidgets.QMessageBox.StandardButtons.Yes,
                                            QtWidgets.QMessageBox.StandardButtons.No)
     if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать изображение", "/desktop", "Image files (*.jpg, *.png)")
+        fname = QFileDialog.getOpenFileName(
+            my_win, "Выбрать изображение", "/desktop", "Image files (*.jpg, *.png)")
         filepatch = str(fname[0])
     else:
         filepatch = None
@@ -927,11 +979,13 @@ def title_pdf():
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
     canvas = Canvas(f"title_{short_name}.pdf", pagesize=A4)
-    
+
     if filepatch == None:
         canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
-        canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
+        canvas.drawString(
+            5 * cm, 28 * cm, "Федерация настольного тенниса России")
+        canvas.drawString(
+            3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
         canvas.setFont("DejaVuSerif-Italic", 20)
         canvas.drawString(2 * cm, 23 * cm, nz)
         canvas.setFont("DejaVuSerif-Italic", 16)
@@ -943,8 +997,10 @@ def title_pdf():
         canvas.drawImage(filepatch, 7 * cm, 12 * cm, 6.9 * cm, 4.9 * cm,
                          mask=[0, 2, 0, 2, 0, 2])  # делает фон прозрачным
         canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
-        canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
+        canvas.drawString(
+            5 * cm, 28 * cm, "Федерация настольного тенниса России")
+        canvas.drawString(
+            3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
         canvas.setFont("DejaVuSerif-Italic", 20)
         canvas.drawString(2 * cm, 23 * cm, nz)
         canvas.setFont("DejaVuSerif-Italic", 16)
@@ -964,11 +1020,14 @@ def title_made():
     else:
         db_insert_title(title_str)
     title_pdf()
-    my_win.checkBox.setChecked(False)  # после заполнения титула выключает чекбокс
+    # после заполнения титула выключает чекбокс
+    my_win.checkBox.setChecked(False)
     my_win.Button_title_made.setText("Создать")
     region()
-    t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
-    s = System.select().order_by(System.id.desc()).get()  # получение последнего id системы соревнования
+    # получение последней записи в таблице
+    t = Title.select().order_by(Title.id.desc()).get()
+    # получение последнего id системы соревнования
+    s = System.select().order_by(System.id.desc()).get()
 
     with db:
         System.create_table()
@@ -980,7 +1039,8 @@ def data_title_string():
     """получение строки начало и конец соревнований для вставки в титульный лист"""
     months_list = ("января", "февраля", "марта", "апреля", "мая", "июня", "июля",
                    "августа", "сентября", "октября", "ноября", "декабря")
-    title = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+    # получение последней записи в таблице
+    title = Title.select().order_by(Title.id.desc()).get()
     datastart = str(title.data_start)
     dataend = str(title.data_end)
     ds = datastart[8:10]  # получаем число день из календаря
@@ -1056,7 +1116,8 @@ def fill_table(player_list):
     row_count = len(player_selected)  # кол-во строк в таблице
     if row_count != 0:  # список удаленных игроков пуст
         column_count = len(player_selected[0])  # кол-во столбцов в таблице
-        my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+        # вставляет в таблицу необходимое кол-во строк
+        my_win.tableWidget.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
                 if column == 7:  # преобразует id тренера в фамилию
@@ -1065,13 +1126,17 @@ def fill_table(player_list):
                     item = coach.coach
                 else:
                     item = str(list(player_selected[row].values())[column])
-                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-        my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+                my_win.tableWidget.setItem(
+                    row, column, QTableWidgetItem(str(item)))
+        # ставит размер столбцов согласно записям
+        my_win.tableWidget.resizeColumnsToContents()
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
             my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
     else:
-        my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
-        my_win.statusbar.showMessage("Удаленных участников соревнований нет", 10000)
+        # вставляет в таблицу необходимое кол-во строк
+        my_win.tableWidget.setRowCount(row_count)
+        my_win.statusbar.showMessage(
+            "Удаленных участников соревнований нет", 10000)
 
 
 def fill_table_R_list():
@@ -1080,14 +1145,17 @@ def fill_table_R_list():
     player_r = player_rlist.dicts().execute()
     row_count = len(player_r)  # кол-во строк в таблице
     column_count = len(player_r[0])  # кол-во столбцов в таблице
-    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+    # вставляет в таблицу необходимое кол-во строк
+    my_win.tableWidget.setRowCount(row_count)
 
     for row in range(row_count):  # добвляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(player_r[row].values())[column])
-            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+            my_win.tableWidget.setItem(
+                row, column, QTableWidgetItem(str(item)))
 
-    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+    # ставит размер столбцов согласно записям
+    my_win.tableWidget.resizeColumnsToContents()
 
 
 def fill_table_R1_list():
@@ -1096,14 +1164,17 @@ def fill_table_R1_list():
     player_r1 = player_rlist.dicts().execute()
     row_count = len(player_r1)  # кол-во строк в таблице
     column_count = len(player_r1[0])  # кол-во столбцов в таблице
-    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+    # вставляет в таблицу необходимое кол-во строк
+    my_win.tableWidget.setRowCount(row_count)
 
     for row in range(row_count):  # добавляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(player_r1[row].values())[column])
-            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+            my_win.tableWidget.setItem(
+                row, column, QTableWidgetItem(str(item)))
 
-    my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+    # ставит размер столбцов согласно записям
+    my_win.tableWidget.resizeColumnsToContents()
 
 
 def fill_table_results():
@@ -1146,10 +1217,11 @@ def fill_table_results():
     else:
         # надо выбрать, что загружать в зависимости от вкладки группы, пф или финалы
         if tb == 3:
-            player_result = Result.select().order_by(Result.id).where(Result.system_stage == "Предварительный")
+            player_result = Result.select().order_by(Result.id).where(
+                Result.system_stage == "Предварительный")
         elif tb == 4:
             player_result = Result.select().order_by(Result.id)
-        elif tb == 5: # здесь надо выбрать финалы (круг или сетка)
+        elif tb == 5:  # здесь надо выбрать финалы (круг или сетка)
             player_result = Result.select().order_by(Result.id).where(Result.title_id == title_id() and
                                                                       Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
             count = len(player_result)
@@ -1158,53 +1230,66 @@ def fill_table_results():
         result_list = player_result.dicts().execute()
         row_count = len(result_list)  # кол-во строк в таблице
         column_count = len(result_list[0])  # кол-во столбцов в таблице
-        my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+        # вставляет в таблицу необходимое кол-во строк
+        my_win.tableWidget.setRowCount(row_count)
         row_result = []
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
                 item = str(list(result_list[row].values())[column])
                 if column < 6:
                     row_result.append(item)
-                    my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                    my_win.tableWidget.setItem(
+                        row, column, QTableWidgetItem(str(item)))
                 elif column == 6:
                     row_result.append(item)
                     if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
                         if row_result[4] == row_result[6]:
-                            my_win.tableWidget.item(row, 4).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст
+                            my_win.tableWidget.item(row, 4).setForeground(
+                                QBrush(QColor(255, 0, 0)))  # окрашивает текст
                             # в красный цвет 1-ого игрока
                         else:
-                            my_win.tableWidget.item(row, 5).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст
+                            my_win.tableWidget.item(row, 5).setForeground(
+                                QBrush(QColor(255, 0, 0)))  # окрашивает текст
                             # в красный цвет 2-ого игрока
                     else:
-                        my_win.tableWidget.item(row, 4).setForeground(QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
-                        my_win.tableWidget.item(row, 5).setForeground(QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
+                        my_win.tableWidget.item(row, 4).setForeground(
+                            QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
+                        my_win.tableWidget.item(row, 5).setForeground(
+                            QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
                     row_result.clear()
-                    my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                    my_win.tableWidget.setItem(
+                        row, column, QTableWidgetItem(str(item)))
                 elif column > 6:
-                    my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                    my_win.tableWidget.setItem(
+                        row, column, QTableWidgetItem(str(item)))
 
         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
         my_win.tableWidget.hideColumn(13)
-        my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+        # ставит размер столбцов согласно записям
+        my_win.tableWidget.resizeColumnsToContents()
 
 
 def fill_table_choice():
     """заполняет таблицу жеребьевки"""
     gamer = my_win.lineEdit_title_gamer.text()
-    player_choice = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc())
+    player_choice = Choice.select().where(
+        Choice.title_id == title_id()).order_by(Choice.rank.desc())
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
     if row_count != 0:
         column_count = len(choice_list[0])  # кол-во столбцов в таблице
-        my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+        # вставляет в таблицу необходимое кол-во строк
+        my_win.tableWidget.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
                 item = str(list(choice_list[row].values())[column])
-                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-        my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+                my_win.tableWidget.setItem(
+                    row, column, QTableWidgetItem(str(item)))
+        # ставит размер столбцов согласно записям
+        my_win.tableWidget.resizeColumnsToContents()
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
             my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 
@@ -1242,16 +1327,18 @@ def add_player():
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
         with db:
-            player_del = Delete_player.get(Delete_player.player == my_win.tableWidget.item(row, 1).text())
+            player_del = Delete_player.get(
+                Delete_player.player == my_win.tableWidget.item(row, 1).text())
             pl_id = player_del.player_del_id
             player_del.delete_instance()
             plr = Player(player_id=pl_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-                         razryad=rz, coach_id=idc, full_name = fn, mesto=ms, title_id=title_id()).save()
+                         razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id()).save()
         spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
         for i in range(0, 9):  # добавляет в tablewidget
             my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
         load_tableWidget()  # заново обновляет список
-        player_list = Player.select().where(Player.title_id == title_id())  # выделяет все строки базы данных
+        player_list = Player.select().where(Player.title_id == title_id()
+                                            )  # выделяет все строки базы данных
         count = len(player_list)  # подсчитывает новое кол-во игроков
         my_win.label_46.setText(f"Всего: {count} участников")
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
@@ -1260,22 +1347,23 @@ def add_player():
         if txt == "Редактировать":
             with db:
                 plr = Player.get(Player.player == pl)
-                plr.player=pl
-                plr.bday=bd
-                plr.rank=rn
-                plr.city=ct
-                plr.region=rg
-                plr.razryad=rz
-                plr.coach_id=idc
-                plr.full_name=fn
+                plr.player = pl
+                plr.bday = bd
+                plr.rank = rn
+                plr.city = ct
+                plr.region = rg
+                plr.razryad = rz
+                plr.coach_id = idc
+                plr.full_name = fn
                 plr.save()
         elif txt == "Добавить":
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
-                                coach_id=idc, mesto="", full_name=fn, title_id=title_id() ).save()
+                                coach_id=idc, mesto="", full_name=fn, title_id=title_id()).save()
         spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
         for i in range(0, 9):  # добавляет в tablewidget
-            my_win.tableWidget.setItem(count + 1, i, QTableWidgetItem(spisok[i]))
+            my_win.tableWidget.setItem(
+                count + 1, i, QTableWidgetItem(spisok[i]))
         load_tableWidget()  # заново обновляет список
         player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)  # подсчитывает новое кол-во игроков
@@ -1291,7 +1379,8 @@ def add_player():
 def dclick_in_listwidget():
     """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""
     text = my_win.listWidget.currentItem().text()
-    tc = my_win.lineEdit_coach.text()  # если строка "тренер" пустая значит заполняются поля игрока
+    # если строка "тренер" пустая значит заполняются поля игрока
+    tc = my_win.lineEdit_coach.text()
     if tc == "":
         ds = len(text)
         sz = text.index(",")
@@ -1323,7 +1412,8 @@ def dclick_in_listwidget():
 def load_combobox_filter_final():
     """заполняет комбобокс фильтр финалов для таблицы результаты"""
     my_win.comboBox_filter_final.clear()
-    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().order_by(System.id).where(
+        System.title_id == title_id())  # находит system id последнего
     fin = ["все финалы"]
     for sys in system:
         if sys.stage == "Одна таблица":
@@ -1345,7 +1435,8 @@ def load_combobox_filter_group():
     my_win.comboBox_filter_group.clear()
     my_win.comboBox_filter_choice.clear()
 
-    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().order_by(System.id).where(
+        System.title_id == title_id())  # находит system id последнего
     for i in system:
         e = i.stage
         etap.append(e)  # получает список этапов на данных соревнованиях
@@ -1443,8 +1534,10 @@ def page():
             result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
                                         msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
             if result == msgBox.StandardButtons.Ok:
-                my_win.statusbar.showMessage("Создание системы соревнования", 10000)
-                choice_tbl_made()  # создание таблицы жеребьевка, заполняет db списком участников для жеребъевки
+                my_win.statusbar.showMessage(
+                    "Создание системы соревнования", 10000)
+                # создание таблицы жеребьевка, заполняет db списком участников для жеребъевки
+                choice_tbl_made()
                 my_win.label_10.show()
                 my_win.comboBox_etap_1.show()
             else:
@@ -1591,11 +1684,14 @@ def sort():
     sender = my_win.sender()  # сигнал от кнопки
 
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(
+            Player.rank.desc())  # сортировка по рейтингу
     elif sender == my_win.Button_sort_Name:
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алфавиту
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(
+            Player.player)  # сортировка по алфавиту
     elif sender == my_win.Button_sort_mesto:
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
+        player_list = Player.select().where(Player.title_id == title_id()
+                                            ).order_by(Player.mesto)  # сортировка по месту
 
     fill_table(player_list)
     list_player_pdf(player_list)
@@ -1623,7 +1719,8 @@ def button_title_made_enable(state):
         nm = title_str[0]
         ds = title_str[3]
         de = title_str[4]
-        t = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        # получение последней записи в таблице
+        t = Title.select().order_by(Title.id.desc()).get()
         if t.name == nm and str(t.data_start) == ds and str(t.data_end) == de:
             my_win.Button_title_made.setText("Редактировать")
         else:
@@ -1666,19 +1763,27 @@ def list_player_pdf(player_list):
     elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
-              colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.7 * cm, 1.1 * cm),
+              colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm,
+                         2.5 * cm, 3.1 * cm, 1.2 * cm, 4.7 * cm, 1.1 * cm),
               rowHeights=None)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
-                           ('FONTSIZE', (0, 0), (-1, -1), 7),  # Использую импортированный шрифта размер
-                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),  # межстрочный верхний инервал
-                           ('TOPPADDING', (0, 0), (-1, -1), 1),  # межстрочный нижний инервал
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # вериткальное выравнивание в ячейке заголовка
-                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),  # горизонтальное выравнивание в ячейке
+                           # Использую импортированный шрифта размер
+                           ('FONTSIZE', (0, 0), (-1, -1), 7),
+                           # межстрочный верхний инервал
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                           # межстрочный нижний инервал
+                           ('TOPPADDING', (0, 0), (-1, -1), 1),
+                           # вериткальное выравнивание в ячейке заголовка
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           # горизонтальное выравнивание в ячейке
+                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
                            ('BACKGROUND', (0, 0), (-1, kp * -1), colors.yellow),
                            ('TEXTCOLOR', (0, 0), (-1, kp * -1), colors.darkblue),
                            ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
-                           ('INNERGRID', (0, 0), (-1, -1), 0.05, colors.black),  # цвет и толщину внутренних линий
-                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)  # внешние границы таблицы
+                           # цвет и толщину внутренних линий
+                           ('INNERGRID', (0, 0), (-1, -1), 0.05, colors.black),
+                           # внешние границы таблицы
+                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
                            ]))
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
@@ -1717,7 +1822,8 @@ def system_competition():
             result = msgBox.information(my_win, "", "Вы хотите изменить систему соревнований?",
                                         msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
             if result == msgBox.StandardButtons.Ok:
-                clear_db_before_edit()  # очищает таблицы перед новой системой соревнования (system, choice)
+                # очищает таблицы перед новой системой соревнования (system, choice)
+                clear_db_before_edit()
                 choice_tbl_made()  # заполняет db жеребьевка
             else:
                 return
@@ -1848,7 +1954,8 @@ def one_table(fin, mesto_in_group, group):
 
             load_tableWidget()
 
-            choice = Choice.select().where(Choice.title_id == t_id and Choice.mesto_group == mesta_exit)  # отбирает
+            choice = Choice.select().where(
+                Choice.title_id == t_id and Choice.mesto_group == mesta_exit)  # отбирает
             # записи жеребьевки после игр в группах (места которые вышли в финал)
             player_choice = choice.select().order_by(Choice.group)
             con = len(player_choice)
@@ -1859,7 +1966,8 @@ def one_table(fin, mesto_in_group, group):
                 i.save()
 
             string_table = my_win.label_50.text()
-            system = System.get(System.title_id == title_id() and System.stage == fin)
+            system = System.get(System.title_id == title_id()
+                                and System.stage == fin)
             system.choice_flag = 1
             system.save()
             return
@@ -1873,8 +1981,10 @@ def kol_player_in_group():
     player_list = Player.select().where(Player.title_id == title_id())
     type_table = "группы"
     count = len(player_list)  # количество записей в базе
-    e1 = int(count) % int(kg)  # остаток отделения, если 0, то участники равно делится на группы
-    p = int(count) // int(kg)  # если количество участников равно делится на группы (кол-во групп)
+    # остаток отделения, если 0, то участники равно делится на группы
+    e1 = int(count) % int(kg)
+    # если количество участников равно делится на группы (кол-во групп)
+    p = int(count) // int(kg)
     g1 = int(kg) - e1  # кол-во групп, где наименьшее кол-во спортсменов
     p2 = str(p + 1)  # кол-во человек в группе с наибольшим их количеством
     if e1 == 0:  # то в группах равное количество человек -e1-
@@ -1934,7 +2044,8 @@ def view():
         view_file = f"Title_{short_name}.pdf"
     elif sender == my_win.view_list_Action:
         my_win.tabWidget.setCurrentIndex(1)
-        player_list = Player.select().where(Player.title_id == title_id())  # сортировка по алфавиту
+        player_list = Player.select().where(
+            Player.title_id == title_id())  # сортировка по алфавиту
         list_player_pdf(player_list)
         view_file = f"table_list_{short_name}.pdf"
     elif sender == my_win.view_gr_Action:  # вкладка группы
@@ -1952,7 +2063,8 @@ def view():
 def player_in_setka(fin):
     """заполняет таблицу Game_list данными спортсменами из сетки tds - список списков данных из сетки, а затем
     заполняет таблицу -Result-"""
-    s = System.select().where(System.title_id == title_id())  # находит system id последнего
+    s = System.select().where(System.title_id == title_id()
+                              )  # находит system id последнего
     # count = len(s)
     for i in s:  # перебирает в цикле строки в табл System где последний titul_id
         if i.stage == fin:
@@ -1962,12 +2074,14 @@ def player_in_setka(fin):
     game = int(mg[:space])
     sd_full = []
     sd = []
-    tds = setka_16_made(fin)  # создание сетки со спортсменами согласно жеребьевки
+    # создание сетки со спортсменами согласно жеребьевки
+    tds = setka_16_made(fin)
     for r in tds:
         if r != "bye":
             space = r.find(" ")  # находит пробел перед именем
             symbol = r.find("/")  # находит черту отделяющий город
-            sl = r[:space + 2]  # удаляет все после пробела кроме первой буквы имени
+            # удаляет все после пробела кроме первой буквы имени
+            sl = r[:space + 2]
             sl_full = r[:symbol]
             family = f'{sl}.'  # добавляет точку к имени
             sd.append(family)
@@ -2003,10 +2117,11 @@ def player_fin_on_circle(fin):
     """заполняет таблицу Game_list данными спортсменами из группы, которые будут играть в финале по кругу
      td - список списков данных из групп"""
     gr = []
-    player_final ={}
+    player_final = {}
     parametrs_final = {}
     mesto = 1
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().where(System.title_id == title_id()
+                                   )  # находит system id последнего
     for s in system:
         if s.stage == "Предварительный":
             sys = system.select().where(System.stage == "Предварительный").get()
@@ -2024,11 +2139,13 @@ def player_fin_on_circle(fin):
 
     mesto_in_group = player_final[fin]
 
-    one_table(fin, mesto_in_group, group)  # вызов функции, где получаем список всех участников по группам
+    # вызов функции, где получаем список всех участников по группам
+    one_table(fin, mesto_in_group, group)
     choice = Choice.select().order_by(Choice.group).where(Choice.title_id == title_id() and
                                                           Choice.mesto_group == mesto_in_group["место"])
 
-    system_id = System.get(System.title_id == title_id() and System.stage == fin)
+    system_id = System.get(System.title_id == title_id()
+                           and System.stage == fin)
     st = "Финальный"
     k = 0
     t_id = title_id()
@@ -2057,14 +2174,17 @@ def player_fin_on_circle(fin):
 def player_in_table():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
     встречи по турам в таблицу -Result- """
-    system = System.select().where(System.title_id == title_id()).get()  # находит system id последнего
+    system = System.select().where(System.title_id == title_id()
+                                   ).get()  # находит system id последнего
     kg = system.total_group
     st = system.stage
     table = system.label_string
     pv = system.page_vid
     stage = st
-    table_made(pv)  # создание таблиц групп со спортсменами согласно жеребьевки в PDF
-    tdt_all = table_data(stage, kg)  # вызов функции, где получаем список всех участников по группам
+    # создание таблиц групп со спортсменами согласно жеребьевки в PDF
+    table_made(pv)
+    # вызов функции, где получаем список всех участников по группам
+    tdt_all = table_data(stage, kg)
     tdt = tdt_all[0]
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
         gr = tdt[p]
@@ -2073,13 +2193,15 @@ def player_in_table():
         k = 0  # кол-во спортсменов в группе
         for i in range(0, count_player * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
-            fp = len(family_player)  # подсчет кол-во знаков в фамилия, если 0 значит игрока нет
+            # подсчет кол-во знаков в фамилия, если 0 значит игрока нет
+            fp = len(family_player)
             if fp > 0:  # если строка (фамилия игрока) не пустая идет запись в db
                 k += 1
                 with db:
                     game_list = Game_list(number_group=number_group, rank_num_player=k, player_group=family_player,
                                           system_id=system, title_id=title_id()).save()
-        if fp == 0 and k != 0 or k == count_player:  # если 1-я строка (фамилия игрока) пустая выход из группы
+        # если 1-я строка (фамилия игрока) пустая выход из группы
+        if fp == 0 and k != 0 or k == count_player:
             cp = k - 3
             tour = tours_list(cp)
             kol_tours = len(tour)  # кол-во туров
@@ -2091,7 +2213,8 @@ def player_in_table():
                     match = tours[d]  # матч в туре
                     znak = match.find("-")
                     first = int(match[:znak])  # игрок под номером в группе
-                    second = int(match[znak + 1:])  # игрок под номером в группе
+                    # игрок под номером в группе
+                    second = int(match[znak + 1:])
                     pl1 = gr[first * 2 - 2][1]  # фамилия первого игрока
                     pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
                     with db:
@@ -2162,11 +2285,14 @@ def match_score_db():
                 match_check = 0
         if match_check == 0:
             if match == 3:
-                my_win.radioButton_match_3.setChecked(True)  # устанавливает галочку
+                my_win.radioButton_match_3.setChecked(
+                    True)  # устанавливает галочку
             elif match == 5:
-                my_win.radioButton_match_5.setChecked(True)  # устанавливает галочку
+                my_win.radioButton_match_5.setChecked(
+                    True)  # устанавливает галочку
             elif match == 7:
-                my_win.radioButton_match_7.setChecked(True)  # устанавливает галочку
+                my_win.radioButton_match_7.setChecked(
+                    True)  # устанавливает галочку
         elif match != match_check:
             with db:
                 sf.score_flag = match_check
@@ -2186,7 +2312,7 @@ def match_score_db():
             match = sf.score_flag
             state = sf.visible_game  # флаг, показывающий записывать счет в партиях или нет
 
-        #====================
+        # ====================
         if state is False:  # изменяет состояние на Bool в зависимости от цифрового кода CheckBox
             my_win.checkBox_5.setChecked(False)
         elif state is True:
@@ -2212,11 +2338,14 @@ def match_score_db():
                 match_check = 0
         if match_check == 0:
             if match == 3:
-                my_win.radioButton_match_4.setChecked(True)  # устанавливает галочку
+                my_win.radioButton_match_4.setChecked(
+                    True)  # устанавливает галочку
             elif match == 5:
-                my_win.radioButton_match_6.setChecked(True)  # устанавливает галочку
+                my_win.radioButton_match_6.setChecked(
+                    True)  # устанавливает галочку
             elif match == 7:
-                my_win.radioButton_match_8.setChecked(True)  # устанавливает галочку
+                my_win.radioButton_match_8.setChecked(
+                    True)  # устанавливает галочку
         elif match != match_check:
             with db:
                 sf.score_flag = match_check
@@ -2233,11 +2362,12 @@ def game_in_visible():
     tab = my_win.tabWidget.currentIndex()
     sender = my_win.sender()
     system = System.select().where(System.title_id == title_id())
-    #=================
+    # =================
     count = len(system)
     flag = 0  # флаг переключения состояния чекбокса
     state_check = False
-    if sender == my_win.checkBox_4:  # изменение состояния чекбокс (видимость полей для счета)
+    # изменение состояния чекбокс (видимость полей для счета)
+    if sender == my_win.checkBox_4:
         state_check = my_win.checkBox_4.isChecked()
     elif sender == my_win.checkBox_5:
         state_check = my_win.checkBox_5.isChecked()
@@ -2258,19 +2388,22 @@ def game_in_visible():
         if r >= 0:  # двойной клик по строке встречи
             if tab == 3:
                 my_win.checkBox_4.setEnabled(True)
-                final = my_win.tableWidget.item(r, 1).text()  # из какой группы пара игроков в данный момент
+                # из какой группы пара игроков в данный момент
+                final = my_win.tableWidget.item(r, 1).text()
             elif tab == 4:
                 pass
             else:
                 my_win.checkBox_5.setEnabled(True)
-                final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
-            #===============
+                # из какого финала пара игроков в данный момент
+                final = my_win.tableWidget.item(r, 2).text()
+            # ===============
             if final != "":
-                k = System.get(System.title_id == title_id() and System.stage == final)
+                k = System.get(System.title_id == title_id()
+                               and System.stage == final)
                 state = k.visible_game
             else:
                 return
-            #================
+            # ================
             if flag == 1:
                 if tab == 3:
                     state_check = my_win.checkBox_4.isChecked()
@@ -2296,15 +2429,18 @@ def game_in_visible():
                 my_win.checkBox_5.setEnabled(False)
                 if count == 1:
                     final = "Одна таблица"
-                    k = System.get(System.title_id == title_id() and System.stage == final)
+                    k = System.get(System.title_id == title_id()
+                                   and System.stage == final)
                     state = k.visible_game
                 else:
                     if r == -1:
                         final = "1-й финал"
                         state = False
                     else:
-                        final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
-                        k = System.get(System.title_id == title_id() and System.stage == final)
+                        # из какого финала пара игроков в данный момент
+                        final = my_win.tableWidget.item(r, 2).text()
+                        k = System.get(System.title_id ==
+                                       title_id() and System.stage == final)
                         state = k.visible_game
 
         if flag == 0:
@@ -2336,7 +2472,8 @@ def visible_field(state):
         my_win.lineEdit_pl2_s7_fin.setVisible(False)
         my_win.label_22.setVisible(False)
     else:
-        if tab == 3:  # вкладка -группы- проверка какая стоит галочка (сколько партий)
+        # вкладка -группы- проверка какая стоит галочка (сколько партий)
+        if tab == 3:
             if my_win.radioButton_match_3.isChecked():
                 match = 3
                 my_win.lineEdit_pl1_s1.setVisible(True)
@@ -2452,7 +2589,7 @@ def select_player_in_list():
     rn = len(region)
     razrayd = my_win.tableWidget.item(r, 6).text()
     coach = my_win.tableWidget.item(r, 7).text()
-#================================
+# ================================
     my_win.lineEdit_Family_name.setText(family)
     my_win.lineEdit_bday.setText(birthday)
     my_win.lineEdit_R.setText(rank)
@@ -2461,7 +2598,7 @@ def select_player_in_list():
     my_win.comboBox_razryad.setCurrentText(razrayd)
     my_win.lineEdit_coach.setText(coach)
     my_win.Button_add_edit_player.setEnabled(True)
-    if my_win.checkBox_6.isChecked(): # отмечен флажок -удаленные-
+    if my_win.checkBox_6.isChecked():  # отмечен флажок -удаленные-
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_add_edit_player.setText("Восстановить")
     else:
@@ -2491,21 +2628,24 @@ def select_player_in_game():
         my_win.checkBox_10.setChecked(False)
     game_in_visible()
 
-    if tab == 3 or tab == 4 or tab == 5: #
-        win_pole = my_win.tableWidget.item(r, 6).text()  # поле победителя (если заполнено, значит встреча сыграна)
+    if tab == 3 or tab == 4 or tab == 5:
+        # поле победителя (если заполнено, значит встреча сыграна)
+        win_pole = my_win.tableWidget.item(r, 6).text()
         if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
             sc = my_win.tableWidget.item(r, 8).text()
             pl1 = my_win.tableWidget.item(r, 4).text()
             pl2 = my_win.tableWidget.item(r, 5).text()
             if pl1 == my_win.tableWidget.item(r, 6).text():
-                if sc != "": # если в сетке недостающие игроки (bye), то нет счета
+                # если в сетке недостающие игроки (bye), то нет счета
+                if sc != "":
                     sc1 = sc[0]
                     sc2 = sc[4]
                 else:  # оставляет поля общий счет пустыми
                     sc1 = ""
                     sc2 = ""
             else:
-                if sc != "":  # если в сетке недостающие игроки (bye), то нет счета
+                # если в сетке недостающие игроки (bye), то нет счета
+                if sc != "":
                     sc1 = sc[4]
                     sc2 = sc[0]
                 else:
@@ -2566,10 +2706,11 @@ def delete_player():
     if result == msgBox.StandardButtons.Ok:
         with db:
             del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
-                                       region=region, razryad=razryad, coach_id=coach_id, full_name =full_name,
+                                       region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
                                        player=player_del, title_id=t_id).save()
 
-            player = Player.get(Player.player == my_win.tableWidget.item(r, 1).text())
+            player = Player.get(
+                Player.player == my_win.tableWidget.item(r, 1).text())
             player.delete_instance()
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
@@ -2599,7 +2740,7 @@ def focus():
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl1_s1.setFocus()
             else:
-                 my_win.lineEdit_pl2_s1.setFocus()
+                my_win.lineEdit_pl2_s1.setFocus()
         elif sender == my_win.lineEdit_pl2_s1:
             if my_win.lineEdit_pl2_s1.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
@@ -2673,7 +2814,8 @@ def focus():
                     my_win.Button_Ok.setFocus()
     elif tab == 5:
         r = my_win.tableWidget.currentRow()
-        final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
+        # из какого финала пара игроков в данный момент
+        final = my_win.tableWidget.item(r, 2).text()
         if stage == "Одна таблица":
             final = stage
         sys = system.select().where(System.stage == final).get()
@@ -2707,7 +2849,7 @@ def focus():
                 if count == 0:
                     my_win.lineEdit_pl1_s3_fin.setFocus()
                 else:
-                # =====================
+                    # =====================
                     if sum_total_game[0] != sum_total_game[1]:
                         my_win.lineEdit_pl1_s3_fin.setFocus()  # переводит фокус на следующее поле
                     else:
@@ -2720,16 +2862,17 @@ def focus():
                 my_win.lineEdit_pl2_s3_fin.setFocus()
         elif sender == my_win.lineEdit_pl2_s3_fin:  # нажал ентер на счете 2-ого игрока 3-й партии
             if my_win.lineEdit_pl2_s3_fin.text() == "":
-                msgBox.critical(my_win, "", "Ошибка при вводе счета!")  # если забыл написать счет и нажал ентер
+                # если забыл написать счет и нажал ентер
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl2_s3_fin.setFocus()
             else:
                 sum_total_game = score_in_game()  # подсчет очков в партии
-                #====================
+                # ====================
                 count = len(sum_total_game)
                 if count == 0:
                     my_win.lineEdit_pl2_s3_fin.setFocus()
                 else:
-                #=====================
+                    # =====================
                     if sum_total_game[0] != sum_total_game[1]:
                         my_win.lineEdit_pl1_s4_fin.setFocus()
                     else:
@@ -2751,7 +2894,7 @@ def focus():
                 if count == 0:
                     my_win.lineEdit_pl2_s4_fin.setFocus()
                 else:
-                # =====================
+                    # =====================
                     if sum_total_game[0] != sum_total_game[1]:
                         my_win.lineEdit_pl1_s5_fin.setFocus()
                     else:
@@ -2773,7 +2916,7 @@ def focus():
                 if count == 0:
                     my_win.lineEdit_pl2_s5_fin.setFocus()
                 else:
-                # =====================
+                    # =====================
                     if sum_total_game[0] != sum_total_game[1]:
                         my_win.lineEdit_pl1_s5_fin.setFocus()
                     else:
@@ -2796,7 +2939,7 @@ def score_in_game():
     if tab == 3:
         sys = system.select().where(System.stage == "Предварительный").get()
         sf = sys.score_flag  # флаг из скольки партий играется матч
-        #==========
+        # ==========
         s11 = my_win.lineEdit_pl1_s1.text()
         s21 = my_win.lineEdit_pl2_s1.text()
         s12 = my_win.lineEdit_pl1_s2.text()
@@ -2815,7 +2958,8 @@ def score_in_game():
         pass
     elif tab == 5:
         r = my_win.tableWidget.currentRow()
-        final = my_win.tableWidget.item(r, 2).text()  # из какого финала пара игроков в данный момент
+        # из какого финала пара игроков в данный момент
+        final = my_win.tableWidget.item(r, 2).text()
         if stage == "Одна таблица":
             final = stage
         sys = system.select().where(System.stage == final).get()
@@ -2892,12 +3036,13 @@ def score_in_game():
                     ts2.append(point)
                 st1 = sum(ts1)
                 st2 = sum(ts2)
-                #==============
+                # ==============
                 if tab == 3:
                     my_win.lineEdit_pl1_score_total.setText(str(st1))
                     my_win.lineEdit_pl2_score_total.setText(str(st2))
                     if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
-                        my_win.Button_Ok.setEnabled(True)  # если игрок набрал макс очки активиоует кнопку ОК и переводит на нее фокус
+                        # если игрок набрал макс очки активиоует кнопку ОК и переводит на нее фокус
+                        my_win.Button_Ok.setEnabled(True)
                         my_win.Button_Ok.setFocus()
                 elif tab == 4:
                     pass
@@ -2905,14 +3050,18 @@ def score_in_game():
                     my_win.lineEdit_pl1_score_total_fin.setText(str(st1))
                     my_win.lineEdit_pl2_score_total_fin.setText(str(st2))
                     if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
-                        my_win.Button_Ok_fin.setEnabled(True)  # если игрок набрал макс очки активирует кнопку ОК и переводит на нее фокус
+                        # если игрок набрал макс очки активирует кнопку ОК и переводит на нее фокус
+                        my_win.Button_Ok_fin.setEnabled(True)
                         my_win.Button_Ok_fin.setFocus()
                 total_game.append(st1)
                 total_game.append(st2)
-                max_score = max(total_game)  # находит максимальное число очков из сыгранных партий
+                # находит максимальное число очков из сыгранных партий
+                max_score = max(total_game)
                 if i == 0:
-                    sum_total_game.append(max_game)  # добавляет в список макс число очков которые надо набрать
-                    sum_total_game.append(max_score)  # добавляет в список макс число очков которые уже набрал игрок
+                    # добавляет в список макс число очков которые надо набрать
+                    sum_total_game.append(max_game)
+                    # добавляет в список макс число очков которые уже набрал игрок
+                    sum_total_game.append(max_score)
                 else:
                     sum_total_game[0] = max_game
                     sum_total_game[1] = max_score
@@ -2989,7 +3138,9 @@ def enter_score(none_player=0):
             stage = "Одна таблица"
         else:
             stage = fin
-    system = System.get(System.title_id == title_id() and System.stage == stage)  # находит system id последнего
+    # находит system id последнего
+    system = System.get(System.title_id == title_id()
+                        and System.stage == stage)
     type = system.type_table
 
     if stage == "Предварительный":
@@ -3004,7 +3155,7 @@ def enter_score(none_player=0):
     else:  # финалы
         if type == "сетка":
             sc_total = setka_type(none_player)
-        else: # по кругу
+        else:  # по кругу
             sc_total = circle_type(none_player, stage)
     st1 = sc_total[0]  # партия выигранные
     st2 = sc_total[1]  # партии проигранные
@@ -3038,7 +3189,7 @@ def enter_score(none_player=0):
         else:
             winner_string = ts_winner  # только общий счет
     game_play = False
-    with db: # записывает в таблицу -Result- сыгранный матч
+    with db:  # записывает в таблицу -Result- сыгранный матч
         result = Result.get(Result.id == id)
         result.winner = winner
         result.points_win = w
@@ -3051,24 +3202,27 @@ def enter_score(none_player=0):
 
     if tab == 5:  # записывает в -Result- сыгранный матч со сносками на соответствующие строки победителя и проигравшего
         if type == "сетка":
-            snoska = numer_game(num_game)  # список 1-й номер победителя 2-й проигравшего
+            # список 1-й номер победителя 2-й проигравшего
+            snoska = numer_game(num_game)
             if snoska[0] != 0:
                 with db:  # записывает в db таблицу Result победителя и проигравшего
                     player = winner
                     for k in range(0, 2):
-                        res = Result.select().where(Result.number_group == fin)  # номер id куда записывается победитель
+                        # номер id куда записывается победитель
+                        res = Result.select().where(Result.number_group == fin)
                         for result in res:
                             match_num = result.tours  # номер встречи
                             game = snoska[2] * -1
                             if int(match_num) == game:
-                                        res_id = Result.get(Result.number_group == fin and Result.tours == snoska[k])
-                                        if int(match_num) % 2 != 0:
-                                            res_id.player1 = player
-                                        else:
-                                            res_id.player2 = player
-                                        res_id.save()
-                                        player = loser
-                                        break
+                                res_id = Result.get(
+                                    Result.number_group == fin and Result.tours == snoska[k])
+                                if int(match_num) % 2 != 0:
+                                    res_id.player1 = player
+                                else:
+                                    res_id.player2 = player
+                                res_id.save()
+                                player = loser
+                                break
         elif type == "круг":
             pass
     fill_table_results()
@@ -3110,9 +3264,11 @@ def enter_score(none_player=0):
         my_win.lineEdit_player2_fin.clear()
     # ===== вызов функции заполнения таблицы pdf группы сыгранными играми
     if stage == "Одна таблица":
-        system = System.select().order_by(System.id).where(System.title_id == title_id()).get()
+        system = System.select().order_by(System.id).where(
+            System.title_id == title_id()).get()
     else:
-        system = System.select().order_by(System.id).where(System.title_id == title_id() and System.stage == fin).get()
+        system = System.select().order_by(System.id).where(
+            System.title_id == title_id() and System.stage == fin).get()
 
     if system.stage == "Предварительный":
         pv = system.page_vid
@@ -3347,12 +3503,14 @@ def result_filter_name():
     result_list = c.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = 13  # кол-во столбцов в таблице
-    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+    # вставляет в таблицу необходимое кол-во строк
+    my_win.tableWidget.setRowCount(row_count)
 
     for row in range(row_count):  # добавляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(result_list[row].values())[column])
-            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+            my_win.tableWidget.setItem(
+                row, column, QTableWidgetItem(str(item)))
 
 
 def filter_fin(pl=False):
@@ -3364,11 +3522,13 @@ def filter_fin(pl=False):
     round = my_win.lineEdit_tour.text()
     name = name.title()  # делает Заглавными буквы слов
     played = my_win.comboBox_filter_played_fin.currentText()
-    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().order_by(System.id).where(
+        System.title_id == title_id())  # находит system id последнего
 
     fin = []
     if final == "Одна таблица":
-        fltr = Result.select().where(Result.title_id == title_id() and Result.system_stage == "Одна таблица")
+        fltr = Result.select().where(Result.title_id == title_id()
+                                     and Result.system_stage == "Одна таблица")
         if final == "Одна таблица" and my_win.comboBox_find_name_fin.currentText() != "":
             if pl == False:
                 fltr = Result.select().where(Result.title_id == title_id() and Result.player1 == name)
@@ -3385,7 +3545,8 @@ def filter_fin(pl=False):
                 count = len(fltr)
                 my_win.label_38.setText(f'Сыграно {count} игры')
             elif final == "Одна таблица" and played == "не сыгранные":
-                fltr = Result.select().where(Result.system_stage == "Одна таблица" and Result.points_win == None)
+                fltr = Result.select().where(Result.system_stage ==
+                                             "Одна таблица" and Result.points_win == None)
                 count = len(fltr)
                 my_win.label_38.setText(f'Не сыграно {count} игры')
             elif final == "Одна таблица" and played == "все игры" and num_game_fin == "" and round != "":
@@ -3398,26 +3559,29 @@ def filter_fin(pl=False):
                 fltr = fl.select().where(Result.tours == num_game_fin)
     else:
         if final == "все финалы" and played == "все игры" and num_game_fin == "":
-            fltr = Result.select().where(Result.title_id == title_id() and Result.system_stage == "Финальный")
+            fltr = Result.select().where(Result.title_id == title_id()
+                                         and Result.system_stage == "Финальный")
             if name == "":
                 count = len(fltr)
                 my_win.label_38.setText(f'Всего в финалах {count} игры')
                 for i in range(0, count):
-                     my_win.tableWidget.showRow(i)
+                    my_win.tableWidget.showRow(i)
             else:  # выбор по фамилии спортсмена
                 row = 0
                 fltr = Result.select().where(Result.system_stage == "Финальный")
                 for result_name in fltr:
                     row += 1
                 if result_name.player1 == name or result_name.player2 == name:
-                     pass
+                    pass
                 else:
                     my_win.tableWidget.hideRow(row - 1)
-        elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "":  # один из финалов встречи которые не сыгранные
+        # один из финалов встречи которые не сыгранные
+        elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "":
             fl = Result.select().where(Result.number_group == final)
             fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
             count = len(fltr)
-            my_win.label_38.setText(f'Всего в {final} не сыгранно {count} игры')
+            my_win.label_38.setText(
+                f'Всего в {final} не сыгранно {count} игры')
         elif final != "все финалы" and played == "завершенные" and num_game_fin == "":
             fltr_played = []
             fltr = Result.select().where(Result.number_group == final)
@@ -3439,7 +3603,8 @@ def filter_fin(pl=False):
                     win = fl.winner
                     fltr_played.append(win)
             count_pl = len(fltr_played)
-            my_win.label_38.setText(f' Всего сыграно во всех финалах {count_pl} игры')
+            my_win.label_38.setText(
+                f' Всего сыграно во всех финалах {count_pl} игры')
         else:
             if final != "все финалы" and num_game_fin != "":
                 fltr = Result.select().where(Result.number_group == final)
@@ -3450,7 +3615,8 @@ def filter_fin(pl=False):
                         txt = txt[:5]
                         if txt == "Сетка":
                             fin.append(sys.stage)
-                fin, ok = QInputDialog.getItem(my_win, "Финалы", "Выберите финал, где искать номер встречи.", fin, 0, False)
+                fin, ok = QInputDialog.getItem(
+                    my_win, "Финалы", "Выберите финал, где искать номер встречи.", fin, 0, False)
                 fltr = Result.select().where(Result.number_group == fin)
             row = 0
             for result_list in fltr:
@@ -3460,7 +3626,8 @@ def filter_fin(pl=False):
                     r = num_game_fin - 1
                     my_win.tableWidget.selectRow(r)
                     item = my_win.tableWidget.item(r, 5)
-                    my_win.tableWidget.scrollToItem(item)  # переводит выделенную строку в видимую часть экрана
+                    # переводит выделенную строку в видимую часть экрана
+                    my_win.tableWidget.scrollToItem(item)
                     break
 
     result_list = fltr.dicts().execute()
@@ -3468,13 +3635,15 @@ def filter_fin(pl=False):
     my_win.label_38.show()
     row_count = len(fltr)  # кол-во строк в таблице
     column_count = 13  # кол-во столбцов в таблице
-    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+    # вставляет в таблицу необходимое кол-во строк
+    my_win.tableWidget.setRowCount(row_count)
 
     for row in range(row_count):  # добавляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(result_list[row].values())[column])
-            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-            #=====================
+            my_win.tableWidget.setItem(
+                row, column, QTableWidgetItem(str(item)))
+            # =====================
     if my_win.comboBox_find_name_fin.currentText() != "" and pl == False:
         result = msgBox.question(my_win, "", "Продолжить поиск игр с участием\n"
                                              f"{name} ?",
@@ -3496,7 +3665,8 @@ def filter_gr(pl=False):
     name = my_win.comboBox_find_name.currentText()
     name = name.title()  # делает Заглавными буквы слов
     played = my_win.comboBox_filter_played.currentText()
-    fltr_id = Result.select().where(Result.title_id == title_id())  # отфильтровывает записи с id соревнования (title_id)
+    # отфильтровывает записи с id соревнования (title_id)
+    fltr_id = Result.select().where(Result.title_id == title_id())
     if group == "все группы" and my_win.comboBox_find_name.currentText() != "":
         if pl == False:
             fltr = fltr_id.select().where(Result.player1 == name)
@@ -3527,12 +3697,14 @@ def filter_gr(pl=False):
         my_win.label_16.setText(f"всего {row_count} встреч(а)")
     my_win.label_16.show()
     column_count = 13  # кол-во столбцов в таблице
-    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+    # вставляет в таблицу необходимое кол-во строк
+    my_win.tableWidget.setRowCount(row_count)
 
     for row in range(row_count):  # добавляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(result_list[row].values())[column])
-            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+            my_win.tableWidget.setItem(
+                row, column, QTableWidgetItem(str(item)))
 
     if my_win.comboBox_find_name.currentText() != "" and pl == False:
         result = msgBox.question(my_win, "", "Продолжить поиск игр с участием\n"
@@ -3602,14 +3774,16 @@ def test_choice_group():
     "новая система жеребьевки групп"
     posev = []
     load_tableWidget()
-    sys = System.get(System.title_id == title_id() and System.stage == "Предварительный")
+    sys = System.get(System.title_id == title_id()
+                     and System.stage == "Предварительный")
     s_id = sys.id
     group = sys.total_group
     max_player = sys.max_player
     total_player = sys.total_athletes
-    pl_choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.title_id == title_id())
+    pl_choice = Choice.select().order_by(
+        Choice.rank.desc()).where(Choice.title_id == title_id())
     h = 0
-    for k in range (1, max_player + 1):
+    for k in range(1, max_player + 1):
         start = 1
         end = group
         for i in range(start, end):
@@ -3621,7 +3795,8 @@ def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
     load_tableWidget()
     # gamer = my_win.lineEdit_title_gamer.text()
-    sys = System.get(System.title_id == title_id() and System.stage == "Предварительный")
+    sys = System.get(System.title_id == title_id()
+                     and System.stage == "Предварительный")
     s_id = sys.id
     group = sys.total_group
     mp = sys.max_player
@@ -3645,8 +3820,10 @@ def choice_gr_automat():
         for i in range(start, end, step):  # №-й посев
             if h < tp:
                 txt = str(f'{i + p} группа')
-                id = int(my_win.tableWidget.item(h, 1).text())  # ищет id игрока
-                ch_id = Choice.get(Choice.player_choice == id)  # находит id таблицы choice, соответсвующий игроку
+                id = int(my_win.tableWidget.item(
+                    h, 1).text())  # ищет id игрока
+                # находит id таблицы choice, соответсвующий игроку
+                ch_id = Choice.get(Choice.player_choice == id)
                 choice_id = ch_id.id
                 h += 1
                 with db:  # запись в таблицу Choice результата жеребъевки
@@ -3665,22 +3842,24 @@ def choice_gr_automat():
 
 def choice_setka(fin):
     """проба жеребьевки сетки на 16"""
-    sys = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
+    sys = System.select().order_by(System.id).where(System.title_id ==
+                                                    title_id()).get()  # находит system id последнего
     system = sys.get(System.stage == fin)
     flag = system.choice_flag
     if flag is True:  # перед повторной жеребьевкой
-        del_choice = Game_list.select().where(Game_list.title_id == title_id() and Game_list.number_group == fin)
+        del_choice = Game_list.select().where(Game_list.title_id == title_id()
+                                              and Game_list.number_group == fin)
         for i in del_choice:
             i.delete_instance()  # удаляет строки финала (fin) из таблицы -Game_list
         del_result = Result.select().where(Result.number_group == fin)
         for i in del_result:
-            i.delete_instance() # удаляет строки финала (fin) из таблицы -Result-
-        #========= рано отмечает, что сделана жеребьевка
+            i.delete_instance()  # удаляет строки финала (fin) из таблицы -Result-
+        # ========= рано отмечает, что сделана жеребьевка
     # with db:  # записывает флаг жеребьевки финала
     #     sys = System.get(System.stage == fin)
     #     sys.choice_flag = True
     #     sys.save()
-    #===================
+    # ===================
     player_in_setka(fin)
     load_tableWidget()
 
@@ -3688,7 +3867,8 @@ def choice_setka(fin):
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребьевки"""
     title = title_id()
-    player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title)
+    player = Player.select().order_by(
+        Player.rank.desc()).where(Player.title_id == title)
     system = System.select().where(System.title_id == title)
     choice = Choice.select().where(Choice.title_id == title)
     for k in system:
@@ -3718,14 +3898,17 @@ def choice_filter_group():
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
     column_count = 10  # кол-во столбцов в таблице
-    my_win.tableWidget.setRowCount(row_count)  # вставляет в таблицу необходимое кол-во строк
+    # вставляет в таблицу необходимое кол-во строк
+    my_win.tableWidget.setRowCount(row_count)
     if row_count != 0:
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
                 item = str(list(choice_list[row].values())[column])
-                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                my_win.tableWidget.setItem(
+                    row, column, QTableWidgetItem(str(item)))
 
-        my_win.tableWidget.resizeColumnsToContents()  # ставит размер столбцов согласно записям
+        # ставит размер столбцов согласно записям
+        my_win.tableWidget.resizeColumnsToContents()
         color_region_in_tableWidget(fg)
         for d in range(0, row_count):  # сортирует нумерация по порядку
             my_win.tableWidget.setItem(d, 0, QTableWidgetItem(str(d + 1)))
@@ -3736,7 +3919,8 @@ def color_region_in_tableWidget(fg):
     reg = []
     rid = []
     if fg != "все группы":
-        line = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)  # выбирает все строки той группы (fg)
+        line = Choice.select().order_by(Choice.posev_group).where(
+            Choice.group == fg)  # выбирает все строки той группы (fg)
         count = len(line)
         for i in line:
             r = Choice.get(Choice.id == i)
@@ -3754,10 +3938,12 @@ def color_region_in_tableWidget(fg):
                         txt = my_win.tableWidget.item(i, 3).text()
                         txt = txt.rstrip()  # удаляет пробел в конце строки
                         if txt == x:
-                            my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
+                            my_win.tableWidget.item(i, 3).setForeground(
+                                QBrush(QColor(255, 0, 0)))  # окрашивает текст в
                             # красный цвет
                         else:
-                            my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в
+                            my_win.tableWidget.item(i, 3).setForeground(
+                                QBrush(QColor(0, 0, 0)))  # окрашивает текст в
                             # черный цвет
 
 
@@ -3799,7 +3985,8 @@ def total_game_table(kpt, fin, pv, cur_index):
     """количество участников в сетке и кол-во игр"""
     msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
-    system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
+    system = System.select().order_by(System.id).where(
+        System.title_id == title_id()).get()  # находит system id последнего
     total_player = system.total_athletes
     if kpt != 0:  # подсчет кол-во игр из выбора кол-ва игроков вышедших из группы и системы финала
         player_in_final = system.total_group * kpt
@@ -3819,7 +4006,8 @@ def total_game_table(kpt, fin, pv, cur_index):
             vt = "Круговая таблица на"
             type_table = "круг"
 
-        total_games = numbers_of_games(cur_index, player_in_final)  # подсчет кол-во игр
+        total_games = numbers_of_games(
+            cur_index, player_in_final)  # подсчет кол-во игр
 
         pv = my_win.comboBox_page_vid.currentText()
         str_setka = f"{vt} {player_in_final} участников"
@@ -3838,11 +4026,13 @@ def total_game_table(kpt, fin, pv, cur_index):
                         choice_flag=0, score_flag=5, visible_game=False, stage_exit=stage_exit).save()
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
     else:  # нажата кнопка создания этапа, если еще не все игроки посеяны в финал, то продолжает этапы соревнования
-        sys_last = System.select().where(System.title_id == title_id() and System.stage ** '%финал')  # отбирает записи, где
+        sys_last = System.select().where(System.title_id == title_id())
+        sys_fin = sys_last.select().where(System.stage ** '%финал') # отбирает записи, где
         # титул id и стадия содержит слово финал (1 и 2 заменяет %)
-        count = len(sys_last)
-        system = System.select().order_by(System.id).where(System.title_id == title_id() and System.stage ** '%финал').get()
-        sys_id = system.id
+        count = len(sys_fin)
+        system = System.select().order_by(System.id).where(System.title_id == title_id())
+        system_id = system.select().where(System.stage ** '%финал').get()
+        sys_id = system_id.id
         sum_final = []
         for i in range(0, count):
             st = System.get(System.id == sys_id + i)
@@ -3913,7 +4103,8 @@ def clear_db_before_edit():
 def ready_system():
     """проверка на готовность системы"""
     # gamer = my_win.lineEdit_title_gamer.text()
-    sid_first = System.select().where(System.title_id == title_id())  # находит system id первого
+    sid_first = System.select().where(System.title_id == title_id()
+                                      )  # находит system id первого
     count = len(sid_first)
     if count == 1:
         system = System.get(System.id == sid_first)
@@ -3922,21 +4113,23 @@ def ready_system():
             my_win.statusbar.showMessage("Система соревнований создана", 5000)
             flag = True
         else:
-            my_win.statusbar.showMessage("Необходимо создать систему соревнований", 500)
+            my_win.statusbar.showMessage(
+                "Необходимо создать систему соревнований", 500)
             flag = False
     elif count > 1:
         my_win.statusbar.showMessage("Система соревнований создана", 5000)
         flag = True
     else:
-        my_win.statusbar.showMessage("Необходимо создать систему соревнований", 500)
+        my_win.statusbar.showMessage(
+            "Необходимо создать систему соревнований", 500)
         flag = False
     return flag
 
 
 def ready_choice(stage):
     """проверка на готовность жеребьевки групп"""
-    # system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
-    system = System.get(System.title_id == title_id() and System.stage == stage)  # находит system id последнего
+    system = System.get(System.title_id == title_id(
+    ) and System.stage == stage)  # находит system id последнего
     flag_greb = system.choice_flag
     if flag_greb is True:
         my_win.statusbar.showMessage("Жеребьевка сделана", 5000)
@@ -3949,13 +4142,15 @@ def ready_choice(stage):
 
 def select_choice_final():
     """выбор жеребьевки финала"""
-    system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
+    system = System.select().order_by(System.id).where(
+        System.title_id == title_id()).get()  # находит system id последнего
 
     fin = []
     for sys in system.select():
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
             fin.append(sys.stage)
-    fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
+    fin, ok = QInputDialog.getItem(
+        my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
     if ok:
         return fin
     else:
@@ -3968,15 +4163,18 @@ def del_player_table():
     """таблица удаленных игроков на данных соревнованиях"""
     if my_win.checkBox_6.isChecked():
         my_win.tableWidget.hideColumn(8)
-        player_list = Delete_player.select().where(Delete_player.title_id == title_id())
+        player_list = Delete_player.select().where(
+            Delete_player.title_id == title_id())
         count = len(player_list)
         if count == 0:
-            my_win.statusbar.showMessage("Удаленных участников соревнований нет", 10000)
+            my_win.statusbar.showMessage(
+                "Удаленных участников соревнований нет", 10000)
             fill_table(player_list)
         else:
             load_tableWidget()
             fill_table(player_list)
-            my_win.statusbar.showMessage("Список удаленных участников соревнований", 10000)
+            my_win.statusbar.showMessage(
+                "Список удаленных участников соревнований", 10000)
             if my_win.lineEdit_Family_name.text() != "":
                 my_win.Button_add_edit_player.setText("Восстановить")
                 my_win.Button_add_edit_player.setEnabled(True)
@@ -4024,11 +4222,13 @@ def kol_player_in_final():
                 fin = "2-й финал"
         kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников,\nвыходящих "
                                                                   f"из группы в {fin}")
-        list = total_game_table(kpt, fin, pv, cur_index)  # возвращает из функции несколько значения в списке
+        # возвращает из функции несколько значения в списке
+        list = total_game_table(kpt, fin, pv, cur_index)
         if ok:
             if sender == my_win.comboBox_table:
                 my_win.label_27.show()
-                my_win.label_27.setText(list[3])  # пишет кол-во игр 2-ого этапа
+                # пишет кол-во игр 2-ого этапа
+                my_win.label_27.setText(list[3])
                 my_win.label_28.show()
                 my_win.label_28.setText(list[0])
                 if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
@@ -4065,9 +4265,13 @@ def backup():
         db_backup = sqlite3.connect('comp_db_backup.db')
         with db_backup:
             db.backup(db_backup, pages=3, progress=None)
-        my_win.statusbar.showMessage("Резервное копирование базы данных завершено успешно", 5000)  # показывает статус бар на 5 секунд
+        # показывает статус бар на 5 секунд
+        my_win.statusbar.showMessage(
+            "Резервное копирование базы данных завершено успешно", 5000)
     except sqlite3.Error as error:
-        my_win.statusbar.showMessage("Ошибка при копировании базы данных", 5000)  # показывает статус бар на 5 секунд
+        # показывает статус бар на 5 секунд
+        my_win.statusbar.showMessage(
+            "Ошибка при копировании базы данных", 5000)
     finally:
         if (db_backup):
             db_backup.close()
@@ -4081,11 +4285,13 @@ def title_id():
     if name != "":
         data = my_win.dateEdit_start.text()
         gamer = my_win.lineEdit_title_gamer.text()
-        t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
+        t = Title.select().where(Title.name == name and Title.data_start ==
+                                 data)  # получает эту строку в db
         title = t.select().where(Title.gamer == gamer).get()
         title_id = title.id  # получает его id
     else:
-        t_id = Title.select().order_by(Title.id.desc()).get()  # получение последней записи в таблице
+        # получение последней записи в таблице
+        t_id = Title.select().order_by(Title.id.desc()).get()
         title_id = t_id
     return title_id
 
@@ -4111,22 +4317,29 @@ def func_zagolovok(canvas, doc):
 
     canvas.saveState()
     canvas.setFont("DejaVuSerif-Italic", 14)
-    canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)  # центральный текст титула
+    # центральный текст титула
+    canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)
     # canvas.drawCentredString(width / 2.0, height - 1.1 * cm, final)  # центральный текст номер финала
     canvas.setFont("DejaVuSerif-Italic", 11)
-    canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)  # текста титула по основным
-    canvas.drawRightString(width - 1 * cm, height - 1.6 * cm, f"г. {ms}")  # город
+    # текста титула по основным
+    canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
+    canvas.drawRightString(width - 1 * cm, height -
+                           1.6 * cm, f"г. {ms}")  # город
     canvas.drawString(0.8 * cm, height - 1.6 * cm, data_comp)  # дата начала
     canvas.setFont("DejaVuSerif-Italic", 11)
     if pv == landscape(A4):
         main_referee_collegia = f"Гл. судья: {title.referee} судья {title.kat_ref}______________  " \
                                 f"Гл. секретарь: {title.secretary} судья {title.kat_sek} ______________"
-        canvas.drawCentredString(width / 2.0, height - 20 * cm, main_referee_collegia)  # текста титула по основным
+        # текста титула по основным
+        canvas.drawCentredString(
+            width / 2.0, height - 20 * cm, main_referee_collegia)
     else:
         main_referee = f"Гл. судья: {title.referee} судья {title.kat_ref} ______________"
         main_secretary = f"Гл. секретарь: {title.secretary} судья {title.kat_sek} ______________"
-        canvas.drawString(2 * cm, 2 * cm, main_referee)  # подпись главного судьи
-        canvas.drawString(2 * cm, 1 * cm, main_secretary)  # подпись главного секретаря
+        # подпись главного судьи
+        canvas.drawString(2 * cm, 2 * cm, main_referee)
+        # подпись главного секретаря
+        canvas.drawString(2 * cm, 1 * cm, main_secretary)
     canvas.restoreState()
     return func_zagolovok
 
@@ -4136,15 +4349,18 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     tdt_new - [[[участник],[регион счет в партиях]]]"""
     dict_tbl = {}
     tdt_all = table_data(stage, kg)  # данные результатов в группах
-    tdt_new = tdt_all[0]  # данные результатов победителей в группах для окрашивания очков в красный цвет
+    # данные результатов победителей в группах для окрашивания очков в красный цвет
+    tdt_new = tdt_all[0]
     for i in range(0, kg):
         tdt_new[i].insert(0, zagolovok)
         dict_tbl[i] = Table(tdt_new[i], colWidths=cW, rowHeights=rH)
-        ts.add('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue)  # ставит всю таблицу в синий цвет
+        # ставит всю таблицу в синий цвет
+        ts.add('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue)
         for k in tdt_all[1][i]:
             col = k[0]  # столбец очков победителя
             row = k[1]  # ряд очков победителя
-            ts.add('TEXTCOLOR', (col, row + 1), (col, row + 1), colors.red)  # красный цвет очков победителя
+            ts.add('TEXTCOLOR', (col, row + 1), (col, row + 1),
+                   colors.red)  # красный цвет очков победителя
         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
     return dict_tbl
 
@@ -4152,7 +4368,8 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().where(System.title_id == title_id()
+                                   )  # находит system id последнего
     for s_id in system:
         if s_id.stage == stage:
             ta = s_id.max_player
@@ -4164,10 +4381,11 @@ def table_made(pv, stage):
     elif stage != "Одна таблица" and type_tbl == "круг":  # финальные игры по кругу
         kg = 1
         t = ta
-    else: # групповые игры
+    else:  # групповые игры
         kg = s_id.total_group
         t = int(ta) // int(kg)
-        e = int(ta) % int(kg)  # если количество участников не равно делится на группы
+        # если количество участников не равно делится на группы
+        e = int(ta) % int(kg)
         g2 = t + 1
         kg = int(kg)
         if e == 0:
@@ -4177,9 +4395,11 @@ def table_made(pv, stage):
     if pv == "альбомная":  # альбомная ориентация стр
         pv = landscape(A4)
         if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:
-            wcells = 21.4 / t  # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
+            # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
+            wcells = 21.4 / t
         else:
-            wcells = 7.4 / t  # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
+            # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
+            wcells = 7.4 / t
     else:  # книжная ориентация стр
         pv = A4
         wcells = 12.8 / t  # ширина столбцов таблицы в зависимости от кол-во чел
@@ -4187,7 +4407,8 @@ def table_made(pv, stage):
 
     elements = []
 
-    cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))  # кол-во столбцов в таблице и их ширина
+    # кол-во столбцов в таблице и их ширина
+    cW = ((0.4 * cm, 3.2 * cm) + col + (1 * cm, 1 * cm, 1 * cm))
     if kg == 1:
         rH = (0.45 * cm)  # высота строки
     else:
@@ -4198,28 +4419,38 @@ def table_made(pv, stage):
         i += 1
         i = str(i)
         num_columns.append(i)
-    zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
+    zagolovok = (['№', 'Участники/ Город'] +
+                 num_columns + ['Очки', 'Соот', 'Место'])
 
     tblstyle = []
     # =========  цикл создания стиля таблицы ================
     for q in range(1, t + 1):  # город участника делает курсивом
-        fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")  # город участника делает курсивом
+        # город участника делает курсивом
+        fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
         tblstyle.append(fn)
-        fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1), "DejaVuSerif-Bold")  # участника делает жирным шрифтом
+        fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1),
+              "DejaVuSerif-Bold")  # участника делает жирным шрифтом
         tblstyle.append(fn)
-        fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')  # центрирование текста в ячейках)
+        # центрирование текста в ячейках)
+        fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')
         tblstyle.append(fn)
-        fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))  # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
+        # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
+        fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))
         tblstyle.append(fn)
-        fn = ('SPAN', (t + 2, q * 2 - 1), (t + 2, q * 2))  # объединяет клетки очки
+        # объединяет клетки очки
+        fn = ('SPAN', (t + 2, q * 2 - 1), (t + 2, q * 2))
         tblstyle.append(fn)
-        fn = ('SPAN', (t + 3, q * 2 - 1), (t + 3, q * 2))  # объединяет клетки соот
+        # объединяет клетки соот
+        fn = ('SPAN', (t + 3, q * 2 - 1), (t + 3, q * 2))
         tblstyle.append(fn)
-        fn = ('SPAN', (t + 4, q * 2 - 1), (t + 4, q * 2))  # объединяет клетки  место
+        # объединяет клетки  место
+        fn = ('SPAN', (t + 4, q * 2 - 1), (t + 4, q * 2))
         tblstyle.append(fn)
-        fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))  # объединяет диагональные клетки
+        # объединяет диагональные клетки
+        fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
         tblstyle.append(fn)
-        fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2), colors.lightgreen)  # заливает диагональные клетки
+        fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
+              colors.lightgreen)  # заливает диагональные клетки
         tblstyle.append(fn)
 
     ts = []
@@ -4233,14 +4464,19 @@ def table_made(pv, stage):
                      ('VALIGN', (0, 0), (t + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
                     + tblstyle +
                     [('BACKGROUND', (0, 0), (t + 5, 0), colors.yellow),
-                     ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),  # цвет шрифта в ячейках
-                     ('LINEABOVE', (0, 0), (-1, 1), 1, colors.black),  # цвет линий нижней
-                     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),  # цвет и толщину внутренних линий
+                     # цвет шрифта в ячейках
+                     ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
+                     ('LINEABOVE', (0, 0), (-1, 1), 1,
+                      colors.black),  # цвет линий нижней
+                     # цвет и толщину внутренних линий
+                     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
 
     #  ============ создание таблиц и вставка данных =================
-    h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=150)  # стиль параграфа (номера таблиц)
-    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic", leftIndent=50)  # стиль параграфа (номера таблиц)
+    h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=150)  # стиль параграфа (номера таблиц)
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=50)  # стиль параграфа (номера таблиц)
     if kg == 1:  # одна таблицу
         dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
         data = [[dict_table[0]]]
@@ -4249,7 +4485,8 @@ def table_made(pv, stage):
         # elements.append(stage)
     elif kg == 2:
         dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-        if pv == landscape(A4) and t in [3, 4, 5, 6]:  # страница альбомная, то таблицы размещаются обе в ряд
+        # страница альбомная, то таблицы размещаются обе в ряд
+        if pv == landscape(A4) and t in [3, 4, 5, 6]:
             data = [[dict_table[0], dict_table[1]]]
             shell_table = Table(data, colWidths=["*"])
             elements.append(shell_table)
@@ -4410,7 +4647,8 @@ def table_made(pv, stage):
             shell_table1 = Table(data1, colWidths=["*"])
             shell_table2 = Table(data2, colWidths=["*"])
             shell_table3 = Table(data3, colWidths=["*"])
-            elements.append(Paragraph('группа 1 группа 2', h2))  # заголовки групп (надо точно позиционировать)
+            # заголовки групп (надо точно позиционировать)
+            elements.append(Paragraph('группа 1 группа 2', h2))
             elements.append(shell_table)
             elements.append(Paragraph('группа 3 группа 4', h2))
             elements.append(shell_table1)
@@ -4457,9 +4695,10 @@ def table_made(pv, stage):
     else:
         txt = stage.rfind("-")
         stage = stage[:txt + 1]
-        name_table =  f"{stage}финал_{short_name}.pdf"
+        name_table = f"{stage}финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=pv)
-    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    doc.build(elements, onFirstPage=func_zagolovok,
+              onLaterPages=func_zagolovok)
 
 
 def setka_16_made(fin):
@@ -4559,7 +4798,8 @@ def setka_16_made(fin):
         n = i - (i // 2)
         data[i][1] = tds[n]
     # ===== вставить результаты встреч необходим цикл по всей таблице -Result-
-    dict_setka = score_in_setka(fin)  # функция расстановки счетов и сносок игроков
+    # функция расстановки счетов и сносок игроков
+    dict_setka = score_in_setka(fin)
     key_list = []
     val_list = []
     for k in dict_setka.keys():
@@ -4567,11 +4807,13 @@ def setka_16_made(fin):
     for v in key_list:
         val = dict_setka[v]
         val_list.append(val)
-    column = [[9, 10, 11, 12, 21, 22, 23, 24], [13, 14, 17, 18, 25, 26, 29, 30], [15, 16, 19, 20, 27, 28, 31, 32]]
+    column = [[9, 10, 11, 12, 21, 22, 23, 24], [13, 14, 17,
+                                                18, 25, 26, 29, 30], [15, 16, 19, 20, 27, 28, 31, 32]]
     row_plus = [[13, 14, 27], [15]]
-    #======= list mest
-    mesta_list = [15, -15, 16, -16, 19, -19,  20, -20, 27, -27, 28, -28, 31, -31, 32, -32]
-    #============
+    # ======= list mest
+    mesta_list = [15, -15, 16, -16, 19, -19,  20, -
+                  20, 27, -27, 28, -28, 31, -31, 32, -32]
+    # ============
     count = len(column)
     # записать в базу данных в списки места финальные
     for i in key_list:
@@ -4585,7 +4827,7 @@ def setka_16_made(fin):
         i = str(i)
         r = str(match[3])
         row_rank = match[3]
-        #===== определение мест и запись в db
+        # ===== определение мест и запись в db
         if row_rank in mesta_list:
             index = mesta_list.index(row_rank)
             mesto = first_mesto + index
@@ -4593,7 +4835,8 @@ def setka_16_made(fin):
             pl1_mesto = mesto - 1
             pl2 = match[4]
             pl2_mesto = mesto
-            player = Player.get(Player.id == id_win)  # записывает места в таблицу -Player-
+            # записывает места в таблицу -Player-
+            player = Player.get(Player.id == id_win)
             player.mesto = pl1_mesto
             player.save()
             player = Player.get(Player.id == id_los)
@@ -4633,105 +4876,136 @@ def setka_16_made(fin):
     # ==============
     cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm,
            0.4 * cm, 3.2 * cm, 1.2 * cm))
-    t = Table(data, cw, 69 * [0.35 * cm])  # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
+    # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
+    t = Table(data, cw, 69 * [0.35 * cm])
     style = []
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки (1-й тур)
     for q in range(1, 33, 2):  # рисует встречи 1-8
-        fn = ('LINEABOVE', (0, q * 2 - q), (1, q * 2 - q), 1, colors.darkblue)  # окрашивает низ ячейки (от 0 до 2 ст)
+        fn = ('LINEABOVE', (0, q * 2 - q), (1, q * 2 - q), 1,
+              colors.darkblue)  # окрашивает низ ячейки (от 0 до 2 ст)
         style.append(fn)
     for q in range(0, 16, 2):  # рисует встречи 9-12
-        fn = ('LINEABOVE', (3, q * 2 + 2), (4, q * 2 + 2), 1, colors.darkblue)  # рисует 9-12 встречи
+        fn = ('LINEABOVE', (3, q * 2 + 2), (4, q * 2 + 2),
+              1, colors.darkblue)  # рисует 9-12 встречи
         style.append(fn)
-        fn = ('LINEABOVE', (2, q + 41), (3, q + 41), 1, colors.darkblue)  # рисует 21-24 встречи
+        fn = ('LINEABOVE', (2, q + 41), (3, q + 41), 1,
+              colors.darkblue)  # рисует 21-24 встречи
         style.append(fn)
     # ========== 3-й тур
     for q in range(1, 17, 4):
-        fn = ('LINEABOVE', (5, q * 2 + 2), (5, q * 2 + 2), 1, colors.darkblue)  # рисует 13-14 встречи
+        fn = ('LINEABOVE', (5, q * 2 + 2), (5, q * 2 + 2),
+              1, colors.darkblue)  # рисует 13-14 встречи
         style.append(fn)
     for q in range(0, 7, 2):
-        fn = ('LINEABOVE', (4, q + 32), (5, q + 32), 1, colors.darkblue)  # встречи (17, 18)
+        fn = ('LINEABOVE', (4, q + 32), (5, q + 32),
+              1, colors.darkblue)  # встречи (17, 18)
         style.append(fn)
-        fn = ('LINEABOVE', (4, q + 58), (5, q + 58), 1, colors.darkblue)  # встречи (29, 30)
+        fn = ('LINEABOVE', (4, q + 58), (5, q + 58),
+              1, colors.darkblue)  # встречи (29, 30)
         style.append(fn)
     for q in range(0, 15, 4):
-        fn = ('LINEABOVE', (5, q + 42), (5, q + 42), 1, colors.darkblue)  # рисует встречи 25-26
+        fn = ('LINEABOVE', (5, q + 42), (5, q + 42), 1,
+              colors.darkblue)  # рисует встречи 25-26
         style.append(fn)
     # ========== 4-й тур
     for q in range(1, 17, 8):
-        fn = ('LINEABOVE', (7, q * 2 + 6), (8, q * 2 + 6), 1, colors.darkblue)  # встреча 15
+        fn = ('LINEABOVE', (7, q * 2 + 6), (8, q * 2 + 6),
+              1, colors.darkblue)  # встреча 15
         style.append(fn)
     for q in range(0, 3, 2):
-        fn = ('LINEABOVE', (6, q + 29), (7, q + 29), 1, colors.darkblue)  # встреча 16
+        fn = ('LINEABOVE', (6, q + 29), (7, q + 29),
+              1, colors.darkblue)  # встреча 16
         style.append(fn)
-        fn = ('LINEABOVE', (6, q + 39), (7, q + 39), 1, colors.darkblue)  # встреча 20
+        fn = ('LINEABOVE', (6, q + 39), (7, q + 39),
+              1, colors.darkblue)  # встреча 20
         style.append(fn)
-        fn = ('LINEABOVE', (6, q + 55), (7, q + 55), 1, colors.darkblue)  # встреча 28
+        fn = ('LINEABOVE', (6, q + 55), (7, q + 55),
+              1, colors.darkblue)  # встреча 28
         style.append(fn)
-        fn = ('LINEABOVE', (6, q + 65), (7, q + 65), 1, colors.darkblue)  # встреча 32
+        fn = ('LINEABOVE', (6, q + 65), (7, q + 65),
+              1, colors.darkblue)  # встреча 32
         style.append(fn)
     for q in range(0, 5, 4):
-        fn = ('LINEABOVE', (7, q + 33), (7, q + 33), 1, colors.darkblue)  # встречи 19
+        fn = ('LINEABOVE', (7, q + 33), (7, q + 33),
+              1, colors.darkblue)  # встречи 19
         style.append(fn)
-        fn = ('LINEABOVE', (7, q + 59), (7, q + 59), 1, colors.darkblue)  # встречи 31
+        fn = ('LINEABOVE', (7, q + 59), (7, q + 59),
+              1, colors.darkblue)  # встречи 31
         style.append(fn)
     for q in range(0, 16, 8):
-        fn = ('LINEABOVE', (7, q + 44), (7, q + 44), 1, colors.darkblue)  # рисует 27 встречу
+        fn = ('LINEABOVE', (7, q + 44), (7, q + 44),
+              1, colors.darkblue)  # рисует 27 встречу
         style.append(fn)
     # ======= встречи за места =====
     for q in range(0, 11, 10):
-        fn = ('LINEABOVE', (9, q + 16), (10, q + 16), 1, colors.darkblue)  # за 1-2 место
+        fn = ('LINEABOVE', (9, q + 16), (10, q + 16),
+              1, colors.darkblue)  # за 1-2 место
         style.append(fn)
     for q in range(0, 3, 2):
-        fn = ('LINEABOVE', (9, q + 30), (10, q + 30), 1, colors.darkblue)  # за 3-4 место
+        fn = ('LINEABOVE', (9, q + 30), (10, q + 30),
+              1, colors.darkblue)  # за 3-4 место
         style.append(fn)
-        fn = ('LINEABOVE', (9, q + 40), (10, q + 40), 1, colors.darkblue)  # за 7-8 место
+        fn = ('LINEABOVE', (9, q + 40), (10, q + 40),
+              1, colors.darkblue)  # за 7-8 место
         style.append(fn)
-        fn = ('LINEABOVE', (9, q + 56), (10, q + 56), 1, colors.darkblue)  # за 11-12 место
+        fn = ('LINEABOVE', (9, q + 56), (10, q + 56),
+              1, colors.darkblue)  # за 11-12 место
         style.append(fn)
-        fn = ('LINEABOVE', (9, q + 66), (10, q + 66), 1, colors.darkblue)  # за 15-16 место
+        fn = ('LINEABOVE', (9, q + 66), (10, q + 66),
+              1, colors.darkblue)  # за 15-16 место
         style.append(fn)
     for q in range(0, 4, 3):
-        fn = ('LINEABOVE', (9, q + 35), (10, q + 35), 1, colors.darkblue)  # за 5-6 место
+        fn = ('LINEABOVE', (9, q + 35), (10, q + 35),
+              1, colors.darkblue)  # за 5-6 место
         style.append(fn)
-        fn = ('LINEABOVE', (9, q + 61), (10, q + 61), 1, colors.darkblue)  # за 13-14 место
+        fn = ('LINEABOVE', (9, q + 61), (10, q + 61),
+              1, colors.darkblue)  # за 13-14 место
         style.append(fn)
     for q in range(0, 6, 5):
-        fn = ('LINEABOVE', (9, q + 48), (10, q + 48), 1, colors.darkblue)  # за 9-10 место
+        fn = ('LINEABOVE', (9, q + 48), (10, q + 48),
+              1, colors.darkblue)  # за 9-10 место
         style.append(fn)
     # ============  объединяет ячейки номер встречи
     for q in range(1, 17, 2):  # объединяет ячейки номер встречи
         fn = ('SPAN', (2, q * 2 - 1), (2, q * 2))  # встречи 1-8
         style.append(fn)
-        fn = ('BACKGROUND', (2, q * 2 - 1), (2, q * 2), colors.lightyellow)  # встречи 1-8
+        fn = ('BACKGROUND', (2, q * 2 - 1), (2, q * 2),
+              colors.lightyellow)  # встречи 1-8
         style.append(fn)
     for q in range(0, 14, 4):
         fn = ('SPAN', (4, q * 2 + 2), (4, q * 2 + 5))  # встречи 9-12
         style.append(fn)
-        fn = ('BACKGROUND', (4, q * 2 + 2), (4, q * 2 + 5), colors.lightyellow)  # встречи 1-8
+        fn = ('BACKGROUND', (4, q * 2 + 2), (4, q * 2 + 5),
+              colors.lightyellow)  # встречи 1-8
         style.append(fn)
         fn = ('SPAN', (4, q + 41), (4, q + 42))  # встречи 21-24
         style.append(fn)
-        fn = ('BACKGROUND', (4, q + 41), (4, q + 42), colors.lightyellow)  # встречи 1-8
+        fn = ('BACKGROUND', (4, q + 41), (4, q + 42),
+              colors.lightyellow)  # встречи 1-8
         style.append(fn)
     for q in range(0, 17, 16):  # объединяет ячейки между фамилии спортсменами номер встречи
         fn = ('SPAN', (6, q + 4), (6, q + 11))  # встреча 13-14
         style.append(fn)
-        fn = ('BACKGROUND', (6, q + 4), (6, q + 11), colors.lightyellow)  # встречи 1-8
+        fn = ('BACKGROUND', (6, q + 4), (6, q + 11),
+              colors.lightyellow)  # встречи 1-8
         style.append(fn)
     for q in range(0, 5, 4):  # объединяет ячейки между фамилии спортсменами номер встречи
         fn = ('SPAN', (6, q + 32), (6, q + 33))  # встреча 17-18
         style.append(fn)
-        fn = ('BACKGROUND', (6, q + 32), (6, q + 33), colors.lightyellow)  # встречи 1-8
+        fn = ('BACKGROUND', (6, q + 32), (6, q + 33),
+              colors.lightyellow)  # встречи 1-8
         style.append(fn)
         fn = ('SPAN', (6, q + 58), (6, q + 59))  # встреча 29-30
         style.append(fn)
-        fn = ('BACKGROUND', (6, q + 58), (6, q + 59), colors.lightyellow)  # встречи 1-8
+        fn = ('BACKGROUND', (6, q + 58), (6, q + 59),
+              colors.lightyellow)  # встречи 1-8
         style.append(fn)
     for q in range(0, 16, 8):  # объединяет ячейки между фамилии спортсменами номер встречи
         fn = ('SPAN', (6, q + 42), (6, q + 45))  # встреча 25-26
         style.append(fn)
-        fn = ('BACKGROUND', (6, q + 42), (6, q + 45), colors.lightyellow)  # встречи 1-8
+        fn = ('BACKGROUND', (6, q + 42), (6, q + 45),
+              colors.lightyellow)  # встречи 1-8
         style.append(fn)
  # объединяет ячейки между фамилии спортсменами номер встречи (за места)
     fn = ('SPAN', (8, 8), (8, 23))  # встреча 15
@@ -4767,47 +5041,66 @@ def setka_16_made(fin):
     fn = ('BACKGROUND', (8, 65), (8, 66), colors.lightyellow)  # встречи 32
     style.append(fn)
     for q in range(1, 33, 4):
-        fn = ('BOX', (2, q), (2, q + 1), 1, colors.darkblue)  # рисует область 1 столбца, где номера встреч 1-8
+        # рисует область 1 столбца, где номера встреч 1-8
+        fn = ('BOX', (2, q), (2, q + 1), 1, colors.darkblue)
         style.append(fn)
     for q in range(1, 14, 4):
-        fn = ('BOX', (4, q * 2), (4, q * 2 + 3), 1, colors.darkblue)  # рисует область 2 столбца, где номера встреч 9-12
+        # рисует область 2 столбца, где номера встреч 9-12
+        fn = ('BOX', (4, q * 2), (4, q * 2 + 3), 1, colors.darkblue)
         style.append(fn)
-        fn = ('BOX', (4, q + 40), (4, q + 41), 1, colors.darkblue)  # рисует область 2 столбца, где номера встреч 21-24
+        # рисует область 2 столбца, где номера встреч 21-24
+        fn = ('BOX', (4, q + 40), (4, q + 41), 1, colors.darkblue)
         style.append(fn)
     for q in range(1, 10, 8):
-        fn = ('BOX', (6, q * 2 + 2), (6, q * 2 + 9), 1, colors.darkblue)  # рисует область 3 столбца, где встречи 13-14
+        # рисует область 3 столбца, где встречи 13-14
+        fn = ('BOX', (6, q * 2 + 2), (6, q * 2 + 9), 1, colors.darkblue)
         style.append(fn)
-        fn = ('BOX', (6, q + 41), (6, q + 44), 1, colors.darkblue)  # рисует область 3 столбца, где номера встреч 25-26
+        # рисует область 3 столбца, где номера встреч 25-26
+        fn = ('BOX', (6, q + 41), (6, q + 44), 1, colors.darkblue)
         style.append(fn)
     for q in range(1, 6, 4):
-        fn = ('BOX', (6, q + 31), (6, q + 32), 1, colors.darkblue)  # рисует область 3 столбца, где номера встреч 17-18
+        # рисует область 3 столбца, где номера встреч 17-18
+        fn = ('BOX', (6, q + 31), (6, q + 32), 1, colors.darkblue)
         style.append(fn)
-        fn = ('BOX', (6, q + 57), (6, q + 58), 1, colors.darkblue)  # рисует область 3 столбца, где номера встреч 29-30
+        # рисует область 3 столбца, где номера встреч 29-30
+        fn = ('BOX', (6, q + 57), (6, q + 58), 1, colors.darkblue)
         style.append(fn)
-    fn = ('BOX', (8, 8), (8, 23), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 15
+    # рисует область 4 столбца, где встреча 15
+    fn = ('BOX', (8, 8), (8, 23), 1, colors.darkblue)
     style.append(fn)
-    fn = ('BOX', (8, 29), (8, 30), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 16
+    # рисует область 4 столбца, где встреча 16
+    fn = ('BOX', (8, 29), (8, 30), 1, colors.darkblue)
     style.append(fn)
-    fn = ('BOX', (8, 33), (8, 36), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 19
+    # рисует область 4 столбца, где встреча 19
+    fn = ('BOX', (8, 33), (8, 36), 1, colors.darkblue)
     style.append(fn)
-    fn = ('BOX', (8, 39), (8, 40), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 20
+    # рисует область 4 столбца, где встреча 20
+    fn = ('BOX', (8, 39), (8, 40), 1, colors.darkblue)
     style.append(fn)
-    fn = ('BOX', (8, 44), (8, 51), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 27
+    # рисует область 4 столбца, где встреча 27
+    fn = ('BOX', (8, 44), (8, 51), 1, colors.darkblue)
     style.append(fn)
-    fn = ('BOX', (8, 55), (8, 56), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 28
+    # рисует область 4 столбца, где встреча 28
+    fn = ('BOX', (8, 55), (8, 56), 1, colors.darkblue)
     style.append(fn)
-    fn = ('BOX', (8, 59), (8, 62), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 31
+    # рисует область 4 столбца, где встреча 31
+    fn = ('BOX', (8, 59), (8, 62), 1, colors.darkblue)
     style.append(fn)
-    fn = ('BOX', (8, 65), (8, 66), 1, colors.darkblue)  # рисует область 4 столбца, где встреча 32
+    # рисует область 4 столбца, где встреча 32
+    fn = ('BOX', (8, 65), (8, 66), 1, colors.darkblue)
     style.append(fn)
     for i in range(1, 8, 2):
-        fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
+        fn = ('TEXTCOLOR', (i, 0), (i, 68),
+              colors.black)  # цвет шрифта игроков
         style.append(fn)
-        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 68), colors.green)  # цвет шрифта номеров встреч
+        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 68),
+              colors.green)  # цвет шрифта номеров встреч
         style.append(fn)
-        fn = ('ALIGN', (i, 0), (i, 68), 'LEFT')  # выравнивание фамилий игроков по левому краю
+        # выравнивание фамилий игроков по левому краю
+        fn = ('ALIGN', (i, 0), (i, 68), 'LEFT')
         style.append(fn)
-        fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')  # центрирование номеров встреч
+        # центрирование номеров встреч
+        fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
         style.append(fn)
     # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
     # style.append(fn)
@@ -4819,9 +5112,11 @@ def setka_16_made(fin):
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
                            ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
                            ('FONTSIZE', (1, 0), (1, 32), 7),
-                           ('TEXTCOLOR', (10, 0), (10, 68), colors.red),  # 10 столбец с 0 по 68 ряд (цвет места)
+                           # 10 столбец с 0 по 68 ряд (цвет места)
+                           ('TEXTCOLOR', (10, 0), (10, 68), colors.red),
                            # ('VALIGN', (0, 0), (0, -1), 'TOP'),
-                           ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),  # цвет шрифта игроков 1 ого тура
+                           # цвет шрифта игроков 1 ого тура
+                           ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
                            ] + ts))
 
@@ -4838,7 +5133,8 @@ def setka_16_made(fin):
     short_name = t_id.short_name_comp
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
-    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    doc.build(elements, onFirstPage=func_zagolovok,
+              onLaterPages=func_zagolovok)
     return tds
 
 
@@ -4848,7 +5144,8 @@ def mesto_in_final(fin):
     mesto = {}
     tmp = []
 
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().where(System.title_id == title_id()
+                                   )  # находит system id последнего
 
     first = 1
     k = 0
@@ -4876,7 +5173,8 @@ def kol_player():
     all_players = system.total_athletes
     all_group = system.total_group
     flat = all_players % all_group  # если количество участников равно делится на группы
-    player_flat = all_players // all_group  # если количество участников не равно делится на группы, g2 наибольшое кол-во человек в группе
+    # если количество участников не равно делится на группы, g2 наибольшое кол-во человек в группе
+    player_flat = all_players // all_group
     if flat == 0:
         max_gamer = player_flat
     else:
@@ -4889,15 +5187,19 @@ def table_data(stage, kg):
     tdt_all = []  # список списков [tdt_new] и [tdt_color]
     tdt_color = []
     tdt_new = []
-    ta = Result.select().where(Result.title_id == title_id())  # находит system id последнего
-    tr = len(ta)  # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
+    ta = Result.select().where(Result.title_id == title_id()
+                               )  # находит system id последнего
+    # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
+    tr = len(ta)
     if kg == 1:  # система одна таблица круг или финалу по кругу
-        posev_data = player_choice_one_table(stage)  # список словарей участник и его регион
+        # список словарей участник и его регион
+        posev_data = player_choice_one_table(stage)
         count_player_group = len(posev_data)
         num_gr = "1 группа"
         max_gamer = count_player_group
         num_gr = stage
-        tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
+        tdt_tmp = tdt_news(max_gamer, posev_data,
+                           count_player_group, tr, num_gr)
         tdt_new.append(tdt_tmp[0])
         tdt_color.append(tdt_tmp[1])
         tdt_all.append(tdt_new)
@@ -4909,7 +5211,8 @@ def table_data(stage, kg):
             posev_data = player_choice_in_group(num_gr)
             count_player_group = len(posev_data)
 
-            tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
+            tdt_tmp = tdt_news(max_gamer, posev_data,
+                               count_player_group, tr, num_gr)
             tdt_new.append(tdt_tmp[0])
             tdt_color.append(tdt_tmp[1])
             tdt_all.append(tdt_new)
@@ -4920,9 +5223,11 @@ def table_data(stage, kg):
 def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     tdt_tmp = []
     tbl_tmp = []  # временный список группы tbl
-    for k in range(1, max_gamer * 2 + 1):  # цикл нумерации строк (по 2-е строки на каждого участника)
+    # цикл нумерации строк (по 2-е строки на каждого участника)
+    for k in range(1, max_gamer * 2 + 1):
         st = ['']
-        s = (st * (max_gamer + 4))  # получаем пустой список (номер, фамилия и регион, клетки (кол-во уч), оч, соот, место)
+        # получаем пустой список (номер, фамилия и регион, клетки (кол-во уч), оч, соот, место)
+        s = (st * (max_gamer + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         tbl_tmp.append(s)
     for i in range(1, count_player_group * 2 + 1, 2):
@@ -4933,20 +5238,22 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     td_color = []
 
     if tr != 0:  # если еще не была жеребьевка, то пропуск счета в группе
-        td_color = score_in_table(td, num_gr)  # список очки победителя красные (ряд, столбец) без заголовка
+        # список очки победителя красные (ряд, столбец) без заголовка
+        td_color = score_in_table(td, num_gr)
 
     tdt_new = td
     tdt_tmp.append(tdt_new)
     tdt_tmp.append(td_color)
 
-    return  tdt_tmp
+    return tdt_tmp
 
 
 def setka_data_16(fin):
     """данные сетки на 16"""
     id_ful_name = {}
     id_name = {}
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().where(System.title_id == title_id()
+                                   )  # находит system id последнего
     for sys in system:  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
             mp = sys.max_player
@@ -4960,13 +5267,16 @@ def setka_data_16(fin):
             id_f_name = full_player_id(family)
             id_f_n = id_f_name[0]
             id_s_n = id_f_name[1]
-            id_ful_name[id_f_n["name"]] = id_f_n["id"]  # словарь ключ - полное имя/ город, значение - id
+            # словарь ключ - полное имя/ город, значение - id
+            id_ful_name[id_f_n["name"]] = id_f_n["id"]
             id_name[id_s_n["name"]] = id_s_n["id"]
-            #=================
-            space = family.find(" ")  # находит пробел отделяющий имя от фамилии
+            # =================
+            # находит пробел отделяющий имя от фамилии
+            space = family.find(" ")
             line = family.find("/")  # находит черту отделяющий имя от города
             city_slice = family[line:]  # получает отдельно город
-            family_slice = family[:space + 2]   # получает отдельно фамилия и первую букву имени
+            # получает отдельно фамилия и первую букву имени
+            family_slice = family[:space + 2]
             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
             tds.append(family_city)
         else:
@@ -4981,13 +5291,15 @@ def full_player_id(family):
     """получает словарь -фамилия игрока и его город и соответствующий ему id в таблице Players"""
     full_name = {}
     short_name = {}
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
+    # получение id последнего соревнования
+    t = Title.select().order_by(Title.id.desc()).get()
     plr = Player.get(Player.title_id == t and Player.full_name == family)
     id_player = plr.id
     city = plr.city
     name = plr.player
     space = name.find(" ")  # находит пробел отделяющий имя от фамилии
-    family_slice = name[:space + 2]  # получает отдельно фамилия и первую букву имени
+    # получает отдельно фамилия и первую букву имени
+    family_slice = name[:space + 2]
     full_name["name"] = f"{family_slice}./ {city}"
     full_name["id"] = id_player
     short_name["name"] = f"{family_slice}."
@@ -5007,26 +5319,32 @@ def score_in_table(td, num_gr):
     tab = my_win.tabWidget.currentIndex()
 
     if tab == 3:
-        ta = System.get(System.title_id == title_id() and System.stage == "Предварительный")  # находит system id последнего
+        ta = System.get(System.title_id == title_id() and System.stage ==
+                        "Предварительный")  # находит system id последнего
         mp = ta.max_player // ta.total_group
     elif tab == 4:
         pass
     else:
-        ta = System.get(System.title_id == title_id() and System.stage == num_gr)  # находит system id последнего
+        # находит system id последнего
+        ta = System.get(System.title_id == title_id()
+                        and System.stage == num_gr)
         mp = ta.max_player
     stage = ta.stage
     # mp = ta.max_player
     result = Result.select().where(Result.title_id == title_id())
     if stage == "Предварительный":
         r = result.select().where(Result.number_group == num_gr)
-        choice = Choice.select().where(Choice.title_id == title_id() and Choice.group == num_gr)  # фильтрует по группе
+        choice = Choice.select().where(Choice.title_id == title_id()
+                                       and Choice.group == num_gr)  # фильтрует по группе
     elif stage == "Одна таблица":
         r = result.select().where(Result.number_group == "1 группа")
-        choice = Choice.select().where(Choice.title_id == title_id() and Choice.basic == "Одна таблица")  # фильтрует
+        choice = Choice.select().where(Choice.title_id == title_id()
+                                       and Choice.basic == "Одна таблица")  # фильтрует
         # по одной таблице
     else:
         r = result.select().where(Result.number_group == num_gr)
-        choice = Choice.select().where(Choice.title_id == title_id() and Choice.final == num_gr)  # фильтрует
+        choice = Choice.select().where(Choice.title_id == title_id()
+                                       and Choice.final == num_gr)  # фильтрует
         # финал по кругу
 
     count = len(r)
@@ -5049,14 +5367,23 @@ def score_in_table(td, num_gr):
         player1 = str(list(result_list[i].values())[4])
         if win != "" and win != "None":  # если нет сыгранной встречи данного тура
             if win == player1:  # если победитель игрок под первым номером в туре
-                td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[7])  # очки 1-ого игрока
-                td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[scg])  # счет 1-ого игрока
-                td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[11])  # очки 2-ого игрока
-                td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[12])  # счет 2-ого игрока
-                tp1 = str(list(result_list[i].values())[7])  # очки 1-ого игрока
-                tp2 = str(list(result_list[i].values())[11])  # очки 2-ого игрока
-                plr1 = total_score[p1]  # считывает из словаря 1-ого игрока всего очков
-                plr2 = total_score[p2]  # считывает из словаря 2-ого игрока всего очков
+                # очки 1-ого игрока
+                td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[7])
+                # счет 1-ого игрока
+                td[p1 * 2 - 1][p2 +
+                               1] = str(list(result_list[i].values())[scg])
+                # очки 2-ого игрока
+                td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[11])
+                # счет 2-ого игрока
+                td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[12])
+                # очки 1-ого игрока
+                tp1 = str(list(result_list[i].values())[7])
+                # очки 2-ого игрока
+                tp2 = str(list(result_list[i].values())[11])
+                # считывает из словаря 1-ого игрока всего очков
+                plr1 = total_score[p1]
+                # считывает из словаря 2-ого игрока всего очков
+                plr2 = total_score[p2]
                 plr1 = plr1 + int(tp1)  # прибавляет очки 1-ого игрока
                 plr2 = plr2 + int(tp2)  # прибавляет очки 2-ого игрока
                 total_score[p1] = plr1  # записывает сумму очков 1-му игроку
@@ -5064,25 +5391,36 @@ def score_in_table(td, num_gr):
                 col = p1 * 2 - 2
                 row = p2 + 1
             else:  # если победитель игрок под вторым номером в туре
-                td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[11])  # очки 1-ого игрока
-                td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[12])  # счет 1-ого игрока
-                td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[7])  # очки 2-ого игрока
-                td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[scg])  # счет 2-ого игрока
-                tp1 = str(list(result_list[i].values())[11])  # очки 1-ого игрока
-                tp2 = str(list(result_list[i].values())[7])  # очки 2-ого игрока
-                plr1 = total_score[p1]  # считывает из словаря 1-ого игрока очки
-                plr2 = total_score[p2]  # считывает из словаря 2-ого игрока очки
+                # очки 1-ого игрока
+                td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[11])
+                # счет 1-ого игрока
+                td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[12])
+                # очки 2-ого игрока
+                td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[7])
+                # счет 2-ого игрока
+                td[p2 * 2 - 1][p1 +
+                               1] = str(list(result_list[i].values())[scg])
+                # очки 1-ого игрока
+                tp1 = str(list(result_list[i].values())[11])
+                # очки 2-ого игрока
+                tp2 = str(list(result_list[i].values())[7])
+                # считывает из словаря 1-ого игрока очки
+                plr1 = total_score[p1]
+                # считывает из словаря 2-ого игрока очки
+                plr2 = total_score[p2]
                 plr1 = plr1 + int(tp1)  # прибавляет очки 1-ого игрока
                 plr2 = plr2 + int(tp2)  # прибавляет очки 2-ого игрока
                 total_score[p1] = plr1  # записывает сумму очков 1-му игроку
                 total_score[p2] = plr2  # записывает сумму очков 2-му игроку
                 col = p2 * 2 - 2
                 row = p1 + 1
-            td_tmp = [row, col]  # список ряд столбец, где очки надо красить в красный
+            # список ряд столбец, где очки надо красить в красный
+            td_tmp = [row, col]
             td_color.append(td_tmp)
     for t in range(0, count_player):  # записывает очки в зависимости от кол-во игроков в группе
-        td[t * 2][mp + 2] = total_score[t + 1]  # записывает каждому игроку сумму очков
-    #===== если сыграны все игры группе то выставляет места =========
+        # записывает каждому игроку сумму очков
+        td[t * 2][mp + 2] = total_score[t + 1]
+    # ===== если сыграны все игры группе то выставляет места =========
     count_game = (count_player * (count_player - 1)) // 2
     result_id = Result.select().where(Result.title_id == title_id())
     if num_gr == "Одна таблица":
@@ -5115,14 +5453,16 @@ def numer_game(num_game):
     if num_game in dict_mesta:
         index = dict_mesta.index(num_game)
         snoska = [0, 0]
-        game_loser = dict_mesta[index] * -1  # для отображения в pdf (встречи с минусом)
+        # для отображения в pdf (встречи с минусом)
+        game_loser = dict_mesta[index] * -1
         snoska.append(game_loser)
     else:
         game_winner = dict_winner[num_game]  # номер игры победителя
         snoska.append(game_winner)
         game_loser = dict_loser[num_game]  # номер игры проигравшего
         snoska.append(game_loser)
-        game_loser = dict_loser_pdf[num_game]  # для отображения в pdf (встречи с минусом)
+        # для отображения в pdf (встречи с минусом)
+        game_loser = dict_loser_pdf[num_game]
         snoska.append(game_loser)
     return snoska
 
@@ -5132,8 +5472,10 @@ def score_in_setka(fin):
     dict_setka = {}
     match = []
     tmp_match = []
-    t = Title.select().order_by(Title.id.desc()).get()  # получение id последнего соревнования
-    result = Result.select().where(Result.title_id == t and Result.number_group == fin)  # находит system id последнего
+    # получение id последнего соревнования
+    t = Title.select().order_by(Title.id.desc()).get()
+    result = Result.select().where(Result.title_id == t and Result.number_group ==
+                                   fin)  # находит system id последнего
 
     for res in result:
         num_game = int(res.tours)
@@ -5157,27 +5499,34 @@ def result_rank_group(num_gr, player_rank_group):
     tab = my_win.tabWidget.currentIndex()
     if len(player_rank_group) > 0:
         if tab == 3:
-            system = System.get(System.title_id == title_id() and System.stage == "Предварительный")
+            system = System.get(System.title_id == title_id()
+                                and System.stage == "Предварительный")
         elif tab == 4:
             pass
         else:
-            system = System.get(System.title_id == title_id() and System.stage == num_gr)
+            system = System.get(System.title_id == title_id()
+                                and System.stage == num_gr)
 
         if system.stage == "Предварительный":
-            choice = Choice.select().where(Choice.title_id == title_id() and Choice.group == num_gr)
+            choice = Choice.select().where(
+                Choice.title_id == title_id() and Choice.group == num_gr)
         elif system.stage == "Одна таблица":
-            choice = Choice.select().where(Choice.title_id == title_id() and Choice.basic == "Одна таблица")
+            choice = Choice.select().where(Choice.title_id == title_id()
+                                           and Choice.basic == "Одна таблица")
         elif system.stage == num_gr:  # финальная игра
-            choice = Choice.select().where(Choice.title_id == title_id() and Choice.final == num_gr)
+            choice = Choice.select().where(
+                Choice.title_id == title_id() and Choice.final == num_gr)
 
         count = len(choice)
         n = 0
         for ch in choice:
             if tab == 3:
                 for i in range(0, count):  # цикл по номерам посева в группе
-                    if ch.posev_group == player_rank_group[i][0]: # если есть совпадение, то место в списке
+                    # если есть совпадение, то место в списке
+                    if ch.posev_group == player_rank_group[i][0]:
                         with db:
-                            ch.mesto_group = player_rank_group[i][1]  # записывает в таблицу -Choice- места в группе
+                            # записывает в таблицу -Choice- места в группе
+                            ch.mesto_group = player_rank_group[i][1]
                             ch.save()
             elif tab == 4:
                 pass
@@ -5211,9 +5560,12 @@ def rank_in_group(total_score, max_person, td, num_gr):
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
     player_rank_group = []
     result = Result.select().where(Result.title_id == title_id())
-    game_max = result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
-    played = result.select().where(Result.number_group == num_gr)  # 1-й запрос на выборку с группой
-    game_played = played.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
+    game_max = result.select().where(Result.number_group ==
+                                     num_gr)  # сколько всего игр в группе
+    # 1-й запрос на выборку с группой
+    played = result.select().where(Result.number_group == num_gr)
+    game_played = played.select().where(
+        Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
     # с победителями из 1-ого запроса
     kol_tours_played = len(game_played)  # сколько игр сыгранных
     kol_tours_in_group = len(game_max)  # кол-во всего игр в группе
@@ -5222,16 +5574,20 @@ def rank_in_group(total_score, max_person, td, num_gr):
         rev_dict.setdefault(value, set()).add(key)
     result = [key for key, values in rev_dict.items() if len(values) > 1]
 
-    key_list = list(total_score.keys())  # отдельно составляет список ключей (группы)
-    val_list = list(total_score.values())  # отдельно составляет список значений (очки)
-    #======== новый вариант =========
-    ds = {index: value for index, value in enumerate(val_list)}  # получает словарь(ключ - номер участника,
+    # отдельно составляет список ключей (группы)
+    key_list = list(total_score.keys())
+    # отдельно составляет список значений (очки)
+    val_list = list(total_score.values())
+    # ======== новый вариант =========
+    # получает словарь(ключ - номер участника,
+    ds = {index: value for index, value in enumerate(val_list)}
     # значение - очки)
-    sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убыванию соот
+    # сортирует словарь по убыванию соот
+    sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}
     # mesto_points = {}  # словарь (ключ-очки, а значения места без учета соотношений)
     valuesList = list(sorted_tuple.values())  # список очков по убыванию
     unique_numbers = list(set(valuesList))  # список уникальных очков
-    unique_numbers.sort(reverse=True) # список уникальных очков по убыванию
+    unique_numbers.sort(reverse=True)  # список уникальных очков по убыванию
     mesto = 1
 
     for f in unique_numbers:  # проходим циклом по уник. значениям
@@ -5246,32 +5602,41 @@ def rank_in_group(total_score, max_person, td, num_gr):
 
         if m_new == 1:  # если кол-во очков у одного спортсмена
             p1 = x
-            td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
+            # записывает место победителю
+            td[p1 * 2 - 2][max_person + 4] = mesto
             player_rank_tmp.append([p1, mesto])
-        elif m_new == 2: # если кол-во очков у двух спортсмена (определение мест по игре между собой)
-            player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr)
+        # если кол-во очков у двух спортсмена (определение мест по игре между собой)
+        elif m_new == 2:
+            player_rank_tmp = circle_2_player(
+                tr, td, max_person, mesto, num_gr)
         elif m_new == 3:
             men_of_circle = m_new
-            u = summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)  # получает список 1-й уникальные
+            # получает список 1-й уникальные
+            u = summa_points_person(
+                men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)
             # значения очков и список значения очков и у скольких спортсменов они есть
             z = u[1]  # список списков кол-во очков и у сколько игроков они есть
             points_person = z[0]
             player_rank_tmp = circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, ps,
                                               tr_all, men_of_circle, pg_win, pg_los, pp, pps)
-        elif m_new > 3:  # если кол-во очков у более трех спортсменов (крутиловка)
+        # если кол-во очков у более трех спортсменов (крутиловка)
+        elif m_new > 3:
             m_circle = m_new
             men_of_circle = m_new
-            player_rank_tmp = circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle)
+            player_rank_tmp = circle(
+                men_of_circle, tr, num_gr, td, max_person, mesto, m_circle)
         tr.clear()
 
         for i in player_rank_tmp:
             player_rank.append(i)
-            player_rank_group.append(i)  # список участников в группе и его место
+            # список участников в группе и его место
+            player_rank_group.append(i)
 
         mesto = mesto + m_new
         player_rank_tmp.clear()
     if kol_tours_played == kol_tours_in_group:  # когда все встречи сыграны
-        result_rank_group(num_gr, player_rank_group)  # функция простановки мест из группы в -Choice-
+        # функция простановки мест из группы в -Choice-
+        result_rank_group(num_gr, player_rank_group)
 
 
 def get_unique_numbers(pp_all):
@@ -5297,7 +5662,9 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle):
     pg_win = {}
     pg_los = {}
 
-    u = summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)  # получает список 1-й уникальные
+    # получает список 1-й уникальные
+    u = summa_points_person(men_of_circle, tr, tr_all,
+                            pp, pg_win, pg_los, num_gr)
     # значения очков и список значения очков и у скольких спортсменов они есть
     unique_numbers = u[0]
     tr.clear()
@@ -5305,7 +5672,8 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle):
     for key, value in sort_tuple.items():
         rev_dict.setdefault(value, set()).add(key)
 
-    key_list = list(sort_tuple.keys())  # отдельно составляет список ключей (группы)
+    # отдельно составляет список ключей (группы)
+    key_list = list(sort_tuple.keys())
 
     for f in unique_numbers:  # проходим циклом по уник. значениям, очки в крутиловке
         m_new = 0
@@ -5315,7 +5683,8 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle):
         if count_point == 1:
             for x in num_player:
                 p1 = x
-            td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
+            # записывает место победителю
+            td[p1 * 2 - 2][max_person + 4] = mesto
             td[p1 * 2 - 2][max_person + 3] = f  # записывает место победителю
             player_rank_tmp.append([p1, mesto])
             m_new += 1
@@ -5323,18 +5692,20 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle):
             for x in num_player:
                 tr.append(str(x))  # создает список (встречи игроков)
                 m_new += 1
-            player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr)
+            player_rank_tmp = circle_2_player(
+                tr, td, max_person, mesto, num_gr)
         else:
             point = 0
             for x in num_player:
                 tr.append(str(x))  # создает список (встречи игроков)
                 m_new += 1
             player_rank_tmp = circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point,
-                                                player_rank_tmp, tr_all, pp, pg_win, pg_los, x, pps, ps)
+                                               player_rank_tmp, tr_all, pp, pg_win, pg_los, x, pps, ps)
         mesto = mesto + m_new
         tr.clear()
 
-        for i in player_rank_tmp:  # заменяет список (места еще не проставлены) на новый с правильными местами
+        # заменяет список (места еще не проставлены) на новый с правильными местами
+        for i in player_rank_tmp:
             pl_rank_tmp.append(i)
         player_rank_tmp.clear()
     player_rank_tmp = pl_rank_tmp
@@ -5353,20 +5724,23 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
         player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr)
     elif m_new == 3:
         men_of_circle = m_new
-        u = summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)  # получает список 1-й уникальные
-            # значения очков и список значения очков и у скольких спортсменов они есть
+        # получает список 1-й уникальные
+        u = summa_points_person(men_of_circle, tr, tr_all,
+                                pp, pg_win, pg_los, num_gr)
+        # значения очков и список значения очков и у скольких спортсменов они есть
         z = u[1]
         points_person = z[0]
         player_rank_tmp = circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, ps,
                                           tr_all, men_of_circle, pg_win, pg_los, pp, pps)
     tr_all.clear()
     tr.clear()
-    return  player_rank_tmp
+    return player_rank_tmp
 
-def tour_circle(pp, per_circ, circ ):
+
+def tour_circle(pp, per_circ, circ):
     tr_new = []
     k_list = list(pp.keys())  # отдельно составляет список ключей (группы)
-    v_list = list(pp.values()) # отдельно составляет список значений (очки)
+    v_list = list(pp.values())  # отдельно составляет список значений (очки)
     y = 0
     for s in range(0, circ):
         index = v_list.index(per_circ, y)
@@ -5400,7 +5774,8 @@ def summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr):
         ki1 = int(tr_all[n][0])  # 1-й игрок в туре
         ki2 = int(tr_all[n][1])  # 2-й игрок в туре
 
-        sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp)  # сумма очков игрока
+        sum_points_circle(num_gr, tour, ki1, ki2, pg_win,
+                          pg_los, pp)  # сумма очков игрока
 
     for i in tr:  # суммирует очки каждого игрока
         i = int(i)
@@ -5417,7 +5792,8 @@ def summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr):
         a = pp_all.count(p)
         list_tmp.append(p)
         list_tmp.append(a)
-        list_uniq.append(list_tmp.copy())  # список (очки и скольких игроков они встречаются)
+        # список (очки и скольких игроков они встречаются)
+        list_uniq.append(list_tmp.copy())
         list_tmp.clear()
     u.append(points_person)
     u.append(list_uniq)
@@ -5428,32 +5804,36 @@ def circle_2_player(tr, td, max_person, mesto, num_gr):
     """крутиловка из 2-ух человек"""
     player_rank_tmp = []
     tour = "-".join(tr)  # делает строку встреча в туре
-    #=====приводит туры к читаемому виду (1-й игрок меньше 2-ого)
+    # =====приводит туры к читаемому виду (1-й игрок меньше 2-ого)
     znak = tour.find("-")
     p1 = int(tour[:znak])  # игрок под номером в группе
     p2 = int(tour[znak + 1:])  # игрок под номером в группе
-    if p1 > p2: # меняет последовательность игроков в туре на обратную, чтоб у 1-ого игрока был номер меньше
+    if p1 > p2:  # меняет последовательность игроков в туре на обратную, чтоб у 1-ого игрока был номер меньше
         p_tmp = p1
         p1 = p2
         p2 = p_tmp
         tour = f"{p1}-{p2}"
     if num_gr != "Одна таблица":
-        c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
+        c = Result.select().where((Result.number_group == num_gr) &
+                                  (Result.tours == tour)).get()  # ищет в базе
     # строчку номер группы и тур по двум столбцам
     else:
-        c = Result.select().where((Result.system_stage == num_gr) & (Result.tours == tour)).get()  # ищет в базе
+        c = Result.select().where((Result.system_stage == num_gr) &
+                                  (Result.tours == tour)).get()  # ищет в базе
         # строчку номер группы и тур по двум столбцам
     if c.winner == c.player1:
         points_p1 = c.points_win  # очки во встрече победителя
         points_p2 = c.points_loser  # очки во встрече проигравшего
         td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
-        td[p2 * 2 - 2][max_person + 4] = mesto + 1  # записывает место проигравшему
+        td[p2 * 2 - 2][max_person + 4] = mesto + \
+            1  # записывает место проигравшему
         player_rank_tmp.append([p1, mesto])
         player_rank_tmp.append([p2, mesto + 1])
     else:
         points_p1 = c.points_loser
         points_p2 = c.points_win
-        td[p1 * 2 - 2][max_person + 4] = mesto + 1  # записывает место победителю
+        td[p1 * 2 - 2][max_person + 4] = mesto + \
+            1  # записывает место победителю
         td[p2 * 2 - 2][max_person + 4] = mesto  # записывает место проигравшему
         player_rank_tmp.append([p1, mesto + 1])
         player_rank_tmp.append([p2, mesto])
@@ -5475,9 +5855,12 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
             x = float('{:.3f}'.format(x))
             ps.append(x)
             pps.append(pp[k])
-        d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер участника)
-        ds = {index: value for index, value in enumerate(ps)}  # получает словарь(ключ, соотношение)
-        sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}  # сортирует словарь по убываню соот
+        # получает словарь(ключ, номер участника)
+        d = {index: value for index, value in enumerate(tr)}
+        # получает словарь(ключ, соотношение)
+        ds = {index: value for index, value in enumerate(ps)}
+        # сортирует словарь по убываню соот
+        sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}
         key_l = list(sorted_tuple.keys())
         val_l = list(sorted_tuple.values())
         vls = set(val_l)  # группирует разные значения
@@ -5487,37 +5870,51 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
             plr_ratio = score_in_circle(tr_all, men_of_circle, num_gr, tr)
             sorted_ratio = {k: plr_ratio[k] for k in
                             sorted(plr_ratio, key=plr_ratio.get, reverse=True)}  # сортирует словарь по убыванию соот
-            key_ratio = list(sorted_ratio.keys())  # получает список ключей отсортированного словаря
+            # получает список ключей отсортированного словаря
+            key_ratio = list(sorted_ratio.keys())
             r = 0
             for i in key_ratio:
                 ratio = sorted_ratio[i]  # соотношение в крутиловке
                 person = int(d[i])  # номер игрока
-                td[person * 2 - 2][max_person + 3] = str(ratio)  # записывает соотношение
-                td[person * 2 - 2][max_person + 4] = str(mesto + r)  # записывает место
-                player_rank_tmp.append([person, mesto + r])  # добавляет в список группа, место, чтоб занести в таблицу Choice
+                # записывает соотношение
+                td[person * 2 - 2][max_person + 3] = str(ratio)
+                td[person * 2 - 2][max_person +
+                                   4] = str(mesto + r)  # записывает место
+                # добавляет в список группа, место, чтоб занести в таблицу Choice
+                player_rank_tmp.append([person, mesto + r])
                 r += 1
         else:
             for i in val_l:
-                w = key_l[val_l.index(i)]  # получает ключ, по которому в списке ищет игрока
-                wq = int(d.setdefault(w))  # получает номер участника, соответствующий
-                td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
-                td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
-                player_rank_tmp.append([wq, m + mesto])  # добавляет в список группа, место, чтоб занести в таблицу Choice
+                # получает ключ, по которому в списке ищет игрока
+                w = key_l[val_l.index(i)]
+                # получает номер участника, соответствующий
+                wq = int(d.setdefault(w))
+                # записывает соотношения игроку
+                td[wq * 2 - 2][max_person + 3] = str(i)
+                # записывает место
+                td[wq * 2 - 2][max_person + 4] = str(m + mesto)
+                # добавляет в список группа, место, чтоб занести в таблицу Choice
+                player_rank_tmp.append([wq, m + mesto])
                 m += 1
     else:   # у трех участников разное кол-во очков
-        d = {index: value for index, value in enumerate(tr)}  # получает словарь(ключ, номер участника)
-        sorted_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}  # сортирует словарь по убыванию соот
+        # получает словарь(ключ, номер участника)
+        d = {index: value for index, value in enumerate(tr)}
+        # сортирует словарь по убыванию соот
+        sorted_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}
         key_l = list(sorted_tuple.keys())
         val_l = list(sorted_tuple.values())
         m = 0
         for i in val_l:
             q = val_l.index(i)
             wq = int(d.setdefault(q))  # получает номер группы, соответствующий
-            td[wq * 2 - 2][max_person + 3] = str(i)  # записывает соотношения игроку
+            # записывает соотношения игроку
+            td[wq * 2 - 2][max_person + 3] = str(i)
             td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
-            player_rank_tmp.append([wq, m + mesto])  # добавляет в список группа, место, чтоб занести в таблицу Choice
+            # добавляет в список группа, место, чтоб занести в таблицу Choice
+            player_rank_tmp.append([wq, m + mesto])
             m += 1
-    return  player_rank_tmp
+    return player_rank_tmp
+
 
 def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
     """сумма очков каждого игрока в крутиловке"""
@@ -5531,13 +5928,16 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         ki1 = p2
         ki2 = p1
     result = Result.select().where(Result.title_id == title_id())
-    c = result.select().where(Result.number_group == num_gr and Result.tours == tour).get()  # ищет в базе
+    c = result.select().where(Result.number_group ==
+                              num_gr and Result.tours == tour).get()  # ищет в базе
     # данную встречу
     if c.winner == c.player1:  # победил 1-й игрок
         points_p1 = c.points_win  # очки победителя
         points_p2 = c.points_loser  # очки проигравшего
-        game_p1 = c.score_in_game  # счет во встречи (выигранные и проигранные партии) победителя
-        game_p2 = c.score_loser  # счет во встречи (выигранные и проигранные партии) проигравшего
+        # счет во встречи (выигранные и проигранные партии) победителя
+        game_p1 = c.score_in_game
+        # счет во встречи (выигранные и проигранные партии) проигравшего
+        game_p2 = c.score_loser
         if game_p1 != "W : L" or game_p1 != "l : W":
             p1_game_win = int(game_p1[0])
             p1_game_los = int(game_p1[4])
@@ -5567,10 +5967,14 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
             # p2_game_los = game_p2[4]
     pp[ki1].append(points_p1)  # добавляет очки 1-ому игроку встречи
     pp[ki2].append(points_p2)  # добавляет очки 2-ому игроку встречи
-    pg_win[ki1].append(p1_game_win)  # записывает в словарь счет во встречи 1-ого игрока
-    pg_los[ki1].append(p1_game_los)  # записывает в словарь счет во встречи 1-ого игрока
-    pg_win[ki2].append(p2_game_win)  # записывает в словарь счет во встречи 2-ого игрока
-    pg_los[ki2].append(p2_game_los)  # записывает в словарь счет во встречи 2-ого игрока
+    # записывает в словарь счет во встречи 1-ого игрока
+    pg_win[ki1].append(p1_game_win)
+    # записывает в словарь счет во встречи 1-ого игрока
+    pg_los[ki1].append(p1_game_los)
+    # записывает в словарь счет во встречи 2-ого игрока
+    pg_win[ki2].append(p2_game_win)
+    # записывает в словарь счет во встречи 2-ого игрока
+    pg_los[ki2].append(p2_game_los)
 
 
 def score_in_circle(tr_all, men_of_circle, num_gr, tr):
@@ -5585,7 +5989,8 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr):
         p2 = int(tour[znak + 1:])  # игрок под номером в группе
         if p1 > p2:  # меняет последовательность игроков в туре на обратную, чтоб у 1-ого игрока был номер меньше
             tour = f"{p2}-{p1}"
-        c = Result.select().where((Result.number_group == num_gr) & (Result.tours == tour)).get()  # ищет в базе
+        c = Result.select().where((Result.number_group == num_gr) &
+                                  (Result.tours == tour)).get()  # ищет в базе
         k1 = tr_all[n][0]  # 1-й игрок в туре
         k2 = tr_all[n][1]  # 2-й игрок в туре
         ki1 = tr.index(k1)  # получение индекса 1-й игрока
@@ -5652,7 +6057,8 @@ def player_choice_in_group(num_gr):
     """распределяет спортсменов по группам согласно жеребьевке"""
     posev_data = []
     t_id = title_id()
-    choice = Choice.select().order_by(Choice.posev_group).where(Choice.title_id == t_id and Choice.group == num_gr)
+    choice = Choice.select().order_by(Choice.posev_group).where(
+        Choice.title_id == t_id and Choice.group == num_gr)
     for posev in choice:
         posev_data.append({
             'фамилия': posev.family,
@@ -5669,7 +6075,8 @@ def player_choice_one_table(stage):
         choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.title_id == t_id and
                                                                     Choice.basic == "Одна таблица")
     else:
-        choice = Choice.select().order_by(Choice.posev_final).where(Choice.title_id == t_id and Choice.final == stage)
+        choice = Choice.select().order_by(Choice.posev_final).where(
+            Choice.title_id == t_id and Choice.final == stage)
     for posev in choice:
         posev_data.append({
             'фамилия': posev.family,
@@ -5685,7 +6092,7 @@ def player_choice_in_setka(fin):
     p_stage = []
 
     system = System.select().where(System.title_id == title_id())
-    #=================
+    # =================
     stage = fin
     flag = ready_choice(stage)
     if flag is False:
@@ -5697,17 +6104,19 @@ def player_choice_in_setka(fin):
         count = len(p_stage)
         if count == 2:  # играются еще и полуфиналы
             pre_stage, ok = QInputDialog.getItem(my_win, "Число участников", "Выберите предварительный этап,\n откуда "
-                                                              "спортсмены выходят" f"{p_stage} в {fin}")
+                                                 "спортсмены выходят" f"{p_stage} в {fin}")
             if ok:
                 pass
         else:  # выходят в финал только из  группового этапа
             kpt, ok = QInputDialog.getInt(my_win, "Места в группе", "Введите место, которoе выходит\n"
-                                              f"из группы в {fin}", value=1)
+                                          f"из группы в {fin}", value=1)
             if ok:
-                system = System.get(System.title_id == title_id() and System.stage == fin)
-                sys = System.get(System.title_id == title_id() and System.stage == "Предварительный")
+                system = System.get(System.title_id ==
+                                    title_id() and System.stage == fin)
+                sys = System.get(System.title_id == title_id()
+                                 and System.stage == "Предварительный")
                 count_exit = system.max_player // sys.total_group
-                if count_exit == 1: # если выходит один человек
+                if count_exit == 1:  # если выходит один человек
                     reply = QMessageBox.information(my_win, 'Уведомление',
                                                     "Из группы выходят спортсмены,\n"
                                                     "занявшие " f"{kpt} место, все верно?",
@@ -5721,8 +6130,8 @@ def player_choice_in_setka(fin):
                                                     QMessageBox.StandardButtons.Cancel)
                 if reply == QMessageBox.StandardButtons.Yes:
                     with db:
-                        system.stage_exit="Предварительный"
-                        system.mesta_exit=kpt
+                        system.stage_exit = "Предварительный"
+                        system.mesta_exit = kpt
                         system.save()
                 else:
                     return
@@ -5731,8 +6140,10 @@ def player_choice_in_setka(fin):
         mesto_second_poseva = kpt + 1
 
     else:  # если была произведена жеребьевка
-        system = System.get(System.title_id == title_id() and System.stage == fin)
-        sys = System.get(System.title_id == title_id() and System.stage == system.stage_exit)
+        system = System.get(System.title_id == title_id()
+                            and System.stage == fin)
+        sys = System.get(System.title_id == title_id()
+                         and System.stage == system.stage_exit)
         count_exit = system.max_player // sys.total_group
 
         mesto_first_poseva = system.mesta_exit
@@ -5744,9 +6155,10 @@ def player_choice_in_setka(fin):
         mesto_first_poseva
         mesto_second_poseva
 
-
-    choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-    choice_second = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
+    choice_first = Choice.select().order_by(Choice.group).where(
+        Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+    choice_second = Choice.select().order_by(Choice.group).where(
+        Choice.mesto_group == mesto_second_poseva)
     first_number = [1, 16, 8, 9, 4, 5, 12, 13]
     second_number = [10, 3, 11, 7, 14, 15, 2, 6]
     count_sec_num = len(second_number)
@@ -5756,13 +6168,15 @@ def player_choice_in_setka(fin):
         player = Player.get(Player.player == posev.family)
         city = player.city
         for i in range(n, n + 1):
-            first_posev.append({'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
+            first_posev.append(
+                {'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
             n += 1
     for posev in choice_second:
         player = Player.get(Player.player == posev.family)
         city = player.city
         for k in range(k, k + 1):
-            second_posev.append({'посев': second_number[k], 'фамилия': f'{posev.family}/ {city}'})
+            second_posev.append(
+                {'посев': second_number[k], 'фамилия': f'{posev.family}/ {city}'})
             k += 1
     if k != count_sec_num:
         no_gamer = second_number[k:]
@@ -5770,9 +6184,10 @@ def player_choice_in_setka(fin):
             second_posev.append({'посев': m, 'фамилия': 'bye'})
 
     posev_data = first_posev + second_posev
-    posev_data = sorted(posev_data, key=lambda i: i['посев'])  # сортировка (списка словарей) по ключу словаря -посев-
+    # сортировка (списка словарей) по ключу словаря -посев-
+    posev_data = sorted(posev_data, key=lambda i: i['посев'])
     with db:  # записывает в db, что жеребьевка произведена
-        system.choice_flag=True
+        system.choice_flag = True
         system.save()
     return posev_data
 
@@ -5781,54 +6196,80 @@ def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
     tour_list = []
     tr = [[['1-3'], ['1-2'], ['2-3']],
-         [['1-3', '2-4'], ['1-2', '3-4'], ['2-3', '1-4']],
-         [['2-4', '1-5'], ['1-4', '3-5'], ['1-3', '2-5'], ['2-3', '4-5'], ['1-2', '3-4']],
-         [['2-4', '1-5', '3-6'], ['1-4', '2-6', '3-5'], ['1-3', '2-5', '4-6'], ['2-3', '1-6', '4-5'],
+          [['1-3', '2-4'], ['1-2', '3-4'], ['2-3', '1-4']],
+          [['2-4', '1-5'], ['1-4', '3-5'], ['1-3', '2-5'],
+              ['2-3', '4-5'], ['1-2', '3-4']],
+          [['2-4', '1-5', '3-6'], ['1-4', '2-6', '3-5'], ['1-3', '2-5', '4-6'], ['2-3', '1-6', '4-5'],
           ['1-2', '3-4', '5-6']],
-         [['2-6', '3-5', '1-7'], ['2-5', '1-6', '4-7'], ['1-5', '4-6', '3-7'], ['4-5', '2-7', '3-6'],
+          [['2-6', '3-5', '1-7'], ['2-5', '1-6', '4-7'], ['1-5', '4-6', '3-7'], ['4-5', '2-7', '3-6'],
           ['1-3', '2-4', '5-7'], ['1-4', '2-3', '6-7'], ['1-2', '3-4', '5-6']],
-         [['2-6', '3-5', '1-7', '4-8'], ['2-5', '1-6', '3-8', '4-7'], ['1-5', '2-8', '4-6', '3-7'],
-          ['1-8', '4-5', '2-7', '3-6'], ['1-3', '2-4', '5-7', '6-8'], ['1-4', '2-3', '6-7', '5-8'],
+          [['2-6', '3-5', '1-7', '4-8'], ['2-5', '1-6', '3-8', '4-7'], ['1-5', '2-8', '4-6', '3-7'],
+          ['1-8', '4-5', '2-7', '3-6'], ['1-3', '2-4',
+                                         '5-7', '6-8'], ['1-4', '2-3', '6-7', '5-8'],
           ['1-2', '3-4', '5-6', '7-8']],
-         [['1-9', '2-8', '3-7', '4-6'], ['5-9', '1-8', '2-7', '3-6'], ['4-9', '5-8', '1-7', '2-6'],
-          ['3-9', '4-8', '5-7', '1-6'], ['2-4', '1-5', '3-8', '7-9'], ['4-1', '5-3', '9-2', '8-6'],
+          [['1-9', '2-8', '3-7', '4-6'], ['5-9', '1-8', '2-7', '3-6'], ['4-9', '5-8', '1-7', '2-6'],
+          ['3-9', '4-8', '5-7', '1-6'], ['2-4', '1-5',
+                                         '3-8', '7-9'], ['4-1', '5-3', '9-2', '8-6'],
           ['1-3', '2-5', '4-7', '6-9'], ['3-2', '5-4', '8-9', '7-6'], ['1-2', '3-4', '5-6', '7-8']],
-         [['1-9', '2-8', '3-7', '4-6', '5-10'], ['5-9', '1-8', '2-7', '3-6', '4-10'], ['4-9', '5-8', '1-7', '2-6', '3-10'],
-          ['3-9', '4-8', '5-7', '1-6', '2-10'], ['2-4', '1-5', '3-8', '7-9', '6-10'], ['4-1', '5-3', '9-2', '8-6', '7-10'],
+          [['1-9', '2-8', '3-7', '4-6', '5-10'], ['5-9', '1-8', '2-7', '3-6', '4-10'], ['4-9', '5-8', '1-7', '2-6', '3-10'],
+          ['3-9', '4-8', '5-7', '1-6', '2-10'], ['2-4', '1-5', '3-8',
+                                                 '7-9', '6-10'], ['4-1', '5-3', '9-2', '8-6', '7-10'],
           ['1-3', '2-5', '4-7', '6-9', '8-10'], ['3-2', '5-4', '8-9', '7-6', '1-10'], ['1-2', '3-4', '5-6', '7-8', '9-10']],
-         [['1-11', '2-10', '3-9','4-8', '5-7'], ['6-11', '1-10', '2-9', '3-8', '4-7'], ['5-11', '6-10', '1-9', '2-8', '3-7'],
-          ['4-11', '5-10', '6-9', '1-8', '2-7'], ['3-11', '4-10', '5-9', '6-8', '1-7'], ['2-11', '3-10', '4-9', '5-8', '6-7'],
-          ['2-4', '1-5', '3-6', '7-10', '9-11'], ['1-4','2-6','3-5','8-10','7-11'], ['1-3', '2-5', '4-6', '7-9', '8-11'],
+          [['1-11', '2-10', '3-9', '4-8', '5-7'], ['6-11', '1-10', '2-9', '3-8', '4-7'], ['5-11', '6-10', '1-9', '2-8', '3-7'],
+          ['4-11', '5-10', '6-9', '1-8', '2-7'], ['3-11', '4-10', '5-9',
+                                                  '6-8', '1-7'], ['2-11', '3-10', '4-9', '5-8', '6-7'],
+          ['2-4', '1-5', '3-6', '7-10', '9-11'], ['1-4', '2-6', '3-5',
+                                                  '8-10', '7-11'], ['1-3', '2-5', '4-6', '7-9', '8-11'],
           ['2-3', '1-6', '4-5', '8-9', '10-11'], ['1-2', '3-4', '5-6', '7-8', '9-10']],
-         [['1-11', '2-10', '3-9', '4-8', '5-7', '6-12'], ['6-11', '1-10', '2-9', '3-8', '4-7', '5-12'],
-          ['5-11', '6-10', '1-9', '2-8', '3-7', '4-12'], ['4-11', '5-10', '6-9', '1-8', '2-7', '3-12'],
-          ['3-11', '4-10', '5-9', '6-8', '1-7', '2-12'], ['2-11', '3-10', '4-9', '5-8', '6-7', '1-12'],
-          ['2-4', '1-5', '3-6', '7-10', '9-11', '8-12'], ['1-4', '2-6', '3-5', '8-10', '7-11', '9-12'],
-          ['1-3', '2-5', '4-6', '7-9', '8-11', '10-12'], ['2-3', '1-6', '4-5', '8-9', '10-11', '7-12'],
+          [['1-11', '2-10', '3-9', '4-8', '5-7', '6-12'], ['6-11', '1-10', '2-9', '3-8', '4-7', '5-12'],
+          ['5-11', '6-10', '1-9', '2-8', '3-7', '4-12'], ['4-11',
+                                                          '5-10', '6-9', '1-8', '2-7', '3-12'],
+          ['3-11', '4-10', '5-9', '6-8', '1-7', '2-12'], ['2-11',
+                                                          '3-10', '4-9', '5-8', '6-7', '1-12'],
+          ['2-4', '1-5', '3-6', '7-10', '9-11', '8-12'], ['1-4',
+                                                          '2-6', '3-5', '8-10', '7-11', '9-12'],
+          ['1-3', '2-5', '4-6', '7-9', '8-11', '10-12'], ['2-3',
+                                                          '1-6', '4-5', '8-9', '10-11', '7-12'],
           ['1-2', '3-4', '5-6', '7-8', '9-10', '11-12']],
-         [['1-13', '2-12', '3-11', '4-10', '5-9', '6-8'], ['7-13', '1-12', '2-11', '3-10', '4-9', '5-8'],
-          ['6-13', '7-12', '1-11', '2-10', '3-9', '4-8'], ['5-13', '6-12', '7-11', '1-10', '2-9', '3-8'],
-          ['4-13', '5-12', '6-11', '7-10', '1-9', '2-8'], ['3-13', '4-12', '5-11', '6-10', '7-9', '1-8'],
-          ['1-7', '2-6', '3-5', '4-11', '9-13', '10-12'], ['1-6', '2-5', '4-7', '3-12', '8-11', '10-13'],
-          ['1-4', '2-7', '3-6', '5-10', '8-13', '9-12'], ['1-5', '3-7', '4-6', '2-13', '8-12', '9-11'],
-          ['1-3', '2-4', '5-7', '6-9', '8-10', '11-13'], ['2-3', '4-5', '6-7', '8-9', '10-11', '12-13'],
+          [['1-13', '2-12', '3-11', '4-10', '5-9', '6-8'], ['7-13', '1-12', '2-11', '3-10', '4-9', '5-8'],
+          ['6-13', '7-12', '1-11', '2-10', '3-9', '4-8'], ['5-13',
+                                                           '6-12', '7-11', '1-10', '2-9', '3-8'],
+          ['4-13', '5-12', '6-11', '7-10', '1-9', '2-8'], ['3-13',
+                                                           '4-12', '5-11', '6-10', '7-9', '1-8'],
+          ['1-7', '2-6', '3-5', '4-11', '9-13', '10-12'], ['1-6',
+                                                           '2-5', '4-7', '3-12', '8-11', '10-13'],
+          ['1-4', '2-7', '3-6', '5-10', '8-13', '9-12'], ['1-5',
+                                                          '3-7', '4-6', '2-13', '8-12', '9-11'],
+          ['1-3', '2-4', '5-7', '6-9', '8-10', '11-13'], ['2-3',
+                                                          '4-5', '6-7', '8-9', '10-11', '12-13'],
           ['1-2', '3-4', '5-6', '7-8', '9-10', '11-12']],
-         [['1-13', '2-12', '3-11', '4-10', '5-9', '6-8', '7-14'], ['7-13', '1-12', '2-11', '3-10', '4-9', '5-8', '6-14'],
-          ['6-13', '7-12', '1-11', '2-10', '3-9', '4-8', '5-14'], ['5-13', '6-12', '7-11', '1-10', '2-9', '3-8', '4-14'],
-          ['4-13', '5-12', '6-11', '7-10', '1-9', '2-8', '3-14'], ['3-13', '4-12', '5-11', '6-10', '7-9', '1-8', '2-14'],
-          ['1-7', '2-6', '3-5', '4-11', '9-13', '10-12', '8-14'], ['1-6', '2-5', '4-7', '3-12', '8-11', '10-13', '9-14'],
-          ['1-4', '2-7', '3-6', '5-10', '8-13', '9-12', '11-14'], ['1-5', '3-7', '4-6', '2-13', '8-12', '9-11', '10-14'],
-          ['1-3', '2-4', '5-7', '6-9', '8-10', '11-13', '12-14'], ['2-3', '4-5', '6-7', '8-9', '10-11', '12-13', '1-14'],
+          [['1-13', '2-12', '3-11', '4-10', '5-9', '6-8', '7-14'], ['7-13', '1-12', '2-11', '3-10', '4-9', '5-8', '6-14'],
+          ['6-13', '7-12', '1-11', '2-10', '3-9', '4-8', '5-14'], ['5-13',
+                                                                   '6-12', '7-11', '1-10', '2-9', '3-8', '4-14'],
+          ['4-13', '5-12', '6-11', '7-10', '1-9', '2-8', '3-14'], ['3-13',
+                                                                   '4-12', '5-11', '6-10', '7-9', '1-8', '2-14'],
+          ['1-7', '2-6', '3-5', '4-11', '9-13', '10-12', '8-14'], ['1-6',
+                                                                   '2-5', '4-7', '3-12', '8-11', '10-13', '9-14'],
+          ['1-4', '2-7', '3-6', '5-10', '8-13', '9-12', '11-14'], ['1-5',
+                                                                   '3-7', '4-6', '2-13', '8-12', '9-11', '10-14'],
+          ['1-3', '2-4', '5-7', '6-9', '8-10', '11-13', '12-14'], ['2-3',
+                                                                   '4-5', '6-7', '8-9', '10-11', '12-13', '1-14'],
           ['1-2', '3-4', '5-6', '7-8', '9-10', '11-12', '13-14']],
-         [['1-15', '2-14', '3-13', '4-12', '5-11', '6-10', '7-9'], ['8-15', '1-14', '2-13', '3-12', '4-11', '5-10', '6-9'],
-          ['8-15', '1-14', '2-13', '3-12', '4-11', '5-10', '6-9'], ['7-15', '8-14', '1-13', '2-12', '3-11', '4-10', '5-9'],
-          ['6-15', '7-14', '8-13', '1-12', '2-11', '3-10', '4-9'], ['5-15', '6-14', '7-13', '8-12', '1-11', '2-10', '3-9'],
-          ['4-15', '5-14', '6-13', '7-12', '8-11', '1-10', '2-9'], ['3-15', '4-14', '5-13', '6-12', '7-11', '8-10', '1-9'],
-          ['2-15', '3-14', '4-13', '5-12', '6-11', '7-10', '8-9'], ['1-7', '2-6', '3-5', '4-8', '9-13', '12-14', '11-15'],
-          ['1-6', '2-5', '3-8', '4-7', '9-14', '10-13', '12-15'], ['1-5', '2-8', '3-7', '4-6', '9-15', '10-14', '11-13'],
-          ['1-4', '2-7', '3-6', '5-8', '9-12', '10-15', '11-14'], ['1-3', '2-4', '5-7', '6-8', '9-11', '10-12', '13-15'],
+          [['1-15', '2-14', '3-13', '4-12', '5-11', '6-10', '7-9'], ['8-15', '1-14', '2-13', '3-12', '4-11', '5-10', '6-9'],
+          ['8-15', '1-14', '2-13', '3-12', '4-11', '5-10', '6-9'], ['7-15',
+                                                                    '8-14', '1-13', '2-12', '3-11', '4-10', '5-9'],
+          ['6-15', '7-14', '8-13', '1-12', '2-11', '3-10', '4-9'], ['5-15',
+                                                                    '6-14', '7-13', '8-12', '1-11', '2-10', '3-9'],
+          ['4-15', '5-14', '6-13', '7-12', '8-11', '1-10', '2-9'], ['3-15',
+                                                                    '4-14', '5-13', '6-12', '7-11', '8-10', '1-9'],
+          ['2-15', '3-14', '4-13', '5-12', '6-11', '7-10', '8-9'], ['1-7',
+                                                                    '2-6', '3-5', '4-8', '9-13', '12-14', '11-15'],
+          ['1-6', '2-5', '3-8', '4-7', '9-14', '10-13', '12-15'], ['1-5',
+                                                                   '2-8', '3-7', '4-6', '9-15', '10-14', '11-13'],
+          ['1-4', '2-7', '3-6', '5-8', '9-12', '10-15', '11-14'], ['1-3',
+                                                                   '2-4', '5-7', '6-8', '9-11', '10-12', '13-15'],
           ['1-8', '2-3', '4-5', '6-7', '10-11', '12-13', '14-15'], ['1-2', '3-4', '5-6', '7-8', '9-10', '11-12', '13-14']],
-         [['1-15', '2-14', '3-13', '4-12', '5-11', '6-10', '7-9', '8-16'],
+          [['1-15', '2-14', '3-13', '4-12', '5-11', '6-10', '7-9', '8-16'],
           ['8-15', '1-14', '2-13', '3-12', '4-11', '5-10', '6-9', '7-16'],
           ['7-15', '8-14', '1-13', '2-12', '3-11', '4-10', '5-9', '6-16'],
           ['6-15', '7-14', '8-13', '1-12', '2-11', '3-10', '4-9', '5-16'],
@@ -5848,7 +6289,6 @@ def tours_list(cp):
     return tour_list
 
 
-
 # def proba():
 #     """добавление столбца в существующую таблицу"""
 #
@@ -5863,15 +6303,13 @@ def tours_list(cp):
 #         # migrate(migrator.rename_column('system', 'stage_final', 'stage_exit'))
 #         migrate(migrator.add_column('titles', 'short_name_comp', short_name_comp))
 
-
-    #========================= создание таблицы
+    # ========================= создание таблицы
     # with db:
     #     Game_list.create_table()
-    #========================
-        # System.create_table()
-        # sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
-        #              kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
-
+    # ========================
+    # System.create_table()
+    # sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
+    #              kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
 my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
@@ -5899,11 +6337,14 @@ my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
 # ====== отслеживание изменения текста в полях ============
 
 # my_win.lineEdit_find_name.textChanged.connect(result_filter_name)
-my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
+my_win.lineEdit_Family_name.textChanged.connect(
+    find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 # ============= двойной клик
-my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)  # двойной клик по listWidget (рейтинг, тренеры)
-my_win.tableWidget.doubleClicked.connect(select_player_in_game)  # двойной клик по строке игроков в таблице -результаты-
+# двойной клик по listWidget (рейтинг, тренеры)
+my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
+# двойной клик по строке игроков в таблице -результаты-
+my_win.tableWidget.doubleClicked.connect(select_player_in_game)
 
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.toolBox.currentChanged.connect(page)
@@ -5934,12 +6375,17 @@ my_win.radioButton_match_5.toggled.connect(match_score_db)
 my_win.radioButton_match_7.toggled.connect(match_score_db)
 
 
-my_win.checkBox.stateChanged.connect(button_title_made_enable)  # при изменении чекбокса активирует кнопку создать
+# при изменении чекбокса активирует кнопку создать
+my_win.checkBox.stateChanged.connect(button_title_made_enable)
 # my_win.checkBox_2.stateChanged.connect(button_etap_made_enabled)  # при изменении чекбокса активирует кнопку создать
-my_win.checkBox_3.stateChanged.connect(button_system_made_enable)  # при изменении чекбокса активирует кнопку создать
-my_win.checkBox_4.stateChanged.connect(game_in_visible)  # при изменении чекбокса показывает поля для ввода счета
-my_win.checkBox_5.stateChanged.connect(game_in_visible)  # при изменении чекбокса показывает поля для ввода счета финала
-my_win.checkBox_6.stateChanged.connect(del_player_table)  # при изменении чекбокса показывает список удаленных игроков
+# при изменении чекбокса активирует кнопку создать
+my_win.checkBox_3.stateChanged.connect(button_system_made_enable)
+# при изменении чекбокса показывает поля для ввода счета
+my_win.checkBox_4.stateChanged.connect(game_in_visible)
+# при изменении чекбокса показывает поля для ввода счета финала
+my_win.checkBox_5.stateChanged.connect(game_in_visible)
+# при изменении чекбокса показывает список удаленных игроков
+my_win.checkBox_6.stateChanged.connect(del_player_table)
 my_win.checkBox_7.stateChanged.connect(no_play)  # поражение по неявке
 my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по неявке
 my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке
@@ -5954,13 +6400,20 @@ my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_reset_filter_fin.clicked.connect(reset_filter)
 my_win.Button_filter_fin.clicked.connect(filter_fin)
 my_win.Button_filter.clicked.connect(filter_gr)
-my_win.Button_etap_made.clicked.connect(etap_made)  # рисует таблицы группового этапа и заполняет game_list
-my_win.Button_system_made.clicked.connect(player_in_table)  # заполнение таблицы Game_list
-my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
-my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
-my_win.Button_title_made.clicked.connect(title_made)  # записывает в базу или редактирует титул
-my_win.Button_Ok.clicked.connect(enter_score)  # записывает в базу счет в партии встречи
-my_win.Button_Ok_fin.clicked.connect(enter_score)  # записывает в базу счет в партии встречи
+# рисует таблицы группового этапа и заполняет game_list
+my_win.Button_etap_made.clicked.connect(etap_made)
+my_win.Button_system_made.clicked.connect(
+    player_in_table)  # заполнение таблицы Game_list
+my_win.Button_add_edit_player.clicked.connect(
+    add_player)  # добавляет игроков в список и базу
+my_win.Button_group.clicked.connect(
+    player_in_table)  # вносит спортсменов в группы
+# записывает в базу или редактирует титул
+my_win.Button_title_made.clicked.connect(title_made)
+# записывает в базу счет в партии встречи
+my_win.Button_Ok.clicked.connect(enter_score)
+# записывает в базу счет в партии встречи
+my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
 my_win.Button_proba.clicked.connect(test_choice_group)
