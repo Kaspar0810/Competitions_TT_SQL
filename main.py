@@ -3772,24 +3772,49 @@ def choice_table():
 
 def test_choice_group():
     "новая система жеребьевки групп"
-    posev = []
+    posev_tmp = []
+    gr_region = []
+    posev_group = []
+    posev_gr_tmp = []
+    posev = {}
     load_tableWidget()
-    sys = System.get(System.title_id == title_id()
-                     and System.stage == "Предварительный")
-    s_id = sys.id
-    group = sys.total_group
-    max_player = sys.max_player
-    total_player = sys.total_athletes
-    pl_choice = Choice.select().order_by(
-        Choice.rank.desc()).where(Choice.title_id == title_id())
-    h = 0
-    for k in range(1, max_player + 1):
-        start = 1
-        end = group
-        for i in range(start, end):
-            id = int(my_win.tableWidget.item(h, 1).text())  # ищет id игрока
-            posev.append(id)
+    sys = System.select().where(System.title_id == title_id())
+    sys_id = sys.select().where(System.stage == "Предварительный").get()
+    group = sys_id.total_group
+    max_player = sys_id.max_player
+    total_player = sys_id.total_athletes
+    pl_choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.title_id == title_id())
+    b = 0
+    m = 1
+    for k in pl_choice:
+        if m % 2 != 0:  # направление посева с 1-й до последней группы
+            smena = group
+            b += 1
+        else:  # направление посева с последней группы до 1-й
+            smena = 1
+            b -= 1
 
+        if b <= group:  # 1-й посев
+            choice = k.get(Choice.id == k)
+            region = choice.region
+            reg = Region.get(Region.region == region)
+            region_id = reg.id
+            posev_tmp.append(b) 
+            posev_tmp.append(region_id)
+            gr_region = posev_tmp.copy()
+            posev_tmp.clear()
+            posev_gr_tmp.append(gr_region)
+            if b == smena:
+                posev_group = posev_gr_tmp.copy()
+                posev_group.sort()
+                posev_gr_tmp.clear()    
+                posev[m] = posev_group
+                m += 1
+                if b == group:
+                    b = group + 1
+                else:
+                    b = 0
+               
 
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
