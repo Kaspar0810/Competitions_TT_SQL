@@ -3808,15 +3808,40 @@ def test_choice_group():
             reg = Region.get(Region.region == region)
             region_id = reg.id            
             posev_tmp[b] = region_id
+            #============== 
+            tmp = posev['1_посев']
+            # tmp_1 = posev['2_посев']
+
+            
+            #     for vp in f"{b}_посев".itmes():
+            #         print(vp)
+
+            #==============
         else:
             posev[f"{m}_посев"] = posev_tmp
  
         if b == smena:
             m += 1
             if b == group:
-                 b = group + 1
+                b = group + 1
+                posev_test(tmp, group)
             else:
                 b = 0
+
+
+def posev_test(tmp, group):
+    """pass"""
+    pgt = []
+    tr = []
+    for a in range(1, group + 1):
+        v = tmp.setdefault(a)
+        pgt.append(v)
+    unique_numbers = list(set(pgt))  # список уникальных очков
+    for f in unique_numbers:  # проходим циклом по уник. значениям
+        num_player = tmp.get(f)
+    for x in num_player:
+        tr.append(str(x))  # создает список (встречи игроков)
+    m_new = pgt.count(f)  # подсчитываем сколько раз оно встречается
                
 
 def choice_gr_automat():
