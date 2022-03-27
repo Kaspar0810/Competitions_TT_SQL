@@ -4,6 +4,7 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 
+
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -19,9 +20,9 @@ from reportlab.pdfgen.canvas import Canvas
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
-from PyQt6.QtGui import *
-from PyQt6.QtWidgets import *
-from PyQt6 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from models import *
 from collections import Counter
 from itertools import *
@@ -1763,8 +1764,7 @@ def list_player_pdf(player_list):
     elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
-              colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm,
-                         2.5 * cm, 3.1 * cm, 1.2 * cm, 4.7 * cm, 1.1 * cm),
+              colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.7 * cm, 1.1 * cm),
               rowHeights=None)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                            # Использую импортированный шрифта размер
@@ -3806,16 +3806,52 @@ def test_choice_group():
             choice = k.get(Choice.id == k)
             region = choice.region
             reg = Region.get(Region.region == region)
-            region_id = reg.id            
-            posev_tmp[b] = region_id
-            #============== 
-            tmp = posev['1_посев']
-            # tmp_1 = posev['2_посев']
+            region_id = reg.id  
+            #  начало 2-ого посева ===================
+            if m == 1:          
+                posev_tmp[b] = region_id  # создает словарь группа - номер региона
+            else:
+                current_region_group = {}
+                key_reg_previous = []
+                key_reg_current = region_current(b, pl_choice, group)
+                for k in previous_region_group.keys():  # цикл получения списка регионов предыдущего посева
+                    key_reg_previous.append(k)
+                for y in range(0, group):
+                    posev_temp = []  
+                    z = key_reg_current[y]
+                    pgt.append(y + 1)  # номера групп которые уже посеяны будут удалены из списка
+#==============================
+                    for i in range(1, group + 1):  # если региона нет в предыдущем посеве, то создает список со номерами всех групп
+                        if key_reg_previous[i - 1] != z:
+                            posev_temp.append(i)
+                    posev_gr_tmp = posev_temp.copy()
+                    current_region_group[z] = posev_gr_tmp
+                    posev_temp.clear()
 
-            
-            #     for vp in f"{b}_посев".itmes():
-            #         print(vp)
+                #  система распределения по группам   
+                
+                for s in range(0, b):
+                    group_free = 0 
+                    region = key_reg_current[s]
+                    for f in range(0, group):
+                        r = key_reg_current[f]
+                        group_free_tmp = current_region_group[r]
+                        if b in group_free_tmp:
+                            group_free += 1  # колличество свободных групп
+                    if group_free > 1:
+                        posev_tmp[b] = region
+                        posev[f"{m}_посев"] = posev_tmp
 
+
+                    if current_region_group[region] == "no" or current_region_group != s + 1:
+                        posev_group[b] = region
+                        
+                        if b == 0:
+                            b += 1
+                        else:
+                            b -= 1
+                sorted_tuple = sorted(posev_group.items(), key=lambda x: x[0])
+                posev[f"{m}_посев"] = dict(sorted_tuple)
             #==============
         else:
             posev[f"{m}_посев"] = posev_tmp
@@ -3824,25 +3860,52 @@ def test_choice_group():
             m += 1
             if b == group:
                 b = group + 1
-                posev_test(tmp, group)
+                previous_region_group = posev_test(posev_tmp, group)  # возвращает словарь регион  - список номера групп, где он есть
+
             else:
                 b = 0
 
+def region_current(b, pl_choice, group):
+    """ создание списка номеров регионов в порядке посева """
+    key_reg_current = []
+    p = 0
+    b1 = b + group
+    for k in pl_choice:
+        p += 1
+        if p > b:
+            if p <= b1:
+                choice = k.get(Choice.id == k)
+                region = choice.region
+                reg = Region.get(Region.region == region)
+                region_id = reg.id  
+                key_reg_current.append(region_id)
+            else:
+                return key_reg_current
 
-def posev_test(tmp, group):
+
+def posev_test(posev_tmp, group):
     """pass"""
     pgt = []
-    tr = []
+    uniq_region = []
+    previous_region_group = {} 
+    gr = [] 
+    gr_tmp = []
+    # список регионов данного посева
     for a in range(1, group + 1):
-        v = tmp.setdefault(a)
+        v = posev_tmp.setdefault(a)
         pgt.append(v)
-    unique_numbers = list(set(pgt))  # список уникальных очков
-    for f in unique_numbers:  # проходим циклом по уник. значениям
-        num_player = tmp.get(f)
-    for x in num_player:
-        tr.append(str(x))  # создает список (встречи игроков)
-    m_new = pgt.count(f)  # подсчитываем сколько раз оно встречается
-               
+    # уникальный список регионов
+    r = 0
+    for v in pgt:
+        r += 1
+        if v not in uniq_region:
+            uniq_region.append(v)
+            gr_tmp.append(r)
+            gr = gr_tmp.copy()
+            previous_region_group[v] = gr
+            gr_tmp.clear()
+    return previous_region_group
+
 
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
@@ -5639,7 +5702,7 @@ def rank_in_group(total_score, max_person, td, num_gr):
     sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}
     # mesto_points = {}  # словарь (ключ-очки, а значения места без учета соотношений)
     valuesList = list(sorted_tuple.values())  # список очков по убыванию
-    unique_numbers = list(set(valuesList))  # список уникальных очков
+    unique_numbers = list(set(valuesList))  # множество уникальных очков
     unique_numbers.sort(reverse=True)  # список уникальных очков по убыванию
     mesto = 1
 
