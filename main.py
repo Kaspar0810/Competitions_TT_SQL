@@ -3829,30 +3829,11 @@ def test_choice_group():
                     posev_temp.clear()
 
                 #  система распределения по группам   
-                list_group = add_delete_region_group(key_reg_current, current_region_group, b, group, posev_tmp, m, posev)
-                # for s in range(0, b):
-                #     group_free = 0 
-                #     region = key_reg_current[s]
-                #     for f in range(0, group):
-                #         r = key_reg_current[f]
-                #         group_free_tmp = current_region_group[r]
-                #         if b in group_free_tmp:
-                #             group_free += 1  # колличество свободных групп
-                #     if group_free > 1:  # если групп больше одной записывает в словарь посев(номер группы - регион)
-                #         posev_tmp[b] = region
-                #         posev[f"{m}_посев"] = posev_tmp
-                #         for d in key_reg_current:  # цикл удаления посеянных групп
-                #             list_group = []
-                #             list_group = current_region_group[d]
-                #             list_group.remove(b)
-
-                        
+                add_delete_region_group(key_reg_current, current_region_group, b, group, posev_tmp, m, posev)
                 if b == 0:
                     b += 1
                 else:
                     b -= 1
-                sorted_tuple = sorted(posev_group.items(), key=lambda x: x[0])
-                posev[f"{m}_посев"] = dict(sorted_tuple)
             #==============
         else:
             posev[f"{m}_посев"] = posev_tmp
@@ -3861,10 +3842,11 @@ def test_choice_group():
             m += 1
             if b == group:
                 b = group + 1
-                previous_region_group = posev_test(posev_tmp, group)  # возвращает словарь регион  - список номера групп, где он есть
-
+                # previous_region_group = posev_test(posev_tmp, group)  # возвращает словарь регион  - список номера групп, где он есть
             else:
                 b = 0
+            # previous_region_group = posev_test(posev_tmp, group)  # возвращает словарь регион  - список номера групп, где он есть
+            previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
 
 
 def add_delete_region_group(key_reg_current, current_region_group, b, group, posev_tmp, m, posev):
@@ -3895,7 +3877,7 @@ def add_delete_region_group(key_reg_current, current_region_group, b, group, pos
             b += 1
         else:
             b -= 1        
-    return list_group
+    # return list_group
 
 
 def region_current(b, pl_choice, group):
@@ -3916,17 +3898,22 @@ def region_current(b, pl_choice, group):
                 return key_reg_current
 
 
-def posev_test(posev_tmp, group):
+# def posev_test(posev_tmp, group):
+def posev_test(posev, group, m):
     """pass"""
     pgt = []
     uniq_region = []
+    tmp_posev = {}
     previous_region_group = {} 
     gr = [] 
     gr_tmp = []
     # список регионов данного посева
-    for a in range(1, group + 1):
-        v = posev_tmp.setdefault(a)
-        pgt.append(v)
+    for p in range(1, m):
+        tmp_posev = posev[f"{p}_посев"]
+        for a in range(1, group + 1):
+            # v = posev_tmp.setdefault(a)
+            v = tmp_posev.setdefault(a)
+            pgt.append(v)
     # уникальный список регионов
     r = 0
     for v in pgt:
