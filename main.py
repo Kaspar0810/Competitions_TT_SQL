@@ -3829,27 +3829,28 @@ def test_choice_group():
                     posev_temp.clear()
 
                 #  система распределения по группам   
-                
-                for s in range(0, b):
-                    group_free = 0 
-                    region = key_reg_current[s]
-                    for f in range(0, group):
-                        r = key_reg_current[f]
-                        group_free_tmp = current_region_group[r]
-                        if b in group_free_tmp:
-                            group_free += 1  # колличество свободных групп
-                    if group_free > 1:
-                        posev_tmp[b] = region
-                        posev[f"{m}_посев"] = posev_tmp
+                list_group = add_delete_region_group(key_reg_current, current_region_group, b, group, posev_tmp, m, posev)
+                # for s in range(0, b):
+                #     group_free = 0 
+                #     region = key_reg_current[s]
+                #     for f in range(0, group):
+                #         r = key_reg_current[f]
+                #         group_free_tmp = current_region_group[r]
+                #         if b in group_free_tmp:
+                #             group_free += 1  # колличество свободных групп
+                #     if group_free > 1:  # если групп больше одной записывает в словарь посев(номер группы - регион)
+                #         posev_tmp[b] = region
+                #         posev[f"{m}_посев"] = posev_tmp
+                #         for d in key_reg_current:  # цикл удаления посеянных групп
+                #             list_group = []
+                #             list_group = current_region_group[d]
+                #             list_group.remove(b)
 
-
-                    if current_region_group[region] == "no" or current_region_group != s + 1:
-                        posev_group[b] = region
                         
-                        if b == 0:
-                            b += 1
-                        else:
-                            b -= 1
+                if b == 0:
+                    b += 1
+                else:
+                    b -= 1
                 sorted_tuple = sorted(posev_group.items(), key=lambda x: x[0])
                 posev[f"{m}_посев"] = dict(sorted_tuple)
             #==============
@@ -3864,6 +3865,38 @@ def test_choice_group():
 
             else:
                 b = 0
+
+
+def add_delete_region_group(key_reg_current, current_region_group, b, group, posev_tmp, m, posev):
+    """при добавлении в группу региона удалении номера группы из списка сеянных"""
+    for s in range(0, b):
+        group_free = 0 
+        region = key_reg_current[0]
+        kol_reg = len(key_reg_current)
+        for f in range(0, kol_reg):
+            r = key_reg_current[f]
+            group_free_tmp = current_region_group[r]
+            if b in group_free_tmp:
+                group_free += 1  # колличество свободных групп
+        if group_free > 1:  # если групп больше одной записывает в словарь посев(номер группы - регион)
+            posev_tmp[b] = region
+            posev[f"{m}_посев"] = posev_tmp            
+            # del current_region_group[region]
+            for d in key_reg_current:  # цикл удаления посеянных групп
+                list_group = []
+                list_group = current_region_group[d]
+                list_group.remove(b)
+            key_reg_current.remove(region)
+            del current_region_group[region]
+        else:
+            posev_tmp[b] = region
+            posev[f"{m}_посев"] = posev_tmp 
+        if b == 0:
+            b += 1
+        else:
+            b -= 1        
+    return list_group
+
 
 def region_current(b, pl_choice, group):
     """ создание списка номеров регионов в порядке посева """
