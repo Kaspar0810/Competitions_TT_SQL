@@ -3777,6 +3777,7 @@ def test_choice_group():
     posev_gr_tmp = []
     pgt = []
     posev = {}
+    group_list = []
     # load_tableWidget()
     sys = System.select().where(System.title_id == title_id())
     sys_id = sys.select().where(System.stage == "Предварительный").get()
@@ -3789,39 +3790,62 @@ def test_choice_group():
         gr_region = posev_group.copy()
         posev[f"{b}_посев"] = gr_region
         posev_group.clear()
+    for e in range(1, group + 1):
+        group_list.append(e)
    
     pl_choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.title_id == title_id())
     b = 1  # счетчик номеров групп в посеве
-    m = 1  # нчальное число посева
+    m = 1  # начальное число посева
     smena  = 0
-    for k in pl_choice:  # цикл по регионам жеребьевки
+    number_poseva = 0  # общий счетчик посева игроков
+    reg_list = []
+    for np in pl_choice:
+        choice = np.get(Choice.id == np)
+        region = choice.region
+        reg = Region.get(Region.region == region)
+        region_id = reg.id 
+        reg_list.append(region_id)
+    number_poseva = 0
+    for t in range(number_poseva, total_player):  # цикл по регионам жеребьевки
+        region_id= reg_list[t]
         posev_tmp = posev[f"{m}_посев"]
         if b <= group:  # 1-й посев
-            choice = k.get(Choice.id == k)
-            region = choice.region
-            reg = Region.get(Region.region == region)
-            region_id = reg.id  
             if m == 1:  # 1-й посев        
                 posev_tmp[b] = region_id  # создает словарь группа - номер региона
             else:  # 2-й посев и т.д.
                 current_region_group = {}  # словарь регион - список номеров групп куда можно сеять
                 key_reg_previous = []
-                key_reg_current = region_current(b, pl_choice, group)
-                for k in previous_region_group.keys():  # цикл получения списка регионов предыдущего посева
-                    key_reg_previous.append(k)
+                key_reg_current = region_current(number_poseva, reg_list, group)  # ? должен быть получен список текущих регионов посева
+
+                for o in previous_region_group.keys():  # цикл получения списка регионов предыдущих посевов
+                    key_reg_previous.append(o)
+                pgt.clear()
                 for y in range(0, group):
-                    posev_temp = []  
+                    group_list_tmp = []  
                     z = key_reg_current[y]
                     pgt.append(y + 1)  # номера групп которые уже посеяны будут удалены из списка
 #==============================
-                    for i in range(1, group + 1):  # если региона нет в предыдущем посеве, то создает список со номерами всех групп
-                        if key_reg_previous[i - 1] != z:
-                            posev_temp.append(i)  # список групп куда можно сеять
-                    posev_gr_tmp = posev_temp.copy()
-                    current_region_group[z] = posev_gr_tmp
-                    posev_temp.clear()
-                #  система распределения по группам   
+                    # for i in range(1, group + 1):  # создает список со номерами всех групп куда можно сеять
+                    #     z = key_reg_current[i]
+                    if z not in key_reg_previous:  # если нет в списке, то добавляет полный список групп
+                        current_region_group[z] = group_list
+                    else:
+                        gr_del = previous_region_group[z]
+                        kol_del_group = len(gr_del)
+                        for u in gr_del:
+                            group_list_tmp = group_list.copy()
+                            group_list_tmp.remove(u)
+                        current_region_group[z] = group_list_tmp
+                        # group_list_tmp.clear()  
+
+                            # posev_temp.append(i)  # список групп куда можно сеять
+                    # posev_gr_tmp = posev_temp.copy()
+                    # current_region_group[z] = posev_gr_tmp  # словарь (номер региона - список групп куда можно сеять)
+                    # posev_temp.clear()
+                #  система распределения по группам (посев), где m - номер посева
                 add_delete_region_group(key_reg_current, current_region_group, b, posev_tmp, m, posev)
+                # add_delete_region_group(key_reg_current, current_region_group, b, group_list_tmp, m, posev)
+                number_poseva += group
             #==============
         else:
             posev[f"{m}_посев"] = posev_tmp
@@ -3830,8 +3854,9 @@ def test_choice_group():
             if b == smena:
                 b = group
                 m += 1
-                smena = 1
-                previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть                
+                smena = 1  # номер группы где прозойдет смена направления посева
+                previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть 
+                number_poseva = group * (m - 1)            
             else:
                 smena = group  # номер группы где происходит смена направления посева
                 b += 1
@@ -3839,12 +3864,13 @@ def test_choice_group():
             if b == smena:
                 b = 1
                 m += 1
-                smena = group
-                previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
             else:
-                smena = 1
+                b = group + 1
+                smena = group
                 b -= 1
- 
+                m += 1
+                previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
+                number_poseva = group * (m - 1)  
 
 
 def add_delete_region_group(key_reg_current, current_region_group, b, posev_tmp, m, posev):
@@ -3861,44 +3887,42 @@ def add_delete_region_group(key_reg_current, current_region_group, b, posev_tmp,
                 group_free += 1  # колличество свободных групп
         if group_free > 1:  # если групп больше одной записывает в словарь посев(номер группы - регион)
             posev_tmp[b] = region
-            posev[f"{m}_посев"] = posev_tmp            
+            posev[f"{m}_посев"] = posev_tmp           
             for d in key_reg_current:  # цикл удаления посеянных групп
                 list_group = []
                 list_group = current_region_group[d]
-                list_group.remove(b)
+                if b in list_group:
+                    list_group.remove(b)
             key_reg_current.remove(region)  # удаляет регион из списка как посеянный
             del current_region_group[region]
         else:
             posev_tmp[b] = region
-            posev[f"{m}_посев"] = posev_tmp 
+            posev[f"{m}_посев"] = posev_tmp
         if b == 0:
             b += 1
         else:
             b -= 1        
+    
 
 
-def region_current(b, pl_choice, group):
-    """ создание списка номеров регионов в порядке посева """
+def region_current(number_poseva, reg_list, group):
+    """ создание списка номеров регионов в порядке посева для текущего номера посева """
     key_reg_current = []
+    key_tmp = []
     p = 0
-    b1 = b + group
-    for k in pl_choice:
-        p += 1
-        if p > b:
-            if p <= b1:
-                choice = k.get(Choice.id == k)
-                region = choice.region
-                reg = Region.get(Region.region == region)
-                region_id = reg.id  
-                key_reg_current.append(region_id)
-            else:
-                return key_reg_current
+    start = number_poseva
+    end = start + group
+    for k in range(start, end):
+        p = reg_list[k]
+        key_tmp.append(p)
+    key_reg_current = key_tmp.copy()
+    key_tmp.clear()
+    return key_reg_current
 
 
 def posev_test(posev, group, m):
-    """pass"""
-    pgt = []
-    uniq_region = []
+    """возвращает словарь предыдущих посевов регион - группы, где они есть"""
+    uniq_region = []  # уникальный список регионов которые уже посеяны
     tmp_posev = {}
     previous_region_group = {} 
     gr = [] 
@@ -3908,19 +3932,19 @@ def posev_test(posev, group, m):
         tmp_posev = posev[f"{p}_посев"]
         for a in range(1, group + 1):
             v = tmp_posev.setdefault(a)
-            pgt.append(v)
+            if v not in uniq_region:
+                uniq_region.append(v)
     # уникальный список регионов
-    r = 0
-    for v in pgt:
-        r += 1
-        if v not in uniq_region:
-            uniq_region.append(v)
-            gr_tmp.append(r)
-            gr = gr_tmp.copy()
-            previous_region_group[v] = gr
-            gr_tmp.clear()
+    for val in uniq_region:  # цикл получения словаря (номер региона - список групп где они уже есть)
+        for d in range(1, m):
+            for key, value in posev[f"{d}_посев"].items():
+                if val == value:
+                    gr_tmp.append(key)
+        gr = gr_tmp.copy()
+        previous_region_group[val] = gr
+        gr_tmp.clear()
     return previous_region_group
-
+ 
 
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
