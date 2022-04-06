@@ -3823,7 +3823,7 @@ def test_choice_group():
                 pgt.clear()
                 for y in range(0, group):
                     group_list_tmp = []  
-                    z = key_reg_current[y]
+                    z = key_reg_current[y] # список регионов которые уже были посеяны
                     pgt.append(y + 1)  # номера групп которые уже посеяны будут удалены из списка
 #==============================
                     if z not in key_reg_previous:  # если нет в списке, то добавляет полный список групп
@@ -3866,18 +3866,23 @@ def test_choice_group():
 
 def add_delete_region_group(key_reg_current, current_region_group, b, posev_tmp, m, posev):
     """при добавлении в группу региона удалении номера группы из списка сеянных -b- номер группы
-    -m- номер посева"""
+    -m- номер посева, kol_group_free - словарь регион и кол-во свободных групп"""
     for s in range(0, b):
-        group_free = 0 
-        region = key_reg_current[0]  # регион посева
-        kol_reg = len(key_reg_current)  # колво регионов (посевов)
+        kol_group_free = {}
+        group_free = 0
+        for i in key_reg_current:  # получение словаря (регион и кол-во групп куда можно сеять)
+            tmp = current_region_group[i] 
+            kol_reg = len(tmp)  # колво регионов (посевов)
+            kol_group_free[i] = kol_reg
+
         for f in range(0, kol_reg):
             r = key_reg_current[f]
+            region = key_reg_current[0]  # регион посева
             group_free_tmp = current_region_group[r]  # номера групп куда можно сеять
-            if b in group_free_tmp:
+            if b in group_free_tmp:  # если номер группы входит в список возможных групп
                 group_free += 1  # колличество свободных групп
         if group_free > 1:  # если групп больше одной записывает в словарь посев(номер группы - регион)
-            posev_tmp[b] = region
+            posev_tmp[b] = region  # запись номер группы - регион
             posev[f"{m}_посев"] = posev_tmp           
             for d in key_reg_current:  # цикл удаления посеянных групп
                 list_group = []
