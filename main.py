@@ -3874,14 +3874,36 @@ def add_delete_region_group(key_reg_current, current_region_group, b, posev_tmp,
             tmp = current_region_group[i] 
             kol_reg = len(tmp)  # колво регионов (посевов)
             kol_group_free[i] = kol_reg
+        for key, value in kol_group_free.items():
+            group_free += 1
+            if value == 1:  # если осталась одна группа в посеве для данного региона
 
-        for f in range(0, kol_reg):
-            r = key_reg_current[f]
-            region = key_reg_current[0]  # регион посева
-            group_free_tmp = current_region_group[r]  # номера групп куда можно сеять
-            if b in group_free_tmp:  # если номер группы входит в список возможных групп
-                group_free += 1  # колличество свободных групп
-        if group_free > 1:  # если групп больше одной записывает в словарь посев(номер группы - регион)
+                posev_tmp[group_free] = key
+                posev[f"{m}_посев"] = posev_tmp
+            group_free = 0
+        # for f in range(0, kol_reg):
+        #     r = key_reg_current[f]
+        region = key_reg_current[0]  # регион посева
+            # group_free_tmp = current_region_group[r]  # номера групп куда можно сеять
+           
+            # if b in group_free_tmp:  # если номер группы входит в список возможных групп
+            #     group_free += 1  # колличество свободных групп
+        # if group_free > 1:  # если групп больше одной записывает в словарь посев(номер группы - регион)
+            # free_gr = kol_group_free[region]
+            # if free_gr > 1:
+            #     posev_tmp[b] = region  # запись номер группы - регион
+            #     posev[f"{m}_посев"] = posev_tmp           
+            #     for d in key_reg_current:  # цикл удаления посеянных групп
+            #         list_group = []
+            #         list_group = current_region_group[d]
+            #         if b in list_group:
+            #             list_group.remove(b)
+            #     key_reg_current.remove(region)  # удаляет регион из списка как посеянный
+            #     del current_region_group[region]
+            # else:
+            #     pass
+        free_gr = kol_group_free[region]
+        if free_gr > 1:
             posev_tmp[b] = region  # запись номер группы - регион
             posev[f"{m}_посев"] = posev_tmp           
             for d in key_reg_current:  # цикл удаления посеянных групп
@@ -3890,7 +3912,7 @@ def add_delete_region_group(key_reg_current, current_region_group, b, posev_tmp,
                 if b in list_group:
                     list_group.remove(b)
             key_reg_current.remove(region)  # удаляет регион из списка как посеянный
-            del current_region_group[region]
+            del current_region_group[region]           
         else:
             posev_tmp[b] = region
             posev[f"{m}_посев"] = posev_tmp
