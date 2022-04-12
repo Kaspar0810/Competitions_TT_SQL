@@ -3795,7 +3795,6 @@ def test_choice_group():
         posev_group.clear()
    
     pl_choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.title_id == title_id())
-    # begin = 1  # счетчик номеров групп в посеве
     m = 1  # начальное число посева
     smena  = 0
     number_poseva = 0  # общий счетчик посева игроков
@@ -3832,48 +3831,32 @@ def test_choice_group():
                     current_region_group[z] = group_list
                 else:
                     gr_del = previous_region_group[z]  # список групп где уже есть этот регион
-                    kol_del_group = len(gr_del)
                     group_list_tmp = list((Counter(group_list) - Counter(gr_del)).elements()) # удаляет из списка номера групп где уже есть регионы
                     current_region_group[z] = group_list_tmp  # получает словарь со списком групп куда сеять
                  # система распределения по группам (посев), где m - номер посева начина со 2-ого посева
             sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step)
-            # m = sev[0]
-            # number_poseva = number_poseva + sev[1]
             number_poseva = number_poseva + sv
-
-        if number_poseva == group * m:
-            if m % 2 != 0:
-                start = group
-                end = 0
-                step = -1
-            else:
-                start = 0
-                end = group
-                step = 1
-            m += 1
-            previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
+        if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканцания
+            if number_poseva == group * m:  # смена направления посева
+                if m % 2 != 0:
+                    start = group
+                    end = 0
+                    step = -1
+                else:
+                    start = 0
+                    end = group
+                    step = 1
+                m += 1
+                previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
+        else:
+            print(posev)
+            return
+            with db:  # запись в таблицу Choice результата жеребъевки
+                grp = Choice.get(Choice.id == choice_id)
+                grp.group = txt
+                grp.posev_group = k
+                grp.save()
         group_list.clear()
-
-
-
-
- 
-        # if m % 2 != 0:  # направление посева с 1-й до последней группы (нечетные номера посевов)
-        #     if number_poseva == group * m:  # число посева региона
-        #         m += 1  # изменеят посев
-        #         start = group
-        #         end = 0
-        #         step -= 1
-        #         previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
-        # else:  # четные номера посева
-        #     if number_poseva == group * m:  # число посева региона
-        #         m += 1  # изменеят посев
-        #         start = 0
-        #         end = group
-        #         step += 1
-        #         previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
-        # group_list.clear()
-
 
 
 def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step):
@@ -3997,9 +3980,7 @@ def choice_gr_automat():
         for i in range(start, end, step):  # №-й посев
             if h < tp:
                 txt = str(f'{i + p} группа')
-                id = int(my_win.tableWidget.item(
-                    h, 1).text())  # ищет id игрока
-                # находит id таблицы choice, соответсвующий игроку
+                id = int(my_win.tableWidget.item(h, 1).text())  # ищет id игрока находит id таблицы choice, соответсвующий игроку
                 ch_id = Choice.get(Choice.player_choice == id)
                 choice_id = ch_id.id
                 h += 1
