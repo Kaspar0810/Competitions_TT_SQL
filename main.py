@@ -5,6 +5,7 @@
 
 
 
+from imp import load_dynamic
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -3775,12 +3776,17 @@ def test_choice_group():
     posev_tmp = {}
     gr_region = {}
     posev_group = {}
+    id_list = []
     pgt = []
     posev = {}
     group_list = []
     start = 0
     end = 1
     step = 0
+    tmp = []
+    n = []
+
+    load_tableWidget()
 
     sys = System.select().where(System.title_id == title_id())
     sys_id = sys.select().where(System.stage == "Предварительный").get()
@@ -3801,18 +3807,27 @@ def test_choice_group():
     reg_list = []
     for np in pl_choice:
         choice = np.get(Choice.id == np)
+        player_id = choice.player_choice_id
         region = choice.region
         reg = Region.get(Region.region == region)
         region_id = reg.id 
         reg_list.append(region_id)
+        id_list.append(player_id)
     for p in range(1, total_player + 1):  # цикл по регионам жеребьевки
     
         for e in range(1, group + 1):  # получение списка всех групп
             group_list.append(e)
-        region_id= reg_list[number_poseva]
+        region_id = reg_list[number_poseva]
+        #========================
+        pl_id = id_list[number_poseva]
+        #========================
         posev_tmp = posev[f"{m}_посев"]
-        if m == 1:  # 1-й посев        
+        if m == 1:  # 1-й посев    
             posev_tmp[p] = region_id  # создает словарь группа - номер региона
+            tmp.append(p)
+            tmp.append(pl_id)
+            n = tmp.copy()
+
             number_poseva += 1
         else:  # 2-й посев и т.д.
             current_region_group = {}  # словарь регион - список номеров групп куда можно сеять
@@ -3954,7 +3969,7 @@ def posev_test(posev, group, m):
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
     load_tableWidget()
-    # gamer = my_win.lineEdit_title_gamer.text()
+ 
     sys = System.get(System.title_id == title_id()
                      and System.stage == "Предварительный")
     s_id = sys.id
