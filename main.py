@@ -3818,14 +3818,18 @@ def test_choice_group():
         region_id = reg_list[number_poseva]
         pl_id = player_list[number_poseva]
         posev_tmp = posev[f"{m}_посев"]
+
         if m == 1:  # 1-й посев        
             posev_tmp[p] = region_id  # создает словарь группа - номер региона
             player_posev_tmp[p] = pl_id
             number_poseva += 1
+            choice_save(m, number_poseva, pl_id)
         else:  # 2-й посев и т.д.
             current_region_group = {}  # словарь регион - список номеров групп куда можно сеять
             key_reg_previous = []
-            key_reg_current = region_current(number_poseva, reg_list, group)  # должен быть получен список текущих регионов посева
+            current = region_player_current(number_poseva, reg_list, group, player_list)  # должен быть получен список текущих регионов посева
+            key_reg_current = current[0]
+            player_current = current[1]
 
             for o in previous_region_group.keys():  # цикл получения списка регионов предыдущих посевов
                 key_reg_previous.append(o)
@@ -3858,13 +3862,13 @@ def test_choice_group():
                 previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
         else:
             print(posev)
-            for y in range(1, total_player + 1):
-                txt = str(f'{i + y} группа')
-                with db:  # запись в таблицу Choice результата жеребъевки
-                    grp = Choice.get(Choice.id == choice_id)
-                    grp.group = txt
-                    grp.posev_group = k
-                    grp.save()
+            # for y in range(1, total_player + 1):
+            #     txt = str(f'{i + y} группа')
+            #     with db:  # запись в таблицу Choice результата жеребъевки
+            #         grp = Choice.get(Choice.id == choice_id)
+            #         grp.group = txt
+            #         grp.posev_group = k
+            #         grp.save()
         group_list.clear()
 
 
@@ -3919,19 +3923,41 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
     return sv
 
 
-def region_current(number_poseva, reg_list, group):
+
+def choice_save(m, number_poseva, pl_id):
+    """запись в db результаты жеребьевки"""
+    with db:  # запись в таблицу Choice результата жеребъевки
+        choice = Choice.get(Choice.player_choice_id == pl_id)
+        choice.group = f"{number_poseva} группа"
+        choice.posev_group = m
+        choice.save()
+
+
+
+def region_player_current(number_poseva, reg_list, group, player_list):
     """ создание списка номеров регионов в порядке посева для текущего номера посева """
     key_reg_current = []
     key_tmp = []
+    player_current = []
+    pl_tmp = []
+    current = []
+    r = 0
     p = 0
     start = number_poseva
     end = start + group
     for k in range(start, end):
-        p = reg_list[k]
-        key_tmp.append(p)
+        r = reg_list[k]
+        key_tmp.append(r)
+        p = player_list[k]
+        pl_tmp.append(p)
+
     key_reg_current = key_tmp.copy()
+    player_current = pl_tmp.copy()
     key_tmp.clear()
-    return key_reg_current
+    pl_tmp.clear()
+    current.append(key_reg_current)
+    current.append(player_current)
+    return current
 
 
 def posev_test(posev, group, m):
