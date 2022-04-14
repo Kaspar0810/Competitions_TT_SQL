@@ -3777,6 +3777,7 @@ def test_choice_group():
     player_posev_tmp = {}
     gr_region = {}
     posev_group = {}
+    play_id = []
     player_id = []
     pgt = []
     posev = {}
@@ -3819,11 +3820,13 @@ def test_choice_group():
         pl_id = player_list[number_poseva]
         posev_tmp = posev[f"{m}_посев"]
 
-        if m == 1:  # 1-й посев        
+        if m == 1:  # 1-й посев       
             posev_tmp[p] = region_id  # создает словарь группа - номер региона
             player_posev_tmp[p] = pl_id
             number_poseva += 1
-            choice_save(m, number_poseva, pl_id)
+            play_id.append(pl_id)
+            if number_poseva == group:
+                choice_save(m, number_poseva, play_id)
         else:  # 2-й посев и т.д.
             current_region_group = {}  # словарь регион - список номеров групп куда можно сеять
             key_reg_previous = []
@@ -3862,13 +3865,6 @@ def test_choice_group():
                 previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
         else:
             print(posev)
-            # for y in range(1, total_player + 1):
-            #     txt = str(f'{i + y} группа')
-            #     with db:  # запись в таблицу Choice результата жеребъевки
-            #         grp = Choice.get(Choice.id == choice_id)
-            #         grp.group = txt
-            #         grp.posev_group = k
-            #         grp.save()
         group_list.clear()
 
 
@@ -3924,13 +3920,14 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
 
 
 
-def choice_save(m, number_poseva, pl_id):
+def choice_save(m, number_poseva, play_id):
     """запись в db результаты жеребьевки"""
-    with db:  # запись в таблицу Choice результата жеребъевки
-        choice = Choice.get(Choice.player_choice_id == pl_id)
-        choice.group = f"{number_poseva} группа"
-        choice.posev_group = m
-        choice.save()
+    for i in play_id:
+        with db:  # запись в таблицу Choice результата жеребъевки
+            choice = Choice.get(Choice.player_choice_id == i)
+            choice.group = f"{number_poseva} группа"
+            choice.posev_group = m
+            choice.save()
 
 
 
