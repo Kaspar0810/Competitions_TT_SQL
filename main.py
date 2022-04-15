@@ -3849,7 +3849,7 @@ def test_choice_group():
                     group_list_tmp = list((Counter(group_list) - Counter(gr_del)).elements()) # удаляет из списка номера групп где уже есть регионы
                     current_region_group[z] = group_list_tmp  # получает словарь со списком групп куда сеять
                  # система распределения по группам (посев), где m - номер посева начина со 2-ого посева
-            sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step)
+            sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
             number_poseva = number_poseva + sv
         if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканцания
             if number_poseva == group * m:  # смена направления посева
@@ -3868,12 +3868,13 @@ def test_choice_group():
         group_list.clear()
 
 
-def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step):
+def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current):
     """при добавлении в группу региона удалении номера группы из списка сеянных -b- номер группы
     -m- номер посева, kol_group_free - словарь регион и кол-во свободных групп"""
     free_list = []
     reg_list = []
     kol_group_free = {}
+    reg_player = dict.fromkeys(player_current, 0)
     group_free = 0
     sv = 0
     for s in range(start, end, step):
@@ -3903,6 +3904,7 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                     posev_tmp[g] = region
                     u = g    # присваивает переменной u - номер группы, если она идет не по порядку
                 posev[f"{m}_посев"] = posev_tmp
+                reg_player[player_current[sv - 1]] = u
         for d in key_reg_current:  # цикл удаления посеянных групп
             list_group = []
             list_group = current_region_group[d]
@@ -3922,10 +3924,10 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
 
 def choice_save(m, number_poseva, play_id):
     """запись в db результаты жеребьевки"""
-    for i in play_id:
+    for i in range(0, number_poseva):
         with db:  # запись в таблицу Choice результата жеребъевки
-            choice = Choice.get(Choice.player_choice_id == i)
-            choice.group = f"{number_poseva} группа"
+            choice = Choice.get(Choice.player_choice_id == play_id[i])
+            choice.group = f"{i + 1} группа"
             choice.posev_group = m
             choice.save()
 
