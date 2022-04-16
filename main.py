@@ -3772,13 +3772,13 @@ def choice_table():
 def test_choice_group():
     "новая система жеребьевки групп"
     " current_region_group - словарь (регион - список номеров групп куда можно сеять)"
+    " reg_player - словарь регион ид игрока, player_current - список сеящихся игроков, posev - словарь всего посева"
     load_tableWidget()
     posev_tmp = {}
-    player_posev_tmp = {}
+    reg_player = {}
     gr_region = {}
     posev_group = {}
-    play_id = []
-    player_id = []
+    player_current = []
     pgt = []
     posev = {}
     group_list = []
@@ -3800,7 +3800,7 @@ def test_choice_group():
    
     pl_choice = Choice.select().order_by(Choice.rank.desc()).where(Choice.title_id == title_id())
     m = 1  # начальное число посева
-    smena  = 0
+    p = 0
     number_poseva = 0  # общий счетчик посева игроков
     reg_list = []
     player_list = []
@@ -3812,21 +3812,24 @@ def test_choice_group():
         region_id = reg.id 
         reg_list.append(region_id)
         player_list.append(pl_id)
-    for p in range(1, total_player + 1):  # цикл по регионам жеребьевки
-    
-        for e in range(1, group + 1):  # получение списка всех групп
-            group_list.append(e)
+    # for p in range(1, total_player + 1):  # цикл по регионам жеребьевки
+    while number_poseva < total_player:
+        p += 1
+        if number_poseva == 0 or number_poseva % group == 0 :
+            for e in range(1, group + 1):  # получение списка всех групп
+                group_list.append(e)
+
         region_id = reg_list[number_poseva]
         pl_id = player_list[number_poseva]
         posev_tmp = posev[f"{m}_посев"]
 
         if m == 1:  # 1-й посев       
             posev_tmp[p] = region_id  # создает словарь группа - номер региона
-            player_posev_tmp[p] = pl_id
             number_poseva += 1
-            play_id.append(pl_id)
-            if number_poseva == group:
-                choice_save(m, number_poseva, play_id)
+            player_current.append(pl_id)
+            reg_player[pl_id] = number_poseva  # словарь ид игрока его группа при посеве
+            if number_poseva == group:  # если доходит окончания данного посева идет запись в db
+                choice_save(m, player_current, reg_player)
         else:  # 2-й посев и т.д.
             current_region_group = {}  # словарь регион - список номеров групп куда можно сеять
             key_reg_previous = []
@@ -3850,8 +3853,9 @@ def test_choice_group():
                     current_region_group[z] = group_list_tmp  # получает словарь со списком групп куда сеять
                  # система распределения по группам (посев), где m - номер посева начина со 2-ого посева
             sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
+            current.clear()
             number_poseva = number_poseva + sv
-        if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканцания
+        if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканчания
             if number_poseva == group * m:  # смена направления посева
                 if m % 2 != 0:
                     start = group
@@ -3864,7 +3868,12 @@ def test_choice_group():
                 m += 1
                 previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
         else:
-            print(posev)
+            fill_table_choice()
+            with db:  # записывает в систему, что произведена жеребъевка
+                system = System.get(System.id == sys_id)
+                system.choice_flag = True
+                system.save()
+            player_in_table()
         group_list.clear()
 
 
@@ -3875,7 +3884,7 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
     reg_list = []
     kol_group_free = {}
     reg_player = dict.fromkeys(player_current, 0)
-    group_free = 0
+    # group_free = 0
     sv = 0
     for s in range(start, end, step):
         sv += 1
@@ -3903,8 +3912,8 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                     g = f[0]
                     posev_tmp[g] = region
                     u = g    # присваивает переменной u - номер группы, если она идет не по порядку
-                posev[f"{m}_посев"] = posev_tmp
-                reg_player[player_current[sv - 1]] = u
+        posev[f"{m}_посев"] = posev_tmp
+        reg_player[player_current[sv - 1]] = u  # записывает в словарь региогн и группу посева
         for d in key_reg_current:  # цикл удаления посеянных групп
             list_group = []
             list_group = current_region_group[d]
@@ -3917,20 +3926,20 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         if start > end:
             start -= 1
         else:
-            start += 1          
+            start += 1 
+    choice_save(m, player_current, reg_player)        
     return sv
 
 
-
-def choice_save(m, number_poseva, play_id):
-    """запись в db результаты жеребьевки"""
-    for i in range(0, number_poseva):
+def choice_save(m, player_current, reg_player):
+    """запись в db результаты жеребьевки конкретного посева"""
+    for i in player_current:
+        num_group = reg_player[i]
         with db:  # запись в таблицу Choice результата жеребъевки
-            choice = Choice.get(Choice.player_choice_id == play_id[i])
-            choice.group = f"{i + 1} группа"
+            choice = Choice.get(Choice.player_choice_id == i)
+            choice.group = f"{num_group} группа"
             choice.posev_group = m
             choice.save()
-
 
 
 def region_player_current(number_poseva, reg_list, group, player_list):
@@ -3988,7 +3997,6 @@ def posev_test(posev, group, m):
 def choice_gr_automat():
     """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
     load_tableWidget()
-    # gamer = my_win.lineEdit_title_gamer.text()
     sys = System.get(System.title_id == title_id()
                      and System.stage == "Предварительный")
     s_id = sys.id
