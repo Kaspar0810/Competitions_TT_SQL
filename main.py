@@ -4588,25 +4588,11 @@ def table_made(pv, stage):
         t = ta
     else:  # групповые игры
         kg = s_id.total_group  # кол-во групп
-        #=============
         a = int(ta) // int(kg)
         if a == 1 or a < ta: # значит число игроков кратно группам
             t = ta
         else:
             t = ta + 1
-
-
-
-        # #==========
-        # t = int(ta) // int(kg)
-        # # если количество участников не равно делится на группы
-        # e = int(ta) % int(kg)
-        # g2 = t + 1
-        # kg = int(kg)
-        # if e == 0:
-        #     t = ta
-        # else:
-        #     t = g2
     if pv == "альбомная":  # альбомная ориентация стр
         pv = landscape(A4)
         if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:
