@@ -253,6 +253,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusbar.showMessage("Список участников сохранен")
 
     def choice(self):
+        msg = QMessageBox
         sender = self.sender()
         if sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
             system = System.select().where(System.title_id == title_id())
@@ -262,9 +263,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         reply = QMessageBox.information(my_win, 'Уведомление',
                                                         "Жеребъевка была произведена,\nесли хотите сделать "
                                                         "повторно\nнажмите -ОК-, если нет то - Cancel-",
-                                                        QMessageBox.StandardButtons.Ok,
-                                                        QMessageBox.StandardButtons.Cancel)
-                        if reply == QMessageBox.StandardButtons.Ok:
+                                                        QMessageBox.Ok, QMessageBox.Cancel)
+
+                        if reply == QMessageBox.Ok:
                             my_win.tabWidget.setCurrentIndex(2)
                             choice_gr_automat()
                             my_win.tabWidget.setCurrentIndex(3)
@@ -285,9 +286,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                                                            f"\nесли хотите сделать "
                                                                            "повторно\nнажмите-ОК-, "
                                                                            "если нет то - Cancel-",
-                                                    QMessageBox.StandardButtons.Ok,
-                                                    QMessageBox.StandardButtons.Cancel)
-                    if reply == QMessageBox.StandardButtons.Ok:
+                                                    QMessageBox.Ok,
+                                                    QMessageBox.Cancel)
+                    if reply == QMessageBox.Ok:
                         if type == "круг":
                             player_fin_on_circle(fin)
                         else:
@@ -383,8 +384,8 @@ class StartWindow(QMainWindow, Ui_Form):
         """запускает новые соревнования"""
         msgBox = QMessageBox
         result = msgBox.question(my_win, "", "Вы действительно хотите создать новые соревнования?",
-                                 msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-        if result == msgBox.StandardButtons.Ok:
+                                 msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
             gamer = ("Мальчики", "Девочки", "Юноши",
                      "Девушки", "Мужчины", "Женщины")
             gamer, ok = QInputDialog.getItem(
@@ -526,9 +527,9 @@ def control_R_list(fname, gamer):
     if current_month != month_vybor:
         message = "Вы выбрали файл не с актуальным рейтингом!\nесли все равно хотите его использовать, нажмите <Ок>\nесли хотите вернуться, нажмите <Отмена>"
         reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
-                                                  QtWidgets.QMessageBox.StandardButtons.Ok,
-                                                  QtWidgets.QMessageBox.StandardButtons.Cancel)
-        if reply == QMessageBox.StandardButtons.Ok:
+                                                  QtWidgets.QMessageBox.Ok,
+                                                  QtWidgets.QMessageBox.Cancel)
+        if reply == QMessageBox.Ok:
             return
         else:
             db_r(gamer)
@@ -547,9 +548,9 @@ def load_listR_in_db(fname, table_db):
     if filepatch == "":
         message = f"Вы не выбрали файл с {r} рейтингом!\nесли хотите выйти, нажмите <Ок>\nесли хотите вернуться, нажмите <Отмена>"
         reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
-                                                  QtWidgets.QMessageBox.StandardButtons.Ok,
-                                                  QtWidgets.QMessageBox.StandardButtons.Cancel)
-        if reply == QMessageBox.StandardButtons.Ok:
+                                                  QtWidgets.QMessageBox.Ok,
+                                                  QtWidgets.QMessageBox.Cancel)
+        if reply == QMessageBox.Ok:
             return
         else:
             db_r(table_db)
@@ -2173,15 +2174,14 @@ def player_fin_on_circle(fin):
 def player_in_table():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
     встречи по турам в таблицу -Result- """
-    system = System.select().where(System.title_id == title_id()
-                                   ).get()  # находит system id последнего
+    system = System.select().where(System.title_id == title_id()).get()  # находит system id последнего
     kg = system.total_group
     st = system.stage
     table = system.label_string
     pv = system.page_vid
     stage = st
     # создание таблиц групп со спортсменами согласно жеребьевки в PDF
-    table_made(pv)
+    table_made(pv, stage)
     # вызов функции, где получаем список всех участников по группам
     tdt_all = table_data(stage, kg)
     tdt = tdt_all[0]
@@ -3708,11 +3708,11 @@ def filter_gr(pl=False):
     if my_win.comboBox_find_name.currentText() != "" and pl == False:
         result = msgBox.question(my_win, "", "Продолжить поиск игр с участием\n"
                                              f"{name} ?",
-                                 msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-        if result == msgBox.StandardButtons.Ok:
+                                 msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
             pl = True
             filter_gr(pl)
-        elif result == msgBox.StandardButtons.Cancel:
+        elif result == msgBox.Cancel:
             my_win.comboBox_find_name.clear()
             return
     else:
@@ -3763,13 +3763,13 @@ def choice_table():
     mp = system.total_athletes
     if mp == 0:  # система еще не создана (mp - всего человек в списке)
         result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
-                                    msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-        if result == msgBox.StandardButtons.Ok:
+                                    msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
             choice_tbl_made()  # заполняет db жеребьевка
             system_competition()  # создает систему соревнований
 
 
-def test_choice_group():
+def choice_gr_automat():
     "новая система жеребьевки групп"
     " current_region_group - словарь (регион - список номеров групп куда можно сеять)"
     " reg_player - словарь регион ид игрока, player_current - список сеящихся игроков, posev - словарь всего посева"
@@ -3884,8 +3884,9 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
     reg_list = []
     kol_group_free = {}
     reg_player = dict.fromkeys(player_current, 0)
-    # group_free = 0
+    player_list = player_current.copy()
     sv = 0
+
     for s in range(start, end, step):
         sv += 1
         for i in key_reg_current:  # получение словаря (регион и кол-во мест (групп) куда можно сеять)
@@ -3897,7 +3898,6 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         last = len(reg_list)  # кол-во остатка посева
         region = key_reg_current[0]
         free_gr = kol_group_free[region]
-
         if 1 in free_list and last > 1 or last == 1:  # проверка есть ли группа где осталось только одно места для посева
             region = reg_list[free_list.index(1)]  # регион
             u = current_region_group[region][0]  # номер группы
@@ -3905,6 +3905,10 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         else:
             if free_gr != 1:
                 f = current_region_group[region]
+                if m % 2 != 0:  # в зависимости от четности посева меняет направления посева групп в списке
+                    f.sort()
+                else:
+                    f.sort(reverse = True)
                 if s in f:
                     posev_tmp[s] = region
                     u = s #  присваивает переменной u - номер группы, если она идет по порядку
@@ -3912,13 +3916,15 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                     g = f[0]
                     posev_tmp[g] = region
                     u = g    # присваивает переменной u - номер группы, если она идет не по порядку
+        index = reg_list.index(region)
+        p = player_list[index]
+        reg_player[p] = u
         posev[f"{m}_посев"] = posev_tmp
-        reg_player[player_current[sv - 1]] = u  # записывает в словарь региогн и группу посева
         for d in key_reg_current:  # цикл удаления посеянных групп
-            list_group = []
             list_group = current_region_group[d]
             if u in list_group:  # находит сеяную группу и удаляет ее из списка групп
                 list_group.remove(u)
+        player_list.remove(p)
         key_reg_current.remove(region)  # удаляет регион из списка как посеянный
         del current_region_group[region] 
         del kol_group_free[region]
@@ -3994,50 +4000,50 @@ def posev_test(posev, group, m):
     return previous_region_group
  
 
-def choice_gr_automat():
-    """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
-    load_tableWidget()
-    sys = System.get(System.title_id == title_id()
-                     and System.stage == "Предварительный")
-    s_id = sys.id
-    group = sys.total_group
-    mp = sys.max_player
-    tp = sys.total_athletes
-    pl_choice = Choice.select().where(Choice.title_id == title_id())
-    player_choice = pl_choice.select().order_by(Choice.rank.desc())
-    h = 0
+# def choice_gr_automat():
+    # """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
+    # load_tableWidget()
+    # sys = System.get(System.title_id == title_id()
+    #                  and System.stage == "Предварительный")
+    # s_id = sys.id
+    # group = sys.total_group
+    # mp = sys.max_player
+    # tp = sys.total_athletes
+    # pl_choice = Choice.select().where(Choice.title_id == title_id())
+    # player_choice = pl_choice.select().order_by(Choice.rank.desc())
+    # h = 0
 
-    for k in range(1, mp + 1):  # цикл посевов
-        # вставить проверку на окончание посева
-        if k % 2 != 0:  # направление посева с последней группы до 1-й
-            start = 0
-            end = group
-            step = 1
-            p = 1
-        else:  # направление посева с 1-й до последней группы
-            start = group
-            end = 0
-            step = -1
-            p = 0
-        for i in range(start, end, step):  # №-й посев
-            if h < tp:
-                txt = str(f'{i + p} группа')
-                id = int(my_win.tableWidget.item(h, 1).text())  # ищет id игрока находит id таблицы choice, соответсвующий игроку
-                ch_id = Choice.get(Choice.player_choice == id)
-                choice_id = ch_id.id
-                h += 1
-                with db:  # запись в таблицу Choice результата жеребъевки
-                    grp = Choice.get(Choice.id == choice_id)
-                    grp.group = txt
-                    grp.posev_group = k
-                    grp.save()
-    if tp == h:
-        fill_table_choice()
-    with db:  # записывает в систему, что произведена жеребъевка
-        system = System.get(System.id == s_id)
-        system.choice_flag = True
-        system.save()
-    player_in_table()
+    # for k in range(1, mp + 1):  # цикл посевов
+    #     # вставить проверку на окончание посева
+    #     if k % 2 != 0:  # направление посева с последней группы до 1-й
+    #         start = 0
+    #         end = group
+    #         step = 1
+    #         p = 1
+    #     else:  # направление посева с 1-й до последней группы
+    #         start = group
+    #         end = 0
+    #         step = -1
+    #         p = 0
+    #     for i in range(start, end, step):  # №-й посев
+    #         if h < tp:
+    #             txt = str(f'{i + p} группа')
+    #             id = int(my_win.tableWidget.item(h, 1).text())  # ищет id игрока находит id таблицы choice, соответсвующий игроку
+    #             ch_id = Choice.get(Choice.player_choice == id)
+    #             choice_id = ch_id.id
+    #             h += 1
+    #             with db:  # запись в таблицу Choice результата жеребъевки
+    #                 grp = Choice.get(Choice.id == choice_id)
+    #                 grp.group = txt
+    #                 grp.posev_group = k
+    #                 grp.save()
+    # if tp == h:
+    #     fill_table_choice()
+    # with db:  # записывает в систему, что произведена жеребъевка
+    #     system = System.get(System.id == s_id)
+    #     system.choice_flag = True
+    #     system.save()
+    # player_in_table()
 
 
 def choice_setka(fin):
@@ -4244,8 +4250,8 @@ def total_game_table(kpt, fin, pv, cur_index):
                                                  "Теперь необходимо сделать жеребъевку\n"
                                                  "предварительного этапа.\n"
                                                  "Хотите ее сделать сейчас?",
-                                     msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-            if result == msgBox.StandardButtons.Ok:
+                                     msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
                 choice_gr_automat()
                 tab_enabled(gamer)
             else:
@@ -4568,8 +4574,7 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
-    system = System.select().where(System.title_id == title_id()
-                                   )  # находит system id последнего
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
     for s_id in system:
         if s_id.stage == stage:
             ta = s_id.max_player
@@ -4582,16 +4587,26 @@ def table_made(pv, stage):
         kg = 1
         t = ta
     else:  # групповые игры
-        kg = s_id.total_group
-        t = int(ta) // int(kg)
-        # если количество участников не равно делится на группы
-        e = int(ta) % int(kg)
-        g2 = t + 1
-        kg = int(kg)
-        if e == 0:
-            t = t
+        kg = s_id.total_group  # кол-во групп
+        #=============
+        a = int(ta) // int(kg)
+        if a == 1 or a < ta: # значит число игроков кратно группам
+            t = ta
         else:
-            t = g2
+            t = ta + 1
+
+
+
+        # #==========
+        # t = int(ta) // int(kg)
+        # # если количество участников не равно делится на группы
+        # e = int(ta) % int(kg)
+        # g2 = t + 1
+        # kg = int(kg)
+        # if e == 0:
+        #     t = ta
+        # else:
+        #     t = g2
     if pv == "альбомная":  # альбомная ориентация стр
         pv = landscape(A4)
         if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:
@@ -4619,8 +4634,7 @@ def table_made(pv, stage):
         i += 1
         i = str(i)
         num_columns.append(i)
-    zagolovok = (['№', 'Участники/ Город'] +
-                 num_columns + ['Очки', 'Соот', 'Место'])
+    zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
 
     tblstyle = []
     # =========  цикл создания стиля таблицы ================
@@ -5387,8 +5401,7 @@ def table_data(stage, kg):
     tdt_all = []  # список списков [tdt_new] и [tdt_color]
     tdt_color = []
     tdt_new = []
-    ta = Result.select().where(Result.title_id == title_id()
-                               )  # находит system id последнего
+    ta = Result.select().where(Result.title_id == title_id())  # находит system id последнего
     # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
     tr = len(ta)
     if kg == 1:  # система одна таблица круг или финалу по кругу
@@ -6257,9 +6270,9 @@ def player_choice_in_group(num_gr):
     """распределяет спортсменов по группам согласно жеребьевке"""
     posev_data = []
     t_id = title_id()
-    choice = Choice.select().order_by(Choice.posev_group).where(
-        Choice.title_id == t_id and Choice.group == num_gr)
-    for posev in choice:
+    choice = Choice.select().where(Choice.title_id == t_id)
+    choice_group = choice.select().where(Choice.group == num_gr)
+    for posev in choice_group:
         posev_data.append({
             'фамилия': posev.family,
             'регион': posev.region,
@@ -6320,15 +6333,15 @@ def player_choice_in_setka(fin):
                     reply = QMessageBox.information(my_win, 'Уведомление',
                                                     "Из группы выходят спортсмены,\n"
                                                     "занявшие " f"{kpt} место, все верно?",
-                                                    QMessageBox.StandardButtons.Yes,
-                                                    QMessageBox.StandardButtons.Cancel)
+                                                    QMessageBox.Yes,
+                                                    QMessageBox.Cancel)
                 else:  # если выходит два человека
                     reply = QMessageBox.information(my_win, 'Уведомление',
                                                     "Из группы выходят спортсмены,\n"
                                                     "занявшие " f"{kpt} и {kpt + 1} места, все верно?",
-                                                    QMessageBox.StandardButtons.Yes,
-                                                    QMessageBox.StandardButtons.Cancel)
-                if reply == QMessageBox.StandardButtons.Yes:
+                                                    QMessageBox.Yes,
+                                                    QMessageBox.Cancel)
+                if reply == QMessageBox.Yes:
                     with db:
                         system.stage_exit = "Предварительный"
                         system.mesta_exit = kpt
@@ -6602,12 +6615,9 @@ my_win.Button_filter_fin.clicked.connect(filter_fin)
 my_win.Button_filter.clicked.connect(filter_gr)
 # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_etap_made.clicked.connect(etap_made)
-my_win.Button_system_made.clicked.connect(
-    player_in_table)  # заполнение таблицы Game_list
-my_win.Button_add_edit_player.clicked.connect(
-    add_player)  # добавляет игроков в список и базу
-my_win.Button_group.clicked.connect(
-    player_in_table)  # вносит спортсменов в группы
+my_win.Button_system_made.clicked.connect(player_in_table)  # заполнение таблицы Game_list
+my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
+my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 # записывает в базу или редактирует титул
 my_win.Button_title_made.clicked.connect(title_made)
 # записывает в базу счет в партии встречи
@@ -6616,7 +6626,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-my_win.Button_proba.clicked.connect(test_choice_group)
+# my_win.Button_proba.clicked.connect(test_choice_group)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
