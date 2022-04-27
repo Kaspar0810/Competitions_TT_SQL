@@ -252,12 +252,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             for stage in system:
                 if stage.stage == "Предварительный":
                     if stage.choice_flag == True:
-                        reply = QMessageBox.information(my_win, 'Уведомление',
+                        reply = msg.information(my_win, 'Уведомление',
                                                         "Жеребъевка была произведена,\nесли хотите сделать "
                                                         "повторно\nнажмите -ОК-, если нет то - Cancel-",
-                                                        QMessageBox.Ok, QMessageBox.Cancel)
+                                                        msg.Ok, msg.Cancel)
 
-                        if reply == QMessageBox.Ok:
+                        if reply == msg.Ok:
                             my_win.tabWidget.setCurrentIndex(2)
                             choice_gr_automat()
                             my_win.tabWidget.setCurrentIndex(3)
@@ -274,13 +274,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if fin is not None:
                 sys = System.get(System.stage == fin)
                 if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
-                    reply = QMessageBox.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
+                    reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
                                                                            f"\nесли хотите сделать "
                                                                            "повторно\nнажмите-ОК-, "
                                                                            "если нет то - Cancel-",
-                                                    QMessageBox.Ok,
-                                                    QMessageBox.Cancel)
-                    if reply == QMessageBox.Ok:
+                                                    msg.Ok,
+                                                    msg.Cancel)
+                    if reply == msg.Ok:
                         if type == "круг":
                             player_fin_on_circle(fin)
                         else:
@@ -1172,6 +1172,7 @@ def fill_table_R1_list():
 
 def fill_table_results():
     """заполняет таблицу результатов QtableWidget из db result"""
+    msg = QMessageBox
     tb = my_win.tabWidget.currentIndex()
     if tb == 3:
         stage = "Предварительный"
@@ -1184,38 +1185,36 @@ def fill_table_results():
         else:
             stage = "Финальный"
 
-    player_result = Result.select().order_by(Result.id).where(Result.title_id == title_id() and
-                                                              Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
+    # result = Result.select().order_by(Result.id).where(Result.title_id == title_id() and
+    #                                                           Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
+    result = Result.select().where(Result.title_id == title_id())
+    player_result = result.select().order_by(Result.id).where(Result.title_id == title_id() and Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
     count = len(player_result)  # если 0, то записей нет
     flag = ready_system()
     if flag is False and count == 0:
         message = "Надо сделать жербьевку предварительного этапа.\nХотите ее создать?"
-        reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
-                                               QtWidgets.QMessageBox.StandardButtons.Yes,
-                                               QtWidgets.QMessageBox.StandardButtons.No)
-        if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
+        reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
+        if reply == msg.Yes:
             choice_gr_automat()
         else:
             return
     elif flag is False and count == 0:
         message = "Сначала надо создать систему соревнований\nзатем произвести жербьевку.\n" \
                   "Хотите начать ее создавать?"
-        reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
-                                               QtWidgets.QMessageBox.StandardButtons.Yes,
-                                               QtWidgets.QMessageBox.StandardButtons.No)
-        if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
+        reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
+        if reply == msg.Yes:
             system_competition()
         else:
             return
     else:
         # надо выбрать, что загружать в зависимости от вкладки группы, пф или финалы
         if tb == 3:
-            player_result = Result.select().order_by(Result.id).where(
+            player_result = result.select().order_by(Result.id).where(
                 Result.system_stage == "Предварительный")
         elif tb == 4:
-            player_result = Result.select().order_by(Result.id)
+            player_result = result.select().order_by(Result.id)
         elif tb == 5:  # здесь надо выбрать финалы (круг или сетка)
-            player_result = Result.select().order_by(Result.id).where(Result.title_id == title_id() and
+            player_result = result.select().order_by(Result.id).where(Result.title_id == title_id() and
                                                                       Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
             count = len(player_result)
             if count == 0:
@@ -2228,9 +2227,9 @@ def chop_line(q, maxline=30):
             strline += "%s\n" % (q[(index - maxline):s2 + 1])
         strline += "%s" % (q[s2 + 1:])
         q = strline
-        return q
-    else:
-        return q
+    return q
+    # else:
+    #     return q
 
 
 def match_score_db():
@@ -4568,6 +4567,7 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
+    from reportlab.platypus import Table
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     for s_id in system:
         if s_id.stage == stage:
