@@ -1791,9 +1791,9 @@ def list_player_pdf(player_list):
 def exit_comp():
     """нажата кнопка -выход-"""
     msgBox = QMessageBox
-    result = msgBox.question(my_win, "", "Вы действительно хотите выйти из программы?",
-                             msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-    if result == msgBox.StandardButtons.Ok:
+    result = msgBox.question(my_win, "Выход из программы", "Вы действительно хотите выйти из программы?",
+                             msgBox.Ok, msgBox.Cancel)
+    if result == msgBox.Ok:
         my_win.close()
         backup()
     else:
@@ -1812,8 +1812,8 @@ def system_competition():
             sb = "Изменение системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
             result = msgBox.information(my_win, "", "Вы хотите изменить систему соревнований?",
-                                        msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-            if result == msgBox.StandardButtons.Ok:
+                                        msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
                 choice_tbl_made()  # заполняет db жеребьевка
@@ -1874,9 +1874,9 @@ def system_competition():
                 reply = QMessageBox.information(my_win, 'Уведомление',
                                                 "У Вас нет ни одного спортсмена.\nСначала необходимо создать "
                                                 "список участников соревнований.\n Перейти к созданию списка?",
-                                                QMessageBox.StandardButtons.Ok,
-                                                QMessageBox.StandardButtons.Cancel)
-                if reply == QMessageBox.StandardButtons.Ok:
+                                                msgBox.Ok,
+                                                msgBox.Cancel)
+                if reply == msgBox.Ok:
                     my_win.tabWidget.setCurrentIndex(1)
                     my_win.lineEdit_Family_name.setFocus()
                 else:
