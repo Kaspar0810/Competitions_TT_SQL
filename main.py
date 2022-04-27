@@ -3,14 +3,12 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-
-
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib import colors
-from reportlab.platypus import Paragraph, Table, TableStyle, Image, SimpleDocTemplate
+from reportlab.platypus import Paragraph, TableStyle, Table, Image, SimpleDocTemplate
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -25,14 +23,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from models import *
 from collections import Counter
 from itertools import *
-import datetime
+# import datetime
 import os
-import models
 import openpyxl as op
 import pandas as pd
 import sys
 import sqlite3
-from playhouse.migrate import *
+
+# from playhouse.migrate import *
 
 
 def print_hi(name):
@@ -46,14 +44,8 @@ if __name__ == '__main__':
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
-# import tbl_data
 # from playhouse.sqlite_ext import SqliteExtDatabase, backup_to_file, backup
 
-
-# ==========
-# from reportlab.rl_settings import defaultPageSize
-# ==========
-# defaultPageSize = A4
 
 registerFontFamily('DejaVuSerif', normal='DejaVuSerif',
                    bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
@@ -1739,6 +1731,7 @@ def button_system_made_enable(state):
 
 def list_player_pdf(player_list):
     """создание списка участников в pdf файл"""
+    from reportlab.platypus import Table
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
     tit = Title.get(Title.id == title_id())
@@ -4553,12 +4546,13 @@ def func_zagolovok(canvas, doc):
 def tbl(stage, kg, ts, zagolovok, cW, rH):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
+    from reportlab.platypus import Table
     dict_tbl = {}
     tdt_all = table_data(stage, kg)  # данные результатов в группах
     # данные результатов победителей в группах для окрашивания очков в красный цвет
     tdt_new = tdt_all[0]
     for i in range(0, kg):
-        tdt_new[i].insert(0, zagolovok)
+        tdt_new[i].insert(0, zagolovok)       
         dict_tbl[i] = Table(tdt_new[i], colWidths=cW, rowHeights=rH)
         # ставит всю таблицу в синий цвет
         ts.add('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue)
