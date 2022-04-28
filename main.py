@@ -2027,6 +2027,8 @@ def page_vid():
 
 def view():
     """просмотр PDF файлов средствами OS"""
+    from sys import platform
+
     sender = my_win.sender()
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
@@ -2048,8 +2050,16 @@ def view():
         view_file = f"2-финал_{short_name}.pdf"
     elif sender == my_win.view_one_table_Action:
         view_file = f"one_table_{short_name}.pdf"
+    
+ 
+    if platform == "linux" or platform == "linux2":  # linux
+        pass
+    elif platform == "darwin":  # OS X
+        os.system(f"open {view_file}")
+    elif platform == "win32":  # Windows...
+        os.system(f"{view_file}")
 
-    os.system(f"open {view_file}")
+
 
 
 def player_in_setka(fin):
@@ -3071,10 +3081,10 @@ def control_score(sc1, sc2):
     if sc1 > 35 or sc2 > 35:
         result = msgBox.question(my_win, "", "Вы уверенны в правильности счета в партии?\n"
                                              f"{sc1} : {sc2}",
-                                 msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-        if result == msgBox.StandardButtons.Ok:
+                                 msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
             flag = True
-        elif result == msgBox.StandardButtons.Cancel:
+        elif result == msgBox.Cancel:
             return
     if sc1 == 11:
         if 9 >= sc2 >= 0:
@@ -5512,8 +5522,8 @@ def score_in_table(td, num_gr):
     tab = my_win.tabWidget.currentIndex()
 
     if tab == 3:
-        ta = System.get(System.title_id == title_id() and System.stage ==
-                        "Предварительный")  # находит system id последнего
+        system = System.select().where(System.title_id == title_id())
+        ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
         mp = ta.max_player // ta.total_group
     elif tab == 4:
         pass
@@ -5525,20 +5535,16 @@ def score_in_table(td, num_gr):
     stage = ta.stage
     # mp = ta.max_player
     result = Result.select().where(Result.title_id == title_id())
+    ch = Choice.select().where(Choice.title_id == title_id())
     if stage == "Предварительный":
         r = result.select().where(Result.number_group == num_gr)
-        choice = Choice.select().where(Choice.title_id == title_id()
-                                       and Choice.group == num_gr)  # фильтрует по группе
+        choice = ch.select().where(Choice.group == num_gr)  # фильтрует по группе
     elif stage == "Одна таблица":
         r = result.select().where(Result.number_group == "1 группа")
-        choice = Choice.select().where(Choice.title_id == title_id()
-                                       and Choice.basic == "Одна таблица")  # фильтрует
-        # по одной таблице
+        choice = ch.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
     else:
         r = result.select().where(Result.number_group == num_gr)
-        choice = Choice.select().where(Choice.title_id == title_id()
-                                       and Choice.final == num_gr)  # фильтрует
-        # финал по кругу
+        choice = ch.select().where(Choice.final == num_gr)  # фильтрует финал по кругу
 
     count = len(r)
     count_player = len(choice)  # определяет сколько игроков в группе
@@ -5563,8 +5569,7 @@ def score_in_table(td, num_gr):
                 # очки 1-ого игрока
                 td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[7])
                 # счет 1-ого игрока
-                td[p1 * 2 - 1][p2 +
-                               1] = str(list(result_list[i].values())[scg])
+                td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[scg])
                 # очки 2-ого игрока
                 td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[11])
                 # счет 2-ого игрока
@@ -5591,8 +5596,7 @@ def score_in_table(td, num_gr):
                 # очки 2-ого игрока
                 td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[7])
                 # счет 2-ого игрока
-                td[p2 * 2 - 1][p1 +
-                               1] = str(list(result_list[i].values())[scg])
+                td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[scg])
                 # очки 1-ого игрока
                 tp1 = str(list(result_list[i].values())[11])
                 # очки 2-ого игрока
