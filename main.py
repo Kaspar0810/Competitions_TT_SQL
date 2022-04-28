@@ -3113,7 +3113,7 @@ def control_score(sc1, sc2):
 
     if flag == False:
         result = msgBox.information(my_win, "", "Проверьте правильность ввода\n счета в партии!",
-                                    msgBox.StandardButtons.Ok)
+                                    msgBox.Ok)
         flag = False
         return flag
     elif flag == True:
@@ -3140,8 +3140,8 @@ def enter_score(none_player=0):
         else:
             stage = fin
     # находит system id последнего
-    system = System.get(System.title_id == title_id()
-                        and System.stage == stage)
+    sys = System.select().where(System.title_id == title_id())
+    system = sys.select().where(System.stage == stage).get()
     type = system.type_table
 
     if stage == "Предварительный":
@@ -3268,9 +3268,8 @@ def enter_score(none_player=0):
         system = System.select().order_by(System.id).where(
             System.title_id == title_id()).get()
     else:
-        system = System.select().order_by(System.id).where(
-            System.title_id == title_id() and System.stage == fin).get()
-
+        sys = System.select().order_by(System.id).where(System.title_id == title_id())
+        system = sys.select().where(System.stage == fin).get()
     if system.stage == "Предварительный":
         pv = system.page_vid
         table_made(pv, stage)
@@ -5546,7 +5545,7 @@ def score_in_table(td, num_gr):
         r = result.select().where(Result.number_group == num_gr)
         choice = ch.select().where(Choice.final == num_gr)  # фильтрует финал по кругу
 
-    count = len(r)
+    count = len(r)  # сколько игр в группе
     count_player = len(choice)  # определяет сколько игроков в группе
     result_list = r.dicts().execute()
     for s in range(1, count_player + 1):
@@ -5567,13 +5566,13 @@ def score_in_table(td, num_gr):
         if win != "" and win != "None":  # если нет сыгранной встречи данного тура
             if win == player1:  # если победитель игрок под первым номером в туре
                 # очки 1-ого игрока
-                td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[7])
+                td[p1 * 2 - 2][p2 + 1] = str(list(result_list[i].values())[7])  # ячейка в таблице очки
                 # счет 1-ого игрока
-                td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[scg])
+                td[p1 * 2 - 1][p2 + 1] = str(list(result_list[i].values())[scg])   # ячейка в таблице счет впартии
                 # очки 2-ого игрока
-                td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[11])
+                td[p2 * 2 - 2][p1 + 1] = str(list(result_list[i].values())[11])  # ячейка в таблице очки
                 # счет 2-ого игрока
-                td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[12])
+                td[p2 * 2 - 1][p1 + 1] = str(list(result_list[i].values())[12])  # ячейка в таблице счет впартии
                 # очки 1-ого игрока
                 tp1 = str(list(result_list[i].values())[7])
                 # очки 2-ого игрока
