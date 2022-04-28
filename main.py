@@ -5392,7 +5392,7 @@ def table_data(stage, kg):
     tdt_new = []
     ta = Result.select().where(Result.title_id == title_id())  # находит system id последнего
     # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
-    tr = len(ta)
+    tr = len(ta)  # общее кол-во игр в группах
     if kg == 1:  # система одна таблица круг или финалу по кругу
         # список словарей участник и его регион
         posev_data = player_choice_one_table(stage)
@@ -5519,20 +5519,21 @@ def score_in_table(td, num_gr):
     td_color = []
     total_score = {}  # словарь, где ключ - номер участника группы, а значение - очки
     tab = my_win.tabWidget.currentIndex()
-
+    system = System.select().where(System.title_id == title_id())
     if tab == 3:
-        system = System.select().where(System.title_id == title_id())
+        # system = System.select().where(System.title_id == title_id())
         ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
-        mp = ta.max_player // ta.total_group
+        # mp = ta.max_player 
+        # mp = ta.max_player // ta.total_group
     elif tab == 4:
         pass
     else:
-        # находит system id последнего
-        ta = System.get(System.title_id == title_id()
-                        and System.stage == num_gr)
-        mp = ta.max_player
+        ta = system.select().where(System.stage == num_gr).get()  # находит system id последнего
+        # ta = System.get(System.title_id == title_id()
+        #                 and System.stage == num_gr)
+    mp = ta.max_player
     stage = ta.stage
-    # mp = ta.max_player
+
     result = Result.select().where(Result.title_id == title_id())
     ch = Choice.select().where(Choice.title_id == title_id())
     if stage == "Предварительный":
@@ -5756,28 +5757,27 @@ def rank_in_group(total_score, max_person, td, num_gr):
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
     player_rank_group = []
     result = Result.select().where(Result.title_id == title_id())
-    game_max = result.select().where(Result.number_group ==
-                                     num_gr)  # сколько всего игр в группе
+    game_max = result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
     # 1-й запрос на выборку с группой
-    played = result.select().where(Result.number_group == num_gr)
-    game_played = played.select().where(
-        Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
+    # played = result.select().where(Result.number_group == num_gr)
+    # game_played = played.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
+    game_played = game_max.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
     # с победителями из 1-ого запроса
     kol_tours_played = len(game_played)  # сколько игр сыгранных
     kol_tours_in_group = len(game_max)  # кол-во всего игр в группе
 
     for key, value in total_score.items():
         rev_dict.setdefault(value, set()).add(key)
-    result = [key for key, values in rev_dict.items() if len(values) > 1]
+    # result = [key for key, values in rev_dict.items() if len(values) > 1]
+    res = [key for key, values in rev_dict.items() if len(values) > 1]
 
     # отдельно составляет список ключей (группы)
     key_list = list(total_score.keys())
     # отдельно составляет список значений (очки)
     val_list = list(total_score.values())
     # ======== новый вариант =========
-    # получает словарь(ключ - номер участника,
-    ds = {index: value for index, value in enumerate(val_list)}
-    # значение - очки)
+    # получает словарь(ключ - номер участника, значение - очки)
+    ds = {index: value for index, value in enumerate(val_list)}  
     # сортирует словарь по убыванию соот
     sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}
     # mesto_points = {}  # словарь (ключ-очки, а значения места без учета соотношений)
