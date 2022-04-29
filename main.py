@@ -5694,25 +5694,22 @@ def result_rank_group(num_gr, player_rank_group):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
     tab = my_win.tabWidget.currentIndex()
+    sys = System.select().where(System.title_id == title_id())
+    chc = Choice.select().where(Choice.title_id == title_id())
     if len(player_rank_group) > 0:
         if tab == 3:
-            system = System.get(System.title_id == title_id()
-                                and System.stage == "Предварительный")
+            system = sys.select().where(System.stage == "Предварительный").get()
         elif tab == 4:
             pass
         else:
-            system = System.get(System.title_id == title_id()
-                                and System.stage == num_gr)
+            system = sys.select().where(System.stage == num_gr)
 
         if system.stage == "Предварительный":
-            choice = Choice.select().where(
-                Choice.title_id == title_id() and Choice.group == num_gr)
+            choice = chc.select().where(Choice.group == num_gr)
         elif system.stage == "Одна таблица":
-            choice = Choice.select().where(Choice.title_id == title_id()
-                                           and Choice.basic == "Одна таблица")
+            choice = chc.select().where(Choice.basic == "Одна таблица")
         elif system.stage == num_gr:  # финальная игра
-            choice = Choice.select().where(
-                Choice.title_id == title_id() and Choice.final == num_gr)
+            choice = chc.select().where(Choice.final == num_gr)
 
         count = len(choice)
         n = 0
