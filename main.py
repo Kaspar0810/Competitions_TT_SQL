@@ -259,6 +259,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                         if reply == msg.Ok:
                             my_win.tabWidget.setCurrentIndex(2)
+                            clear_db_before_choice()
                             choice_gr_automat()
                             my_win.tabWidget.setCurrentIndex(3)
                         else:
@@ -4074,8 +4075,7 @@ def choice_setka(fin):
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребьевки"""
     title = title_id()
-    player = Player.select().order_by(
-        Player.rank.desc()).where(Player.title_id == title)
+    player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title)
     system = System.select().where(System.title_id == title)
     choice = Choice.select().where(Choice.title_id == title)
     for k in system:
@@ -4288,20 +4288,56 @@ def clear_db_before_edit():
                  stage_exit="", mesta_exit="").save()
 
     gl = Game_list.select().where(Game_list.title_id == t_id)
-    # g_count = len(gl)
-    # for i in range(1, g_count + 1):
     for i in gl:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
     chc = Choice.select().where(Choice.title_id == t_id)
-    # ch_count = len(chc)
-    # # for i in range(1, ch_count + 1):
     for i in chc:
         ch_d = Choice.get(Choice.id == i)
         ch_d.delete_instance()
     rs = Result.select().where(Result.title_id == t_id)
-    # r_count = len(rs)
-    # for i in range(1, r_count + 1):
+    for i in rs:
+        r_d = Result.get(Result.id == i)
+        r_d.delete_instance()
+
+
+def clear_db_before_choice():
+    """очищает систему перед повторной жеребьевкой и изменяте кол-во участников если они изменились"""
+    msgBox = QMessageBox
+    sys = System.select().where(System.title_id == title_id())
+    player = Player.select().where(Player.title_id == title_id())
+    ta = sys.total_athletes
+    new_total_player = len(player)
+    if ta != new_total_player:
+        result = msgBox.information(my_win, "", "Был изменен количественный список участников\n"
+                                    "необходимо отредактировать систему соревнований:",
+                                    msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
+            # очищает таблицы перед новой системой соревнования (system, choice)
+            clear_db_before_edit()
+            choice_tbl_made()  # заполняет db жеребьевка
+        else:
+            return
+    system = sys.select().where(System.stage == "Предварительный").get()
+    tg = system.total_group
+    if new_total_player % tg == 0:
+        max_pl = new_total_player / tg
+    else:
+        max_pl = new_total_player // tg + 1
+    
+    system.total_athletes = new_total_player
+    system.max_player = max_pl
+    system.save()
+
+    gl = Game_list.select().where(Game_list.title_id == title_id())
+    for i in gl:
+        gl_d = Game_list.get(Game_list.id == i)
+        gl_d.delete_instance()
+    chc = Choice.select().where(Choice.title_id == title_id())
+    for i in chc:
+        ch_d = Choice.get(Choice.id == i)
+        ch_d.delete_instance()
+    rs = Result.select().where(Result.title_id == title_id())
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
@@ -5670,9 +5706,8 @@ def score_in_setka(fin):
     match = []
     tmp_match = []
     # получение id последнего соревнования
-    t = Title.select().order_by(Title.id.desc()).get()
-    result = Result.select().where(Result.title_id == t and Result.number_group ==
-                                   fin)  # находит system id последнего
+    res = Result.select().where(Result.title_id == title_id())
+    result = res.select().where(Result.number_group == fin)  # находит system id последнего
 
     for res in result:
         num_game = int(res.tours)
@@ -5756,8 +5791,6 @@ def rank_in_group(total_score, max_person, td, num_gr):
     result = Result.select().where(Result.title_id == title_id())
     game_max = result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
     # 1-й запрос на выборку с группой
-    # played = result.select().where(Result.number_group == num_gr)
-    # game_played = played.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
     game_played = game_max.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
     # с победителями из 1-ого запроса
     kol_tours_played = len(game_played)  # сколько игр сыгранных
