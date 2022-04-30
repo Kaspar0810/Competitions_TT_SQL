@@ -953,6 +953,7 @@ def title_string():
 
 def title_pdf():
     """сохранение в PDF формате титульной страницы"""
+    msgBox = QMessageBox
     string_data = data_title_string()
     nz = my_win.lineEdit_title_nazvanie.text()
     sr = my_win.comboBox_sredi.currentText()
@@ -960,10 +961,10 @@ def title_pdf():
     ct = my_win.lineEdit_city_title.text()
 
     message = "Хотите добавить изображение в титульный лист?"
-    reply = QtWidgets.QMessageBox.question(my_win, 'Уведомление', message,
-                                           QtWidgets.QMessageBox.StandardButtons.Yes,
-                                           QtWidgets.QMessageBox.StandardButtons.No)
-    if reply == QtWidgets.QMessageBox.StandardButtons.Yes:
+    reply = msgBox.question(my_win, 'Уведомление', message,
+                                           msgBox.QMessageBo.Yes,
+                                           msgBox.No)
+    if reply == msgBox.Yes:
         fname = QFileDialog.getOpenFileName(
             my_win, "Выбрать изображение", "/desktop", "Image files (*.jpg, *.png)")
         filepatch = str(fname[0])
@@ -1525,8 +1526,8 @@ def page():
 
         if flag is False:  # система еще не создана
             result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
-                                        msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-            if result == msgBox.StandardButtons.Ok:
+                                        msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
                 my_win.statusbar.showMessage(
                     "Создание системы соревнования", 10000)
                 # создание таблицы жеребьевка, заполняет db списком участников для жеребъевки
@@ -1588,8 +1589,8 @@ def page():
         flag = ready_choice(stage="Предварительный")
         if flag is False:
             result = msgBox.information(my_win, "", "Необходимо сделать жеребьевку\nпредварительного этапа.",
-                                        msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-            if result != msgBox.StandardButtons.Ok:
+                                        msgBox.Ok, msgBox.Cancel)
+            if result != msgBox.Ok:
                 return
             else:
                 my_win.tabWidget.setCurrentIndex(2)
@@ -2704,8 +2705,8 @@ def delete_player():
     coach_id = Coach.get(Coach.coach == coach)
     result = msgBox.question(my_win, "", f"Вы действительно хотите удалить\n"
                                          f" {player_del} город {player_city_del}?",
-                             msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-    if result == msgBox.StandardButtons.Ok:
+                             msgBox.Ok, msgBox.Cancel)
+    if result == msgBox.Ok:
         with db:
             del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
                                        region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
@@ -3648,11 +3649,11 @@ def filter_fin(pl=False):
     if my_win.comboBox_find_name_fin.currentText() != "" and pl == False:
         result = msgBox.question(my_win, "", "Продолжить поиск игр с участием\n"
                                              f"{name} ?",
-                                 msgBox.StandardButtons.Ok, msgBox.StandardButtons.Cancel)
-        if result == msgBox.StandardButtons.Ok:
+                                 msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
             pl = True
             filter_fin(pl)
-        elif result == msgBox.StandardButtons.Cancel:
+        elif result == msgBox.Cancel:
             my_win.comboBox_find_name_fin.clear()
             return
     else:
@@ -3814,7 +3815,6 @@ def choice_gr_automat():
         region_id = reg.id 
         reg_list.append(region_id)
         player_list.append(pl_id)
-    # for p in range(1, total_player + 1):  # цикл по регионам жеребьевки
     while number_poseva < total_player:
         p += 1
         if number_poseva == 0 or number_poseva % group == 0 :
@@ -3842,7 +3842,12 @@ def choice_gr_automat():
             for o in previous_region_group.keys():  # цикл получения списка регионов предыдущих посевов
                 key_reg_previous.append(o)
             pgt.clear()
-            for y in range(0, group):
+            remains = total_player - number_poseva  # остаток посева
+            if remains > group: 
+                end = group  # если остаток больше кол-во групп
+            else:
+                end = remains
+            for y in range(0, end):
                 group_list_tmp = []  
                 z = key_reg_current[y] # список регионов которые уже были посеяны
                 pgt.append(y + 1)  # номера групп которые уже посеяны будут удалены из списка
@@ -3898,15 +3903,15 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         free_list = list(kol_group_free.values())  # список кол-во свободных групп, куда можно сеять
         reg_list = list(kol_group_free.keys())  # список ключей (регионов)
         last = len(reg_list)  # кол-во остатка посева
-        region = key_reg_current[0]
-        free_gr = kol_group_free[region]
+        region = key_reg_current[0]  # номер региона, который сейчас сеется
+        free_gr = kol_group_free[region]  # кол-во групп куда можно сеять
         if 1 in free_list and last > 1 or last == 1:  # проверка есть ли группа где осталось только одно места для посева
             region = reg_list[free_list.index(1)]  # регион
             u = current_region_group[region][0]  # номер группы
             posev_tmp[u] = region  # запись региона в группу (посев)
         else:
             if free_gr != 1:
-                f = current_region_group[region]
+                f = current_region_group[region]  # список номеров групп для посева текущего региона
                 if m % 2 != 0:  # в зависимости от четности посева меняет направления посева групп в списке
                     f.sort()
                 else:
@@ -3926,10 +3931,12 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
             list_group = current_region_group[d]
             if u in list_group:  # находит сеяную группу и удаляет ее из списка групп
                 list_group.remove(u)
-        player_list.remove(p)
+        player_list.remove(p)       
         key_reg_current.remove(region)  # удаляет регион из списка как посеянный
-        del current_region_group[region] 
-        del kol_group_free[region]
+        count_in_list = key_reg_current.count(region)
+        if count_in_list == 0:  # если в посеве больше одного региона, то пропускает удаление из словаря
+            del current_region_group[region] 
+            del kol_group_free[region]
 
         if start > end:
             start -= 1
@@ -3960,7 +3967,12 @@ def region_player_current(number_poseva, reg_list, group, player_list):
     r = 0
     p = 0
     start = number_poseva
-    end = start + group
+    count = len(player_list)  # кол-во игрок
+    remains = count - number_poseva  # остаток посева
+    if remains > group: 
+        end = start + group  # если остаток больше кол-во групп
+    else:
+        end = start + remains
     for k in range(start, end):
         r = reg_list[k]
         key_tmp.append(r)
@@ -4306,28 +4318,28 @@ def clear_db_before_choice():
     msgBox = QMessageBox
     sys = System.select().where(System.title_id == title_id())
     player = Player.select().where(Player.title_id == title_id())
-    ta = sys.total_athletes
+    system = sys.select().where(System.stage == "Предварительный").get()
+    tg = system.total_group
+    ta = system.total_athletes
     new_total_player = len(player)
-    if ta != new_total_player:
-        result = msgBox.information(my_win, "", "Был изменен количественный список участников\n"
-                                    "необходимо отредактировать систему соревнований:",
+    if ta == new_total_player:
+        result = msgBox.information(my_win, "", "Был изменен количественный список участников.\n"
+                                    "Если хотите изменить систему соревнований, нажмите -ОК-.\n"
+                                    "Если просто изменится последний финал, нажмите -Cancel-",
                                     msgBox.Ok, msgBox.Cancel)
         if result == msgBox.Ok:
             # очищает таблицы перед новой системой соревнования (system, choice)
             clear_db_before_edit()
             choice_tbl_made()  # заполняет db жеребьевка
-        else:
-            return
-    system = sys.select().where(System.stage == "Предварительный").get()
-    tg = system.total_group
-    if new_total_player % tg == 0:
-        max_pl = new_total_player / tg
-    else:
-        max_pl = new_total_player // tg + 1
-    
-    system.total_athletes = new_total_player
-    system.max_player = max_pl
-    system.save()
+        else:   
+            if new_total_player % tg == 0:
+                max_pl = new_total_player / tg
+            else:
+                max_pl = new_total_player // tg + 1
+            for sys_id in sys:            
+                sys_id.total_athletes = new_total_player
+            system.max_player = max_pl
+            system.save()
 
     gl = Game_list.select().where(Game_list.title_id == title_id())
     for i in gl:
