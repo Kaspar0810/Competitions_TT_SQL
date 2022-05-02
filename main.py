@@ -118,7 +118,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         go_to = fileMenu.addMenu("Перейти к")
         fileMenu.addSeparator()  # вставляет разделительную черту
         # подменю без выбора (addAction создает сразу действие)
-        fileMenu.addAction(self.systemAction)
+        system = fileMenu.addMenu("Система")
         choice = fileMenu.addMenu("Жеребьевка")
         saveList = fileMenu.addMenu("Сохранить")
         fileMenu.addSeparator()
@@ -127,6 +127,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         editMenu = menuBar.addMenu("Редактировать")  # основное
         #  создание подменю
         go_to.addAction(self.go_to_Action)  # подменю выбора соревнования
+        system.addAction(self.system_made_Action)  # подменю создание системы
+        system.addAction(self.system_edit_Action)  # подменю редактирование системы
         choice.addAction(self.choice_gr_Action)  # подменю группы
         choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
         choice.addAction(self.choice_fin_Action)  # подменю финалы
@@ -134,7 +136,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ed_Menu = editMenu.addMenu("Редактор")
         ed_Menu.addAction(self.title_Action)
         ed_Menu.addAction(self.list_Action)
-        ed_Menu.addAction(self.system_edit_Action)
+        # ed_Menu.addAction(self.system_edit_Action)
         find_Menu = editMenu.addMenu("Поиск")
         find_Menu.addAction(self.find_r_Action)
         find_Menu.addAction(self.find_r1_Action)
@@ -161,23 +163,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def _createAction(self):
         self.helpAction = QAction(self)
-        self.systemAction = QAction("Система соревнований")
+        self.system_edit_Action = QAction("Редактировать")
+        self.system_made_Action = QAction("Создать")
         self.exitAction = QAction("Выход")
         self.rAction = QAction("Текущий рейтинг")
         self.r1Action = QAction("Рейтинг за январь")
         self.title_Action = QAction("Титульный лист")  # подменю редактор
         self.list_Action = QAction("Список участников")
-        self.system_edit_Action = QAction("Система соревнования")
-        self.find_r_Action = QAction(
-            "Поиск в текущем рейтинге")  # подменю поиск
+        self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
         self.savelist_Action = QAction("Список")  # подменю сохранить
         # подменю жеребьевка -группы-
         self.choice_gr_Action = QAction("Группы")
         # подменю жеребьевка -полуфиналы-
         self.choice_pf_Action = QAction("Полуфиналы")
-        self.choice_fin_Action = QAction(
-            "Финалы")  # подменю жеребьевка -финалы-
+        self.choice_fin_Action = QAction("Финалы")  # подменю жеребьевка -финалы-
         self.all_comp_Action = QAction("Полные соревнования")
         self.view_list_Action = QAction("Список участников")
         self.view_gr_Action = QAction("Группы")
@@ -199,7 +199,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def _connectActions(self):
         # Connect File actions
         # self.newAction.triggered.connect(self.newFile)
-        self.systemAction.triggered.connect(self.system_made)
+        self.system_made_Action.triggered.connect(self.system_made)
         self.system_edit_Action.triggered.connect(self.system_edit)
         self.exitAction.triggered.connect(self.exit)
         self.savelist_Action.triggered.connect(self.saveList)
@@ -667,8 +667,10 @@ def tab_enabled(gamer):
         if count_stage >= 1:  # если система еще не создана, то выключает отдельные вкладки при переходе на другое сорев
             if count > 0:
                 # выключает отдельные вкладки
-                my_win.tabWidget.setTabEnabled(2, True)
-                my_win.toolBox.setItemEnabled(2, True)
+                # my_win.tabWidget.setTabEnabled(2, True)
+                # my_win.toolBox.setItemEnabled(2, True)
+                my_win.tabWidget.setTabEnabled(2, False)
+                my_win.toolBox.setItemEnabled(2, False)
                 for i in stage:
                     if i == "Одна таблица":
                         system = System.get(
@@ -818,8 +820,7 @@ def system_edit():
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
-    t = Title.select().where(Title.id == title_id()
-                             )  # последний id соревнований (текуших)
+    t = Title.select().where(Title.id == title_id())  # последний id соревнований (текуших)
     # находит system id последнего
     ce = System.select().where(System.title_id == t).get()
     # все строки, где title_id соревнований
@@ -1211,8 +1212,7 @@ def fill_table_results():
     else:
         # надо выбрать, что загружать в зависимости от вкладки группы, пф или финалы
         if tb == 3:
-            player_result = result.select().order_by(Result.id).where(
-                Result.system_stage == "Предварительный")
+            player_result = result.select().order_by(Result.id).where(Result.system_stage == "Предварительный")
         elif tb == 4:
             player_result = result.select().order_by(Result.id)
         elif tb == 5:  # здесь надо выбрать финалы (круг или сетка)
@@ -1269,8 +1269,7 @@ def fill_table_results():
 def fill_table_choice():
     """заполняет таблицу жеребьевки"""
     gamer = my_win.lineEdit_title_gamer.text()
-    player_choice = Choice.select().where(
-        Choice.title_id == title_id()).order_by(Choice.rank.desc())
+    player_choice = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc())
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
     if row_count != 0:
@@ -1321,20 +1320,11 @@ def add_player():
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
         with db:
-            player_del = Delete_player.get(
-                Delete_player.player == my_win.tableWidget.item(row, 1).text())
+            player_del = Delete_player.get(Delete_player.player == my_win.tableWidget.item(row, 1).text())
             pl_id = player_del.player_del_id
             player_del.delete_instance()
             plr = Player(player_id=pl_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id()).save()
-        spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
-        for i in range(0, 9):  # добавляет в tablewidget
-            my_win.tableWidget.setItem(count, i, QTableWidgetItem(spisok[i]))
-        load_tableWidget()  # заново обновляет список
-        player_list = Player.select().where(Player.title_id == title_id()
-                                            )  # выделяет все строки базы данных
-        count = len(player_list)  # подсчитывает новое кол-во игроков
-        my_win.label_46.setText(f"Всего: {count} участников")
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
         txt = my_win.Button_add_edit_player.text()
@@ -1354,20 +1344,19 @@ def add_player():
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id()).save()
-        spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
-        for i in range(0, 9):  # добавляет в tablewidget
-            my_win.tableWidget.setItem(
-                count + 1, i, QTableWidgetItem(spisok[i]))
-        load_tableWidget()  # заново обновляет список
-        player_list = Player.select().where(Player.title_id == title_id())
-        count = len(player_list)  # подсчитывает новое кол-во игроков
-        my_win.label_46.setText(f"Всего: {count} участников")
-        list_player_pdf(player_list)
-        my_win.lineEdit_Family_name.clear()
-        my_win.lineEdit_bday.clear()
-        my_win.lineEdit_R.clear()
-        my_win.lineEdit_city_list.clear()
-        my_win.lineEdit_coach.clear()
+    spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
+    for i in range(0, 9):  # добавляет в tablewidget
+        my_win.tableWidget.setItem(count + 1, i, QTableWidgetItem(spisok[i]))
+    load_tableWidget()  # заново обновляет список
+    player_list = Player.select().where(Player.title_id == title_id())
+    count = len(player_list)  # подсчитывает новое кол-во игроков
+    my_win.label_46.setText(f"Всего: {count} участников")
+    list_player_pdf(player_list)
+    my_win.lineEdit_Family_name.clear()
+    my_win.lineEdit_bday.clear()
+    my_win.lineEdit_R.clear()
+    my_win.lineEdit_city_list.clear()
+    my_win.lineEdit_coach.clear()
 
 
 def dclick_in_listwidget():
@@ -1525,17 +1514,9 @@ def page():
         flag = ready_system()
 
         if flag is False:  # система еще не создана
-            result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
-                                        msgBox.Ok, msgBox.Cancel)
-            if result == msgBox.Ok:
-                my_win.statusbar.showMessage(
-                    "Создание системы соревнования", 10000)
-                # создание таблицы жеребьевка, заполняет db списком участников для жеребъевки
-                choice_tbl_made()
-                my_win.label_10.show()
-                my_win.comboBox_etap_1.show()
-            else:
-                return
+            my_win.statusbar.showMessage("Создание системы соревнования", 10000)
+            my_win.label_10.show()
+            my_win.comboBox_etap_1.show()
         else:
             stage = []
             table = []
@@ -1807,42 +1788,55 @@ def system_competition():
     msgBox = QMessageBox
     sender = my_win.sender()
     flag_system = ready_system()
-    if sender == my_win.systemAction or sender == my_win.choice_gr_Action or sender == my_win.tabWidget \
-            or sender == my_win.toolBox or sender == my_win.system_edit_Action:
+    # if sender == my_win.system_made_Action or sender == my_win.choice_gr_Action or sender == my_win.tabWidget \
+    #         or sender == my_win.toolBox or sender == my_win.system_edit_Action:
+    if sender == my_win.system_made_Action or sender == my_win.system_edit_Action:
         # нажат меню -система- или -жеребьевка- или вкладка -система-
         if sender == my_win.system_edit_Action:
             sb = "Изменение системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
-            result = msgBox.information(my_win, "", "Вы хотите изменить систему соревнований?",
-                                        msgBox.Ok, msgBox.Cancel)
+            result = msgBox.question(my_win, "", f"Вы хотите изменить систему соревнований?",
+                                    msgBox.Ok, msgBox.Cancel)
             if result == msgBox.Ok:
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
                 choice_tbl_made()  # заполняет db жеребьевка
             else:
                 return
-            my_win.spinBox_kol_group.hide()
-            my_win.comboBox_etap_1.setEnabled(True)
-            my_win.comboBox_etap_2.setEnabled(True)
-            my_win.comboBox_etap_3.setEnabled(True)
-            my_win.comboBox_etap_1.show()
-            my_win.comboBox_etap_2.hide()
-            my_win.comboBox_etap_3.hide()
-            my_win.comboBox_etap_4.hide()
-            my_win.label_10.hide()
-            my_win.label_15.hide()
-            my_win.label_17.hide()
-            my_win.label_23.hide()
-            my_win.label_27.hide()
-            my_win.label_28.hide()
-            my_win.label_29.hide()
-            my_win.label_30.hide()
-            my_win.label_31.hide()
-            my_win.label_32.hide()
-            my_win.comboBox_table.hide()
-            my_win.comboBox_table_2.hide()
-            my_win.tabWidget.setCurrentIndex(2)
-        elif flag_system is True:
+        elif sender == my_win.system_made_Action: 
+            sb = "Создание системы проведения соревнования."
+            my_win.statusbar.showMessage(sb)
+            result = msgBox.question(my_win, "", f"Вы хотите создать систему соревнований?",
+                                msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
+                choice_tbl_made()  # заполняет db жеребьевка
+            else:
+                return
+        my_win.spinBox_kol_group.hide()
+        my_win.comboBox_etap_1.setEnabled(True)
+        my_win.comboBox_etap_2.setEnabled(True)
+        my_win.comboBox_etap_3.setEnabled(True)
+        my_win.comboBox_etap_1.show()
+        my_win.comboBox_etap_2.hide()
+        my_win.comboBox_etap_3.hide()
+        my_win.comboBox_etap_4.hide()
+        my_win.label_10.hide()
+        my_win.label_15.hide()
+        my_win.label_17.hide()
+        my_win.label_23.hide()
+        my_win.label_27.hide()
+        my_win.label_28.hide()
+        my_win.label_29.hide()
+        my_win.label_30.hide()
+        my_win.label_31.hide()
+        my_win.label_32.hide()
+        my_win.comboBox_table.hide()
+        my_win.comboBox_table_2.hide()
+        my_win.tabWidget.setTabEnabled(2, True)
+        # my_win.toolBox.setTabEnabled(2, True)
+
+
+        if flag_system is True:
             flag_choice = ready_choice()
             if flag_choice is True:
                 sb = "Система и жербьевка создана."
@@ -1870,7 +1864,7 @@ def system_competition():
             player = Player.select().where(Player.title_id == title_id())
             count = len(player)
             if count != 0:
-                choice_tbl_made()  # заполнение db списком для жеребьевки
+                # choice_tbl_made()  # заполнение db списком для жеребьевки
                 my_win.tabWidget.setCurrentIndex(2)
             else:
                 reply = QMessageBox.information(my_win, 'Уведомление',
@@ -1976,20 +1970,20 @@ def kol_player_in_group():
     type_table = "группы"
     count = len(player_list)  # количество записей в базе
     # остаток отделения, если 0, то участники равно делится на группы
-    e1 = int(count) % int(kg)
+    e1 = count % int(kg)
     # если количество участников равно делится на группы (кол-во групп)
-    p = int(count) // int(kg)
+    p = count // int(kg)
     g1 = int(kg) - e1  # кол-во групп, где наименьшее кол-во спортсменов
-    p2 = str(p + 1)  # кол-во человек в группе с наибольшим их количеством
+    g2 = int(p + 1)  # кол-во человек в группе с наибольшим их количеством
     if e1 == 0:  # то в группах равное количество человек -e1-
         stroka_kol_group = f"{kg} группы по {str(p)} чел."
         skg = int((p * (p - 1) / 2) * int(kg))
         mp = p
     else:
-        stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(p2)} чел."
+        stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(g2)} чел."
         p = int(p)
-        skg = int((((p * (p - 1)) / 2 * g1) + ((p * (p - 1)) / 2 * e1)))
-        mp = p2
+        skg = int((((p * (p - 1)) / 2 * g1) + ((g2 * (g2 - 1)) / 2 * e1)))
+        mp = g2
     stroka_kol_game = f"{skg} игр"
     my_win.label_11.hide()
     my_win.label_12.setText(stroka_kol_group)
@@ -2180,10 +2174,9 @@ def player_in_table():
     встречи по турам в таблицу -Result- """
     system = System.select().where(System.title_id == title_id()).get()  # находит system id последнего
     kg = system.total_group
-    st = system.stage
+    stage = system.stage
     table = system.label_string
     pv = system.page_vid
-    stage = st
     # создание таблиц групп со спортсменами согласно жеребьевки в PDF
     table_made(pv, stage)
     # вызов функции, где получаем список всех участников по группам
@@ -2221,7 +2214,7 @@ def player_in_table():
                     pl1 = gr[first * 2 - 2][1]  # фамилия первого игрока
                     pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
                     with db:
-                        results = Result(number_group=number_group, system_stage=st, player1=pl1, player2=pl2,
+                        results = Result(number_group=number_group, system_stage=stage, player1=pl1, player2=pl2,
                                          tours=match, title_id=title_id(), round=round).save()
 
 
@@ -2401,8 +2394,7 @@ def game_in_visible():
                 final = my_win.tableWidget.item(r, 2).text()
             # ===============
             if final != "":
-                k = System.get(System.title_id == title_id()
-                               and System.stage == final)
+                k = System.get(System.title_id == title_id()and System.stage == final)
                 state = k.visible_game
             else:
                 return
@@ -2629,7 +2621,8 @@ def select_player_in_game():
         my_win.checkBox_10.setEnabled(True)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
-    game_in_visible()
+    if tab != 1:
+        game_in_visible()
 
     if tab == 3 or tab == 4 or tab == 5:
         # поле победителя (если заполнено, значит встреча сыграна)
@@ -3843,11 +3836,12 @@ def choice_gr_automat():
                 key_reg_previous.append(o)
             pgt.clear()
             remains = total_player - number_poseva  # остаток посева
+            finish = 0
             if remains > group: 
-                end = group  # если остаток больше кол-во групп
+                finish = group  # если остаток больше кол-во групп
             else:
-                end = remains
-            for y in range(0, end):
+                finish = remains               
+            for y in range(0, finish):
                 group_list_tmp = []  
                 z = key_reg_current[y] # список регионов которые уже были посеяны
                 pgt.append(y + 1)  # номера групп которые уже посеяны будут удалены из списка
@@ -3893,6 +3887,10 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
     reg_player = dict.fromkeys(player_current, 0)
     player_list = player_current.copy()
     sv = 0
+    if start == 0:
+        end = len(key_reg_current)
+    else:
+        start = len(key_reg_current)
 
     for s in range(start, end, step):
         sv += 1
@@ -3905,8 +3903,10 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         last = len(reg_list)  # кол-во остатка посева
         region = key_reg_current[0]  # номер региона, который сейчас сеется
         free_gr = kol_group_free[region]  # кол-во групп куда можно сеять
-        if 1 in free_list and last > 1 or last == 1:  # проверка есть ли группа где осталось только одно места для посева
-            region = reg_list[free_list.index(1)]  # регион
+        # if 1 in free_list and last > 1 or last == 1 :  # проверка есть ли группа где осталось только одно места для посева
+        if 1 in free_list and last > 1 or last == 1 and free_gr == 1 :  # проверка есть ли группа где осталось только одно места для посева
+            # сделать посев 1 регион но много групп
+            region = reg_list[free_list.index(1)]  # регион если в списке free list есть значение -1-, т.е. осталась одна группа
             u = current_region_group[region][0]  # номер группы
             posev_tmp[u] = region  # запись региона в группу (посев)
         else:
@@ -4012,52 +4012,6 @@ def posev_test(posev, group, m):
         previous_region_group[val] = gr
         gr_tmp.clear()
     return previous_region_group
- 
-
-# def choice_gr_automat():
-    # """проба автоматической жеребьевки групп, записывает в таблицу Choice номер группы и посев"""
-    # load_tableWidget()
-    # sys = System.get(System.title_id == title_id()
-    #                  and System.stage == "Предварительный")
-    # s_id = sys.id
-    # group = sys.total_group
-    # mp = sys.max_player
-    # tp = sys.total_athletes
-    # pl_choice = Choice.select().where(Choice.title_id == title_id())
-    # player_choice = pl_choice.select().order_by(Choice.rank.desc())
-    # h = 0
-
-    # for k in range(1, mp + 1):  # цикл посевов
-    #     # вставить проверку на окончание посева
-    #     if k % 2 != 0:  # направление посева с последней группы до 1-й
-    #         start = 0
-    #         end = group
-    #         step = 1
-    #         p = 1
-    #     else:  # направление посева с 1-й до последней группы
-    #         start = group
-    #         end = 0
-    #         step = -1
-    #         p = 0
-    #     for i in range(start, end, step):  # №-й посев
-    #         if h < tp:
-    #             txt = str(f'{i + p} группа')
-    #             id = int(my_win.tableWidget.item(h, 1).text())  # ищет id игрока находит id таблицы choice, соответсвующий игроку
-    #             ch_id = Choice.get(Choice.player_choice == id)
-    #             choice_id = ch_id.id
-    #             h += 1
-    #             with db:  # запись в таблицу Choice результата жеребъевки
-    #                 grp = Choice.get(Choice.id == choice_id)
-    #                 grp.group = txt
-    #                 grp.posev_group = k
-    #                 grp.save()
-    # if tp == h:
-    #     fill_table_choice()
-    # with db:  # записывает в систему, что произведена жеребъевка
-    #     system = System.get(System.id == s_id)
-    #     system.choice_flag = True
-    #     system.save()
-    # player_in_table()
 
 
 def choice_setka(fin):
@@ -4075,11 +4029,6 @@ def choice_setka(fin):
         for i in del_result:
             i.delete_instance()  # удаляет строки финала (fin) из таблицы -Result-
         # ========= рано отмечает, что сделана жеребьевка
-    # with db:  # записывает флаг жеребьевки финала
-    #     sys = System.get(System.stage == fin)
-    #     sys.choice_flag = True
-    #     sys.save()
-    # ===================
     player_in_setka(fin)
     load_tableWidget()
 
@@ -4204,8 +4153,7 @@ def total_game_table(kpt, fin, pv, cur_index):
     """количество участников в сетке и кол-во игр"""
     msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
-    system = System.select().order_by(System.id).where(
-        System.title_id == title_id()).get()  # находит system id последнего
+    system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
     total_player = system.total_athletes
     if kpt != 0:  # подсчет кол-во игр из выбора кол-ва игроков вышедших из группы и системы финала
         player_in_final = system.total_group * kpt
@@ -4248,17 +4196,26 @@ def total_game_table(kpt, fin, pv, cur_index):
         sys_last = System.select().where(System.title_id == title_id())
         sys_fin = sys_last.select().where(System.stage ** '%финал') # отбирает записи, где
         # титул id и стадия содержит слово финал (1 и 2 заменяет %)
-        count = len(sys_fin)
         system = System.select().order_by(System.id).where(System.title_id == title_id())
-        system_id = system.select().where(System.stage ** '%финал').get()
-        sys_id = system_id.id
+        system_id = system.select().where(System.stage ** '%финал')
         sum_final = []
-        for i in range(0, count):
-            st = System.get(System.id == sys_id + i)
-            player_in_etap = st.max_player
+        for i in system_id:
+            player_in_etap = i.max_player
             sum_final.append(player_in_etap)
         total_final = sum(sum_final)
-        if total_final >= total_player:  # подсчитывает все ли игроки распределены по финалам
+        t = total_player - total_final
+        txt = ""
+        if total_final == total_player or t <= 3: # подсчитывает все ли игроки распределены по финалам
+            if t == 1:     
+                txt = "Остался 1 участник, не вошедший в финальную часть"
+                msgBox.information(my_win, "Уведомление", txt)
+            elif t == 2:
+                txt = "Остались 2 игрока, они могут сыграть за место между собой"
+                msgBox.information(my_win, "Уведомление", txt)   
+            elif t == 3:  
+                txt = "Остались 3 игрока, они могут сыграть за места по кругу" 
+                msgBox.information(my_win, "Уведомление", txt)
+            my_win.tabWidget.setTabEnablad(2, True)
             result = msgBox.question(my_win, "", "Система соревнований создана.\n"
                                                  "Теперь необходимо сделать жеребъевку\n"
                                                  "предварительного этапа.\n"
@@ -4268,12 +4225,52 @@ def total_game_table(kpt, fin, pv, cur_index):
                 choice_gr_automat()
                 tab_enabled(gamer)
             else:
-                return
-        else:
+                return    
+        elif t >= 4:
             my_win.comboBox_table.hide()
             my_win.comboBox_etap_3.show()
             my_win.Button_etap_made.setEnabled(True)
             my_win.comboBox_page_vid.setEnabled(True)
+        # else: 
+        #     total_final == total_player  # подсчитывает все ли игроки распределены по финалам
+        #     result = msgBox.question(my_win, "", "Система соревнований создана.\n"
+        #                                          "Теперь необходимо сделать жеребъевку\n"
+        #                                          "предварительного этапа.\n"
+        #                                          "Хотите ее сделать сейчас?",
+        #                              msgBox.Ok, msgBox.Cancel)
+        #     if result == msgBox.Ok:
+        #         choice_gr_automat()
+        #         tab_enabled(gamer)
+        #     else:
+        #         return
+        # else:
+        #     t = total_player - total_final
+        #     txt = ""
+        #     if t == 1:     
+        #         txt = "Остался 1 участник, не вошедший в финальную часть"
+        #         msgBox.information(my_win, "Уведомление", txt)
+        #     elif t == 2:
+        #         txt = "Остались 2 игрока, они могут сыграть за место между собой"
+        #         msgBox.information(my_win, "Уведомление", txt)   
+        #     elif t == 3:  
+        #         txt = "Остались 3 игрока, они могут сыграть за места по кругу" 
+        #         msgBox.information(my_win, "Уведомление", txt)
+        #     result = msgBox.question(my_win, "", "Система соревнований создана.\n"
+        #                                          "Теперь необходимо сделать жеребъевку\n"
+        #                                          "предварительного этапа.\n"
+        #                                          "Хотите ее сделать сейчас?",
+        #                              msgBox.Ok, msgBox.Cancel)
+        #     if result == msgBox.Ok:
+        #         choice_gr_automat()
+        #         tab_enabled(gamer)
+        #     else:
+        #         return
+        #     if t >= 4:
+        #         my_win.comboBox_table.hide()
+        #         my_win.comboBox_etap_3.show()
+        #         my_win.Button_etap_made.setEnabled(True)
+        #         my_win.comboBox_page_vid.setEnabled(True)
+
 
 
 def numbers_of_games(cur_index, player_in_final):
@@ -4319,19 +4316,48 @@ def clear_db_before_choice():
     sys = System.select().where(System.title_id == title_id())
     player = Player.select().where(Player.title_id == title_id())
     system = sys.select().where(System.stage == "Предварительный").get()
+    sys_id = system.id
     tg = system.total_group
-    ta = system.total_athletes
+    total_player = system.total_athletes
     new_total_player = len(player)
-    if ta == new_total_player:
-        result = msgBox.information(my_win, "", "Был изменен количественный список участников.\n"
-                                    "Если хотите изменить систему соревнований, нажмите -ОК-.\n"
-                                    "Если просто изменится последний финал, нажмите -Cancel-",
-                                    msgBox.Ok, msgBox.Cancel)
-        if result == msgBox.Ok:
-            # очищает таблицы перед новой системой соревнования (system, choice)
-            clear_db_before_edit()
-            choice_tbl_made()  # заполняет db жеребьевка
-        else:   
+    free_group = 0
+    if total_player != new_total_player: #  если изменилось число участников
+        if new_total_player % tg == 0:  # число спортсменов кратно группам
+            max_pl = int(new_total_player / tg)
+            result = msgBox.question(my_win, "Список участников", "Был изменен список участников.\n"
+            "вы хотите изменить систему соревнований?",
+                                        msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
+                # очищает таблицы перед новой системой соревнования (system, choice)
+                clear_db_before_edit()
+                choice_tbl_made()  # заполняет db жеребьевка
+            else:
+                e1 = int(new_total_player) % int(tg)
+                # если количество участников равно делится на группы (кол-во групп)
+                p = int(new_total_player) // int(tg)
+                g1 = int(tg) - e1  # кол-во групп, где наименьшее кол-во спортсменов
+                p2 = str(p + 1)  # кол-во человек в группе с наибольшим их количеством
+                if e1 == 0:  # то в группах равное количество человек -e1-
+                    stroka_kol_group = f"{tg} группы по {str(p)} чел."
+                    skg = int((p * (p - 1) / 2) * int(tg))
+                else:
+                    stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(p2)} чел."
+                    skg = int((((p * (p - 1)) / 2 * g1) + ((p * (p - 1)) / 2 * e1)))
+                kgs = f"{skg} игр"
+                sys = System.select().where(System.id == sys_id).get()
+                sys.max_player = max_pl
+                sys.label_string = stroka_kol_group
+                sys.kol_game_string = kgs
+                sys.save()
+
+                for x in system:
+                    x.ttotal_athletes = new_total_player
+                    x.save()
+        else:
+            max_pl = new_total_player // tg + 1
+            posev = new_total_player // tg  # кол-во полных посевов
+            free_group = tg - new_total_player % tg  # кол-во свободных групп
+
             if new_total_player % tg == 0:
                 max_pl = new_total_player / tg
             else:
@@ -4340,6 +4366,8 @@ def clear_db_before_choice():
                 sys_id.total_athletes = new_total_player
             system.max_player = max_pl
             system.save()
+    else:
+        pass
 
     gl = Game_list.select().where(Game_list.title_id == title_id())
     for i in gl:
