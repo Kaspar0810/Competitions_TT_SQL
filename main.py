@@ -133,9 +133,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
         choice.addAction(self.choice_fin_Action)  # подменю финалы
         saveList.addAction(self.savelist_Action)
-        ed_Menu = editMenu.addMenu("Редактор")
-        ed_Menu.addAction(self.title_Action)
-        ed_Menu.addAction(self.list_Action)
+        ed_Menu = editMenu.addMenu("Жеребьевка")
+        ed_Menu.addAction(self.ed_gr_Action)
+        ed_Menu.addAction(self.ed_pf_Action)
+        ed_Menu.addAction(self.ed_fin_Action)
         # ed_Menu.addAction(self.system_edit_Action)
         find_Menu = editMenu.addMenu("Поиск")
         find_Menu.addAction(self.find_r_Action)
@@ -168,8 +169,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.exitAction = QAction("Выход")
         self.rAction = QAction("Текущий рейтинг")
         self.r1Action = QAction("Рейтинг за январь")
-        self.title_Action = QAction("Титульный лист")  # подменю редактор
-        self.list_Action = QAction("Список участников")
+        self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
+        self.ed_pf_Action = QAction("Редактировать полуфиналы")
+        self.ed_fin_Action = QAction("Редактировать финалы")
+
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
         self.savelist_Action = QAction("Список")  # подменю сохранить
@@ -216,10 +219,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
-        self.r1Action.triggered.connect(self.r1_File)
-        # Connect Help actions
-        self.helpAction.triggered.connect(self.help)
-
     def newFile(self):
         # Logic for creating a new file goes here...
         my_win.textEdit.setText("Нажата кнопка меню соревнования")
@@ -295,11 +294,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         choice_setka(fin)
             else:
                 return
-            # ========= необходимо проверить на правильность желания жеребъевки
-            #         choice_setka(fin)
-            # else:
-            #     pass
-
+           
     def system_made(self):
         system_competition()
 
