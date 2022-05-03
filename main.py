@@ -70,10 +70,8 @@ TTFSearchPath = (
 pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
-pdfmetrics.registerFont(
-    TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
-pdfmetrics.registerFont(
-    TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -219,6 +217,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
+
     def newFile(self):
         # Logic for creating a new file goes here...
         my_win.textEdit.setText("Нажата кнопка меню соревнования")
@@ -2047,8 +2046,6 @@ def view():
         os.system(f"open {view_file}")
     elif platform == "win32":  # Windows...
         os.system(f"{view_file}")
-
-
 
 
 def player_in_setka(fin):
@@ -4228,47 +4225,7 @@ def total_game_table(kpt, fin, pv, cur_index):
             my_win.comboBox_etap_3.show()
             my_win.Button_etap_made.setEnabled(True)
             my_win.comboBox_page_vid.setEnabled(True)
-        # else: 
-        #     total_final == total_player  # подсчитывает все ли игроки распределены по финалам
-        #     result = msgBox.question(my_win, "", "Система соревнований создана.\n"
-        #                                          "Теперь необходимо сделать жеребъевку\n"
-        #                                          "предварительного этапа.\n"
-        #                                          "Хотите ее сделать сейчас?",
-        #                              msgBox.Ok, msgBox.Cancel)
-        #     if result == msgBox.Ok:
-        #         choice_gr_automat()
-        #         tab_enabled(gamer)
-        #     else:
-        #         return
-        # else:
-        #     t = total_player - total_final
-        #     txt = ""
-        #     if t == 1:     
-        #         txt = "Остался 1 участник, не вошедший в финальную часть"
-        #         msgBox.information(my_win, "Уведомление", txt)
-        #     elif t == 2:
-        #         txt = "Остались 2 игрока, они могут сыграть за место между собой"
-        #         msgBox.information(my_win, "Уведомление", txt)   
-        #     elif t == 3:  
-        #         txt = "Остались 3 игрока, они могут сыграть за места по кругу" 
-        #         msgBox.information(my_win, "Уведомление", txt)
-        #     result = msgBox.question(my_win, "", "Система соревнований создана.\n"
-        #                                          "Теперь необходимо сделать жеребъевку\n"
-        #                                          "предварительного этапа.\n"
-        #                                          "Хотите ее сделать сейчас?",
-        #                              msgBox.Ok, msgBox.Cancel)
-        #     if result == msgBox.Ok:
-        #         choice_gr_automat()
-        #         tab_enabled(gamer)
-        #     else:
-        #         return
-        #     if t >= 4:
-        #         my_win.comboBox_table.hide()
-        #         my_win.comboBox_etap_3.show()
-        #         my_win.Button_etap_made.setEnabled(True)
-        #         my_win.comboBox_page_vid.setEnabled(True)
-
-
+        
 
 def numbers_of_games(cur_index, player_in_final):
     """подсчет количество игр в зависимости от системы (пока сетки на 16)"""
