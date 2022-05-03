@@ -667,10 +667,8 @@ def tab_enabled(gamer):
         if count_stage >= 1:  # если система еще не создана, то выключает отдельные вкладки при переходе на другое сорев
             if count > 0:
                 # выключает отдельные вкладки
-                # my_win.tabWidget.setTabEnabled(2, True)
-                # my_win.toolBox.setItemEnabled(2, True)
-                my_win.tabWidget.setTabEnabled(2, False)
-                my_win.toolBox.setItemEnabled(2, False)
+                my_win.tabWidget.setTabEnabled(2, True)
+                my_win.toolBox.setItemEnabled(2, True)
                 for i in stage:
                     if i == "Одна таблица":
                         system = System.get(
@@ -3851,7 +3849,11 @@ def choice_gr_automat():
                 else:
                     gr_del = previous_region_group[z]  # список групп где уже есть этот регион
                     group_list_tmp = list((Counter(group_list) - Counter(gr_del)).elements()) # удаляет из списка номера групп где уже есть регионы
-                    current_region_group[z] = group_list_tmp  # получает словарь со списком групп куда сеять
+                    r = len(group_list_tmp)
+                    if r == 0:  # если во всех группах уже есть, то начинает опять полный список групп
+                        current_region_group[z] = group_list  # получает словарь со списком групп куда сеять
+                    else:
+                        current_region_group[z] = group_list_tmp  # получает словарь со списком групп куда сеять
                  # система распределения по группам (посев), где m - номер посева начина со 2-ого посева
             sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
             current.clear()
@@ -4311,7 +4313,7 @@ def clear_db_before_edit():
 
 
 def clear_db_before_choice():
-    """очищает систему перед повторной жеребьевкой и изменяте кол-во участников если они изменились"""
+    """очищает систему перед повторной жеребьевкой и изменяет кол-во участников если они изменились"""
     msgBox = QMessageBox
     sys = System.select().where(System.title_id == title_id())
     player = Player.select().where(Player.title_id == title_id())
@@ -4319,56 +4321,42 @@ def clear_db_before_choice():
     sys_id = system.id
     tg = system.total_group
     total_player = system.total_athletes
+    max_pl = system.max_player
     new_total_player = len(player)
     free_group = 0
     if total_player != new_total_player: #  если изменилось число участников
-        if new_total_player % tg == 0:  # число спортсменов кратно группам
-            max_pl = int(new_total_player / tg)
-            result = msgBox.question(my_win, "Список участников", "Был изменен список участников.\n"
-            "вы хотите изменить систему соревнований?",
-                                        msgBox.Ok, msgBox.Cancel)
-            if result == msgBox.Ok:
-                # очищает таблицы перед новой системой соревнования (system, choice)
-                clear_db_before_edit()
-                choice_tbl_made()  # заполняет db жеребьевка
-            else:
-                e1 = int(new_total_player) % int(tg)
-                # если количество участников равно делится на группы (кол-во групп)
-                p = int(new_total_player) // int(tg)
-                g1 = int(tg) - e1  # кол-во групп, где наименьшее кол-во спортсменов
-                p2 = str(p + 1)  # кол-во человек в группе с наибольшим их количеством
-                if e1 == 0:  # то в группах равное количество человек -e1-
-                    stroka_kol_group = f"{tg} группы по {str(p)} чел."
-                    skg = int((p * (p - 1) / 2) * int(tg))
-                else:
-                    stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(p2)} чел."
-                    skg = int((((p * (p - 1)) / 2 * g1) + ((p * (p - 1)) / 2 * e1)))
-                kgs = f"{skg} игр"
-                sys = System.select().where(System.id == sys_id).get()
-                sys.max_player = max_pl
-                sys.label_string = stroka_kol_group
-                sys.kol_game_string = kgs
-                sys.save()
-
-                for x in system:
-                    x.ttotal_athletes = new_total_player
-                    x.save()
+        result = msgBox.question(my_win, "Список участников", "Был изменено число участников.\n"
+        "вы хотите изменить систему соревнований?",
+                                    msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
+             # очищает таблицы перед новой системой соревнования (system, choice)
+            clear_db_before_edit()
+            choice_tbl_made()  # заполняет db жеребьевка
         else:
-            max_pl = new_total_player // tg + 1
-            posev = new_total_player // tg  # кол-во полных посевов
-            free_group = tg - new_total_player % tg  # кол-во свободных групп
-
-            if new_total_player % tg == 0:
-                max_pl = new_total_player / tg
+            e1 = new_total_player % tg  # остаток до полного посева групп, где спортсменов на одного больше
+                # если количество участников равно делится на группы (кол-во групп)
+            p_min = new_total_player // tg  # минимальное число спортсменов в группах
+            g1 = int(tg) - e1  # кол-во групп, где наименьшее кол-во спортсменов
+            p_max= p_min + 1  # кол-во человек в группе с наибольшим их количеством
+            if e1 == 0:  # то в группах равное количество человек -e1-
+                stroka_kol_group = f"{tg} группы по {str(p_min)} чел."
+                skg = int((p_min * (p_min - 1) / 2) * int(tg))
+                max_pl = p_min
             else:
-                max_pl = new_total_player // tg + 1
-            for sys_id in sys:            
-                sys_id.total_athletes = new_total_player
-            system.max_player = max_pl
-            system.save()
-    else:
-        pass
+                stroka_kol_group = f"{str(g1)} групп(а) по {str(p_min)} чел. и {str(e1)} групп(а) по {str(p_max)} чел."
+                skg = int((((p_min * (p_min - 1)) / 2 * g1) + ((p_max * (p_max - 1)) / 2 * e1)))
+                max_pl = p_max
+            kgs = f"{skg} игр"
+            sys_t = System.select().where(System.id == sys_id).get()
+            sys_t.max_player = max_pl
+            sys_t.label_string = stroka_kol_group
+            sys_t.kol_game_string = kgs
+            sys_t.save()
 
+            for x in sys:
+                x.total_athletes = new_total_player
+                x.save()
+    # else:  # если число спортсменов не изменилось (просто смена участников)
     gl = Game_list.select().where(Game_list.title_id == title_id())
     for i in gl:
         gl_d = Game_list.get(Game_list.id == i)
@@ -4381,6 +4369,8 @@ def clear_db_before_choice():
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
+    choice_tbl_made()
+    choice_gr_automat()
 
 
 def ready_system():
