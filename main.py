@@ -852,12 +852,12 @@ def load_tableWidget():
         z = 6
         column_label = ["№", "Место", "  Рейтинг",
                         "Фамилия Имя", "Дата рождения", "Город"]
-    elif my_win.tabWidget.currentIndex() == 3 or my_win.tabWidget.currentIndex() == 5:
+    elif tb == 3 or tb == 5:
         z = 15
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
                         "Общий счет",
                         "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
-    elif my_win.tabWidget.currentIndex() == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
+    elif tb == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
         z = 19
         column_label = ["№", "Id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
                         "Посев",
@@ -887,7 +887,7 @@ def load_tableWidget():
         fill_table_R1_list()
     elif my_win.checkBox_6.checkState() is True:  # нажат пункт  -просмотр удаленных игроков-
         del_player_table()
-    elif my_win.tabWidget.currentIndex() == 3 or my_win.tabWidget.currentIndex() == 5:  # таблица результатов
+    elif tb == 3 or tb == 5:  # таблица результатов
         if tb == 3:
             stage = "Предварительный"
         else:
@@ -895,7 +895,7 @@ def load_tableWidget():
         flag = ready_choice(stage)
         if flag is True:
             fill_table_results()
-    elif my_win.tabWidget.currentIndex() == 2 or sender == my_win.choice_gr_Action:
+    elif tb == 2 or sender == my_win.choice_gr_Action:
         if sender == my_win.choice_fin_Action:  # таблица жеребьевки
             pass
         else:
@@ -2604,7 +2604,7 @@ def select_player_in_game():
     if tab == 1:
         select_player_in_list()
     elif tab ==2:
-        change_choice_group(r)
+        change_choice_group()
     elif tab == 3:  # вкладка -группы-
         my_win.checkBox_7.setEnabled(True)
         my_win.checkBox_8.setEnabled(True)
@@ -6403,12 +6403,20 @@ def player_choice_in_setka(fin):
     return posev_data
 
 
-def change_choice_group(r):
+def change_choice_group():
     """Смена жеребьевки групп если в группе 2 и более одинаковых регион чтоб развести тренеров"""
+    reg = []
     choice = Choice.select().where(Choice.title_id == title_id())
-    posev = my_win.tableWidget.item(r, 7).text()
-    ps = choice.select().where(Choice.posev_group == posev)
-    t = len(ps)
+    system = System.select().where(System.title_id == title_id())
+    sys = system.select().where(System.stage == "Предварительный")
+    total_gr = sys.toal_group
+    for i in range(1, total_gr + 1):
+        
+
+
+
+    # posev = my_win.tableWidget.item(r, 7).text()
+    # ps = choice.select().where(Choice.posev_group == posev)
     load_tableWidget()
 
     
@@ -6618,6 +6626,7 @@ my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по не
 my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
 my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
 
+my_win.Button_edit_posev.clicked.connect(change_choice_group)
 my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_reset_filter_fin.clicked.connect(reset_filter)
 my_win.Button_filter_fin.clicked.connect(filter_fin)

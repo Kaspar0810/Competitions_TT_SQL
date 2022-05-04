@@ -1321,6 +1321,19 @@
         <string>Финалы</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="Button_edit_posev">
+       <property name="geometry">
+        <rect>
+         <x>77</x>
+         <y>33</y>
+         <width>113</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Посев</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QLabel" name="label_18">
       <property name="geometry">
@@ -3126,7 +3139,7 @@
        <x>0</x>
        <y>0</y>
        <width>219</width>
-       <height>279</height>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3181,7 +3194,7 @@
        <x>0</x>
        <y>0</y>
        <width>219</width>
-       <height>279</height>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3358,7 +3371,7 @@
        <x>0</x>
        <y>0</y>
        <width>219</width>
-       <height>279</height>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3507,7 +3520,7 @@
        <x>0</x>
        <y>0</y>
        <width>219</width>
-       <height>279</height>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3520,7 +3533,7 @@
        <x>0</x>
        <y>0</y>
        <width>219</width>
-       <height>279</height>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3533,7 +3546,7 @@
        <x>0</x>
        <y>0</y>
        <width>219</width>
-       <height>279</height>
+       <height>285</height>
       </rect>
      </property>
      <attribute name="label">
