@@ -1470,9 +1470,13 @@ def page():
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
     elif tb == 2:  # -система-
+        result = Result.select().where(Result.title_id == title_id())
+        result_played = result.select().where(Result.winner != "")
+        count_result = len(result_played)
         player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
+        my_win.label_52.setText(f"Сыграно: {count_result} игр.")
         st_count = len(sf)
         if st_count != 1:
             load_combobox_filter_group()
@@ -2599,6 +2603,8 @@ def select_player_in_game():
 
     if tab == 1:
         select_player_in_list()
+    elif tab ==2:
+        change_choice_group(r)
     elif tab == 3:  # вкладка -группы-
         my_win.checkBox_7.setEnabled(True)
         my_win.checkBox_8.setEnabled(True)
@@ -2611,7 +2617,7 @@ def select_player_in_game():
         my_win.checkBox_10.setEnabled(True)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
-    if tab != 1:
+    if tab == 3 or tab == 4 or tab == 5:
         game_in_visible()
 
     if tab == 3 or tab == 4 or tab == 5:
@@ -4066,8 +4072,7 @@ def choice_filter_group():
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
                 item = str(list(choice_list[row].values())[column])
-                my_win.tableWidget.setItem(
-                    row, column, QTableWidgetItem(str(item)))
+                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
@@ -4100,12 +4105,10 @@ def color_region_in_tableWidget(fg):
                         txt = my_win.tableWidget.item(i, 3).text()
                         txt = txt.rstrip()  # удаляет пробел в конце строки
                         if txt == x:
-                            my_win.tableWidget.item(i, 3).setForeground(
-                                QBrush(QColor(255, 0, 0)))  # окрашивает текст в
+                            my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
                             # красный цвет
                         else:
-                            my_win.tableWidget.item(i, 3).setForeground(
-                                QBrush(QColor(0, 0, 0)))  # окрашивает текст в
+                            my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в
                             # черный цвет
 
 
@@ -6398,6 +6401,17 @@ def player_choice_in_setka(fin):
         system.choice_flag = True
         system.save()
     return posev_data
+
+
+def change_choice_group(r):
+    """Смена жеребьевки групп если в группе 2 и более одинаковых регион чтоб развести тренеров"""
+    choice = Choice.select().where(Choice.title_id == title_id())
+    posev = my_win.tableWidget.item(r, 7).text()
+    ps = choice.select().where(Choice.posev_group == posev)
+    t = len(ps)
+    load_tableWidget()
+
+    
 
 
 def tours_list(cp):
