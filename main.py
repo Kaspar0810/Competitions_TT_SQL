@@ -6411,7 +6411,6 @@ def change_choice_group():
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == "Предварительный").get()
     total_gr = sys.total_group
-    max_pl = sys.max_player
     for i in range(1, total_gr + 1):
         m = 0
         group = choice.select().where(Choice.group == f"{i} группа")
@@ -6424,28 +6423,28 @@ def change_choice_group():
                 double_reg[f"{i} группа"] = reg_n
         if m == len(reg):
             print("OK") 
-        # else:
-<<<<<<< HEAD
-
         reg.clear()
-       
-
-       
-            
-            
-        
-
-
-
-    # posev = my_win.tableWidget.item(r, 7).text()
-    # ps = choice.select().where(Choice.posev_group == posev)
+    for key in double_reg.keys():
+        y = double_reg[key]
+    ch = choice.select().where(Choice.group == key)
+    ch_replay = ch.select().where(Choice.region == y)
     load_tableWidget()
-=======
->>>>>>> 8675719d0c7165e0edc85c031e9ed079475e24db
+    choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
+    row_count = len(choice_list)  # кол-во строк в таблице
+    if row_count != 0:
+        column_count = len(choice_list[0])  # кол-во столбцов в таблице
+        # вставляет в таблицу необходимое кол-во строк
+        my_win.tableWidget.setRowCount(row_count)
+        for row in range(row_count):  # добавляет данные из базы в TableWidget
+            for column in range(column_count):
+                item = str(list(choice_list[row].values())[column])
+                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+        # ставит размер столбцов согласно записям
+        my_win.tableWidget.resizeColumnsToContents()
+        for i in range(0, row_count):  # отсортировывает номера строк по порядку
+            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 
-        reg.clear()
     
-
 
 def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
