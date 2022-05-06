@@ -6405,24 +6405,28 @@ def player_choice_in_setka(fin):
 
 def change_choice_group():
     """Смена жеребьевки групп если в группе 2 и более одинаковых регион чтоб развести тренеров"""
-    pass
-    # reg = []
-    # choice = Choice.select().where(Choice.title_id == title_id())
-    # system = System.select().where(System.title_id == title_id())
-    # sys = system.select().where(System.stage == "Предварительный")
-    # total_gr = sys.total_group
-    # max_player = sys.max_player
-    # for i in range(1, total_gr + 1):
-    #     for k in range(1, max_player):
-            
-        
+    reg = []
+    double_reg = {}
+    choice = Choice.select().where(Choice.title_id == title_id())
+    system = System.select().where(System.title_id == title_id())
+    sys = system.select().where(System.stage == "Предварительный").get()
+    total_gr = sys.total_group
+    max_pl = sys.max_player
+    for i in range(1, total_gr + 1):
+        m = 0
+        group = choice.select().where(Choice.group == f"{i} группа")
+        for k in group:
+            m += 1
+            reg_n = k.region
+            if reg_n not in reg:
+                reg.append(reg_n)
+            else:
+                double_reg[f"{i} группа"] = reg_n
+        if m == len(reg):
+            print("OK") 
+        # else:
 
-
-
-    # posev = my_win.tableWidget.item(r, 7).text()
-    # ps = choice.select().where(Choice.posev_group == posev)
-    load_tableWidget()
-
+        reg.clear()
     
 
 
