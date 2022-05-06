@@ -5542,16 +5542,11 @@ def score_in_table(td, num_gr):
     tab = my_win.tabWidget.currentIndex()
     system = System.select().where(System.title_id == title_id())
     if tab == 3:
-        # system = System.select().where(System.title_id == title_id())
         ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
-        # mp = ta.max_player 
-        # mp = ta.max_player // ta.total_group
     elif tab == 4:
         pass
     else:
         ta = system.select().where(System.stage == num_gr).get()  # находит system id последнего
-        # ta = System.get(System.title_id == title_id()
-        #                 and System.stage == num_gr)
     mp = ta.max_player
     stage = ta.stage
 
