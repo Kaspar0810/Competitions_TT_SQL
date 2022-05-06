@@ -6425,6 +6425,7 @@ def change_choice_group():
         if m == len(reg):
             print("OK") 
         # else:
+<<<<<<< HEAD
 
         reg.clear()
        
@@ -6439,7 +6440,10 @@ def change_choice_group():
     # posev = my_win.tableWidget.item(r, 7).text()
     # ps = choice.select().where(Choice.posev_group == posev)
     load_tableWidget()
+=======
+>>>>>>> 8675719d0c7165e0edc85c031e9ed079475e24db
 
+        reg.clear()
     
 
 
