@@ -1464,6 +1464,7 @@ def page():
         load_tableWidget()
         my_win.tableWidget.show()
         my_win.Button_del_player.setEnabled(False)
+        my_win.Button_clear_del.setEnabled(False)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
         player_list = Player.select().where(Player.title_id == title_id())
@@ -1784,8 +1785,6 @@ def system_competition():
     msgBox = QMessageBox
     sender = my_win.sender()
     flag_system = ready_system()
-    # if sender == my_win.system_made_Action or sender == my_win.choice_gr_Action or sender == my_win.tabWidget \
-    #         or sender == my_win.toolBox or sender == my_win.system_edit_Action:
     if sender == my_win.system_made_Action or sender == my_win.system_edit_Action:
         # нажат меню -система- или -жеребьевка- или вкладка -система-
         if sender == my_win.system_edit_Action:
@@ -1797,12 +1796,13 @@ def system_competition():
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
                 choice_tbl_made()  # заполняет db жеребьевка
+                stage = "Предварительный"
             else:
                 return
         elif sender == my_win.system_made_Action: 
             sb = "Создание системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
-            result = msgBox.question(my_win, "", f"Вы хотите создать систему соревнований?",
+            result = msgBox.question(my_win, "", "Вы хотите создать систему соревнований?",
                                 msgBox.Ok, msgBox.Cancel)
             if result == msgBox.Ok:
                 choice_tbl_made()  # заполняет db жеребьевка
@@ -1833,7 +1833,7 @@ def system_competition():
 
 
         if flag_system is True:
-            flag_choice = ready_choice()
+            flag_choice = ready_choice(stage)
             if flag_choice is True:
                 sb = "Система и жербьевка создана."
             elif flag_choice is False:
@@ -1847,20 +1847,23 @@ def system_competition():
             my_win.comboBox_etap_1.setEnabled(True)
             my_win.comboBox_etap_2.setEnabled(True)
             my_win.comboBox_etap_3.setEnabled(True)
+            my_win.comboBox_etap_4.setEnabled(True)
             my_win.comboBox_etap_1.show()
             my_win.comboBox_etap_2.hide()
             my_win.comboBox_etap_3.hide()
+            my_win.comboBox_etap_4.hide()
             my_win.label_10.hide()
             my_win.label_15.hide()
             my_win.label_17.hide()
             my_win.label_23.hide()
             my_win.label_27.hide()
             my_win.label_28.hide()
+            my_win.label_53.hide()
+
             my_win.comboBox_table.hide()
             player = Player.select().where(Player.title_id == title_id())
             count = len(player)
             if count != 0:
-                # choice_tbl_made()  # заполнение db списком для жеребьевки
                 my_win.tabWidget.setCurrentIndex(2)
             else:
                 reply = QMessageBox.information(my_win, 'Уведомление',
@@ -1878,9 +1881,13 @@ def system_competition():
         my_win.comboBox_etap_1.setEnabled(True)
         my_win.comboBox_etap_2.setEnabled(True)
         my_win.comboBox_etap_3.setEnabled(True)
+        my_win.comboBox_etap_4.setEnabled(True)
+        my_win.comboBox_etap_5.setEnabled(True)
         my_win.comboBox_etap_1.show()
         my_win.comboBox_etap_2.hide()
         my_win.comboBox_etap_3.hide()
+        my_win.comboBox_etap_4.hide()
+        my_win.comboBox_etap_5.hide()
         my_win.label_10.show()
         my_win.label_15.hide()
         my_win.label_17.hide()
@@ -1909,6 +1916,16 @@ def system_competition():
         my_win.label_30.hide()
         my_win.label_31.hide()
         my_win.comboBox_table_2.show()
+    elif sender == my_win.comboBox_etap_4:
+        my_win.label_55.show()
+        my_win.label_53.hide()
+        # my_win.label_31.hide()
+        my_win.comboBox_table_3.show()
+    elif sender == my_win.comboBox_etap_5:
+        my_win.label_55.show()
+        my_win.label_53.hide()
+        # my_win.label_31.hide()
+        my_win.comboBox_table_4.show()
     else:  # скрывает и выключает label и combobox этапов систем
         my_win.label_10.hide()
         my_win.label_15.hide()
@@ -1916,6 +1933,8 @@ def system_competition():
         my_win.comboBox_etap_1.setEnabled(False)
         my_win.comboBox_etap_2.setEnabled(False)
         my_win.comboBox_etap_3.setEnabled(False)
+        my_win.comboBox_etap_4.setEnabled(False)
+
 
 
 def one_table(fin, mesto_in_group, group):
@@ -4147,7 +4166,7 @@ def etap_made():
 
 
 def total_game_table(kpt, fin, pv, cur_index):
-    """количество участников в сетке и кол-во игр"""
+    """количество участников и кол-во игр"""
     msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
     system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
@@ -4348,16 +4367,17 @@ def ready_system():
         my_win.statusbar.showMessage("Система соревнований создана", 5000)
         flag = True
     else:
-        my_win.statusbar.showMessage(
-            "Необходимо создать систему соревнований", 500)
+        my_win.statusbar.showMessage("Необходимо создать систему соревнований", 500)
         flag = False
     return flag
 
 
+# def ready_choice(stage):
 def ready_choice(stage):
     """проверка на готовность жеребьевки групп"""
-    system = System.get(System.title_id == title_id(
-    ) and System.stage == stage)  # находит system id последнего
+    sys = System.get(System.title_id == title_id())
+    system = sys.stage == stage  # находит system id последнего
+    # system = sys.stage == "Предварительный"  # находит system id последнего
     flag_greb = system.choice_flag
     if flag_greb is True:
         my_win.statusbar.showMessage("Жеребьевка сделана", 5000)
@@ -4390,9 +4410,9 @@ def select_choice_final():
 def del_player_table():
     """таблица удаленных игроков на данных соревнованиях"""
     if my_win.checkBox_6.isChecked():
+        my_win.Button_clear_del.setEnabled(True)
         my_win.tableWidget.hideColumn(8)
-        player_list = Delete_player.select().where(
-            Delete_player.title_id == title_id())
+        player_list = Delete_player.select().where(Delete_player.title_id == title_id())
         count = len(player_list)
         if count == 0:
             my_win.statusbar.showMessage(
@@ -4414,7 +4434,24 @@ def del_player_table():
         my_win.tableWidget.showColumn(8)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.Button_add_edit_player.setEnabled(True)
+        my_win.Button_clear_del.setEnabled(False)
         my_win.statusbar.showMessage("Список участников соревнований", 10000)
+
+
+def clear_del_player():
+    """Очистка базы данных удаленных игроков"""
+    msgBox = QMessageBox
+    del_player = Delete_player.select().where(Delete_player.title_id == title_id())
+    result = msgBox.question(my_win, "Участники", "Вы действительно хотите очистить список\n"
+                                "удаленных игроков?",
+                                        msgBox.Ok, msgBox.Cancel)
+    if result == msgBox.Ok:
+        for i in del_player:
+            i.delete_instance()
+        my_win.Button_clear_del.setEnabled(False)  
+        my_win.checkBox_6.setChecked(False)      
+    else:
+        return
 
 
 def kol_player_in_final():
@@ -6644,7 +6681,7 @@ my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по не
 
 my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
 my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
-
+my_win.Button_clear_del.clicked.connect(clear_del_player)
 my_win.Button_edit_posev.clicked.connect(change_choice_group)
 my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_reset_filter_fin.clicked.connect(reset_filter)

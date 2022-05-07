@@ -1187,6 +1187,144 @@
         <string>TextLabel</string>
        </property>
       </widget>
+      <widget class="QLabel" name="label_53">
+       <property name="geometry">
+        <rect>
+         <x>571</x>
+         <y>72</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_54">
+       <property name="geometry">
+        <rect>
+         <x>649</x>
+         <y>72</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_55">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_table_3">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>69</y>
+         <width>161</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_56">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>91</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_57">
+       <property name="geometry">
+        <rect>
+         <x>649</x>
+         <y>94</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_table_4">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>91</y>
+         <width>161</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_58">
+       <property name="geometry">
+        <rect>
+         <x>571</x>
+         <y>94</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QFrame" name="frame_2">
       <property name="geometry">
@@ -3105,7 +3243,7 @@
       <x>10</x>
       <y>10</y>
       <width>221</width>
-      <height>491</height>
+      <height>489</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -3131,15 +3269,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3194,7 +3332,7 @@
        <x>0</x>
        <y>0</y>
        <width>219</width>
-       <height>285</height>
+       <height>283</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3204,9 +3342,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>146</y>
+        <y>134</y>
         <width>151</width>
-        <height>121</height>
+        <height>101</height>
        </rect>
       </property>
       <property name="font">
@@ -3227,7 +3365,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>60</y>
+         <y>45</y>
          <width>151</width>
          <height>32</height>
         </rect>
@@ -3245,7 +3383,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>30</y>
+         <y>21</y>
          <width>151</width>
          <height>32</height>
         </rect>
@@ -3253,8 +3391,8 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <weight>75</weight>
-         <bold>true</bold>
+         <weight>50</weight>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -3265,7 +3403,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>90</y>
+         <y>69</y>
          <width>151</width>
          <height>32</height>
         </rect>
@@ -3280,59 +3418,21 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>151</width>
-        <height>66</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QPushButton" name="Button_add_edit_player">
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Добавить</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="Button_del_player">
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Удалить</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QCheckBox" name="checkBox_6">
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>268</y>
+        <y>241</y>
         <width>111</width>
         <height>20</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Courier New</family>
-        <pointsize>14</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <family>Times</family>
+        <pointsize>13</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="text">
@@ -3364,6 +3464,76 @@
        <string>Всего</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="Button_clear_del">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>258</y>
+        <width>150</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="text">
+       <string>Очистить</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_2">
+      <property name="geometry">
+       <rect>
+        <x>7</x>
+        <y>230</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Button_add_edit_player">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>150</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Добавить</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Button_del_player">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>55</y>
+        <width>150</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Удалить</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_6">
      <property name="geometry">
@@ -3371,7 +3541,7 @@
        <x>0</x>
        <y>0</y>
        <width>219</width>
-       <height>285</height>
+       <height>283</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3513,14 +3683,40 @@
        <string>4-й этап:</string>
       </property>
      </widget>
+     <widget class="QComboBox" name="comboBox_etap_5">
+      <property name="geometry">
+       <rect>
+        <x>69</x>
+        <y>86</y>
+        <width>146</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_59">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>89</y>
+        <width>60</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>5-й этап:</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_3">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3532,8 +3728,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3545,8 +3741,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>285</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
