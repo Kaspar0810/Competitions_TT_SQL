@@ -1506,6 +1506,7 @@ def page():
         my_win.label_34.hide()
         my_win.label_35.hide()
         my_win.label_50.hide()
+        my_win.label_59.hide()
         my_win.label_60.hide()
         my_win.label_61.hide()
         my_win.label_62.hide()
@@ -1540,10 +1541,10 @@ def page():
                 t = txt.find(" ")
                 txt = int(txt[0:t])
                 sum_game.append(txt)
-                if i == 0:
+                if i == 0:  # показывает в зависимости от этапов финал, кол-во игр
                     my_win.label_9.setText(stage[0])
-                    my_win.label_12.setText(table[0])
                     my_win.label_19.setText(game[0])
+                    my_win.label_12.setText(table[0])
                     my_win.label_9.show()
                     my_win.label_12.show()
                     my_win.label_19.show()
@@ -1561,6 +1562,20 @@ def page():
                     my_win.label_30.show()
                     my_win.label_31.show()
                     my_win.label_32.show()
+                elif i == 3:
+                    my_win.label_55.setText(stage[3])
+                    my_win.label_53.setText(game[3])
+                    my_win.label_61.setText(table[3])
+                    my_win.label_55.show()
+                    my_win.label_53.show()
+                    my_win.label_61.show()
+                elif i == 4:
+                    my_win.label_56.setText(stage[3])
+                    my_win.label_58.setText(game[3])
+                    my_win.label_62.setText(table[3])
+                    my_win.label_56.show()
+                    my_win.label_58.show()
+                    my_win.label_62.show()
 
             total_game = sum(sum_game)
             my_win.comboBox_table.hide()
@@ -1961,8 +1976,8 @@ def system_competition():
         my_win.comboBox_table_3.show()
         my_win.comboBox_table_3.setCurrentIndex(0)
     elif sender == my_win.comboBox_etap_5:
-        my_win.label_55.show()
-        my_win.label_53.hide()
+        my_win.label_56.show()
+        my_win.label_58.hide()
         # my_win.label_31.hide()
         my_win.comboBox_table_4.show()
         my_win.comboBox_table_4.setCurrentIndex(0)
@@ -2050,7 +2065,7 @@ def kol_player_in_group():
         my_win.comboBox_page_vid.setEnabled(False)
         my_win.spinBox_kol_group.hide()
         my_win.comboBox_etap_2.setVisible(True)
-        my_win.comboBox_etap_2.setCurrentIndex(0)
+        my_win.comboBox_etap_2.setCurrentText("")
         my_win.label_15.show()
         # ====== запись в таблицу db -system- первый этап
         s = System.select().order_by(System.id.desc()).get()
@@ -4545,7 +4560,7 @@ def kol_player_in_final():
             ct = my_win.comboBox_etap_5.currentText()
             if ct == "Финальный":
                 my_win.label_56.setText("Финальный этап")
-                fin = "3-й финал"
+                fin = "4-й финал"
         kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников,\nвыходящих "
                                                                   f"из группы в {fin}", min=1)
                 
