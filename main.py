@@ -683,19 +683,22 @@ def tab_enabled(gamer):
                     elif i == "Полуфиналы":
                         my_win.tabWidget.setTabEnabled(4, True)
                     elif i == "1-й финал" or i == "финальный":
-                        system = System.get(
-                            System.id == title_id() and System.stage == i)
+                        system = System.get(System.id == title_id() and System.stage == i)
                         flag = system.choice_flag
                         if flag is True:
                             my_win.tabWidget.setTabEnabled(5, True)
-                my_win.tabWidget.setCurrentIndex(0)
+                    elif i == "":
+                        my_win.tabWidget.setTabEnabled(3, False)
+                        my_win.tabWidget.setTabEnabled(4, False)
+                        my_win.tabWidget.setTabEnabled(5, False)
+                my_win.tabWidget.setCurrentIndex(1)
         else:
             # выключает отдельные вкладки
             my_win.tabWidget.setTabEnabled(2, True)
             my_win.tabWidget.setTabEnabled(3, False)
             my_win.tabWidget.setTabEnabled(4, False)
             my_win.tabWidget.setTabEnabled(5, False)
-            my_win.tabWidget.setCurrentIndex(0)
+            my_win.tabWidget.setCurrentIndex(1)
     else:
         my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
         my_win.tabWidget.setTabEnabled(3, False)
@@ -1792,18 +1795,22 @@ def system_competition():
     """выбор системы проведения"""
     msgBox = QMessageBox
     sender = my_win.sender()
+    tit = Title.get(Title.id == title_id())
+    gamer = tit.gamer
     flag_system = ready_system()
     if sender == my_win.system_made_Action or sender == my_win.system_edit_Action:
         # нажат меню -система- или -жеребьевка- или вкладка -система-
         if sender == my_win.system_edit_Action:
             sb = "Изменение системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
-            result = msgBox.question(my_win, "", f"Вы хотите изменить систему соревнований?",
+            result = msgBox.question(my_win, "", "Вы хотите изменить систему соревнований?",
                                     msgBox.Ok, msgBox.Cancel)
             if result == msgBox.Ok:
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
+                tab_enabled(gamer)  # показывает вкладки по новому
                 choice_tbl_made()  # заполняет db жеребьевка
+                flag_system = False
                 stage = ""
             else:
                 return
@@ -1823,6 +1830,7 @@ def system_competition():
         my_win.comboBox_etap_4.setEnabled(True)
         my_win.comboBox_etap_5.setEnabled(True)
         my_win.comboBox_etap_1.show()
+        my_win.comboBox_etap_1.setCurrentIndex(0)
         my_win.comboBox_etap_2.hide()
         my_win.comboBox_etap_3.hide()
         my_win.comboBox_etap_4.hide()
@@ -1921,6 +1929,7 @@ def system_competition():
             my_win.label_9.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
+            my_win.spinBox_kol_group.setValue(0)
             my_win.comboBox_one_table.hide()
             my_win.label_9.show()
             my_win.label_9.setText("Предварительный этап")
@@ -1938,21 +1947,25 @@ def system_competition():
         my_win.label_53.hide()
         my_win.label_58.hide()
         my_win.comboBox_table.show()
+        my_win.comboBox_table.setCurrentIndex(0)
     elif sender == my_win.comboBox_etap_3:
         my_win.label_32.show()
         my_win.label_30.hide()
         my_win.label_31.hide()
         my_win.comboBox_table_2.show()
+        my_win.comboBox_table_2.setCurrentIndex(0)
     elif sender == my_win.comboBox_etap_4:
         my_win.label_55.show()
         my_win.label_53.hide()
         # my_win.label_31.hide()
         my_win.comboBox_table_3.show()
+        my_win.comboBox_table_3.setCurrentIndex(0)
     elif sender == my_win.comboBox_etap_5:
         my_win.label_55.show()
         my_win.label_53.hide()
         # my_win.label_31.hide()
         my_win.comboBox_table_4.show()
+        my_win.comboBox_table_4.setCurrentIndex(0)
     else:  # скрывает и выключает label и combobox этапов систем
         my_win.label_10.hide()
         my_win.label_15.hide()
@@ -1996,8 +2009,7 @@ def one_table(fin, mesto_in_group, group):
                 i.save()
 
             string_table = my_win.label_50.text()
-            system = System.get(System.title_id == title_id()
-                                and System.stage == fin)
+            system = System.get(System.title_id == title_id() and System.stage == fin)
             system.choice_flag = 1
             system.save()
             return
@@ -2038,6 +2050,7 @@ def kol_player_in_group():
         my_win.comboBox_page_vid.setEnabled(False)
         my_win.spinBox_kol_group.hide()
         my_win.comboBox_etap_2.setVisible(True)
+        my_win.comboBox_etap_2.setCurrentIndex(0)
         my_win.label_15.show()
         # ====== запись в таблицу db -system- первый этап
         s = System.select().order_by(System.id.desc()).get()
@@ -4276,10 +4289,13 @@ def total_game_table(kpt, fin, pv, cur_index):
             my_win.comboBox_table.hide()
             if tot_fin == 1:
                 my_win.comboBox_etap_3.show()
+                my_win.comboBox_etap_3.setCurrentIndex(0)
             elif tot_fin ==2:
                 my_win.comboBox_etap_4.show()
+                my_win.comboBox_etap_4.setCurrentIndex(0)
             elif tot_fin == 3:
                 my_win.comboBox_etap_5.show()
+                my_win.comboBox_etap_5.setCurrentIndex(0)
 
             my_win.Button_etap_made.setEnabled(True)
             my_win.comboBox_page_vid.setEnabled(True)
@@ -4408,7 +4424,7 @@ def ready_system():
 def ready_choice(stage):
     """проверка на готовность жеребьевки групп"""
     sys = System.select().where(System.title_id == title_id())
-    greb_flag is False
+    greb_flag = False
     if stage != "":
         system = sys.select().where(System.stage == stage).get()
         greb_flag = system.choice_flag
@@ -4431,8 +4447,7 @@ def select_choice_final():
     for sys in system.select():
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
             fin.append(sys.stage)
-    fin, ok = QInputDialog.getItem(
-        my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
+    fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
     if ok:
         return fin
     else:
