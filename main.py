@@ -135,12 +135,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ed_Menu.addAction(self.ed_gr_Action)
         ed_Menu.addAction(self.ed_pf_Action)
         ed_Menu.addAction(self.ed_fin_Action)
-        # ed_Menu.addAction(self.system_edit_Action)
+        ed_Menu.addAction(self.system_edit_Action)
         find_Menu = editMenu.addMenu("Поиск")
         find_Menu.addAction(self.find_r_Action)
         find_Menu.addAction(self.find_r1_Action)
-        vid_Menu = editMenu.addMenu("Ориентация таблиц")
-        vid_Menu.addAction(self.vid_gr_Action)
+        editMenu.addAction(self.vid_edit_Action)  #в осн меню -Редактировать- добавлен пункт сразу с акцией -Вид страницы этапов
         # меню Рейтинг
         rank_Menu = menuBar.addMenu("Рейтинг")  # основное
         rank_Menu.addAction(self.rAction)
@@ -172,7 +171,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
         self.ed_pf_Action = QAction("Редактировать полуфиналы")
         self.ed_fin_Action = QAction("Редактировать финалы")
-        self.vid_gr_Action = QAction("Группы")
+        self.vid_edit_Action = QAction("Вид страницы этапов")
 
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
@@ -205,7 +204,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.newAction.triggered.connect(self.newFile)
         self.system_made_Action.triggered.connect(self.system_made)
         self.system_edit_Action.triggered.connect(self.system_edit)
-        self.vid_gr_Action.triggered.connect(self.vid_edit)
+        self.vid_edit_Action.triggered.connect(self.vid_edit)
         self.exitAction.triggered.connect(self.exit)
         self.savelist_Action.triggered.connect(self.saveList)
         self.choice_gr_Action.triggered.connect(self.choice)
@@ -6629,19 +6628,22 @@ def change_page_vid():
         sys.append(stage)
     stage, ok = QInputDialog.getItem(my_win, "Таблицы", "Выберите таблицы из списка для\n"
                                         "смены ориентации страницы", sys)
-    sys = system.select().where(System.stage == stage).get()
-    vid = sys.page_vid
-    vid_ed = "альбомная"
-    if vid == "альбомная":
-        vid_ed = "книжная"
-    else:
+    if ok:                                   
+        sys = system.select().where(System.stage == stage).get()
+        vid = sys.page_vid
         vid_ed = "альбомная"
-    ok = msgBox.question(my_win, "Таблицы", "Текущая ориентация страницы\n"
-                                        f"-{stage}-: {vid},\n"
-                                        "Хотите ее изменить на:" f"{vid_ed}?", msgBox.Ok, msgBox.Cancel)
-    if ok:
-        sys.page_vid = vid_ed
-        sys.save()
+        if vid == "альбомная":
+            vid_ed = "книжная"
+        else:
+            vid_ed = "альбомная"
+        ok = msgBox.question(my_win, "Таблицы", "Текущая ориентация страницы\n"
+                                            f"-{stage}-: {vid},\n"
+                                            "Хотите ее изменить на:" f"{vid_ed}?", msgBox.Ok, msgBox.Cancel)
+        if ok:
+            sys.page_vid = vid_ed
+            sys.save()
+        else:
+            return
     else:
         return
 
