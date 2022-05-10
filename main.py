@@ -139,6 +139,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         find_Menu = editMenu.addMenu("Поиск")
         find_Menu.addAction(self.find_r_Action)
         find_Menu.addAction(self.find_r1_Action)
+        vid_Menu = editMenu.addMenu("Ориентация таблиц")
+        vid_Menu.addAction(self.vid_gr_Action)
         # меню Рейтинг
         rank_Menu = menuBar.addMenu("Рейтинг")  # основное
         rank_Menu.addAction(self.rAction)
@@ -170,6 +172,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
         self.ed_pf_Action = QAction("Редактировать полуфиналы")
         self.ed_fin_Action = QAction("Редактировать финалы")
+        self.vid_gr_Action = QAction("Ориентация страницы группы")
 
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
