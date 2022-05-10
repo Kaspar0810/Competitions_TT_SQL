@@ -172,7 +172,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
         self.ed_pf_Action = QAction("Редактировать полуфиналы")
         self.ed_fin_Action = QAction("Редактировать финалы")
-        self.vid_gr_Action = QAction("Ориентация страницы группы")
+        self.vid_gr_Action = QAction("Группы")
 
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
@@ -205,6 +205,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.newAction.triggered.connect(self.newFile)
         self.system_made_Action.triggered.connect(self.system_made)
         self.system_edit_Action.triggered.connect(self.system_edit)
+        self.vid_gr_Action.triggered.connect(self.vid_edit)
         self.exitAction.triggered.connect(self.exit)
         self.savelist_Action.triggered.connect(self.saveList)
         self.choice_gr_Action.triggered.connect(self.choice)
@@ -311,6 +312,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def view(self):
         view()
+    
+    def vid_edit(self):
+        change_page_vid()
+
 
 
 app = QApplication(sys.argv)
@@ -6612,7 +6617,21 @@ def change_choice_group():
     else:
         msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
 
-    
+
+def change_page_vid():
+    """Смена вида страницы с таблицами""" 
+    # msgBox = QMessageBox
+    sys = []
+    sys.append("")
+    system = System.select().where(System.title_id == title_id()) 
+    for i in system:
+        stage = i.stage
+        sys.append(stage)
+    kpt, ok = QInputDialog.getItem(my_win, "Таблицы", "Выберите таблицы из списка для\n"
+                                        "смены ориентации страницы", sys)
+    if ok:
+        print(kpt)
+
 
 def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
