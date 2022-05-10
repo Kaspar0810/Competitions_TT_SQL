@@ -6620,17 +6620,28 @@ def change_choice_group():
 
 def change_page_vid():
     """Смена вида страницы с таблицами""" 
-    # msgBox = QMessageBox
+    msgBox = QMessageBox
     sys = []
     sys.append("")
     system = System.select().where(System.title_id == title_id()) 
     for i in system:
         stage = i.stage
         sys.append(stage)
-    kpt, ok = QInputDialog.getItem(my_win, "Таблицы", "Выберите таблицы из списка для\n"
+    stage, ok = QInputDialog.getItem(my_win, "Таблицы", "Выберите таблицы из списка для\n"
                                         "смены ориентации страницы", sys)
+    sys = system.select().where(System.stage == stage).get()
+    vid = sys.page_vid
+    vid_ed = "альбомная"
+    if vid == "альбомная":
+        vid_ed = "книжная"
+    else:
+        vid_ed = "альбомная"
+
+    ok = msgBox.question(my_win, "Таблицы", "Текущая ориентация страницы \n"
+                                        f"{stage} - {vid},\n"
+                                        "Хотите ее поменять на:" f"{vid_ed}?", msgBox.Ok, msgBox.Cancel)
     if ok:
-        print(kpt)
+        print(page)
 
 
 def tours_list(cp):
