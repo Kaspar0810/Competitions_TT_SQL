@@ -6636,12 +6636,14 @@ def change_page_vid():
         vid_ed = "книжная"
     else:
         vid_ed = "альбомная"
-
-    ok = msgBox.question(my_win, "Таблицы", "Текущая ориентация страницы \n"
-                                        f"{stage} - {vid},\n"
-                                        "Хотите ее поменять на:" f"{vid_ed}?", msgBox.Ok, msgBox.Cancel)
+    ok = msgBox.question(my_win, "Таблицы", "Текущая ориентация страницы\n"
+                                        f"-{stage}-: {vid},\n"
+                                        "Хотите ее изменить на:" f"{vid_ed}?", msgBox.Ok, msgBox.Cancel)
     if ok:
-        print(page)
+        sys.page_vid = vid_ed
+        sys.save()
+    else:
+        return
 
 
 def tours_list(cp):
