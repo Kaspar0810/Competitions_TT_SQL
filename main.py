@@ -6602,9 +6602,12 @@ def change_choice_group():
     dr_count = len(double_reg)
     if dr_count != 0:
         for key in double_reg.keys():
-            y = double_reg[key]
-        ch = choice.select().where(Choice.group == key)
-        ch_replay = ch.select().where(Choice.region == y)
+            double_reg_list = double_reg[key]
+            c = len(double_reg_list)
+            for k in range(0, c):
+                rg = double_reg_list[k]
+                ch = choice.select().where(Choice.group == key)
+                ch_replay = ch.select().where(Choice.region == rg)
         load_tableWidget()
         choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
         row_count = len(choice_list)  # кол-во строк в таблице
