@@ -6574,6 +6574,8 @@ def change_choice_group():
     """Смена жеребьевки групп если в группе 2 и более одинаковых регион чтоб развести тренеров"""
     msg = QMessageBox
     reg = []
+    reg_d = []
+    reg_tmp = []
     double_reg = {}
     choice = Choice.select().where(Choice.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
@@ -6588,9 +6590,14 @@ def change_choice_group():
             if reg_n not in reg:
                 reg.append(reg_n)
             else:
-                double_reg[f"{i} группа"] = reg_n
-        if m == len(reg):
-            print("OK") 
+                reg_tmp.append(reg_n)
+        reg_d = reg_tmp.copy()
+        count =len(reg_d)
+        if count > 0:
+            double_reg[f"{i} группа"] = reg_d
+        # if m == len(reg):
+        #     print("OK")
+        reg_tmp.clear()
         reg.clear()
     dr_count = len(double_reg)
     if dr_count != 0:
