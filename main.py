@@ -3912,8 +3912,9 @@ def choice_gr_automat():
     while number_poseva < total_player:
         p += 1
         if number_poseva == 0 or number_poseva % group == 0 :
-            for e in range(1, group + 1):  # получение списка всех групп
-                group_list.append(e)
+            group_list = list(range(group + 1))  # получение списка групп с помощью функции range
+            # for e in range(1, group + 1):  # получение списка всех групп
+            #     group_list.append(e)
 
         region_id = reg_list[number_poseva]
         pl_id = player_list[number_poseva]
@@ -6575,6 +6576,9 @@ def change_choice_group():
     msg = QMessageBox
     reg = []
     reg_d = []
+    gr_key = []
+    d_reg = []
+    double_reg_tmp = []
     reg_tmp = []
     double_reg = {}
     choice = Choice.select().where(Choice.title_id == title_id())
@@ -6595,22 +6599,19 @@ def change_choice_group():
         count =len(reg_d)
         if count > 0:
             double_reg[f"{i} группа"] = reg_d
-        # if m == len(reg):
-        #     print("OK")
         reg_tmp.clear()
         reg.clear()
     dr_count = len(double_reg)
     if dr_count != 0:
-        # for key in double_reg.keys():
-            # ch = choice.select().where(Choice.group == key)
-        ch = choice.select().where(Choice.group == "1 группа")
-        double_reg_list = double_reg["1 группа"]
-            # c = len(double_reg_list)
-            # for k in range(0, c):
-            #     rg = double_reg_list[k]
-                # ch = choice.select().where(Choice.group == key)
-        # ch_replay = ch.select().where(Choice.region == double_reg_list[0] or Choice.region == double_reg_list[1])
-        ch_replay = ch.select().where(Choice.region.in_(["г. Москва", "Нижегородская обл."]))
+        for key in double_reg.keys():
+            gr_key.append(key)       
+            double_reg_tmp = double_reg[key]
+            for i in double_reg_tmp:
+                if i not in d_reg:
+                    d_reg.append(i)
+        ch = choice.select().where(Choice.group.in_(gr_key))
+        ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(d_reg))
+        # ch_replay = ch.select().where(Choice.region.in_(["г. Москва", "Нижегородская обл."]))
         # friends = User.select().where(User.username.in_(['charlie', 'huey', 'mickey']))
         # load_tableWidget()
         choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
