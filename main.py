@@ -6601,16 +6601,21 @@ def change_choice_group():
         reg.clear()
     dr_count = len(double_reg)
     if dr_count != 0:
-        for key in double_reg.keys():
-            double_reg_list = double_reg[key]
-            c = len(double_reg_list)
-            for k in range(0, c):
-                rg = double_reg_list[k]
-                ch = choice.select().where(Choice.group == key)
-                ch_replay = ch.select().where(Choice.region == rg)
-        load_tableWidget()
+        # for key in double_reg.keys():
+            # ch = choice.select().where(Choice.group == key)
+        ch = choice.select().where(Choice.group == "1 группа")
+        double_reg_list = double_reg["1 группа"]
+            # c = len(double_reg_list)
+            # for k in range(0, c):
+            #     rg = double_reg_list[k]
+                # ch = choice.select().where(Choice.group == key)
+        # ch_replay = ch.select().where(Choice.region == double_reg_list[0] or Choice.region == double_reg_list[1])
+        ch_replay = ch.select().where(Choice.region.in_(["г. Москва", "Нижегородская обл."]))
+        # friends = User.select().where(User.username.in_(['charlie', 'huey', 'mickey']))
+        # load_tableWidget()
         choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
-        row_count = len(choice_list)  # кол-во строк в таблице
+        load_tableWidget()
+        row_count = len(ch_replay)  # кол-во строк в таблице
         if row_count != 0:
             column_count = len(choice_list[0])  # кол-во столбцов в таблице
             # вставляет в таблицу необходимое кол-во строк
