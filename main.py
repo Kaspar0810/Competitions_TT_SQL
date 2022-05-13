@@ -4163,8 +4163,11 @@ def choice_filter_group():
     """фильтрует таблицу жеребьевка по группам"""
     gamer = my_win.lineEdit_title_gamer.text()
     fg = my_win.comboBox_filter_choice.currentText()
+    choice = Choice.select().where(Choice.title_id == title_id())
     if fg == "все группы":
         player_choice = Choice.select().where(Choice.title_id == title_id())
+    elif my_win.radioButton_4.isChecked():
+        player_choice = choice.select().where(Choice.group == fg)
     else:
         p_choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
         player_choice = p_choice.select().where(Choice.title_id == title_id())
@@ -6574,11 +6577,10 @@ def player_choice_in_setka(fin):
 def change_choice_group():
     """Смена жеребьевки групп если в группе 2 и более одинаковых регион чтоб развести тренеров"""
     msg = QMessageBox
+    sender = my_win.sender()
     reg = []
     reg_d = []
     gr_key = []
-    d_reg = []
-    double_reg_tmp = []
     reg_tmp = []
     double_reg = {}
     choice = Choice.select().where(Choice.title_id == title_id())
@@ -6604,56 +6606,24 @@ def change_choice_group():
     dr_count = len(double_reg)
     if dr_count != 0:
         for key in double_reg.keys():
-            #==================================
             gr_key.append(key)
-        pre_stage, ok = QInputDialog.getItem(my_win, "Группа", "Выберите группу в которой повторяющиеся регионы",
-                                                gr_key)
-        if ok:
-            ch = choice.select().where(Choice.group.in_(gr_key))
-            ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(d_reg))
-            choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
-            load_tableWidget()
-            row_count = len(ch_replay)  # кол-во строк в таблице
-            if row_count != 0:
-                column_count = len(choice_list[0])  # кол-во столбцов в таблице
-                # вставляет в таблицу необходимое кол-во строк
-                my_win.tableWidget.setRowCount(row_count)
-                for row in range(row_count):  # добавляет данные из базы в TableWidget
-                    for column in range(column_count):
-                        item = str(list(choice_list[row].values())[column])
-                        my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-                # ставит размер столбцов согласно записям
-                my_win.tableWidget.resizeColumnsToContents()
-                for i in range(0, row_count):  # отсортировывает номера строк по порядку
-                    my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
-
-        # my_win.comboBox_filter_choice.clear()
-        # my_win.comboBox_filter_choice.addItems(gr_key)
-            #===========================
-        #     gr_key.append(key)       
-        #     double_reg_tmp = double_reg[key]
-        #     for i in double_reg_tmp:
-        #         if i not in d_reg:
-        #             d_reg.append(i)
+     
+            double_reg_tmp = double_reg[key]
         # ch = choice.select().where(Choice.group.in_(gr_key))
-        # ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(d_reg))
-        # choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
-        # load_tableWidget()
-        # row_count = len(ch_replay)  # кол-во строк в таблице
-        # if row_count != 0:
-        #     column_count = len(choice_list[0])  # кол-во столбцов в таблице
-        #     # вставляет в таблицу необходимое кол-во строк
-        #     my_win.tableWidget.setRowCount(row_count)
-        #     for row in range(row_count):  # добавляет данные из базы в TableWidget
-        #         for column in range(column_count):
-        #             item = str(list(choice_list[row].values())[column])
-        #             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-        #     # ставит размер столбцов согласно записям
-        #     my_win.tableWidget.resizeColumnsToContents()
-        #     for i in range(0, row_count):  # отсортировывает номера строк по порядку
-        #         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+        # ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(double_reg_tmp))
+
+        my_win.comboBox_filter_choice.clear()
+        my_win.comboBox_filter_choice.addItems(gr_key)
     else:
         msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
+
+
+def double_region(double_reg_tmp, gr_key):
+    """одинаковые регионы в группе"""
+    choice = Choice.select().where(Choice.title_id == title_id())
+    ch = choice.select().where(Choice.group.in_(gr_key))
+    ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(double_reg_tmp))
+
 
 
 def change_page_vid():
@@ -6871,6 +6841,7 @@ my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 my_win.radioButton_match_3.toggled.connect(match_score_db)
 my_win.radioButton_match_5.toggled.connect(match_score_db)
 my_win.radioButton_match_7.toggled.connect(match_score_db)
+my_win.radioButton_4.toggled.connect(change_choice_group)
 
 
 # при изменении чекбокса активирует кнопку создать
@@ -6894,7 +6865,7 @@ my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по не
 my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
 my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
 my_win.Button_clear_del.clicked.connect(clear_del_player)
-my_win.Button_edit_posev.clicked.connect(change_choice_group)
+# my_win.Button_edit_posev.clicked.connect(change_choice_group)
 my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_reset_filter_fin.clicked.connect(reset_filter)
 my_win.Button_filter_fin.clicked.connect(filter_fin)

@@ -1450,9 +1450,9 @@
       <property name="geometry">
        <rect>
         <x>719</x>
-        <y>146</y>
+        <y>124</y>
         <width>190</width>
-        <height>64</height>
+        <height>85</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -1516,17 +1516,17 @@
         <string>Финалы</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="Button_edit_posev">
+      <widget class="QRadioButton" name="radioButton_4">
        <property name="geometry">
         <rect>
-         <x>77</x>
-         <y>33</y>
-         <width>113</width>
-         <height>32</height>
+         <x>2</x>
+         <y>59</y>
+         <width>141</width>
+         <height>20</height>
         </rect>
        </property>
        <property name="text">
-        <string>Посев</string>
+        <string>Повтор регионов</string>
        </property>
       </widget>
      </widget>
@@ -1581,7 +1581,7 @@
       <property name="geometry">
        <rect>
         <x>726</x>
-        <y>123</y>
+        <y>100</y>
         <width>171</width>
         <height>20</height>
        </rect>
@@ -1597,7 +1597,7 @@
        </font>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Фильтр по жеребъевке&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Фильтр по жеребьевке&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_33">
