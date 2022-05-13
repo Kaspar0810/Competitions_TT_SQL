@@ -6604,31 +6604,54 @@ def change_choice_group():
     dr_count = len(double_reg)
     if dr_count != 0:
         for key in double_reg.keys():
-            gr_key.append(key)       
-            double_reg_tmp = double_reg[key]
-            for i in double_reg_tmp:
-                if i not in d_reg:
-                    d_reg.append(i)
-        ch = choice.select().where(Choice.group.in_(gr_key))
-        ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(d_reg))
-        # ch_replay = ch.select().where(Choice.region.in_(["г. Москва", "Нижегородская обл."]))
-        # friends = User.select().where(User.username.in_(['charlie', 'huey', 'mickey']))
+            #==================================
+            gr_key.append(key)
+        pre_stage, ok = QInputDialog.getItem(my_win, "Группа", "Выберите группу в которой повторяющиеся регионы",
+                                                gr_key)
+        if ok:
+            ch = choice.select().where(Choice.group.in_(gr_key))
+            ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(d_reg))
+            choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
+            load_tableWidget()
+            row_count = len(ch_replay)  # кол-во строк в таблице
+            if row_count != 0:
+                column_count = len(choice_list[0])  # кол-во столбцов в таблице
+                # вставляет в таблицу необходимое кол-во строк
+                my_win.tableWidget.setRowCount(row_count)
+                for row in range(row_count):  # добавляет данные из базы в TableWidget
+                    for column in range(column_count):
+                        item = str(list(choice_list[row].values())[column])
+                        my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                # ставит размер столбцов согласно записям
+                my_win.tableWidget.resizeColumnsToContents()
+                for i in range(0, row_count):  # отсортировывает номера строк по порядку
+                    my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+
+        # my_win.comboBox_filter_choice.clear()
+        # my_win.comboBox_filter_choice.addItems(gr_key)
+            #===========================
+        #     gr_key.append(key)       
+        #     double_reg_tmp = double_reg[key]
+        #     for i in double_reg_tmp:
+        #         if i not in d_reg:
+        #             d_reg.append(i)
+        # ch = choice.select().where(Choice.group.in_(gr_key))
+        # ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(d_reg))
+        # choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
         # load_tableWidget()
-        choice_list = ch_replay.dicts().execute()  # вывод групп, где есть одинаковые регионы
-        load_tableWidget()
-        row_count = len(ch_replay)  # кол-во строк в таблице
-        if row_count != 0:
-            column_count = len(choice_list[0])  # кол-во столбцов в таблице
-            # вставляет в таблицу необходимое кол-во строк
-            my_win.tableWidget.setRowCount(row_count)
-            for row in range(row_count):  # добавляет данные из базы в TableWidget
-                for column in range(column_count):
-                    item = str(list(choice_list[row].values())[column])
-                    my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-            # ставит размер столбцов согласно записям
-            my_win.tableWidget.resizeColumnsToContents()
-            for i in range(0, row_count):  # отсортировывает номера строк по порядку
-                my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+        # row_count = len(ch_replay)  # кол-во строк в таблице
+        # if row_count != 0:
+        #     column_count = len(choice_list[0])  # кол-во столбцов в таблице
+        #     # вставляет в таблицу необходимое кол-во строк
+        #     my_win.tableWidget.setRowCount(row_count)
+        #     for row in range(row_count):  # добавляет данные из базы в TableWidget
+        #         for column in range(column_count):
+        #             item = str(list(choice_list[row].values())[column])
+        #             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+        #     # ставит размер столбцов согласно записям
+        #     my_win.tableWidget.resizeColumnsToContents()
+        #     for i in range(0, row_count):  # отсортировывает номера строк по порядку
+        #         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
     else:
         msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
 
