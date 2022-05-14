@@ -1217,9 +1217,6 @@ def fill_table_results():
             stage = "Одна таблица"
         else:
             stage = "Финальный"
-
-    # result = Result.select().order_by(Result.id).where(Result.title_id == title_id() and
-    #                                                           Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
     result = Result.select().where(Result.title_id == title_id())
     player_result = result.select().order_by(Result.id).where(Result.title_id == title_id() and Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
     count = len(player_result)  # если 0, то записей нет
@@ -4168,6 +4165,7 @@ def choice_filter_group():
         player_choice = Choice.select().where(Choice.title_id == title_id())
     elif my_win.radioButton_4.isChecked():
         player_choice = choice.select().where(Choice.group == fg)
+        color_region_in_tableWidget(fg)
     else:
         p_choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
         player_choice = p_choice.select().where(Choice.title_id == title_id())
@@ -4194,31 +4192,32 @@ def color_region_in_tableWidget(fg):
     """смена цвета шрифта в QtableWidget -fg- номер группы"""
     reg = []
     rid = []
-    if fg != "все группы":
-        line = Choice.select().order_by(Choice.posev_group).where(
-            Choice.group == fg)  # выбирает все строки той группы (fg)
-        count = len(line)
+
+    if fg != "все группы" and fg != "":
+        choice = Choice.select().where(Choice.title_id == title_id())
+        line = choice.select().where(Choice.group == fg)
         for i in line:
-            r = Choice.get(Choice.id == i)
-            r_id = r.id
-            region = r.region
+            region = i.region
             region = str(region.rstrip())  # удаляет пробел в конце строки
             reg.append(region)
-            rid.append(r_id)
         if len(reg) != 0:
             for x in reg:
                 count_region = reg.count(x)
                 if count_region > 1:  # если повторяющихся регионов больше одного
-                    rows = my_win.tableWidget.rowCount()  # кол-во строк в отсортированной таблице
-                    for i in range(rows):
-                        txt = my_win.tableWidget.item(i, 3).text()
-                        txt = txt.rstrip()  # удаляет пробел в конце строки
-                        if txt == x:
-                            my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в
-                            # красный цвет
-                        else:
-                            my_win.tableWidget.item(i, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в
-                            # черный цвет
+                    p = 0
+                    for m in range(len(reg)):
+                        ind = reg.index(x, p)
+                        p = ind + 1
+                        rid.append(ind)                       
+                        if m == count_region - 1:
+                            break
+            rid = list(set(rid))  # получает список индексов повторяющихся регионов
+            rows = my_win.tableWidget.rowCount()  # кол-во строк в отсортированной таблице
+            # for u in range(0, rows):
+            #     my_win.tableWidget.item(u, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в черный цвет
+            if rows != 0:
+                for k in rid:
+                    my_win.tableWidget.item(k, 3).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в красный цвет
 
 
 def hide_show_columns(tb):
@@ -6583,6 +6582,7 @@ def change_choice_group():
     gr_key = []
     reg_tmp = []
     double_reg = {}
+    fg = my_win.comboBox_filter_choice.currentText()
     choice = Choice.select().where(Choice.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == "Предварительный").get()
@@ -6606,23 +6606,25 @@ def change_choice_group():
     dr_count = len(double_reg)
     if dr_count != 0:
         for key in double_reg.keys():
-            gr_key.append(key)
-     
-            double_reg_tmp = double_reg[key]
+            gr_key.append(key)     
+            # double_reg_tmp = double_reg[key]
         # ch = choice.select().where(Choice.group.in_(gr_key))
         # ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(double_reg_tmp))
-
         my_win.comboBox_filter_choice.clear()
         my_win.comboBox_filter_choice.addItems(gr_key)
+        # double_region(double_reg_tmp, gr_key, fg)
     else:
         msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
 
 
-def double_region(double_reg_tmp, gr_key):
-    """одинаковые регионы в группе"""
-    choice = Choice.select().where(Choice.title_id == title_id())
-    ch = choice.select().where(Choice.group.in_(gr_key))
-    ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(double_reg_tmp))
+# def double_region(double_reg_tmp, gr_key, fg):
+#     """одинаковые регионы в группе"""
+#     if fg != "":
+#         choice = Choice.select().where(Choice.title_id == title_id())
+#         ch = choice.select().where(Choice.group.in_(gr_key))
+#         ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(double_reg_tmp))
+#     else:
+#         return
 
 
 
