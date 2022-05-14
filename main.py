@@ -6607,25 +6607,10 @@ def change_choice_group():
     if dr_count != 0:
         for key in double_reg.keys():
             gr_key.append(key)     
-            # double_reg_tmp = double_reg[key]
-        # ch = choice.select().where(Choice.group.in_(gr_key))
-        # ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(double_reg_tmp))
         my_win.comboBox_filter_choice.clear()
         my_win.comboBox_filter_choice.addItems(gr_key)
-        # double_region(double_reg_tmp, gr_key, fg)
     else:
         msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
-
-
-# def double_region(double_reg_tmp, gr_key, fg):
-#     """одинаковые регионы в группе"""
-#     if fg != "":
-#         choice = Choice.select().where(Choice.title_id == title_id())
-#         ch = choice.select().where(Choice.group.in_(gr_key))
-#         ch_replay = ch.select().order_by(Choice.group).where(Choice.region.in_(double_reg_tmp))
-#     else:
-#         return
-
 
 
 def change_page_vid():
@@ -6834,9 +6819,6 @@ my_win.comboBox_filter_final.currentTextChanged.connect(game_in_visible)
 my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
 
 
-# my_win.comboBox_filter_group.currentTextChanged.connect(result_filter_group)
-# my_win.comboBox_filter_played.currentTextChanged.connect(result_filter_played)
-
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
@@ -6867,7 +6849,6 @@ my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по не
 my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
 my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
 my_win.Button_clear_del.clicked.connect(clear_del_player)
-# my_win.Button_edit_posev.clicked.connect(change_choice_group)
 my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_reset_filter_fin.clicked.connect(reset_filter)
 my_win.Button_filter_fin.clicked.connect(filter_fin)
