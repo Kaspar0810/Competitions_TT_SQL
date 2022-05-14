@@ -1978,7 +1978,7 @@ def system_competition():
             my_win.label_9.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
-            my_win.spinBox_kol_group.setValue(0)
+            # my_win.spinBox_kol_group.setValue(0)
             my_win.comboBox_one_table.hide()
             my_win.label_9.show()
             my_win.label_9.setText("Предварительный этап")
@@ -3909,9 +3909,7 @@ def choice_gr_automat():
     while number_poseva < total_player:
         p += 1
         if number_poseva == 0 or number_poseva % group == 0 :
-            group_list = list(range(group + 1))  # получение списка групп с помощью функции range
-            # for e in range(1, group + 1):  # получение списка всех групп
-            #     group_list.append(e)
+            group_list = list(range(1, group + 1))  # получение списка групп с помощью функции range
 
         region_id = reg_list[number_poseva]
         pl_id = player_list[number_poseva]
