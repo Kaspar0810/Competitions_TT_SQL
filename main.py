@@ -1314,6 +1314,28 @@ def fill_table_choice():
             my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
 
 
+def fill_table_after_choice():
+    """заполняет TableWidget после жеребьевки """
+    choice = Choice.select().where(Choice.title_id == title_id())
+    pl_choice = choice.select().order_by(Choice.group)
+    player_choice = pl_choice.select().order_by(Choice.posev_group)
+    choice_list = player_choice.dicts().execute()
+    row_count = len(choice_list)  # кол-во строк в таблице
+    if row_count != 0:
+        column_count = len(choice_list[0])  # кол-во столбцов в таблице
+        # вставляет в таблицу необходимое кол-во строк
+        my_win.tableWidget.setRowCount(row_count)
+        for row in range(row_count):  # добавляет данные из базы в TableWidget
+            for column in range(column_count):
+                item = str(list(choice_list[row].values())[column])
+                my_win.tableWidget.setItem(
+                    row, column, QTableWidgetItem(str(item)))
+        # ставит размер столбцов согласно записям
+        my_win.tableWidget.resizeColumnsToContents()
+        for i in range(0, row_count):  # отсортировывает номера строк по порядку
+            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1))) 
+
+
 def progressbar(count):
     pass
     # progress = QtWidgets.QProgressBar()
@@ -3926,10 +3948,10 @@ def choice_gr_automat():
             current_region_group = {}  # словарь регион - список номеров групп куда можно сеять
             key_reg_previous = []
             current = region_player_current(number_poseva, reg_list, group, player_list)  # должен быть получен список текущих регионов посева
-            key_reg_current = current[0]
-            player_current = current[1]
+            key_reg_current = current[0]  # номера регионов текущего посева
+            player_current = current[1]  # номера игроков (id)
 
-            for o in previous_region_group.keys():  # цикл получения списка регионов предыдущих посевов
+            for o in previous_region_group.keys():  # цикл получения списка регионов предыдущих посевов уникальный
                 key_reg_previous.append(o)
             pgt.clear()
             remains = total_player - number_poseva  # остаток посева
@@ -3970,7 +3992,8 @@ def choice_gr_automat():
                 m += 1
                 previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
         else:
-            fill_table_choice()
+            # fill_table_choice()
+            fill_table_after_choice()
             with db:  # записывает в систему, что произведена жеребъевка
                 system = System.get(System.id == sys_id)
                 system.choice_flag = True
@@ -4024,9 +4047,12 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                     g = f[0]
                     posev_tmp[g] = region
                     u = g    # присваивает переменной u - номер группы, если она идет не по порядку
-        index = reg_list.index(region)
+        # ====не правильное соответствие номера региона и номера группы
+        # index = reg_list.index(region)  # проверить !!!!
+        index = key_reg_current.index(region)
         p = player_list[index]
         reg_player[p] = u
+        #=====================
         posev[f"{m}_посев"] = posev_tmp
         for d in key_reg_current:  # цикл удаления посеянных групп
             list_group = current_region_group[d]
