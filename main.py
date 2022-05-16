@@ -3,6 +3,7 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
+from msilib.schema import RadioButton
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -1467,8 +1468,7 @@ def load_combobox_filter_group():
     my_win.comboBox_filter_group.clear()
     my_win.comboBox_filter_choice.clear()
 
-    system = System.select().order_by(System.id).where(
-        System.title_id == title_id())  # находит system id последнего
+    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
     for i in system:
         e = i.stage
         etap.append(e)  # получает список этапов на данных соревнованиях
@@ -5650,7 +5650,7 @@ def setka_32_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    all_list = setka_data_16(fin)  # список фамилия/ город 1-ого посева
+    all_list = setka_data_32(fin)  # список фамилия/ город 1-ого посева
     tds = all_list[0]
     id_name_city = all_list[1]
     id_sh_name = all_list[2]
@@ -5997,9 +5997,6 @@ def setka_32_made(fin):
     return tds
 
 
-
-
-
 def mesto_in_final(fin):
     """с какого номера расставляются места в финале, в зависимости от его номера и кол-во участников fin - финал"""
     final = []
@@ -6107,6 +6104,44 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
 
 def setka_data_16(fin):
     """данные сетки на 16"""
+    id_ful_name = {}
+    id_name = {}
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    for sys in system:  # проходит циклом по всем отобранным записям
+        if sys.stage == fin:
+            mp = sys.max_player
+    tds = []
+    all_list = []
+    posev_data = player_choice_in_setka(fin)  # посев
+    for i in range(1, mp * 2 + 1, 2):
+        posev = posev_data[((i + 1) // 2) - 1]
+        family = posev['фамилия']
+        if family != "bye":
+            id_f_name = full_player_id(family)
+            id_f_n = id_f_name[0]
+            id_s_n = id_f_name[1]
+            # словарь ключ - полное имя/ город, значение - id
+            id_ful_name[id_f_n["name"]] = id_f_n["id"]
+            id_name[id_s_n["name"]] = id_s_n["id"]
+            # =================
+            # находит пробел отделяющий имя от фамилии
+            space = family.find(" ")
+            line = family.find("/")  # находит черту отделяющий имя от города
+            city_slice = family[line:]  # получает отдельно город
+            # получает отдельно фамилия и первую букву имени
+            family_slice = family[:space + 2]
+            family_city = f'{family_slice}.{city_slice}'   # все это соединяет
+            tds.append(family_city)
+        else:
+            tds.append(family)
+    all_list.append(tds)
+    all_list.append(id_ful_name)
+    all_list.append(id_name)
+    return all_list
+
+
+def setka_data_32(fin):
+    """данные сетки на 32"""
     id_ful_name = {}
     id_name = {}
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
@@ -7034,40 +7069,43 @@ def change_choice_group():
     """Смена жеребьевки групп если в группе 2 и более одинаковых регион чтоб развести тренеров"""
     msg = QMessageBox
     sender = my_win.sender()
-    reg = []
-    reg_d = []
-    gr_key = []
-    reg_tmp = []
-    double_reg = {}
-    fg = my_win.comboBox_filter_choice.currentText()
-    choice = Choice.select().where(Choice.title_id == title_id())
-    system = System.select().where(System.title_id == title_id())
-    sys = system.select().where(System.stage == "Предварительный").get()
-    total_gr = sys.total_group
-    for i in range(1, total_gr + 1):
-        m = 0
-        group = choice.select().where(Choice.group == f"{i} группа")
-        for k in group:
-            m += 1
-            reg_n = k.region
-            if reg_n not in reg:
-                reg.append(reg_n)
-            else:
-                reg_tmp.append(reg_n)
-        reg_d = reg_tmp.copy()
-        count =len(reg_d)
-        if count > 0:
-            double_reg[f"{i} группа"] = reg_d
-        reg_tmp.clear()
-        reg.clear()
-    dr_count = len(double_reg)
-    if dr_count != 0:
-        for key in double_reg.keys():
-            gr_key.append(key)     
-        my_win.comboBox_filter_choice.clear()
-        my_win.comboBox_filter_choice.addItems(gr_key)
+    if my_win.radioButton_4.isChecked():
+        reg = []
+        reg_d = []
+        gr_key = []
+        reg_tmp = []
+        double_reg = {}
+        fg = my_win.comboBox_filter_choice.currentText()
+        choice = Choice.select().where(Choice.title_id == title_id())
+        system = System.select().where(System.title_id == title_id())
+        sys = system.select().where(System.stage == "Предварительный").get()
+        total_gr = sys.total_group
+        for i in range(1, total_gr + 1):
+            m = 0
+            group = choice.select().where(Choice.group == f"{i} группа")
+            for k in group:
+                m += 1
+                reg_n = k.region
+                if reg_n not in reg:
+                    reg.append(reg_n)
+                else:
+                    reg_tmp.append(reg_n)
+            reg_d = reg_tmp.copy()
+            count =len(reg_d)
+            if count > 0:
+                double_reg[f"{i} группа"] = reg_d
+            reg_tmp.clear()
+            reg.clear()
+        dr_count = len(double_reg)
+        if dr_count != 0:
+            for key in double_reg.keys():
+                gr_key.append(key)     
+            my_win.comboBox_filter_choice.clear()
+            my_win.comboBox_filter_choice.addItems(gr_key)
+        else:
+            msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
     else:
-        msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
+        return
 
 
 def change_page_vid():
