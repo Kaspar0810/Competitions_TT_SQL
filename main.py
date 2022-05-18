@@ -4512,11 +4512,10 @@ def ready_choice(stage):
 
 def select_choice_final():
     """выбор жеребьевки финала"""
-    system = System.select().order_by(System.id).where(
-        System.title_id == title_id()).get()  # находит system id последнего
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
 
     fin = []
-    for sys in system.select():
+    for sys in system:
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
             fin.append(sys.stage)
     fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
@@ -7006,10 +7005,8 @@ def player_choice_in_setka(fin):
         mesto_second_poseva = kpt + 1
 
     else:  # если была произведена жеребьевка
-        system = System.get(System.title_id == title_id()
-                            and System.stage == fin)
-        sys = System.get(System.title_id == title_id()
-                         and System.stage == system.stage_exit)
+        system = System.get(System.title_id == title_id() and System.stage == fin)
+        sys = System.get(System.title_id == title_id() and System.stage == system.stage_exit)
         count_exit = system.max_player // sys.total_group
 
         mesto_first_poseva = system.mesta_exit
