@@ -4512,11 +4512,10 @@ def ready_choice(stage):
 
 def select_choice_final():
     """выбор жеребьевки финала"""
-    system = System.select().order_by(System.id).where(
-        System.title_id == title_id()).get()  # находит system id последнего
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
 
     fin = []
-    for sys in system.select():
+    for sys in system:
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
             fin.append(sys.stage)
     fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
@@ -6482,8 +6481,7 @@ def rank_in_group(total_score, max_person, td, num_gr):
         elif m_new == 3:
             men_of_circle = m_new
             # получает список 1-й уникальные
-            u = summa_points_person(
-                men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)
+            u = summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)
             # значения очков и список значения очков и у скольких спортсменов они есть
             z = u[1]  # список списков кол-во очков и у сколько игроков они есть
             points_person = z[0]
@@ -6644,8 +6642,7 @@ def summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr):
         ki1 = int(tr_all[n][0])  # 1-й игрок в туре
         ki2 = int(tr_all[n][1])  # 2-й игрок в туре
 
-        sum_points_circle(num_gr, tour, ki1, ki2, pg_win,
-                          pg_los, pp)  # сумма очков игрока
+        sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp)  # сумма очков игрока
 
     for i in tr:  # суммирует очки каждого игрока
         i = int(i)
@@ -6797,9 +6794,8 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         ki1 = p2
         ki2 = p1
     result = Result.select().where(Result.title_id == title_id())
-    c = result.select().where(Result.number_group ==
-                              num_gr and Result.tours == tour).get()  # ищет в базе
-    # данную встречу
+    res = result.select().where(Result.number_group == num_gr)
+    c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу
     if c.winner == c.player1:  # победил 1-й игрок
         points_p1 = c.points_win  # очки победителя
         points_p2 = c.points_loser  # очки проигравшего
@@ -7009,10 +7005,8 @@ def player_choice_in_setka(fin):
         mesto_second_poseva = kpt + 1
 
     else:  # если была произведена жеребьевка
-        system = System.get(System.title_id == title_id()
-                            and System.stage == fin)
-        sys = System.get(System.title_id == title_id()
-                         and System.stage == system.stage_exit)
+        system = System.get(System.title_id == title_id() and System.stage == fin)
+        sys = System.get(System.title_id == title_id() and System.stage == system.stage_exit)
         count_exit = system.max_player // sys.total_group
 
         mesto_first_poseva = system.mesta_exit
