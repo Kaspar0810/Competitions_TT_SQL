@@ -3,7 +3,6 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-from msilib.schema import RadioButton
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -941,8 +940,7 @@ def load_tableWidget():
             fill_table_choice()
             hide_show_columns(tb)
     else:  # загружает таблицу со списком
-        player_list = Player.select().where(
-            Player.title_id == title_id()).order_by(Player.rank.desc())
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())
         count = len(player_list)
         if count != 0:
             fill_table(player_list)
@@ -1445,8 +1443,7 @@ def dclick_in_listwidget():
 def load_combobox_filter_final():
     """заполняет комбобокс фильтр финалов для таблицы результаты"""
     my_win.comboBox_filter_final.clear()
-    system = System.select().order_by(System.id).where(
-        System.title_id == title_id())  # находит system id последнего
+    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
     fin = ["все финалы"]
     for sys in system:
         if sys.stage == "Одна таблица":
@@ -1660,7 +1657,7 @@ def page():
             my_win.tabWidget.setCurrentIndex(3)
         else:  # жеребьевка сделана
             my_win.tableWidget.show()
-            my_win.Button_Ok.setDisabled(True)
+            my_win.Button_Ok.setEnabled(False)
             load_combobox_filter_group()
             load_tableWidget()
             load_combo()
@@ -1674,7 +1671,7 @@ def page():
         my_win.checkBox_9.setEnabled(False)
         my_win.checkBox_10.setEnabled(False)
         my_win.tableWidget.show()
-        my_win.Button_Ok_fin.setDisabled(False)
+        my_win.Button_Ok_fin.setEnabled(False)
         load_combobox_filter_final()
         load_tableWidget()
         load_combo()
@@ -2399,14 +2396,11 @@ def match_score_db():
                 match_check = 0
         if match_check == 0:
             if match == 3:
-                my_win.radioButton_match_3.setChecked(
-                    True)  # устанавливает галочку
+                my_win.radioButton_match_3.setChecked(True)  # устанавливает галочку
             elif match == 5:
-                my_win.radioButton_match_5.setChecked(
-                    True)  # устанавливает галочку
+                my_win.radioButton_match_5.setChecked(True)  # устанавливает галочку
             elif match == 7:
-                my_win.radioButton_match_7.setChecked(
-                    True)  # устанавливает галочку
+                my_win.radioButton_match_7.setChecked(True)  # устанавливает галочку
         elif match != match_check:
             with db:
                 sf.score_flag = match_check
@@ -2512,7 +2506,9 @@ def game_in_visible():
                 final = my_win.tableWidget.item(r, 2).text()
             # ===============
             if final != "":
-                k = System.get(System.title_id == title_id()and System.stage == final)
+                # k = System.get(System.title_id == title_id() and System.stage == final)
+                # system = System.select().where(System.title_id == title_id()) 
+                k = system.select().where(System.stage == final).get()
                 state = k.visible_game
             else:
                 return
@@ -3244,7 +3240,7 @@ def enter_score(none_player=0):
     id = my_win.tableWidget.item(r, 0).text()
     num_game = my_win.tableWidget.item(r, 3).text()
     fin = my_win.tableWidget.item(r, 2).text()
-
+       
     if tab == 3:
         stage = "Предварительный"
     elif tab == 4:
