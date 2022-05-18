@@ -929,7 +929,9 @@ def load_tableWidget():
         if tb == 3:
             stage = "Предварительный"
         else:
-            stage = "Предварительный"
+            system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  #должен получить первый номер id 
+            # в этой системе(там будет либо -предварительный либо одна таблица)
+            stage = system.stage
         flag = ready_choice(stage)
         if flag is True:
             fill_table_results()
@@ -1443,7 +1445,7 @@ def dclick_in_listwidget():
 def load_combobox_filter_final():
     """заполняет комбобокс фильтр финалов для таблицы результаты"""
     my_win.comboBox_filter_final.clear()
-    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
     fin = ["все финалы"]
     for sys in system:
         if sys.stage == "Одна таблица":
@@ -5121,6 +5123,7 @@ def table_made(pv, stage):
 
 def setka_16_made(fin):
     """сетка на 16 в pdf"""
+    from reportlab.platypus import Table
     elements = []
     data = []
     column = ['']
@@ -6432,6 +6435,12 @@ def rank_in_group(total_score, max_person, td, num_gr):
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
     player_rank_group = []
     result = Result.select().where(Result.title_id == title_id())
+    #======= ghjdth====
+
+    if num_gr == "Одна таблица":
+        num_gr = "1 группа"
+
+    #================
     game_max = result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
     # 1-й запрос на выборку с группой
     game_played = game_max.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
