@@ -6486,8 +6486,7 @@ def rank_in_group(total_score, max_person, td, num_gr):
         elif m_new == 3:
             men_of_circle = m_new
             # получает список 1-й уникальные
-            u = summa_points_person(
-                men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)
+            u = summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)
             # значения очков и список значения очков и у скольких спортсменов они есть
             z = u[1]  # список списков кол-во очков и у сколько игроков они есть
             points_person = z[0]
@@ -6648,8 +6647,7 @@ def summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr):
         ki1 = int(tr_all[n][0])  # 1-й игрок в туре
         ki2 = int(tr_all[n][1])  # 2-й игрок в туре
 
-        sum_points_circle(num_gr, tour, ki1, ki2, pg_win,
-                          pg_los, pp)  # сумма очков игрока
+        sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp)  # сумма очков игрока
 
     for i in tr:  # суммирует очки каждого игрока
         i = int(i)
@@ -6801,9 +6799,8 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         ki1 = p2
         ki2 = p1
     result = Result.select().where(Result.title_id == title_id())
-    c = result.select().where(Result.number_group ==
-                              num_gr and Result.tours == tour).get()  # ищет в базе
-    # данную встречу
+    res = result.select().where(Result.number_group == num_gr)
+    c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу
     if c.winner == c.player1:  # победил 1-й игрок
         points_p1 = c.points_win  # очки победителя
         points_p2 = c.points_loser  # очки проигравшего
