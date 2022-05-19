@@ -7034,10 +7034,8 @@ def player_choice_in_setka(fin):
         mesto_first_poseva
         mesto_second_poseva
 
-    choice_first = Choice.select().order_by(Choice.group).where(
-        Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-    choice_second = Choice.select().order_by(Choice.group).where(
-        Choice.mesto_group == mesto_second_poseva)
+    choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+    choice_second = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
     first_number = [1, 16, 8, 9, 4, 5, 12, 13]
     second_number = [10, 3, 11, 7, 14, 15, 2, 6]
     count_sec_num = len(second_number)
