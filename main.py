@@ -5211,8 +5211,9 @@ def setka_16_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    all_list = setka_data_16(fin)  # список фамилия/ город 1-ого посева
-    tds = all_list[0]
+    # создать возможность пустой сетки
+    all_list = setka_data_16(fin)  # 
+    tds = all_list[0]  # список фамилия/ город 1-ого посева
     id_name_city = all_list[1]
     id_sh_name = all_list[2]
     for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
@@ -5554,8 +5555,7 @@ def setka_16_made(fin):
     short_name = t_id.short_name_comp
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
-    doc.build(elements, onFirstPage=func_zagolovok,
-              onLaterPages=func_zagolovok)
+    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     return tds
 
 
@@ -6352,9 +6352,10 @@ def score_in_setka(fin):
     match = []
     tmp_match = []
     # получение id последнего соревнования
-    res = Result.select().where(Result.title_id == title_id())
-    result = res.select().where(Result.number_group == fin)  # находит system id последнего
-
+    res_t = Result.select().where(Result.title_id == title_id())
+    y = len(res_t)
+    result = res_t.select().where(Result.number_group == fin)  # находит system id последнего
+    x = len(result)
     for res in result:
         num_game = int(res.tours)
         family_win = res.winner
@@ -6375,22 +6376,28 @@ def result_rank_group(num_gr, player_rank_group):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
     tab = my_win.tabWidget.currentIndex()
-    sys = System.select().where(System.title_id == title_id())
+    # sys = System.select().where(System.title_id == title_id())
     chc = Choice.select().where(Choice.title_id == title_id())
     if len(player_rank_group) > 0:
         if tab == 3:
-            system = sys.select().where(System.stage == "Предварительный").get()
+            # system = sys.select().where(System.stage == "Предварительный").get()
+            choice = chc.select().where(Choice.group == num_gr)
         elif tab == 4:
             pass
         else:
-            system = sys.select().where(System.stage == num_gr)
+            # system = sys.select().where(System.stage == num_gr)
+            if num_gr == "Одна таблица":
+                choice = chc.select().where(Choice.basic == "Одна таблица")
+            else:
+                choice = chc.select().where(Choice.final == num_gr)
 
-        if system.stage == "Предварительный":
-            choice = chc.select().where(Choice.group == num_gr)
-        elif system.stage == "Одна таблица":
-            choice = chc.select().where(Choice.basic == "Одна таблица")
-        elif system.stage == num_gr:  # финальная игра
-            choice = chc.select().where(Choice.final == num_gr)
+
+        # if system.stage == "Предварительный":
+        #     choice = chc.select().where(Choice.group == num_gr)
+        # elif system.stage == "Одна таблица":
+        #     choice = chc.select().where(Choice.basic == "Одна таблица")
+        # elif system.stage == num_gr:  # финальная игра
+        #     choice = chc.select().where(Choice.final == num_gr)
 
         count = len(choice)
         n = 0
@@ -6431,17 +6438,14 @@ def rank_in_group(total_score, max_person, td, num_gr):
     tr = []
     player_rank_tmp = []
     player_rank = []
-    pl_group = Choice.select().where(Choice.group == num_gr)
+    # pl_group = Choice.select().where(Choice.group == num_gr)
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
     player_rank_group = []
     result = Result.select().where(Result.title_id == title_id())
-    #======= ghjdth====
-
     if num_gr == "Одна таблица":
-        num_gr = "1 группа"
-
-    #================
-    game_max = result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
+        game_max = result.select().where(Result.system_stage == num_gr)  # сколько всего игр в группе
+    else:
+        game_max = result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
     # 1-й запрос на выборку с группой
     game_played = game_max.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
     # с победителями из 1-ого запроса
@@ -6803,7 +6807,10 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         ki1 = p2
         ki2 = p1
     result = Result.select().where(Result.title_id == title_id())
-    res = result.select().where(Result.number_group == num_gr)
+    if num_gr == "Одна таблица":
+        res = result.select().where(Result.system_stage == num_gr)
+    else:
+        res = result.select().where(Result.number_group == num_gr)
     c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу
     if c.winner == c.player1:  # победил 1-й игрок
         points_p1 = c.points_win  # очки победителя
