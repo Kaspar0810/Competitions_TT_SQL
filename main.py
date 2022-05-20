@@ -2219,7 +2219,7 @@ def player_in_setka(fin):
         if pl1 is not None and pl2 is not None:
             with db:
                 results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
-                                 tours=num_game, title_id=s).save()
+                                 tours=num_game, title_id=title_id()).save()
     for i in range(mp // 2 + 1, game + 1):  # дополняет номера будущих встреч
         pl1 = ""
         pl2 = ""
@@ -4141,9 +4141,12 @@ def posev_test(posev, group, m):
 
 def choice_setka(fin):
     """проба жеребьевки сетки на 16"""
-    sys = System.select().order_by(System.id).where(System.title_id ==
-                                                    title_id()).get()  # находит system id последнего
-    system = sys.get(System.stage == fin)
+    sys = System.select().where(System.title_id == title_id())  # находит system id последнего
+    system = sys.select().where(System.stage == fin).get()
+
+    # sys = System.select().order_by(System.id).where(System.title_id ==
+    #                                                 title_id()).get()  # находит system id последнего
+    # system = sys.get(System.stage == fin)
     flag = system.choice_flag
     if flag is True:  # перед повторной жеребьевкой
         del_choice = Game_list.select().where(Game_list.title_id == title_id()
