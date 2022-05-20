@@ -6376,29 +6376,17 @@ def result_rank_group(num_gr, player_rank_group):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
     tab = my_win.tabWidget.currentIndex()
-    # sys = System.select().where(System.title_id == title_id())
     chc = Choice.select().where(Choice.title_id == title_id())
     if len(player_rank_group) > 0:
         if tab == 3:
-            # system = sys.select().where(System.stage == "Предварительный").get()
             choice = chc.select().where(Choice.group == num_gr)
         elif tab == 4:
             pass
         else:
-            # system = sys.select().where(System.stage == num_gr)
             if num_gr == "Одна таблица":
                 choice = chc.select().where(Choice.basic == "Одна таблица")
             else:
                 choice = chc.select().where(Choice.final == num_gr)
-
-
-        # if system.stage == "Предварительный":
-        #     choice = chc.select().where(Choice.group == num_gr)
-        # elif system.stage == "Одна таблица":
-        #     choice = chc.select().where(Choice.basic == "Одна таблица")
-        # elif system.stage == num_gr:  # финальная игра
-        #     choice = chc.select().where(Choice.final == num_gr)
-
         count = len(choice)
         n = 0
         for ch in choice:
