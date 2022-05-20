@@ -29,7 +29,8 @@ import openpyxl as op
 import pandas as pd
 import sys
 import sqlite3
-
+import pathlib
+from pathlib import Path
 # from playhouse.migrate import *
 
 
@@ -2350,8 +2351,6 @@ def chop_line(q, maxline=30):
         strline += "%s" % (q[s2 + 1:])
         q = strline
     return q
-    # else:
-    #     return q
 
 
 def match_score_db():
@@ -2448,14 +2447,11 @@ def match_score_db():
                 match_check = 0
         if match_check == 0:
             if match == 3:
-                my_win.radioButton_match_4.setChecked(
-                    True)  # устанавливает галочку
+                my_win.radioButton_match_4.setChecked(True)  # устанавливает галочку
             elif match == 5:
-                my_win.radioButton_match_6.setChecked(
-                    True)  # устанавливает галочку
+                my_win.radioButton_match_6.setChecked(True)  # устанавливает галочку
             elif match == 7:
-                my_win.radioButton_match_8.setChecked(
-                    True)  # устанавливает галочку
+                my_win.radioButton_match_8.setChecked(True)  # устанавливает галочку
         elif match != match_check:
             with db:
                 sf.score_flag = match_check
@@ -2800,7 +2796,6 @@ def select_player_in_game():
 def delete_player():
     """удаляет игрока из списка и заносит его в архив"""
     msgBox = QMessageBox
-    t_id = title_id()
     r = my_win.tableWidget.currentRow()
 
     player_del = my_win.tableWidget.item(r, 1).text()
@@ -2821,7 +2816,7 @@ def delete_player():
         with db:
             del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
                                        region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
-                                       player=player_del, title_id=t_id).save()
+                                       player=player_del, title_id=title_id()).save()
 
             player = Player.get(
                 Player.player == my_win.tableWidget.item(r, 1).text())
@@ -5559,6 +5554,10 @@ def setka_16_made(fin):
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    #Получаем строку, содержащую путь к рабочей директории:
+    dir_path = pathlib.Path.cwd()
+    path = Path(dir_path, 'table_pdf', name_table_final)
+    path.save()
     return tds
 
 
