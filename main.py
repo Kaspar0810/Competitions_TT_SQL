@@ -200,7 +200,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.go_to_Action = QAction("пусто")
         # подменю жеребьевка -печать-
         self.clear_s16_Action = QAction("Сетка на 16")
-        self.clear_s32_Action = QAction("Сетка на 32")
+        self.clear_s32_full_Action = QAction("Сетка 32 прогрессивная")
+        self.clear_s32_Action = QAction("Сетка на 32 (1-3 места)")
         # ======== подменю финалы ============= сделать в зависимости от кол-во финалов остальные невидимые
 
         self.view_fin1_Action = QAction("1-финал")
@@ -230,6 +231,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin3_Action.triggered.connect(self.view)
         self.view_fin4_Action.triggered.connect(self.view)
         self.clear_s16_Action.triggered.connect(self.print_clear)
+        self.clear_s32_full_Action.triggered.connect(self.print_clear)
         self.clear_s32_Action.triggered.connect(self.print_clear)
 
         self.go_to_Action.triggered.connect(self.open)
@@ -332,6 +334,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def print_clear(self):
         """Печать чистых таблиц"""
+
         setka_32_made(fin="1-й финал")
         view()
 
@@ -6037,7 +6040,7 @@ def mesto_in_final(fin):
 def setka_data_clear(fin):
     """заполняет сетку для просмотра пустыми фаммилиями"""
     all_list = []
-    tmp = ["*"]
+    tmp = [""]
     sys = System.select().where(System.title_id == title_id())
     # system = sys.get(System.stage == fin)
     system = sys.select().where(System.stage == fin).get()
