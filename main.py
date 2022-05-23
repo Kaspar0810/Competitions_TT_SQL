@@ -153,6 +153,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print_Menu = printMenu.addMenu("Чистые таблицы")        
         print_Menu.addAction(self.clear_s16_Action)
         print_Menu.addAction(self.clear_s32_Action)
+        print_Menu.addAction(self.clear_s32_full_Action)
 
         # меню просмотр
         view_Menu = menuBar.addMenu("Просмотр")
@@ -334,8 +335,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def print_clear(self):
         """Печать чистых таблиц"""
-
-        setka_32_made(fin="1-й финал")
+        setka_32_full_made(fin="1-й финал")
+        # setka_32_made(fin="1-й финал")
         view()
 
 
@@ -2192,6 +2193,8 @@ def view():
         view_file = f"one_table_{short_name}.pdf"
     elif sender == my_win.clear_s32_Action:
         view_file = "1-финал_чист_32_сетка.pdf"
+    elif sender == my_win.clear_s32_full_Action:
+        view_file = "1-финал_чист_32_full_сетка.pdf"
     
     
  
@@ -6002,7 +6005,7 @@ def setka_32_full_made(fin):
         pv = landscape(A4)
     t_id = Title.get(Title.id == title_id())
     # short_name = t_id.short_name_comp
-    short_name = "чист_32_сетка"
+    short_name = "чист_32_full_сетка"
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
