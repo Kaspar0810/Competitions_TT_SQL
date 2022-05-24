@@ -5840,12 +5840,13 @@ def setka_32_full_made(fin):
         # data[i // 2 + 56][8] = str((p + 1) * -1)  # номера проигравших 29-30
         p += 1
     # for i in range(33, 40, 6):
-    # data[63][8] = str((p - 1) * -1)  # номера проигравших 29
-    # data[65][8] = str((p) * -1)  # номера проигравших 30
+    data[71][8] = str((p - 1) * -1)  # номера проигравших 29
+    data[73][8] = str(p * -1)  # номера проигравших 30
     data[19][10] = str(p + 1)  # создание номеров встреч (31)
     data[58][10] = str((p + 1) * -1)  # номер проигравшего финал (-31)
-        # p += 1
-    # data[8][8] = str(15)  # создание номеров встреч 15
+    p += 1
+    data[72][10] = str(p + 1)  # создание номеров встреч 32
+    data[75][10] = str((p + 1) * -1)  # номер проигравшего финал (-32)
     # data[25][8] = str(-15)
     # data[29][8] = str(16)  # создание номеров встреч 16
     # data[31][8] = str(-16)
@@ -5877,14 +5878,11 @@ def setka_32_full_made(fin):
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     t = Table(data, cw, 138 * [0.35 * cm])
     style = []
-    # =========  цикл создания стиля таблицы ================
+    # =========  цикл создания стиля таблицы ================ 1 страница =========
     # ==== рисует основной столбец сетки (1-й тур)
     for q in range(4, 68, 2):  # рисует встречи 1-16
         fn = ('LINEABOVE', (0, q * 2 - q), (1, q * 2 - q), 1, colors.darkblue)  # окрашивает низ ячейки (от 0 до 2 ст)
         style.append(fn)
-    # for q in range(73, 105, 2):  # рисует встречи (-1-16) 2стр
-    #     fn = ('LINEABOVE', (0, q * 2 - q), (1, q * 2 - q), 1, colors.darkblue)  # окрашивает низ ячейки (от 0 до 2 ст)
-    #     style.append(fn)    
     # ========== 2-й тур    
     for q in range(3, 35, 2):  # рисует встречи 17-24 
         fn = ('LINEABOVE', (3, q * 2 - 1), (4, q * 2 - 1), 1, colors.darkblue)  # рисует 17-24 встречи
@@ -5905,14 +5903,6 @@ def setka_32_full_made(fin):
     for q in range(3, 36, 24):
         fn = ('LINEABOVE', (11, q + 32), (12, q + 32), 1, colors.darkblue)  # финальная встреча
         style.append(fn)
-    # ======= встречи за 3-4 место =====
-    # for q in range(0, 3, 2):
-    #     fn = ('LINEABOVE', (9, q + 61), (10, q + 61), 1, colors.darkblue)  # встреча -31 за 3-4 место
-    #     style.append(fn) 
-    # for q in range(0, 4, 3):
-    #     fn = ('LINEABOVE', (11, q + 62), (12, q + 62), 1, colors.darkblue)  # за 3-4 место
-    #     style.append(fn)
- 
     # ============  объединяет ячейки номер встречи
     for q in range(4, 68, 4):  # объединяет ячейки номер встречи
         fn = ('SPAN', (2, q), (2, q + 1))  # встречи 1-16
@@ -5943,19 +5933,11 @@ def setka_32_full_made(fin):
     style.append(fn)       
     fn = ('BACKGROUND', (10, 19), (10, 50), colors.lightyellow)  # встречи 31 за 1-2 место
     style.append(fn)
-    # fn = ('SPAN', (10, 61), (10, 62))  # встреча за 3-4 место
-    # style.append(fn)
-    # fn = ('BACKGROUND', (10, 61), (10, 62), colors.lightyellow)  # встречи за 3-4 место
-    # style.append(fn)  
     #  обводит рамкой номера встреч   
     for q in range(4, 68, 4):
         # рисует область 1 столбца, где номера встреч 1-16
         fn = ('BOX', (2, q), (2, q + 1), 1, colors.darkblue)
         style.append(fn)
-    # for q in range(70, 102, 4):
-    #     # рисует область 1 столбца, где номера встреч (-1-16) 2 стр
-    #     fn = ('BOX', (2, q), (2, q + 1), 1, colors.darkblue)
-    #     style.append(fn)
     for q in range(1, 30, 4):
         # рисует область 2 столбца, где номера встреч 17-24
         fn = ('BOX', (4, q * 2 + 3), (4, q * 2 + 6), 1, colors.darkblue)
@@ -5971,20 +5953,47 @@ def setka_32_full_made(fin):
     # рисует область 5 столбца, где встреча 31, за 1-2 место
     fn = ('BOX', (10, 19), (10, 50), 1, colors.darkblue)
     style.append(fn)
-    # # рисует область 5 столбца, где встреча -32, за 3-4 место
-    # fn = ('BOX', (10, 61), (10, 62), 1, colors.darkblue)
-    # style.append(fn)
-  
-    for i in range(1, 10, 2):
-        fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
+# =========== 2 страница ===================
+    # ======= встречи за 3-4 место =====
+    for q in range(0, 3, 2):
+        fn = ('LINEABOVE', (9, q + 72), (10, q + 72), 1, colors.darkblue)  # встреча -31 за 3-4 место
+        style.append(fn) 
+    for q in range(0, 4, 3):
+        fn = ('LINEABOVE', (11, q + 73), (12, q + 73), 1, colors.darkblue)  # за 3-4 место
         style.append(fn)
-        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 68), colors.green)  # цвет шрифта номеров встреч
+    for q in range(78, 93, 2):
+        fn = ('LINEABOVE', (5, q - 1), (5, q - 1), 1, colors.darkblue)  # рисует 25-28 встречи
+        style.append(fn)
+    # ============  объединяет ячейки номер встречи
+    fn = ('SPAN', (10, 72), (10, 73))  # встреча за 3-4 место
+    style.append(fn)
+    fn = ('BACKGROUND', (10, 72), (10, 73), colors.lightyellow)  # встречи за 3-4 место
+    style.append(fn) 
+    for q in range(77, 90, 4):  # встречи 33-36
+        fn = ('SPAN', (6, q), (6, q + 1))  
+        style.append(fn)
+        fn = ('BACKGROUND', (6, q), (6, q + 1), colors.lightyellow)  # встречи 17-24
+        style.append(fn) 
+    # ========= обводит рамкой номера встреч 
+    fn = ('BOX', (10, 72), (10, 73), 1, colors.darkblue) # встреча за 3-4 место
+    style.append(fn)
+    for q in range(77, 90, 4):
+        # рисует область 6 столбца, где номера встреч 33-36
+        fn = ('BOX', (6, q), (6, q + 1), 1, colors.darkblue)
+        style.append(fn)
+# =========== 3 страница ==================
+
+# =========================================
+    for i in range(1, 10, 2):
+        fn = ('TEXTCOLOR', (i, 0), (i, 136), colors.black)  # цвет шрифта игроков
+        style.append(fn)
+        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 136), colors.green)  # цвет шрифта номеров встреч
         style.append(fn)
         # выравнивание фамилий игроков по левому краю
-        fn = ('ALIGN', (i, 0), (i, 68), 'LEFT')
+        fn = ('ALIGN', (i, 0), (i, 136), 'LEFT')
         style.append(fn)
         # центрирование номеров встреч
-        fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
+        fn = ('ALIGN', (i + 1, 0), (i + 1, 136), 'CENTER')
         style.append(fn)
     # fn = ('TEXTCOLOR', (12, 0), (12, 68), colors.red)  # цвет шрифта места
     # style.append(fn)
