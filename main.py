@@ -5955,32 +5955,44 @@ def setka_32_full_made(fin):
     style.append(fn)
 # =========== 2 страница ===================
     # ======= встречи за 3-4 место =====
-    for q in range(0, 3, 2):
-        fn = ('LINEABOVE', (9, q + 72), (10, q + 72), 1, colors.darkblue)  # встреча -31 за 3-4 место
+    for q in range(72, 75, 2):
+        fn = ('LINEABOVE', (9, q), (10, q), 1, colors.darkblue)  # встреча -31 за 3-4 место
         style.append(fn) 
-    for q in range(0, 4, 3):
-        fn = ('LINEABOVE', (11, q + 73), (12, q + 73), 1, colors.darkblue)  # за 3-4 место
+    for q in range(73, 78, 4):
+        fn = ('LINEABOVE', (11, q), (12, q), 1, colors.darkblue)  # встреча 32 (за 3-4 место)
         style.append(fn)
-    for q in range(78, 93, 2):
-        fn = ('LINEABOVE', (5, q - 1), (5, q - 1), 1, colors.darkblue)  # рисует 25-28 встречи
+    for q in range(77, 85, 2):
+        fn = ('LINEABOVE', (7, q), (7, q), 1, colors.darkblue)  # рисует 33-34 встречи
+        style.append(fn)
+    for q in range(78, 83, 4):
+        fn = ('LINEABOVE', (9, q), (9, q), 1, colors.darkblue)  # рисует 35 встречи
+        style.append(fn)
+    for q in range(80, 85, 4):
+        fn = ('LINEABOVE', (11, q), (12, q), 1, colors.darkblue)  # встреча -35 за 5-6 место
         style.append(fn)
     # ============  объединяет ячейки номер встречи
     fn = ('SPAN', (10, 72), (10, 73))  # встреча за 3-4 место
     style.append(fn)
-    fn = ('BACKGROUND', (10, 72), (10, 73), colors.lightyellow)  # встречи за 3-4 место
+    fn = ('BACKGROUND', (10, 72), (10, 73), colors.lightyellow)  # встречи 32 (за 3-4 место)
     style.append(fn) 
-    for q in range(77, 90, 4):  # встречи 33-36
-        fn = ('SPAN', (6, q), (6, q + 1))  
+    for q in range(77, 82, 4):  # встречи 33-34
+        fn = ('SPAN', (8, q), (8, q + 1))  
         style.append(fn)
-        fn = ('BACKGROUND', (6, q), (6, q + 1), colors.lightyellow)  # встречи 17-24
+        fn = ('BACKGROUND', (8, q), (8, q + 1), colors.lightyellow)  
         style.append(fn) 
-    # ========= обводит рамкой номера встреч 
-    fn = ('BOX', (10, 72), (10, 73), 1, colors.darkblue) # встреча за 3-4 место
+    fn = ('SPAN', (10, 78), (10, 81))  # встреча 35
     style.append(fn)
-    for q in range(77, 90, 4):
-        # рисует область 6 столбца, где номера встреч 33-36
-        fn = ('BOX', (6, q), (6, q + 1), 1, colors.darkblue)
+    fn = ('BACKGROUND', (10, 78), (10, 81), colors.lightyellow)  # встречи 35
+    style.append(fn) 
+    # ========= обводит рамкой номера встреч 
+    fn = ('BOX', (10, 72), (10, 73), 1, colors.darkblue) # встреча 32 (за 3-4 место)
+    style.append(fn)
+    for q in range(77, 82, 4):
+        # рисует область 6 столбца, где номера встреч 33-34
+        fn = ('BOX', (8, q), (8, q + 1), 1, colors.darkblue)
         style.append(fn)
+    fn = ('BOX', (10, 78), (10, 81), 1, colors.darkblue) # встреча 35
+    style.append(fn)
 # =========== 3 страница ==================
 
 # =========================================
