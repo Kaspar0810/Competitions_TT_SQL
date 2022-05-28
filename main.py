@@ -5914,6 +5914,7 @@ def setka_32_full_made(fin):
     style = []
     # =========  цикл создания стиля таблицы ================ 1 страница =========
     # ==== рисует основной столбец сетки (1-й тур)
+<<<<<<< HEAD
     for i in range (0, 14, 2):
         for k in range(3, 68, 2):
             fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # окрашивает низ ячейки (от 0 до 2 ст)
@@ -5927,6 +5928,39 @@ def setka_32_full_made(fin):
 
     # for q in range(4, 68, 2):  # рисует встречи 1-16
     #     fn = ('LINEABOVE', (0, q), (1, q), 1, colors.darkblue)  # окрашивает низ ячейки (от 0 до 2 ст)
+=======
+    for q in range(4, 68, 2):  # рисует встречи 1-16
+        fn = ('LINEABOVE', (0, q), (1, q), 1, colors.darkblue)  # окрашивает низ ячейки (от 0 до 2 ст)
+        style.append(fn)
+    # ========== 2-й тур    
+    for q in range(5, 66, 4):  # рисует встречи 17-24 
+        fn = ('LINEABOVE', (3, q ), (4, q), 1, colors.darkblue)  # рисует 17-24 встречи
+        style.append(fn)
+    # ========== 3-й тур
+    for q in range(4, 36, 4):
+        fn = ('LINEABOVE', (5, q * 2 - 1), (5, q * 2 - 1), 1, colors.darkblue)  # рисует 25-28 встречи
+        style.append(fn)
+    # ========== 4-й тур
+    for q in range(4, 36, 8):
+        fn = ('LINEABOVE', (7, q * 2 + 3), (8, q * 2 + 3), 1, colors.darkblue)  # встреча 29-30
+        style.append(fn)
+    # ========== 5-й тур
+    for q in range(3, 36, 32):
+        fn = ('LINEABOVE', (9, q + 16), (10, q + 16), 1, colors.darkblue)  # встреча 31
+        style.append(fn) 
+    # ========== 6-й тур      
+    for q in range(3, 36, 24):
+        fn = ('LINEABOVE', (11, q + 32), (12, q + 32), 1, colors.darkblue)  # финальная встреча
+        style.append(fn)
+    # ============  объединяет ячейки номер встречи
+    for q in range(4, 68, 4):  # объединяет ячейки номер встречи
+        fn = ('SPAN', (2, q), (2, q + 1))  # встречи 1-16
+        style.append(fn)
+        fn = ('BACKGROUND', (2, q), (2, q + 1), colors.lightyellow)  # встречи 1-16
+        style.append(fn)
+    # for q in range(1, 33, 2):  # объединяет ячейки номер встречи 2 стр
+    #     fn = ('SPAN', (2, q * 2 - 1), (2, q * 2))  # встречи 33-16
+>>>>>>> 89b276764b9af8018b1ca57d47aa5a21e5692570
     #     style.append(fn)
     # # ========== 2-й тур    
     # for q in range(5, 66, 4):  # рисует встречи 17-24 
