@@ -33,6 +33,13 @@ import pathlib
 from pathlib import Path
 # from playhouse.migrate import *
 
+if not os.path.isdir("table_pdf"):  # создает папку 
+     os.mkdir("table_pdf")
+
+patch = os.getcwd()
+print(patch)
+
+
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -5601,16 +5608,15 @@ def setka_32_made(fin):
     # first_mesto = mesto_in_final(fin)
     first_mesto = 1
     for i in range(0, 69):
-        column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
 
     # ========= места ==========
     n = 1
-    # x = 0
     for i in range(1, 3):
-        data[i * 24 + 7][13] = str(first_mesto + i // 2) + "Место"  
-        data[i * 3 + 58][13] = str(first_mesto + i // 2 + 2) + "Место"
+        data[i * 22 + 9][13] = str(first_mesto + i // 2) + "Место"  
+        data[i * 5 + 54][13] = str(first_mesto + i // 2 + 2) + "Место"
     p = 0
     # ========= нумерация встреч сетки ==========
     for i in range(3, 66, 2):  # создание номеров игроков сетки (1-32)
@@ -5629,8 +5635,8 @@ def setka_32_made(fin):
     for i in range(10, 43, 32):
         data[i][8] = str(p + 1)  # создание номеров встреч (29-30)
         p += 1
-    data[62][8] = str((p - 1) * -1)  # номера проигравших 29
-    data[64][8] = str((p) * -1)  # номера проигравших 30
+    data[60][8] = str((p - 1) * -1)  # номера проигравших 29
+    data[62][8] = str((p) * -1)  # номера проигравших 30
     data[18][10] = str(p + 1)  # создание номеров встреч (31)
     data[61][10] = str(p + 2)  # создание номеров встреч (32)
    
@@ -5658,12 +5664,22 @@ def setka_32_made(fin):
     # =========  цикл создания стиля таблицы ================
     n = 3
     s = 1
-    for i in range (1, 13, 2): # номер столбца 
+    for i in range (1, 10, 2): # номер столбца 
         s *= 2
         for k in range(n, 67, s): # номер строки
             fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # рисует линии встреч
             style.append(fn)  
         n = n + s // 2
+
+    for l in range(34, 57, 22):
+        fn = ('LINEABOVE', (11, l), (13, l), 1, colors.darkblue)  # рисует линии встреч за 1-2 места
+        style.append(fn)
+    for l in range(62, 68, 5):
+        fn = ('LINEABOVE', (11, l), (13, l), 1, colors.darkblue)  # рисует линии встреч за 3-4 места
+        style.append(fn)
+    for p in range(61, 64, 2):
+        fn = ('LINEABOVE', (9, p), (10, p), 1, colors.darkblue)  # рисует линии встреч за -29 -30
+        style.append(fn)
 
     for q in range(2, 64, 4): # рисует область 1 столбца, где номера встреч 1-16
         fn = ('BOX', (2, q + 1), (2, q + 2), 1, colors.darkblue)
@@ -5700,7 +5716,12 @@ def setka_32_made(fin):
     style.append(fn)       
     fn = ('BACKGROUND', (10, 18), (10, 49), colors.lightyellow)  # встречи 31 за 1-2 место
     style.append(fn)
-   
+    fn = ('BOX', (10, 61), (10, 62), 1, colors.darkblue)
+    style.append(fn) 
+    fn = ('SPAN', (10, 61), (10, 62))  # встреча 32
+    style.append(fn)       
+    fn = ('BACKGROUND', (10, 61), (10, 62), colors.lightyellow)  # встречи 32 за 3-4 место
+    style.append(fn)
    
   
     for i in range(1, 10, 2):
@@ -5715,8 +5736,8 @@ def setka_32_made(fin):
         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
         style.append(fn)
   
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
 
@@ -5727,10 +5748,10 @@ def setka_32_made(fin):
                            ('FONTSIZE', (1, 0), (1, 32), 7),
                            # 13 столбец с 0 по 68 ряд (цвет места)
                            ('TEXTCOLOR', (13, 0), (13, 68), colors.red),
-                           # ('VALIGN', (0, 0), (0, -1), 'TOP'),
+                           ('ALIGN', (13, 0), (13, 68), 'CENTER'), # выравнивание горизонтально по центру
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE') # выравнивание веритикально по середине
                            ] + ts))
 
     elements.append(t)
