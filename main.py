@@ -36,9 +36,6 @@ from pathlib import Path
 if not os.path.isdir("table_pdf"):  # создает папку 
      os.mkdir("table_pdf")
 
-path = os.getcwd()
-path = path +"\table_pdf"
-
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -1880,6 +1877,7 @@ def list_player_pdf(player_list):
     story.append(t)
 
     doc = SimpleDocTemplate(f"table_list_{short_name}.pdf", pagesize=A4)
+    change_dir()
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
 
 
@@ -2179,7 +2177,6 @@ def page_vid():
 def view():
     """просмотр PDF файлов средствами OS"""
     from sys import platform
-    # os.chdir("table_pdf")
     sender = my_win.sender()
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
@@ -5154,6 +5151,7 @@ def table_made(pv, stage):
         stage = stage[:txt + 1]
         name_table = f"{stage}финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=pv)
+    change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
 
 
@@ -5591,8 +5589,7 @@ def setka_16_made(fin):
     short_name = t_id.short_name_comp
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
-    patch = os.getcwd()
-    os.chdir("table_pdf")
+    change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     #Получаем строку, содержащую путь к рабочей директории:
     return tds
@@ -5770,9 +5767,7 @@ def setka_32_made(fin):
     short_name = "чист_32_сетка"
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
-    doc = os.path.join(path, doc)
-    # patch = os.getcwd()
-    # os.chdir("table_pdf")
+    change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     return tds
 
@@ -5943,9 +5938,13 @@ def setka_32_full_made(fin):
         style.append(fn)
 # =========== 2 страница ===================
     # # ======= встречи за 3-4 место =====
-    # for q in range(72, 75, 2):
-    #     fn = ('LINEABOVE', (9, q), (10, q), 1, colors.darkblue)  # встреча -31 за 3-4 место
-    #     style.append(fn) 
+    n = 0
+    for k in range(7, 10, 2):
+        n += 1
+        for q in range(72, 79, 2 * n):
+            fn = ('LINEABOVE', (k, q + n - 1), (k + 1, q + n - 1), 1, colors.darkblue)  # встреча -31 за 3-4 место
+            style.append(fn) 
+        # n += 1
     # for q in range(73, 78, 4):
     #     fn = ('LINEABOVE', (11, q), (12, q), 1, colors.darkblue)  # встреча 32 (за 3-4 место)
     #     style.append(fn)
@@ -5966,11 +5965,17 @@ def setka_32_full_made(fin):
     # style.append(fn)
     # fn = ('BACKGROUND', (10, 72), (10, 73), colors.lightyellow)  # встречи 32 (за 3-4 место)
     # style.append(fn) 
-    # for q in range(78, 83, 4):  # встречи 33-34
-    #     fn = ('SPAN', (8, q), (8, q + 1)) and ('BACKGROUND', (8, q), (8, q + 1), colors.lightyellow)
-    #     style.append(fn)
-    #     # fn = ('BACKGROUND', (8, q), (8, q + 1), colors.lightyellow)  
-    #     # style.append(fn) 
+    n = 1
+    for m in range(8, 11, 2):
+        s = n * 4
+        for q in range(m + 64, 77, s):  # встречи 33-34
+            fn = ('SPAN', (m, q + n - 1), (m, q + n)) 
+            style.append(fn)
+            fn = ('BACKGROUND', (m, q + n - 1), (m, q + n), colors.lightyellow)  
+            style.append(fn) 
+            fn = ('BOX', (m, q + n - 1), (m, q + n), 1, colors.darkblue)
+            style.append(fn)
+        n += 1
     # fn = ('SPAN', (10, 79), (10, 82)) and ('BACKGROUND', (10, 79), (10, 82), colors.lightyellow)  # встречи 35 
     # style.append(fn)
     # # fn = ('BACKGROUND', (10, 79), (10, 82), colors.lightyellow)  # встречи 35
@@ -6038,7 +6043,7 @@ def setka_32_full_made(fin):
     short_name = "чист_32_full_сетка"
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
-    os.chdir("table_pdf")
+    change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     return tds
 
@@ -7195,6 +7200,17 @@ def change_page_vid():
             return
     else:
         return
+
+
+def change_dir():
+    """смена директории, чтоб все pdf фалы сохранялися в папке table_pdf"""
+    dir_path = pathlib.Path.cwd()
+    p = str(dir_path)
+    f = p.rfind("table_pdf")
+    if f == -1:
+        os.chdir("table_pdf")
+
+
 
 
 def tours_list(cp):
