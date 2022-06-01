@@ -5937,17 +5937,16 @@ def setka_32_full_made(fin):
         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
         style.append(fn)
 # =========== 2 страница ===================
-    # # ======= встречи за 3-4 место =====
+    # # ======= встречи за 5-8 место =====
     n = 0
     for k in range(7, 10, 2):
         n += 1
         for q in range(72, 79, 2 * n):
-            fn = ('LINEABOVE', (k, q + n - 1), (k + 1, q + n - 1), 1, colors.darkblue)  # встреча -31 за 3-4 место
+            fn = ('LINEABOVE', (k, q + n - 1), (k + 1, q + n - 1), 1, colors.darkblue)  # встреча 33-35 за 5-6 место
             style.append(fn) 
-        # n += 1
-    # for q in range(73, 78, 4):
-    #     fn = ('LINEABOVE', (11, q), (12, q), 1, colors.darkblue)  # встреча 32 (за 3-4 место)
-    #     style.append(fn)
+    for q in range(80, 83, 2):
+        fn = ('LINEABOVE', (9, q), (9, q), 1, colors.darkblue)  # встреча 36 (за 7-8 место)
+        style.append(fn)
     # for q in range(78, 86, 2):
     #     fn = ('LINEABOVE', (7, q), (7, q), 1, colors.darkblue)  # рисует 33-34 встречи
     #     style.append(fn)
@@ -5965,21 +5964,27 @@ def setka_32_full_made(fin):
     # style.append(fn)
     # fn = ('BACKGROUND', (10, 72), (10, 73), colors.lightyellow)  # встречи 32 (за 3-4 место)
     # style.append(fn) 
-    n = 1
-    for m in range(8, 11, 2):
-        s = n * 4
-        for q in range(m + 64, 77, s):  # встречи 33-34
-            fn = ('SPAN', (m, q + n - 1), (m, q + n)) 
+
+    # ====== рисует сетку из 4-х участников =========
+    n = 0
+    s = 2
+    for m in range(8, 11, s):
+        for q in range(m + 64, 77, s * 2):  # встречи 33-34
+            fn = ('SPAN', (m, q - n), (m, q + s // 2))             
             style.append(fn)
-            fn = ('BACKGROUND', (m, q + n - 1), (m, q + n), colors.lightyellow)  
+            fn = ('BACKGROUND', (m, q - n), (m, q + s // 2), colors.lightyellow)  
             style.append(fn) 
-            fn = ('BOX', (m, q + n - 1), (m, q + n), 1, colors.darkblue)
+            fn = ('BOX', (m, q - n), (m, q + s // 2), 1, colors.darkblue)
             style.append(fn)
         n += 1
-    # fn = ('SPAN', (10, 79), (10, 82)) and ('BACKGROUND', (10, 79), (10, 82), colors.lightyellow)  # встречи 35 
-    # style.append(fn)
-    # # fn = ('BACKGROUND', (10, 79), (10, 82), colors.lightyellow)  # встречи 35
-    # # style.append(fn) 
+        s *= 2
+    # ============================ # встречи 36
+    fn_list = [('SPAN', (10, 80), (10, 81)), ('BACKGROUND', (10, 80), (10, 81), colors.lightyellow),
+            ('BOX', (10, 80), (10, 81), 1, colors.darkblue)]
+    for fn in fn_list:
+        style.append(fn)
+
+
     # fn = ('SPAN', (10, 88), (10, 89)) # встречи 36
     # style.append(fn)
     # fn = ('BACKGROUND', (10, 88), (10, 89), colors.lightyellow)  # встречи 36 
