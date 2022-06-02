@@ -5948,13 +5948,12 @@ def setka_32_full_made(fin):
     for q in range(80, 83, 2):
         fn = ('LINEABOVE', (9, q), (9, q), 1, colors.darkblue)  # встреча 36 (за 7-8 место)
         style.append(fn)
-<<<<<<< HEAD
 
-    style_set = draw_setka(3, 110, 4)
+    style_set = draw_setka(3, 110, 4) # рисует кусок сетки с 3-ого стобца, 110 строки на 4 человека
     for fn in style_set:
         style.append(fn)
 
-=======
+# =======
     n = 1
     for m in range(6, 11, 2):
         s = n * 2
@@ -5975,7 +5974,7 @@ def setka_32_full_made(fin):
             style.append(fn)
         n *= 2
         #==================
->>>>>>> b1c9632e1f254d316aadf9bf7d449129617ea13e
+# >>>>>>> b1c9632e1f254d316aadf9bf7d449129617ea13e
     # for q in range(78, 86, 2):
     #     fn = ('LINEABOVE', (7, q), (7, q), 1, colors.darkblue)  # рисует 33-34 встречи
     #     style.append(fn)
@@ -7251,7 +7250,6 @@ def draw_setka(col, row, num):
     """рисование линий сетки встреч игроков
     col - начальный столбец, row - начальный ряд, num - кол-во туров"""
     style_set = []    
-    # n = 3
     s = 1
    
     col_fin = col + num - 1 # последний столбец
@@ -7261,9 +7259,9 @@ def draw_setka(col, row, num):
         for k in range(row, row_fin, s): # номер строки
             fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # рисует линии встреч
             style_set.append(fn)  
-        # n = n + s // 2
         row = row + s // 2
     return style_set
+
 
 def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
