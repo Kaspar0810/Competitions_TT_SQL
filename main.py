@@ -5779,57 +5779,57 @@ def setka_32_full_made(fin):
     elements = []
     data = []
     column = ['']
-    column_count = column * 15
+    column_count = column * 13
     # добавить в аргументы функции
     final = fin
     # first_mesto = mesto_in_final(fin)
     first_mesto = 1
     for i in range(0, 138):
-        column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
 
     # ========= места ==========
     n = 1
     for i in range(1, 3):
-        data[i * 22 + 9][13] = str(first_mesto + i // 2) + "Место"   
-        data[i * 5 + 54][13] = str(first_mesto + i // 2 + 2) + "Место"
+        data[i * 22 + 9][11] = str(first_mesto + i // 2) + "Место"   
+        data[i * 5 + 54][11] = str(first_mesto + i // 2 + 2) + "Место"
     p = 0
     # ========= нумерация встреч сетки ==========
-    for i in range(4, 67, 2):  # создание номеров игроков сетки (1-32)
+    for i in range(3, 67, 2):  # создание номеров игроков сетки (1-32)
         data[i - 1][0] = str(p + 1)
         p += 1
     p = 0
-    for i in range(3, 64, 4):  # создание номеров встреч (1-16)
+    for i in range(2, 63, 4):  # создание номеров встреч (1-16)
         data[i + 1][2] = str(p + 1)
         # data[i // 2 + 40][2] = str((p + 1) * -1)  # номера проигравших 1-8
         p += 1
-    for i in range(5, 62, 8):
+    for i in range(4, 62, 8):
         data[i][4] = str(p + 1)  # создание номеров встреч (17-24)
         # data[i // 4 + 31][4] = str((p + 1) * -1)  # номера проигравших 9-12
         # data[i // 2 + 40][4] = str(p + 13)  # создание номеров встреч (21-24)
         # data[i // 4 + 57][4] = str((p + 13) * -1)  # номера проигравших 21-24
         p += 1
-    for i in range(7, 56, 16):
+    for i in range(6, 56, 16):
         data[i][6] = str(p + 1)  # создание номеров встреч (25-28)
         # data[i // 8 + 28][6] = str((p + 1) * -1)  # номера проигравших 13-14
         # data[i // 2 + 40][6] = str(p + 13)  # создание номеров встреч (25-26)
         # data[i // 8 + 54][6] = str((p + 13) * -1)  # номера проигравших 25-26
         p += 1
-    for i in range(11, 44, 32):
+    for i in range(10, 44, 32):
         data[i][8] = str(p + 1)  # создание номеров встреч (29-30)
         # data[i // 2 + 22][6] = str((p + 3) * -1)  # номера проигравших 17-18
         # data[i + 26][6] = str(p + 15)  # создание номеров встреч (29-30)
         # data[i // 2 + 56][8] = str((p + 1) * -1)  # номера проигравших 29-30
         p += 1
     # for i in range(33, 40, 6):
-    data[71][8] = str((p - 1) * -1)  # номера проигравших 29
-    data[73][8] = str(p * -1)  # номера проигравших 30
-    data[19][10] = str(p + 1)  # создание номеров встреч (31)
-    data[58][10] = str((p + 1) * -1)  # номер проигравшего финал (-31)
+    data[60][8] = str((p - 1) * -1)  # номера проигравших 29
+    data[62][8] = str(p * -1)  # номера проигравших 30
+    data[18][10] = str(p + 1)  # создание номеров встреч (31)
+    data[55][10] = str((p + 1) * -1)  # номер проигравшего финал (-31)
     p += 1
-    data[72][10] = str(p + 1)  # создание номеров встреч 32
-    data[75][10] = str((p + 1) * -1)  # номер проигравшего финал (-32)
+    data[61][10] = str(p + 1)  # создание номеров встреч 32
+    data[66][10] = str((p + 1) * -1)  # номер проигравшего финал (-32)
     # data[25][8] = str(-15)
     # data[29][8] = str(16)  # создание номеров встреч 16
     # data[31][8] = str(-16)
@@ -5857,8 +5857,8 @@ def setka_32_full_made(fin):
         n = i - (i // 2)
         data[i][1] = tds[n]
     # ==============
-    cw = ((0.2 * cm, 3.6 * cm, 0.35 * cm, 2.3 * cm, 0.35 * cm, 2.3 * cm, 0.35 * cm, 2.3 * cm, 0.35 * cm,
-        2.3 * cm, 0.35 * cm, 2.3 * cm, 0.35 * cm, 2.5 * cm, 0.3 * cm))
+    cw = ((0.2 * cm, 3.6 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm,
+        2.5 * cm, 0.35 * cm, 2.9 * cm, 0.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     t = Table(data, cw, 138 * [0.35 * cm])
     style = []
@@ -5949,7 +5949,17 @@ def setka_32_full_made(fin):
         style.append(fn)
     style_set.clear()
 
-    style_set = draw_setka(5, 84, 8) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style_set = draw_setka(5, 83, 8) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    for fn in style_set:
+        style.append(fn)
+    style_set.clear()
+
+    style_set = draw_setka(9, 99, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    for fn in style_set:
+        style.append(fn)
+    style_set.clear()
+
+    style_set = draw_setka(7, 110, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
     for fn in style_set:
         style.append(fn)
     style_set.clear()
@@ -5981,7 +5991,7 @@ def setka_32_full_made(fin):
                            ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
                            ('FONTSIZE', (1, 0), (1, 32), 7),
                            # 12 столбец с 0 по 68 ряд (цвет места)
-                           ('TEXTCOLOR', (13, 0), (13, 68), colors.red),
+                           ('TEXTCOLOR', (11, 0), (11, 138), colors.red),
                            ('ALIGN', (13, 0), (13, 68), 'CENTER'),
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
@@ -7172,11 +7182,22 @@ def change_dir():
 
 def draw_setka(col, row, num):
     """рисование сетки встреч игроков
-    col - начальный столбец, row - начальный ряд, num - кол-во туров"""
+    col - начальный столбец, row - начальный ряд, num - кол-во игроков"""
     style_set = []    
     s = 1
+    cf = 0  # кол-во туров
+    if num == 2:  # кол-во игроков
+        cf = 1
+    elif num == 4:
+        cf = 2
+    elif num == 8:
+        cf = 3
+    elif num == 16:
+        cf = 4
+    elif num == 32:
+        cf = 5
     row_b = row
-    col_fin = col + num - 1 # последний столбец
+    col_fin = col + cf * 2 # последний столбец
     row_fin = row + num * 2 - 1 # последняя строка 
     for i in range (col, col_fin, 2): # номер столбца 
         s *= 2
