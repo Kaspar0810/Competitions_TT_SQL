@@ -5942,17 +5942,40 @@ def setka_32_full_made(fin):
     n = 0
     for k in range(7, 10, 2):
         n += 1
-        for q in range(72, 79, 2 * n):
-            fn = ('LINEABOVE', (k, q + n - 1), (k + 1, q + n - 1), 1, colors.darkblue)  # встреча 33-35 за 5-6 место
+        for q in range(72, 79, n * 2):
+            fn = ('LINEABOVE', (k, q + n - 1), (k, q + n - 1), 1, colors.darkblue)  # встреча 33-35 за 5-6 место
             style.append(fn) 
     for q in range(80, 83, 2):
         fn = ('LINEABOVE', (9, q), (9, q), 1, colors.darkblue)  # встреча 36 (за 7-8 место)
         style.append(fn)
+<<<<<<< HEAD
 
     style_set = draw_setka(3, 110, 4)
     for fn in style_set:
         style.append(fn)
 
+=======
+    n = 1
+    for m in range(6, 11, 2):
+        s = n * 2
+        for q in range(s + 82, 96, s * 2):  # встречи 33-34
+            fn = ('SPAN', (m, q), (m, q + p - 1))             
+            style.append(fn)
+            fn = ('BACKGROUND', (m, q), (m, q + n - 1), colors.lightyellow)  
+            style.append(fn) 
+            fn = ('BOX', (m, q), (m, q + n - 1), 1, colors.darkblue)
+            style.append(fn)
+        n *= 2    
+    # =====встреча за 9-16 место
+    n = 1
+    for k in range(5, 10, 2):
+        s = n * 2
+        for q in range(82, 97, s):
+            fn = ('LINEABOVE', (k, q + n ), (k, q + n), 1, colors.darkblue)  # встреча 33-35 за 5-6 место
+            style.append(fn)
+        n *= 2
+        #==================
+>>>>>>> b1c9632e1f254d316aadf9bf7d449129617ea13e
     # for q in range(78, 86, 2):
     #     fn = ('LINEABOVE', (7, q), (7, q), 1, colors.darkblue)  # рисует 33-34 встречи
     #     style.append(fn)
@@ -5985,8 +6008,10 @@ def setka_32_full_made(fin):
         n += 1
         s *= 2
     # ============================ # встречи 36
-    fn_list = [('SPAN', (10, 80), (10, 81)), ('BACKGROUND', (10, 80), (10, 81), colors.lightyellow),
-            ('BOX', (10, 80), (10, 81), 1, colors.darkblue)]
+    c = 10 # столбец
+    r = 80 # начальная строка
+    fn_list = [('SPAN', (c, r), (c, r + 1)), ('BACKGROUND', (c, r), (c, r + 1), colors.lightyellow),
+            ('BOX', (c, r), (c, r + 1), 1, colors.darkblue)]
     for fn in fn_list:
         style.append(fn)
 
