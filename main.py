@@ -5938,98 +5938,22 @@ def setka_32_full_made(fin):
         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
         style.append(fn)
 # =========== 2 страница ===================
-    # # ======= встречи за 5-8 место =====
-    n = 0
-    for k in range(7, 10, 2):
-        n += 1
-        for q in range(72, 79, n * 2):
-            fn = ('LINEABOVE', (k, q + n - 1), (k, q + n - 1), 1, colors.darkblue)  # встреча 33-35 за 5-6 место
-            style.append(fn) 
-    for q in range(80, 83, 2):
-        fn = ('LINEABOVE', (9, q), (9, q), 1, colors.darkblue)  # встреча 36 (за 7-8 место)
-        style.append(fn)
-
-    style_set = draw_setka(3, 110, 4) # рисует кусок сетки с 3-ого стобца, 110 строки на 4 человека
+    # # ======= встречи (33-35) за 5-8 место =====
+    style_set = draw_setka(7, 72, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
     for fn in style_set:
         style.append(fn)
+    style_set.clear()
 
-# =======
-    n = 1
-    for m in range(6, 11, 2):
-        s = n * 2
-        for q in range(s + 82, 96, s * 2):  # встречи 33-34
-            fn = ('SPAN', (m, q), (m, q + p - 1))             
-            style.append(fn)
-            fn = ('BACKGROUND', (m, q), (m, q + n - 1), colors.lightyellow)  
-            style.append(fn) 
-            fn = ('BOX', (m, q), (m, q + n - 1), 1, colors.darkblue)
-            style.append(fn)
-        n *= 2    
-    # =====встреча за 9-16 место
-    n = 1
-    for k in range(5, 10, 2):
-        s = n * 2
-        for q in range(82, 97, s):
-            fn = ('LINEABOVE', (k, q + n ), (k, q + n), 1, colors.darkblue)  # встреча 33-35 за 5-6 место
-            style.append(fn)
-        n *= 2
-        #==================
-# >>>>>>> b1c9632e1f254d316aadf9bf7d449129617ea13e
-    # for q in range(78, 86, 2):
-    #     fn = ('LINEABOVE', (7, q), (7, q), 1, colors.darkblue)  # рисует 33-34 встречи
-    #     style.append(fn)
-    # for q in range(79, 84, 4):
-    #     fn = ('LINEABOVE', (9, q), (9, q), 1, colors.darkblue)  # рисует 35 встречи
-    #     style.append(fn)
-    # for q in range(81, 86, 4):
-    #     fn = ('LINEABOVE', (11, q), (12, q), 1, colors.darkblue)  # встреча -35 за 5-6 место
-    #     style.append(fn)
-    # for q in range(88, 91, 2):
-    #     fn = ('LINEABOVE', (9, q), (10, q), 1, colors.darkblue)  # встреча 36 
-    #     style.append(fn)
-    # # ============  объединяет ячейки номер встречи
-    # fn = ('SPAN', (10, 72), (10, 73))  # встреча за 3-4 место
-    # style.append(fn)
-    # fn = ('BACKGROUND', (10, 72), (10, 73), colors.lightyellow)  # встречи 32 (за 3-4 место)
-    # style.append(fn) 
-
-    # ====== рисует сетку из 4-х участников =========
-    n = 0
-    s = 2
-    for m in range(8, 11, s):
-        for q in range(m + 64, 77, s * 2):  # встречи 33-34
-            fn = ('SPAN', (m, q - n), (m, q + s // 2))             
-            style.append(fn)
-            fn = ('BACKGROUND', (m, q - n), (m, q + s // 2), colors.lightyellow)  
-            style.append(fn) 
-            fn = ('BOX', (m, q - n), (m, q + s // 2), 1, colors.darkblue)
-            style.append(fn)
-        n += 1
-        s *= 2
-    # ============================ # встречи 36
-    c = 10 # столбец
-    r = 80 # начальная строка
-    fn_list = [('SPAN', (c, r), (c, r + 1)), ('BACKGROUND', (c, r), (c, r + 1), colors.lightyellow),
-            ('BOX', (c, r), (c, r + 1), 1, colors.darkblue)]
-    for fn in fn_list:
+    style_set = draw_setka(9, 80, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    for fn in style_set:
         style.append(fn)
+    style_set.clear()
 
+    style_set = draw_setka(5, 84, 8) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    for fn in style_set:
+        style.append(fn)
+    style_set.clear()
 
-    # fn = ('SPAN', (10, 88), (10, 89)) # встречи 36
-    # style.append(fn)
-    # fn = ('BACKGROUND', (10, 88), (10, 89), colors.lightyellow)  # встречи 36 
-    # style.append(fn) 
-    # # ========= обводит рамкой номера встреч 
-    # fn = ('BOX', (10, 72), (10, 73), 1, colors.darkblue) # встреча 32 (за 3-4 место)
-    # style.append(fn)
-    # for q in range(78, 83, 4):
-    #     # рисует область 8 столбца, где номера встреч 33-34
-    #     fn = ('BOX', (8, q), (8, q + 1), 1, colors.darkblue)
-    #     style.append(fn)
-    # fn = ('BOX', (10, 79), (10, 82), 1, colors.darkblue) # встреча 35
-    # style.append(fn)
-    # fn = ('BOX', (10, 88), (10, 89), 1, colors.darkblue) # встреча 36
-    # style.append(fn)
 # =========== 3 страница ==================
 
 # =========================================
@@ -7247,11 +7171,11 @@ def change_dir():
 
 
 def draw_setka(col, row, num):
-    """рисование линий сетки встреч игроков
+    """рисование сетки встреч игроков
     col - начальный столбец, row - начальный ряд, num - кол-во туров"""
     style_set = []    
     s = 1
-   
+    row_b = row
     col_fin = col + num - 1 # последний столбец
     row_fin = row + num * 2 - 1 # последняя строка 
     for i in range (col, col_fin, 2): # номер столбца 
@@ -7260,6 +7184,17 @@ def draw_setka(col, row, num):
             fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # рисует линии встреч
             style_set.append(fn)  
         row = row + s // 2
+    s = 1
+    for m in range(col + 1, col_fin + 1, 2):
+        s *= 2
+        for q in range(row_b, row_fin, s * 2):  # встречи 33-34
+            fn = ('SPAN', (m, q), (m, q + s - 1 ))             
+            style_set.append(fn)
+            fn = ('BACKGROUND', (m, q), (m, q + s - 1 ), colors.lightyellow)  
+            style_set.append(fn) 
+            fn = ('BOX', (m, q), (m, q + s - 1), 1, colors.darkblue)
+            style_set.append(fn)
+        row_b = row_b + s // 2   
     return style_set
 
 
@@ -7470,8 +7405,6 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-
-# my_win.Button_export.clicked.connect(setka_32_made(fin="1-й финал"))
 # my_win.Button_proba.clicked.connect(test_choice_group)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
