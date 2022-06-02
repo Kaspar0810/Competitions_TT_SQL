@@ -5862,7 +5862,8 @@ def setka_32_full_made(fin):
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     t = Table(data, cw, 138 * [0.35 * cm])
     style = []
-    # =========  цикл создания стиля таблицы ================ 1 страница =========
+    # =========  цикл создания стиля таблицы =======
+    # ========= 1 страница =========
     n = 3
     s = 1
     for i in range (1, 10, 2): # номер столбца 
@@ -5947,6 +5948,11 @@ def setka_32_full_made(fin):
     for q in range(80, 83, 2):
         fn = ('LINEABOVE', (9, q), (9, q), 1, colors.darkblue)  # встреча 36 (за 7-8 место)
         style.append(fn)
+
+    style_set = draw_setka(3, 110, 4)
+    for fn in style_set:
+        style.append(fn)
+
     # for q in range(78, 86, 2):
     #     fn = ('LINEABOVE', (7, q), (7, q), 1, colors.darkblue)  # рисует 33-34 встречи
     #     style.append(fn)
@@ -7216,7 +7222,23 @@ def change_dir():
         os.chdir("table_pdf")
 
 
-
+def draw_setka(col, row, num):
+    """рисование линий сетки встреч игроков
+    col - начальный столбец, row - начальный ряд, num - кол-во туров"""
+    style_set = []    
+    # n = 3
+    s = 1
+   
+    col_fin = col + num - 1 # последний столбец
+    row_fin = row + num * 2 - 1 # последняя строка 
+    for i in range (col, col_fin, 2): # номер столбца 
+        s *= 2
+        for k in range(row, row_fin, s): # номер строки
+            fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # рисует линии встреч
+            style_set.append(fn)  
+        # n = n + s // 2
+        row = row + s // 2
+    return style_set
 
 def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
