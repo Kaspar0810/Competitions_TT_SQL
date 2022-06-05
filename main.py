@@ -5901,66 +5901,95 @@ def setka_32_full_made(fin):
     style_set = draw_setka(5, 72, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(75, 4) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(75, 4, 9) # рисует линии сетки за места(номер строки, участники)
     for fn in style_set:
         style.append(fn)
     # ======= встречи (36) за 7-8 место =====
     style_set = draw_setka(7, 84, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(85, 2) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(85, 2, 9) # рисует линии сетки за места(номер строки, участники)
     for fn in style_set:
         style.append(fn)
     # ======= встречи (37-43) за 9-10 место =====
     style_set = draw_setka(3, 89, 8) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(96, 8) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(96, 8, 9) # рисует линии сетки за места(номер строки, участники)
     for fn in style_set:
         style.append(fn)
     # ======= встречи (44) за 11-12 место =====
     style_set = draw_setka(7, 106, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(107, 2) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(107, 2, 9) # рисует линии сетки за места(номер строки, участники)
     for fn in style_set:
         style.append(fn)
     # ======= встречи (45-47) за 13-14 место =====
     style_set = draw_setka(5, 114, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(117, 4) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(117, 4, 9) # рисует линии сетки за места(номер строки, участники, столбец)
     for fn in style_set:
         style.append(fn)
     # ======= встречи (48) за 15-16 место =====
     style_set = draw_setka(7, 126, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(127, 2) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(127, 2, 9) # рисует линии сетки за места(номер строки, участники)
     for fn in style_set:
         style.append(fn)
 # =========== 3 страница ==================
-    # ======= встречи (49-56) за 17- место =====
+    # ======= встречи (49-56) за 17-18 место =====
     style_set = draw_setka(1, 140, 16) # рисует кусок сетки(номер столбца, номер строки на 16человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(155, 16) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(155, 16, 9) # рисует линии сетки за места(номер строки, участники)
     for fn in style_set:
         style.append(fn)
-    # ======= встречи (36) за 7-8 место =====
-    style_set = draw_setka(7, 169, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    # ======= встречи (64) за 19-20 место =====
+    style_set = draw_setka(9, 168, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(170, 2) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(169, 2, 10) # рисует линии сетки за места(номер строки, участники)
     for fn in style_set:
         style.append(fn)
-    # ======= встречи (33-35) за 5-6 место =====
-    style_set = draw_setka(5, 176, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    # ======= встречи (33-35) за 21-24 место =====
+    style_set = draw_setka(3, 172, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
     for fn in style_set:
         style.append(fn)
-    style_set = draw_mesta(179, 4) # рисует линии сетки за места(номер строки, участники)
+    style_set = draw_mesta(175, 4, 7) # рисует линии сетки за места(номер строки, участники)
     for fn in style_set:
         style.append(fn)
+    # ======= встречи (64) за 25-26 место =====
+    style_set = draw_setka(9, 181, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    for fn in style_set:
+        style.append(fn)
+    style_set = draw_mesta(182, 2, 11) # рисует линии сетки за места(номер строки, участники)
+    for fn in style_set:
+        style.append(fn)
+    # ======= встречи (64) за 25-26 место =====
+    style_set = draw_setka(1, 180, 8) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    for fn in style_set:
+        style.append(fn)
+    style_set = draw_mesta(187, 8, 7) # рисует линии сетки за места(номер строки, участники)
+    for fn in style_set:
+        style.append(fn)
+    # ======= встречи (64) за 25-26 место =====
+    style_set = draw_setka(9, 195, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    for fn in style_set:
+        style.append(fn)
+    style_set = draw_mesta(196, 2, 10) # рисует линии сетки за места(номер строки, участники)
+    for fn in style_set:
+        style.append(fn)
+     # ======= встречи (64) за 25-26 место =====
+    style_set = draw_setka(1, 197, 4) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    for fn in style_set:
+        style.append(fn)
+    style_set = draw_mesta(200, 4, 5) # рисует линии сетки за места(номер строки, участники)
+    for fn in style_set:
+        style.append(fn)
+    
 # =========================================
     for i in range(1, 10, 2):
         fn = ('TEXTCOLOR', (i, 0), (i, 136), colors.black)  # цвет шрифта игроков
@@ -7783,21 +7812,28 @@ def draw_setka(col, row, num):
     return style_set
 
 
-def draw_mesta(row_m, men):
+def draw_mesta(row_m, men, col_m):
     """рисует линии встреч за место"""
     style_set = []
     p = 0
     if men == 2:
-        p = 5
+        p = 4
     elif men == 4:
-        p = 5
+        p = 4
     elif men == 8:
         p = 6
     elif men == 16:
         p = 10
 
+    col_f = 11
+
+    if col_m == 9:
+        col_f = col_m + 2
+    else:
+        col_f = col_m + 1
+
     for l in range(row_m, row_m + p + 1, p):
-        fn = ('LINEABOVE', (9, l), (11, l), 1, colors.darkblue)  # рисует линии мест 5-6 места (4 чел)
+        fn = ('LINEABOVE', (col_m, l), (col_f, l), 1, colors.darkblue)  # рисует линии мест 5-6 места (4 чел)
         style_set.append(fn)
     return style_set
 
