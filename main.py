@@ -343,7 +343,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if sender == self.clear_s32_Action:
             setka_32_made(fin="1-й финал")
         elif sender == self.clear_s32_full_Action:
-            setka_32_full_made(fin="1-й финал")
+             setka_32_full_made(fin="1-й финал")
         view()
 
 
@@ -5777,6 +5777,7 @@ def setka_32_full_made(fin):
     """сетка на 32 с розыгрышем всех мест"""
     from reportlab.platypus import Table
     elements = []
+    style = []
     data = []
     column = ['']
     column_count = column * 13
@@ -5786,7 +5787,7 @@ def setka_32_full_made(fin):
     first_mesto = 1
     strok = 207
     for i in range(0, strok):
-        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
 
@@ -5903,7 +5904,6 @@ def setka_32_full_made(fin):
         2.5 * cm, 0.35 * cm, 3.0 * cm, 0.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     t = Table(data, cw, strok * [0.35 * cm])
-    style = []
     # =========  цикл создания стиля таблицы =======
     # ========= 1 страница =========
     style_set = draw_setka(1, 3, 32) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
@@ -5926,18 +5926,6 @@ def setka_32_full_made(fin):
     style.append(fn)       
     fn = ('BACKGROUND', (10, 61), (10, 62), colors.lightyellow)  # встречи 32 за 3-4 место
     style.append(fn)
-   
-    # for i in range(1, 10, 2):
-    #     fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
-    #     style.append(fn)
-    #     fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 68), colors.green)  # цвет шрифта номеров встреч
-    #     style.append(fn)
-    #     # выравнивание фамилий игроков по левому краю
-    #     fn = ('ALIGN', (i, 0), (i, 68), 'LEFT')
-    #     style.append(fn)
-    #     # центрирование номеров встреч
-    #     fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
-    #     style.append(fn)
 # =========== 2 страница ===================
     # ======= встречи (33-35) за 5-6 место =====
     style_set = draw_setka(5, 72, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
@@ -6052,10 +6040,13 @@ def setka_32_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
+    style_color = color_mesta()
+    for b in style_color:
+        ts.append(b)
 
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
@@ -6063,8 +6054,8 @@ def setka_32_full_made(fin):
                            ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
                            ('FONTSIZE', (1, 0), (1, 32), 7),
                            # 11 столбец с 0 по 68 ряд (цвет места)
-                           ('TEXTCOLOR', (11, 0), (11, 206), colors.red),
-                           ('ALIGN', (11, 0), (11, 206), 'CENTER'),
+                        #    ('TEXTCOLOR', (11, 0), (11, 137), colors.red),
+                        #    ('ALIGN', (11, 0), (11, 206), 'CENTER'),
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
@@ -7897,7 +7888,6 @@ def draw_num(row_n, col_n, num, data, game):
     while 2 ** n < game:
         n += 1
 
-  
     col_f = col_n + (2 * n - 2) + 1
  
     for k in range(col_n, col_f, 2):
@@ -7917,7 +7907,20 @@ def draw_num_lost(row_n, col_n, lost, game, data):
     for d in range(row_n, row_n + (game - 1) * 2 + 1, 2):
             data[d - 1][col_n] = str(lost * -1)
             lost += 1
-    
+
+
+def color_mesta():
+    """окрашивает места в красный цвет"""
+    style_color = []
+    row_n = 94
+    row_f = 131
+    for i in range(row_n, row_f, 5):
+        fn = (('TEXTCOLOR', (11, i), (11, i), colors.red))
+        style_color.append(fn)
+        fn =  ('ALIGN', (11, i), (11, i), 'CENTER')
+        style_color.append(fn)
+    return style_color   
+
 
 def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
