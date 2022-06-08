@@ -5787,7 +5787,7 @@ def setka_32_full_made(fin):
     first_mesto = 1
     strok = 207
     for i in range(0, strok):
-        # column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
 
@@ -5802,10 +5802,35 @@ def setka_32_full_made(fin):
     for i in range(4, 20, 5):
         b += 1
         data[i + 68][11] = str(first_mesto + b + 3) + " Место" 
-    data[94][11] = str(first_mesto + b + 3) + " Место" 
+    data[94][11] = str(first_mesto + b + 4) + " Место" 
     for i in range(26, 60, 5):
         b += 1
         data[i + 73][11] = str(first_mesto + b + 4) + " Место"
+    # ==== места 3-й страницы ========
+    b += 1
+    mml = []
+    for c in range(0, 8):
+        if c == 0:
+            ml = [11, 152, 163, 10]
+        elif c == 1:
+            ml = [11, 167, 172, 4]
+        elif c == 2:
+            ml = [9, 173, 178, 4]
+        elif c == 3:
+            ml = [11, 180, 186, 5]
+        elif c == 4:
+            ml = [7, 184, 191, 6]
+        elif c == 5:
+            ml = [11, 192, 198, 5]
+        elif c == 6:
+            ml = [5, 198, 203, 4]
+        elif c == 7:
+            ml = [11, 200, 205, 4]
+            
+        for i in range(ml[1], ml[2], ml[3]):
+            b += 1
+            data[i][ml[0]] = str(first_mesto + b + 3) + " Место"
+
     # ========= нумерация встреч сетки ==========
     for i in range(3, 67, 2):  # создание номеров игроков сетки (1-32)
         data[i - 1][0] = str(p + 1)
@@ -6040,8 +6065,8 @@ def setka_32_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    # style.append(fn)
+    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     style_color = color_mesta()
@@ -7912,13 +7937,30 @@ def draw_num_lost(row_n, col_n, lost, game, data):
 def color_mesta():
     """окрашивает места в красный цвет"""
     style_color = []
-    row_n = 94
-    row_f = 131
-    for i in range(row_n, row_f, 5):
-        fn = (('TEXTCOLOR', (11, i), (11, i), colors.red))
-        style_color.append(fn)
-        fn =  ('ALIGN', (11, i), (11, i), 'CENTER')
-        style_color.append(fn)
+    for k in range(0, 4):
+        if k == 0:
+            row_n = 31
+            row_f = 54
+            step = 22
+        elif k == 1:
+            row_n = 94
+            row_f = 131
+            step = 5
+        elif k == 2:
+            row_n = 59
+            row_f = 65
+            step = 5    
+        elif k == 3:
+            row_n = 72
+            row_f = 88
+            step = 5   
+        for i in range(row_n, row_f, step):
+            fn = (('TEXTCOLOR', (11, i), (11, i), colors.red))
+            style_color.append(fn)
+            fn =  ('ALIGN', (11, i), (11, i), 'CENTER')
+            style_color.append(fn)
+    
+    
     return style_color   
 
 
