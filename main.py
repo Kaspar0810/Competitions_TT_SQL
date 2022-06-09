@@ -338,12 +338,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def print_clear(self):
         """Печать чистых таблиц"""
-        os.chdir("table_pdf")
+        change_dir()
+        # os.chdir("table_pdf")
         sender = self.sender()
         if sender == self.clear_s32_Action:
             setka_32_made(fin="1-й финал")
         elif sender == self.clear_s32_full_Action:
-             setka_32_full_made(fin="1-й финал")
+            setka_32_full_made(fin="1-й финал")
+        # view_file = "1-финал_чист_32_full_сетка.pdf"
+        # open_close_fail(view_file)
         view()
 
 
@@ -2181,7 +2184,6 @@ def view():
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
 
-    view_file = ""
     if sender == my_win.all_comp_Action:
         view_file = f"Title_{short_name}.pdf"
     elif sender == my_win.view_list_Action:
@@ -6061,7 +6063,6 @@ def setka_32_full_made(fin):
     return tds
 
 
-
 def setka_32_full_made_new(fin):
     """сетка на 32 с розыгрышем всех мест"""
     from reportlab.platypus import Table
@@ -8016,6 +8017,22 @@ def tours_list(cp):
 
     tour_list = tr[cp]
     return tour_list
+
+
+# def open_close_fail(view_file):
+# # Введите имя файла для проверки
+#     # filename = input("Введите любое существующее имя файла:\n")
+# # Откройте файл в первый раз с помощью функции open()
+#     # fileHandler = open(view_file, "r")
+#     view(view_file)
+# # Попробуйте открыть файл с таким же именем снова
+#     try:
+#         with open("view_file") as file:
+
+#             print("Файл открыт для чтения.")
+# # Вызовите ошибку, если файл был открыт раньше
+#     except IOError:
+#         print("Файл уже открыт")
 
 
 # def proba():
