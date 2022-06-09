@@ -5781,57 +5781,16 @@ def setka_32_full_made(fin):
     data = []
     column = ['']
     column_count = column * 13
-    # добавить в аргументы функции
     final = fin
     # first_mesto = mesto_in_final(fin)
     first_mesto = 1
     strok = 207
     for i in range(0, strok):
-        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
-
-    # ========= места ==========
-    n = 1
-    for i in range(1, 3):
-        data[i * 22 + 9][11] = str(first_mesto + i // 2) + " Место"   
-        data[i * 5 + 54][11] = str(first_mesto + i // 2 + 2) + " Место"
-    p = 0
-    # ==== места 2-й страницы ========
-    b = 0
-    for i in range(4, 20, 5):
-        b += 1
-        data[i + 68][11] = str(first_mesto + b + 3) + " Место" 
-    data[94][11] = str(first_mesto + b + 4) + " Место" 
-    for i in range(26, 60, 5):
-        b += 1
-        data[i + 73][11] = str(first_mesto + b + 4) + " Место"
-    # ==== места 3-й страницы ========
-    b += 1
-    mml = []
-    for c in range(0, 8):
-        if c == 0:
-            ml = [11, 152, 163, 10]
-        elif c == 1:
-            ml = [11, 167, 172, 4]
-        elif c == 2:
-            ml = [9, 173, 178, 4]
-        elif c == 3:
-            ml = [11, 180, 186, 5]
-        elif c == 4:
-            ml = [7, 184, 191, 6]
-        elif c == 5:
-            ml = [11, 192, 198, 5]
-        elif c == 6:
-            ml = [5, 198, 203, 4]
-        elif c == 7:
-            ml = [11, 200, 205, 4]
-            
-        for i in range(ml[1], ml[2], ml[3]):
-            b += 1
-            data[i][ml[0]] = str(first_mesto + b + 3) + " Место"
-
     # ========= нумерация встреч сетки ==========
+    p = 0
     for i in range(3, 67, 2):  # создание номеров игроков сетки (1-32)
         data[i - 1][0] = str(p + 1)
         p += 1
@@ -5928,10 +5887,11 @@ def setka_32_full_made(fin):
     cw = ((0.2 * cm, 3.8 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm,
         2.5 * cm, 0.35 * cm, 3.0 * cm, 0.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
+    style_color = color_mesta(data, first_mesto) # ркаскрашивает места участников красным цветом
     t = Table(data, cw, strok * [0.35 * cm])
     # =========  цикл создания стиля таблицы =======
     # ========= 1 страница =========
-    style_set = draw_setka(1, 3, 32) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style_set = draw_setka(1, 3, 32) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
     for fn in style_set:
         style.append(fn)
   
@@ -6065,11 +6025,9 @@ def setka_32_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
-
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
-    style_color = color_mesta()
     for b in style_color:
         ts.append(b)
 
@@ -6077,14 +6035,12 @@ def setka_32_full_made(fin):
                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
                            ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
-                           ('FONTSIZE', (1, 0), (1, 32), 7),
-                           # 11 столбец с 0 по 68 ряд (цвет места)
-                        #    ('TEXTCOLOR', (11, 0), (11, 137), colors.red),
-                        #    ('ALIGN', (11, 0), (11, 206), 'CENTER'),
+                           ('FONTSIZE', (1, 0), (1, 32), 7)] + ts 
+                           + [
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-                           ] + ts))
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
+                           
 
     elements.append(t)
     pv = A4
@@ -7934,32 +7890,48 @@ def draw_num_lost(row_n, col_n, lost, game, data):
             lost += 1
 
 
-def color_mesta():
+def color_mesta(data, first_mesto):
     """окрашивает места в красный цвет"""
+    b = 0
     style_color = []
-    for k in range(0, 4):
-        if k == 0:
-            row_n = 31
-            row_f = 54
-            step = 22
-        elif k == 1:
-            row_n = 94
-            row_f = 131
-            step = 5
-        elif k == 2:
-            row_n = 59
-            row_f = 65
-            step = 5    
-        elif k == 3:
-            row_n = 72
-            row_f = 88
-            step = 5   
-        for i in range(row_n, row_f, step):
-            fn = (('TEXTCOLOR', (11, i), (11, i), colors.red))
+    ml = []
+
+    for c in range(0, 13):
+        if c == 0:
+            ml = [11, 31, 54, 22]
+        elif c == 1:
+            ml = [11, 59, 65, 5]
+        elif c == 2:
+            ml = [11, 72, 92, 5]
+        elif c == 3:
+            ml = [11, 94, 95, 1]
+        elif c == 4:
+            ml = [11, 99, 133, 5]
+        elif c == 5:
+            ml = [11, 152, 163, 10]
+        elif c == 6:
+            ml = [11, 167, 172, 4]
+        elif c == 7:
+            ml = [9, 173, 178, 4]
+        elif c == 8:
+            ml = [11, 180, 186, 5]
+        elif c == 9:
+            ml = [7, 184, 191, 6]
+        elif c == 10:
+            ml = [11, 192, 198, 5]
+        elif c == 11:
+            ml = [5, 198, 203, 4]
+        elif c == 12:
+            ml = [11, 200, 205, 4]
+            
+        for i in range(ml[1], ml[2], ml[3]):
+
+            data[i][ml[0]] = str(first_mesto + b) + " Место"
+            fn = (('TEXTCOLOR', (ml[0], i), (ml[0], i), colors.red))
             style_color.append(fn)
-            fn =  ('ALIGN', (11, i), (11, i), 'CENTER')
+            fn =  ('ALIGN', (ml[0], i), (ml[0], i), 'CENTER')
             style_color.append(fn)
-    
+            b += 1
     
     return style_color   
 
