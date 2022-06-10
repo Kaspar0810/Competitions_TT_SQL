@@ -8,6 +8,7 @@ from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib import colors
+from reportlab.lib.colors import *
 from reportlab.platypus import Paragraph, TableStyle, Table, Image, SimpleDocTemplate
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfbase import pdfmetrics
@@ -157,6 +158,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print_Menu.addAction(self.clear_s16_Action)
         print_Menu.addAction(self.clear_s32_Action)
         print_Menu.addAction(self.clear_s32_full_Action)
+        print_Menu.addAction(self.clear_s32_2_Action)
 
         # меню просмотр
         view_Menu = menuBar.addMenu("Просмотр")
@@ -204,6 +206,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.go_to_Action = QAction("пусто")
         # подменю жеребьевка -печать-
         self.clear_s16_Action = QAction("Сетка на 16")
+        self.clear_s32_2_Action = QAction("Сетка 32 минус 2")
         self.clear_s32_full_Action = QAction("Сетка 32 прогрессивная")
         self.clear_s32_Action = QAction("Сетка на 32 (1-3 места)")
         # ======== подменю финалы ============= сделать в зависимости от кол-во финалов остальные невидимые
@@ -237,6 +240,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.clear_s16_Action.triggered.connect(self.print_clear)
         self.clear_s32_full_Action.triggered.connect(self.print_clear)
         self.clear_s32_Action.triggered.connect(self.print_clear)
+        self.clear_s32_2_Action.triggered.connect(self.print_clear)
 
         self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
@@ -339,14 +343,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def print_clear(self):
         """Печать чистых таблиц"""
         change_dir()
-        # os.chdir("table_pdf")
         sender = self.sender()
         if sender == self.clear_s32_Action:
             setka_32_made(fin="1-й финал")
         elif sender == self.clear_s32_full_Action:
             setka_32_full_made(fin="1-й финал")
-        # view_file = "1-финал_чист_32_full_сетка.pdf"
-        # open_close_fail(view_file)
+        elif sender == self.clear_s32_2_Action:
+            setka_32_2_made(fin="1-й финал")
+
         view()
 
 
@@ -2204,6 +2208,8 @@ def view():
         view_file = "1-финал_чист_32_сетка.pdf"
     elif sender == my_win.clear_s32_full_Action:
         view_file = "1-финал_чист_32_full_сетка.pdf"
+    elif sender == my_win.clear_s32_2_Action:
+        view_file = "1-финал_чист_32_2_сетка.pdf"
     
     
  
@@ -4788,6 +4794,7 @@ def func_zagolovok(canvas, doc):
                            1.6 * cm, f"г. {ms}")  # город
     canvas.drawString(0.8 * cm, height - 1.6 * cm, data_comp)  # дата начала
     canvas.setFont("DejaVuSerif-Italic", 11)
+    canvas.setFillColor(blue)  # меняет цвет шрифта списка судейской коллеги
     if pv == landscape(A4):
         main_referee_collegia = f"Гл. судья: {title.referee} судья {title.kat_ref}______________  " \
                                 f"Гл. секретарь: {title.secretary} судья {title.kat_sek} ______________"
@@ -5593,13 +5600,13 @@ def setka_16_made(fin):
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    #Получаем строку, содержащую путь к рабочей директории:
     return tds
 
 
 def setka_32_made(fin):
     """сетка на 32"""
     from reportlab.platypus import Table
+    table = "setka_32"
     elements = []
     data = []
     column = ['']
@@ -5612,35 +5619,19 @@ def setka_32_made(fin):
         # column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
-
-    # ========= места ==========
-    n = 1
-    for i in range(1, 3):
-        data[i * 22 + 9][13] = str(first_mesto + i // 2) + "Место"  
-        data[i * 5 + 54][13] = str(first_mesto + i // 2 + 2) + "Место"
-    p = 0
     # ========= нумерация встреч сетки ==========
-    for i in range(3, 66, 2):  # создание номеров игроков сетки (1-32)
-        data[i - 1][0] = str(p + 1)
-        p += 1
-    p = 0
-    for i in range(2, 63, 4):  # создание номеров встреч (1-16)
-        data[i + 1][2] = str(p + 1)
-        p += 1
-    for i in range(4, 61, 8):
-        data[i][4] = str(p + 1)  # создание номеров встреч (17-24)
-        p += 1
-    for i in range(6, 55, 16):
-        data[i][6] = str(p + 1)  # создание номеров встреч (25-28)
-        p += 1
-    for i in range(10, 43, 32):
-        data[i][8] = str(p + 1)  # создание номеров встреч (29-30)
-        p += 1
-    data[60][8] = str((p - 1) * -1)  # номера проигравших 29
-    data[62][8] = str((p) * -1)  # номера проигравших 30
-    data[18][10] = str(p + 1)  # создание номеров встреч (31)
-    data[61][10] = str(p + 2)  # создание номеров встреч (32)
-   
+    y = 0
+    for i in range(1, 65, 2):
+        y += 1
+        data[i + 1][0] = str(y)  # рисует начальные номера таблицы 1-32
+    num = draw_num(3, 2, 1, data, 32) # рисует номера встреч 1-32 (нач_строка, нача_столбец, нач номер, кол-во участников, номер встречи прогиравшего)
+  
+    data[60][8] = str((num - 3) * -1)  # номера проигравших 29
+    data[62][8] = str((num - 2) * -1)  # номера проигравших 30
+    data[18][10] = str(num - 1)  # создание номеров встреч (31)
+    data[55][10] = str((num - 1) * -1)  # номер проигравшего финал (-31)
+    data[61][10] = str(num)  # создание номеров встреч 32
+    data[66][10] = str((num) * -1)  # номер проигравшего финал (-32)
     # ============= данные игроков и встреч и размещение по сетке =============
     # ======= создать словарь  ключ - номер встречи, значение - номер ряда
     dict_num_game = {}
@@ -5659,6 +5650,7 @@ def setka_32_made(fin):
     cw = ((0.2 * cm, 3.6 * cm, 0.35 * cm, 2.3 * cm, 0.35 * cm, 2.3 * cm, 0.35 * cm, 2.3 * cm, 0.35 * cm,
         2.3 * cm, 0.35 * cm, 2.3 * cm, 0.35 * cm, 2.5 * cm, 0.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
+    style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
     t = Table(data, cw, 69 * [0.35 * cm])
     style = []
 
@@ -5741,7 +5733,8 @@ def setka_32_made(fin):
     # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
-
+    for b in style_color:
+        ts.append(b)
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
@@ -5778,6 +5771,7 @@ def setka_32_made(fin):
 def setka_32_full_made(fin):
     """сетка на 32 с розыгрышем всех мест"""
     from reportlab.platypus import Table
+    table = "setka_32_full"
     elements = []
     style = []
     data = []
@@ -5792,31 +5786,19 @@ def setka_32_full_made(fin):
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
-    p = 0
-    for i in range(3, 67, 2):  # создание номеров игроков сетки (1-32)
-        data[i - 1][0] = str(p + 1)
-        p += 1
-    p = 0
-    for i in range(2, 63, 4):  # создание номеров встреч (1-16)
-        data[i + 1][2] = str(p + 1)
-        p += 1
-    for i in range(4, 62, 8):
-        data[i][4] = str(p + 1)  # создание номеров встреч (17-24)
-        p += 1
-    for i in range(6, 56, 16):
-        data[i][6] = str(p + 1)  # создание номеров встреч (25-28)
-        p += 1
-    for i in range(10, 44, 32):
-        data[i][8] = str(p + 1)  # создание номеров встреч (29-30)
-        p += 1
-
-    data[60][8] = str((p - 1) * -1)  # номера проигравших 29
-    data[62][8] = str(p * -1)  # номера проигравших 30
-    data[18][10] = str(p + 1)  # создание номеров встреч (31)
-    data[55][10] = str((p + 1) * -1)  # номер проигравшего финал (-31)
-    data[61][10] = str(p + 2)  # создание номеров встреч 32
-    data[66][10] = str((p + 2) * -1)  # номер проигравшего финал (-32)
-
+    y = 0
+    for i in range(1, 65, 2):
+        y += 1
+        data[i + 1][0] = str(y)  # рисует начальные номера таблицы 1-32
+    num = draw_num(3, 2, 1, data, 32) # рисует номера встреч 1-32 (нач_строка, нача_столбец, нач номер, кол-во участников, номер встречи прогиравшего)
+  
+    data[60][8] = str((num - 3) * -1)  # номера проигравших 29
+    data[62][8] = str((num - 2) * -1)  # номера проигравших 30
+    data[18][10] = str(num - 1)  # создание номеров встреч (31)
+    data[55][10] = str((num - 1) * -1)  # номер проигравшего финал (-31)
+    data[61][10] = str(num)  # создание номеров встреч 32
+    data[66][10] = str((num) * -1)  # номер проигравшего финал (-32)
+    #===== 2-я страница =========
     y = 0
     for i in range(78, 89, 10):
         y += 1
@@ -5889,14 +5871,12 @@ def setka_32_full_made(fin):
     cw = ((0.2 * cm, 3.8 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm,
         2.5 * cm, 0.35 * cm, 3.0 * cm, 0.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
-    style_color = color_mesta(data, first_mesto) # ркаскрашивает места участников красным цветом
+    style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
     t = Table(data, cw, strok * [0.35 * cm])
     # =========  цикл создания стиля таблицы =======
     # ========= 1 страница =========
-    style_set = draw_setka(1, 3, 32) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-    for fn in style_set:
-        style.append(fn)
-  
+    style = draw_setka(1, 3, 32, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
+   
     for l in range(34, 57, 22):
         fn = ('LINEABOVE', (11, l), (13, l), 1, colors.darkblue)  # рисует линии встреч за 1-2 места
         style.append(fn)
@@ -5915,105 +5895,49 @@ def setka_32_full_made(fin):
     style.append(fn)
 # =========== 2 страница ===================
     # ======= встречи (33-35) за 5-6 место =====
-    style_set = draw_setka(5, 72, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(75, 4, 9) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(5, 72, 4, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(75, 4, 9, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (36) за 7-8 место =====
-    style_set = draw_setka(7, 84, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(85, 2, 9) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(7, 84, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(85, 2, 9, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (37-43) за 9-10 место =====
-    style_set = draw_setka(3, 89, 8) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(96, 8, 9) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(3, 89, 8, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(96, 8, 9, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (44) за 11-12 место =====
-    style_set = draw_setka(7, 106, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(107, 2, 9) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(7, 106, 2, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(107, 2, 9, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (45-47) за 13-14 место =====
-    style_set = draw_setka(5, 114, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(117, 4, 9) # рисует линии сетки за места(номер строки, участники, столбец)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(5, 114, 4, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(117, 4, 9, style) # рисует линии сетки за места(номер строки, участники, столбец)
     # ======= встречи (48) за 15-16 место =====
-    style_set = draw_setka(7, 126, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(127, 2, 9) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(7, 126, 2, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(127, 2, 9, style) # рисует линии сетки за места(номер строки, участники)
 # =========== 3 страница ==================
     # ======= встречи (49-56) за 17-18 место =====
-    style_set = draw_setka(1, 140, 16) # рисует кусок сетки(номер столбца, номер строки на 16человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(155, 16, 9) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(1, 140, 16, style) # рисует кусок сетки(номер столбца, номер строки на 16человека)
+    style = draw_mesta(155, 16, 9, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (64) за 19-20 место =====
-    style_set = draw_setka(9, 168, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(169, 2, 10) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(9, 168, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(169, 2, 10, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (33-35) за 21-24 место =====
-    style_set = draw_setka(5, 172, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(175, 4, 8) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(5, 172, 4, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(175, 4, 8, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (68) за 25-26 место =====
-    style_set = draw_setka(9, 182, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(183, 2, 11) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(9, 182, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(183, 2, 11, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (69 - 75) за 25-26 место =====
-    style_set = draw_setka(1, 179, 8) # рисует кусок сетки(номер столбца, номер строки на 8 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(186, 8, 7) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(1, 179, 8, style) # рисует кусок сетки(номер столбца, номер строки на 8 человека)
+    style = draw_mesta(186, 8, 7, style) # рисует линии сетки за места(номер строки, участники)
     # ======= встречи (64) за 25-26 место =====
-    style_set = draw_setka(9, 194, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(195, 2, 10) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(9, 194, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(195, 2, 10, style) # рисует линии сетки за места(номер строки, участники)
      # ======= встречи (64) за 25-26 место =====
-    style_set = draw_setka(1, 197, 4) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(200, 4, 5) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
+    style = draw_setka(1, 197, 4, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(200, 4, 5, style) # рисует линии сетки за места(номер строки, участники)
      # ======= встречи (64) за 25-26 место =====
-    style_set = draw_setka(9, 201, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set = draw_mesta(202, 2, 10) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
-    
+    style = draw_setka(9, 201, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(202, 2, 10, style) # рисует линии сетки за места(номер строки, участники)
+
     
 # =========================================
     for i in range(0, 11, 2):
@@ -6063,372 +5987,93 @@ def setka_32_full_made(fin):
     return tds
 
 
-def setka_32_full_made_new(fin):
-    """сетка на 32 с розыгрышем всех мест"""
-    from reportlab.platypus import Table
-    elements = []
-    data = []
-    column = ['']
-    column_count = column * 12
-    # добавить в аргументы функции
-    final = fin
-    # first_mesto = mesto_in_final(fin)
-    first_mesto = 1
-    for i in range(0, 138):
-        column_count[11] = i  # нумерация 10 столбца для удобного просмотра таблицы
-        list_tmp = column_count.copy()
-        data.append(list_tmp)
-
-    # ========= места ==========
-    n = 1
-    # for i in range(1, 3):
-    #     data[i * 22 + 9][11] = str(first_mesto + i // 2) + "Место"   
-    #     data[i * 5 + 54][11] = str(first_mesto + i // 2 + 2) + "Место"
-    p = 0
-    # ========= нумерация встреч сетки ==========
-    for i in range(3, 67, 2):  # создание номеров игроков сетки (1-32)
-        data[i - 1][0] = str(p + 1)
-        p += 1
-    p = 0
-    for i in range(2, 63, 4):  # создание номеров встреч (1-16)
-        data[i + 1][2] = str(p + 1)
-        # data[i // 2 + 40][2] = str((p + 1) * -1)  # номера проигравших 1-8
-        p += 1
-    for i in range(4, 62, 8):
-        data[i][4] = str(p + 1)  # создание номеров встреч (17-24)
-        # data[i // 4 + 31][4] = str((p + 1) * -1)  # номера проигравших 9-12
-        # data[i // 2 + 40][4] = str(p + 13)  # создание номеров встреч (21-24)
-        # data[i // 4 + 57][4] = str((p + 13) * -1)  # номера проигравших 21-24
-        p += 1
-    for i in range(6, 56, 16):
-        data[i][6] = str(p + 1)  # создание номеров встреч (25-28)
-        # data[i // 8 + 28][6] = str((p + 1) * -1)  # номера проигравших 13-14
-        # data[i // 2 + 40][6] = str(p + 13)  # создание номеров встреч (25-26)
-        # data[i // 8 + 54][6] = str((p + 13) * -1)  # номера проигравших 25-26
-        p += 1
-    # for i in range(10, 44, 32):
-    #     data[i][8] = str(p + 1)  # создание номеров встреч (29-30)
-    #     # data[i // 2 + 22][6] = str((p + 3) * -1)  # номера проигравших 17-18
-    #     # data[i + 62][8] = str(p + 15)  # создание номеров встреч (29-30)
-    #     # data[i // 2 + 56][8] = str((p + 1) * -1)  # номера проигравших 29-30
-    #     p += 1
-
-  
-    # for i in range(33, 40, 6):
-    data[60][8] = str((p - 1) * -1)  # номера проигравших 29
-    data[62][8] = str(p * -1)  # номера проигравших 30
-    data[18][10] = str(p + 1)  # создание номеров встреч (31)
-    data[55][10] = str((p + 1) * -1)  # номер проигравшего финал (-31)
-    data[61][10] = str(p + 2)  # создание номеров встреч 32
-    data[66][10] = str((p + 2) * -1)  # номер проигравшего финал (-32)
- 
-    num = draw_num(72, 8, 33, data, 2) # рисует номера встреч (нач_строка, нача_столбец, нач номер, кол-во участников)
-    data[84][10] = str(num + 1)  # создание номеров встреч 36
-    num = draw_num(89, 6, 37, data, 4) # рисует номера встреч (нач_строка, нача_столбец, нач номер, кол-во участников)
-    # s = 1
-    # for k in range(8, 11, 2):
-    #     for i in range (71 + s, 77, 4):
-    #         data[i][k] = str(p + 3)
-    #         p += 1
-    #     s *= 2
-    # data[25][8] = str(-15)
-    # data[29][8] = str(16)  # создание номеров встреч 16
-    # data[31][8] = str(-16)
-    # data[37][8] = str(-19)
-    # data[41][8] = str(-20)
-    # data[44][8] = str(27)  # создание номеров встреч 27
-    # data[52][8] = str(-27)
-    # data[55][8] = str(28)  # создание номеров встреч 28
-    # data[57][8] = str(-28)
-    # data[63][8] = str(-31)
-    # data[67][8] = str(-32)
-
-    # ============= данные игроков и встреч и размещение по сетке =============
-    # ======= создать словарь  ключ - номер встречи, значение - номер ряда
-    dict_num_game = {}
-    for d in range(2, 11, 2):
-        for r in range(0, 69):
-            key = data[r][d]
-            if key != "":
-                dict_num_game[key] = r
-    # ===== добавить данные игроков и счета в data ==================
-    all_list = setka_data_clear(fin)
-    tds = all_list[0]
-    for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
-        n = i - (i // 2)
-        data[i][1] = tds[n]
-    # ==============
-    # cw = ((0.2 * cm, 3.6 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm,
-        # 2.5 * cm, 0.35 * cm, 2.9 * cm, 0.3 * cm))
-    cw = ((0.2 * cm, 3.8 * cm, 0.35 * cm, 2.8 * cm, 0.35 * cm, 2.8 * cm, 0.35 * cm, 
-        2.8 * cm, 0.35 * cm, 3.8 * cm, 0.3 * cm, 0.5 * cm))
-    # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
-    t = Table(data, cw, 138 * [0.35 * cm])
-    style = []
-    # =========  цикл создания стиля таблицы =======
-    # ========= 1 страница =========
-    n = 3
-    s = 1
-    for i in range (1, 10, 2): # номер столбца 
-        s *= 2
-        for k in range(n, 67, s): # номер строки
-            fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # рисует линии встреч
-            style.append(fn)  
-        n = n + s // 2
-
-    for l in range(34, 65, 27):
-        fn = ('LINEABOVE', (9, l), (10, l), 1, colors.darkblue)  # рисует линии встреч за 1-2 места
-        style.append(fn)
-    for l in range(64, 70, 5):
-        fn = ('LINEABOVE', (7, l), (7, l), 1, colors.darkblue)  # рисует линии встреч за 3-4 места
-        style.append(fn)
-    # for p in range(61, 64, 2):
-    #     fn = ('LINEABOVE', (9, p), (10, p), 1, colors.darkblue)  # рисует линии встреч за -29 -30
-    #     style.append(fn)
-
-    for q in range(2, 64, 4): # рисует область 1 столбца, где номера встреч 1-16
-        fn = ('BOX', (2, q + 1), (2, q + 2), 1, colors.darkblue)
-        style.append(fn)
-        fn = ('SPAN', (2, q + 1), (2, q + 2))  # встречи 1-16
-        style.append(fn)
-        fn = ('BACKGROUND', (2, q + 1), (2, q + 1), colors.lightyellow)  # встречи 1-16
-        style.append(fn)
-    for q in range(2, 34, 4): # рисует область 2 столбца, где номера встреч 17-24
-        fn = ('BOX', (4, q * 2), (4, q * 2 + 3), 1, colors.darkblue)
-        style.append(fn)
-        fn = ('SPAN', (4, q * 2), (4, q * 2 + 3))  # встречи 17-24
-        style.append(fn)
-        fn = ('BACKGROUND', (4, q * 2), (4, q * 2 + 3), colors.lightyellow)  # встречи 17-24
-        style.append(fn)
-    for q in range(2, 27, 8): # рисует область 3 столбца, где встречи 25-28
-        fn = ('BOX', (6, q * 2 + 2), (6, q * 2 + 9), 1, colors.darkblue)
-        style.append(fn) 
-        fn = ('SPAN', (6, q * 2 + 2), (6, q * 2 + 9))  # встреча 25-28
-        style.append(fn)
-        fn = ('BACKGROUND', (6, q * 2 + 2), (6, q * 2 + 9), colors.lightyellow)  # встречи 25-28
-        style.append(fn)
-    for q in range(2, 19, 16):
-        fn = ('BOX', (8, q * 2 + 6), (8, q * 2 + 21), 1, colors.darkblue)
-        style.append(fn)
-        fn = ('SPAN', (8, q * 2 + 6), (8, q * 2 + 21))  # встреча 29-30
-        style.append(fn)
-        fn = ('BACKGROUND', (8, q * 2 + 6), (8, q * 2 + 21), colors.lightyellow)  # встречи 29-30
-        style.append(fn)  
-    # рисует область 5 столбца, где встреча 31, за 1-2 место
-    fn = ('BOX', (10, 18), (10, 49), 1, colors.darkblue)
-    style.append(fn) 
-    fn = ('SPAN', (10, 18), (10, 49))  # встреча 31
-    style.append(fn)       
-    fn = ('BACKGROUND', (10, 18), (10, 49), colors.lightyellow)  # встречи 31 за 1-2 место
-    style.append(fn)
-    # fn = ('BOX', (10, 61), (10, 62), 1, colors.darkblue)
-    # style.append(fn) 
-    # fn = ('SPAN', (10, 61), (10, 62))  # встреча 32
-    # style.append(fn)       
-    # fn = ('BACKGROUND', (10, 61), (10, 62), colors.lightyellow)  # встречи 32 за 3-4 место
-    # style.append(fn)
-   
-  
-    for i in range(1, 10, 2):
-        fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
-        style.append(fn)
-        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 68), colors.green)  # цвет шрифта номеров встреч
-        style.append(fn)
-        # выравнивание фамилий игроков по левому краю
-        fn = ('ALIGN', (i, 0), (i, 68), 'LEFT')
-        style.append(fn)
-        # центрирование номеров встреч
-        fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
-        style.append(fn)
-# =========== 2 страница ===================
-#     # # ======= встречи (33-35) за 5-6 место =====
-#     style_set = draw_setka(7, 72, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-#     style_set = draw_mesta(75, 4) # рисует линии сетки за места(номер строки, участники)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-# # ======= встречи (36) за 7-8 место =====
-#     style_set = draw_setka(9, 84, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-#     style_set = draw_mesta(85, 2) # рисует линии сетки за места(номер строки, участники)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-# # ======= встречи (37-43) за 9-10 место =====
-#     style_set = draw_setka(5, 89, 8) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-#     style_set = draw_mesta(96, 8) # рисует линии сетки за места(номер строки, участники)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-# # ======= встречи (44) за 11-12 место =====
-#     style_set = draw_setka(9, 106, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-#     style_set = draw_mesta(107, 2) # рисует линии сетки за места(номер строки, участники)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-# # # ======= встречи (45-47) за 13-14 место =====
-#     style_set = draw_setka(7, 114, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-#     style_set = draw_mesta(117, 4) # рисует линии сетки за места(номер строки, участники)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-# # # ======= встречи (48) за 15-16 место =====
-#     style_set = draw_setka(9, 126, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-#     style_set = draw_mesta(127, 2) # рисует линии сетки за места(номер строки, участники)
-#     for fn in style_set:
-#         style.append(fn)
-#     style_set.clear()
-# =========== 3 страница ==================
-
-# =========================================
-    for i in range(1, 10, 2):
-        fn = ('TEXTCOLOR', (i, 0), (i, 136), colors.black)  # цвет шрифта игроков
-        style.append(fn)
-        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 136), colors.green)  # цвет шрифта номеров встреч
-        style.append(fn)
-        # выравнивание фамилий игроков по левому краю
-        fn = ('ALIGN', (i, 0), (i, 136), 'LEFT')
-        style.append(fn)
-        # центрирование номеров встреч
-        fn = ('ALIGN', (i + 1, 0), (i + 1, 136), 'CENTER')
-        style.append(fn)
-    # fn = ('TEXTCOLOR', (12, 0), (12, 68), colors.red)  # цвет шрифта места
-    # style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
-
-    ts = style   # стиль таблицы (список оформления строк и шрифта)
-
-    t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
-                           ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
-                           ('FONTSIZE', (0, 0), (-1, -1), 7),
-                           ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
-                           ('FONTSIZE', (1, 0), (1, 32), 7),
-                           # 12 столбец с 0 по 68 ряд (цвет места)
-                           ('TEXTCOLOR', (11, 0), (11, 138), colors.black),
-                           ('ALIGN', (11, 0), (11, 68), 'RIGHT'),
-                           # цвет шрифта игроков 1 ого тура
-                           ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-                           ] + ts))
-
-    elements.append(t)
-    pv = A4
-    znak = final.rfind("-")
-    f = final[:znak]
-
-    if pv == A4:
-        pv = A4
-    else:
-        pv = landscape(A4)
-    t_id = Title.get(Title.id == title_id())
-    # short_name = t_id.short_name_comp
-    short_name = "чист_32_full_сетка"
-    name_table_final = f"{f}-финал_{short_name}.pdf"
-    doc = SimpleDocTemplate(name_table_final, pagesize=pv)
-    change_dir()
-    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    return tds
-
-
-
 def setka_32_2_made(fin):
     """сетка на 32 (-2) с розыгрышем всех мест"""
     from reportlab.platypus import Table
+    table = "setka_32_2"
     elements = []
+    style = []
     data = []
     column = ['']
-    column_count = column * 13
-    # добавить в аргументы функции
+    column_count = column * 15
     final = fin
     # first_mesto = mesto_in_final(fin)
     first_mesto = 1
-    for i in range(0, 138):
-        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
+    strok = 207
+    for i in range(0, strok):
+        column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
-
-    # ========= места ==========
-    n = 1
-    for i in range(1, 3):
-        data[i * 22 + 9][11] = str(first_mesto + i // 2) + "Место"   
-        data[i * 5 + 54][11] = str(first_mesto + i // 2 + 2) + "Место"
-    p = 0
     # ========= нумерация встреч сетки ==========
-    for i in range(3, 67, 2):  # создание номеров игроков сетки (1-32)
-        data[i - 1][0] = str(p + 1)
-        p += 1
-    p = 0
-    for i in range(2, 63, 4):  # создание номеров встреч (1-16)
-        data[i + 1][2] = str(p + 1)
-        # data[i // 2 + 40][2] = str((p + 1) * -1)  # номера проигравших 1-8
-        p += 1
-    for i in range(4, 62, 8):
-        data[i][4] = str(p + 1)  # создание номеров встреч (17-24)
-        # data[i // 4 + 31][4] = str((p + 1) * -1)  # номера проигравших 9-12
-        # data[i // 2 + 40][4] = str(p + 13)  # создание номеров встреч (21-24)
-        # data[i // 4 + 57][4] = str((p + 13) * -1)  # номера проигравших 21-24
-        p += 1
-    for i in range(6, 56, 16):
-        data[i][6] = str(p + 1)  # создание номеров встреч (25-28)
-        # data[i // 8 + 28][6] = str((p + 1) * -1)  # номера проигравших 13-14
-        # data[i // 2 + 40][6] = str(p + 13)  # создание номеров встреч (25-26)
-        # data[i // 8 + 54][6] = str((p + 13) * -1)  # номера проигравших 25-26
-        p += 1
-    for i in range(10, 44, 32):
-        data[i][8] = str(p + 1)  # создание номеров встреч (29-30)
-        # data[i // 2 + 22][6] = str((p + 3) * -1)  # номера проигравших 17-18
-        # data[i + 62][8] = str(p + 15)  # создание номеров встреч (29-30)
-        # data[i // 2 + 56][8] = str((p + 1) * -1)  # номера проигравших 29-30
-        p += 1
-
+    y = 0
+    for i in range(1, 65, 2):
+        y += 1
+        data[i + 1][0] = str(y)  # рисует начальные номера таблицы 1-32
+    num = draw_num(3, 2, 1, data, 32) # рисует номера встреч 1-32 (нач_строка, нача_столбец, нач номер, кол-во участников, номер встречи прогиравшего)
   
-    # for i in range(33, 40, 6):
-    data[60][8] = str((p - 1) * -1)  # номера проигравших 29
-    data[62][8] = str(p * -1)  # номера проигравших 30
-    data[18][10] = str(p + 1)  # создание номеров встреч (31)
-    data[55][10] = str((p + 1) * -1)  # номер проигравшего финал (-31)
-    data[61][10] = str(p + 2)  # создание номеров встреч 32
-    data[66][10] = str((p + 2) * -1)  # номер проигравшего финал (-32)
- 
-    num = draw_num(72, 8, 33, data, 2) # рисует номера встреч (нач_строка, нача_столбец, нач номер, кол-во участников)
-    data[84][10] = str(num + 1)  # создание номеров встреч 36
-    num = draw_num(89, 6, 37, data, 4) # рисует номера встреч (нач_строка, нача_столбец, нач номер, кол-во участников)
-    # s = 1
-    # for k in range(8, 11, 2):
-    #     for i in range (71 + s, 77, 4):
-    #         data[i][k] = str(p + 3)
-    #         p += 1
-    #     s *= 2
-    # data[25][8] = str(-15)
-    # data[29][8] = str(16)  # создание номеров встреч 16
-    # data[31][8] = str(-16)
-    # data[37][8] = str(-19)
-    # data[41][8] = str(-20)
-    # data[44][8] = str(27)  # создание номеров встреч 27
-    # data[52][8] = str(-27)
-    # data[55][8] = str(28)  # создание номеров встреч 28
-    # data[57][8] = str(-28)
-    # data[63][8] = str(-31)
-    # data[67][8] = str(-32)
+    data[60][8] = str((num - 3) * -1)  # номера проигравших 29
+    data[62][8] = str((num - 2) * -1)  # номера проигравших 30
+    data[18][10] = str(num - 1)  # создание номеров встреч (31)
+    data[55][10] = str((num - 1) * -1)  # номер проигравшего финал (-31)
+    data[61][10] = str(num)  # создание номеров встреч 32
+    data[66][10] = str((num) * -1)  # номер проигравшего финал (-32)
+    #===== 2-я страница =========
+    # y = 0
+    # for i in range(78, 89, 10):
+    #     y += 1
+    #     data[i][8] = str((y + 34) * -1)  # номер проигравшего финал (-35, -36)
+    # y = 0
+    # for i in range(101, 112, 9):
+    #     y += 1
+    #     data[i][8] = str((y + 42) * -1)  # номер проигравшего финал (-43, -44)
+    # y = 0
+    # for i in range(120, 131, 10):
+    #     y += 1
+    #     data[i][8] = str((y + 46) * -1)  # номер проигравшего финал (-47, -48)
+    y = 0
+    for i in range(172, 187, 14):
+        y += 4
+        data[i][10] = str((y + 60) * -1)  # номер проигравшего финал (-64, -68)
+    y = 0
+    for i in range(198, 206, 7):
+        y += 4
+        data[i][10] = str((y + 72) * -1)  # номер проигравшего финал (-76, -80)
+    data[178][8] = str(-67)  # номер проигравшего финал (-67)
+    data[191][6] = str(-75)  # номер проигравшего финал (-75)
+    data[164][8] = str(-63)  # номер проигравшего финал (-63)
+    data[203][4] = str(-79)  # номер проигравшего финал (-79)
 
+
+
+    # num = draw_num_2(70, 0, 32, data, 16) # рисует номера встреч 33-35 (нач_строка, нача_столбец, нач номер, кол-во участников, номер встречи прогиравшего)
+    # draw_num_lost(72, 4, 25, 4, data) # номера минус проигравшие встречи
+    # data[84][8] = str(num)  # создание номеров встреч 36
+    # num = draw_num(89, 4, 37, data, 8) # рисует номера встреч 37-43 (нач_строка, нача_столбец, нач номер, кол-во участников)
+    # draw_num_lost(84, 6, 33, 2, data) # номера минус проигравшие встречи
+    # data[106][8] = str(num)  # создание номеров встреч 44
+    # num = draw_num(114, 6, 45, data, 4) # рисует номера встреч 45-47 (нач_строка, нача_столбец, нач номер, кол-во участников)
+    # draw_num_lost(89, 2, 17, 8, data) # номера минус проигравшие встречи
+    # data[126][8] = str(num)  # создание номеров встреч 48
+    # draw_num_lost(106, 6, 41, 2, data) # номера минус проигравшие встречи
+    # draw_num_lost(114, 4, 37, 4, data) # номера минус проигравшие встречи
+    # draw_num_lost(126, 6, 45, 2, data) # номера минус проигравшие встречи
+
+    num = draw_num(140, 2, 49, data, 16) # рисует номера встреч 49-63 (нач_строка, нача_столбец, нач номер, кол-во участников, номер встречи прогиравшего)
+    draw_num_lost(140, 0, 1, 16, data) # номера минус проигравшие встречи
+    data[168][10] = str(num)  # создание номеров встреч 64
+    num = draw_num(172, 6, 65, data, 4) # рисует номера встреч 65-67 (нач_строка, нача_столбец, нач номер, кол-во участников, номер встречи прогиравшего)
+    draw_num_lost(172, 4, 57, 4, data) # номера минус проигравшие встречи
+    data[182][10] = str(num)  # создание номеров встреч 68
+    num = draw_num(179, 2, 69, data, 8) # рисует номера встреч 69-75 (нач_строка, нача_столбец, нач номер, кол-во участников, номер встречи прогиравшего)
+    draw_num_lost(179, 0, 49, 8, data) # номера минус проигравшие встречи
+    data[194][10] = str(num)  # создание номеров встреч 68
+    num = draw_num(197, 2, 77, data, 4) # рисует номера встреч 69-75 (нач_строка, нача_столбец, нач номер, кол-во участников, номер встречи прогиравшего)
+    draw_num_lost(197, 0, 69, 4, data) # номера минус проигравшие встречи
+    data[201][10] = str(num)  # создание номеров встреч 68
+    draw_num_lost(168, 8, 61, 2, data) # номера минус проигравшие встречи
+    draw_num_lost(182, 8, 65, 2, data) # номера минус проигравшие встречи -65 -66
+    draw_num_lost(194, 8, 73, 2, data) # номера минус проигравшие встречи
+    draw_num_lost(201, 8, 77, 2, data) # номера минус проигравшие встречи
     # ============= данные игроков и встреч и размещение по сетке =============
     # ======= создать словарь  ключ - номер встречи, значение - номер ряда
     dict_num_game = {}
@@ -6444,174 +6089,105 @@ def setka_32_2_made(fin):
         n = i - (i // 2)
         data[i][1] = tds[n]
     # ==============
-    cw = ((0.2 * cm, 3.6 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm, 2.5 * cm, 0.35 * cm,
-        2.5 * cm, 0.35 * cm, 2.9 * cm, 0.3 * cm))
+    cw = ((0.2 * cm, 3.5 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm,
+        2.4 * cm, 0.35 * cm, 2.6 * cm, 0.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
-    t = Table(data, cw, 138 * [0.35 * cm])
-    style = []
+    style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
+    t = Table(data, cw, strok * [0.35 * cm])
     # =========  цикл создания стиля таблицы =======
     # ========= 1 страница =========
-    n = 3
-    s = 1
-    for i in range (1, 10, 2): # номер столбца 
-        s *= 2
-        for k in range(n, 67, s): # номер строки
-            fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # рисует линии встреч
-            style.append(fn)  
-        n = n + s // 2
-
+    style = draw_setka(1, 3, 32, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
+   
     for l in range(34, 57, 22):
         fn = ('LINEABOVE', (11, l), (13, l), 1, colors.darkblue)  # рисует линии встреч за 1-2 места
         style.append(fn)
     for l in range(62, 68, 5):
         fn = ('LINEABOVE', (11, l), (13, l), 1, colors.darkblue)  # рисует линии встреч за 3-4 места
         style.append(fn)
-    for p in range(61, 64, 2):
-        fn = ('LINEABOVE', (9, p), (10, p), 1, colors.darkblue)  # рисует линии встреч за -29 -30
+    for l in range(61, 64, 2):
+        fn = ('LINEABOVE', (9, l), (10, l), 1, colors.darkblue)  # рисует линии встреч за -29 -30
         style.append(fn)
 
-    for q in range(2, 64, 4): # рисует область 1 столбца, где номера встреч 1-16
-        fn = ('BOX', (2, q + 1), (2, q + 2), 1, colors.darkblue)
-        style.append(fn)
-        fn = ('SPAN', (2, q + 1), (2, q + 2))  # встречи 1-16
-        style.append(fn)
-        fn = ('BACKGROUND', (2, q + 1), (2, q + 1), colors.lightyellow)  # встречи 1-16
-        style.append(fn)
-    for q in range(2, 34, 4): # рисует область 2 столбца, где номера встреч 17-24
-        fn = ('BOX', (4, q * 2), (4, q * 2 + 3), 1, colors.darkblue)
-        style.append(fn)
-        fn = ('SPAN', (4, q * 2), (4, q * 2 + 3))  # встречи 17-24
-        style.append(fn)
-        fn = ('BACKGROUND', (4, q * 2), (4, q * 2 + 3), colors.lightyellow)  # встречи 17-24
-        style.append(fn)
-    for q in range(2, 27, 8): # рисует область 3 столбца, где встречи 25-28
-        fn = ('BOX', (6, q * 2 + 2), (6, q * 2 + 9), 1, colors.darkblue)
-        style.append(fn) 
-        fn = ('SPAN', (6, q * 2 + 2), (6, q * 2 + 9))  # встреча 25-28
-        style.append(fn)
-        fn = ('BACKGROUND', (6, q * 2 + 2), (6, q * 2 + 9), colors.lightyellow)  # встречи 25-28
-        style.append(fn)
-    for q in range(2, 19, 16):
-        fn = ('BOX', (8, q * 2 + 6), (8, q * 2 + 21), 1, colors.darkblue)
-        style.append(fn)
-        fn = ('SPAN', (8, q * 2 + 6), (8, q * 2 + 21))  # встреча 29-30
-        style.append(fn)
-        fn = ('BACKGROUND', (8, q * 2 + 6), (8, q * 2 + 21), colors.lightyellow)  # встречи 29-30
-        style.append(fn)  
-    # рисует область 5 столбца, где встреча 31, за 1-2 место
-    fn = ('BOX', (10, 18), (10, 49), 1, colors.darkblue)
-    style.append(fn) 
-    fn = ('SPAN', (10, 18), (10, 49))  # встреча 31
-    style.append(fn)       
-    fn = ('BACKGROUND', (10, 18), (10, 49), colors.lightyellow)  # встречи 31 за 1-2 место
-    style.append(fn)
     fn = ('BOX', (10, 61), (10, 62), 1, colors.darkblue)
     style.append(fn) 
     fn = ('SPAN', (10, 61), (10, 62))  # встреча 32
     style.append(fn)       
     fn = ('BACKGROUND', (10, 61), (10, 62), colors.lightyellow)  # встречи 32 за 3-4 место
     style.append(fn)
-   
-  
-    for i in range(1, 10, 2):
-        fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
-        style.append(fn)
-        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 68), colors.green)  # цвет шрифта номеров встреч
-        style.append(fn)
-        # выравнивание фамилий игроков по левому краю
-        fn = ('ALIGN', (i, 0), (i, 68), 'LEFT')
-        style.append(fn)
-        # центрирование номеров встреч
-        fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
-        style.append(fn)
 # =========== 2 страница ===================
     # # ======= встречи (33-35) за 5-6 место =====
-    style_set = draw_setka(7, 72, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-    style_set = draw_mesta(75, 4) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-# ======= встречи (36) за 7-8 место =====
-    style_set = draw_setka(9, 84, 2) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-    style_set = draw_mesta(85, 2) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-# ======= встречи (37-43) за 9-10 место =====
-    style_set = draw_setka(5, 89, 8) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-    style_set = draw_mesta(96, 8) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-# ======= встречи (44) за 11-12 место =====
-    style_set = draw_setka(9, 106, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-    style_set = draw_mesta(107, 2) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-# # ======= встречи (45-47) за 13-14 место =====
-    style_set = draw_setka(7, 114, 4) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-    style_set = draw_mesta(117, 4) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-# # ======= встречи (48) за 15-16 место =====
-    style_set = draw_setka(9, 126, 2) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
-    style_set = draw_mesta(127, 2) # рисует линии сетки за места(номер строки, участники)
-    for fn in style_set:
-        style.append(fn)
-    style_set.clear()
+    style = draw_setka_2(1, 74, 16, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    # style = draw_mesta(75, 4, 9, style) # рисует линии сетки за места(номер строки, участники)
+    # # ======= встречи (36) за 7-8 место =====
+    # style = draw_setka(7, 84, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    # style = draw_mesta(85, 2, 9, style) # рисует линии сетки за места(номер строки, участники)
+    # # ======= встречи (37-43) за 9-10 место =====
+    # style = draw_setka(3, 89, 8, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    # style = draw_mesta(96, 8, 9, style) # рисует линии сетки за места(номер строки, участники)
+    # # ======= встречи (44) за 11-12 место =====
+    # style = draw_setka(7, 106, 2, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    # style = draw_mesta(107, 2, 9, style) # рисует линии сетки за места(номер строки, участники)
+    # # ======= встречи (45-47) за 13-14 место =====
+    # style = draw_setka(5, 114, 4, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    # style = draw_mesta(117, 4, 9, style) # рисует линии сетки за места(номер строки, участники, столбец)
+    # # ======= встречи (48) за 15-16 место =====
+    # style = draw_setka(7, 126, 2, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    # style = draw_mesta(127, 2, 9, style) # рисует линии сетки за места(номер строки, участники)
 # =========== 3 страница ==================
+    # ======= встречи (49-56) за 17-18 место =====
+    style = draw_setka(1, 140, 16, style) # рисует кусок сетки(номер столбца, номер строки на 16человека)
+    style = draw_mesta(155, 16, 9, style) # рисует линии сетки за места(номер строки, участники)
+    # ======= встречи (64) за 19-20 место =====
+    style = draw_setka(9, 168, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(169, 2, 10, style) # рисует линии сетки за места(номер строки, участники)
+    # ======= встречи (33-35) за 21-24 место =====
+    style = draw_setka(5, 172, 4, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(175, 4, 8, style) # рисует линии сетки за места(номер строки, участники)
+    # ======= встречи (68) за 25-26 место =====
+    style = draw_setka(9, 182, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(183, 2, 11, style) # рисует линии сетки за места(номер строки, участники)
+    # ======= встречи (69 - 75) за 25-26 место =====
+    style = draw_setka(1, 179, 8, style) # рисует кусок сетки(номер столбца, номер строки на 8 человека)
+    style = draw_mesta(186, 8, 7, style) # рисует линии сетки за места(номер строки, участники)
+    # ======= встречи (64) за 25-26 место =====
+    style = draw_setka(9, 194, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(195, 2, 10, style) # рисует линии сетки за места(номер строки, участники)
+     # ======= встречи (64) за 25-26 место =====
+    style = draw_setka(1, 197, 4, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(200, 4, 5, style) # рисует линии сетки за места(номер строки, участники)
+     # ======= встречи (64) за 25-26 место =====
+    style = draw_setka(9, 201, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(202, 2, 10, style) # рисует линии сетки за места(номер строки, участники)
 
+    
 # =========================================
-    for i in range(1, 10, 2):
-        fn = ('TEXTCOLOR', (i, 0), (i, 136), colors.black)  # цвет шрифта игроков
+    for i in range(0, 11, 2):
+        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 206), colors.black)  # цвет шрифта игроков
         style.append(fn)
-        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 136), colors.green)  # цвет шрифта номеров встреч
+        fn = ('TEXTCOLOR', (i, 0), (i, 206), colors.green)  # цвет шрифта номеров встреч
         style.append(fn)
         # выравнивание фамилий игроков по левому краю
-        fn = ('ALIGN', (i, 0), (i, 136), 'LEFT')
+        fn = ('ALIGN', (i + 1, 0), (i + 1, 206), 'LEFT')
         style.append(fn)
         # центрирование номеров встреч
-        fn = ('ALIGN', (i + 1, 0), (i + 1, 136), 'CENTER')
+        fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    # fn = ('TEXTCOLOR', (12, 0), (12, 68), colors.red)  # цвет шрифта места
-    # style.append(fn)
     fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
     style.append(fn)
-
     ts = style   # стиль таблицы (список оформления строк и шрифта)
+    for b in style_color:
+        ts.append(b)
 
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
                            ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
-                           ('FONTSIZE', (1, 0), (1, 32), 7),
-                           # 12 столбец с 0 по 68 ряд (цвет места)
-                           ('TEXTCOLOR', (11, 0), (11, 138), colors.red),
-                           ('ALIGN', (13, 0), (13, 68), 'CENTER'),
+                           ('FONTSIZE', (1, 0), (1, 32), 7)] + ts 
+                           + [
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-                           ] + ts))
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
+                           
 
     elements.append(t)
     pv = A4
@@ -6624,13 +6200,12 @@ def setka_32_2_made(fin):
         pv = landscape(A4)
     t_id = Title.get(Title.id == title_id())
     # short_name = t_id.short_name_comp
-    short_name = "чист_32_full_сетка"
+    short_name = "чист_32_2_сетка"
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     return tds
-
 
 
 def mesto_in_final(fin):
@@ -6666,18 +6241,13 @@ def setka_data_clear(fin):
     all_list = []
     tmp = [""]
     sys = System.select().where(System.title_id == title_id())
-    # system = sys.get(System.stage == fin)
     system = sys.select().where(System.stage == fin).get()
     max_pl = system.max_player
     # max_pl = 16
     tds = tmp * max_pl
     all_list.append(tds)
-    # all_list.append(id_ful_name)
-    # all_list.append(id_name)
     return all_list
     
-
-
 
 def kol_player():
     """выводит максимальное количество человек в группе t если все группы равны, а g2 если разное количество"""
@@ -7796,10 +7366,11 @@ def change_dir():
         os.chdir("table_pdf")
 
 
-def draw_setka(col, row, num):
+def draw_setka(col, row, num, style):
     """рисование сетки встреч игроков
     col - начальный столбец, row - начальный ряд, num - кол-во игроков"""
-    style_set = []    
+    style_set = [] 
+    # style = []   
     s = 1
     cf = 0  # кол-во туров
     if num == 2:  # кол-во игроков
@@ -7832,12 +7403,57 @@ def draw_setka(col, row, num):
             fn = ('BOX', (m, q), (m, q + s - 1), 1, colors.darkblue)
             style_set.append(fn)
         row_b = row_b + s // 2   
-    return style_set
+    for fn in style_set:
+        style.append(fn)
+    return style
 
 
-def draw_mesta(row_m, men, col_m):
+def draw_setka_2(col, row, num, style):
+    """рисование сетки встреч игроков
+    col - начальный столбец, row - начальный ряд, num - кол-во игроков"""
+    style_set = [] 
+    # style = []   
+    s = 1
+    cf = 0  # кол-во туров
+    if num == 2:  # кол-во игроков
+        cf = 1
+    elif num == 4:
+        cf = 2
+    elif num == 8:
+        cf = 3
+    elif num == 16:
+        cf = 4
+    elif num == 32:
+        cf = 5
+    row_b = row
+    col_fin = col + cf * 2 # последний столбец
+    row_fin = row + num * 2 - 1 # последняя строка 
+    for i in range (col, col_fin, 2): # номер столбца 
+        s *= 2
+        for k in range(row, row_fin, s): # номер строки
+            fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # рисует линии встреч
+            style_set.append(fn)  
+        # row = row + s // 2
+        row -= 1
+        s = s // 2
+    # s = 1
+    # for m in range(col + 1, col_fin + 1, 4):
+    #     s *= 2
+    #     for q in range(row_b, row_fin, s * 2):  # встречи 33-34
+    #         fn = ('SPAN', (m, q), (m, q + s - 1 ))             
+    #         style_set.append(fn)
+    #         fn = ('BACKGROUND', (m, q), (m, q + s - 1 ), colors.lightyellow)  
+    #         style_set.append(fn) 
+    #         fn = ('BOX', (m, q), (m, q + s - 1), 1, colors.darkblue)
+    #         style_set.append(fn)
+    #     row_b = row_b + s // 2   
+    for fn in style_set:
+        style.append(fn)
+    return style
+
+
+def draw_mesta(row_m, men, col_m, style):
     """рисует линии встреч за место"""
-    style_set = []
     p = 0
     if men == 2:
         p = 4
@@ -7857,8 +7473,8 @@ def draw_mesta(row_m, men, col_m):
 
     for l in range(row_m, row_m + p + 1, p):
         fn = ('LINEABOVE', (col_m, l), (col_f, l), 1, colors.darkblue)  # рисует линии мест 5-6 места (4 чел)
-        style_set.append(fn)
-    return style_set
+        style.append(fn)
+    return style
 
 
 def draw_num(row_n, col_n, num, data, game):
@@ -7884,20 +7500,51 @@ def draw_num(row_n, col_n, num, data, game):
     return num
 
 
+def draw_num_2(row_n, col_n, num, data, game):
+    """рисует номера встреч, row_n - начальный ряд, col_n - начальный столбец, 
+    num - начальный номер встречи, game - кол-во участников"""
+    s = 1
+    u = 0
+    n = 1
+    while 2 ** n < game:
+        n += 1
+
+    col_f = col_n + (2 * n - 2) + 1
+ 
+    for k in range(col_n, col_f, 4):
+        u += 1
+        row_f = row_n + (game * 2 - 1)
+        step = s * 4
+        for i in range (row_n, row_f, step):
+            data[i][k] = str(num)
+            num += 1
+        s *= 2
+        row_n = row_n + s // 2
+    return num
+
+
 def draw_num_lost(row_n, col_n, lost, game, data):
     """нумерация встреч проигранных"""
-    for d in range(row_n, row_n + (game - 1) * 2 + 1, 2):
+    row_f = row_n + (game - 1) * 2 + 1
+    for d in range(row_n, row_f, 2):
             data[d - 1][col_n] = str(lost * -1)
             lost += 1
 
 
-def color_mesta(data, first_mesto):
+def color_mesta(data, first_mesto, table):
     """окрашивает места в красный цвет"""
     b = 0
     style_color = []
     ml = []
+    f = 0
+    if table == "setka_32":
+        f = 2
+    elif table == "setka_32_full":
+        f = 13
+    elif table == "setka_32_2":
+        f = 13
 
-    for c in range(0, 13):
+    for c in range(0, f):
         if c == 0:
             ml = [11, 31, 54, 22]
         elif c == 1:
