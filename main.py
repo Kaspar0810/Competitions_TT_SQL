@@ -6090,7 +6090,7 @@ def setka_32_2_made(fin):
         data[i][1] = tds[n]
     # ==============
     cw = ((0.2 * cm, 3.5 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm,
-        2.4 * cm, 0.35 * cm, 2.6 * cm, 0.3 * cm))
+        2.4 * cm, 0.35 * cm, 2.6 * cm, 0.35 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
     t = Table(data, cw, strok * [0.35 * cm])
@@ -6115,9 +6115,43 @@ def setka_32_2_made(fin):
     fn = ('BACKGROUND', (10, 61), (10, 62), colors.lightyellow)  # встречи 32 за 3-4 место
     style.append(fn)
 # =========== 2 страница ===================
-    # # ======= встречи (33-35) за 5-6 место =====
-    style = draw_setka_2(1, 74, 16, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
-    # style = draw_mesta(75, 4, 9, style) # рисует линии сетки за места(номер строки, участники)
+    # # ======= встречи (33-35) за 3-4 место =====
+    style = draw_setka_2(1, 74, 16, style) # рисует кусок сетки(номер столбца, номер строки на 16 человека)
+    for k in range(0, 7, 6):
+        for l in range(72 + k, 89 + k, 16):
+            fn = ('LINEABOVE', (11, l), (12, l), 1, colors.darkblue)  # рисует линии встреч за 1-2 места
+            style.append(fn)   
+    for k in range(0, 17, 16):
+        fn = ('BOX', (12, 72 + k), (12, 77 + k), 1, colors.darkblue)
+        style.append(fn) 
+        fn = ('SPAN', (12, 72 + k), (12, 77 + k))  # встреча 32
+        style.append(fn)       
+        fn = ('BACKGROUND', (12, 72 + k), (12, 77 + k), colors.lightyellow)  # встречи 32 за 3-4 место
+        style.append(fn) 
+           
+    for l in range(75, 101, 8):
+        fn = ('LINEABOVE', (13, l), (13, l), 1, colors.darkblue)  # рисует линии встреч за 3-4 места
+        style.append(fn)
+    fn = ('BOX', (14, 75), (14, 90), 1, colors.darkblue)
+    style.append(fn) 
+    fn = ('SPAN', (14, 75), (14, 90))  # встреча 32
+    style.append(fn)       
+    fn = ('BACKGROUND', (14, 75), (14, 90), colors.lightyellow)  # встречи 32 за 3-4 место
+    style.append(fn)  
+    # # ======= встречи (61) за 5-6 место =====
+    style = draw_setka(11, 102, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(103, 2, 13, style) # рисует линии сетки за места(номер строки, участники)
+    # ======= встречи (36) за 7-8 место =====
+    style = draw_setka(11, 110, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_mesta(111, 2, 13, style) # рисует линии сетки за места(номер строки, участники)
+    # ======= встречи (37-43) за 9-10 место =====
+    style = draw_setka(1, 112, 4, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(115, 4, 5, style) # рисует линии сетки за места(номер строки, участники)
+    # ======= встречи (44) за 11-12 место =====
+    style = draw_setka(9, 120, 2, style) # рисует кусок сетки(номер столбца, номер строки на 4 человека)
+    style = draw_mesta(121, 2, 11, style) # рисует линии сетки за места(номер строки, участники)
+
+    # style = draw_mesta(85, 2, 9, style) # рисует линии сетки за места(номер строки, участники)
     # # ======= встречи (36) за 7-8 место =====
     # style = draw_setka(7, 84, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
     # style = draw_mesta(85, 2, 9, style) # рисует линии сетки за места(номер строки, участники)
@@ -7411,8 +7445,7 @@ def draw_setka(col, row, num, style):
 def draw_setka_2(col, row, num, style):
     """рисование сетки встреч игроков
     col - начальный столбец, row - начальный ряд, num - кол-во игроков"""
-    style_set = [] 
-    # style = []   
+    style_set = []  
     s = 1
     cf = 0  # кол-во туров
     if num == 2:  # кол-во игроков
@@ -7422,9 +7455,8 @@ def draw_setka_2(col, row, num, style):
     elif num == 8:
         cf = 3
     elif num == 16:
-        cf = 4
-    elif num == 32:
         cf = 5
+    
     row_b = row
     col_fin = col + cf * 2 # последний столбец
     row_fin = row + num * 2 - 1 # последняя строка 
@@ -7433,20 +7465,44 @@ def draw_setka_2(col, row, num, style):
         for k in range(row, row_fin, s): # номер строки
             fn = ('LINEABOVE', (i, k), (i + 1, k), 1, colors.darkblue)  # рисует линии встреч
             style_set.append(fn)  
-        # row = row + s // 2
-        row -= 1
-        s = s // 2
-    # s = 1
-    # for m in range(col + 1, col_fin + 1, 4):
-    #     s *= 2
-    #     for q in range(row_b, row_fin, s * 2):  # встречи 33-34
-    #         fn = ('SPAN', (m, q), (m, q + s - 1 ))             
-    #         style_set.append(fn)
-    #         fn = ('BACKGROUND', (m, q), (m, q + s - 1 ), colors.lightyellow)  
-    #         style_set.append(fn) 
-    #         fn = ('BOX', (m, q), (m, q + s - 1), 1, colors.darkblue)
-    #         style_set.append(fn)
-    #     row_b = row_b + s // 2   
+        if i == 1:
+            row -= 1
+            s = 1
+        elif i == 3:
+            row += 1
+            s = 2
+        elif i == 5:
+            row -= 2
+            row_fin -= 1
+            s = 2
+        elif i == 7:
+            row += 2
+            s = 4
+ 
+    s = 1
+    row_fin = row_b + num * 2 - 2 # последняя строка 
+    for m in range(col + 1, col_fin + 1, 2):
+        s *= 2
+        for q in range(row_b, row_fin, s * 2):  # встречи 33-34
+            fn = ('SPAN', (m, q), (m, q + s - 1 ))             
+            style_set.append(fn)
+            fn = ('BACKGROUND', (m, q), (m, q + s - 1 ), colors.lightyellow)  
+            style_set.append(fn) 
+            fn = ('BOX', (m, q), (m, q + s - 1), 1, colors.darkblue)
+            style_set.append(fn)
+        if m == 2:
+            row_b -= 1
+            s = 1
+        elif m == 4:
+            row_b += 1
+            s = 2
+        elif m == 6:
+            row_b -= 2
+            s = 2
+        elif m == 8:
+            row_b += 2
+            s = 4
+
     for fn in style_set:
         style.append(fn)
     return style
@@ -7537,26 +7593,46 @@ def color_mesta(data, first_mesto, table):
     style_color = []
     ml = []
     f = 0
+    u = 0
     if table == "setka_32":
         f = 2
     elif table == "setka_32_full":
         f = 13
     elif table == "setka_32_2":
         f = 13
+        u = 2
 
     for c in range(0, f):
         if c == 0:
-            ml = [11, 31, 54, 22]
+            if u == 2:
+                ml = [13, 31, 54, 22] # 1-2 место (-2)
+            else:
+                ml = [11, 31, 54, 22] # 1-2 место
         elif c == 1:
-            ml = [11, 59, 65, 5]
+            if u == 2:
+                ml = [13, 80, 97, 16]  # 3-4 место (-2)
+            else:                
+                ml = [11, 59, 65, 5] 
         elif c == 2:
-            ml = [11, 72, 92, 5]
+            if u == 2:
+                ml = [13, 101, 106, 4]  # 5-6 место (-2)
+            else:
+                ml = [11, 72, 92, 5]
         elif c == 3:
-            ml = [11, 94, 95, 1]
+            if u == 2:
+                ml = [13, 109, 114, 4]  # 7-8 место (-2)
+            else:
+                ml = [11, 94, 95, 1]
         elif c == 4:
-            ml = [11, 99, 133, 5]
+            if u == 2:
+                ml = [5, 113, 118, 4]  # 9-10 место (-2)
+            else:
+                ml = [11, 99, 133, 5]
         elif c == 5:
-            ml = [11, 152, 163, 10]
+            if u == 2:
+                ml = [11, 119, 124, 4]  # 11-12 место (-2)
+            else:
+                ml = [11, 152, 163, 10]
         elif c == 6:
             ml = [11, 167, 172, 4]
         elif c == 7:
@@ -7579,8 +7655,7 @@ def color_mesta(data, first_mesto, table):
             style_color.append(fn)
             fn =  ('ALIGN', (ml[0], i), (ml[0], i), 'CENTER')
             style_color.append(fn)
-            b += 1
-    
+            b += 1    
     return style_color   
 
 
