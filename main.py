@@ -5174,44 +5174,25 @@ def setka_16_made(fin):
     table = "setka_16"
     elements = []
     data = []
+    style = []
     column = ['']
     column_count = column * 11
     # добавить в аргументы функции
     final = fin
     # first_mesto = mesto_in_final(fin)
-    first_mesto = "1-й финал"
+    first_mesto = 1
     for i in range(0, 69):
-        column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
 
     # ========= места ==========
-    # n = 1
-    # x = 0
-    # for i in range(0, 20, 2):
-    #     n += 1
-    #     i = i + x
-    #     data[i + 29][10] = str(first_mesto + n) + "Место"
-    #     if n == 3:
-    #         x = n = 4
-    #     elif n == 7:
-    #         n = 9
-    #         x = 16
-    #     elif n == 11:
-    #         n = 12
-    #         x = 20
-    # for i in range(1, 4, 2):
-    #     data[i * 5 + 10][10] = str(first_mesto + i // 2) + "Место"
-    #     data[i // 2 + i * 2 + 45][10] = str(first_mesto + i // 2 + 8) + "Место"
-
-    # data[34][10] = str(first_mesto + 4) + "Место"
-    # data[60][10] = str(first_mesto + 12) + "Место"
-    # ========= нумерация встреч сетки ==========
     y = 0
-    for i in range(1, 33, 2):
+    for i in range(0, 32, 2):
         y += 1
-        data[i + 1][0] = str(y)  # рисует начальные номера таблицы 1-32
-    number_of_game = draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=5, number_of_game=1, player=16, data=data) # рисует номера встреч 1-32
+        data[i][0] = str(y)  # рисует начальные номера таблицы 1-16
+    # ========= нумерация встреч сетки ==========
+    number_of_game = draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=4, number_of_game=1, player=16, data=data) # рисует номера встреч 1-32
     number_of_game = draw_num(row_n=32, row_step=2, col_n=6, number_of_columns=2, number_of_game=17, player=4, data=data) # рисует номера встреч 1-32
     number_of_game = draw_num(row_n=41, row_step=2, col_n=4, number_of_columns=3, number_of_game=21, player=8, data=data) # рисует номера встреч 1-32
     number_of_game = draw_num(row_n=58, row_step=2, col_n=6, number_of_columns=2, number_of_game=29, player=4, data=data) # рисует номера встреч 1-32
@@ -5222,13 +5203,13 @@ def setka_16_made(fin):
     draw_num_lost(row_n=58, row_step=2, col_n=4, number_of_game=21, player=4, data=data) # номера минус проигравшие встречи -1 -16
     draw_num_lost(row_n=55, row_step=2, col_n=6, number_of_game=25, player=2, data=data) # номера минус проигравшие встречи -1 -16
     draw_num_lost(row_n=65, row_step=2, col_n=6, number_of_game=29, player=2, data=data) # номера минус проигравшие встречи -1 -16
-  
-  
+   
     data[8][8] = str(15)  # создание номеров встреч 15
     data[25][8] = str(-15)
     data[29][8] = str(16)  # создание номеров встреч 16
     data[31][8] = str(-16)
     data[37][8] = str(-19)
+    data[39][8] = str(20)
     data[41][8] = str(-20)
     data[44][8] = str(27)  # создание номеров встреч 27
     data[52][8] = str(-27)
@@ -5262,7 +5243,6 @@ def setka_16_made(fin):
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
     t = Table(data, cw, 69 * [0.35 * cm])
-    style = []
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки 
     style = draw_setka(1, 1, 16, style) # рисует кусок сетки(номер столбца, номер строки на 16 человека)
@@ -5273,7 +5253,35 @@ def setka_16_made(fin):
     style = draw_setka(7, 55, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
     style = draw_setka(5, 58, 4, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
     style = draw_setka(7, 65, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-
+    # ======= встречи за места =====
+    for q in range(0, 11, 10):
+        fn = ('LINEABOVE', (9, q + 16), (10, q + 16),
+              1, colors.darkblue)  # за 1-2 место
+        style.append(fn)
+    for q in range(0, 3, 2):
+        fn = ('LINEABOVE', (9, q + 30), (10, q + 30),
+              1, colors.darkblue)  # за 3-4 место
+        style.append(fn)
+        fn = ('LINEABOVE', (9, q + 40), (10, q + 40),
+              1, colors.darkblue)  # за 7-8 место
+        style.append(fn)
+        fn = ('LINEABOVE', (9, q + 56), (10, q + 56),
+              1, colors.darkblue)  # за 11-12 место
+        style.append(fn)
+        fn = ('LINEABOVE', (9, q + 66), (10, q + 66),
+              1, colors.darkblue)  # за 15-16 место
+        style.append(fn)
+    for q in range(0, 4, 3):
+        fn = ('LINEABOVE', (9, q + 35), (10, q + 35),
+              1, colors.darkblue)  # за 5-6 место
+        style.append(fn)
+        fn = ('LINEABOVE', (9, q + 61), (10, q + 61),
+              1, colors.darkblue)  # за 13-14 место
+        style.append(fn)
+    for q in range(0, 6, 5):
+        fn = ('LINEABOVE', (9, q + 48), (10, q + 48),
+              1, colors.darkblue)  # за 9-10 место
+        style.append(fn)
 
     for i in range(1, 8, 2):
         fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
@@ -5286,11 +5294,11 @@ def setka_16_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
-    # style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
+    style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
@@ -5761,7 +5769,6 @@ def setka_16_made_old(fin):
     change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     return tds
-
 
 
 def setka_32_made(fin):
@@ -7687,91 +7694,103 @@ def color_mesta(data, first_mesto, table):
     style_color = []
     ml = []
     f = 0
-    u = 0
     if table == "setka_32":
         f = 2
     elif table == "setka_32_full":
         f = 13
     elif table == "setka_32_2":
         f = 16
-        u = 2
     elif table == "setka_16":
-        f = 16
-        u = 2
+        f = 8
 
     for c in range(0, f):
-        if c == 0:
-            if u == 2:
-                ml = [13, 31, 54, 22] # 1-2 место (-2)
+        if c == 0: # 1-2 место
+            if table == "setka_32_2":
+                ml = [13, 31, 54, 22] 
+            elif table == "setka_16":
+                ml = [10, 15, 26, 10] 
             else:
-                ml = [11, 31, 54, 22] # 1-2 место
-        elif c == 1:
-            if u == 2:
-                ml = [13, 80, 97, 16]  # 3-4 место (-2)
+                ml = [11, 31, 54, 22] 
+        elif c == 1: # 3-4 место
+            if table == "setka_32_2":
+                ml = [13, 80, 97, 16]  
+            elif table == "setka_16":
+                ml = [10, 29, 32, 2] 
             else:                
                 ml = [11, 59, 65, 5] 
-        elif c == 2:
-            if u == 2:
-                ml = [13, 101, 106, 4]  # 5-6 место (-2)
+        elif c == 2: # 5-6 место
+            if table == "setka_32_2":
+                ml = [13, 101, 106, 4]  
+            elif table == "setka_16":
+                ml = [10, 34, 38, 3] 
             else:
                 ml = [11, 72, 92, 5]
-        elif c == 3:
-            if u == 2:
-                ml = [13, 109, 114, 4]  # 7-8 место (-2)
+        elif c == 3: # 7-8 место
+            if table == "setka_32_2":
+                ml = [13, 109, 114, 4]  
+            elif table == "setka_16":
+                ml = [10, 39, 42, 2] 
             else:
                 ml = [11, 94, 95, 1]
-        elif c == 4:
-            if u == 2:
-                ml = [5, 113, 118, 4]  # 9-10 место (-2)
+        elif c == 4: # 9-10 место
+            if table == "setka_32_2":
+                ml = [5, 113, 118, 4]  
+            elif table == "setka_16":
+                ml = [10, 47, 53, 5] 
             else:
                 ml = [11, 99, 133, 5]
-        elif c == 5:
-            if u == 2:
-                ml = [11, 119, 124, 4]  # 11-12 место (-2)
+        elif c == 5: # 11-12 место
+            if table == "setka_32_2":
+                ml = [11, 119, 124, 4]  
+            elif table == "setka_16":
+                ml = [10, 55, 58, 2] 
             else:
                 ml = [11, 152, 163, 10]
-        elif c == 6:
-            if u == 2:
-                ml = [5, 125, 130, 4]  # 13-14 место (-2)
+        elif c == 6: # 13-14 место
+            if table == "setka_32_2":
+                ml = [5, 125, 130, 4]  
+            elif table == "setka_16":
+                ml = [10, 60, 64, 3] 
             else:
                 ml = [11, 167, 172, 4]
-        elif c == 7:
-            if u == 2:
-                ml = [11, 127, 132, 4]  # 15-16 место (-2)
+        elif c == 7: # 15-16 место
+            if table == "setka_32_2":
+                ml = [11, 127, 132, 4] 
+            elif table == "setka_16":
+                ml = [10, 65, 68, 2] 
             else:
                 ml = [9, 173, 178, 4]
-        elif c == 8:
-            if u == 2:
-                ml = [7, 145, 153, 7]  # 17-18 место (-2)
+        elif c == 8: # 17-18 место
+            if table == "setka_32_2":
+                ml = [7, 145, 153, 7]  
             else:
                 ml = [11, 180, 186, 5]
-        elif c == 9:
-            if u == 2:
-                ml = [11, 154, 160, 5]  # 19-20 место (-2)
+        elif c == 9: # 19-20 место
+            if table == "setka_32_2":
+                ml = [11, 154, 160, 5]  
             else:
                 ml = [7, 184, 191, 6]
-        elif c == 10:
-            if u == 2:
-                ml = [7, 161, 166, 4]  # 21-22 место (-2)
+        elif c == 10: # 21-22 место
+            if table == "setka_32_2":
+                ml = [7, 161, 166, 4]  
             else:
                 ml = [11, 192, 198, 5]
-        elif c == 11:
-            if u == 2:
-                ml = [11, 169, 175, 5]  # 23-24 место (-2)
+        elif c == 11: # 23-24 место
+            if table == "setka_32_2":
+                ml = [11, 169, 175, 5]  
             else:
                 ml = [5, 198, 203, 4]
-        elif c == 12:
-            if u == 2:
-                ml = [7, 175, 183, 7]  # 25-26 место (-2)
+        elif c == 12: # 25-26 место
+            if table == "setka_32_2":
+                ml = [7, 175, 183, 7] 
             else:
                 ml = [11, 200, 205, 4]
-        elif c == 13:
-            ml = [11, 184, 190, 5]  # 27-28 место (-2)
-        elif c == 14:
-            ml = [7, 193, 198, 4]  # 29-30 место (-2)
-        elif c == 15:
-            ml = [11, 199, 205, 5]  # 31-32 место (-2)
-
+        elif c == 13: # 27-28 место
+            ml = [11, 184, 190, 5]  
+        elif c == 14: # 29-30 место 
+            ml = [7, 193, 198, 4] 
+        elif c == 15: # 31-32 место
+            ml = [11, 199, 205, 5]
             
         for i in range(ml[1], ml[2], ml[3]):
 
