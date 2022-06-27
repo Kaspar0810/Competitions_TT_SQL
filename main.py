@@ -2194,8 +2194,7 @@ def view():
         view_file = f"Title_{short_name}.pdf"
     elif sender == my_win.view_list_Action:
         my_win.tabWidget.setCurrentIndex(1)
-        player_list = Player.select().where(
-            Player.title_id == title_id())  # сортировка по алфавиту
+        player_list = Player.select().where(Player.title_id == title_id())  # сортировка по алфавиту
         list_player_pdf(player_list)
         view_file = f"table_list_{short_name}.pdf"
     elif sender == my_win.view_gr_Action:  # вкладка группы
@@ -5179,8 +5178,8 @@ def setka_16_made(fin):
     column_count = column * 11
     # добавить в аргументы функции
     final = fin
-    # first_mesto = mesto_in_final(fin)
-    first_mesto = 1
+    first_mesto = mesto_in_final(fin)
+    # first_mesto = 1  # временный финал для чистой сетки
     for i in range(0, 69):
         # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
@@ -5229,11 +5228,11 @@ def setka_16_made(fin):
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
     # создать возможность пустой сетки
-    # all_list = setka_data_16(fin)  # 
-    all_list = setka_data_clear(fin)
+    all_list = setka_data_16(fin)  # 
+    # all_list = setka_data_clear(fin)  # печать чистой сетки
     tds = all_list[0]  # список фамилия/ город 1-ого посева
-    # id_name_city = all_list[1]
-    # id_sh_name = all_list[2]
+    id_name_city = all_list[1]
+    id_sh_name = all_list[2]
     for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
         n = i - (i // 2)
         data[i][1] = tds[n]
@@ -5322,8 +5321,8 @@ def setka_16_made(fin):
     else:
         pv = landscape(A4)
     t_id = Title.get(Title.id == title_id())
-    # short_name = t_id.short_name_comp
-    short_name = "чист_16_сетка"
+    short_name = t_id.short_name_comp
+    # short_name = "чист_16_сетка"  # имя для чистой сетки
     name_table_final = f"{f}-финал_{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
@@ -7685,7 +7684,6 @@ def draw_num_lost_2(row_n, row_step, col_n, revers_number, number_of_game, playe
     for d in range(row_n, row_f, step):
             data[d][col_n] = str(number_of_game * -1)
             number_of_game += 1
-
 
 
 def color_mesta(data, first_mesto, table):
