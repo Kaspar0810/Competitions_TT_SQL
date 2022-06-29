@@ -205,7 +205,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.view_one_table_Action = QAction("Одна таблица")
         self.go_to_Action = QAction("пусто")
-        # подменю жеребьевка -печать-
+        # подменю -печать-
         self.clear_s16_Action = QAction("Сетка 16")
         self.clear_s16_2_Action = QAction("Сетка 16 минус 2")
         self.clear_s32_2_Action = QAction("Сетка 32 минус 2")
@@ -300,8 +300,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             sys = System.select().where(System.title_id == title_id())
             system = sys.select().where(System.stage == fin).get()
             type = system.type_table
+
             if fin is not None:
                 sys = System.get(System.stage == fin)
+                check_flag = check_choice(fin)
                 if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
                     reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
                                                                            f"\nесли хотите сделать "
@@ -4575,7 +4577,30 @@ def select_choice_final():
     else:
         fin = None
         return fin
-    my_win.tabWidget.setCurrentIndex(5)
+
+
+def check_choice(fin):
+    """Проверяет перед жеребьевкой финалов, сыграны ли все партиии в группах"""
+    msg = QMessageBox
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    final = system.select().where(System.stage == fin).get() # получаем запись конкретного финала
+    exit = final.stage_exit  # запись откуда идет выход в финал
+    res = Result.select().where(Result.title_id == title_id())  # отбираем записи с выходом в финал
+    gr = res.select().where(Result.system_stage == exit)
+    for i in gr:
+        game = i.points_win
+        if game > 0:
+            print ("OK")
+        else:
+            result = msg.information(my_win, "Предварительный этап", "Еще не все встречи сыграны в предварительном этапе.",
+                                    msg.Ok)
+            break
+    
+
+
+
+
+
 
 
 def del_player_table():
@@ -4775,8 +4800,7 @@ def func_zagolovok(canvas, doc):
     """создание заголовка страниц"""
     pagesizeW = doc.width
     pagesizeH = doc.height
-    # final = doc.
-
+ 
     if pagesizeH > pagesizeW:
         pv = A4
     else:
@@ -5348,11 +5372,11 @@ def write_in_setka(data, fin, first_mesto, table):
         mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
                         64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
     elif table == "setka_32_2":
-        kolvo_rows = 209
+        kolvo_rows = 207
         kolvo_columns = 15
         row_start = 63
     elif table == "setka_32_full":
-        kolvo_rows = 209
+        kolvo_rows = 207
         kolvo_columns = 11
         row_start = 63
         column = [[49, 50, 51, 52, 53, 54, 55, 56, 69, 70, 71, 72, 77, 78], 
