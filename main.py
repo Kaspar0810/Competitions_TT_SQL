@@ -297,8 +297,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         choice_gr_automat()
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
-            system = System.get(System.title_id == title_id()
-                                and System.stage == fin)
+            sys = System.select().where(System.title_id == title_id())
+            system = sys.select().where(System.stage == fin).get()
             type = system.type_table
             if fin is not None:
                 sys = System.get(System.stage == fin)
@@ -2102,7 +2102,8 @@ def one_table(fin, mesto_in_group, group):
                 my_win.Button_etap_made.setEnabled(False)
                 my_win.comboBox_page_vid.setEnabled(False)
             elif type_tbl == "сетка":
-                pass
+                count_player = mesto_in_group["выход"]
+                mesta_exit = mesto_in_group["место"]
 
             load_tableWidget()
 
@@ -2234,12 +2235,17 @@ def player_in_setka(fin):
         if i.stage == fin:
             mp = i.max_player
             mg = i.kol_game_string
+            tabel_string = i.label_string
     space = mg.find(" ")
     game = int(mg[:space])
     sd_full = []
     sd = []
     # создание сетки со спортсменами согласно жеребьевки
-    tds = setka_16_made(fin)
+    if tabel_string == "Сетка (с розыгрышем всех мест) на 16 участников":
+        tds = setka_16_made(fin)
+    elif tabel_string == "Сетка (с розыгрышем всех мест) на 32 участников":
+        tds = setka_32_full_made(fin)
+
     for r in tds:
         if r != "bye":
             space = r.find(" ")  # находит пробел перед именем
@@ -4187,9 +4193,6 @@ def choice_setka(fin):
     sys = System.select().where(System.title_id == title_id())  # находит system id последнего
     system = sys.select().where(System.stage == fin).get()
 
-    # sys = System.select().order_by(System.id).where(System.title_id ==
-    #                                                 title_id()).get()  # находит system id последнего
-    # system = sys.get(System.stage == fin)
     flag = system.choice_flag
     if flag is True:  # перед повторной жеребьевкой
         del_choice = Game_list.select().where(Game_list.title_id == title_id()
@@ -5319,7 +5322,7 @@ def write_in_setka(data, fin, first_mesto, table):
     sender = my_win.sender()
     dict_num_game = {}
     row_start = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
-    column = 11
+    column = 3
 
     # уточнить кол-во столбцов
     if table == "setka_16_full":
@@ -5336,15 +5339,30 @@ def write_in_setka(data, fin, first_mesto, table):
         kolvo_rows = 69
         kolvo_columns = 11
         row_start = 63
+        column = [[49, 50, 51, 52, 53, 54, 55, 56, 69, 70, 71, 72, 77, 78], 
+        [17, 18, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 57, 58, 59, 60, 73, 74], 
+        [25, 26, 27, 28, 33, 34, 41, 42, 45, 46, 61, 62, 65, 66],
+        [29, 30]]
+        row_plus = [[13, 14, 27], [15]]
+                 # ======= list mest
+        mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
+                        64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
     elif table == "setka_32_2":
         kolvo_rows = 209
         kolvo_columns = 15
         row_start = 63
     elif table == "setka_32_full":
         kolvo_rows = 209
-        kolvo_columns = 13
+        kolvo_columns = 11
         row_start = 63
-
+        column = [[49, 50, 51, 52, 53, 54, 55, 56, 69, 70, 71, 72, 77, 78], 
+        [17, 18, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 57, 58, 59, 60, 73, 74], 
+        [25, 26, 27, 28, 33, 34, 41, 42, 45, 46, 61, 62, 65, 66],
+        [29, 30]]
+        row_plus = [[13, 14, 27], [15]]
+                 # ======= list mest
+        mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
+                        64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
     
 
     if sender == my_win.clear_s32_Action or sender == my_win.clear_s32_full_Action or sender == my_win.clear_s32_2_Action or sender == my_win.clear_s16_Action:
@@ -5355,6 +5373,8 @@ def write_in_setka(data, fin, first_mesto, table):
         setka_string = system.label_string
         if setka_string == "Сетка (с розыгрышем всех мест) на 16 участников":
             all_list = setka_data_16(fin)
+        elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
+            all_list = setka_data_32(fin)
         id_name_city = all_list[1]
         id_sh_name = all_list[2]
     tds = all_list[0]  # список фамилия/ город 1-ого посева
@@ -5652,12 +5672,14 @@ def setka_32_full_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    all_list = setka_data_clear(fin)
-    tds = all_list[0]
-    for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
-        n = i - (i // 2)
-        data[i][1] = tds[n]
-    # ==============
+    # all_list = setka_data_clear(fin)
+    # tds = all_list[0]
+    # for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
+    #     n = i - (i // 2)
+    #     data[i][1] = tds[n]
+    # ============= данные игроков и встреч и размещение по сетке =============
+    tds = write_in_setka(data, fin, first_mesto, table)
+    #===============
     cw = ((0.2 * cm, 3.8 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm,
         2.5 * cm, 0.35 * cm, 3.0 * cm, 0.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
@@ -6983,6 +7005,8 @@ def player_choice_in_setka(fin):
     """распределяет спортсменов в сетке согласно жеребьевке"""
     first_posev = []
     second_posev = []
+    third_posev = []
+    fourth_posev = []
     p_stage = []
 
     system = System.select().where(System.title_id == title_id())
@@ -7005,10 +7029,9 @@ def player_choice_in_setka(fin):
             kpt, ok = QInputDialog.getInt(my_win, "Места в группе", "Введите место, которoе выходит\n"
                                           f"из группы в {fin}", value=1)
             if ok:
-                system = System.get(System.title_id ==
-                                    title_id() and System.stage == fin)
-                sys = System.get(System.title_id == title_id()
-                                 and System.stage == "Предварительный")
+                # syst = System.select().where(System.title_id == title_id())
+                syst = system.select().where(System.stage == fin).get()
+                sys = syst.select().where(System.stage == "Предварительный").get()
                 count_exit = system.max_player // sys.total_group
                 if count_exit == 1:  # если выходит один человек
                     reply = QMessageBox.information(my_win, 'Уведомление',
@@ -7016,12 +7039,25 @@ def player_choice_in_setka(fin):
                                                     "занявшие " f"{kpt} место, все верно?",
                                                     QMessageBox.Yes,
                                                     QMessageBox.Cancel)
-                else:  # если выходит два человека
+                elif count_exit == 2: # если выходит два человека
                     reply = QMessageBox.information(my_win, 'Уведомление',
                                                     "Из группы выходят спортсмены,\n"
                                                     "занявшие " f"{kpt} и {kpt + 1} места, все верно?",
                                                     QMessageBox.Yes,
                                                     QMessageBox.Cancel)
+                elif count_exit == 3:  # если выходит 4 человека
+                    reply = QMessageBox.information(my_win, 'Уведомление',
+                                                    "Из группы выходят спортсмены,\n"
+                                                    "занявшие " f"{kpt}, {kpt + 1} и {kpt + 2} места, все верно?",
+                                                    QMessageBox.Yes,
+                                                    QMessageBox.Cancel)
+                elif count_exit == 4:  # если выходит 4 человека
+                    reply = QMessageBox.information(my_win, 'Уведомление',
+                                                    "Из группы выходят спортсмены,\n"
+                                                    "занявшие " f"{kpt}, {kpt + 1}, {kpt + 2} и {kpt + 3} места, все верно?",
+                                                    QMessageBox.Yes,
+                                                    QMessageBox.Cancel)   
+
                 if reply == QMessageBox.Yes:
                     with db:
                         system.stage_exit = "Предварительный"
@@ -7032,28 +7068,58 @@ def player_choice_in_setka(fin):
 
         mesto_first_poseva = kpt
         mesto_second_poseva = kpt + 1
+        mesto_third_poseva = kpt + 2
+        mesto_fourth_poseva = kpt + 3
 
     else:  # если была произведена жеребьевка
-        system = System.get(System.title_id == title_id() and System.stage == fin)
-        sys = System.get(System.title_id == title_id() and System.stage == system.stage_exit)
-        count_exit = system.max_player // sys.total_group
+        # system = System.get(System.title_id == title_id() and System.stage == fin)
+        sys = system.select().where(System.stage == fin).get()
 
-        mesto_first_poseva = system.mesta_exit
+        syst = sys.select().where(System.stage == sys.stage_exit).get()
+        count_exit = sys.max_player // syst.total_group
+
+        mesto_first_poseva = sys.mesta_exit
         mesto_second_poseva = mesto_first_poseva + 1
+        mesto_third_poseva = mesto_first_poseva + 2
+        mesto_fourth_poseva = mesto_first_poseva + 3
 
     if count_exit == 1:
         mesto_first_poseva
-    else:
+        choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+    elif count_exit == 2:
+        # mesto_first_poseva
+        # mesto_second_poseva
+        choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+        choice_second = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
+        first_number = [1, 16, 8, 9, 4, 5, 12, 13]
+        second_number = [10, 3, 11, 7, 14, 15, 2, 6]
+        count_sec_num = len(second_number)
+    elif count_exit == 3:
         mesto_first_poseva
         mesto_second_poseva
+        mesto_third_poseva
+    elif count_exit == 4:
+        # mesto_first_poseva
+        # mesto_second_poseva
+        # mesto_third_poseva
+        # mesto_fourth_poseva
+        choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+        choice_second = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
+        choice_third = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
+        choice_fourth = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_fourth_poseva)
+        first_number = [1, 32, 16, 17, 8, 9, 24, 25]
+        second_number = [4, 29, 12, 20, 5, 28, 13, 21]
+        third_number = [3, 30, 11, 19, 6, 27, 14, 22]
+        fourth_number = [2, 31, 15, 18, 7, 10, 23, 26]
 
-    choice_first = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-    choice_second = Choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
-    first_number = [1, 16, 8, 9, 4, 5, 12, 13]
-    second_number = [10, 3, 11, 7, 14, 15, 2, 6]
-    count_sec_num = len(second_number)
+        count_sec_num = len(second_number)
+        count_third_num = len(third_number)
+        count_fourth_num = len(fourth_number)
+
     n = 0
     k = 0
+    t = 0
+    f = 0
     for posev in choice_first:
         player = Player.get(Player.player == posev.family)
         city = player.city
@@ -7061,24 +7127,78 @@ def player_choice_in_setka(fin):
             first_posev.append(
                 {'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
             n += 1
-    for posev in choice_second:
-        player = Player.get(Player.player == posev.family)
-        city = player.city
-        for k in range(k, k + 1):
-            second_posev.append(
-                {'посев': second_number[k], 'фамилия': f'{posev.family}/ {city}'})
-            k += 1
-    if k != count_sec_num:
-        no_gamer = second_number[k:]
+    if count_exit == 2:
+        for posev in choice_second:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            for i in range(k, k + 1):
+                second_posev.append(
+                    {'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+                k += 1
+        if k != count_sec_num:
+            no_gamer = second_number[k:]
         for m in no_gamer:
             second_posev.append({'посев': m, 'фамилия': 'bye'})
+        posev_data = first_posev + second_posev
+    elif count_exit == 3:
+        for posev in choice_second:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            for i in range(k, k + 1):
+                second_posev.append(
+                    {'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+                k += 1
+        for posev in choice_third:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            for i in range(t, t + 1):
+                third_posev.append(
+                    {'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
+                t += 1
+        if t != count_third_num:
+            no_gamer = third_number[t:]
+        for m in no_gamer:
+            third_posev.append({'посев': m, 'фамилия': 'bye'})
+        posev_data = first_posev + second_posev + third_posev
+    elif count_exit == 4:
+        for posev in choice_second:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            for i in range(k, k + 1):
+                second_posev.append(
+                    {'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+                k += 1
+        for posev in choice_third:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            for i in range(t, t + 1):
+                third_posev.append(
+                    {'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
+                t += 1
+        for posev in choice_fourth:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            for i in range(f, f + 1):
+                fourth_posev.append(
+                    {'посев': fourth_number[i], 'фамилия': f'{posev.family}/ {city}'})
+                f += 1
+        if f != count_fourth_num:
+            no_gamer = fourth_number[f:]
+        for m in no_gamer:
+            fourth_posev.append({'посев': m, 'фамилия': 'bye'})
+        posev_data = first_posev + second_posev + third_posev + fourth_posev
 
-    posev_data = first_posev + second_posev
+    # if k != count_sec_num:
+    #     no_gamer = second_number[k:]
+    #     for m in no_gamer:
+    #         second_posev.append({'посев': m, 'фамилия': 'bye'})
+
+    # posev_data = first_posev + second_posev
     # сортировка (списка словарей) по ключу словаря -посев-
     posev_data = sorted(posev_data, key=lambda i: i['посев'])
     with db:  # записывает в db, что жеребьевка произведена
-        system.choice_flag = True
-        system.save()
+        sys.choice_flag = True
+        sys.save()
     return posev_data
 
 
