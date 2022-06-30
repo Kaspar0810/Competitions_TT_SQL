@@ -304,25 +304,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if fin is not None:
                 sys = System.get(System.stage == fin)
                 check_flag = check_choice(fin)
-                if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
-                    reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
-                                                                           f"\nесли хотите сделать "
-                                                                           "повторно\nнажмите-ОК-, "
-                                                                           "если нет то - Cancel-",
-                                                    msg.Ok,
-                                                    msg.Cancel)
-                    if reply == msg.Ok:
+                if check_flag is True:
+                    if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
+                        reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
+                                                                            f"\nесли хотите сделать "
+                                                                            "повторно\nнажмите-ОК-, "
+                                                                            "если нет то - Cancel-",
+                                                        msg.Ok,
+                                                        msg.Cancel)
+                        if reply == msg.Ok:
+                            if type == "круг":
+                                player_fin_on_circle(fin)
+                            else:
+                                choice_setka(fin)
+                        else:
+                            return
+                    else:
                         if type == "круг":
                             player_fin_on_circle(fin)
                         else:
                             choice_setka(fin)
-                    else:
-                        return
                 else:
-                    if type == "круг":
-                        player_fin_on_circle(fin)
-                    else:
-                        choice_setka(fin)
+                    return
             else:
                 return
            
@@ -1263,10 +1266,12 @@ def fill_table_results():
         else:
             stage = "Финальный"
     result = Result.select().where(Result.title_id == title_id())
-    player_result = result.select().order_by(Result.id).where(Result.title_id == title_id() and Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
+    pl_result = result.select().order_by(Result.id)
+    player_result = pl_result.select().where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
     count = len(player_result)  # если 0, то записей нет
     flag = ready_system()
-    if flag is False and count == 0:
+    # if flag is False and count == 0:
+    if flag is True and count == 0:
         message = "Надо сделать жербьевку предварительного этапа.\nХотите ее создать?"
         reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
         if reply == msg.Yes:
@@ -1284,12 +1289,14 @@ def fill_table_results():
     else:
         # надо выбрать, что загружать в зависимости от вкладки группы, пф или финалы
         if tb == 3:
-            player_result = result.select().order_by(Result.id).where(Result.system_stage == "Предварительный")
+            # player_result = result.select().order_by(Result.id).where(Result.system_stage == "Предварительный")
+            player_result = pl_result.select().where(Result.system_stage == "Предварительный")
         elif tb == 4:
             player_result = result.select().order_by(Result.id)
         elif tb == 5:  # здесь надо выбрать финалы (круг или сетка)
-            player_result = result.select().order_by(Result.id).where(Result.title_id == title_id() and
-                                                                      Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
+            # player_result = result.select().order_by(Result.id).where(Result.title_id == title_id() and
+                                                                    #   Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
+            player_result = pl_result.select().where(Result.system_stage == stage)
             count = len(player_result)
             if count == 0:
                 return
@@ -2191,6 +2198,7 @@ def page_vid():
 def view():
     """просмотр PDF файлов средствами OS"""
     from sys import platform
+    change_dir()  # смена директории на папку с pdf файлами
     sender = my_win.sender()
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
@@ -3354,6 +3362,7 @@ def enter_score(none_player=0):
         else:
             winner_string = ts_winner  # только общий счет
     game_play = False
+
     with db:  # записывает в таблицу -Result- сыгранный матч
         result = Result.get(Result.id == id)
         result.winner = winner
@@ -3429,8 +3438,7 @@ def enter_score(none_player=0):
         my_win.lineEdit_player2_fin.clear()
     # ===== вызов функции заполнения таблицы pdf группы сыгранными играми
     if stage == "Одна таблица":
-        system = System.select().order_by(System.id).where(
-            System.title_id == title_id()).get()
+        system = System.select().order_by(System.id).where(System.title_id == title_id()).get()
     else:
         sys = System.select().order_by(System.id).where(System.title_id == title_id())
         system = sys.select().where(System.stage == fin).get()
@@ -4588,19 +4596,15 @@ def check_choice(fin):
     res = Result.select().where(Result.title_id == title_id())  # отбираем записи с выходом в финал
     gr = res.select().where(Result.system_stage == exit)
     for i in gr:
-        game = i.points_win
-        if game > 0:
-            print ("OK")
-        else:
+        game = i.points_win       
+        if game is None:
             result = msg.information(my_win, "Предварительный этап", "Еще не все встречи сыграны в предварительном этапе.",
                                     msg.Ok)
-            break
-    
-
-
-
-
-
+            check_flag = False
+            break                        
+        else:
+            check_flag = True  
+    return check_flag
 
 
 def del_player_table():
@@ -4785,14 +4789,13 @@ def title_id():
     if name != "":
         data = my_win.dateEdit_start.text()
         gamer = my_win.lineEdit_title_gamer.text()
-        t = Title.select().where(Title.name == name and Title.data_start ==
-                                 data)  # получает эту строку в db
+        t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
         title = t.select().where(Title.gamer == gamer).get()
         title_id = title.id  # получает его id
     else:
         # получение последней записи в таблице
         t_id = Title.select().order_by(Title.id.desc()).get()
-        title_id = t_id
+        title_id = t_id.id
     return title_id
 
 
@@ -4883,8 +4886,10 @@ def table_made(pv, stage):
         t = ta
     else:  # групповые игры
         kg = s_id.total_group  # кол-во групп
-        a = int(ta) // int(kg)
-        if a == 1 or a < ta: # значит число игроков кратно группам
+        # a = int(ta) // int(kg)
+
+        if int(kg) % int(ta) == 0:
+        # if a == 1 or a < ta: # значит число игроков кратно группам
             t = ta
         else:
             t = ta + 1
@@ -5194,6 +5199,7 @@ def table_made(pv, stage):
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    change_dir()
 
 
 def setka_16_made(fin):
