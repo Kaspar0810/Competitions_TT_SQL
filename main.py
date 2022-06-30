@@ -7313,7 +7313,9 @@ def change_dir():
     f = p.rfind("table_pdf")
     if f == -1:
         os.chdir("table_pdf")
-
+    else:
+        os.chdir(dir_path.parent)
+  
 
 def draw_setka(col, row, num, style):
     """рисование сетки встреч игроков
