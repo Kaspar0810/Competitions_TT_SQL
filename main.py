@@ -116,7 +116,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню Соревнования
         fileMenu = QMenu("Соревнования", self)  # основное
         menuBar.addMenu(fileMenu)
-
         # подменю с выбором (addMenu добавляет к пункту возможность выбора)
         go_to = fileMenu.addMenu("Перейти к")
         fileMenu.addSeparator()  # вставляет разделительную черту
@@ -124,6 +123,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         system = fileMenu.addMenu("Система")
         choice = fileMenu.addMenu("Жеребьевка")
         saveList = fileMenu.addMenu("Сохранить")
+        fileMenu.addSeparator()
+        last_comp = fileMenu.addMenu("Последние")
         fileMenu.addSeparator()
         fileMenu.addAction(self.exitAction)
         # меню Редактировать
@@ -134,12 +135,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # ============ создание подменю
 
         go_to.addAction(self.go_to_Action)  # подменю выбора соревнования
+        # last_comp.addAction(self.last_Action)  # подменю прошлых соревнований
         system.addAction(self.system_made_Action)  # подменю создание системы
         system.addAction(self.system_edit_Action)  # подменю редактирование системы
         choice.addAction(self.choice_gr_Action)  # подменю группы
         choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
         choice.addAction(self.choice_fin_Action)  # подменю финалы
         saveList.addAction(self.savelist_Action)
+        # add_last = last_comp.addMenu("Последние")
+        last_comp.addAction(self.first_comp_Action)
+        last_comp.addAction(self.second_comp_Action)
+        last_comp.addAction(self.third_comp_Action)
+        last_comp.addAction(self.fourth_comp_Action)
+        last_comp.addAction(self.fifth_comp_Action)
         ed_Menu = editMenu.addMenu("Жеребьевка")
         ed_Menu.addAction(self.ed_gr_Action)
         ed_Menu.addAction(self.ed_pf_Action)
@@ -185,6 +193,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.exitAction = QAction("Выход")
         self.rAction = QAction("Текущий рейтинг")
         self.r1Action = QAction("Рейтинг за январь")
+        self.first_comp_Action = QAction("1")
+        self.second_comp_Action = QAction("2")
+        self.third_comp_Action = QAction("3")
+        self.fourth_comp_Action = QAction("4")
+        self.fifth_comp_Action = QAction("5")
         self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
         self.ed_pf_Action = QAction("Редактировать полуфиналы")
         self.ed_fin_Action = QAction("Редактировать финалы")
@@ -205,6 +218,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.view_one_table_Action = QAction("Одна таблица")
         self.go_to_Action = QAction("пусто")
+        # self.last_Action = QAction("пусто")
         # подменю -печать-
         self.clear_s16_Action = QAction("Сетка 16")
         self.clear_s16_2_Action = QAction("Сетка 16 минус 2")
@@ -243,6 +257,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.clear_s32_full_Action.triggered.connect(self.print_clear)
         self.clear_s32_Action.triggered.connect(self.print_clear)
         self.clear_s32_2_Action.triggered.connect(self.print_clear)
+
+        self.first_comp_Action.triggered.connect(self.last)
+        self.second_comp_Action.triggered.connect(self.last)
+        self.third_comp_Action.triggered.connect(self.last)
+        self.fourth_comp_Action.triggered.connect(self.last)
+        self.fifth_comp_Action.triggered.connect(self.last)
 
         self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
@@ -362,7 +382,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         view()
 
-
+    def last(self):
+        last_competition()
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
@@ -447,6 +468,45 @@ class StartWindow(QMainWindow, Ui_Form):
             my_win.show()
         else:
             return
+
+    def last_competition():
+        """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
+    title = Title.select().order_by(Title.id)
+    i = 0
+    for t in title:
+        full_name = t.full_name_comp
+        if i > 5:
+            break
+        if i == 0: 
+            if full_name != "":
+                my_win.first_comp_Action.setText(full_name)
+            else:
+                my_win.first_comp_Action.setText("Пусто")
+        elif i == 1: 
+            if full_name != "":
+                my_win.second_comp_Action.setText(full_name)
+            else:
+                my_win.second_comp_Action.setText("Пусто")
+        elif i == 2: 
+            if full_name != "":
+                my_win.third_comp_Action.setText(full_name)
+            else:
+                my_win.third_comp_Action.setText("Пусто")
+        elif i == 3: 
+            if full_name != "":
+                my_win.fourth_comp_Action.setText(full_name)
+            else:
+                my_win.fourth_comp_Action.setText("Пусто")
+        elif i == 4: 
+            if full_name != "":
+                my_win.fifth_comp_Action.setText(full_name)
+            else:
+                my_win.fifth_comp_Action.setText("Пусто")
+        i += 1  
+    
+    
+    last_competition()
+   
 
     def r_load(self):
         pass
@@ -5213,7 +5273,7 @@ def setka_16_full_made(fin):
     first_mesto = mesto_in_final(fin)
     # first_mesto = 1  # временный финал для чистой сетки
     for i in range(0, 69):
-        column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -5222,10 +5282,10 @@ def setka_16_full_made(fin):
         y += 1
         data[i][0] = str(y)  # рисует начальные номера таблицы 1-16
     # ========= нумерация встреч сетки ==========
-    number_of_game = draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=4, number_of_game=1, player=16, data=data) # рисует номера встреч 1-32
-    number_of_game = draw_num(row_n=32, row_step=2, col_n=6, number_of_columns=2, number_of_game=17, player=4, data=data) # рисует номера встреч 1-32
-    number_of_game = draw_num(row_n=41, row_step=2, col_n=4, number_of_columns=3, number_of_game=21, player=8, data=data) # рисует номера встреч 1-32
-    number_of_game = draw_num(row_n=58, row_step=2, col_n=6, number_of_columns=2, number_of_game=29, player=4, data=data) # рисует номера встреч 1-32
+    draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=4, number_of_game=1, player=16, data=data) # рисует номера встреч 1-32
+    draw_num(row_n=32, row_step=2, col_n=6, number_of_columns=2, number_of_game=17, player=4, data=data) # рисует номера встреч 1-32
+    draw_num(row_n=41, row_step=2, col_n=4, number_of_columns=3, number_of_game=21, player=8, data=data) # рисует номера встреч 1-32
+    draw_num(row_n=58, row_step=2, col_n=6, number_of_columns=2, number_of_game=29, player=4, data=data) # рисует номера встреч 1-32
     draw_num_lost(row_n=29, row_step=2, col_n=6, number_of_game=13, player=2, data=data) # номера минус проигравшие встречи -1 -16
     draw_num_lost(row_n=32, row_step=2, col_n=4, number_of_game=9, player=4, data=data) # номера минус проигравшие встречи -1 -16
     draw_num_lost(row_n=39, row_step=2, col_n=6, number_of_game=17, player=2, data=data) # номера минус проигравшие встречи -1 -16
@@ -5255,7 +5315,7 @@ def setka_16_full_made(fin):
     cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm,
            0.4 * cm, 3.2 * cm, 1.2 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
-    style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
+    color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
     t = Table(data, cw, 69 * [0.35 * cm])
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки 
@@ -5308,8 +5368,8 @@ def setka_16_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
@@ -5951,7 +6011,6 @@ def write_in_setka(data, fin, first_mesto, table):
         column = [[9, 10, 11, 12, 21, 22, 23, 24], [13, 14, 17, 18, 25, 26, 29, 30], [15, 16, 19, 20, 27, 28, 31, 32]]
         row_setki = {9: [1, 5], 10: [9, 13], 11: [17, 21], 12: [25, 29], 13: [3, 11], 14: [19, 27], 25: [41, 45], 26: [49, 53], 
                     15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
-        row_plus = [[13, 14, 27], [15]]
                  # ======= list mest
         mesta_list = [15, -15, 16, -16, 19, -19,  20, -20, 27, -27, 28, -28, 31, -31, 32, -32]
     elif table == "setka_16_2":
@@ -5964,7 +6023,6 @@ def write_in_setka(data, fin, first_mesto, table):
         [17, 18, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 57, 58, 59, 60, 73, 74], 
         [25, 26, 27, 28, 33, 34, 41, 42, 45, 46, 61, 62, 65, 66],
         [29, 30]]
-        # row_plus = [[13, 14, 27], [15]]
                  # ======= list mest
         mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
                         64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
@@ -5980,7 +6038,8 @@ def write_in_setka(data, fin, first_mesto, table):
         [17, 18, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 57, 58, 59, 60, 73, 74], 
         [25, 26, 27, 28, 33, 34, 41, 42, 45, 46, 61, 62, 65, 66],
         [29, 30]]
-        # row_plus = [[13, 14, 27], [15]]
+        row_setki = {17: [4, 8], 18: [12, 16], 19: [20, 24], 21: [28, 32], 22: [36, 40], 23: [44, 48], 24: [52, 56], 
+        26: [49, 53], 15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
                  # ======= list mest
         mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
                         64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
@@ -5997,11 +6056,9 @@ def write_in_setka(data, fin, first_mesto, table):
         setka_string = system.label_string
         if setka_string == "Сетка (с розыгрышем всех мест) на 16 участников":
             all_list = setka_data_16(fin)
-            # start = 0
             col_first = 2
             row_first = 0
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
-            # start = 2
             col_first = 2
             row_first = 2
             all_list = setka_data_32(fin)
@@ -6009,18 +6066,11 @@ def write_in_setka(data, fin, first_mesto, table):
         id_sh_name = all_list[2]
     tds = all_list[0]  # список фамилия/ город 1-ого посева
   
-    # for d in range(0, column_last, 2):
-    #     for r in range(row_first, row_last):
-    #         key = data[r][d]
-    #         if key != "":
-    #             dict_num_game[key] = r # словарь номер игры, сноски - номер строки
-
     for d in range(2, column_last, 2):
         for r in range(row_first, row_last):
             key = data[r][d]
             if key != "":
                 dict_num_game[key] = r # словарь номер игры, сноски - номер строки
-
 
     n = 0
     for t in range(row_first, row_end, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
@@ -6070,17 +6120,22 @@ def write_in_setka(data, fin, first_mesto, table):
             # ========== расстановка для сетки на 16
             if c != 0:
         # ========= new variant =====
-                row_win = dict_num_game[str(match[0])]  # строка победителя
+                row_win_list = row_setki[c]
+                if abs(match[3]) % 2 != 0: # выбирает из списка номер строки в зависимости от четности встречи(вверх или низ)
+                    row_win = row_win_list[0]
+                else:
+                    row_win = row_win_list[1]
                 row_los = dict_num_game[str(match[3])]  # строка проигравшего
                 win = match[1]
                 score = match[2]  # счет во встречи
                 los = match[4]
-                row_num_win = data[row_win]
-                col_win = row_num_win.index(str(c))
+                for number_column in range(0, count): # цикл определения номера столбца победителя
+                    if c in column[number_column]:
+                        col_win = number_column * 2 + 3
                 row_num_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
                 col_los = row_num_los.index(r)
-                data[row_win - 1][col_win - 1] = win
-                data[row_win][col_win - 1] = score
+                data[row_win][col_win] = win
+                data[row_win + 1][col_win] = score
                 data[row_los][col_los + 1] = los
             else:
                 return tds
@@ -6091,9 +6146,6 @@ def setka_data_clear(fin, table):
     """заполняет сетку для просмотра пустыми фаммилиями"""
     all_list = []
     tmp = [""]
-    # sys = System.select().where(System.title_id == title_id())
-    # system = sys.select().where(System.stage == fin).get()
-    # max_pl = system.max_player
     if table == "setka_16_full" or table == "setka_16_2":
         max_pl = 16
     elif table == "setka_32" or table == "setka_32_full" or table == "setka_32_2":
@@ -7625,6 +7677,44 @@ def color_mesta(data, first_mesto, table):
             style_color.append(fn)
             b += 1    
     return style_color   
+
+
+
+def last_competition():
+    """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
+    title = Title.select().order_by(Title.id)
+    # my_win.last_comp.addAction(my_win.second_comp_Action)
+    i = 0
+    for t in title:
+        full_name = t.full_name_comp
+        if i > 5:
+            break
+        if i == 0: 
+            if full_name != "":
+                my_win.first_comp_Action.setText(full_name)
+            else:
+                my_win.first_comp_Action.setText("Пусто")
+        elif i == 1: 
+            if full_name != "":
+                my_win.second_comp_Action.setText(full_name)
+            else:
+                my_win.second_comp_Action.setText("Пусто")
+        elif i == 2: 
+            if full_name != "":
+                my_win.third_comp_Action.setText(full_name)
+            else:
+                my_win.third_comp_Action.setText("Пусто")
+        elif i == 3: 
+            if full_name != "":
+                my_win.fourth_comp_Action.setText(full_name)
+            else:
+                my_win.fourth_comp_Action.setText("Пусто")
+        elif i == 4: 
+            if full_name != "":
+                my_win.fifth_comp_Action.setText(full_name)
+            else:
+                my_win.fifth_comp_Action.setText("Пусто")
+        i += 1
 
 
 def tours_list(cp):
