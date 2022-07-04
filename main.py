@@ -383,7 +383,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         view()
 
     def last(self):
-        last_competition()
+        sender = self.sender()
+        if sender == self.first_comp_Action:
+            last_competition()
+        elif sender == self.second_comp_Action:
+            last_competition()
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
@@ -7715,6 +7719,7 @@ def last_competition():
             else:
                 my_win.fifth_comp_Action.setText("Пусто")
         i += 1
+    go_to()
 
 
 def tours_list(cp):
