@@ -2313,6 +2313,7 @@ def view():
         os.system(f"open {view_file}")
     elif platform == "win32":  # Windows...
         os.system(f"{view_file}")
+    change_dir()
 
 
 def player_in_setka(fin):
@@ -5622,12 +5623,12 @@ def setka_32_full_made(fin):
     draw_num_lost(row_n=201, row_step=2, col_n=8, number_of_game=77, player=2, data=data) # номера минус проигравшие встречи -1 -16
     # ============= данные игроков и встреч и размещение по сетке =============
     # ======= создать словарь  ключ - номер встречи, значение - номер ряда
-    dict_num_game = {}
-    for d in range(2, 11, 2):
-        for r in range(0, 207):
-            key = data[r][d]
-            if key != "":
-                dict_num_game[key] = r
+    # dict_num_game = {}
+    # for d in range(2, 11, 2):
+    #     for r in range(0, 207):
+    #         key = data[r][d]
+    #         if key != "":
+    #             dict_num_game[key] = r
     # ============= данные игроков и встреч и размещение по сетке =============
     tds = write_in_setka(data, fin, first_mesto, table)
     #===============
@@ -6013,7 +6014,7 @@ def mesto_in_final(fin):
 def write_in_setka(data, fin, first_mesto, table):
     """функция заполнения сетки результатами встреч"""
     sender = my_win.sender()
-    dict_num_game = {}
+    row_num_los = {}
     row_end = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
     column = 3
     flag_clear = False
@@ -6023,7 +6024,7 @@ def write_in_setka(data, fin, first_mesto, table):
         column_last = 11
         row_end = 31
         column = [[9, 10, 11, 12, 21, 22, 23, 24], [13, 14, 17, 18, 25, 26, 29, 30], [15, 16, 19, 20, 27, 28, 31, 32]]
-        row_setki = {9: [1, 5], 10: [9, 13], 11: [17, 21], 12: [25, 29], 13: [3, 11], 14: [19, 27], 25: [41, 45], 26: [49, 53], 
+        row_num_win = {9: [1, 5], 10: [9, 13], 11: [17, 21], 12: [25, 29], 13: [3, 11], 14: [19, 27], 25: [41, 45], 26: [49, 53], 
                     15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
                  # ======= list mest
         mesta_list = [15, -15, 16, -16, 19, -19,  20, -20, 27, -27, 28, -28, 31, -31, 32, -32]
@@ -6052,7 +6053,7 @@ def write_in_setka(data, fin, first_mesto, table):
         [17, 18, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 57, 58, 59, 60, 73, 74], 
         [25, 26, 27, 28, 33, 34, 41, 42, 45, 46, 61, 62, 65, 66],
         [29, 30]]
-        row_setki = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
+        row_num_win = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
         24: [59, 63], 25: [6, 14], 26: [22, 30], 27: [38, 46], 28: [54, 62], 29: [10, 26], 30:[42, 58], 31: [18, 50],
         35: [73, 77], 41: [90, 94], 42: [98, 102], 43: [92, 100], 47: [115, 119],  57: [140, 144], 58: [148, 152], 
         59: [156, 160], 60: [164, 168], 61: [142, 150], 62: [158, 166], 63: [147, 163], 67: [173, 177], 73: [179, 183],
@@ -6095,7 +6096,7 @@ def write_in_setka(data, fin, first_mesto, table):
             if key != "":
                 k = int(key)
             if key != "" and k < 0:
-                dict_num_game[key] = r # словарь номер игры, сноски - номер строки
+                row_num_los[key] = r # словарь номер игры, сноски - номер строки
 
     n = 0
     for t in range(row_first, row_end, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
@@ -6145,12 +6146,12 @@ def write_in_setka(data, fin, first_mesto, table):
             # ========== расстановка для сетки на 16
             if c != 0:
         # ========= new variant =====
-                row_win_list = row_setki[c]
+                row_win_list = row_num_win[c]
                 if abs(match[3]) % 2 != 0: # выбирает из списка номер строки в зависимости от четности встречи(вверх или низ)
                     row_win = row_win_list[0]
                 else:
                     row_win = row_win_list[1]
-                row_los = dict_num_game[str(match[3])]  # строка проигравшего
+                row_los = row_num_los[r]  # строка проигравшего
                 win = match[1]
                 score = match[2]  # счет во встречи
                 los = match[4]
@@ -6158,8 +6159,8 @@ def write_in_setka(data, fin, first_mesto, table):
                     if c in column[number_column]:
                         col_win = number_column * 2 + 1
                         break
-                row_num_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
-                col_los = row_num_los.index(r)
+                row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
+                col_los = row_list_los.index(r) # номер столбца проигравшего
                 data[row_win][col_win] = win
                 data[row_win + 1][col_win] = score
                 data[row_los][col_los + 1] = los
