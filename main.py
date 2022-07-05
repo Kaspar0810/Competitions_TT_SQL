@@ -193,11 +193,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.exitAction = QAction("Выход")
         self.rAction = QAction("Текущий рейтинг")
         self.r1Action = QAction("Рейтинг за январь")
-        self.first_comp_Action = QAction("1")
-        self.second_comp_Action = QAction("2")
-        self.third_comp_Action = QAction("3")
-        self.fourth_comp_Action = QAction("4")
-        self.fifth_comp_Action = QAction("5")
+        self.first_comp_Action = QAction("пусто")
+        self.second_comp_Action = QAction("пусто")
+        self.third_comp_Action = QAction("пусто")
+        self.fourth_comp_Action = QAction("пусто")
+        self.fifth_comp_Action = QAction("пусто")
         self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
         self.ed_pf_Action = QAction("Редактировать полуфиналы")
         self.ed_fin_Action = QAction("Редактировать финалы")
@@ -383,11 +383,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         view()
 
     def last(self):
-        sender = self.sender()
-        if sender == self.first_comp_Action:
-            last_competition()
-        elif sender == self.second_comp_Action:
-            last_competition()
+        last_competition()
+        # sender = self.sender()
+        # if sender == self.first_comp_Action:
+        #     last_competition()
+        # elif sender == self.second_comp_Action:
+        #     last_competition()
+        # elif sender == self.third_comp_Action:
+        #     last_competition()
+        # elif sender == self.fourth_comp_Action:
+        #     last_competition()
+        # elif sender == self.fifth_comp_Action:
+        #     last_competition()
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
@@ -441,9 +448,10 @@ class StartWindow(QMainWindow, Ui_Form):
         my_win.show()
 
     def open(self):
-        gamer = db_select_title()
+        # gamer = db_select_title()
+        full_name = db_select_title()
         self.close()
-        my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
+        my_win.setWindowTitle(f"Соревнования по настольному теннису. {full_name}")
         my_win.show()
 
     def new(self):
@@ -1037,8 +1045,10 @@ def load_tableWidget():
     elif my_win.checkBox_6.checkState() is True:  # нажат пункт  -просмотр удаленных игроков-
         del_player_table()
     elif tb == 3 or tb == 5:  # таблица результатов
+        p = 0
         if tb == 3:
             stage = "Предварительный"
+            fill_table_results()
         else:
             system = System.select().where(System.title_id == title_id())  # должен получить первый номер id 
             choice_flag = {} # словарь финал - жеребьевка
@@ -1054,8 +1064,8 @@ def load_tableWidget():
                 p = 0
                 if choice_flag[k] == True:
                     p += 1
-        if p > 0:
-            fill_table_results()
+            if p > 0:
+                fill_table_results()
 
     elif tb == 2 or sender == my_win.choice_gr_Action:
         if sender == my_win.choice_fin_Action:  # таблица жеребьевки
@@ -6042,15 +6052,24 @@ def write_in_setka(data, fin, first_mesto, table):
         [17, 18, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 57, 58, 59, 60, 73, 74], 
         [25, 26, 27, 28, 33, 34, 41, 42, 45, 46, 61, 62, 65, 66],
         [29, 30]]
-        row_setki = {17: [4, 8], 18: [12, 16], 19: [20, 24], 21: [28, 32], 22: [36, 40], 23: [44, 48], 24: [52, 56], 
-        26: [49, 53], 15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
+        row_setki = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
+        24: [59, 63], 25: [6, 14], 26: [22, 30], 27: [38, 46], 28: [54, 62], 29: [10, 26], 30:[42, 58], 31: [18, 50],
+        35: [73, 77], 41: [90, 94], 42: [98, 102], 43: [92, 100], 47: [115, 119],  57: [140, 144], 58: [148, 152], 
+        59: [156, 160], 60: [164, 168], 61: [142, 150], 62: [158, 166], 63: [147, 163], 67: [173, 177], 73: [179, 183],
+         74: [187, 191], 75: [182, 190], 79: [198, 202]}
                  # ======= list mest
         mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
                         64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
     
 
-    if sender == my_win.clear_s32_Action or sender == my_win.clear_s32_full_Action or sender == my_win.clear_s32_2_Action or sender == my_win.clear_s16_Action:
+    if sender == my_win.clear_s32_Action or sender == my_win.clear_s32_full_Action or sender == my_win.clear_s32_2_Action:
         all_list = setka_data_clear(fin, table)  # печать чистой сетки
+        col_first = 0
+        row_first = 2
+        flag_clear = True
+    elif sender == my_win.clear_s16_Action:
+        all_list = setka_data_clear(fin, table)  # печать чистой сетки
+        col_first = 2
         row_first = 0
         flag_clear = True
     else:
@@ -6063,17 +6082,19 @@ def write_in_setka(data, fin, first_mesto, table):
             col_first = 2
             row_first = 0
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
-            col_first = 2
+            col_first = 0
             row_first = 2
             all_list = setka_data_32(fin)
         id_name_city = all_list[1]
         id_sh_name = all_list[2]
     tds = all_list[0]  # список фамилия/ город 1-ого посева
   
-    for d in range(2, column_last, 2):
+    for d in range(col_first, column_last, 2):
         for r in range(row_first, row_last):
             key = data[r][d]
             if key != "":
+                k = int(key)
+            if key != "" and k < 0:
                 dict_num_game[key] = r # словарь номер игры, сноски - номер строки
 
     n = 0
@@ -6135,7 +6156,8 @@ def write_in_setka(data, fin, first_mesto, table):
                 los = match[4]
                 for number_column in range(0, count): # цикл определения номера столбца победителя
                     if c in column[number_column]:
-                        col_win = number_column * 2 + 3
+                        col_win = number_column * 2 + 1
+                        break
                 row_num_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
                 col_los = row_num_los.index(r)
                 data[row_win][col_win] = win
@@ -6476,7 +6498,7 @@ def numer_game(num_game, vid_setki):
         dict_loser = {1: 49, 2: 49, 3: 50, 4: 50, 5: 51, 6: 51, 7: 52, 8: 52, 9: 53, 10: 53, 11: 54, 12: 54, 13: 55, 14: 55, 15: 56, 16: 56,
                   17: 37, 18: 37, 19: 38, 20: 38, 21: 39, 22: 39, 23: 40, 24: 40, 25: 33, 26: 33, 27: 34, 28: 34, 29: 32, 30: 32,
                   22: 36, 34: 36, 37: 45, 38: 45, 39: 46, 40: 46, 41: 44, 42: 44, 49: 69, 50: 68, 51: 70, 52: 70, 53: 71, 54: 71, 55: 72, 56: 72,
-                  69: 77, 70: 77, 71: 78, 72: 78, 73: 76, 74: 76, 77: 80, 78: 80}
+                  57: 65, 58: 65, 59: 66, 60: 66, 61: 64, 62: 64, 65: 67, 66: 67, 69: 77, 70: 77, 71: 78, 72: 78, 73: 76, 74: 76, 77: 80, 78: 80}
         dict_loser_pdf = {1: -1, 2: -2, 3: -3, 4: -4, 5: -5, 6: -6, 7: -7, 8: -8, 9: -9, 10: -10, 11: -11, 12: -12, 13: -13,
                       14: -14, 15: -15, 16: -16, 17: -17, 18: -18, 19: -19, 20: -20, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 29: -29, 30: -30,
                       33: -33, 34: -34, 37: -37, 38: -38, 39: -39, 40: -40, 41: -41, 42: -42, 45: -45, 46: -46, 49: -49, 50: -50, 51: -51, 52: -52,
@@ -7686,7 +7708,7 @@ def color_mesta(data, first_mesto, table):
 
 def last_competition():
     """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
-    title = Title.select().order_by(Title.id)
+    title = Title.select().order_by(Title.data_start.desc())
     # my_win.last_comp.addAction(my_win.second_comp_Action)
     i = 0
     for t in title:
