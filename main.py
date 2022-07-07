@@ -5547,7 +5547,7 @@ def setka_32_full_made(fin):
     # first_mesto = 1
     strok = 207
     for i in range(0, strok):
-        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
@@ -5702,8 +5702,8 @@ def setka_32_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)
@@ -6112,12 +6112,14 @@ def write_in_setka(data, fin, first_mesto, table):
                 id_win = id_sh_name[f"{pl_win}"]
             if pl_los != "bye":
                 id_los = id_sh_name[f"{pl_los}"]
-            i = str(i)
+            i = int(i)
             r = str(match[3])
-            row_rank = match[3]
+            # row_rank = match[3]
+            # i = match[3]
             # ===== определение мест и запись в db
-            if row_rank in mesta_list:
-                index = mesta_list.index(row_rank)
+            if i in mesta_list:
+                # index = mesta_list.index(row_rank)
+                index = mesta_list.index(i)
                 mesto = first_mesto + index
                 pl1 = match[1]
                 pl1_mesto = mesto - 1
@@ -6125,48 +6127,43 @@ def write_in_setka(data, fin, first_mesto, table):
                 pl2_mesto = mesto
                 # записывает места в таблицу -Player-
                 player = Player.get(Player.id == id_win)
+                win = f"{player.player}/ {player.city}"
                 player.mesto = pl1_mesto
                 player.save()
                 player = Player.get(Player.id == id_los)
+                los = f"{player.player}/ {player.city}"
                 player.mesto = pl2_mesto
                 player.save()
             c = match[0]
             # ========== расстановка для сетки на 16
             if c != 0:
-        # ========= new variant =====
                 row_win_list = row_num_win[c]  # номера строк данной встречи в сетке
                 if abs(match[3]) % 2 != 0: # выбирает из списка номер строки в зависимости от четности встречи(вверх или низ)
                     row_win = row_win_list[0]
                 else:
                     row_win = row_win_list[1]
-                row_los = row_num_los[r]  # строка проигравшего
-                win = match[1]
-                score = match[2]  # счет во встречи
-                los = match[4]
                 for number_column in range(0, count + 1): # цикл определения номера столбца победителя
                     if c in column[number_column]:
                         col_win = number_column * 2 + 1
                         break
-                row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
-                col_los = row_list_los.index(r) # номер столбца проигравшего
-                data[row_win][col_win] = win
-                data[row_win + 1][col_win] = score
-                data[row_los][col_los + 1] = los
-            elif c == 0:
+                win = match[1]
+                los = match[4]
+            elif c == 0:  # встречи за места
                 for number_column in range(0, count + 1): # цикл определения номера столбца победителя
-                    win_r = int(r) * -1
+                    win_r = int(r) * -1 # номер встречи
                     if win_r in column[number_column]:
-                        col_win = number_column * 2 + 1
+                        col_win = number_column * 2 + 3
                         break
-                row_los = row_num_los[r]  # строка проигравшего
-                row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
-                col_los = row_list_los.index(r) # номер столбца проигравшего
-                # win_r = int(r) * -1
                 row_win = mesta_dict[win_r]
-                data[row_win][col_win] = win
-                data[row_win + 1][col_win] = score
-                data[row_los][col_los + 1] = los
-            # return tds
+
+            row_los = row_num_los[r]  # строка проигравшего
+            score = match[2]  # счет во встречи
+            row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
+            col_los = row_list_los.index(r) # номер столбца проигравшего
+            data[row_win][col_win] = win
+            data[row_win + 1][col_win] = score
+            data[row_los][col_los + 1] = los
+
         return tds
 
 
