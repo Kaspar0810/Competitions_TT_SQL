@@ -3458,9 +3458,6 @@ def enter_score(none_player=0):
                 with db:  # записывает в db таблицу Result победителя и проигравшего
                     player = winner
                     for k in range(0, 2):
-                        # номер id куда записывается победитель
-                        # res = Result.select().where(Result.number_group == fin)
-                        # for result_setki in res:
                         match_num = result.tours  # номер встречи
                         game = snoska[2] * -1
                         if int(match_num) == game:
@@ -6043,15 +6040,16 @@ def write_in_setka(data, fin, first_mesto, table):
         column = [[49, 50, 51, 52, 53, 54, 55, 56, 69, 70, 71, 72, 77, 78], 
         [17, 18, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 57, 58, 59, 60, 73, 74], 
         [25, 26, 27, 28, 33, 34, 41, 42, 45, 46, 61, 62, 65, 66],
-        [29, 30]]
+        [29, 30, 35, 36, 43, 44, 47, 48, 63, 67],
+        [31, 32, 64, 68, 76, 80]]
         row_num_win = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
-        24: [59, 63], 25: [5, 13], 26: [21, 29], 27: [37, 45], 28: [53, 61], 29: [9, 25], 30:[41, 57], 31: [18, 50], 
+        24: [59, 63], 25: [5, 13], 26: [21, 29], 27: [37, 45], 28: [53, 61], 29: [9, 25], 30:[41, 57], 31: [17, 49], 
         35: [72, 76], 41: [89, 93], 42: [97, 101], 43: [92, 100], 47: [114, 118],  57: [140, 144], 58: [148, 152], 
         59: [156, 160], 60: [164, 168], 61: [142, 150], 62: [158, 166], 63: [147, 163], 67: [173, 177], 73: [179, 183],
         74: [187, 191], 75: [182, 190], 79: [198, 202]}
                  # ======= list mest
-        mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
-                        64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
+        mesta_dict = {31: 33, 32: 61, 35: 74, 36: 84, 43: 95, 44: 106, 47: 116, 48: 126, 63: 154,
+                        64: 168, 67: 174, 68: 182, 75: 185, 76: 194, 79: 199, 80: 201}
     
 
     if sender == my_win.clear_s32_Action or sender == my_win.clear_s32_full_Action or sender == my_win.clear_s32_2_Action:
@@ -6098,16 +6096,15 @@ def write_in_setka(data, fin, first_mesto, table):
         # функция расстановки счетов и сносок игроков
         dict_setka = score_in_setka(fin)
         key_list = []
-        val_list = []
+        mesta_list = []
         for k in dict_setka.keys():
             key_list.append(k)
-        for v in key_list:
-            val = dict_setka[v]
-            val_list.append(val)
+        for v in mesta_dict.keys():
+            mesta_list.append(v)
         # ============
         count = len(column)
         # записать в базу данных в списки места финальные
-        for i in key_list:
+        for i in key_list: # спиисок встреч которые сыграны
             match = dict_setka[i]
             pl_win = match[1]
             pl_los = match[4]
@@ -6137,7 +6134,7 @@ def write_in_setka(data, fin, first_mesto, table):
             # ========== расстановка для сетки на 16
             if c != 0:
         # ========= new variant =====
-                row_win_list = row_num_win[c]
+                row_win_list = row_num_win[c]  # номера строк данной встречи в сетке
                 if abs(match[3]) % 2 != 0: # выбирает из списка номер строки в зависимости от четности встречи(вверх или низ)
                     row_win = row_win_list[0]
                 else:
@@ -6146,7 +6143,7 @@ def write_in_setka(data, fin, first_mesto, table):
                 win = match[1]
                 score = match[2]  # счет во встречи
                 los = match[4]
-                for number_column in range(0, count): # цикл определения номера столбца победителя
+                for number_column in range(0, count + 1): # цикл определения номера столбца победителя
                     if c in column[number_column]:
                         col_win = number_column * 2 + 1
                         break
@@ -6155,8 +6152,21 @@ def write_in_setka(data, fin, first_mesto, table):
                 data[row_win][col_win] = win
                 data[row_win + 1][col_win] = score
                 data[row_los][col_los + 1] = los
-            else:
-                return tds
+            elif c == 0:
+                for number_column in range(0, count + 1): # цикл определения номера столбца победителя
+                    win_r = int(r) * -1
+                    if win_r in column[number_column]:
+                        col_win = number_column * 2 + 1
+                        break
+                row_los = row_num_los[r]  # строка проигравшего
+                row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
+                col_los = row_list_los.index(r) # номер столбца проигравшего
+                # win_r = int(r) * -1
+                row_win = mesta_dict[win_r]
+                data[row_win][col_win] = win
+                data[row_win + 1][col_win] = score
+                data[row_los][col_los + 1] = los
+            # return tds
         return tds
 
 
