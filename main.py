@@ -3434,7 +3434,9 @@ def enter_score(none_player=0):
         if none_player == 0:
             winner_string = string_score_game()  # пишет счет в партии
         else:
-            winner_string = ts_winner  # только общий счет
+            # winner_string = ts_winner  # только общий счет
+            if type == "сетка":
+                winner_string = ""
     game_play = False
 
     with db:  # записывает в таблицу -Result- сыгранный матч
@@ -6140,7 +6142,7 @@ def write_in_setka(data, fin, first_mesto, table):
                     row_win = row_win_list[0]
                 else:
                     row_win = row_win_list[1]
-                for number_column in range(0, count + 1): # цикл определения номера столбца победителя
+                for number_column in range(0, count): # цикл определения номера столбца победителя
                     if c in column[number_column]:
                         col_win = number_column * 2 + 1
                         break
