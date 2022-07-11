@@ -4893,13 +4893,13 @@ def func_zagolovok(canvas, doc):
     canvas.setFont("DejaVuSerif-Italic", 14)
     # центральный текст титула
     canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)
-    # canvas.drawCentredString(width / 2.0, height - 1.1 * cm, final)  # центральный текст номер финала
+    # canvas.drawCentredString(width / 2.0, height - 1.3 * cm, final)  # центральный текст номер финала
     canvas.setFont("DejaVuSerif-Italic", 11)
     # текста титула по основным
     canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
-    canvas.drawRightString(width - 1 * cm, height -
-                           1.6 * cm, f"г. {ms}")  # город
+    canvas.drawRightString(width - 1 * cm, height - 1.6 * cm, f"г. {ms}")  # город
     canvas.drawString(0.8 * cm, height - 1.6 * cm, data_comp)  # дата начала
+
     canvas.setFont("DejaVuSerif-Italic", 11)
     canvas.setFillColor(blue)  # меняет цвет шрифта списка судейской коллеги
     if pv == landscape(A4):
@@ -5288,7 +5288,7 @@ def setka_16_full_made(fin):
     first_mesto = mesto_in_final(fin)
     # first_mesto = 1  # временный финал для чистой сетки
     for i in range(0, 69):
-        column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -5296,6 +5296,7 @@ def setka_16_full_made(fin):
     for i in range(0, 32, 2):
         y += 1
         data[i][0] = str(y)  # рисует начальные номера таблицы 1-16
+    # data[0][5] = final
     # ========= нумерация встреч сетки ==========
     draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=4, number_of_game=1, player=16, data=data) # рисует номера встреч 1-32
     draw_num(row_n=32, row_step=2, col_n=6, number_of_columns=2, number_of_game=17, player=4, data=data) # рисует номера встреч 1-32
@@ -5327,8 +5328,8 @@ def setka_16_full_made(fin):
     # ============= данные игроков и встреч и размещение по сетке =============
     tds = write_in_setka(data, fin, first_mesto, table)
     #===============
-    cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm, 0.4 * cm, 3 * cm,
-           0.4 * cm, 3.2 * cm, 1.2 * cm))
+    cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm,
+           0.4 * cm, 4.4 * cm, 1.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
     t = Table(data, cw, 69 * [0.35 * cm])
@@ -5383,8 +5384,8 @@ def setka_16_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
@@ -5394,6 +5395,7 @@ def setka_16_full_made(fin):
                            ('FONTSIZE', (1, 0), (1, 32), 7),
                            # 10 столбец с 0 по 68 ряд (цвет места)
                            ('TEXTCOLOR', (10, 0), (10, 68), colors.red),
+                        #    ('ALIGN', (10, 0), (10, 68), 'RIGHT'),
                            ('ALIGN', (9, 0), (9, 68), 'LEFT'),
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
@@ -6015,11 +6017,10 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 69
         column_last = 11
         row_end = 31
-        # column = [[9, 10, 11, 12, 21, 22, 23, 24], [13, 14, 17, 18, 25, 26, 29, 30], [15, 16, 19, 20, 27, 28, 31, 32]]
         row_num_win = {9: [1, 5], 10: [9, 13], 11: [17, 21], 12: [25, 29], 13: [3, 11], 14: [19, 27], 25: [41, 45], 26: [49, 53], 
                     15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
                  # ======= list mest
-        mesta_dict = {15: 23, 16: 1, 19: 1, 20: 1, 27: 1, 28: 1, 31: 1, 32: 1}
+        mesta_dict = {15: 15, 16: 29, 19: 34, 20: 39, 27: 47, 28: 55, 31: 60, 32: 65}
     elif table == "setka_16_2":
         row_end = 31
     elif table == "setka_32":
@@ -6108,8 +6109,6 @@ def write_in_setka(data, fin, first_mesto, table):
         for v in mesta_dict.keys():
             mesta_list.append(v)
         # ============
-        # count = len(column)
-        # записать в базу данных в списки места финальные
         for i in key_list: # спиисок встреч которые сыграны
             match = dict_setka[i]
             pl_win = match[1]
@@ -6168,41 +6167,31 @@ def write_in_setka(data, fin, first_mesto, table):
                 d5 = data[rd][10]
 
                 if d1 != "":
-                    if d1.isdigit():
-                        break
-                    else:
+                    if type(d1) == str:
                         c1.append(d1)
                         if c in c1:
                             col_win = 1
                             break
                 if d2 != "":
-                    if d2.isdigit():
-                        break
-                    else:
+                    if type(d2) == str:
                         c1.append(d2)
                         if c in c1:
                             col_win = 3
                             break
                 if d3 != "":
-                    if d3.isdigit():
-                            break
-                    else:
+                    if type(d3) == str:
                         c1.append(d3)
                         if c in c1:
                             col_win = 5
                             break
                 if d4 != "":
-                    if d4.isdigit():
-                            break
-                    else:
+                    if type(d4) == str:
                         c1.append(d4)
                         if c in c1:
                             col_win = 7
                             break
                 if d5 != "":
-                    if d2.isdigit():
-                            break
-                    else:
+                    if type(d5) == str:
                         c1.append(d5)
                         if c in c1:
                             col_win = 9
