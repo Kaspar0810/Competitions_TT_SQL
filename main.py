@@ -448,11 +448,11 @@ class StartWindow(QMainWindow, Ui_Form):
         my_win.show()
 
     def open(self):
-        # gamer = db_select_title()
         full_name = db_select_title()
         self.close()
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {full_name}")
         my_win.show()
+
 
     def new(self):
         """запускает новые соревнования"""
@@ -483,41 +483,42 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def last_competition():
         """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
-    title = Title.select().order_by(Title.id)
-    i = 0
-    for t in title:
-        full_name = t.full_name_comp
-        if i > 5:
-            break
-        if i == 0: 
-            if full_name != "":
-                my_win.first_comp_Action.setText(full_name)
-            else:
-                my_win.first_comp_Action.setText("Пусто")
-        elif i == 1: 
-            if full_name != "":
-                my_win.second_comp_Action.setText(full_name)
-            else:
-                my_win.second_comp_Action.setText("Пусто")
-        elif i == 2: 
-            if full_name != "":
-                my_win.third_comp_Action.setText(full_name)
-            else:
-                my_win.third_comp_Action.setText("Пусто")
-        elif i == 3: 
-            if full_name != "":
-                my_win.fourth_comp_Action.setText(full_name)
-            else:
-                my_win.fourth_comp_Action.setText("Пусто")
-        elif i == 4: 
-            if full_name != "":
-                my_win.fifth_comp_Action.setText(full_name)
-            else:
-                my_win.fifth_comp_Action.setText("Пусто")
-        i += 1  
+        go_to()
+    # title = Title.select().order_by(Title.id)
+    # i = 0
+    # for t in title:
+    #     full_name = t.full_name_comp
+    #     if i > 5:
+    #         break
+    #     if i == 0: 
+    #         if full_name != "":
+    #             my_win.first_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.first_comp_Action.setText("Пусто")
+    #     elif i == 1: 
+    #         if full_name != "":
+    #             my_win.second_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.second_comp_Action.setText("Пусто")
+    #     elif i == 2: 
+    #         if full_name != "":
+    #             my_win.third_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.third_comp_Action.setText("Пусто")
+    #     elif i == 3: 
+    #         if full_name != "":
+    #             my_win.fourth_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.fourth_comp_Action.setText("Пусто")
+    #     elif i == 4: 
+    #         if full_name != "":
+    #             my_win.fifth_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.fifth_comp_Action.setText("Пусто")
+    #     i += 1  
     
     
-    last_competition()
+    # last_competition()
    
 
     def r_load(self):
@@ -557,6 +558,36 @@ class StartWindow(QMainWindow, Ui_Form):
                     self.comboBox.addItem(f"{old_comp}. {gamer}")
                 else:
                     return
+            full_name = i.full_name_comp
+            if n > 5:
+                break
+            if n == 4: 
+                if full_name != "":
+                    my_win.first_comp_Action.setText(full_name)
+                else:
+                    my_win.first_comp_Action.setText("Пусто")
+            elif n == 3: 
+                if full_name != "":
+                    my_win.second_comp_Action.setText(full_name)
+                else:
+                    my_win.second_comp_Action.setText("Пусто")
+            elif n == 2: 
+                if full_name != "":
+                    my_win.third_comp_Action.setText(full_name)
+                else:
+                    my_win.third_comp_Action.setText("Пусто")
+            elif n == 1: 
+                if full_name != "":
+                    my_win.fourth_comp_Action.setText(full_name)
+                else:
+                    my_win.fourth_comp_Action.setText("Пусто")
+            elif n == 0: 
+                if full_name != "":
+                    my_win.fifth_comp_Action.setText(full_name)
+                else:
+                    my_win.fifth_comp_Action.setText("Пусто")
+            # i += 1      
+
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
             t_id = Title.select().order_by(Title.id.desc()).get()
@@ -567,8 +598,7 @@ class StartWindow(QMainWindow, Ui_Form):
             data_start = title.data_start
             data_finish = title.data_end
             fir_window.comboBox.setCurrentText(f"{old_comp}. {gamer}")
-            fir_window.label_4.setText(
-                f"сроки: с {data_start} по {data_finish}")
+            fir_window.label_4.setText(f"сроки: с {data_start} по {data_finish}")
 
 
 def dbase():
@@ -7749,39 +7779,39 @@ def color_mesta(data, first_mesto, table):
 
 def last_competition():
     """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
-    title = Title.select().order_by(Title.data_start.desc())
-    i = 0
-    for t in title:
-        full_name = t.full_name_comp
-        if i > 5:
-            break
-        if i == 0: 
-            if full_name != "":
-                my_win.first_comp_Action.setText(full_name)
-            else:
-                my_win.first_comp_Action.setText("Пусто")
-        elif i == 1: 
-            if full_name != "":
-                my_win.second_comp_Action.setText(full_name)
-            else:
-                my_win.second_comp_Action.setText("Пусто")
-        elif i == 2: 
-            if full_name != "":
-                my_win.third_comp_Action.setText(full_name)
-            else:
-                my_win.third_comp_Action.setText("Пусто")
-        elif i == 3: 
-            if full_name != "":
-                my_win.fourth_comp_Action.setText(full_name)
-            else:
-                my_win.fourth_comp_Action.setText("Пусто")
-        elif i == 4: 
-            if full_name != "":
-                my_win.fifth_comp_Action.setText(full_name)
-            else:
-                my_win.fifth_comp_Action.setText("Пусто")
-        i += 1
-    # go_to()
+    # title = Title.select().order_by(Title.data_start.desc())
+    # i = 0
+    # for t in title:
+    #     full_name = t.full_name_comp
+    #     if i > 5:
+    #         break
+    #     if i == 0: 
+    #         if full_name != "":
+    #             my_win.first_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.first_comp_Action.setText("Пусто")
+    #     elif i == 1: 
+    #         if full_name != "":
+    #             my_win.second_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.second_comp_Action.setText("Пусто")
+    #     elif i == 2: 
+    #         if full_name != "":
+    #             my_win.third_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.third_comp_Action.setText("Пусто")
+    #     elif i == 3: 
+    #         if full_name != "":
+    #             my_win.fourth_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.fourth_comp_Action.setText("Пусто")
+    #     elif i == 4: 
+    #         if full_name != "":
+    #             my_win.fifth_comp_Action.setText(full_name)
+    #         else:
+    #             my_win.fifth_comp_Action.setText("Пусто")
+    #     i += 1
+    go_to()
 
 
 def tours_list(cp):
