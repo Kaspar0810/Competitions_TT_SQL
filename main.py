@@ -3,7 +3,6 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-from curses.ascii import isdigit
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -7751,7 +7750,6 @@ def color_mesta(data, first_mesto, table):
 def last_competition():
     """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
     title = Title.select().order_by(Title.data_start.desc())
-    # my_win.last_comp.addAction(my_win.second_comp_Action)
     i = 0
     for t in title:
         full_name = t.full_name_comp
@@ -7783,7 +7781,7 @@ def last_competition():
             else:
                 my_win.fifth_comp_Action.setText("Пусто")
         i += 1
-    go_to()
+    # go_to()
 
 
 def tours_list(cp):
