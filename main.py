@@ -393,8 +393,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             go_to()
         elif sender == self.fifth_comp_Action:
             go_to()
-        # else:
-        #     break
+
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
@@ -484,42 +483,7 @@ class StartWindow(QMainWindow, Ui_Form):
     def last_competition():
         """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
         go_to()
-    # title = Title.select().order_by(Title.id)
-    # i = 0
-    # for t in title:
-    #     full_name = t.full_name_comp
-    #     if i > 5:
-    #         break
-    #     if i == 0: 
-    #         if full_name != "":
-    #             my_win.first_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.first_comp_Action.setText("Пусто")
-    #     elif i == 1: 
-    #         if full_name != "":
-    #             my_win.second_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.second_comp_Action.setText("Пусто")
-    #     elif i == 2: 
-    #         if full_name != "":
-    #             my_win.third_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.third_comp_Action.setText("Пусто")
-    #     elif i == 3: 
-    #         if full_name != "":
-    #             my_win.fourth_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.fourth_comp_Action.setText("Пусто")
-    #     elif i == 4: 
-    #         if full_name != "":
-    #             my_win.fifth_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.fifth_comp_Action.setText("Пусто")
-    #     i += 1  
     
-    
-    # last_competition()
-   
 
     def r_load(self):
         pass
@@ -4182,8 +4146,83 @@ def choice_gr_automat():
 
 
 
-def choice_setka_automat():
+def choice_setka_automat(count_exit, choice_first, choice_second, choice_third, choice_fourth):
     """автоматическая жеребьевка сетки""" 
+    first_posev = []
+    second_posev = []
+    third_posev = []
+    fourth_posev = []
+
+
+
+    first_number = [1, 32, 16, 17, 8, 9, 24, 25]
+    second_number = [4, 29, 12, 20, 5, 28, 13, 21]
+    third_number = [3, 30, 11, 19, 6, 27, 14, 22]
+    fourth_number = [2, 31, 15, 18, 7, 10, 23, 26]
+
+    count_sec_num = len(second_number)
+    count_third_num = len(third_number)
+    count_fourth_num = len(fourth_number)
+    i = 0
+    for posev in choice_first:
+        player = Player.get(Player.player == posev.family)
+        city = player.city
+        first_posev.append({'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
+        i += 1
+    if count_exit == 2:
+        i = 0
+        for posev in choice_second:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+            i += 1
+        if i != count_sec_num:
+            no_gamer = second_number[i:]
+            for m in no_gamer:
+                second_posev.append({'посев': m, 'фамилия': 'bye'})
+        posev_data = first_posev + second_posev
+    elif count_exit == 3:
+        i = 0
+        for posev in choice_second:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+            i += 1
+        i = 0    
+        for posev in choice_third:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            third_posev.append({'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
+            i += 1
+        if i != count_third_num:
+            no_gamer = third_number[i:]
+            for m in no_gamer:
+                third_posev.append({'посев': m, 'фамилия': 'bye'})
+        posev_data = first_posev + second_posev + third_posev
+    elif count_exit == 4:
+        i = 0
+        for posev in choice_second:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+            i += 1
+        i = 0
+        for posev in choice_third:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            third_posev.append({'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
+            i += 1
+        i = 0
+        for posev in choice_fourth:
+            player = Player.get(Player.player == posev.family)
+            city = player.city
+            fourth_posev.append({'посев': fourth_number[i], 'фамилия': f'{posev.family}/ {city}'})
+            i += 1
+        if i != count_fourth_num:
+            no_gamer = fourth_number[i:]
+            for m in no_gamer:
+                fourth_posev.append({'посев': m, 'фамилия': 'bye'})
+        posev_data = first_posev + second_posev + third_posev + fourth_posev
     
 
 
@@ -6407,6 +6446,7 @@ def setka_data_32(fin):
     tds = []
     all_list = []
     posev_data = player_choice_in_setka(fin)  # посев
+
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
@@ -7238,10 +7278,10 @@ def player_choice_one_table(stage):
 
 def player_choice_in_setka(fin):
     """распределяет спортсменов в сетке согласно жеребьевке"""
-    first_posev = []
-    second_posev = []
-    third_posev = []
-    fourth_posev = []
+    # first_posev = []
+    # second_posev = []
+    # third_posev = []
+    # fourth_posev = []
     p_stage = []
 
     system = System.select().where(System.title_id == title_id())
@@ -7317,92 +7357,97 @@ def player_choice_in_setka(fin):
         mesto_third_poseva = mesto_first_poseva + 2
         mesto_fourth_poseva = mesto_first_poseva + 3
 
+    # posev_data = choice_setka_automat(count_exit)    
+
     if count_exit == 1:
         mesto_first_poseva
         choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
     elif count_exit == 2:
         choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
         choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
-        first_number = [1, 16, 8, 9, 4, 5, 12, 13]
-        second_number = [10, 3, 11, 7, 14, 15, 2, 6]
-        count_sec_num = len(second_number)
+        # first_number = [1, 16, 8, 9, 4, 5, 12, 13]
+        # second_number = [10, 3, 11, 7, 14, 15, 2, 6]
+        # count_sec_num = len(second_number)
     elif count_exit == 3:
-        mesto_first_poseva
-        mesto_second_poseva
-        mesto_third_poseva
+        choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+        choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
+        choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
     elif count_exit == 4:
         choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
         choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
         choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
         choice_fourth = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_fourth_poseva)
-        first_number = [1, 32, 16, 17, 8, 9, 24, 25]
-        second_number = [4, 29, 12, 20, 5, 28, 13, 21]
-        third_number = [3, 30, 11, 19, 6, 27, 14, 22]
-        fourth_number = [2, 31, 15, 18, 7, 10, 23, 26]
 
-        count_sec_num = len(second_number)
-        count_third_num = len(third_number)
-        count_fourth_num = len(fourth_number)
-    i = 0
-    for posev in choice_first:
-        player = Player.get(Player.player == posev.family)
-        city = player.city
-        first_posev.append({'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
-        i += 1
-    if count_exit == 2:
-        i = 0
-        for posev in choice_second:
-            player = Player.get(Player.player == posev.family)
-            city = player.city
-            second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
-            i += 1
-        if i != count_sec_num:
-            no_gamer = second_number[i:]
-            for m in no_gamer:
-                second_posev.append({'посев': m, 'фамилия': 'bye'})
-        posev_data = first_posev + second_posev
-    elif count_exit == 3:
-        i = 0
-        for posev in choice_second:
-            player = Player.get(Player.player == posev.family)
-            city = player.city
-            second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
-            i += 1
-        i = 0    
-        for posev in choice_third:
-            player = Player.get(Player.player == posev.family)
-            city = player.city
-            third_posev.append({'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
-            i += 1
-        if i != count_third_num:
-            no_gamer = third_number[i:]
-            for m in no_gamer:
-                third_posev.append({'посев': m, 'фамилия': 'bye'})
-        posev_data = first_posev + second_posev + third_posev
-    elif count_exit == 4:
-        i = 0
-        for posev in choice_second:
-            player = Player.get(Player.player == posev.family)
-            city = player.city
-            second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
-            i += 1
-        i = 0
-        for posev in choice_third:
-            player = Player.get(Player.player == posev.family)
-            city = player.city
-            third_posev.append({'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
-            i += 1
-        i = 0
-        for posev in choice_fourth:
-            player = Player.get(Player.player == posev.family)
-            city = player.city
-            fourth_posev.append({'посев': fourth_number[i], 'фамилия': f'{posev.family}/ {city}'})
-            i += 1
-        if i != count_fourth_num:
-            no_gamer = fourth_number[i:]
-            for m in no_gamer:
-                fourth_posev.append({'посев': m, 'фамилия': 'bye'})
-        posev_data = first_posev + second_posev + third_posev + fourth_posev
+        posev_data = choice_setka_automat(count_exit, choice_first, choice_second, choice_third, choice_fourth)
+
+    #     first_number = [1, 32, 16, 17, 8, 9, 24, 25]
+    #     second_number = [4, 29, 12, 20, 5, 28, 13, 21]
+    #     third_number = [3, 30, 11, 19, 6, 27, 14, 22]
+    #     fourth_number = [2, 31, 15, 18, 7, 10, 23, 26]
+
+    #     count_sec_num = len(second_number)
+    #     count_third_num = len(third_number)
+    #     count_fourth_num = len(fourth_number)
+    # i = 0
+    # for posev in choice_first:
+    #     player = Player.get(Player.player == posev.family)
+    #     city = player.city
+    #     first_posev.append({'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
+    #     i += 1
+    # if count_exit == 2:
+    #     i = 0
+    #     for posev in choice_second:
+    #         player = Player.get(Player.player == posev.family)
+    #         city = player.city
+    #         second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+    #         i += 1
+    #     if i != count_sec_num:
+    #         no_gamer = second_number[i:]
+    #         for m in no_gamer:
+    #             second_posev.append({'посев': m, 'фамилия': 'bye'})
+    #     posev_data = first_posev + second_posev
+    # elif count_exit == 3:
+    #     i = 0
+    #     for posev in choice_second:
+    #         player = Player.get(Player.player == posev.family)
+    #         city = player.city
+    #         second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+    #         i += 1
+    #     i = 0    
+    #     for posev in choice_third:
+    #         player = Player.get(Player.player == posev.family)
+    #         city = player.city
+    #         third_posev.append({'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
+    #         i += 1
+    #     if i != count_third_num:
+    #         no_gamer = third_number[i:]
+    #         for m in no_gamer:
+    #             third_posev.append({'посев': m, 'фамилия': 'bye'})
+    #     posev_data = first_posev + second_posev + third_posev
+    # elif count_exit == 4:
+    #     i = 0
+    #     for posev in choice_second:
+    #         player = Player.get(Player.player == posev.family)
+    #         city = player.city
+    #         second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
+    #         i += 1
+    #     i = 0
+    #     for posev in choice_third:
+    #         player = Player.get(Player.player == posev.family)
+    #         city = player.city
+    #         third_posev.append({'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
+    #         i += 1
+    #     i = 0
+    #     for posev in choice_fourth:
+    #         player = Player.get(Player.player == posev.family)
+    #         city = player.city
+    #         fourth_posev.append({'посев': fourth_number[i], 'фамилия': f'{posev.family}/ {city}'})
+    #         i += 1
+    #     if i != count_fourth_num:
+    #         no_gamer = fourth_number[i:]
+    #         for m in no_gamer:
+    #             fourth_posev.append({'посев': m, 'фамилия': 'bye'})
+    #     posev_data = first_posev + second_posev + third_posev + fourth_posev
 
     # сортировка (списка словарей) по ключу словаря -посев-
     posev_data = sorted(posev_data, key=lambda i: i['посев'])
