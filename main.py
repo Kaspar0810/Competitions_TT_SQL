@@ -3,6 +3,9 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
+from ast import Break
+from operator import truediv
+from numpy import False_
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -42,15 +45,10 @@ def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
 # from playhouse.sqlite_ext import SqliteExtDatabase, backup_to_file, backup
-
 
 registerFontFamily('DejaVuSerif', normal='DejaVuSerif',
                    bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
@@ -383,18 +381,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         view()
 
     def last(self):
-        last_competition()
-        # sender = self.sender()
-        # if sender == self.first_comp_Action:
-        #     last_competition()
-        # elif sender == self.second_comp_Action:
-        #     last_competition()
-        # elif sender == self.third_comp_Action:
-        #     last_competition()
-        # elif sender == self.fourth_comp_Action:
-        #     last_competition()
-        # elif sender == self.fifth_comp_Action:
-        #     last_competition()
+        """открыте соревнований из пункта меню - последние-"""
+        sender = self.sender()
+        if sender == self.first_comp_Action:
+            go_to()
+        elif sender == self.second_comp_Action:
+            go_to()
+        elif sender == self.third_comp_Action:
+            go_to()
+        elif sender == self.fourth_comp_Action:
+            go_to()
+        elif sender == self.fifth_comp_Action:
+            go_to()
+        # else:
+        #     break
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
@@ -830,7 +830,7 @@ def tab_enabled(gamer):
     old_gamer = t_id.gamer
     comp = f"{old_comp}.{old_data}.{old_gamer}"
     my_win.go_to_Action.setText(comp)
-
+    last_competition()
     if gamer == "":
         gamer = my_win.lineEdit_title_gamer.text()
     if count_title != 0:  # когда создаются новые соревнования
@@ -853,6 +853,7 @@ def tab_enabled(gamer):
                             System.title_id == title and System.stage == i)
                         flag = system.choice_flag
                         if flag is True:
+                            my_win.tabWidget.setTabEnabled(3, False_)
                             my_win.tabWidget.setTabEnabled(5, True)
                     elif i == "Предварительный":
                         system = System.get(
@@ -918,16 +919,35 @@ def db_insert_title(title_str):
 
 
 def go_to():
-    """переход на предыдущие соревнования и обратно при нажатии меню -перейти к-"""
-    full_name = my_win.go_to_Action.text()  # полное название к которым переходим
+    """переход на предыдущие соревнования и обратно при нажатии меню -перейти к- или из меню -последние-"""
+    msgBox = QMessageBox
+    sender = my_win.sender()
     tit = Title.get(Title.id == title_id())
     name = tit.name
     data = tit.data_start
     gamer_current = tit.gamer
     # полное название текущих соревнований
     full_name_current = f"{name}.{data}.{gamer_current}"
-    # присваиваем новый текст соревнований в меню -перейти к-
-    my_win.go_to_Action.setText(full_name_current)
+
+    if sender == my_win.first_comp_Action:
+        full_name = my_win.first_comp_Action.text()
+    elif sender == my_win.second_comp_Action:
+        full_name = my_win.second_comp_Action.text()
+    elif sender == my_win.third_comp_Action:
+        full_name = my_win.third_comp_Action.text()
+    elif sender == my_win.fourth_comp_Action:
+        full_name = my_win.fourth_comp_Action.text()
+    elif sender == my_win.fifth_comp_Action:
+        full_name = my_win.fifth_comp_Action.text()
+    elif sender == my_win.go_to_Action:
+        full_name = my_win.go_to_Action.text()  # полное название к которым переходим 
+        # присваиваем новый текст соревнований в меню -перейти к-
+        my_win.go_to_Action.setText(full_name_current)
+
+    if full_name == full_name_current:
+        reply = msgBox.information(my_win, 'Уведомление', 'Данные соревнования уже открыты.',
+                                    msgBox.Ok)
+  
     titles = Title.get(Title.full_name_comp == full_name)
     gamer = titles.gamer
     my_win.lineEdit_title_nazvanie.setText(titles.name)
@@ -988,7 +1008,8 @@ def db_select_title():
     my_win.lineEdit_sekretar.setText(titles.secretary)
     my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
     my_win.lineEdit_title_gamer.setText(titles.gamer)
-    tab_enabled(gamer)
+    # tab_enabled(gamer)
+
     return gamer
 
 
@@ -4160,6 +4181,16 @@ def choice_gr_automat():
         group_list.clear()
 
 
+
+def choice_setka_automat():
+    """автоматическая жеребьевка сетки""" 
+    
+
+
+
+
+
+
 def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current):
     """при добавлении в группу региона удалении номера группы из списка сеянных -b- номер группы
     -m- номер посева, kol_group_free - словарь регион и кол-во свободных групп"""
@@ -4987,10 +5018,7 @@ def table_made(pv, stage):
         t = ta
     else:  # групповые игры
         kg = s_id.total_group  # кол-во групп
-        # a = int(ta) // int(kg)
-
         if int(kg) % int(ta) == 0:
-        # if a == 1 or a < ta: # значит число игроков кратно группам
             t = ta
         else:
             t = ta + 1
@@ -6241,7 +6269,7 @@ def write_in_setka(data, fin, first_mesto, table):
 
 
 def setka_data_clear(fin, table):
-    """заполняет сетку для просмотра пустыми фаммилиями"""
+    """заполняет сетку для просмотра пустыми фамилиями"""
     all_list = []
     tmp = [""]
     if table == "setka_16_full" or table == "setka_16_2":
@@ -7776,42 +7804,41 @@ def color_mesta(data, first_mesto, table):
     return style_color   
 
 
-
 def last_competition():
     """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
-    # title = Title.select().order_by(Title.data_start.desc())
-    # i = 0
-    # for t in title:
-    #     full_name = t.full_name_comp
-    #     if i > 5:
-    #         break
-    #     if i == 0: 
-    #         if full_name != "":
-    #             my_win.first_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.first_comp_Action.setText("Пусто")
-    #     elif i == 1: 
-    #         if full_name != "":
-    #             my_win.second_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.second_comp_Action.setText("Пусто")
-    #     elif i == 2: 
-    #         if full_name != "":
-    #             my_win.third_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.third_comp_Action.setText("Пусто")
-    #     elif i == 3: 
-    #         if full_name != "":
-    #             my_win.fourth_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.fourth_comp_Action.setText("Пусто")
-    #     elif i == 4: 
-    #         if full_name != "":
-    #             my_win.fifth_comp_Action.setText(full_name)
-    #         else:
-    #             my_win.fifth_comp_Action.setText("Пусто")
-    #     i += 1
-    go_to()
+    title = Title.select().order_by(Title.data_start.desc())
+    i = 0
+    for t in title:
+        full_name = t.full_name_comp
+        if i > 5:
+            break
+        if i == 0: 
+            if full_name != "":
+                my_win.first_comp_Action.setText(full_name)
+            else:
+                my_win.first_comp_Action.setText("Пусто")
+        elif i == 1: 
+            if full_name != "":
+                my_win.second_comp_Action.setText(full_name)
+            else:
+                my_win.second_comp_Action.setText("Пусто")
+        elif i == 2: 
+            if full_name != "":
+                my_win.third_comp_Action.setText(full_name)
+            else:
+                my_win.third_comp_Action.setText("Пусто")
+        elif i == 3: 
+            if full_name != "":
+                my_win.fourth_comp_Action.setText(full_name)
+            else:
+                my_win.fourth_comp_Action.setText("Пусто")
+        elif i == 4: 
+            if full_name != "":
+                my_win.fifth_comp_Action.setText(full_name)
+            else:
+                my_win.fifth_comp_Action.setText("Пусто")
+        i += 1
+    # go_to()
 
 
 def tours_list(cp):
