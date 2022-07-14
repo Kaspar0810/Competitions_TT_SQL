@@ -4187,6 +4187,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     # i = 0
     for posev in choice_first:
         psv = []
+        id = posev.id
         player = choice.get(Choice.id == posev.id)
         pl_id = player.id
         family = player.family
