@@ -4146,13 +4146,13 @@ def choice_gr_automat():
 
 
 
-def choice_setka_automat(count_exit, choice_first, choice_second, choice_third, choice_fourth):
+def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_third, choice_fourth):
     """автоматическая жеребьевка сетки""" 
     first_posev = []
     second_posev = []
     third_posev = []
     fourth_posev = []
-
+    posev_setki = {}
 
 
     first_number = [1, 32, 16, 17, 8, 9, 24, 25]
@@ -4163,12 +4163,45 @@ def choice_setka_automat(count_exit, choice_first, choice_second, choice_third, 
     count_sec_num = len(second_number)
     count_third_num = len(third_number)
     count_fourth_num = len(fourth_number)
-    i = 0
+
+    #===================================
+    system = System.select().where(System.title_id == title_id())
+    sys = system.select().where(System.stage == fin).get()
+    syst = sys.select().where(System.stage == sys.stage_exit).get()
+    choice = Choice.select().where(Choice.title_id == title_id())
+    count_exit = sys.max_player // syst.total_group
+#=========================
+    # group = sys.total_group
+    # max_player = sys.max_player  # максимальное число игроков в группе, оно же число посевов
+    # total_player = sys.total_athletes
+    # for b in range(1,count_exit + 1):  # цикл создания словарей (номер посева, списки списков(номер группы и 0 вместо номера регионов))
+    #     for x in range(1, count_exit + 1):
+    #         posev_setki[b] = 0
+    #     gr_region = posev_setki.copy() 
+    #     posev[f"{b}_посев"] = gr_region
+    #     posev_setki.clear()
+    #=================================
+
+
+
+    # i = 0
     for posev in choice_first:
-        player = Player.get(Player.player == posev.family)
-        city = player.city
-        first_posev.append({'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
-        i += 1
+        psv = []
+        player = choice.get(Choice.id == posev.id)
+        pl_id = player.id
+        family = player.family
+        region = player.region
+        chc = choice.select().where(Choice.player_choice_id == pl_id).get()
+        group = chc.group
+        psv.append(pl_id)
+        psv.append(posev.family)
+        psv.append(region)
+        psv.append(group)
+        first_posev.append(psv)
+
+
+
+
     if count_exit == 2:
         i = 0
         for posev in choice_second:
@@ -7348,8 +7381,8 @@ def player_choice_in_setka(fin):
 
     else:  # если была произведена жеребьевка
         sys = system.select().where(System.stage == fin).get()
-
         syst = sys.select().where(System.stage == sys.stage_exit).get()
+
         count_exit = sys.max_player // syst.total_group
 
         mesto_first_poseva = sys.mesta_exit
@@ -7378,7 +7411,7 @@ def player_choice_in_setka(fin):
         choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
         choice_fourth = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_fourth_poseva)
 
-        posev_data = choice_setka_automat(count_exit, choice_first, choice_second, choice_third, choice_fourth)
+        posev_data = choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_third, choice_fourth)
 
     #     first_number = [1, 32, 16, 17, 8, 9, 24, 25]
     #     second_number = [4, 29, 12, 20, 5, 28, 13, 21]
