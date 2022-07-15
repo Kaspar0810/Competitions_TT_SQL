@@ -4187,22 +4187,14 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     # i = 0
     for posev in choice_first:
         psv = []
-<<<<<<< HEAD
-        id = posev.id
-        player = choice.get(Choice.id == posev.id)
-        pl_id = player.id
-        family = player.family
-        region = player.region
-        chc = choice.select().where(Choice.player_choice_id == pl_id).get()
-        group = chc.group
-=======
+     
         family = posev.family
         group = posev.group
         pl_id = posev.player_choice_id
         region = posev.region
         player = Player.get(Player.id == pl_id)
         city = player.city
->>>>>>> fcd84579b478387373b3c4f89b5ff27f42a12078
+
         psv.append(pl_id)
         psv.append(family)
         psv.append(region)
@@ -4210,13 +4202,28 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         psv.append(city)
         first_posev.append(psv)
 
-    i = 0
+    # i = 0
     first_pv = []
+    region_posev = []
+    region_list = []
+    region_tmp = []
+    region_number_poseva = {}
+    curent_posev = []
     for i in range(0, 8):
-        family = first_posev[0][i + 1]
-        city = first_posev[0][i + 4]
+        region = first_posev[i][2]
+        if i > 1 and i < 3:
+            for k in range(0, 2):
+                region_number_poseva[k] = region
+                # curent_posev.append(region_number_poseva)
+        family = first_posev[i][1]
+        city = first_posev[i][4]
+        region_list.append(first_number[i])
+        region_list.append(region)
+        region_tmp = region_list.copy()
+        region_posev.append(region_tmp)
+        region_list.clear()
         first_pv.append({'посев': first_number[i], 'фамилия': f'{family}/ {city}'})
-        i += 1
+        # i += 1
 
 
 
