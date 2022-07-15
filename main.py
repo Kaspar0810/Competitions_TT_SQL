@@ -4187,18 +4187,26 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     # i = 0
     for posev in choice_first:
         psv = []
-        player = choice.get(Choice.id == posev.id)
-        pl_id = player.id
-        family = player.family
-        region = player.region
-        chc = choice.select().where(Choice.player_choice_id == pl_id).get()
-        group = chc.group
+        family = posev.family
+        group = posev.group
+        pl_id = posev.player_choice_id
+        region = posev.region
+        player = Player.get(Player.id == pl_id)
+        city = player.city
         psv.append(pl_id)
-        psv.append(posev.family)
+        psv.append(family)
         psv.append(region)
         psv.append(group)
+        psv.append(city)
         first_posev.append(psv)
 
+    i = 0
+    first_pv = []
+    for i in range(0, 8):
+        family = first_posev[0][i + 1]
+        city = first_posev[0][i + 4]
+        first_pv.append({'посев': first_number[i], 'фамилия': f'{family}/ {city}'})
+        i += 1
 
 
 
@@ -7311,10 +7319,6 @@ def player_choice_one_table(stage):
 
 def player_choice_in_setka(fin):
     """распределяет спортсменов в сетке согласно жеребьевке"""
-    # first_posev = []
-    # second_posev = []
-    # third_posev = []
-    # fourth_posev = []
     p_stage = []
 
     system = System.select().where(System.title_id == title_id())
