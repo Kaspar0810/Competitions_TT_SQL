@@ -4207,14 +4207,38 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     region_posev = []
     region_list = []
     region_tmp = []
+    number_list = [] # посеянные номера в сетке
+    number_posev = []
+    reg_list = []  # посеянные регионы в сетке
     region_number_poseva = {}
-    curent_posev = []
+    current_posev = []
+    current_region_poseva = {}
     for i in range(0, 8):
         region = first_posev[i][2]
-        if i > 1 and i < 3:
-            for k in range(0, 2):
-                region_number_poseva[k] = region
-                # curent_posev.append(region_number_poseva)
+
+        if i > 1 and i < 3: # посев на центральные номера
+            for k in range(i, i + 2):
+                current_region_poseva[k] = region # словарь регионы, в текущем посеве по порядку
+            for x in region_number_poseva.keys():
+                number_list.append(x)
+            for r in region_number_poseva.values():
+                reg_list.append(r)
+
+            for m in current_region_poseva.keys():
+                reg = current_region_poseva[m] # регион, который сеятся
+                l = i
+                for d in reg_list:
+                    if reg != d:
+                        num = first_number[l]
+                        number_posev.append(num)
+                        l += 1
+                          # curent_posev.append(region_number_poseva)
+            
+
+
+
+
+
         family = first_posev[i][1]
         city = first_posev[i][4]
         region_list.append(first_number[i])
@@ -4222,7 +4246,9 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         region_tmp = region_list.copy()
         region_posev.append(region_tmp)
         region_list.clear()
-        first_pv.append({'посев': first_number[i], 'фамилия': f'{family}/ {city}'})
+        region_number_poseva[first_number[i]] = region
+        # first_pv.append({'посев': first_number[i], 'регион': f'{region}'})
+        # first_pv.append({'посев': first_number[i], 'фамилия': f'{family}/ {city}'})
         # i += 1
 
 
