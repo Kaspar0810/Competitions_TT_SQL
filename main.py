@@ -35,6 +35,7 @@ import sys
 import sqlite3
 import pathlib
 from pathlib import Path
+import random
 # from playhouse.migrate import *
 
 if not os.path.isdir("table_pdf"):  # создает папку 
@@ -4213,27 +4214,34 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     region_number_poseva = {}
     current_posev = []
     current_region_poseva = {}
+    possible_number = {} # словарь возможных номеров для посева
+
     for i in range(0, 8):
         region = first_posev[i][2]
 
-        if i > 1 and i < 3: # посев на центральные номера
-            for k in range(i, i + 2):
+        if i == 2: # посев на центральные номера
+            for k in range(2, 4):
                 current_region_poseva[k] = region # словарь регионы, в текущем посеве по порядку
             for x in region_number_poseva.keys():
                 number_list.append(x)
             for r in region_number_poseva.values():
                 reg_list.append(r)
-
+        # места в сетке куду можно сеять текущие регионы (центр сетки)
+            l = 2
             for m in current_region_poseva.keys():
                 reg = current_region_poseva[m] # регион, который сеятся
-                l = i
-                for d in reg_list:
-                    if reg != d:
-                        num = first_number[l]
+                for d in range(0, 2):
+                    rl = reg_list[d]
+                    if reg != rl:
+                        num = first_number[i + d]
                         number_posev.append(num)
-                        l += 1
-                          # curent_posev.append(region_number_poseva)
-            
+                posev_tmp = number_posev.copy()
+                possible_number[l] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
+                number_posev.clear()
+                l += 1  
+                    
+            r = random.choice(possible_number[i])  
+
 
 
 
