@@ -4171,21 +4171,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     syst = sys.select().where(System.stage == sys.stage_exit).get()
     choice = Choice.select().where(Choice.title_id == title_id())
     count_exit = sys.max_player // syst.total_group
-#=========================
-    # group = sys.total_group
-    # max_player = sys.max_player  # максимальное число игроков в группе, оно же число посевов
-    # total_player = sys.total_athletes
-    # for b in range(1,count_exit + 1):  # цикл создания словарей (номер посева, списки списков(номер группы и 0 вместо номера регионов))
-    #     for x in range(1, count_exit + 1):
-    #         posev_setki[b] = 0
-    #     gr_region = posev_setki.copy() 
-    #     posev[f"{b}_посев"] = gr_region
-    #     posev_setki.clear()
-    #=================================
 
-
-
-    # i = 0
     for posev in choice_first:
         psv = []
      
@@ -4203,8 +4189,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         psv.append(city)
         first_posev.append(psv)
 
-    # i = 0
-    first_pv = []
+    num_id_player = {} # словарь номер сетки - id игрока
     region_posev = []
     region_list = []
     region_tmp = []
@@ -4218,34 +4203,53 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
 
     for i in range(0, 8):
         region = first_posev[i][2]
-
-        if i == 2: # посев на центральные номера
-            for k in range(2, 4):
+        num_set = first_number[0]
+        if i == 2 or i == 4: # посев на центральные номера
+            start = i
+            end = i * 2
+            number_list.clear()
+            reg_list.clear()
+            for k in range(start, end):
+                region = first_posev[k][2]
                 current_region_poseva[k] = region # словарь регионы, в текущем посеве по порядку
             for x in region_number_poseva.keys():
                 number_list.append(x)
             for r in region_number_poseva.values():
                 reg_list.append(r)
-        # места в сетке куду можно сеять текущие регионы (центр сетки)
-            l = 2
+            for z in range(0, i):
+                current_posev.append(first_number[z]) # номера сетки куда идет посев
+
+        # места в сетке куда можно сеять текущие регионы (центр сетки)
+            l = i
             for m in current_region_poseva.keys():
                 reg = current_region_poseva[m] # регион, который сеятся
-                for d in range(0, 2):
-                    rl = reg_list[d]
-                    if reg != rl:
-                        num = first_number[i + d]
-                        number_posev.append(num)
-                posev_tmp = number_posev.copy()
-                possible_number[l] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
+                if reg not in reg_list:
+                    possible_number[l] = current_posev
+                    posev_tmp = current_posev
+                else:
+                    for d in range(0, i):
+                        rl = reg_list[d]
+                        if reg != rl:
+                            num = first_number[d]
+                            number_posev.append(num)
+                    posev_tmp = number_posev.copy()
+                    possible_number[l] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
                 number_posev.clear()
                 l += 1  
-                    
-            r = random.choice(possible_number[i])  
 
-
-
-
-
+        count_dict =  len(possible_number.keys())
+        if count_dict != 0:
+            if count_dict == 1:
+                num_set = posev_tmp[0]
+            elif count_dict > 1: # если есть выбор посева то гененируется номер сетки      
+                rnd_number = random_generator(list_choice=posev_tmp)
+                num_set = rnd_number 
+ 
+            for t in range(0, count_dict):
+                possible_number[i + t].remove(num_set)
+            del current_region_poseva[i]
+            del possible_number[i] 
+        
 
         family = first_posev[i][1]
         city = first_posev[i][4]
@@ -4254,7 +4258,11 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         region_tmp = region_list.copy()
         region_posev.append(region_tmp)
         region_list.clear()
-        region_number_poseva[first_number[i]] = region
+        num_id_player[num_set] = first_posev[i][0]
+        region_number_poseva[num_set] = region
+        first_number.remove(num_set)
+        # del current_region_poseva[i]
+
         # first_pv.append({'посев': first_number[i], 'регион': f'{region}'})
         # first_pv.append({'посев': first_number[i], 'фамилия': f'{family}/ {city}'})
         # i += 1
@@ -4318,7 +4326,10 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     
 
 
-
+def random_generator(list_choice):
+    """выдает случайное число из предложенного списка"""
+    rnd_number = random.choice(list_choice)
+    return rnd_number
 
 
 
