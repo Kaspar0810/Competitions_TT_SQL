@@ -4196,9 +4196,9 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     number_list = [] # посеянные номера в сетке
     number_posev = []
     reg_list = []  # посеянные регионы в сетке
-    region_number_poseva = {}
+    region_number_posev = {}
     current_posev = []
-    current_region_poseva = {}
+    current_region_posev = {}
     possible_number = {} # словарь возможных номеров для посева
 
     for i in range(0, 8):
@@ -4211,33 +4211,37 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
             reg_list.clear()
             for k in range(start, end):
                 region = first_posev[k][2]
-                current_region_poseva[k] = region # словарь регионы, в текущем посеве по порядку
-            for x in region_number_poseva.keys():
-                number_list.append(x)
-            for r in region_number_poseva.values():
-                reg_list.append(r)
+                current_region_posev[k] = region # словарь регионы, в текущем посеве по порядку
+            for x in region_number_posev.keys():
+                number_list.append(x) # список уже посеянных номеров в сетке
+            for v in region_number_posev.values():
+                reg_list.append(v) # список уже посеянных регионов
             for z in range(0, i):
                 current_posev.append(first_number[z]) # номера сетки куда идет посев
 
         # места в сетке куда можно сеять текущие регионы (центр сетки)
             l = i
-            for m in current_region_poseva.keys():
-                reg = current_region_poseva[m] # регион, который сеятся
+            for m in current_region_posev.keys():
+                reg = current_region_posev[m] # регион, который сеятся
                 if reg not in reg_list:
-                    possible_number[l] = current_posev
+                    possible_number[l] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
                     posev_tmp = current_posev
                 else:
+                    index = reg_list.index(reg)
+                    set_number = number_list[index] # номер где уже посеянна такая же область
+                    
                     for d in range(0, i):
                         rl = reg_list[d]
                         if reg != rl:
                             num = first_number[d]
-                            number_posev.append(num)
+                            if set_number <= 32 // 2 and num >= 32 // 2:
+                                number_posev.append(num)
                     posev_tmp = number_posev.copy()
                     possible_number[l] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
                 number_posev.clear()
                 l += 1  
 
-        count_dict =  len(possible_number.keys())
+        count_dict =  len(possible_number)
         if count_dict != 0:
             if count_dict == 1:
                 num_set = posev_tmp[0]
@@ -4246,20 +4250,22 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                 num_set = rnd_number 
  
             for t in range(0, count_dict):
-                possible_number[i + t].remove(num_set)
-            del current_region_poseva[i]
-            del possible_number[i] 
+                if num_set in current_posev:
+                    possible_number[i + t].remove(num_set) # удаляет из словаря посеянный номер
+            del current_region_posev[i] # удаляет из словаря текущий посеянный регион
+            del possible_number[i] # удаляет из словаря посеянный порядковый номер
         
 
         family = first_posev[i][1]
         city = first_posev[i][4]
-        region_list.append(first_number[i])
+        region_list.append(first_number[0])
+        # region_list.append(first_number[i])
         region_list.append(region)
         region_tmp = region_list.copy()
         region_posev.append(region_tmp)
         region_list.clear()
         num_id_player[num_set] = first_posev[i][0]
-        region_number_poseva[num_set] = region
+        region_number_posev[num_set] = region
         first_number.remove(num_set)
         # del current_region_poseva[i]
 
