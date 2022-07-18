@@ -4200,6 +4200,10 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     current_posev = []
     current_region_posev = {}
     possible_number = {} # словарь возможных номеров для посева
+    possible_tmp = []
+    possible_variant = {}
+    key_list = []
+    val_list = []
 
     for i in range(0, 8):
         region = first_posev[i][2]
@@ -4242,18 +4246,47 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                 l += 1  
 
         count_dict =  len(possible_number)
-        if count_dict != 0:
-            if count_dict == 1:
-                num_set = posev_tmp[0]
-            elif count_dict > 1: # если есть выбор посева то гененируется номер сетки      
-                rnd_number = random_generator(list_choice=posev_tmp)
-                num_set = rnd_number 
+
+        for q in range(0, count_dict):
+            possible_tmp = possible_number[i + q]
+            count_list = len(possible_tmp)
+            possible_variant[i + q] = count_list
+
+        for key in possible_variant.keys():
+            key_list.append(key)
+        for val in possible_variant.values():
+            val_list.append(val)
+
+
+        if 1 in val_list:
+            pass
+        else:
+            rnd_number = random_generator(list_choice=posev_tmp)
+            num_set = rnd_number 
+        for t in range(0, count_dict):
+            possible_tmp = possible_number[i + t]
+            count_list = len(possible_tmp)
+            if num_set in possible_tmp:
+                    # possible_number[i + t].remove(num_set) # удаляет из словаря посеянный номер
+                possible_tmp.remove(num_set)
+        del current_region_posev[i] # удаляет из словаря текущий посеянный регион
+        del possible_number[i] # удаляет из словаря посеянный порядковый номер
+
+        # if count_dict != 0:
+        #     if count_dict == 1:
+        #         num_set = posev_tmp[0]
+        #     elif count_dict > 1: # если есть выбор посева то гененируется номер сетки      
+        #         rnd_number = random_generator(list_choice=posev_tmp)
+        #         num_set = rnd_number 
  
-            for t in range(0, count_dict):
-                if num_set in current_posev:
-                    possible_number[i + t].remove(num_set) # удаляет из словаря посеянный номер
-            del current_region_posev[i] # удаляет из словаря текущий посеянный регион
-            del possible_number[i] # удаляет из словаря посеянный порядковый номер
+        #     for t in range(0, count_dict):
+        #         possible_tmp = possible_number[i + t]
+        #         count_list = len(possible_tmp)
+        #         if num_set in possible_tmp:
+        #             # possible_number[i + t].remove(num_set) # удаляет из словаря посеянный номер
+        #             possible_tmp.remove(num_set)
+        #     del current_region_posev[i] # удаляет из словаря текущий посеянный регион
+        #     del possible_number[i] # удаляет из словаря посеянный порядковый номер
         
 
         family = first_posev[i][1]
