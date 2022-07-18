@@ -4208,6 +4208,8 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     for i in range(0, 8):
         region = first_posev[i][2]
         num_set = first_number[0]
+
+
         if i == 2 or i == 4: # посев на центральные номера
             start = i
             end = i * 2
@@ -4245,54 +4247,37 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                 number_posev.clear()
                 l += 1  
 
-        count_dict =  len(possible_number)
+            count_dict =  len(possible_number)
 
-        for q in range(0, count_dict):
-            possible_tmp = possible_number[i + q]
-            count_list = len(possible_tmp)
-            possible_variant[i + q] = count_list
+            for q in range(0, count_dict):
+                possible_tmp = possible_number[i + q]
+                count_list = len(possible_tmp)
+                possible_variant[i + q] = count_list
 
-        for key in possible_variant.keys():
-            key_list.append(key)
-        for val in possible_variant.values():
-            val_list.append(val)
+            for key in possible_variant.keys():
+                key_list.append(key)  # список номеров которые будут сеются
+            for val in possible_variant.values():
+                val_list.append(val)  # список количество возможных вариантов сева
 
 
-        if 1 in val_list:
-            pass
-        else:
-            rnd_number = random_generator(list_choice=posev_tmp)
-            num_set = rnd_number 
-        for t in range(0, count_dict):
-            possible_tmp = possible_number[i + t]
-            count_list = len(possible_tmp)
-            if num_set in possible_tmp:
-                    # possible_number[i + t].remove(num_set) # удаляет из словаря посеянный номер
-                possible_tmp.remove(num_set)
-        del current_region_posev[i] # удаляет из словаря текущий посеянный регион
-        del possible_number[i] # удаляет из словаря посеянный порядковый номер
-
-        # if count_dict != 0:
-        #     if count_dict == 1:
-        #         num_set = posev_tmp[0]
-        #     elif count_dict > 1: # если есть выбор посева то гененируется номер сетки      
-        #         rnd_number = random_generator(list_choice=posev_tmp)
-        #         num_set = rnd_number 
- 
-        #     for t in range(0, count_dict):
-        #         possible_tmp = possible_number[i + t]
-        #         count_list = len(possible_tmp)
-        #         if num_set in possible_tmp:
-        #             # possible_number[i + t].remove(num_set) # удаляет из словаря посеянный номер
-        #             possible_tmp.remove(num_set)
-        #     del current_region_posev[i] # удаляет из словаря текущий посеянный регион
-        #     del possible_number[i] # удаляет из словаря посеянный порядковый номер
+            if 1 in val_list:
+                pass
+            else:
+                rnd_number = random_generator(list_choice=posev_tmp)
+                num_set = rnd_number 
+                for t in range(0, count_dict):
+                    possible_tmp = possible_number[i + t]
+                    count_list = len(possible_tmp)
+                    if count_list != 1:
+                        if num_set in possible_tmp:
+                            possible_tmp.remove(num_set)
+                    del current_region_posev[i + t] # удаляет из словаря текущий посеянный регион
+                    del possible_number[i + t] # удаляет из словаря посеянный порядковый номер
         
 
         family = first_posev[i][1]
         city = first_posev[i][4]
         region_list.append(first_number[0])
-        # region_list.append(first_number[i])
         region_list.append(region)
         region_tmp = region_list.copy()
         region_posev.append(region_tmp)
@@ -4300,12 +4285,6 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         num_id_player[num_set] = first_posev[i][0]
         region_number_posev[num_set] = region
         first_number.remove(num_set)
-        # del current_region_poseva[i]
-
-        # first_pv.append({'посев': first_number[i], 'регион': f'{region}'})
-        # first_pv.append({'посев': first_number[i], 'фамилия': f'{family}/ {city}'})
-        # i += 1
-
 
 
     if count_exit == 2:
