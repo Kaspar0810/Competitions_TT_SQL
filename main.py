@@ -4253,8 +4253,10 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                 possible_tmp = possible_number[i + q]
                 count_list = len(possible_tmp)
                 possible_variant[i + q] = count_list  # словарь(номер посева по порядку: возможное кол-во вариантов посева)
+            key_list.clear()
             for key in possible_variant.keys():
                 key_list.append(key)  # список номеров которые будут сеются
+            val_list.clear()
             for val in possible_variant.values():
                 val_list.append(val)  # список количество возможных вариантов сева
 
@@ -4273,8 +4275,9 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
 
         family = first_posev[i][1]
         city = first_posev[i][4]
-        region_list.append(first_number[0])
-        region_list.append(region)
+        # region_list.append(first_number[0])
+        region_list.append(num_set)
+        region_list.append(first_posev[i][2])
         region_tmp = region_list.copy()
         region_posev.append(region_tmp)
         region_list.clear()
@@ -4284,6 +4287,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         if i > 1:
             del current_region_posev[i] # удаляет из словаря текущий посеянный регион
             del possible_number[i] # удаляет из словаря посеянный порядковый номер
+            
 
 
     if count_exit == 2:
