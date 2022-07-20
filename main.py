@@ -5,6 +5,7 @@
 
 from ast import Break
 from operator import truediv
+from queue import Empty
 from numpy import False_
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
@@ -4209,10 +4210,12 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         region = first_posev[i][2]
         num_set = first_number[0]
 
-        # if i == 2 or i >= 4: # посев на центральные номера
-        if i >= 2 : # посев на центральные номера
+        if i == 2 or i >= 4: # посев на центральные номера
             start = i
             end = i * 2
+        # elif i == 3:
+        #     start = i
+        #     end = i + 1
             number_list.clear()
             reg_list.clear()
             for k in range(start, end):
@@ -4236,7 +4239,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                 else:
                     index = reg_list.index(reg)
                     set_number = number_list[index] # номер где уже посеянна такая же область
-                    
+                        
                     for d in range(0, i):
                         rl = reg_list[d]
                         if reg != rl:
@@ -4266,13 +4269,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                 pass
             else:
                 rnd_number = random_generator(list_choice=posev_tmp)
-                num_set = rnd_number 
-            # for t in range(0, count_dict):
-            #     possible_tmp = possible_number[i + t]
-            #     count_list = len(possible_tmp)
-                # if count_list != 1:
-                #     if num_set in possible_tmp:
-                #         possible_tmp.remove(num_set)     
+                num_set = rnd_number
 
         family = first_posev[i][1]
         city = first_posev[i][4]
@@ -4287,10 +4284,11 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         first_number.remove(num_set)
         if i > 1:
             del current_region_posev[i] # удаляет из словаря текущий посеянный регион
-            for t in range(0, count_list):
-                possible_tmp = possible_number[i + t]
-                if num_set in possible_tmp:
-                    possible_tmp.remove(num_set)
+            if len(current_region_posev) != 0:
+                for t in range(0, count_list):
+                    possible_tmp = possible_number[i + t]
+                    if num_set in possible_tmp:
+                        possible_tmp.remove(num_set)
             del possible_number[i] # удаляет из словаря посеянный порядковый номер
             
 
