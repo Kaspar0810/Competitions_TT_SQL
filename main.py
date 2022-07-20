@@ -4209,7 +4209,8 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         region = first_posev[i][2]
         num_set = first_number[0]
 
-        if i == 2 or i >= 4: # посев на центральные номера
+        # if i == 2 or i >= 4: # посев на центральные номера
+        if i >= 2 : # посев на центральные номера
             start = i
             end = i * 2
             number_list.clear()
@@ -4286,6 +4287,10 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         first_number.remove(num_set)
         if i > 1:
             del current_region_posev[i] # удаляет из словаря текущий посеянный регион
+            for t in range(0, count_list):
+                possible_tmp = possible_number[i + t]
+                if num_set in possible_tmp:
+                    possible_tmp.remove(num_set)
             del possible_number[i] # удаляет из словаря посеянный порядковый номер
             
 
