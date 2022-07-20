@@ -4206,19 +4206,39 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     key_list = []
     val_list = []
 
-    for i in range(0, 8):
-        region = first_posev[i][2]
-        num_set = first_number[0]
+    posev = [[1, 32], [16, 17], [8, 9, 24, 25]]
+    count_posev = len(posev)
+    for i in range(0, count_posev):
+        sev = posev[i]
+        count = len(sev)
+        for w in range(0, count):
+            num_set = sev[w]
+            region = first_posev[i][2]
 
-        if i == 2 or i >= 4: # посев на центральные номера
-            start = i
-            end = i * 2
-        # elif i == 3:
-        #     start = i
-        #     end = i + 1
-            number_list.clear()
-            reg_list.clear()
-            for k in range(start, end):
+
+
+        # region = first_posev[i][2]
+        # num_set = first_number[0]
+        number_list.clear()
+        reg_list.clear()
+        
+        # if i == 2:
+        #     for k in range(i, 4):
+        #         region = first_posev[k][2]
+        #         current_region_posev[k] = region # словарь регионы, в текущем посеве по порядку
+        # elif i == 4:
+        #     for k in range(i, 8):
+        #         region = first_posev[k][2]
+        #         current_region_posev[k] = region # словарь регионы, в текущем посеве по порядку
+
+            #  or i >= 4: # посев на центральные номера
+            # start = i
+            # end = i * 2
+
+            # number_list.clear()
+            # reg_list.clear()
+            # for k in range(start, end):
+            for k in range(i, 8):
                 region = first_posev[k][2]
                 current_region_posev[k] = region # словарь регионы, в текущем посеве по порядку
             for x in region_number_posev.keys():
@@ -4264,7 +4284,6 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
             for val in possible_variant.values():
                 val_list.append(val)  # список количество возможных вариантов сева
 
-
             if 1 in val_list: # если один вариант для посева
                 pass
             else:
@@ -4273,7 +4292,6 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
 
         family = first_posev[i][1]
         city = first_posev[i][4]
-        # region_list.append(first_number[0])
         region_list.append(num_set)
         region_list.append(first_posev[i][2])
         region_tmp = region_list.copy()
@@ -4285,7 +4303,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         if i > 1:
             del current_region_posev[i] # удаляет из словаря текущий посеянный регион
             if len(current_region_posev) != 0:
-                for t in range(0, count_list):
+                for t in range(0, count_dict):
                     possible_tmp = possible_number[i + t]
                     if num_set in possible_tmp:
                         possible_tmp.remove(num_set)
