@@ -4190,10 +4190,10 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         psv.append(city)
         first_posev.append(psv)
 
-    # num_id_player = {} # словарь номер сетки - id игрока
-    # region_posev = []
-    # region_list = []
-    # region_tmp = []
+    num_id_player = {} # словарь номер сетки - id игрока
+    region_posev = []
+    region_list = []
+    region_tmp = []
     number_list = [] # посеянные номера в сетке
     # number_posev = []
     reg_list = []  # посеянные регионы в сетке
@@ -4210,8 +4210,8 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     count_posev = len(posev)
     l = 0
     for i in range(0, count_posev):
-        sev = posev[i]
-        count = len(sev)
+        sev = posev[i]  # список номеров посева
+        count = len(sev) # количество номеров в посеве
         for w in range(0, count):
             num_set = sev[w]
             region = first_posev[l][2]
@@ -4223,35 +4223,38 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                     number_list.append(x) # список уже посеянных номеров в сетке
                 for v in region_number_posev.values():
                     reg_list.append(v) # список уже посеянных регионов
-                current_posev.clear()
-                for z in range(0, count):
-                    current_posev.append(first_number[z]) # номера сетки куда идет посев
+                # current_posev.clear()
+                # for z in range(0, count):
+                #     current_posev.append(first_number[z]) # номера сетки куда идет посев
+                current_posev = posev[i]
+                # list_sev = possible_sev(current_region_posev, current_posev, number_list, reg_list, sev, i)
                 list_sev = possible_sev(current_region_posev, current_posev, number_list, reg_list, sev, i)
                 num_set = list_sev[0]
                 possible_number = list_sev[1]
                 count_dict = len(possible_number)
                 made_posev(first_posev, num_set, region_number_posev, first_number, current_region_posev, possible_number, i, w, count_dict)
+                print(num_set)
             elif i == 0:
-                made_posev(first_posev, num_set, region_number_posev, first_number, current_region_posev, possible_number, i, w, count_dict)
-                # family = first_posev[w][1]
-                # city = first_posev[w][4]
-                # region_list.append(num_set)
-                # region_list.append(first_posev[w][2])
-                # region_tmp = region_list.copy()
-                # region_posev.append(region_tmp)
-                # region_list.clear()
-                # num_id_player[num_set] = first_posev[w][0]
-                # region_number_posev[num_set] = region
-                # first_number.remove(num_set)
-                # if i > 1:
-                #     del current_region_posev[i] # удаляет из словаря текущий посеянный регион
-                #     if len(current_region_posev) != 0:
-                #         for t in range(0, count_dict):
-                #             possible_tmp = possible_number[i + t]
-                #             if num_set in possible_tmp:
-                #                 possible_tmp.remove(num_set)
-                #     del possible_number[i] # удаляет из словаря посеянный порядковый номер
-                # l += 1
+                # made_posev(first_posev, num_set, region_number_posev, first_number, current_region_posev, possible_number, i, w, count_dict)
+                family = first_posev[w][1]
+                city = first_posev[w][4]
+                region_list.append(num_set)
+                region_list.append(first_posev[w][2])
+                region_tmp = region_list.copy()
+                region_posev.append(region_tmp) # список списков номер в сетке - регион
+                region_list.clear()
+                num_id_player[num_set] = first_posev[w][0] # словарь номер в сетке - id игрока
+                region_number_posev[num_set] = region
+                first_number.remove(num_set)
+                if i > 1:
+                    del current_region_posev[i] # удаляет из словаря текущий посеянный регион
+                    if len(current_region_posev) != 0:
+                        for t in range(0, count_dict):
+                            possible_tmp = possible_number[i + t]
+                            if num_set in possible_tmp:
+                                possible_tmp.remove(num_set)
+                    del possible_number[i] # удаляет из словаря посеянный порядковый номер
+                l += 1
 
 
         # # region = first_posev[i][2]
@@ -4464,14 +4467,14 @@ def made_posev(first_posev, num_set, region_number_posev, first_number, current_
     region_list = []
     region_posev = []
 
-    family = first_posev[w][1]
-    city = first_posev[w][4]
+    family = first_posev[i + 1][1]
+    city = first_posev[i + 1][4]
     region_list.append(num_set)
-    region_list.append(first_posev[w][2])
+    region_list.append(first_posev[i + 1][2])
     region_tmp = region_list.copy()
     region_posev.append(region_tmp)
     region_list.clear()
-    num_id_player[num_set] = first_posev[w][0]
+    num_id_player[num_set] = first_posev[i + 1][0]
     region_number_posev[num_set] = region
     first_number.remove(num_set)
     if i > 1:
