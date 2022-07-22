@@ -4213,7 +4213,10 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
         sev = posev[i]  # список номеров посева
         count = len(sev) # количество номеров в посеве
         for w in range(0, count):
-            num_set = sev[w]
+            if i == 1:
+                num_set = sev[0]
+            else:
+                num_set = sev[w]
             region = first_posev[l][2]
 
             if i == 1:
@@ -4228,10 +4231,6 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
 
             current_sev = made_posev(first_posev, num_set, region, current_region_posev, current_posev, i, reg_list, number_list, sev)
             num_id_player[current_sev[0]] = current_sev[1]
-                # l = current_sev[2]
-            # elif i == 0:
-            #     current_sev = made_posev(first_posev, num_set, region, current_region_posev, current_posev, i, reg_list, number_list, sev)
-            #     num_id_player[current_sev[0]] = current_sev[1]
             l += 1
 
 
@@ -4298,9 +4297,14 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
     key_list = []
     val_list = []
     current_sev = []
-    i += 1
+
+    # i += 1
+
     l = i + 1
+
+    # if i >= 1:
     if i >= 1:
+        i += 1
         for m in current_region_posev.keys():
             reg = current_region_posev[m] # регион, который сеятся
             if reg not in reg_list:
@@ -4323,9 +4327,9 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
         count_dict =  len(possible_number)
         possible_variant.clear()
         for q in range(0, count_dict):
-            possible_tmp = possible_number[i + q + 1]
+            possible_tmp = possible_number[i + q]
             count_list = len(possible_tmp)
-            possible_variant[i + q + 1] = count_list  # словарь(номер посева по порядку: число вариантов посева)
+            possible_variant[i + q] = count_list  # словарь(номер посева по порядку: число вариантов посева)
         key_list.clear()
         for key in possible_variant.keys():
             key_list.append(key)  # список номеров которые будут сеются
@@ -4336,7 +4340,7 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
         if 1 in val_list: # если один вариант для посева
             pass
         else:
-            rnd_number = random_generator(list_choice=posev_tmp)
+            rnd_number = random_generator(posev_tmp)
             num_set = rnd_number
  
         count_dict = len(possible_number)            
@@ -4345,13 +4349,13 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
     # family = first_posev[i + 1][1]
     # city = first_posev[i + 1][4]
     region_list.append(num_set)
-    region_list.append(first_posev[i + 1][2])
+    region_list.append(first_posev[i][2])
     region_tmp = region_list.copy()
     region_posev.append(region_tmp)
     region_list.clear()
     current_sev.append(num_set)
     current_sev.append(region)
-    if i >= 1:
+    if i >= 2:
         del current_region_posev[i] # удаляет из словаря текущий посеянный регион
         if len(current_region_posev) != 0:
             for t in range(0, count_dict):
@@ -4365,9 +4369,9 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
 
 
 
-def random_generator(list_choice):
+def random_generator(posev_tmp):
     """выдает случайное число из предложенного списка"""
-    rnd_number = random.choice(list_choice)
+    rnd_number = random.choice(posev_tmp)
     return rnd_number
 
 
