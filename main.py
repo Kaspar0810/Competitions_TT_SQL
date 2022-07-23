@@ -4220,7 +4220,8 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
             else:
                 num_set = sev[0]
             count_sev = len(sev)
-            if i != 0 and count_sev > 1:
+            if i != 0:
+                current_region_posev.clear()
                 if count_sev > 1:
                     for k in range(l, l + count_sev):
                         region = first_posev[k][2]
@@ -4303,7 +4304,8 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
 
     p = l
     k = l
-    if l > 1:
+    count = len(sev)
+    if l > 1 and count > 1:
         for m in current_region_posev.keys():
             reg = current_region_posev[m] # регион, который сеятся
             if reg not in reg_list:
@@ -4354,7 +4356,7 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
     region_list.clear()
     current_sev.append(num_set)
     current_sev.append(region)
-    if l > 1:
+    if l > 1 and count > 1:
         n = key_list[sev.index(num_set)]
         del current_region_posev[n] # удаляет из словаря текущий посеянный регион
         if len(current_region_posev) != 0:
