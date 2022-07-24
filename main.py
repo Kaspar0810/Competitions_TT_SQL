@@ -4231,15 +4231,15 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                         number_list.append(x) # список уже посеянных номеров в сетке
                     reg_list.clear()
                     for v in num_id_player.values():
-                        reg_list.append(v) # список уже посеянных регионов
+                        reg_list.append(v[1]) # список уже посеянных регионов
                     current_posev = posev[i]
-                else:
-                    klist = []
-                    sev_dict = current_sev[3]
-                    for ks in sev_dict.keys():
-                        klist.append(ks)
+                # else:
+                #     klist = []
+                #     sev_dict = current_sev[3]
+                #     for ks in sev_dict.keys():
+                #         klist.append(ks)
 
-                    current_region_posev[klist[0]] = first_posev[klist[0]][2]
+                #     current_region_posev[klist[0]] = first_posev[klist[0]][2]
 
 
             current_sev = made_posev(first_posev, num_set, region, current_region_posev, current_posev, i, l, reg_list, number_list, sev)
@@ -4317,7 +4317,7 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
     k = l
     count = len(sev) # кол-во номеров в посеве
     if l > 1 and count > 1:
-        # posev_tmp = possible_number(current_region_posev, current_posev, reg_list, number_list, i, l)
+# =========== определения кол-во возможный вариантов посева у каждого региона
         for m in current_region_posev.keys():
             reg = current_region_posev[m] # регион, который сеятся
             if reg not in reg_list:
@@ -4325,18 +4325,18 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
                 posev_tmp = current_posev
             else:
                 index = reg_list.index(reg)
-                set_number = number_list[index] # номер где уже посеянна такая же область
-                            
-                for d in range(0, i):
+                set_number = number_list[index] # номер где уже посеянна такая же область                           
+                for d in range(0, l):
                     rl = reg_list[d]
                     if reg != rl:
                         num = sev[d]
                         if set_number <= 32 // 2 and num >= 32 // 2:
                             number_posev.append(num)
                 posev_tmp = number_posev.copy()
-                possible_number[l] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
+                possible_number[p] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
             number_posev.clear()
             p += 1
+        #   =========    
         count_dict =  len(possible_number)
         if len(possible_variant) != 0:
             possible_variant.clear()
@@ -4354,8 +4354,9 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
         if 1 in val_list: # если один вариант для посева
             pass
         else:
+            posev_tmp = possible_number[l]
             num_set = random_generator(posev_tmp)
-            l = key_list[posev_tmp.index(num_set)]
+            # l = key_list[posev_tmp.index(num_set)]
  
     # family = first_posev[i + 1][1]
     # city = first_posev[i + 1][4]
@@ -4365,6 +4366,7 @@ def made_posev(first_posev, num_set, region, current_region_posev, current_posev
     # region_posev.append(region_tmp)
     # region_list.clear()
     id_player = first_posev[l][0]
+    region = first_posev[l][2]
     current_sev.append(num_set) # добавляет в список номер в сетке
     current_sev.append(id_player)
     current_sev.append(region) # добавляет в список регион посеянный на этот номер
