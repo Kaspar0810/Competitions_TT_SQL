@@ -4227,15 +4227,15 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
             if i == 0: # самый первый посев
                 sev = posev[i]  # список номеров посева
                 num_set = sev[w]
-                # region = first_posev[l][2]
                 count_sev = len(sev) # количество номеров в посеве
             else:
                 num_set = sev[0] # проверить
                 count_sev = len(sev)
                 if count_sev > 1: # если сеющихся номеров больше одного
-                    for k in range(l, l + count_sev):
-                        region = first_posev[k][2]
-                        current_region_posev[k] = region # словарь регионы, в текущем посеве по порядку
+                    if w == 0:
+                        for k in range(l, l + count_sev):
+                            region = first_posev[k][2]
+                            current_region_posev[k] = region # словарь регионы, в текущем посеве по порядку
                     number_list.clear()
                     for x in num_id_player.keys():
                         number_list.append(x) # список уже посеянных номеров в сетке
@@ -4286,7 +4286,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                         else:
                             posev_tmp = possible_number[l]
                             num_set = random_generator(posev_tmp)
-   
+            # в зависимости от порядка посева менять номер l
             id_player = first_posev[l][0]
             region = first_posev[l][2]
             current_sev.clear()
@@ -4299,15 +4299,18 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                 region_tmp = region_list.copy()
                 region_posev.append(region_tmp)
                 region_list.clear()
-                del current_region_posev[l] # удаляет из словаря текущий посеянный регион
-                if len(current_region_posev) != 0:
-                    for z in range(0, count_dict):
+                # del current_region_posev[l] # удаляет из словаря текущий посеянный регион
+                #   ======== *&
+                c = len(current_region_posev)
+                if c != 0:
+                    for z in possible_number.keys():
                         possible_tmp = possible_number[z]
                         if num_set in possible_tmp:
                             possible_tmp.remove(num_set)
                             sev.remove(num_set)
-                    del possible_number[l] # удаляет из словаря посеянный порядковый номер
-                    current_sev.append(possible_number)
+                    del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
+                    del current_region_posev[l] # удаляет из словаря текущий посеянный регион
+                    # current_sev.append(possible_number)
             elif count_sev == 1:
                 sev.remove(num_set)
                 del possible_number[l] # удаляет из словаря посеянный порядковый номер 
