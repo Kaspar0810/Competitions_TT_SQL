@@ -4255,7 +4255,7 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                                 posev_tmp = current_posev
                             else: 
                                 num_list = []
-                                for r in reg_last:
+                                for r in reg_last: # находит все номера если регионов более одного
                                     if reg in reg_last:
                                         index = reg_last.index(r)
                                         set_number = number_last[index] # номер где уже посеянна такая же область 
@@ -4266,9 +4266,9 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                                 # создает список возможных номеров посева, если есть уже такая же
                                 # область в верхней половине сетки
                                 if count_num == 1:
-                                    if set_number <= 32 // 2:
-                                        number_posev = [i for i in sev if i >= 32 // 2]
-                                    else:
+                                    if set_number <= 32 // 2: # есть такая же область в вверхней половине сетке
+                                        number_posev = [i for i in sev if i >= 32 // 2] # отсеивает в списке номера больше 16
+                                    else: # есть такая же область в нижней половине сетке
                                         number_posev = [i for i in sev if i <= 32 // 2]  
                                     posev_tmp = number_posev.copy()
                                 possible_number[p] = posev_tmp
@@ -4311,7 +4311,8 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                         possible_tmp = possible_number[z]
                         if num_set in possible_tmp:
                             possible_tmp.remove(num_set)
-                            sev.remove(num_set)
+                            if num_set in sev:
+                                sev.remove(num_set)
                     del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
                     del current_region_posev[l] # удаляет из словаря текущий посеянный регион
                     # current_sev.append(possible_number)
