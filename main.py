@@ -4248,40 +4248,39 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
                     # count = len(sev) # кол-во номеров в посеве
                     if l > 1 and count_sev > 1:
 # =========== определения кол-во возможный вариантов посева у каждого региона
-                        for m in current_region_posev.keys():
-                            reg = current_region_posev[m] # регион, который сеятся
+                        # for m in current_region_posev.keys():
+                        for reg in current_region_posev.values():
                             if reg not in reg_last:
                                 possible_number[p] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
                                 posev_tmp = current_posev
-                            else:
-                                index = reg_last.index(reg)
-                                set_number = number_last[index] # номер где уже посеянна такая же область  
-                                count_region = len(current_region_posev)  
-                                # ==== проверить правильность отбора номеров посева                       
-                                # for d in range(0, count_region):
-                                for d in reg_last:
-
-                                    # rl = reg_last[d]
-                                    if reg != d:
-                                        num = sev[d]
-                                        if set_number <= 32 // 2 and num >= 32 // 2:
-                                            number_posev.append(num)
-                                posev_tmp = number_posev.copy()
-                                possible_number[p] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
-                            number_posev.clear()
+                            else: 
+                                num_list = []
+                                for r in reg_last:
+                                    if reg in reg_last:
+                                        index = reg_last.index(r)
+                                        set_number = number_last[index] # номер где уже посеянна такая же область 
+                                        num_list.append(set_number) # список номеров где уже посеяна такая область
+                                        number_last.remove(set_number)
+                                        reg_last.remove(r)
+                                count_num = len(num_list)
+                                # создает список возможных номеров посева, если есть уже такая же
+                                # область в верхней половине сетки
+                                if count_num == 1:
+                                    if set_number <= 32 // 2:
+                                        number_posev = [i for i in sev if i >= 32 // 2]
+                                    else:
+                                        number_posev = [i for i in sev if i <= 32 // 2]  
+                                    posev_tmp = number_posev.copy()
+                                possible_number[p] = posev_tmp
+                                number_posev.clear()
                             p += 1
 #   ===========================    
-                        # count_dict =  len(possible_number)
                         if len(possible_variant) != 0:
                             possible_variant.clear()
-                        # for b in range(k, k + count_dict):
                         for b in possible_number.keys():
                             possible_tmp = possible_number[b]
                             count_list = len(possible_tmp)
                             possible_variant[b] = count_list  # словарь(номер посева по порядку: число вариантов посева)
-                        # key_list.clear()
-                        # for key in possible_variant.keys():
-                        #     key_list.append(key)  # список номеров которые будут сеются
                         val_list.clear()
                         for val in possible_variant.values():
                             val_list.append(val)  # список количество возможных вариантов сева
