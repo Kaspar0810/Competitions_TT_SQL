@@ -4148,56 +4148,17 @@ def choice_gr_automat():
 
 
 
-def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_third, choice_fourth):
+def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     """автоматическая жеребьевка сетки""" 
-    first_posev = []  # список полного списка участников 1-ого посева
-    second_posev = []
+    full_posev = []  # список полного списка участников 1-ого посева
+    posev_all = []
     third_posev = []
     fourth_posev = []
-    posev_setki = {}
-
-
-    first_number = [1, 32, 16, 17, 8, 9, 24, 25]
-    second_number = [4, 29, 12, 20, 5, 28, 13, 21]
-    third_number = [3, 30, 11, 19, 6, 27, 14, 22]
-    fourth_number = [2, 31, 15, 18, 7, 10, 23, 26]
-
-    count_sec_num = len(second_number)
-    count_third_num = len(third_number)
-    count_fourth_num = len(fourth_number)
-
-    #===================================
-    system = System.select().where(System.title_id == title_id())
-    sys = system.select().where(System.stage == fin).get()
-    syst = sys.select().where(System.stage == sys.stage_exit).get()
-    choice = Choice.select().where(Choice.title_id == title_id())
-    count_exit = sys.max_player // syst.total_group
-
-    for posev in choice_first:
-        psv = []
-     
-        family = posev.family
-        group = posev.group
-        pl_id = posev.player_choice_id
-        region = posev.region
-        player = Player.get(Player.id == pl_id)
-        city = player.city
-
-        psv.append(pl_id)
-        psv.append(family)
-        psv.append(region)
-        psv.append(group)
-        psv.append(city)
-        first_posev.append(psv)
+    posev_data = {}
 
     num_id_player = {} # словарь номер сетки - id игрока
-    # region_posev = []
-    # region_list = []
-    # region_tmp = []
     number_last = [] # посеянные номера в сетке
-    # number_posev = []
     reg_last = []  # посеянные регионы в сетке
-    # region_number_posev = {}
     current_posev = []
     current_region_posev = {}
 
@@ -4206,303 +4167,200 @@ def choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_th
     possible_number = {}
     number_posev = []
     possible_variant = {}
-    key_list = []
     val_list = []
-    current_sev = []
+
+    # first_number = [1, 32, 16, 17, 8, 9, 24, 25]
+    # second_number = [4, 29, 12, 20, 5, 28, 13, 21]
+    # third_number = [3, 30, 11, 19, 6, 27, 14, 22]
+    # fourth_number = [2, 31, 15, 18, 7, 10, 23, 26]
+
+    # count_sec_num = len(second_number)
+    # count_third_num = len(third_number)
+    # count_fourth_num = len(fourth_number)
+
+    #===================================
+    system = System.select().where(System.title_id == title_id())
+    sys = system.select().where(System.stage == fin).get()
+    syst = sys.select().where(System.stage == sys.stage_exit).get()
+    choice = Choice.select().where(Choice.title_id == title_id())
+    # setka = choice.get(System.stage == fin)
+    type_setka = sys.label_string
+
+    count_exit = sys.max_player // syst.total_group
 
 
-   # ======== начало жеребьевки =========
+    if count_exit == 2:
+        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+            pass
+        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29]]
+            posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
+            posev_all = [posev_1 + posev_2]
+    elif count_exit == 3:
+        pass
+    elif count_exit == 4:
+        # choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)
+        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+            pass
+        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25]]
+            posev_2 = [[4, 5, 12, 13, 20, 21, 28, 29]]
+            posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
+            posev_4 = [[2, 7, 10, 15, 18, 23, 26, 30]]
+            posev_all.append(posev_1)
+            posev_all.append(posev_2)
+            posev_all.append(posev_3)
+            posev_all.append(posev_4) 
 
-    posev = [[1, 32], [16, 17], [8, 9, 24, 25]]
-    count_posev = len(posev)
-    l = 0 # общий список всего посева
-    for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
-        current_region_posev.clear()
-        sev_tmp = posev[i].copy()
-        sev = sev_tmp.copy()
-        sev_tmp.clear()
-        count = len(posev[i]) # количество номеров в посеве
+    for n in range (0, count_exit):
+        choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva + n)
+        for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сентки
+            psv = []
+        
+            family = posev.family
+            group = posev.group
+            pl_id = posev.player_choice_id
+            region = posev.region
+            player = Player.get(Player.id == pl_id)
+            city = player.city
 
-        for w in range(0, count): # внутренний цикл посева
-            if i == 0: # самый первый посев
-                sev = posev[i]  # список номеров посева
-                num_set = sev[w]
-                count_sev = len(sev) # количество номеров в посеве
-            else:
-                num_set = sev[0] # проверить
-                count_sev = len(sev)
-                if count_sev > 1: # если сеющихся номеров больше одного
-                    if w == 0:
-                        for k in range(l, l + count_sev):
-                            region = first_posev[k][2]
-                            current_region_posev[k] = region # словарь регионы, в текущем посеве по порядку
-                    number_last.clear()
-                    for x in num_id_player.keys():
-                        number_last.append(x) # список уже посеянных номеров в сетке
-                    reg_last.clear()
-                    for v in num_id_player.values():
-                        reg_last.append(v[1]) # список уже посеянных регионов
-                    current_posev = posev[i]
-                    p = l
-                    k = l
-                    # count = len(sev) # кол-во номеров в посеве
-                    if l > 1 and count_sev > 1:
-# =========== определения кол-во возможный вариантов посева у каждого региона
-                        # for m in current_region_posev.keys():
-                        for reg in current_region_posev.values():
-                            if reg not in reg_last:
-                                possible_number[p] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
-                                posev_tmp = current_posev
-                            else: 
-                                num_list = []
-                                for r in reg_last: # находит все номера если регионов более одного
-                                    if reg in reg_last:
-                                        index = reg_last.index(r)
-                                        set_number = number_last[index] # номер где уже посеянна такая же область 
-                                        num_list.append(set_number) # список номеров где уже посеяна такая область
-                                        number_last.remove(set_number)
-                                        reg_last.remove(r)
-                                count_num = len(num_list)
-                                # создает список возможных номеров посева, если есть уже такая же
-                                # область в верхней половине сетки
-                                if count_num == 1:
-                                    if set_number <= 32 // 2: # есть такая же область в вверхней половине сетке
-                                        number_posev = [i for i in sev if i >= 32 // 2] # отсеивает в списке номера больше 16
-                                    else: # есть такая же область в нижней половине сетке
-                                        number_posev = [i for i in sev if i <= 32 // 2]  
-                                    posev_tmp = number_posev.copy()
-                                possible_number[p] = posev_tmp
-                                number_posev.clear()
-                            p += 1
-#   ===========================    
-                        if len(possible_variant) != 0:
-                            possible_variant.clear()
-                        for b in possible_number.keys():
-                            possible_tmp = possible_number[b]
-                            count_list = len(possible_tmp)
-                            possible_variant[b] = count_list  # словарь(номер посева по порядку: число вариантов посева)
-                        val_list.clear()
-                        for val in possible_variant.values():
-                            val_list.append(val)  # список количество возможных вариантов сева
+            psv.append(pl_id)
+            psv.append(family)
+            psv.append(region)
+            psv.append(group)
+            psv.append(city)
+            full_posev.append(psv)
 
-                        if 1 in val_list: # если один вариант для посева
-                            pass
-                        else:
-                            posev_tmp = possible_number[l]
-                            num_set = random_generator(posev_tmp)
-            # в зависимости от порядка посева менять номер l
-            id_player = first_posev[l][0]
-            region = first_posev[l][2]
-            current_sev.clear()
-            current_sev.append(num_set) # добавляет в список номер в сетке
-            current_sev.append(id_player)
-            current_sev.append(region) # добавляет в список регион посеянный на этот номер
-            if l > 1 and count_sev > 1:
-                region_list.append(num_set)
-                region_list.append(first_posev[l][2])
-                region_tmp = region_list.copy()
-                region_posev.append(region_tmp)
-                region_list.clear()
-                # del current_region_posev[l] # удаляет из словаря текущий посеянный регион
-                #   ======== *&
-                c = len(current_region_posev)
-                if c != 0:
-                    for z in possible_number.keys():
-                        possible_tmp = possible_number[z]
-                        if num_set in possible_tmp:
-                            possible_tmp.remove(num_set)
-                            if num_set in sev:
-                                sev.remove(num_set)
-                    del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
-                    del current_region_posev[l] # удаляет из словаря текущий посеянный регион
-                    # current_sev.append(possible_number)
-            elif count_sev == 1:
-                sev.remove(num_set)
-                del possible_number[l] # удаляет из словаря посеянный порядковый номер 
+    # ======== начало жеребьевки =========
 
-            id_region = []
-            id_region.append(current_sev[1])
-            id_region.append(current_sev[2])
-            num_id_player[current_sev[0]] = id_region
-            l += 1  
+        # posev = [[1, 32], [16, 17], [8, 9, 24, 25]]
+        posev = posev_all[n]
+        count_posev = len(posev)
+        l = 0 # общий список всего посева
+        for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
+            current_region_posev.clear()
+            sev_tmp = posev[i].copy()
+            sev = sev_tmp.copy()
+            sev_tmp.clear()
+            count = len(posev[i]) # количество номеров в посеве
 
-# ===========
+            for w in range(0, count): # внутренний цикл посева
+                if i == 0 and n == 0: # самый первый посев
+                    sev = posev[i]  # список номеров посева
+                    num_set = sev[w]
+                    count_sev = len(sev) # количество номеров в посеве
+                else:
+                    num_set = sev[0] # проверить
+                    count_sev = len(sev)
+                    if count_sev > 1: # если сеющихся номеров больше одного
+                        if w == 0:
+                            for k in range(l, l + count_sev):
+                                region = full_posev[k][2]
+                                current_region_posev[k] = region # словарь регионы, в текущем посеве по порядку
+                        number_last.clear()
+                        for x in num_id_player.keys():
+                            number_last.append(x) # список уже посеянных номеров в сетке
+                        reg_last.clear()
+                        for v in num_id_player.values():
+                            reg_last.append(v[1]) # список уже посеянных регионов
+                        current_posev = posev[i]
+                        p = l
+                        k = l
+                        if l > 1 and count_sev > 1:
+    # =========== определения кол-во возможный вариантов посева у каждого региона
+                            for reg in current_region_posev.values():
+                                if reg not in reg_last:
+                                    possible_number[p] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
+                                    posev_tmp = current_posev
+                                else: 
+                                    num_list = []
+                                    for r in reg_last: # находит все номера если регионов более одного
+                                        if reg in reg_last:
+                                            index = reg_last.index(r)
+                                            set_number = number_last[index] # номер где уже посеянна такая же область 
+                                            num_list.append(set_number) # список номеров где уже посеяна такая область
+                                            number_last.remove(set_number)
+                                            reg_last.remove(r)
+                                    count_num = len(num_list)
+                                    # создает список возможных номеров посева, если есть уже такая же
+                                    # область в верхней половине сетки
+                                    if count_num == 1:
+                                        if set_number <= 32 // 2: # есть такая же область в вверхней половине сетке
+                                            number_posev = [i for i in sev if i >= 32 // 2] # отсеивает в списке номера больше 16
+                                        else: # есть такая же область в нижней половине сетке
+                                            number_posev = [i for i in sev if i <= 32 // 2]  
+                                        posev_tmp = number_posev.copy()
+                                    possible_number[p] = posev_tmp
+                                    number_posev.clear()
+                                p += 1
+    #   ===========================    
+                            if len(possible_variant) != 0:
+                                possible_variant.clear()
+                            for b in possible_number.keys():
+                                possible_tmp = possible_number[b]
+                                count_list = len(possible_tmp)
+                                possible_variant[b] = count_list  # словарь(номер посева по порядку: число вариантов посева)
+                            val_list.clear()
+                            for val in possible_variant.values():
+                                val_list.append(val)  # список количество возможных вариантов сева
+
+                            if 1 in val_list: # если один вариант для посева
+                                pass
+                            else:
+                                posev_tmp = possible_number[l]
+                                num_set = random_generator(posev_tmp)
+                # в зависимости от порядка посева менять номер l
+                id_player = full_posev[l][0]
+                region = full_posev[l][2]  
+                id_region = []
+                id_region.append(id_player)
+                id_region.append(region)
+                num_id_player[num_set] = id_region
+
+                if l > 1 and count_sev > 1:
+                    region_list.append(num_set)
+                    region_list.append(full_posev[l][2])
+                    region_tmp = region_list.copy()
+                    region_posev.append(region_tmp)
+                    region_list.clear()
+
+                    c = len(current_region_posev)
+                    if c != 0:
+                        for z in possible_number.keys():
+                            possible_tmp = possible_number[z]
+                            if num_set in possible_tmp:
+                                possible_tmp.remove(num_set)
+                                if num_set in sev:
+                                    sev.remove(num_set)
+                        del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
+                        del current_region_posev[l] # удаляет из словаря текущий посеянный регион
+                elif count_sev == 1:
+                    sev.remove(num_set)
+                    del possible_number[l] # удаляет из словаря посеянный порядковый номер 
+                l += 1
+
+        for i in num_id_player.keys():
+            tmp_list = list(num_id_player[i])
+            id = tmp_list[0]
+            pl_id = Player.get(Player.id == id)
+            family_city = pl_id.full_name
+            posev_data[i] = family_city
+        print(posev_data)
+# ================================================================================= 
   
 # def possible_sev(current_region_posev, current_posev, number_list, reg_list, sev, i):
 #     """места в сетке куда можно сеять текущие регионы (центр сетки)"""
-#     possible_number = {}
-#     number_posev = []
-#     possible_variant = {}
-#     key_list = []
-#     val_list = []
-#     list_sev = []
-
-#     l = i + 1
-#     for m in current_region_posev.keys():
-#         reg = current_region_posev[m] # регион, который сеятся
-#         if reg not in reg_list:
-#             possible_number[l] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
-#             posev_tmp = current_posev
-#         else:
-#             index = reg_list.index(reg)
-#             set_number = number_list[index] # номер где уже посеянна такая же область
-                        
-#             for d in range(0, i):
-#                 rl = reg_list[d]
-#                 if reg != rl:
-#                     num = sev[d]
-#                     if set_number <= 32 // 2 and num >= 32 // 2:
-#                         number_posev.append(num)
-#             posev_tmp = number_posev.copy()
-#             possible_number[l] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
-#         number_posev.clear()
-#         l += 1 
-#     count_dict =  len(possible_number)
-#     possible_variant.clear()
-#     for q in range(0, count_dict):
-#         possible_tmp = possible_number[i + q + 1]
-#         count_list = len(possible_tmp)
-#         possible_variant[i + q + 1] = count_list  # словарь(номер посева по порядку: число вариантов посева)
-#     key_list.clear()
-#     for key in possible_variant.keys():
-#         key_list.append(key)  # список номеров которые будут сеются
-#     val_list.clear()
-#     for val in possible_variant.values():
-#          val_list.append(val)  # список количество возможных вариантов сева
-
-#     if 1 in val_list: # если один вариант для посева
-#         pass
-#     else:
-#         num_set = random_generator(posev_tmp)
-#     list_sev.append(num_set)
-#     list_sev.append(possible_variant) 
-#     return list_sev
 
 
-def made_posev(first_posev, num_set, region, current_region_posev, current_posev, i, l, reg_list, number_list, sev):
-    """посев"""
 
-    region_list = []
-    region_posev = []
-    possible_number = {}
-    number_posev = []
-    possible_variant = {}
-    key_list = []
-    val_list = []
-    current_sev = []
+# def made_posev(first_posev, num_set, region, current_region_posev, current_posev, i, l, reg_list, number_list, sev):
+#     """посев"""
 
-    p = l
-    k = l
-    count = len(sev) # кол-во номеров в посеве
-    if l > 1 and count > 1:
-# =========== определения кол-во возможный вариантов посева у каждого региона
-        for m in current_region_posev.keys():
-            reg = current_region_posev[m] # регион, который сеятся
-            if reg not in reg_list:
-                possible_number[p] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
-                posev_tmp = current_posev
-            else:
-                index = reg_list.index(reg)
-                set_number = number_list[index] # номер где уже посеянна такая же область                           
-                for d in range(0, l):
-                    rl = reg_list[d]
-                    if reg != rl:
-                        num = sev[d]
-                        if set_number <= 32 // 2 and num >= 32 // 2:
-                            number_posev.append(num)
-                posev_tmp = number_posev.copy()
-                possible_number[p] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
-            number_posev.clear()
-            p += 1
-        #   =========    
-        count_dict =  len(possible_number)
-        if len(possible_variant) != 0:
-            possible_variant.clear()
-        for b in range(k, k + count_dict):
-            possible_tmp = possible_number[b]
-            count_list = len(possible_tmp)
-            possible_variant[b] = count_list  # словарь(номер посева по порядку: число вариантов посева)
-        key_list.clear()
-        for key in possible_variant.keys():
-            key_list.append(key)  # список номеров которые будут сеются
-        val_list.clear()
-        for val in possible_variant.values():
-            val_list.append(val)  # список количество возможных вариантов сева
 
-        if 1 in val_list: # если один вариант для посева
-            pass
-        else:
-            posev_tmp = possible_number[l]
-            num_set = random_generator(posev_tmp)
-            # l = key_list[posev_tmp.index(num_set)]
- 
-    # family = first_posev[i + 1][1]
-    # city = first_posev[i + 1][4]
-    # region_list.append(num_set)
-    # region_list.append(first_posev[l][2])
-    # region_tmp = region_list.copy()
-    # region_posev.append(region_tmp)
-    # region_list.clear()
-    id_player = first_posev[l][0]
-    region = first_posev[l][2]
-    current_sev.append(num_set) # добавляет в список номер в сетке
-    current_sev.append(id_player)
-    current_sev.append(region) # добавляет в список регион посеянный на этот номер
-    if l > 1 and count > 1:
-        region_list.append(num_set)
-        region_list.append(first_posev[l][2])
-        region_tmp = region_list.copy()
-        region_posev.append(region_tmp)
-        region_list.clear()
-        del current_region_posev[l] # удаляет из словаря текущий посеянный регион
-        if len(current_region_posev) != 0:
-            # for t in range(0, count_dict):
-            possible_tmp = possible_number[l]
-            if num_set in possible_tmp:
-                possible_tmp.remove(num_set)
-                sev.remove(num_set)
-        del possible_number[l] # удаляет из словаря посеянный порядковый номер
-        current_sev.append(possible_number)
-    return current_sev
 
 # def possible_number(current_region_posev, current_posev, reg_list, number_list, i, l):
 #     """возможные номера посева"""
-#     number_posev = []
-#     possible_variant = {}
-#     p = l
-#     k = l
-#     for m in current_region_posev.keys():
-#         reg = current_region_posev[m] # регион, который сеятся
-#         if reg not in reg_list:
-#             possible_number[p] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
-#             posev_tmp = current_posev
-#         else:
-#             index = reg_list.index(reg)
-#             set_number = number_list[index] # номер где уже посеянна такая же область
-                            
-#             for d in range(0, i):
-#                 rl = reg_list[d]
-#                 if reg != rl:
-#                     num = sev[d]
-#                     if set_number <= 32 // 2 and num >= 32 // 2:
-#                         number_posev.append(num)
-#             posev_tmp = number_posev.copy()
-#             possible_number[l] = posev_tmp # номер посева по порядку и список номеров в сетке куда можно сеять
-#         number_posev.clear()
-#         p += 1
-#     count_dict =  len(possible_number)
-#     if len(possible_variant) != 0:
-#         possible_variant.clear()
-#     for b in range(k, k + count_dict):
-#         possible_tmp = possible_number[b]
-#         count_list = len(possible_tmp)
-#         possible_variant[b] = count_list  # словарь(номер посева по порядку: число вариантов посева)
-#     key_list.clear()
-#     for key in possible_variant.keys():
-#         key_list.append(key)  # список номеров которые будут сеются
-#     val_list.clear()
-#     for val in possible_variant.values():
-#         val_list.append(val)  # список количество возможных вариантов сева
+
 
 
 def random_generator(posev_tmp):
@@ -7637,26 +7495,27 @@ def player_choice_in_setka(fin):
 
     # posev_data = choice_setka_automat(count_exit)    
 
-    if count_exit == 1:
-        mesto_first_poseva
-        choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-    elif count_exit == 2:
-        choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-        choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
-        # first_number = [1, 16, 8, 9, 4, 5, 12, 13]
-        # second_number = [10, 3, 11, 7, 14, 15, 2, 6]
-        # count_sec_num = len(second_number)
-    elif count_exit == 3:
-        choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-        choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
-        choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
-    elif count_exit == 4:
-        choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-        choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
-        choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
-        choice_fourth = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_fourth_poseva)
+    # if count_exit == 1:
+    #     mesto_first_poseva
+    #     choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+    # elif count_exit == 2:
+    #     choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+    #     choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
+    #     # first_number = [1, 16, 8, 9, 4, 5, 12, 13]
+    #     # second_number = [10, 3, 11, 7, 14, 15, 2, 6]
+    #     # count_sec_num = len(second_number)
+    # elif count_exit == 3:
+    #     choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+    #     choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
+    #     choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
+    # elif count_exit == 4:
+    #     choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
+    #     choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
+    #     choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
+    #     choice_fourth = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_fourth_poseva)
 
-        posev_data = choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_third, choice_fourth)
+        # posev_data = choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_third, choice_fourth)
+        posev_data = choice_setka_automat(fin, count_exit, mesto_first_poseva)
 
     #     first_number = [1, 32, 16, 17, 8, 9, 24, 25]
     #     second_number = [4, 29, 12, 20, 5, 28, 13, 21]
