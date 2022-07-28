@@ -4169,11 +4169,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     possible_variant = {}
     val_list = []
 
-    # first_number = [1, 32, 16, 17, 8, 9, 24, 25]
-    # second_number = [4, 29, 12, 20, 5, 28, 13, 21]
-    # third_number = [3, 30, 11, 19, 6, 27, 14, 22]
-    # fourth_number = [2, 31, 15, 18, 7, 10, 23, 26]
-
     # count_sec_num = len(second_number)
     # count_third_num = len(third_number)
     # count_fourth_num = len(fourth_number)
@@ -4183,11 +4178,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     sys = system.select().where(System.stage == fin).get()
     syst = sys.select().where(System.stage == sys.stage_exit).get()
     choice = Choice.select().where(Choice.title_id == title_id())
-    # setka = choice.get(System.stage == fin)
     type_setka = sys.label_string
 
     count_exit = sys.max_player // syst.total_group
-
 
     if count_exit == 2:
         if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
@@ -4199,7 +4192,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     elif count_exit == 3:
         pass
     elif count_exit == 4:
-        # choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)
         if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
             pass
         elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
@@ -4214,6 +4206,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
 
     for n in range (0, count_exit):
         choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva + n)
+        full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сентки
             psv = []
         
@@ -4233,7 +4226,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
 
     # ======== начало жеребьевки =========
 
-        # posev = [[1, 32], [16, 17], [8, 9, 24, 25]]
         posev = posev_all[n]
         count_posev = len(posev)
         l = 0 # общий список всего посева
