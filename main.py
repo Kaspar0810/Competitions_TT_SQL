@@ -4152,8 +4152,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     """автоматическая жеребьевка сетки""" 
     full_posev = []  # список полного списка участников 1-ого посева
     posev_all = []
-    third_posev = []
-    fourth_posev = []
+    group_last = []
     posev_data = {}
 
     num_id_player = {} # словарь номер сетки - id игрока
@@ -4262,29 +4261,50 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                         for x in num_id_player.keys():
                             number_last.append(x) # список уже посеянных номеров в сетке
                         reg_last.clear()
+                        group_last.clear()
                         for v in num_id_player.values():
                             reg_last.append(v[1]) # список уже посеянных регионов
+                            group_last.append(v[2]) # список номеров групп уже посеянных
                         current_posev = posev[i]
                         p = l
                         k = l
-                        # if l > 1 and n == 0 and count_sev > 1:
                         if n != 0 or (n == 0 and l > 1):
     # =========== определения кол-во возможный вариантов посева у каждого региона
                             for reg in current_region_posev.values():
-                                #  определять группу чтоб от нее уводить в зависимости о выхода из группы
-                                if reg[0] not in reg_last:
-                                    possible_number[p] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
-                                    posev_tmp = current_posev
-                                else: 
-                                    num_list = []
-                                    for r in reg_last: # находит все номера если регионов более одного
-                                        if reg[0] in reg_last:
-                                            index = reg_last.index(r)
-                                            set_number = number_last[index] # номер где уже посеянна такая же область 
-                                            num_list.append(set_number) # список номеров где уже посеяна такая область
-                                            number_last.remove(set_number)
-                                            reg_last.remove(r)
-                                    count_num = len(num_list)
+                                if n > 0: # о#  определять группу чтоб от нее уводить в зависимости о выхода из группы
+                                    # for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
+                                        # if reg[1] in num_id_player[d]:
+                                        #     if d <= 32 // 2:
+                                        #         current_posev = [i for i in sev if i >= 32 // 2]
+                                        #         break
+                                        #     else: 
+                                        #         current_posev = [i for i in sev if i <= 32 // 2]
+                                        #         break
+                                    if reg[0] not in reg_last: # если сеянная область нет в прошлом посев
+                                        for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
+                                            posev_tmp = num_id_player[d]
+                                            if reg[1] in posev_tmp:
+                                                if d <= 32 // 2:
+                                                    current_posev = [i for i in sev if i >= 32 // 2]
+                                                    # break
+                                                else: 
+                                                    current_posev = [i for i in sev if i <= 32 // 2]
+                                                break    
+                                    # possible_number[p] = current_posev # если в списке нет посеянных регионов до добавляет все номера куда сеять
+                                    # posev_tmp = current_posev
+                                    else: # если сеянная область уже была посеянна
+                                        num_list = []
+                                        reg_last_tmp = reg_last.copy()
+                                        for r in reg_last_tmp: # находит все номера если регионов более одного
+                                            if r == reg[0]:
+                                            # if reg[0] in reg_last:
+                                                index = reg_last_tmp.index(r)
+                                                set_number = number_last[index] # номер где уже посеянна такая же область 
+                                                num_list.append(set_number) # список номеров где уже посеяна такая область
+                                                number_last.remove(set_number)
+                                                reg_last_tmp.remove(r)
+                                        count_num = len(num_list)
+
                                     # создает список возможных номеров посева, если есть уже такая же
                                     # область в верхней половине сетки
                                     if count_num == 1:
@@ -4292,8 +4312,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                                             number_posev = [i for i in sev if i >= 32 // 2] # отсеивает в списке номера больше 16
                                         else: # есть такая же область в нижней половине сетке
                                             number_posev = [i for i in sev if i <= 32 // 2]  
-                                        posev_tmp = number_posev.copy()
-                                    possible_number[p] = posev_tmp
+                                        current_posev = number_posev.copy()
+                                # possible_number[p] = posev_tmp
+                                    possible_number[p] = current_posev
                                     number_posev.clear()
                                 p += 1
     #   ===========================    
