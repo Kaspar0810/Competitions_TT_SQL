@@ -3,10 +3,10 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-from ast import Break
-from operator import truediv
-from queue import Empty
-from winreg import SetValue
+# from ast import Break
+# from operator import truediv
+# from queue import Empty
+# from winreg import SetValue
 from numpy import False_
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
@@ -4412,13 +4412,13 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     num_id_player = {} # словарь номер сетки - id игрока
     number_last = [] # посеянные номера в сетке
     reg_last = []  # посеянные регионы в сетке
-    current_posev = []
+    # current_posev = []
     current_region_posev = {}
 
-    region_list = []
-    region_posev = []
+    # region_list = []
+    # region_posev = []
     # possible_number = {}
-    number_posev = []
+    number_posev = {}
     possible_variant = {}
     val_list = []
 
@@ -4460,7 +4460,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     for n in range (0, count_exit):
         choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva + n)
         full_posev.clear()
-        for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сентки
+        for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
         
             family = posev.family
@@ -4476,7 +4476,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             psv.append(group)
             psv.append(city)
             full_posev.append(psv)
-
+            # f = 
     # ======== начало жеребьевки =========
 
         posev = posev_all[n]
@@ -4535,7 +4535,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                                 for key in possible_number.keys():
                                     current_value_list = possible_number[key]
                                     if len(current_value_list) == 1:
-                                        possible_number[key] = current_value_list[0]
+                                        # possible_number[key] = current_value_list[0]
+                                        possible_number[key] = current_value_list
                                 l = key
                                 num_set = current_value_list[0]
                             else:
@@ -4552,11 +4553,11 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 num_id_player[num_set] = id_region
 
                 if l > 1 and count_sev > 1:
-                    region_list.append(num_set)
-                    region_list.append(full_posev[l][2])
-                    region_tmp = region_list.copy()
-                    region_posev.append(region_tmp)
-                    region_list.clear()
+                    # region_list.append(num_set)
+                    # region_list.append(full_posev[l][2])
+                    # region_tmp = region_list.copy()
+                    # region_posev.append(region_tmp)
+                    # region_list.clear()
 
                     c = len(current_region_posev)
                     if c != 0:
