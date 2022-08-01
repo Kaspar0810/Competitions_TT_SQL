@@ -6,6 +6,7 @@
 from ast import Break
 from operator import truediv
 from queue import Empty
+from winreg import SetValue
 from numpy import False_
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
@@ -4497,7 +4498,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                     num_set = sev[0] # проверить
                     count_sev = len(sev)
                     if count_sev > 1: # если сеющихся номеров больше одного
-                        if w == 0:
+                        if w == 0: # 1-й основной посев
                             gr_region_tmp = []
                             for k in range(l, l + count_sev):
                                 region = full_posev[k][2]
@@ -4511,11 +4512,10 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                         for x in num_id_player.keys():
                             number_last.append(x) # список уже посеянных номеров в сетке
                         reg_last.clear()
+                        group_last.clear()
                         for v in num_id_player.values():
                             reg_last.append(v[1]) # список уже посеянных регионов
                             group_last.append(v[2]) # список номеров групп уже посеянных
-                        current_posev = posev[i]
-                        # p = l
                         k = l
                         if n != 0 or (n == 0 and l > 1):
     # =========== определения кол-во возможный вариантов посева у каждого региона
@@ -4530,9 +4530,14 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                             val_list.clear()
                             for val in possible_variant.values():
                                 val_list.append(val)  # список количество возможных вариантов сева
-
+                            current_value_list = []
                             if 1 in val_list: # если один вариант для посева
-                                pass
+                                for key in possible_number.keys():
+                                    current_value_list = possible_number[key]
+                                    if len(current_value_list) == 1:
+                                        possible_number[key] = current_value_list[0]
+                                l = key
+                                num_set = current_value_list[0]
                             else:
                                 posev_tmp = possible_number[l]
                                 num_set = random_generator(posev_tmp)
@@ -4563,11 +4568,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                                     sev.remove(num_set)
                         del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
                         del current_region_posev[l] # удаляет из словаря текущий посеянный регион
-                elif count_sev == 1:
+                elif count_sev == 1: # удаляет последний ноер в посеве
                     sev.clear()
                     possible_number.clear()
-                    # sev.remove(num_set)
-                    # del possible_number[l] # удаляет из словаря посеянный порядковый номер 
                 l += 1
 
         for i in num_id_player.keys():
@@ -4607,16 +4610,15 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                 count = count_set - len(a)
                 if count == 1: # значит только один регион в посеве
                     gr = reg[1]
-                    number_posev = number_setka_posev(gr, group_last, number_last)
+                    number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev)
+                    possible_number[p] = number_posev
                 else:
                     pass
             else:
                 possible_number[p] = sev
-
-
         else:
             gr = reg[1]
-            number_posev = number_setka_posev(gr, group_last, number_last)
+            number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev)
             reg_temp = num_id_player.copy()
             for s in number_posev:
                 reg_tmp.append(reg_temp[s][1]) # список областей в той половине сетки куда будут сеять
@@ -4646,14 +4648,24 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
     return possible_number
 
 
-def number_setka_posev(gr, group_last, number_last):
+def number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev):
     """промежуточные номера для посева в сетке"""
-    index = group_last.index(gr)
-    set_number = number_last[index] # номер где уже посеянна такая же область 
-    if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
-        number_posev = [i for i in number_last if i <= 32 // 2] # отсеивает в списке номера больше 16
-    else: 
-        number_posev = [i for i in number_last if i >= 32 // 2] # отсеивает в списке номера больше 16 
+    if n == 0:
+        region_sev = reg[0]
+        if region_sev in reg_last:
+            index = reg_last.index(region_sev)
+            set_number = number_last[index] # номер где уже посеянна такая же область 
+            if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
+                number_posev = [i for i in sev if i >= 32 // 2] # отсеивает в списке номера больше 16
+            else: 
+                number_posev = [i for i in sev if i <= 32 // 2] # отсеивает в списке номера больше 16 
+    else:    
+        index = group_last.index(gr)
+        set_number = number_last[index] # номер где уже посеянна такая же область 
+        if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
+            number_posev = [i for i in number_last if i >= 32 // 2] # отсеивает в списке номера больше 16
+        else: 
+            number_posev = [i for i in number_last if i <= 32 // 2] # отсеивает в списке номера больше 16 
     return number_posev
 
 
