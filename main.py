@@ -4407,21 +4407,15 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     """автоматическая жеребьевка сетки""" 
     full_posev = []  # список полного списка участников 1-ого посева
     posev_all = []
-    posev_data = {}
     group_last = []
-    num_id_player = {} # словарь номер сетки - id игрока
     number_last = [] # посеянные номера в сетке
     reg_last = []  # посеянные регионы в сетке
-    # current_posev = []
-    current_region_posev = {}
-
-    # region_list = []
-    # region_posev = []
-    # possible_number = {}
-    number_posev = {}
-    possible_variant = {}
     val_list = []
-
+    number_posev = []  # список по порядку для посева
+    current_region_posev = {} # в текущем посеве список регионов по порядку
+    possible_variant = {}
+    posev_data = {} # окончательные посев номер в сетке - игрок/ город
+    num_id_player = {} # словарь номер сетки - id игрока
     # count_sec_num = len(second_number)
     # count_third_num = len(third_number)
     # count_fourth_num = len(fourth_number)
@@ -4476,12 +4470,15 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             psv.append(group)
             psv.append(city)
             full_posev.append(psv)
-            # f = 
+
     # ======== начало жеребьевки =========
+        end = 32 // count_exit
+        for i in range(0, end):
+            number_posev.append(i)
 
         posev = posev_all[n]
         count_posev = len(posev)
-        l = 0 # общий список всего посева
+
         for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
             current_region_posev.clear()
             sev_tmp = posev[i].copy()
@@ -4490,6 +4487,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             count = len(posev[i]) # количество номеров в посеве
 
             for w in range(0, count): # внутренний цикл посева
+                l = number_posev[0] # общий список всего посева
                 if i == 0 and n == 0: #  ===== 1-й посев
                     sev = posev[i]  # список номеров посева
                     num_set = sev[w]
@@ -4535,7 +4533,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                                 for key in possible_number.keys():
                                     current_value_list = possible_number[key]
                                     if len(current_value_list) == 1:
-                                        # possible_number[key] = current_value_list[0]
                                         possible_number[key] = current_value_list
                                 l = key
                                 num_set = current_value_list[0]
@@ -4572,8 +4569,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 elif count_sev == 1: # удаляет последний ноер в посеве
                     sev.clear()
                     possible_number.clear()
-                l += 1
-
+                number_posev.remove(l)
+                
         for i in num_id_player.keys():
             tmp_list = list(num_id_player[i])
             id = tmp_list[0]
@@ -4597,11 +4594,9 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
     """возможные номера посева"""
     possible_number = {}
     reg_tmp = []
-    # reg_tmp_copy = []
     p = l
     
     for reg in current_region_posev.values():
-
         if n == 0:
             current_reg = reg[0]
             if current_reg in reg_last:
