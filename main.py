@@ -3,13 +3,7 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
-# from ast import Break
-# from operator import truediv
-# from queue import Empty
-# from winreg import SetValue
-from distutils.log import set_verbosity
-from winreg import SetValueEx
-from numpy import False_
+
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -822,7 +816,7 @@ def tab_enabled(gamer):
                             System.title_id == title and System.stage == i)
                         flag = system.choice_flag
                         if flag is True:
-                            my_win.tabWidget.setTabEnabled(3, False_)
+                            my_win.tabWidget.setTabEnabled(3, False)
                             my_win.tabWidget.setTabEnabled(5, True)
                     elif i == "Предварительный":
                         system = System.get(
@@ -4625,27 +4619,21 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
             reg_temp = num_id_player.copy()
                                         
             if reg[0] in reg_tmp: # если сеянная область нет в прошлом посев
-                index = reg_tmp.index(reg[0])
-                number_posev.remove(number_posev[index])
+                num_tmp = []
                 for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
                     posev_tmp = num_id_player[d]
-                    if gr in posev_tmp:
-                        if d <= 32 // 2:
-                            number_posev = [i for i in sev if i >= 32 // 2]
-                        else: 
-                            number_posev = [i for i in sev if i <= 32 // 2]
-                        break    
-                    else: # если сеянная область уже была посеянна
-                        for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
-                            posev_tmp = num_id_player[d]
-                            if gr in posev_tmp:
-                                if d <= 32 // 2:
-                                    number_posev = [i for i in sev if i >= 32 // 2]
-                                else: 
-                                    number_posev = [i for i in sev if i <= 32 // 2]
-                                break
-            else:
-                possible_number[p] = number_posev  
+                    if reg[0] in posev_tmp:
+                        num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
+                if num_tmp[0] <= 8: # в первой четверти (1-8)
+                    number_posev = [i for i in number_posev if i >= 8]
+                elif num_tmp[0] >= 9 and num_tmp[0] <= 16: # в первой четверти (9-16)
+                    number_posev = [i for i in number_posev if i <= 9]
+                elif num_tmp[0] >= 17 and num_tmp[0] <= 24: # в первой четверти (16-24)
+                    number_posev = [i for i in number_posev if i >= 24]
+                elif num_tmp[0] >= 25 and num_tmp[0] <= 32: # в первой четверти (25-32)
+                    number_posev = [i for i in number_posev if i <= 25]
+            # else:
+            possible_number[p] = number_posev  
 
         p += 1
     return possible_number
