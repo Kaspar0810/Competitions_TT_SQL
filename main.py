@@ -7,6 +7,8 @@
 # from operator import truediv
 # from queue import Empty
 # from winreg import SetValue
+from distutils.log import set_verbosity
+from winreg import SetValueEx
 from numpy import False_
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
@@ -4608,37 +4610,42 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                     gr = reg[1]
                     number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev)
                     possible_number[p] = number_posev
-                else:
-                    pass
+                # else:
+                #     pass
             else:
                 possible_number[p] = sev
-        else:
+        else: # 2-й посев и последующие
             gr = reg[1]
             number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev)
+            number_posev_old = number_setka_posev_last(gr, group_last, number_last)
+            reg_tmp.clear()
+            for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
+                d = number_last.index(k)
+                reg_tmp.append(reg_last[d])
             reg_temp = num_id_player.copy()
-            for s in number_posev:
-                reg_tmp.append(reg_temp[s][1]) # список областей в той половине сетки куда будут сеять
                                         
-                if reg[0] in reg_tmp: # если сеянная область нет в прошлом посев
-                    index = reg_tmp.index(reg[0])
-                    number_posev.remove(index)
-                    for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
-                        posev_tmp = num_id_player[d]
-                        if gr in posev_tmp:
-                            if d <= 32 // 2:
-                                current_posev = [i for i in sev if i >= 32 // 2]
-                            else: 
-                                current_posev = [i for i in sev if i <= 32 // 2]
-                            break    
-                        else: # если сеянная область уже была посеянна
-                            for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
-                                posev_tmp = num_id_player[d]
-                                if gr in posev_tmp:
-                                    if d <= 32 // 2:
-                                        current_posev = [i for i in sev if i >= 32 // 2]
-                                    else: 
-                                        current_posev = [i for i in sev if i <= 32 // 2]
-                                    break  
+            if reg[0] in reg_tmp: # если сеянная область нет в прошлом посев
+                index = reg_tmp.index(reg[0])
+                number_posev.remove(number_posev[index])
+                for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
+                    posev_tmp = num_id_player[d]
+                    if gr in posev_tmp:
+                        if d <= 32 // 2:
+                            number_posev = [i for i in sev if i >= 32 // 2]
+                        else: 
+                            number_posev = [i for i in sev if i <= 32 // 2]
+                        break    
+                    else: # если сеянная область уже была посеянна
+                        for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
+                            posev_tmp = num_id_player[d]
+                            if gr in posev_tmp:
+                                if d <= 32 // 2:
+                                    number_posev = [i for i in sev if i >= 32 // 2]
+                                else: 
+                                    number_posev = [i for i in sev if i <= 32 // 2]
+                                break
+            else:
+                possible_number[p] = number_posev  
 
         p += 1
     return possible_number
@@ -4657,12 +4664,27 @@ def number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev):
                 number_posev = [i for i in sev if i <= 32 // 2] # отсеивает в списке номера больше 16 
     else:    
         index = group_last.index(gr)
-        set_number = number_last[index] # номер где уже посеянна такая же область 
+        set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
         if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
-            number_posev = [i for i in number_last if i >= 32 // 2] # отсеивает в списке номера больше 16
+            number_posev = [i for i in sev if i > 32 // 2] # отсеивает в списке номера больше 16
         else: 
-            number_posev = [i for i in number_last if i <= 32 // 2] # отсеивает в списке номера больше 16 
+            number_posev = [i for i in sev if i <= 32 // 2] # отсеивает в списке номера больше 16 
+        
     return number_posev
+
+
+
+def number_setka_posev_last(gr, group_last, number_last):
+    """промежуточные номера для посева в сетке"""
+    index = group_last.index(gr)
+    set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
+    if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
+        number_posev_old = [i for i in number_last if i > 32 // 2] # отсеивает в списке номера больше 16
+    else: 
+        number_posev_old = [i for i in number_last if i <= 32 // 2] # отсеивает в списке номера больше 16
+        
+    return number_posev_old
+
 
 
 def random_generator(posev_tmp):
