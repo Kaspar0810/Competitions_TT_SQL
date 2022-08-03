@@ -4503,8 +4503,11 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                                 current_region_posev[k] = gr_region # словарь регионы, в текущем посеве по порядку
                                 gr_region_tmp.clear()
                         number_last.clear()
-                        for x in num_id_player.keys():
-                            number_last.append(x) # список уже посеянных номеров в сетке
+
+                        x = num_id_player.keys()
+                        number_last = list(x) # список уже посеянных номеров в сетке
+                        # for x in num_id_player.keys():
+                        #     number_last.append(x) # список уже посеянных номеров в сетке
                         reg_last.clear()
                         group_last.clear()
                         for v in num_id_player.values():
@@ -4524,11 +4527,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                             val_list.clear()
                             # сделать сортировку по количеству возможных посевов
                             possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
-                            # sorted_tuple = sorted(possible_number.items(), key=lambda: len(possible_number[key]))
-                            # possible_number = dict(sorted_tuple)
-
-
-
+ 
                             for val in possible_variant.values():
                                 val_list.append(val)  # список количество возможных вариантов сева
                             current_value_list = []
@@ -4558,14 +4557,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 id_region.append(gr)
                 num_id_player[num_set] = id_region
 
-                # if l > 1 and count_sev > 1:
                 if count_sev > 1:
-                    # region_list.append(num_set)
-                    # region_list.append(full_posev[l][2])
-                    # region_tmp = region_list.copy()
-                    # region_posev.append(region_tmp)
-                    # region_list.clear()
-
                     c = len(current_region_posev)
                     if c != 0:
                         for z in possible_number.keys():
