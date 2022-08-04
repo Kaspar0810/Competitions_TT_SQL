@@ -4504,10 +4504,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                                 gr_region_tmp.clear()
                         number_last.clear()
 
-                        x = num_id_player.keys()
-                        number_last = list(x) # список уже посеянных номеров в сетке
-                        # for x in num_id_player.keys():
-                        #     number_last.append(x) # список уже посеянных номеров в сетке
+                        # x = num_id_player.keys()
+                        number_last = list(num_id_player.keys()) # список уже посеянных номеров в сетке
                         reg_last.clear()
                         group_last.clear()
                         for v in num_id_player.values():
@@ -4530,22 +4528,12 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
  
                             for val in possible_variant.values():
                                 val_list.append(val)  # список количество возможных вариантов сева
-                            current_value_list = []
-
+                            key = list(possible_number.keys())[0]
+                            num_set = possible_number[key][0]
                             if 1 in val_list: # если один вариант для посева
-                                for key in possible_number.keys():
-                                    current_value_list = possible_number[key]
-                                    if len(current_value_list) == 1:
-                                        possible_number[key] = current_value_list
-                                        #======
-                                        break
                                 l = key
-                                num_set = current_value_list[0]
                             else:
-                                key = possible_number.keys()
-                                key = list(key)
-                                posev_tmp = possible_number[key[0]]
-                                num_set = random_generator(posev_tmp)
+                                num_set = random_generator(num_set)
                                 l = key[0]
                 # в зависимости от порядка посева менять номер l
                 id_player = full_posev[l][0]
@@ -4562,10 +4550,10 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                     if c != 0:
                         for z in possible_number.keys():
                             possible_tmp = possible_number[z]
-                            if num_set in possible_tmp:
-                                possible_tmp.remove(num_set)
-                                if num_set in sev:
-                                    sev.remove(num_set)
+                            if num_set in possible_tmp: # проверяет посеянный номер в возможных номерах
+                                possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
+                                if num_set in sev: # проверяет посеянный номер в посеве
+                                    sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
                                   
                         del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
                         del current_region_posev[l] # удаляет из словаря текущий посеянный регион
@@ -4632,15 +4620,16 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                     posev_tmp = num_id_player[d]
                     if reg[0] in posev_tmp:
                         num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
-                # подумать если два региона
-                if num_tmp[0] <= 8: # в первой четверти (1-8)
-                    number_posev = [i for i in number_posev if i >= 8]
-                elif num_tmp[0] >= 9 and num_tmp[0] <= 16: # в первой четверти (9-16)
-                    number_posev = [i for i in number_posev if i <= 9]
-                elif num_tmp[0] >= 17 and num_tmp[0] <= 24: # в первой четверти (16-24)
-                    number_posev = [i for i in number_posev if i >= 24]
-                elif num_tmp[0] >= 25 and num_tmp[0] <= 32: # в первой четверти (25-32)
-                    number_posev = [i for i in number_posev if i <= 25]
+                    count = len(num_tmp)
+                if count == 1:
+                    if num_tmp[0] <= 8: # в первой четверти (1-8)
+                        number_posev = [i for i in number_posev if i >= 8]
+                    elif num_tmp[0] >= 9 and num_tmp[0] <= 16: # в первой четверти (9-16)
+                        number_posev = [i for i in number_posev if i <= 9]
+                    elif num_tmp[0] >= 17 and num_tmp[0] <= 24: # в первой четверти (16-24)
+                        number_posev = [i for i in number_posev if i >= 24]
+                    elif num_tmp[0] >= 25 and num_tmp[0] <= 32: # в первой четверти (25-32)
+                        number_posev = [i for i in number_posev if i <= 25]
             # else:
             possible_number[p] = number_posev 
         p += 1
