@@ -4580,6 +4580,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             pl_id = Player.get(Player.id == id)
             family_city = pl_id.full_name
             posev_data[i] = family_city
+        num_id_player = dict(sorted(num_id_player.items()))
         print(posev_data)
 
 
@@ -4603,14 +4604,14 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
         if n == 0:
             current_reg = reg[0]
             if current_reg in reg_last:
-                a = set(reg_last)
-                count_set = len(set(reg_last))
-                a.discard(current_reg)                
-                count = count_set - len(a)
+                reg_tuple = tuple(reg_last)
+                count = reg_tuple.count(current_reg)
                 if count == 1: # значит только один регион в посеве
+                    reg_last = list(reg_tuple)
                     gr = reg[1]
                     number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev)
                     possible_number[p] = number_posev
+                    
                 # else:
                 #     pass
             else:
@@ -4641,8 +4642,7 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                 elif num_tmp[0] >= 25 and num_tmp[0] <= 32: # в первой четверти (25-32)
                     number_posev = [i for i in number_posev if i <= 25]
             # else:
-            possible_number[p] = number_posev  
-
+            possible_number[p] = number_posev 
         p += 1
     return possible_number
 
