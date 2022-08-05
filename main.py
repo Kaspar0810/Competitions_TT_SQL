@@ -4528,13 +4528,12 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
  
                             for val in possible_variant.values():
                                 val_list.append(val)  # список количество возможных вариантов сева
+
                             key = list(possible_number.keys())[0]
-                            num_set = possible_number[key][0]
-                            if 1 in val_list: # если один вариант для посева
-                                l = key
-                            else:
+                            num_set = possible_number[key]
+                            if 1 not in val_list: # если один вариант для посева
                                 num_set = random_generator(num_set)
-                                l = key[0]
+                            l = key
                 # в зависимости от порядка посева менять номер l
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
@@ -4548,16 +4547,20 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 if count_sev > 1:
                     c = len(current_region_posev)
                     if c != 0:
+                        del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
+                        del current_region_posev[l] # удаляет из словаря текущий посеянный регион
+                        if num_set in sev: # проверяет посеянный номер в посеве
+                            sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
                         for z in possible_number.keys():
                             possible_tmp = possible_number[z]
                             if num_set in possible_tmp: # проверяет посеянный номер в возможных номерах
                                 possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
-                                if num_set in sev: # проверяет посеянный номер в посеве
-                                    sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
+                        #         if num_set in sev: # проверяет посеянный номер в посеве
+                        #             sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
                                   
-                        del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
-                        del current_region_posev[l] # удаляет из словаря текущий посеянный регион
-                elif count_sev == 1: # удаляет последний ноер в посеве
+                        # del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
+                        # del current_region_posev[l] # удаляет из словаря текущий посеянный регион
+                elif count_sev == 1: # удаляет последний номер в посеве
                     sev.clear()
                     possible_number.clear()
                 number_posev.remove(l)
@@ -4606,7 +4609,7 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                 possible_number[p] = sev
         else: # 2-й посев и последующие
             gr = reg[1]
-            number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev)
+            number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev) # возможные номера после ухода от своей группы
             number_posev_old = number_setka_posev_last(gr, group_last, number_last)
             reg_tmp.clear()
             for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
@@ -4630,7 +4633,28 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                         number_posev = [i for i in number_posev if i >= 24]
                     elif num_tmp[0] >= 25 and num_tmp[0] <= 32: # в первой четверти (25-32)
                         number_posev = [i for i in number_posev if i <= 25]
-            # else:
+                elif count == 2:
+                    number_tmp = []
+                    for k in num_tmp:
+                        if k <= 4: # в первой четверти (1-4)
+                            np = [i for i in number_posev if i >= 5 and i <= 8]
+                        elif k >= 5 and k <= 8: # в первой четверти (5-8)
+                            np = [i for i in number_posev if i >= 1 and i <= 4]
+                        elif k >= 9 and k <= 12: # в первой четверти (9-12)
+                            np = [i for i in number_posev if i >= 13 and i <= 16]
+                        elif k >= 13 and k <= 16: # в первой четверти (13-16)
+                            np = [i for i in number_posev if i >= 9 and i <= 12]
+                        elif k >= 17 and k <= 20: # в первой четверти (17-20)
+                            np = [i for i in number_posev if i >= 21 and i <= 24]
+                        elif k >= 21 and k <= 24: # в первой четверти (21-24)
+                            np= [i for i in number_posev if i >= 17 and i <= 20]
+                        elif k >= 25 and k <= 28: # в первой четверти (25-28)
+                            np= [i for i in number_posev if i >= 29 and i <= 32]
+                        elif k >= 29 and k <= 32: # в первой четверти (29-32)
+                            np = [i for i in number_posev if i >= 25 and i <= 28]
+                        number_tmp.append(np[0])
+                    number_posev.clear()
+                    number_posev = number_tmp.copy()
             possible_number[p] = number_posev 
         p += 1
     return possible_number
