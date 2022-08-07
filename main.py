@@ -4506,38 +4506,27 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                                 current_region_posev[k] = gr_region # словарь регионы, в текущем посеве по порядку
                                 gr_region_tmp.clear()
                         number_last.clear()
-
-                        # x = num_id_player.keys()
                         number_last = list(num_id_player.keys()) # список уже посеянных номеров в сетке
                         reg_last.clear()
                         group_last.clear()
+                        # reg_last = list(num_id_player.values())
                         for v in num_id_player.values():
                             reg_last.append(v[1]) # список уже посеянных регионов
                             group_last.append(v[2]) # список номеров групп уже посеянных
-                        # k = l
                         if n != 0 or (n == 0 and l > 1):
     # =========== определения кол-во возможный вариантов посева у каждого региона
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, l, n, sev, num_id_player)
                              # сделать сортировку по количеству возможных посевов
                             possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
+                            if n != 0:
+                                number_posev = list(possible_number.keys())
     #   ===========================    
-                            if len(possible_variant) != 0:
-                                possible_variant.clear()
-                            for b in possible_number.keys():
-                                possible_tmp = possible_number[b]
-                                count_list = len(possible_tmp)
-                                possible_variant[b] = count_list  # словарь(номер посева по порядку: число вариантов посева)
-                            val_list.clear()
- 
-                            for val in possible_variant.values():
-                                val_list.append(val)  # список количество возможных вариантов сева
-
-                            # key = list(possible_number.keys())[0]
                             l = list(possible_number.keys())[0]
                             num_set = possible_number[l]
-                            if 1 not in val_list: # если не один вариант для посева то случайный выбор
+                            if len(num_set) == 1:
+                                num_set = num_set[0]
+                            else:
                                 num_set = random_generator(num_set)
-                            # l = key
                 # в зависимости от порядка посева менять номер l
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
@@ -4602,23 +4591,19 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                     gr = reg[1]
                     number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev)
                     possible_number[p] = number_posev
-                    
-                # else:
-                #     pass
             else:
                 possible_number[p] = sev
-        else: # 2-й посев и последующие
+        else: # 2-й посев и последующие      
             gr = reg[1]
             number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev) # возможные номера после ухода от своей группы
             number_posev_old = number_setka_posev_last(gr, group_last, number_last)
             reg_tmp.clear()
             for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
                 d = number_last.index(k)
-                reg_tmp.append(reg_last[d])
-            # reg_temp = num_id_player.copy()                        
-            if reg[0] in reg_tmp: # если сеянная область есть в прошлом посеве
+                reg_tmp.append(reg_last[d])     
+            if reg[0] in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
                 num_tmp = []
-                for d in num_id_player.keys(): # номер в сетке в предыдущем посеве
+                for d in number_posev_old: # номер в сетке в предыдущем посеве
                     posev_tmp = num_id_player[d]
                     if reg[0] in posev_tmp:
                         num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
@@ -4657,6 +4642,7 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
             possible_number[p] = number_posev 
             proba_possible[gr] = number_posev
         p += 1
+    p = 0
     return possible_number
 
 
@@ -4675,9 +4661,9 @@ def number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev):
         index = group_last.index(gr)
         set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
         if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
-            number_posev = [i for i in sev if i > 32 // 2] # отсеивает в списке номера больше 16
+            number_posev = [i for i in sev if i > 32 // 2] # номера от 17 до 32
         else: 
-            number_posev = [i for i in sev if i <= 32 // 2] # отсеивает в списке номера больше 16 
+            number_posev = [i for i in sev if i <= 32 // 2] # номера от 1 до 16
         
     return number_posev
 
