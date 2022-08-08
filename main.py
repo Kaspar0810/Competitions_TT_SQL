@@ -4492,7 +4492,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                     num_set = sev[w]
                     count_sev = len(sev) # количество номеров в посеве
                 else:
-                    num_set = sev[0] # проверить
+                    # num_set = sev[0] # проверить
                     count_sev = len(sev)
                     if count_sev > 1: # если сеющихся номеров больше одного
                         if w == 0: # 1-й основной посев
@@ -4517,8 +4517,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     # =========== определения кол-во возможный вариантов посева у каждого региона
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, l, n, sev, num_id_player)
                              # сделать сортировку по количеству возможных посевов
-                            possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
+                            # possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                             if n != 0:
+                                possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                                 number_posev = list(possible_number.keys())
     #   ===========================    
                             l = list(possible_number.keys())[0]
@@ -4578,9 +4579,11 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
     possible_number = {}
     proba_possible = {} 
     reg_tmp = []
-    p = l
-    
+    # p = l
+    current_list = list(current_region_posev.keys())
+    y = 0
     for reg in current_region_posev.values():
+        r = current_list[y]
         if n == 0:
             current_reg = reg[0]
             if current_reg in reg_last:
@@ -4590,9 +4593,9 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                     reg_last = list(reg_tuple)
                     gr = reg[1]
                     number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev)
-                    possible_number[p] = number_posev
+                    possible_number[r] = number_posev
             else:
-                possible_number[p] = sev
+                possible_number[r] = sev
         else: # 2-й посев и последующие      
             gr = reg[1]
             number_posev = number_setka_posev(gr, group_last, reg_last, number_last, n, reg, sev) # возможные номера после ухода от своей группы
@@ -4639,10 +4642,12 @@ def possible_draw_numbers(current_region_posev, reg_last,  number_last, group_la
                         number_tmp.append(np[0])
                     number_posev.clear()
                     number_posev = number_tmp.copy()
-            possible_number[p] = number_posev 
+            r = current_list[y]
+            possible_number[r] = number_posev 
             proba_possible[gr] = number_posev
-        p += 1
-    p = 0
+        # p += 1
+        y += 1
+    # p = 0
     return possible_number
 
 
