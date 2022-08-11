@@ -4700,7 +4700,7 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
         elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
             number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 17 до 24
     elif n == 3: # уводит 4-е место от 1-ого в другую четверть
-        group_last = group_last[8:] 
+        group_last = group_last[:] 
         number_last = number_last[8:]  
         index = group_last.index(cur_gr)
         set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
@@ -4711,7 +4711,7 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
         elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
             number_posev = [i for i in sev if i >= 25] # номера от 25 до 32   
         elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 17 до 24
+            number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 9 до 16
 
     return number_posev
 
