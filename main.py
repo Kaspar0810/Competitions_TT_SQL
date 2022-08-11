@@ -4557,7 +4557,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             pl_id = Player.get(Player.id == id)
             family_city = pl_id.full_name
             posev_data[i] = family_city
-        posev_data = dict(sorted(posev_data.items(), key=lambda x: x[0]))
+        # posev_data = dict(sorted(posev_data.items(), key=lambda x: x[0]))
     return posev_data
 
 
@@ -7894,8 +7894,8 @@ def player_choice_in_setka(fin):
     #     choice_fourth = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_fourth_poseva)
 
         # posev_data = choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_third, choice_fourth)
-        posev_data = choice_setka_automat(fin, count_exit, mesto_first_poseva)
-        print(posev_data)
+        posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+        # print(posev)
 
     #     first_number = [1, 32, 16, 17, 8, 9, 24, 25]
     #     second_number = [4, 29, 12, 20, 5, 28, 13, 21]
@@ -7906,11 +7906,10 @@ def player_choice_in_setka(fin):
     #     count_third_num = len(third_number)
     #     count_fourth_num = len(fourth_number)
     # i = 0
-    # for posev in choice_first:
-    #     player = Player.get(Player.player == posev.family)
-    #     city = player.city
-    #     first_posev.append({'посев': first_number[i], 'фамилия': f'{posev.family}/ {city}'})
-    #     i += 1
+    posev_data = []
+    for key in posev.keys():
+        posev_data.append({'посев': key, 'фамилия': posev[key]})
+        # i += 1
     # if count_exit == 2:
     #     i = 0
     #     for posev in choice_second:
