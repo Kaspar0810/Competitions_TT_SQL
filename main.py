@@ -4450,8 +4450,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     for n in range (0, count_exit):
         choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva + n)
         full_posev.clear()
-        if n == 3:
-            print(num_id_player)
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
         
@@ -4521,12 +4519,12 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                         #   ===========================    
                             l = list(possible_number.keys())[0]
                             num_set = possible_number[l]
-                            if len(num_set) == 0:
+                            if len(num_set) != 1:
                                 num_set = random_generator(num_set)
-                            elif len(num_set) == 1:
-                                num_set = num_set[0]
                             else:
-                                num_set = random_generator(num_set)
+                                num_set = num_set[0]
+                            # else:
+                            #     num_set = random_generator(num_set)
                         # в зависимости от порядка посева менять номер l
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
@@ -4559,10 +4557,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             pl_id = Player.get(Player.id == id)
             family_city = pl_id.full_name
             posev_data[i] = family_city
-        # num_id_player = dict(sorted(num_id_player.items()))
-        # sorted_tuple = sorted(d.items(), key=lambda x: x[0])
-        # print(posev_data = dict(sorted(posev_data.items(), key=lambda x: x[0])))
-        print(posev_data)
+        posev_data = dict(sorted(posev_data.items(), key=lambda x: x[0]))
+    return posev_data
 
 
 # def possible_sev(current_region_posev, current_posev, number_list, reg_list, sev, i):
@@ -4641,28 +4637,6 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                             number_tmp.append(np[0]) 
                     number_posev.clear()
                     number_posev = number_tmp.copy() 
-                # elif count == 3:
-                #     number_tmp = []
-                #     for k in num_tmp:
-                #         if k <= 4: # в первой четверти (1-4)
-                #             np = [i for i in number_posev if i >= 5 and i <= 8]
-                #         elif k >= 5 and k <= 8: # в первой четверти (5-8)
-                #             np = [i for i in number_posev if i >= 1 and i <= 4]
-                #         elif k >= 9 and k <= 12: # в первой четверти (9-12)
-                #             np = [i for i in number_posev if i >= 13 and i <= 16]
-                #         elif k >= 13 and k <= 16: # в первой четверти (13-16)
-                #             np = [i for i in number_posev if i >= 9 and i <= 12]
-                #         elif k >= 17 and k <= 20: # в первой четверти (17-20)
-                #             np = [i for i in number_posev if i >= 21 and i <= 24]
-                #         elif k >= 21 and k <= 24: # в первой четверти (21-24)
-                #             np= [i for i in number_posev if i >= 17 and i <= 20]
-                #         elif k >= 25 and k <= 28: # в первой четверти (25-28)
-                #             np= [i for i in number_posev if i >= 29 and i <= 32]
-                #         elif k >= 29: # в первой четверти (29-32)
-                #             np = [i for i in number_posev if i >= 25 and i <= 28]
-                #         number_tmp.append(np[0])
-                #     number_posev.clear()
-                #     number_posev = number_tmp.copy()
             possible_number[reg] = number_posev 
             proba_possible[cur_gr] = number_posev
         y += 1
@@ -4704,19 +4678,6 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
             number_posev = [i for i in sev if i >= 25] # номера от 25 до 32   
         elif set_number >= 25: # если номер в сетке вверху, то наде сеять вниз: 
             number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 17 до 24
-    # elif n == 3: # уводит 4-е место от 1-ого в другую четверть
-    #     group_last = group_last[:8] 
-    #     number_last = number_last[:8]  
-    #     index = group_last.index(cur_gr)
-    #     set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
-    #     if set_number <= 8: # если номер в сетке вверху, то наде сеять вниз
-    #         number_posev = [i for i in sev if i >= 9 and i < 17] # номера от 9 до 17
-    #     elif set_number > 8 and set_number < 17: # если номер в сетке вверху, то наде сеять вниз: 
-    #         number_posev = [i for i in sev if i <= 8] # номера от 1 до 8 
-    #     elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
-    #         number_posev = [i for i in sev if i >= 25] # номера от 25 до 32   
-    #     elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
-    #         number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 9 до 16
 
     return number_posev
 
@@ -7907,9 +7868,9 @@ def player_choice_in_setka(fin):
         count_exit = sys.max_player // syst.total_group
 
         mesto_first_poseva = sys.mesta_exit
-        mesto_second_poseva = mesto_first_poseva + 1
-        mesto_third_poseva = mesto_first_poseva + 2
-        mesto_fourth_poseva = mesto_first_poseva + 3
+        # mesto_second_poseva = mesto_first_poseva + 1
+        # mesto_third_poseva = mesto_first_poseva + 2
+        # mesto_fourth_poseva = mesto_first_poseva + 3
 
     # posev_data = choice_setka_automat(count_exit)    
 
@@ -7934,6 +7895,7 @@ def player_choice_in_setka(fin):
 
         # posev_data = choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_third, choice_fourth)
         posev_data = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+        print(posev_data)
 
     #     first_number = [1, 32, 16, 17, 8, 9, 24, 25]
     #     second_number = [4, 29, 12, 20, 5, 28, 13, 21]
