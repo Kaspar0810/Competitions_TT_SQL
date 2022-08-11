@@ -4618,7 +4618,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                         number_posev = [i for i in number_posev if i > 24] # номера 25-32
                     elif num_tmp[0] >= 25 and num_tmp[0] <= 32: # в первой четверти (25-32)
                         number_posev = [i for i in number_posev if i > 16 and i < 25] # номера 17-24
-                elif count > 1 or n == 2:
+                elif count > 1 or n > 1:
                     number_tmp = []
                     for k in num_tmp:
                         if k <= 4: # в первой четверти (1-4)
@@ -4686,32 +4686,37 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
             number_posev = [i for i in sev if i > 32 // 2] # номера от 17 до 32
         else: 
             number_posev = [i for i in sev if i <= 32 // 2] # номера от 1 до 16 
-    elif n == 2: # уводит 3-е место от 2-ого в другую четверть
-        group_last = group_last[8:]
-        number_last = number_last[8:]   # список номеров 2-ого посева
+    elif n > 1: 
+        if n == 2: # уводит 3-е место от 2-ого в другую четверть
+            group_last = group_last[8:]
+            number_last = number_last[8:] # список номеров 2-ого посева
+        elif n == 3: # уводит 4-е место от 1-ого в другую четверть
+            group_last = group_last[:8] 
+            number_last = number_last[:8]
         index = group_last.index(cur_gr)
         set_number = number_last[index] # номер где посеянна группа, во 2-ом посеве от которой надо увести 
+
         if set_number <= 8: # если номер в сетке вверху, то наде сеять вниз
             number_posev = [i for i in sev if i >= 9 and i < 17] # номера от 9 до 17
         elif set_number > 8 and set_number < 17: # если номер в сетке вверху, то наде сеять вниз: 
             number_posev = [i for i in sev if i <= 8] # номера от 1 до 8 
         elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
             number_posev = [i for i in sev if i >= 25] # номера от 25 до 32   
-        elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
+        elif set_number >= 25: # если номер в сетке вверху, то наде сеять вниз: 
             number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 17 до 24
-    elif n == 3: # уводит 4-е место от 1-ого в другую четверть
-        group_last = group_last[:] 
-        number_last = number_last[8:]  
-        index = group_last.index(cur_gr)
-        set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
-        if set_number <= 8: # если номер в сетке вверху, то наде сеять вниз
-            number_posev = [i for i in sev if i >= 9 and i < 17] # номера от 9 до 17
-        elif set_number > 8 and set_number < 17: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev = [i for i in sev if i <= 8] # номера от 1 до 8 
-        elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev = [i for i in sev if i >= 25] # номера от 25 до 32   
-        elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 9 до 16
+    # elif n == 3: # уводит 4-е место от 1-ого в другую четверть
+    #     group_last = group_last[:8] 
+    #     number_last = number_last[:8]  
+    #     index = group_last.index(cur_gr)
+    #     set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
+    #     if set_number <= 8: # если номер в сетке вверху, то наде сеять вниз
+    #         number_posev = [i for i in sev if i >= 9 and i < 17] # номера от 9 до 17
+    #     elif set_number > 8 and set_number < 17: # если номер в сетке вверху, то наде сеять вниз: 
+    #         number_posev = [i for i in sev if i <= 8] # номера от 1 до 8 
+    #     elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
+    #         number_posev = [i for i in sev if i >= 25] # номера от 25 до 32   
+    #     elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
+    #         number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 9 до 16
 
     return number_posev
 
@@ -4735,9 +4740,14 @@ def number_setka_posev_last(cur_gr, group_last, number_last, n):
             number_posev_old  = [i for i in number_last if i > 32 // 2] # номера от 17 до 32
         else: 
             number_posev_old  = [i for i in number_last if i <= 32 // 2] # номера от 1 до 16 
-    elif n == 2: # уводит 3-е место от 2-ого в другую четверть
-        group_last = group_last[8:] 
-        number_last = number_last[8:]  
+    elif n > 1: 
+        if n == 2: # уводит 3-е место от 2-ого в другую четверть
+            group_last = group_last[8:] 
+            number_last = number_last[8:]  
+        elif n == 3: # уводит 4-е место от 1-ого в другую четверть
+            group_last = group_last[:8] 
+            number_last = number_last[:8]
+
         index = group_last.index(cur_gr)
         set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
         if set_number <= 8: # если номер в сетке вверху, то наде сеять вниз
@@ -4746,21 +4756,21 @@ def number_setka_posev_last(cur_gr, group_last, number_last, n):
             number_posev_old  = [i for i in number_last if i <= 8] # номера от 1 до 8 
         elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
             number_posev_old  = [i for i in number_last if i >= 25] # номера от 25 до 32   
-        elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
+        elif set_number >= 25: # если номер в сетке вверху, то наде сеять вниз: 
             number_posev_old  = [i for i in number_last if i >= 17 and i < 25] # номера от 17 до 24
-    elif n == 3: # уводит 4-е место от 1-ого в другую четверть
-        group_last = group_last[8:] 
-        number_last = number_last[8:]  
-        index = group_last.index(cur_gr)
-        set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
-        if set_number <= 8: # если номер в сетке вверху, то наде сеять вниз
-            number_posev_old  = [i for i in number_last if i >= 9 and i < 17] # номера от 9 до 17
-        elif set_number > 8 and set_number < 17: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev_old  = [i for i in number_last if i <= 8] # номера от 1 до 8 
-        elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev_old  = [i for i in number_last if i >= 25] # номера от 25 до 32   
-        elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev_old  = [i for i in number_last if i >= 17 and i < 25] # номера от 17 до 24
+    # elif n == 3: # уводит 4-е место от 1-ого в другую четверть
+    #     group_last = group_last[8:] 
+    #     number_last = number_last[8:]  
+    #     index = group_last.index(cur_gr)
+    #     set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
+    #     if set_number <= 8: # если номер в сетке вверху, то наде сеять вниз
+    #         number_posev_old  = [i for i in number_last if i >= 9 and i < 17] # номера от 9 до 17
+    #     elif set_number > 8 and set_number < 17: # если номер в сетке вверху, то наде сеять вниз: 
+    #         number_posev_old  = [i for i in number_last if i <= 8] # номера от 1 до 8 
+    #     elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
+    #         number_posev_old  = [i for i in number_last if i >= 25] # номера от 25 до 32   
+    #     elif set_number > 25: # если номер в сетке вверху, то наде сеять вниз: 
+    #         number_posev_old  = [i for i in number_last if i >= 17 and i < 25] # номера от 17 до 24
 
 
     # if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
