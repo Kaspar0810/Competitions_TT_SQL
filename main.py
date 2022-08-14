@@ -10,7 +10,7 @@ from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib import colors
 from reportlab.lib.colors import *
-from reportlab.platypus import Paragraph, TableStyle, Table, Image, SimpleDocTemplate
+from reportlab.platypus import Paragraph, TableStyle, Table, Image, SimpleDocTemplate, BaseDocTemplate, PageTemplate, NextPageTemplate, FrameBreak, Frame
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -25,7 +25,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets, QtPrintSupport, Qt
 from models import *
 from collections import Counter
 from itertools import *
-# import datetime
 import os
 import openpyxl as op
 import pandas as pd
@@ -786,9 +785,6 @@ def tab_enabled(gamer):
     if sender == fir_window.LinkButton:  # если переход со стартового окна последение соревнование
         t = t_next - 1
         t_id = Title.get(Title.id == t)
-    elif sender == fir_window.Button_new:
-        t_id = Title.get(Title.id == t_next)
-        my_win.tabWidget.setCurrentTab(0)
     else:
         if t_next > title:
             t_id = Title.get(Title.id == t_next)
@@ -812,7 +808,8 @@ def tab_enabled(gamer):
             st = i.stage
             stage.append(st)
         count_stage = len(stage)
-        if count_stage >= 1:  # если система еще не создана, то выключает отдельные вкладки при переходе на другое сорев
+        # if count_stage >= 1:  # если система еще не создана, то выключает отдельные вкладки при переходе на другое сорев
+        if st != "":
             if count > 0:
                 # выключает отдельные вкладки
                 my_win.tabWidget.setTabEnabled(2, True)
@@ -849,7 +846,7 @@ def tab_enabled(gamer):
             my_win.tabWidget.setTabEnabled(3, False)
             my_win.tabWidget.setTabEnabled(4, False)
             my_win.tabWidget.setTabEnabled(5, False)
-            my_win.tabWidget.setCurrentIndex(1)
+            my_win.tabWidget.setCurrentIndex(0)
     else:
         my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
         my_win.tabWidget.setTabEnabled(3, False)
@@ -1147,7 +1144,7 @@ def title_pdf():
 
     message = "Хотите добавить изображение в титульный лист?"
     reply = msgBox.question(my_win, 'Уведомление', message,
-                                           msgBox.QMessageBo.Yes,
+                                           msgBox.Yes,
                                            msgBox.No)
     if reply == msgBox.Yes:
         fname = QFileDialog.getOpenFileName(
@@ -1519,7 +1516,7 @@ def add_player():
     fn = f"{pl}/ {ct}"
 
     add_coach(ch, num)
-    ms = ""
+    ms = "" # записвыает место в базу как пустое
     idc = Coach.get(Coach.coach == ch)
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
@@ -1994,15 +1991,37 @@ def list_player_pdf(player_list):
                            ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
                            ]))
 
-    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
-            firstLineIndent=-20)  # стиль параграфа
-    h3.spaceAfter = 10  # промежуток после заголовка
-    story.append(Paragraph(f'Список участников. {gamer}', h3))
-    story.append(t)
+    #========
+    styles = getSampleStyleSheet()
+    styleN = styles['Normal']
+    styleH = styles['Heading1']
+    story = []
 
+    #add some flowables
+    story.append(Paragraph("This is a Heading",styleH))
+    story.append(Paragraph("This is a paragraph in <i>Normal</i> style.",
+        styleN))
+    # c  = Canvas('mydoc.pdf')
     doc = SimpleDocTemplate(f"table_list_{short_name}.pdf", pagesize=A4)
+    f = Frame(cm, cm, 20*cm, 29*cm, showBoundary=0)
+    f.addFromList(story, doc)
+    # c.save()
     change_dir()
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    change_dir()
+
+    #========
+
+    # h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+    #         firstLineIndent=-20)  # стиль параграфа
+    # h3.spaceAfter = 10  # промежуток после заголовка
+    # story.append(Paragraph(f'Список участников. {gamer}', h3))
+    # story.append(t)
+
+    # doc = SimpleDocTemplate(f"table_list_{short_name}.pdf", pagesize=A4)
+    # change_dir()
+    # doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    # change_dir()
 
 
 def exit_comp():
@@ -2297,7 +2316,7 @@ def page_vid():
 def view():
     """просмотр PDF файлов средствами OS"""
     from sys import platform
-    change_dir()  # смена директории на папку с pdf файлами
+    # change_dir()  # смена директории на папку с pdf файлами
     sender = my_win.sender()
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
@@ -4141,7 +4160,6 @@ def choice_gr_automat():
                 m += 1
                 previous_region_group = posev_test(posev, group, m)  # возвращает словарь регион  - список номера групп, где он есть
         else:
-            # fill_table_choice()
             fill_table_after_choice()
             with db:  # записывает в систему, что произведена жеребъевка
                 system = System.get(System.id == sys_id)
@@ -8212,6 +8230,143 @@ def tours_list(cp):
 #     except IOError:
 #         print("Файл уже открыт")
 
+def proba():
+    change_dir()
+    from reportlab.pdfgen.canvas import Canvas
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.platypus import Paragraph, Frame
+    styles = getSampleStyleSheet()
+    styleN = styles['Normal']
+    styleH = styles['Heading1']
+    story = []
+
+    #add some flowables
+    story.append(Paragraph("This is a Heading",styleH))
+    story.append(Paragraph("This is a paragraph in <i>Normal</i> style.",
+        styleN))
+    c  = Canvas('mydoc.pdf')
+    f = Frame(inch, inch, 6*inch, 9*inch, showBoundary=0)
+    f.addFromList(story,c)
+    c.save()
+
+
+
+
+# def proba():
+ 
+#     change_dir()
+#     file_name = "proba_table"
+#     document_title = "Title"
+#     canvas = Canvas(file_name, pagesize=landscape(A4))
+
+#     doc = BaseDocTemplate(file_name)
+#     contents =[]
+#     width,height = A4
+
+
+#     # frame_later = Frame(
+#     #     0.2*inch, 
+#     #     0.6*inch, 
+#     #     (width-0.6*inch)+0.17*inch, 
+#     #     height-1*inch,
+#     #     leftPadding = 0, 
+#     #     topPadding=0, 
+#     #     showBoundary = 1,
+#     #     id='col'
+#     #     )
+#     frame_later= Frame(20*cm, 29*cm, (width-0.6*cm)+0.17*cm, height-1*cm, showBoundary = 1, id='col')
+#     frame_table= Frame(20*cm, 29*cm, (width-0.6*cm)+0.17*cm, height-1*cm,showBoundary = 1, id='col')
+
+#     laterpages = PageTemplate(id='laterpages',frames=[frame_later])
+
+#     firstpage = PageTemplate(id='firstpage', frames=[frame_table])
+
+#     contents.append(NextPageTemplate('firstpage'))
+   
+
+
+#     canvas.setTitle(document_title)
+
+#     # contents.append(Paragraph(title, style_title))
+#     # contents.append(Paragraph(nombre_colaborador + ' - ' + sucursal_colaborador, style_data))
+#     # contents.append(Paragraph(fecha_actual, style_date))
+#     contents.append(FrameBreak())
+
+#     title_background = colors.fidblue
+#     hour = 8
+#     minute = 0
+#     hour_list = []
+
+#     data_actividades = [
+#         {'Hora', 'Cliente', 'Resultado de \nActividad', 'Monto Venta \n(MXN)', 'Monto Venta \n(USD)',
+#         'Monto Cotización \n(MXN)', 'Monto Cotización \n(USD)', 'Comentarios \nAdicionales'},
+#     ]
+
+#     i = 0
+#     for i in range(300):
+
+#         if minute == 0:
+#             if hour <= 12:
+#                 time = str(hour) + ':' + str(minute) + '0 a.m.'
+#             else:
+#                 time = str(hour-12) + ':' + str(minute) + '0 p.m.'
+#         else:
+#             if hour <= 12:
+#                 time = str(hour) + ':' + str(minute) + ' a.m.'
+#             else:
+#                 time = str(hour-12) + ':' + str(minute) + ' p.m.'
+
+#         if minute != 45:
+#             minute += 15
+#         else:
+#             hour += 1
+#             minute = 0
+#         hour_list.append(time)
+
+#         # I TRIED THIS SOLUTION BUT THIS DIDN'T WORK
+#         # if i % 20 == 0:
+        
+
+#         data_actividades.append([hour_list[i], i, i, i, i, i, i, i])
+
+#         i += 1
+
+#         table_actividades = Table(data_actividades, colWidths=85, rowHeights=30, repeatRows=1)
+#         tblStyle = TableStyle([
+#             ('BACKGROUND', (0, 0), (-1, 0), title_background),
+#             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+#             ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+#             ('GRID', (0, 0), (-1, -1), 1, colors.black)
+#         ])
+
+#         rowNumb = len(data_actividades)
+#         for row in range(1, rowNumb):
+#             if row % 2 == 0:
+#                 table_background = colors.lightblue
+#             else:
+#                 table_background = colors.aliceblue
+
+#             tblStyle.add('BACKGROUND', (0, row), (-1, row), table_background)
+
+#         table_actividades.setStyle(tblStyle)
+
+#         width = 150
+#         height = 150
+
+#     change_dir()
+        
+#     contents.append(NextPageTemplate('laterpages'))
+#     contents.append(table_actividades)
+
+
+#     contents.append(PageBreak())
+
+
+#     doc.addPageTemplates([firstpage,laterpages])
+#     doc.build(contents)
+#     change_dir()
+
 
 # def proba():
 #     """добавление столбца в существующую таблицу"""
@@ -8327,7 +8482,6 @@ my_win.Button_filter_fin.clicked.connect(filter_fin)
 my_win.Button_filter.clicked.connect(filter_gr)
 # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_etap_made.clicked.connect(etap_made)
-# my_win.Button_system_made.clicked.connect(player_in_table)  # заполнение таблицы Game_list
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 my_win.Button_group.clicked.connect(player_in_table)  # вносит спортсменов в группы
 # записывает в базу или редактирует титул
@@ -8338,7 +8492,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(test_choice_group)
+my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
