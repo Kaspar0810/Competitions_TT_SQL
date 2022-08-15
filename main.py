@@ -1230,6 +1230,8 @@ def data_title_string():
     if de > ds:  # получаем строку начало и конец соревнования в
         # одном месяце или два месяца если начало и конец в разных месяцах
         return f"{ds}-{de} {month_st} {ys} г."
+    elif de == ds:
+        return f"{ds} {month_st} {ys} г."
     else:
         month_end = months_list[int(me) - 1]
         return f"{ds} {month_st}-{de} {month_end} {ys} г."
@@ -1962,6 +1964,7 @@ def list_player_pdf(player_list):
         t = my_win.tableWidget.item(k, 6).text()
         q = my_win.tableWidget.item(k, 7).text()
         m = my_win.tableWidget.item(k, 8).text()
+        g = chop_line_city(g)
         q = chop_line(q)
         data = [n, p, b, c, g, z, t, q, m]
 
@@ -1969,9 +1972,10 @@ def list_player_pdf(player_list):
     elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
-              colWidths=(0.6 * cm, 3.7 * cm, 1.9 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.7 * cm, 1.1 * cm),
-              rowHeights=None)  # ширина столбцов, если None-автоматическая
+              colWidths=(0.6 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
+              rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                            ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
                            # Использую импортированный шрифта размер
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
                            # межстрочный верхний инервал
@@ -1982,46 +1986,26 @@ def list_player_pdf(player_list):
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                            # горизонтальное выравнивание в ячейке
                            ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
-                           ('BACKGROUND', (0, 0), (-1, kp * -1), colors.yellow),
-                           ('TEXTCOLOR', (0, 0), (-1, kp * -1), colors.darkblue),
+                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
                            ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
                            # цвет и толщину внутренних линий
-                           ('INNERGRID', (0, 0), (-1, -1), 0.05, colors.black),
+                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
                            # внешние границы таблицы
                            ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
                            ]))
 
-    #========
-    styles = getSampleStyleSheet()
-    styleN = styles['Normal']
-    styleH = styles['Heading1']
-    story = []
 
-    #add some flowables
-    story.append(Paragraph("This is a Heading",styleH))
-    story.append(Paragraph("This is a paragraph in <i>Normal</i> style.",
-        styleN))
-    # c  = Canvas('mydoc.pdf')
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+            firstLineIndent=-20)  # стиль параграфа
+    h3.spaceAfter = 10  # промежуток после заголовка
+    story.append(Paragraph(f'Список участников. {gamer}', h3))
+    story.append(t)
+
     doc = SimpleDocTemplate(f"table_list_{short_name}.pdf", pagesize=A4)
-    f = Frame(cm, cm, 20*cm, 29*cm, showBoundary=0)
-    f.addFromList(story, doc)
-    # c.save()
     change_dir()
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     change_dir()
-
-    #========
-
-    # h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
-    #         firstLineIndent=-20)  # стиль параграфа
-    # h3.spaceAfter = 10  # промежуток после заголовка
-    # story.append(Paragraph(f'Список участников. {gamer}', h3))
-    # story.append(t)
-
-    # doc = SimpleDocTemplate(f"table_list_{short_name}.pdf", pagesize=A4)
-    # change_dir()
-    # doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    # change_dir()
 
 
 def exit_comp():
@@ -2316,7 +2300,6 @@ def page_vid():
 def view():
     """просмотр PDF файлов средствами OS"""
     from sys import platform
-    # change_dir()  # смена директории на папку с pdf файлами
     sender = my_win.sender()
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
@@ -2327,6 +2310,7 @@ def view():
         my_win.tabWidget.setCurrentIndex(1)
         player_list = Player.select().where(Player.title_id == title_id())  # сортировка по алфавиту
         list_player_pdf(player_list)
+        change_dir()
         view_file = f"table_list_{short_name}.pdf"
     elif sender == my_win.view_gr_Action:  # вкладка группы
         view_file = f"table_group_{short_name}.pdf"
@@ -2519,21 +2503,42 @@ def player_in_table():
                                          tours=match, title_id=title_id(), round=round).save()
 
 
-def chop_line(q, maxline=30):
+def chop_line(q, maxline=31):
     """перевод строки если слишком длинный список тренеров"""
-    if len(q) > maxline:
+    l = len(q)
+    if l > maxline:
         s1 = q.find(",", 0, maxline)
-        s2 = q.find(",", s1 + 1, maxline)
-
+        s2 = q.find(",", s1 + 1, maxline)       
         cant = len(q) // maxline
         cant += 1
         strline = ""
-        for k in range(1, cant):
-            index = maxline * k
-            strline += "%s\n" % (q[(index - maxline):s2 + 1])
-        strline += "%s" % (q[s2 + 1:])
+        if s2 == -1: # если две фамилии больше 31, перевод после 1-ой фамилии
+            for k in range(1, cant):
+                index = maxline * k
+                strline += "%s\n" % (q[(index - maxline):s1 + 1])
+            strline += "%s" % (q[s1 + 1:])
+        else:
+            for k in range(1, cant):
+                index = maxline * k
+                strline += "%s\n" % (q[(index - maxline):s2 + 1])
+            strline += "%s" % (q[s2 + 1:])
         q = strline
     return q
+
+
+def chop_line_city(g, maxline=15):
+    """перевод строки если слишком длинный список города"""
+    l = len(g)
+    if l > maxline:
+        s1 = g.find(" ", 0, maxline)
+        s2 = g.find(" ", s1 + 1, maxline)       
+        strline = ""
+        if s2 == -1: # если две фамилии больше 31, перевод после 1-ой фамилии
+            strline = g[:s1]
+        else:
+            strline = g[:s2]
+        g = strline
+    return g
 
 
 def match_score_db():
@@ -5306,8 +5311,9 @@ def table_made(pv, stage):
         kg = 1
         t = ta
     else:  # групповые игры
+        all_player = s_id.total_athletes  # кол-во участников
         kg = s_id.total_group  # кол-во групп
-        if int(kg) % int(ta) == 0:
+        if int(all_player) % int(kg) == 0:
             t = ta
         else:
             t = ta + 1
@@ -5554,7 +5560,7 @@ def table_made(pv, stage):
             elements.append(shell_table4)
             elements.append(shell_table5)
             elements.append(shell_table6)
-    elif kg == 8:
+    elif kg >= 8:
         dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
             data = [[dict_table[0], dict_table[1]]]
@@ -8230,142 +8236,29 @@ def tours_list(cp):
 #     except IOError:
 #         print("Файл уже открыт")
 
-def proba():
-    change_dir()
-    from reportlab.pdfgen.canvas import Canvas
-    from reportlab.lib.styles import getSampleStyleSheet
-    from reportlab.lib.units import inch
-    from reportlab.platypus import Paragraph, Frame
-    styles = getSampleStyleSheet()
-    styleN = styles['Normal']
-    styleH = styles['Heading1']
-    story = []
-
-    #add some flowables
-    story.append(Paragraph("This is a Heading",styleH))
-    story.append(Paragraph("This is a paragraph in <i>Normal</i> style.",
-        styleN))
-    c  = Canvas('mydoc.pdf')
-    f = Frame(inch, inch, 6*inch, 9*inch, showBoundary=0)
-    f.addFromList(story,c)
-    c.save()
-
-
-
-
 # def proba():
- 
 #     change_dir()
-#     file_name = "proba_table"
-#     document_title = "Title"
-#     canvas = Canvas(file_name, pagesize=landscape(A4))
+#     from reportlab.pdfgen.canvas import Canvas
+#     from reportlab.lib.styles import getSampleStyleSheet
+#     from reportlab.lib.units import inch
+#     from reportlab.platypus import Paragraph, Frame
+#     styles = getSampleStyleSheet()
+#     styleN = styles['Normal']
+#     styleH = styles['Heading1']
+#     story = []
 
-#     doc = BaseDocTemplate(file_name)
-#     contents =[]
-#     width,height = A4
-
-
-#     # frame_later = Frame(
-#     #     0.2*inch, 
-#     #     0.6*inch, 
-#     #     (width-0.6*inch)+0.17*inch, 
-#     #     height-1*inch,
-#     #     leftPadding = 0, 
-#     #     topPadding=0, 
-#     #     showBoundary = 1,
-#     #     id='col'
-#     #     )
-#     frame_later= Frame(20*cm, 29*cm, (width-0.6*cm)+0.17*cm, height-1*cm, showBoundary = 1, id='col')
-#     frame_table= Frame(20*cm, 29*cm, (width-0.6*cm)+0.17*cm, height-1*cm,showBoundary = 1, id='col')
-
-#     laterpages = PageTemplate(id='laterpages',frames=[frame_later])
-
-#     firstpage = PageTemplate(id='firstpage', frames=[frame_table])
-
-#     contents.append(NextPageTemplate('firstpage'))
-   
+#     #add some flowables
+#     story.append(Paragraph("This is a Heading",styleH))
+#     story.append(Paragraph("This is a paragraph in <i>Normal</i> style.",
+#         styleN))
+#     c  = Canvas('mydoc.pdf')
+#     f = Frame(inch, inch, 6*inch, 9*inch, showBoundary=0)
+#     f.addFromList(story,c)
+#     c.save()
 
 
-#     canvas.setTitle(document_title)
-
-#     # contents.append(Paragraph(title, style_title))
-#     # contents.append(Paragraph(nombre_colaborador + ' - ' + sucursal_colaborador, style_data))
-#     # contents.append(Paragraph(fecha_actual, style_date))
-#     contents.append(FrameBreak())
-
-#     title_background = colors.fidblue
-#     hour = 8
-#     minute = 0
-#     hour_list = []
-
-#     data_actividades = [
-#         {'Hora', 'Cliente', 'Resultado de \nActividad', 'Monto Venta \n(MXN)', 'Monto Venta \n(USD)',
-#         'Monto Cotización \n(MXN)', 'Monto Cotización \n(USD)', 'Comentarios \nAdicionales'},
-#     ]
-
-#     i = 0
-#     for i in range(300):
-
-#         if minute == 0:
-#             if hour <= 12:
-#                 time = str(hour) + ':' + str(minute) + '0 a.m.'
-#             else:
-#                 time = str(hour-12) + ':' + str(minute) + '0 p.m.'
-#         else:
-#             if hour <= 12:
-#                 time = str(hour) + ':' + str(minute) + ' a.m.'
-#             else:
-#                 time = str(hour-12) + ':' + str(minute) + ' p.m.'
-
-#         if minute != 45:
-#             minute += 15
-#         else:
-#             hour += 1
-#             minute = 0
-#         hour_list.append(time)
-
-#         # I TRIED THIS SOLUTION BUT THIS DIDN'T WORK
-#         # if i % 20 == 0:
-        
-
-#         data_actividades.append([hour_list[i], i, i, i, i, i, i, i])
-
-#         i += 1
-
-#         table_actividades = Table(data_actividades, colWidths=85, rowHeights=30, repeatRows=1)
-#         tblStyle = TableStyle([
-#             ('BACKGROUND', (0, 0), (-1, 0), title_background),
-#             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-#             ('ALIGN', (1, 0), (1, -1), 'CENTER'),
-#             ('GRID', (0, 0), (-1, -1), 1, colors.black)
-#         ])
-
-#         rowNumb = len(data_actividades)
-#         for row in range(1, rowNumb):
-#             if row % 2 == 0:
-#                 table_background = colors.lightblue
-#             else:
-#                 table_background = colors.aliceblue
-
-#             tblStyle.add('BACKGROUND', (0, row), (-1, row), table_background)
-
-#         table_actividades.setStyle(tblStyle)
-
-#         width = 150
-#         height = 150
-
-#     change_dir()
-        
-#     contents.append(NextPageTemplate('laterpages'))
-#     contents.append(table_actividades)
 
 
-#     contents.append(PageBreak())
-
-
-#     doc.addPageTemplates([firstpage,laterpages])
-#     doc.build(contents)
-#     change_dir()
 
 
 # def proba():
@@ -8492,7 +8385,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-my_win.Button_proba.clicked.connect(proba)
+# my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
