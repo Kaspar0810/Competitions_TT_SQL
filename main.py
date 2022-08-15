@@ -5561,25 +5561,45 @@ def table_made(pv, stage):
             elements.append(shell_table5)
             elements.append(shell_table6)
     elif kg >= 8:
+
         dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[dict_table[0], dict_table[1]]]
-            data1 = [[dict_table[2], dict_table[3]]]
-            data2 = [[dict_table[4], dict_table[5]]]
-            data3 = [[dict_table[6], dict_table[7]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            shell_table3 = Table(data3, colWidths=["*"])
-            # заголовки групп (надо точно позиционировать)
-            elements.append(Paragraph('группа 1 группа 2', h2))
-            elements.append(shell_table)
-            elements.append(Paragraph('группа 3 группа 4', h2))
-            elements.append(shell_table1)
-            elements.append(Paragraph('группа 5 группа 6', h2))
-            elements.append(shell_table2)
-            elements.append(Paragraph('группа 7 группа 8', h2))
-            elements.append(shell_table3)
+            data_tmp = []
+            data_temp = []
+            tmp = []
+            data = []
+            for k in range(1, kg // 4 + 1):
+                for i in range(0, 2):
+                    a = (k * 2 - 2) + i     
+                    dict_table[a]
+                    data_tmp.append(dict_table[a])  
+                data_temp = data_tmp.copy()
+                data_tmp.clear()
+                tmp = data_temp.copy()
+                data_temp.clear()
+                data.append(tmp) 
+                d = data[0]
+            for l in range(0, 4):           
+                shell_table = Table(data[l], colWidths=["*"])
+                elements.append(shell_table)
+                #=======
+            # data = [[dict_table[0], dict_table[1]]]
+            # data1 = [[dict_table[2], dict_table[3]]]
+            # data2 = [[dict_table[4], dict_table[5]]]
+            # data3 = [[dict_table[6], dict_table[7]]]
+            # shell_table = Table(data, colWidths=["*"])
+            # shell_table1 = Table(data1, colWidths=["*"])
+            # shell_table2 = Table(data2, colWidths=["*"])
+            # shell_table3 = Table(data3, colWidths=["*"])
+            # # заголовки групп (надо точно позиционировать)
+            # elements.append(Paragraph('группа 1 группа 2', h2))
+            # elements.append(shell_table)
+            # elements.append(Paragraph('группа 3 группа 4', h2))
+            # elements.append(shell_table1)
+            # elements.append(Paragraph('группа 5 группа 6', h2))
+            # elements.append(shell_table2)
+            # elements.append(Paragraph('группа 7 группа 8', h2))
+            # elements.append(shell_table3)
         else:  # страница книжная, то таблицы размещаются обе в столбец
             data = [[dict_table[0]]]
             data1 = [[dict_table[1]]]
