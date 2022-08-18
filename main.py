@@ -4,6 +4,7 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 
+from curses import KEY_RIGHT
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -318,10 +319,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             type = system.type_table
 
             if fin is not None:
-                sys = System.get(System.stage == fin)
                 check_flag = check_choice(fin)
                 if check_flag is True:
-                    if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
+                    if system.choice_flag == True:  # проверка флаг на жеребьевку финала
                         reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
                                                                             f"\nесли хотите сделать "
                                                                             "повторно\nнажмите-ОК-, "
@@ -2303,7 +2303,9 @@ def view():
     sender = my_win.sender()
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
-
+    change_dir()
+    dir_path = pathlib.Path.cwd()
+    p = str(dir_path)
     if sender == my_win.all_comp_Action:
         view_file = f"Title_{short_name}.pdf"
     elif sender == my_win.view_list_Action:
@@ -4192,11 +4194,11 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     #===================================
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == fin).get()
-    syst = sys.select().where(System.stage == sys.stage_exit).get()
+    # syst = system.select().where(System.stage == sys.stage_exit).get()
     choice = Choice.select().where(Choice.title_id == title_id())
     type_setka = sys.label_string
 
-    count_exit = sys.max_player // syst.total_group
+    # count_exit = sys.max_player // syst.total_group
 
     if count_exit == 2:
         if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
@@ -4221,13 +4223,17 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             posev_all.append(posev_4) 
 
     for n in range (0, count_exit):
-        choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva + n)
+        # choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva + n)
+        choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
+        
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
         
             family = posev.family
             group = posev.group
+            ind = group.find(' ')
+            group_number = int(group[:ind])
             pl_id = posev.player_choice_id
             region = posev.region
             player = Player.get(Player.id == pl_id)
@@ -4236,10 +4242,13 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             psv.append(pl_id)
             psv.append(family)
             psv.append(region)
+            psv.append(group_number)
             psv.append(group)
             psv.append(city)
             full_posev.append(psv)
-
+            full_posev.sort(key=lambda k: k[3])
+        for k in full_posev:
+            k.remove(k[3])
     # ======== начало жеребьевки =========
         end = 32 // count_exit
         for i in range(0, end):
@@ -4793,13 +4802,25 @@ def total_game_table(kpt, fin, pv, cur_index):
 
         pv = my_win.comboBox_page_vid.currentText()
         str_setka = f"{vt} {player_in_final} участников"
+        stage_list = []
+        sys = System.select().where(System.id == title_id())
+        for k in sys:
+            st = k.stage
+            stage_list.append(st)
+
+        if "Полуфиналы" in stage_list:
+            pass
+        else:
+            stage_exit = "Предварительный"
+
         s = System.select().order_by(System.id.desc()).get()
+
         total_athletes = s.total_athletes
         stage_exit = ""
         stroka_kol_game = f"{total_games} игр"
 
-        if total_athletes == player_in_final:
-            stage_exit = "Предварительный"
+        # if total_athletes == player_in_final:
+        #     stage_exit = "Предварительный"
         final = fin
 
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=0, kol_game_string=stroka_kol_game,
@@ -4868,7 +4889,7 @@ def numbers_of_games(cur_index, player_in_final):
             total_games = 80
     elif cur_index == 3:  # сетка с розыгрышем призовых мест
         pass
-    else:
+    else: # игры в круг
         total_games = (player_in_final * (player_in_final - 1)) // 2
     return total_games
 
@@ -5397,175 +5418,177 @@ def table_made(pv, stage):
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
 
     #  ============ создание таблиц и вставка данных =================
-    h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=150)  # стиль параграфа (номера таблиц)
+    # h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+    #         leftIndent=150)  # стиль параграфа (номера таблиц)
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=50, textcolor=Color(0, 0, 1, 1))  # стиль параграфа (номера таблиц)
+            leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+            #========
+    dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
     if kg == 1:  # одна таблицу
-        dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+        # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
         data = [[dict_table[0]]]
         shell_table = Table(data, colWidths=["*"])
         elements.append(shell_table)
-    elif kg == 2:
-        dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-        # страница альбомная, то таблицы размещаются обе в ряд
-        if pv == landscape(A4) and t in [3, 4, 5, 6]:
-            data = [[dict_table[0], dict_table[1]]]
-            shell_table = Table(data, colWidths=["*"])
-            elements.append(shell_table)
-        else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[dict_table[0]]]
-            data1 = [[dict_table[1]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-    elif kg == 3:
-        dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[dict_table[0], dict_table[1]]]
-            data1 = [[dict_table[2]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-        else:  # страница книжная, то таблицы размещаются в столбец
-            data = [[dict_table[0]]]
-            data1 = [[dict_table[1]]]
-            data2 = [[dict_table[2]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-    elif kg == 4:
-        dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[dict_table[0], dict_table[1]]]
-            data1 = [[dict_table[2], dict_table[3]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            elements.append(Paragraph('группа 1             группа 2', h2))
-            elements.append(shell_table)
-            elements.append(Paragraph('группа 3             группа 4', h2))
-            elements.append(shell_table1)
-        else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[dict_table[0]]]
-            data1 = [[dict_table[1]]]
-            data2 = [[dict_table[2]]]
-            data3 = [[dict_table[3]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            shell_table3 = Table(data3, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-            elements.append(shell_table3)
-    elif kg == 5:
-        dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[dict_table[0], dict_table[1]]]
-            data1 = [[dict_table[2], dict_table[3]]]
-            data2 = [[dict_table[4]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-        else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[dict_table[0]]]
-            data1 = [[dict_table[1]]]
-            data2 = [[dict_table[2]]]
-            data3 = [[dict_table[3]]]
-            data4 = [[dict_table[4]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            shell_table3 = Table(data3, colWidths=["*"])
-            shell_table4 = Table(data4, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-            elements.append(shell_table3)
-            elements.append(shell_table4)
-    elif kg == 6:
-        dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[dict_table[0], dict_table[1]]]
-            data1 = [[dict_table[2], dict_table[3]]]
-            data2 = [[dict_table[4], dict_table[5]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-        else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[dict_table[0]]]
-            data1 = [[dict_table[1]]]
-            data2 = [[dict_table[2]]]
-            data3 = [[dict_table[3]]]
-            data4 = [[dict_table[4]]]
-            data5 = [[dict_table[5]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            shell_table3 = Table(data3, colWidths=["*"])
-            shell_table4 = Table(data4, colWidths=["*"])
-            shell_table5 = Table(data5, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-            elements.append(shell_table3)
-            elements.append(shell_table4)
-            elements.append(shell_table5)
-    elif kg == 7:
-        dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-            data = [[dict_table[0], dict_table[1]]]
-            data1 = [[dict_table[2], dict_table[3]]]
-            data2 = [[dict_table[4], dict_table[5]]]
-            data3 = [[dict_table[6]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            shell_table3 = Table(data3, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-            elements.append(shell_table3)
-        else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[dict_table[0]]]
-            data1 = [[dict_table[1]]]
-            data2 = [[dict_table[2]]]
-            data3 = [[dict_table[3]]]
-            data4 = [[dict_table[4]]]
-            data5 = [[dict_table[5]]]
-            data6 = [[dict_table[6]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            shell_table3 = Table(data3, colWidths=["*"])
-            shell_table4 = Table(data4, colWidths=["*"])
-            shell_table5 = Table(data5, colWidths=["*"])
-            shell_table6 = Table(data6, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-            elements.append(shell_table3)
-            elements.append(shell_table4)
-            elements.append(shell_table5)
-            elements.append(shell_table6)
-    elif kg >= 8:
+    # else :
+    #     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+    #     # страница альбомная, то таблицы размещаются обе в ряд
+    #     if pv == landscape(A4) and t in [3, 4, 5, 6]:
+    #         data = [[dict_table[0], dict_table[1]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         elements.append(shell_table)
+    #     else:  # страница книжная, то таблицы размещаются обе в столбец
+    #         data = [[dict_table[0]]]
+    #         data1 = [[dict_table[1]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    # elif kg == 3:
+    #     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+    #     if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+    #         data = [[dict_table[0], dict_table[1]]]
+    #         data1 = [[dict_table[2]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #     else:  # страница книжная, то таблицы размещаются в столбец
+    #         data = [[dict_table[0]]]
+    #         data1 = [[dict_table[1]]]
+    #         data2 = [[dict_table[2]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         shell_table2 = Table(data2, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #         elements.append(shell_table2)
+    # elif kg == 4:
+    #     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+    #     if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+    #         data = [[dict_table[0], dict_table[1]]]
+    #         data1 = [[dict_table[2], dict_table[3]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         elements.append(Paragraph('группа 1             группа 2', h2))
+    #         elements.append(shell_table)
+    #         elements.append(Paragraph('группа 3             группа 4', h2))
+    #         elements.append(shell_table1)
+    #     else:  # страница книжная, то таблицы размещаются обе в столбец
+    #         data = [[dict_table[0]]]
+    #         data1 = [[dict_table[1]]]
+    #         data2 = [[dict_table[2]]]
+    #         data3 = [[dict_table[3]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         shell_table2 = Table(data2, colWidths=["*"])
+    #         shell_table3 = Table(data3, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #         elements.append(shell_table2)
+    #         elements.append(shell_table3)
+    # elif kg == 5:
+    #     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+    #     if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+    #         data = [[dict_table[0], dict_table[1]]]
+    #         data1 = [[dict_table[2], dict_table[3]]]
+    #         data2 = [[dict_table[4]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         shell_table2 = Table(data2, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #         elements.append(shell_table2)
+    #     else:  # страница книжная, то таблицы размещаются обе в столбец
+    #         data = [[dict_table[0]]]
+    #         data1 = [[dict_table[1]]]
+    #         data2 = [[dict_table[2]]]
+    #         data3 = [[dict_table[3]]]
+    #         data4 = [[dict_table[4]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         shell_table2 = Table(data2, colWidths=["*"])
+    #         shell_table3 = Table(data3, colWidths=["*"])
+    #         shell_table4 = Table(data4, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #         elements.append(shell_table2)
+    #         elements.append(shell_table3)
+    #         elements.append(shell_table4)
+    # elif kg == 6:
+    #     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+    #     if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+    #         data = [[dict_table[0], dict_table[1]]]
+    #         data1 = [[dict_table[2], dict_table[3]]]
+    #         data2 = [[dict_table[4], dict_table[5]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         shell_table2 = Table(data2, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #         elements.append(shell_table2)
+    #     else:  # страница книжная, то таблицы размещаются обе в столбец
+    #         data = [[dict_table[0]]]
+    #         data1 = [[dict_table[1]]]
+    #         data2 = [[dict_table[2]]]
+    #         data3 = [[dict_table[3]]]
+    #         data4 = [[dict_table[4]]]
+    #         data5 = [[dict_table[5]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         shell_table2 = Table(data2, colWidths=["*"])
+    #         shell_table3 = Table(data3, colWidths=["*"])
+    #         shell_table4 = Table(data4, colWidths=["*"])
+    #         shell_table5 = Table(data5, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #         elements.append(shell_table2)
+    #         elements.append(shell_table3)
+    #         elements.append(shell_table4)
+    #         elements.append(shell_table5)
+    # elif kg == 7:
+    #     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+    #     if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+    #         data = [[dict_table[0], dict_table[1]]]
+    #         data1 = [[dict_table[2], dict_table[3]]]
+    #         data2 = [[dict_table[4], dict_table[5]]]
+    #         data3 = [[dict_table[6]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         shell_table2 = Table(data2, colWidths=["*"])
+    #         shell_table3 = Table(data3, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #         elements.append(shell_table2)
+    #         elements.append(shell_table3)
+    #     else:  # страница книжная, то таблицы размещаются обе в столбец
+    #         data = [[dict_table[0]]]
+    #         data1 = [[dict_table[1]]]
+    #         data2 = [[dict_table[2]]]
+    #         data3 = [[dict_table[3]]]
+    #         data4 = [[dict_table[4]]]
+    #         data5 = [[dict_table[5]]]
+    #         data6 = [[dict_table[6]]]
+    #         shell_table = Table(data, colWidths=["*"])
+    #         shell_table1 = Table(data1, colWidths=["*"])
+    #         shell_table2 = Table(data2, colWidths=["*"])
+    #         shell_table3 = Table(data3, colWidths=["*"])
+    #         shell_table4 = Table(data4, colWidths=["*"])
+    #         shell_table5 = Table(data5, colWidths=["*"])
+    #         shell_table6 = Table(data6, colWidths=["*"])
+    #         elements.append(shell_table)
+    #         elements.append(shell_table1)
+    #         elements.append(shell_table2)
+    #         elements.append(shell_table3)
+    #         elements.append(shell_table4)
+    #         elements.append(shell_table5)
+    #         elements.append(shell_table6)
+    else:
         data_tmp = []
         data_temp = []
         tmp = []
         temp = []
         data = []
-        dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+        # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
             for k in range(1, kg // 2 + 1):
                 for i in range(0, 2):
@@ -5584,33 +5607,54 @@ def table_made(pv, stage):
                 tmp_copy = s_tmp.copy()
                 shell_table.append(tmp_copy)
                 s_tmp.clear()
-                elements.append(Paragraph(f'группа {l * 2 + 1} группа {l * 2 + 2}', h2))
+                text = f'группа {l * 2 + 1} группа {l * 2 + 2}'
+                elements.append(Paragraph(text, h2))
                 elements.append(shell_table[l][0])
         else:  # страница книжная, то таблицы размещаются обе в столбец
-            data = [[dict_table[0]]]
-            data1 = [[dict_table[1]]]
-            data2 = [[dict_table[2]]]
-            data3 = [[dict_table[3]]]
-            data4 = [[dict_table[4]]]
-            data5 = [[dict_table[5]]]
-            data6 = [[dict_table[6]]]
-            data7 = [[dict_table[7]]]
-            shell_table = Table(data, colWidths=["*"])
-            shell_table1 = Table(data1, colWidths=["*"])
-            shell_table2 = Table(data2, colWidths=["*"])
-            shell_table3 = Table(data3, colWidths=["*"])
-            shell_table4 = Table(data4, colWidths=["*"])
-            shell_table5 = Table(data5, colWidths=["*"])
-            shell_table6 = Table(data6, colWidths=["*"])
-            shell_table7 = Table(data7, colWidths=["*"])
-            elements.append(shell_table)
-            elements.append(shell_table1)
-            elements.append(shell_table2)
-            elements.append(shell_table3)
-            elements.append(shell_table4)
-            elements.append(shell_table5)
-            elements.append(shell_table6)
-            elements.append(shell_table7)
+            for k in range(1, kg // 2 + 1):
+                for i in range(0, kg):
+                    data_tmp.append(dict_table[i])  
+                    tmp = data_tmp.copy()
+                    data_temp.append(tmp) 
+                    temp = data_temp.copy()
+                    data.append(temp)
+                    data_tmp.clear()
+                    data_temp.clear()
+            shell_table = []
+            s_tmp = []
+            for l in range(0, kg): 
+                shell_tmp = Table(data[l], colWidths=["*"])
+                s_tmp.append(shell_tmp)
+                tmp_copy = s_tmp.copy()
+                shell_table.append(tmp_copy)
+                s_tmp.clear()
+                elements.append(Paragraph(f'группа {l}', h2))
+                elements.append(shell_table[l][0])
+
+            # data = [[dict_table[0]]]
+            # data1 = [[dict_table[1]]]
+            # data2 = [[dict_table[2]]]
+            # data3 = [[dict_table[3]]]
+            # data4 = [[dict_table[4]]]
+            # data5 = [[dict_table[5]]]
+            # data6 = [[dict_table[6]]]
+            # data7 = [[dict_table[7]]]
+            # shell_table = Table(data, colWidths=["*"])
+            # shell_table1 = Table(data1, colWidths=["*"])
+            # shell_table2 = Table(data2, colWidths=["*"])
+            # shell_table3 = Table(data3, colWidths=["*"])
+            # shell_table4 = Table(data4, colWidths=["*"])
+            # shell_table5 = Table(data5, colWidths=["*"])
+            # shell_table6 = Table(data6, colWidths=["*"])
+            # shell_table7 = Table(data7, colWidths=["*"])
+            # elements.append(shell_table)
+            # elements.append(shell_table1)
+            # elements.append(shell_table2)
+            # elements.append(shell_table3)
+            # elements.append(shell_table4)
+            # elements.append(shell_table5)
+            # elements.append(shell_table6)
+            # elements.append(shell_table7)
     if pv == A4:
         pv = A4
     else:
@@ -7563,9 +7607,9 @@ def player_choice_in_setka(fin):
             kpt, ok = QInputDialog.getInt(my_win, "Места в группе", "Введите место, которoе выходит\n"
                                           f"из группы в {fin}", value=1)
             if ok:
-                syst = system.select().where(System.stage == fin).get()
-                sys = syst.select().where(System.stage == "Предварительный").get()
-                count_exit = system.max_player // sys.total_group
+                sys_tem = system.select().where(System.stage == fin).get()
+                sys = system.select().where(System.stage == "Предварительный").get()
+                count_exit = sys_tem.max_player // sys.total_group
                 if count_exit == 1:  # если выходит один человек
                     reply = QMessageBox.information(my_win, 'Уведомление',
                                                     "Из группы выходят спортсмены,\n"
@@ -7593,9 +7637,9 @@ def player_choice_in_setka(fin):
 
                 if reply == QMessageBox.Yes:
                     with db:
-                        system.stage_exit = "Предварительный"
-                        system.mesta_exit = kpt
-                        system.save()
+                        sys_tem.stage_exit = "Предварительный"
+                        sys_tem.mesta_exit = kpt
+                        sys_tem.save()
                 else:
                     return
 
@@ -7603,7 +7647,7 @@ def player_choice_in_setka(fin):
         mesto_second_poseva = kpt + 1
         mesto_third_poseva = kpt + 2
         mesto_fourth_poseva = kpt + 3
-
+        posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
     else:  # если была произведена жеребьевка
         sys = system.select().where(System.stage == fin).get()
         syst = sys.select().where(System.stage == sys.stage_exit).get()
