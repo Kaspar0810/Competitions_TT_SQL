@@ -4246,7 +4246,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             psv.append(group)
             psv.append(city)
             full_posev.append(psv)
-            full_posev.sort(key=lambda k: k[3])
+            full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
         for k in full_posev:
             k.remove(k[3])
     # ======== начало жеребьевки =========
@@ -4295,9 +4295,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                         if n != 0 or (n == 0 and l > 1):
                         # =========== определения кол-во возможный вариантов посева у каждого региона
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, l, n, sev, num_id_player)
-                            if n != 0:
+                            if i != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
-                                number_posev = list(possible_number.keys())   
+                                num_posev = list(possible_number.keys())   
                             l = list(possible_number.keys())[0]
                             num_set = possible_number[l]
 
@@ -4329,6 +4329,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                     sev.clear()
                     possible_number.clear()
                 number_posev.remove(l)
+                if i != 0:
+                    num_posev.remove(l)
                 
         for i in num_id_player.keys():
             tmp_list = list(num_id_player[i])
@@ -4343,7 +4345,9 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
     """возможные номера посева"""
     possible_number = {}
     proba_possible = {} 
+    num_tmp = []
     reg_tmp = []
+    # sev_tmp = sev.copy()
     current_region = list(current_region_posev.values())
     y = 0
     for reg in current_region_posev.keys():
@@ -4352,10 +4356,79 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
         if n == 0:
             if cur_reg in reg_last:
                 reg_tuple = tuple(reg_last)
-                count = reg_tuple.count(cur_reg)
+                count = reg_tuple.count(cur_reg) # количество регионов уже посеянных 
                 if count == 1: # значит только один регион в посеве
                     cur_gr = current_region[y][1]
                     number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev)
+                    possible_number[reg] = number_posev
+                else: # если есть уже областей более двух
+                    number_tmp = []
+                    num_tmp.clear()
+                    start = 0
+                    for k in reg_last: # получаем список номеров сетки областей в той половине куда идет сев
+                        if k == cur_reg:
+                            index = reg_last.index(k, start)
+                            set_number = number_last[index] # номер где уже посеянна такая же область
+                            num_tmp.append(set_number)
+                        start += 1
+                    if count == 2:
+                        for h in num_tmp:
+                            if h <= 8: # если номер в сетке вверху, то наде сеять вниз
+                                f = [i for i in sev if i >= 9 and i <= 16] # отсеивает в списке номера 9-16
+                            elif h > 8 and h < 17: 
+                                f = [i for i in sev if i < 9] # отсеивает в списке номера 1-8
+                            elif h >= 17 and h < 25: 
+                                f = [i for i in sev if i > 24] # отсеивает в списке номера 25-32
+                            elif h > 24: 
+                                f = [i for i in sev if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
+                            number_tmp += f
+                    elif count > 2:
+                        set_dawn = 0
+                        set_up = 0
+                        for z in num_tmp: # определяет количество сеящейся области внизу и вверху сетки
+                            if z < 17:
+                                set_dawn += 1 # количество в вверхней половине сетка
+                            else:
+                                set_up += 1
+                        if count // 2 != 0: # отбирает нечетные числа
+                            if set_dawn > set_up:
+                                sev_tmp = [i for i in sev if i > 32 // 2] # отсеивает в списке номера больше 16
+                                h = [i for i in num_tmp if i > 32 // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
+                            else: 
+                                sev_tmp = [i for i in sev if i <= 32 // 2] # отсеивает в списке номера больше 16 
+                                h = [i for i in num_tmp if i <= 32 // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
+                            h = h[0]
+
+                            if h <= 8: # если номер в сетке вверху, то наде сеять вниз
+                                number_tmp = [i for i in sev_tmp if i >= 9 and i <= 16] # отсеивает в списке номера 9-16
+                            elif h > 8 and h < 17: 
+                                number_tmp = [i for i in sev_tmp if i < 9] # отсеивает в списке номера 1-8
+                            elif h >= 17 and h < 25: 
+                                number_tmp = [i for i in sev_tmp if i > 24] # отсеивает в списке номера 25-32
+                            elif h > 24: 
+                                number_tmp = [i for i in sev_tmp if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
+                            # number_tmp += f
+                        # for h in num_tmp:
+                            # if h <= 4: # если номер в сетке вверху, то наде сеять вниз
+                            #     f = [i for i in sev if i > 4 and i < 9] # отсеивает в списке номера 9-16
+                            # elif h >= 5 and h <= 8: 
+                            #     f = [i for i in sev if i < 5] # отсеивает в списке номера 1-8
+                            # elif h >= 9 and h <= 12: 
+                            #     f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
+                            # elif h >= 13 and h <= 16: 
+                            #     f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 17-24
+                            # elif h >= 17 and h <= 20: 
+                            #     f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
+                            # elif h >= 21 and h <= 24: 
+                            #     f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
+                            # elif h >= 25 and h <= 28: 
+                            #     f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
+                            # elif h > 28: 
+                            #     f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24
+
+                            # number_tmp += f
+
+                    number_posev = number_tmp.copy()
                     possible_number[reg] = number_posev
             else:
                 possible_number[reg] = sev
@@ -4418,7 +4491,7 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
             index = reg_last.index(cur_reg)
             set_number = number_last[index] # номер где уже посеянна такая же область 
             if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
-                number_posev = [i for i in sev if i >= 32 // 2] # отсеивает в списке номера больше 16
+                number_posev = [i for i in sev if i > 32 // 2] # отсеивает в списке номера больше 16
             else: 
                 number_posev = [i for i in sev if i <= 32 // 2] # отсеивает в списке номера больше 16 
     elif n == 1: # уводит 2-е место от 1-ого в другую половину
@@ -4458,7 +4531,7 @@ def number_setka_posev_last(cur_gr, group_last, number_last, n):
             index = group_last.index(cur_gr)
             set_number = number_last[index] # номер где уже посеянна такая же область 
             if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
-                number_posev_old  = [i for i in number_last if i >= 32 // 2] # отсеивает в списке номера больше 16
+                number_posev_old  = [i for i in number_last if i > 32 // 2] # отсеивает в списке номера больше 16
             else: 
                 number_posev_old  = [i for i in number_last if i <= 32 // 2] # отсеивает в списке номера больше 16 
     elif n == 1: # уводит 2-е место от 1-ого в другую половину
