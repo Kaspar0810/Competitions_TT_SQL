@@ -4179,7 +4179,7 @@ def choice_gr_automat():
 def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     """автоматическая жеребьевка сетки""" 
     full_posev = []  # список полного списка участников 1-ого посева
-    posev_all = []
+    # posev_all = []
     group_last = []
     number_last = [] # посеянные номера в сетке
     reg_last = []  # посеянные регионы в сетке
@@ -4194,33 +4194,45 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     #===================================
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == fin).get()
+    # max_player = sys.max_player
     # syst = system.select().where(System.stage == sys.stage_exit).get()
     choice = Choice.select().where(Choice.title_id == title_id())
     type_setka = sys.label_string
-
-    # count_exit = sys.max_player // syst.total_group
-
-    if count_exit == 2:
+    if count_exit == 1:
         if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
-            pass
+            posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13], [2, 3, 6, 7, 10, 11, 14, 15]]
+            player_net = 16
+        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29], [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
+            player_net = 32
+    elif count_exit == 2:
+        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+            posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13]]
+            posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15]]
+            player_net = 16
+            # posev_all = [posev_1 + posev_2]
         elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
             posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29]]
             posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
-            posev_all = [posev_1 + posev_2]
+            player_net = 32
+            # posev_all = [posev_1 + posev_2]
     elif count_exit == 3:
         pass
     elif count_exit == 4:
         if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
-            pass
+            posev_1 = [[1, 16], [8, 9]]
+            posev_2 = [[4, 5, 12, 13]]
+            posev_3 = [[3, 6, 11, 14]]
+            posev_4 = [[2, 7, 10, 15]]
+            player_net = 16
+            # posev_all = [posev_1 + posev_2 + posev_3 + posev_4]
         elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
             posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25]]
             posev_2 = [[4, 5, 12, 13, 20, 21, 28, 29]]
             posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
             posev_4 = [[2, 7, 10, 15, 18, 23, 26, 31]]
-            posev_all.append(posev_1)
-            posev_all.append(posev_2)
-            posev_all.append(posev_3)
-            posev_all.append(posev_4) 
+            player_net = 32
+            # posev_all = [posev_1 + posev_2 + posev_3 + posev_4]
 
     for n in range (0, count_exit): # начало основного посева
         choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
@@ -4248,7 +4260,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
         for k in full_posev:
             k.remove(k[3])
         # ======== начало жеребьевки =========
-        end = 32 // count_exit
+        end = player_net // count_exit
         for i in range(0, end):
             number_posev.append(i)
 
@@ -4299,7 +4311,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                             group_last.append(v[2]) # список номеров групп уже посеянных
                         if n != 0 or (n == 0 and l > 1):
                         # =========== определения кол-во возможный вариантов посева у каждого региона
-                            possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, l, n, sev, num_id_player)
+                            possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                                 num_posev = list(possible_number.keys())   
@@ -4346,7 +4358,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     return posev_data
 
 
-def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, l, n, sev, num_id_player):
+def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net):
     """возможные номера посева"""
     possible_number = {}
     proba_possible = {} 
@@ -4411,26 +4423,6 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                                 number_tmp = [i for i in sev_tmp if i > 24] # отсеивает в списке номера 25-32
                             elif h > 24: 
                                 number_tmp = [i for i in sev_tmp if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
-                            # number_tmp += f
-                        # for h in num_tmp:
-                            # if h <= 4: # если номер в сетке вверху, то наде сеять вниз
-                            #     f = [i for i in sev if i > 4 and i < 9] # отсеивает в списке номера 9-16
-                            # elif h >= 5 and h <= 8: 
-                            #     f = [i for i in sev if i < 5] # отсеивает в списке номера 1-8
-                            # elif h >= 9 and h <= 12: 
-                            #     f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
-                            # elif h >= 13 and h <= 16: 
-                            #     f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 17-24
-                            # elif h >= 17 and h <= 20: 
-                            #     f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
-                            # elif h >= 21 and h <= 24: 
-                            #     f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
-                            # elif h >= 25 and h <= 28: 
-                            #     f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
-                            # elif h > 28: 
-                            #     f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24
-
-                            # number_tmp += f
 
                     number_posev = number_tmp.copy()
                     possible_number[reg] = number_posev
@@ -4491,16 +4483,16 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
     return possible_number
 
 
-def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev):
+def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net):
     """промежуточные номера для посева в сетке"""
     if n == 0:
         if cur_reg in reg_last:
             index = reg_last.index(cur_reg)
             set_number = number_last[index] # номер где уже посеянна такая же область 
             if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
-                number_posev = [i for i in sev if i > 32 // 2] # отсеивает в списке номера больше 16
+                number_posev = [i for i in sev if i > player_net // 2] # отсеивает в списке номера больше 16
             else: 
-                number_posev = [i for i in sev if i <= 32 // 2] # отсеивает в списке номера больше 16 
+                number_posev = [i for i in sev if i <= player_net // 2] # отсеивает в списке номера больше 16 
     elif n == 1: # уводит 2-е место от 1-ого в другую половину
         index = group_last.index(cur_gr)
         set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
@@ -4889,14 +4881,14 @@ def total_game_table(kpt, fin, pv, cur_index):
             stage_list.append(st)
 
         if "Полуфиналы" in stage_list:
-            pass
+            stage_exit = "Полуфиналы"
         else:
             stage_exit = "Предварительный"
 
         s = System.select().order_by(System.id.desc()).get()
 
         total_athletes = s.total_athletes
-        stage_exit = ""
+        # stage_exit = ""
         stroka_kol_game = f"{total_games} игр"
 
         # if total_athletes == player_in_final:
@@ -5123,14 +5115,15 @@ def check_choice(fin):
     res = Result.select().where(Result.title_id == title_id())  # отбираем записи с выходом в финал
     gr = res.select().where(Result.system_stage == exit)
     for i in gr:
-        game = i.points_win       
+        game = i.points_win 
+        check_flag = True      
         if game is None:
             result = msg.information(my_win, "Предварительный этап", "Еще не все встречи сыграны в предварительном этапе.",
                                     msg.Ok)
             check_flag = False
             break                        
-        else:
-            check_flag = True  
+        # else:
+        #     check_flag = True  
     return check_flag
 
 
@@ -7667,7 +7660,7 @@ def player_choice_in_setka(fin):
     p_stage = []
 
     system = System.select().where(System.title_id == title_id())
-    choice = Choice.select().where(Choice.title_id == title_id())  # отбирает все записи жеребьевки данныж соревнований
+    # choice = Choice.select().where(Choice.title_id == title_id())  # отбирает все записи жеребьевки данныж соревнований
     # =================
     stage = fin
     flag = ready_choice(stage)
@@ -7735,39 +7728,7 @@ def player_choice_in_setka(fin):
         count_exit = sys.max_player // syst.total_group
 
         mesto_first_poseva = sys.mesta_exit
-        # mesto_second_poseva = mesto_first_poseva + 1
-        # mesto_third_poseva = mesto_first_poseva + 2
-        # mesto_fourth_poseva = mesto_first_poseva + 3
-
-    # posev_data = choice_setka_automat(count_exit)    
-
-    # if count_exit == 1:
-    #     mesto_first_poseva
-    #     choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-    # elif count_exit == 2:
-    #     choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-    #     choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
-    #     # first_number = [1, 16, 8, 9, 4, 5, 12, 13]
-    #     # second_number = [10, 3, 11, 7, 14, 15, 2, 6]
-    #     # count_sec_num = len(second_number)
-    # elif count_exit == 3:
-    #     choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-    #     choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
-    #     choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
-    # elif count_exit == 4:
-    #     choice_first = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva)  # меств в группе для посева
-    #     choice_second = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_second_poseva)
-    #     choice_third = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_third_poseva)  # меств в группе для посева
-    #     choice_fourth = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_fourth_poseva)
-
-        # posev_data = choice_setka_automat(fin, count_exit, choice_first, choice_second, choice_third, choice_fourth)
         posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
-        # print(posev)
-
-    #     first_number = [1, 32, 16, 17, 8, 9, 24, 25]
-    #     second_number = [4, 29, 12, 20, 5, 28, 13, 21]
-    #     third_number = [3, 30, 11, 19, 6, 27, 14, 22]
-    #     fourth_number = [2, 31, 15, 18, 7, 10, 23, 26]
 
     #     count_sec_num = len(second_number)
     #     count_third_num = len(third_number)
@@ -7776,62 +7737,7 @@ def player_choice_in_setka(fin):
     posev_data = []
     for key in posev.keys():
         posev_data.append({'посев': key, 'фамилия': posev[key]})
-        # i += 1
-    # if count_exit == 2:
-    #     i = 0
-    #     for posev in choice_second:
-    #         player = Player.get(Player.player == posev.family)
-    #         city = player.city
-    #         second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
-    #         i += 1
-    #     if i != count_sec_num:
-    #         no_gamer = second_number[i:]
-    #         for m in no_gamer:
-    #             second_posev.append({'посев': m, 'фамилия': 'bye'})
-    #     posev_data = first_posev + second_posev
-    # elif count_exit == 3:
-    #     i = 0
-    #     for posev in choice_second:
-    #         player = Player.get(Player.player == posev.family)
-    #         city = player.city
-    #         second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
-    #         i += 1
-    #     i = 0    
-    #     for posev in choice_third:
-    #         player = Player.get(Player.player == posev.family)
-    #         city = player.city
-    #         third_posev.append({'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
-    #         i += 1
-    #     if i != count_third_num:
-    #         no_gamer = third_number[i:]
-    #         for m in no_gamer:
-    #             third_posev.append({'посев': m, 'фамилия': 'bye'})
-    #     posev_data = first_posev + second_posev + third_posev
-    # elif count_exit == 4:
-    #     i = 0
-    #     for posev in choice_second:
-    #         player = Player.get(Player.player == posev.family)
-    #         city = player.city
-    #         second_posev.append({'посев': second_number[i], 'фамилия': f'{posev.family}/ {city}'})
-    #         i += 1
-    #     i = 0
-    #     for posev in choice_third:
-    #         player = Player.get(Player.player == posev.family)
-    #         city = player.city
-    #         third_posev.append({'посев': third_number[i], 'фамилия': f'{posev.family}/ {city}'})
-    #         i += 1
-    #     i = 0
-    #     for posev in choice_fourth:
-    #         player = Player.get(Player.player == posev.family)
-    #         city = player.city
-    #         fourth_posev.append({'посев': fourth_number[i], 'фамилия': f'{posev.family}/ {city}'})
-    #         i += 1
-    #     if i != count_fourth_num:
-    #         no_gamer = fourth_number[i:]
-    #         for m in no_gamer:
-    #             fourth_posev.append({'посев': m, 'фамилия': 'bye'})
-    #     posev_data = first_posev + second_posev + third_posev + fourth_posev
-
+   
     # сортировка (списка словарей) по ключу словаря -посев-
     posev_data = sorted(posev_data, key=lambda i: i['посев'])
     with db:  # записывает в db, что жеребьевка произведена
