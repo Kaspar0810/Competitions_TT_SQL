@@ -4222,10 +4222,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             posev_all.append(posev_3)
             posev_all.append(posev_4) 
 
-    for n in range (0, count_exit):
-        # choice_posev = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_first_poseva + n)
+    for n in range (0, count_exit): # начало основного посева
         choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
-        
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
@@ -4249,14 +4247,17 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
         for k in full_posev:
             k.remove(k[3])
-    # ======== начало жеребьевки =========
+        # ======== начало жеребьевки =========
         end = 32 // count_exit
         for i in range(0, end):
             number_posev.append(i)
 
-        posev = posev_all[n]
-        count_posev = len(posev)
+        if n == 0:
+            posev = posev_1
+        elif n == 1:
+            posev = posev_2
 
+        count_posev = len(posev)
         for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
             current_region_posev.clear()
             sev_tmp = posev[i].copy()
@@ -4474,8 +4475,11 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                             np= [i for i in number_posev if i >= 29 and i <= 32]
                         elif k >= 29: # в первой четверти (29-32)
                             np = [i for i in number_posev if i >= 25 and i <= 28]
-                        if len(np) != 0:
+                        if len(np) == 1:
                             number_tmp.append(np[0]) 
+                        if len(np) > 1:
+                            for y in np:
+                                number_tmp.append(y)
                     number_posev.clear()
                     number_posev = number_tmp.copy() 
             possible_number[reg] = number_posev 
