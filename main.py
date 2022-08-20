@@ -4256,6 +4256,10 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             posev = posev_1
         elif n == 1:
             posev = posev_2
+        elif n == 2:
+            posev = posev_3
+        elif n == 3:
+            posev = posev_4
 
         count_posev = len(posev)
         for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
@@ -4296,7 +4300,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                         if n != 0 or (n == 0 and l > 1):
                         # =========== определения кол-во возможный вариантов посева у каждого региона
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, l, n, sev, num_id_player)
-                            if i != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
+                            if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                                 num_posev = list(possible_number.keys())   
                             l = list(possible_number.keys())[0]
@@ -4348,7 +4352,6 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
     proba_possible = {} 
     num_tmp = []
     reg_tmp = []
-    # sev_tmp = sev.copy()
     current_region = list(current_region_posev.values())
     y = 0
     for reg in current_region_posev.keys():
@@ -4456,7 +4459,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                         number_posev = [i for i in number_posev if i > 24] # номера 25-32
                     elif num_tmp[0] >= 25 and num_tmp[0] <= 32: # в первой четверти (25-32)
                         number_posev = [i for i in number_posev if i > 16 and i < 25] # номера 17-24
-                elif count > 1 or n > 1:
+                elif count > 1 or n >= 1:
                     number_tmp = []
                     for k in num_tmp:
                         if k <= 4: # в первой четверти (1-4)
@@ -4478,8 +4481,8 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                         if len(np) == 1:
                             number_tmp.append(np[0]) 
                         if len(np) > 1:
-                            for y in np:
-                                number_tmp.append(y)
+                            for v in np:
+                                number_tmp.append(v)
                     number_posev.clear()
                     number_posev = number_tmp.copy() 
             possible_number[reg] = number_posev 
