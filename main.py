@@ -4330,7 +4330,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 id_region.append(region)
                 id_region.append(gr)
                 num_id_player[num_set] = id_region
-
+                # ======== модуль удаления посеянных номеров =========
                 if count_sev > 1:
                     c = len(current_region_posev)
                     if c != 0:
@@ -4375,7 +4375,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                 count = reg_tuple.count(cur_reg) # количество регионов уже посеянных 
                 if count == 1: # значит только один регион в посеве
                     cur_gr = current_region[y][1]
-                    number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev)
+                    number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net)
                     possible_number[reg] = number_posev
                 else: # если есть уже областей более двух
                     number_tmp = []
@@ -4388,16 +4388,28 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                             num_tmp.append(set_number)
                         start += 1
                     if count == 2:
-                        for h in num_tmp:
-                            if h <= 8: # если номер в сетке вверху, то наде сеять вниз
-                                f = [i for i in sev if i >= 9 and i <= 16] # отсеивает в списке номера 9-16
-                            elif h > 8 and h < 17: 
-                                f = [i for i in sev if i < 9] # отсеивает в списке номера 1-8
-                            elif h >= 17 and h < 25: 
-                                f = [i for i in sev if i > 24] # отсеивает в списке номера 25-32
-                            elif h > 24: 
-                                f = [i for i in sev if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
-                            number_tmp += f
+                        if player_net == 16:
+                            for h in num_tmp:
+                                if h <= 4: # если номер в сетке вверху, то наде сеять вниз
+                                    f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 9-16
+                                elif h > 4 and h < 9: 
+                                    f = [i for i in sev if i < 5] # отсеивает в списке номера 1-8
+                                elif h >= 9 and h < 13: 
+                                    f = [i for i in sev if i > 12] # отсеивает в списке номера 25-32
+                                elif h > 12: 
+                                    f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
+                                number_tmp += f
+                        elif player_net == 32:
+                            for h in num_tmp:
+                                if h <= 8: # если номер в сетке вверху, то наде сеять вниз
+                                    f = [i for i in sev if i >= 9 and i <= 16] # отсеивает в списке номера 9-16
+                                elif h > 8 and h < 17: 
+                                    f = [i for i in sev if i < 9] # отсеивает в списке номера 1-8
+                                elif h >= 17 and h < 25: 
+                                    f = [i for i in sev if i > 24] # отсеивает в списке номера 25-32
+                                elif h > 24: 
+                                    f = [i for i in sev if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
+                                number_tmp += f
                     elif count > 2:
                         set_dawn = 0
                         set_up = 0
@@ -6502,13 +6514,6 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 69
         column_last = 11
         row_end = 65
-        # column = [[49, 50, 51, 52, 53, 54, 55, 56, 69, 70, 71, 72, 77, 78], 
-        # [17, 18, 19, 20, 21, 22, 23, 24, 37, 38, 39, 40, 57, 58, 59, 60, 73, 74], 
-        # [25, 26, 27, 28, 33, 34, 41, 42, 45, 46, 61, 62, 65, 66],
-        # [29, 30]]
-                 # ======= list mest
-        # mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
-        #                 64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
         row_num_win = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
         24: [59, 63], 25: [5, 13], 26: [21, 29], 27: [37, 45], 28: [53, 61], 29: [9, 25], 30:[41, 57], 31: [17, 49], 
         35: [72, 76], 41: [89, 93], 42: [97, 101], 43: [91, 99], 47: [114, 118],  57: [140, 144], 58: [148, 152], 
@@ -6596,7 +6601,6 @@ def write_in_setka(data, fin, first_mesto, table):
             r = str(match[3])
             # ===== определение мест и запись в db
             if i in mesta_list:
-                # index = mesta_list.index(row_rank)
                 index = mesta_list.index(i)
                 mesto = first_mesto + index
                 pl1 = match[1]
