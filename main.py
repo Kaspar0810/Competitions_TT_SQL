@@ -314,6 +314,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         choice_gr_automat()
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
+            if fin is None: # если отмена при выборе жеребьевки
+                return
             sys = System.select().where(System.title_id == title_id())
             system = sys.select().where(System.stage == fin).get()
             type = system.type_table
@@ -3812,44 +3814,42 @@ def filter_fin(pl=False):
     round = my_win.lineEdit_tour.text()
     name = name.title()  # делает Заглавными буквы слов
     played = my_win.comboBox_filter_played_fin.currentText()
-    system = System.select().order_by(System.id).where(
-        System.title_id == title_id())  # находит system id последнего
-
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    filter = Result.select().where(Result.title_id == title_id())
     fin = []
     if final == "Одна таблица":
-        fltr = Result.select().where(Result.title_id == title_id()
+        fltr = filter.select().where(Result.title_id == title_id()
                                      and Result.system_stage == "Одна таблица")
         if final == "Одна таблица" and my_win.comboBox_find_name_fin.currentText() != "":
             if pl == False:
-                fltr = Result.select().where(Result.title_id == title_id() and Result.player1 == name)
+                fltr = filter.select().where(Result.title_id == title_id() and Result.player1 == name)
             else:
-                fltr = Result.select().where(Result.title_id == title_id() and Result.player2 == name)
+                fltr = filter.select().where(Result.title_id == title_id() and Result.player2 == name)
         else:
             if final == "Одна таблица" and played == "все игры" and num_game_fin == "" and round == "":
-                fltr = Result.select().where(Result.system_stage == "Одна таблица")
+                fltr = filter.select().where(Result.system_stage == "Одна таблица")
                 count = len(fltr)
                 my_win.label_38.setText(f'Всего {count} игры')
             elif final == "Одна таблица" and played == "завершенные":
-                fl = Result.select().where(Result.system_stage == "Одна таблица")
+                fl = filter.select().where(Result.system_stage == "Одна таблица")
                 fltr = fl.select().where(Result.winner != "")
                 count = len(fltr)
                 my_win.label_38.setText(f'Сыграно {count} игры')
             elif final == "Одна таблица" and played == "не сыгранные":
-                fltr = Result.select().where(Result.system_stage ==
+                fltr = filter.select().where(Result.system_stage ==
                                              "Одна таблица" and Result.points_win == None)
                 count = len(fltr)
                 my_win.label_38.setText(f'Не сыграно {count} игры')
             elif final == "Одна таблица" and played == "все игры" and num_game_fin == "" and round != "":
-                fl = Result.select().where(Result.system_stage == "Одна таблица")
+                fl = filter.select().where(Result.system_stage == "Одна таблица")
                 fltr = fl.select().where(Result.round == round)
                 count = len(fltr)
                 my_win.label_38.setText(f'Всего {count} игры')
             elif final == "Одна таблица" and played == "все игры" and num_game_fin != "" and round == "":
-                fl = Result.select().where(Result.system_stage == "Одна таблица")
+                fl = filter.select().where(Result.system_stage == "Одна таблица")
                 fltr = fl.select().where(Result.tours == num_game_fin)
     else:
         if final == "все финалы" and played == "все игры" and num_game_fin == "":
-            filter = Result.select().where(Result.title_id == title_id())
             fltr = filter.select().where(Result.system_stage == "Финальный")
             if name == "":
                 count = len(fltr)
@@ -3858,7 +3858,7 @@ def filter_fin(pl=False):
                     my_win.tableWidget.showRow(i)
             else:  # выбор по фамилии спортсмена
                 row = 0
-                fltr = Result.select().where(Result.system_stage == "Финальный")
+                fltr = filter.select().where(Result.system_stage == "Финальный")
                 for result_name in fltr:
                     row += 1
                 if result_name.player1 == name or result_name.player2 == name:
@@ -3867,14 +3867,14 @@ def filter_fin(pl=False):
                     my_win.tableWidget.hideRow(row - 1)
         # один из финалов встречи которые не сыгранные
         elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "":
-            fl = Result.select().where(Result.number_group == final)
+            fl = filter.select().where(Result.number_group == final)
             fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
             count = len(fltr)
             my_win.label_38.setText(
                 f'Всего в {final} не сыгранно {count} игры')
         elif final != "все финалы" and played == "завершенные" and num_game_fin == "":
             fltr_played = []
-            fltr = Result.select().where(Result.number_group == final)
+            fltr = filter.select().where(Result.number_group == final)
             for fl in fltr:
                 if fl.winner is not None:
                     win = fl.winner
@@ -3882,12 +3882,12 @@ def filter_fin(pl=False):
             count_pl = len(fltr_played)
             my_win.label_38.setText(f'Завершено в {final} {count_pl} игры')
         elif final != "все финалы" and played == "все игры" and num_game_fin == "":
-            fltr = Result.select().where(Result.number_group == final)
+            fltr = filter.select().where(Result.number_group == final)
             count = len(fltr)
             my_win.label_38.setText(f'Всего в {final} {count} игры')
         elif final == "все финалы" and played == "завершенные" and num_game_fin == "":
             fltr_played = []
-            fltr = Result.select().where(Result.system_stage == "Финальный")
+            fltr = filter.select().where(Result.system_stage == "Финальный")
             for fl in fltr:
                 if fl.winner is not None:
                     win = fl.winner
@@ -3897,7 +3897,7 @@ def filter_fin(pl=False):
                 f' Всего сыграно во всех финалах {count_pl} игры')
         else:
             if final != "все финалы" and num_game_fin != "":
-                fltr = Result.select().where(Result.number_group == final)
+                fltr = filter.select().where(Result.number_group == final)
             else:
                 for sys in system:  # отбирает финалы с сеткой
                     if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
@@ -3907,7 +3907,7 @@ def filter_fin(pl=False):
                             fin.append(sys.stage)
                 fin, ok = QInputDialog.getItem(
                     my_win, "Финалы", "Выберите финал, где искать номер встречи.", fin, 0, False)
-                fltr = Result.select().where(Result.number_group == fin)
+                fltr = filter.select().where(Result.number_group == fin)
             row = 0
             for result_list in fltr:
                 row += 1
@@ -4194,8 +4194,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     #===================================
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == fin).get()
-    # max_player = sys.max_player
-    # syst = system.select().where(System.stage == sys.stage_exit).get()
     choice = Choice.select().where(Choice.title_id == title_id())
     type_setka = sys.label_string
     if count_exit == 1:
@@ -4210,12 +4208,10 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13]]
             posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15]]
             player_net = 16
-            # posev_all = [posev_1 + posev_2]
         elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
             posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29]]
             posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
             player_net = 32
-            # posev_all = [posev_1 + posev_2]
     elif count_exit == 3:
         pass
     elif count_exit == 4:
@@ -4225,17 +4221,18 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             posev_3 = [[3, 6, 11, 14]]
             posev_4 = [[2, 7, 10, 15]]
             player_net = 16
-            # posev_all = [posev_1 + posev_2 + posev_3 + posev_4]
         elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
             posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25]]
             posev_2 = [[4, 5, 12, 13, 20, 21, 28, 29]]
             posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
             posev_4 = [[2, 7, 10, 15, 18, 23, 26, 31]]
             player_net = 32
-            # posev_all = [posev_1 + posev_2 + posev_3 + posev_4]
 
     for n in range (0, count_exit): # начало основного посева
-        choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
+        if fin == "1-й финал":
+            choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
+        else:
+            choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
@@ -4257,6 +4254,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             psv.append(city)
             full_posev.append(psv)
             full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
+        if fin != "1-й финал":
+            full_posev.sort(key=lambda k: k[0], reverse=True) # сортировка списка участников по рейтингу
         for k in full_posev:
             k.remove(k[3])
         # ======== начало жеребьевки =========
@@ -4310,7 +4309,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                             reg_last.append(v[1]) # список уже посеянных регионов
                             group_last.append(v[2]) # список номеров групп уже посеянных
                         if n != 0 or (n == 0 and l > 1):
-                        # =========== определения кол-во возможный вариантов посева у каждого региона
+            # =========== определения кол-во возможный вариантов посева у каждого региона
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
@@ -4330,7 +4329,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 id_region.append(region)
                 id_region.append(gr)
                 num_id_player[num_set] = id_region
-                # ======== модуль удаления посеянных номеров =========
+            # ======== модуль удаления посеянных номеров =========
                 if count_sev > 1:
                     c = len(current_region_posev)
                     if c != 0:
@@ -4387,54 +4386,91 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                             set_number = number_last[index] # номер где уже посеянна такая же область
                             num_tmp.append(set_number)
                         start += 1
-                    if count == 2:
-                        if player_net == 16:
+                    if count % 2 == 0:
+                        if count == 2: # посеяны 2 области разводит по четвертям
                             for h in num_tmp:
-                                if h <= 4: # если номер в сетке вверху, то наде сеять вниз
-                                    f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 9-16
-                                elif h > 4 and h < 9: 
-                                    f = [i for i in sev if i < 5] # отсеивает в списке номера 1-8
-                                elif h >= 9 and h < 13: 
-                                    f = [i for i in sev if i > 12] # отсеивает в списке номера 25-32
-                                elif h > 12: 
-                                    f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
+                                if h <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз
+                                    f = [i for i in sev if i >= player_net // 4 + 1 and i <= player_net // 2] # отсеивает в списке номера 9-16
+                                elif h > player_net // 4 and h < player_net // 2 + 1: 
+                                    f = [i for i in sev if i < player_net // 4 + 1] # отсеивает в списке номера 1-8
+                                elif h >= player_net // 2 + 1 and h < int(player_net * 0.75 + 1): 
+                                    f = [i for i in sev if i > player_net * 0.75] # отсеивает в списке номера 25-32
+                                elif h > player_net * 0.75: 
+                                    f = [i for i in sev if i >= player_net // 2 + 1 and i <= int(player_net * 0.75)] # отсеивает в списке номера 17-24
                                 number_tmp += f
-                        elif player_net == 32:
-                            for h in num_tmp:
-                                if h <= 8: # если номер в сетке вверху, то наде сеять вниз
-                                    f = [i for i in sev if i >= 9 and i <= 16] # отсеивает в списке номера 9-16
-                                elif h > 8 and h < 17: 
-                                    f = [i for i in sev if i < 9] # отсеивает в списке номера 1-8
-                                elif h >= 17 and h < 25: 
-                                    f = [i for i in sev if i > 24] # отсеивает в списке номера 25-32
-                                elif h > 24: 
-                                    f = [i for i in sev if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
-                                number_tmp += f
+                        elif count == 4: # посеяны 4 области разводит по восьмушкам
+                            if player_net == 16:
+                                for h in num_tmp:
+                                    if h <= 2: # если номер в сетке 1-2
+                                        f = [i for i in sev if i >= 3 and i <= 4] # отсеивает в списке номера 3-4 ()
+                                    elif h >= 3 and h <= 4: # если номер в сетке 3-4
+                                        f = [i for i in sev if i < 3] # отсеивает в списке номера 1-2 ()
+                                    elif h >= 5 and h <= 6: # если номер в сетке 5-6
+                                        f = [i for i in sev if i >= 7 and i <= 8] # отсеивает в списке номера 25-32
+                                    elif h >= 7 and h <= 8: # если номер в сетке 7-8
+                                        f = [i for i in sev if i >= 5 and i <= 6] # отсеивает в списке номера 17-24
+                                    elif h >= 9 and h <= 10: # если номер в сетке вверху, то наде сеять вниз
+                                        f = [i for i in sev if i >= 11 and i <= 12] # отсеивает в списке номера 9-16
+                                    elif h >= 11 and h <= 12: 
+                                        f = [i for i in sev if i <= 9 and i <= 10] # отсеивает в списке номера 1-8
+                                    elif h >= 13 and h <= 14: 
+                                        f = [i for i in sev if i > 14] # отсеивает в списке номера 25-32
+                                    elif h > 14: 
+                                        f = [i for i in sev if i >= 12 and i <= 13] # отсеивает в списке номера 17-24    
+                                    number_tmp += f
+                            elif player_net == 32:
+                                for h in num_tmp:
+                                    if h <= player_net // 8: # если номер в сетке вверху, то наде сеять вниз
+                                        f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 3-4 ()
+                                    elif h >= 5 and h <= 8: 
+                                        f = [i for i in sev if i < 5] # отсеивает в списке номера 1-2 ()
+                                    elif h >= 9 and h <= 12: 
+                                        f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
+                                    elif h >= 13 and h <= 16: 
+                                        f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
+                                    elif h >= 17 and h <= 20: # если номер в сетке вверху, то наде сеять вниз
+                                        f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
+                                    elif h >= 21 and h <= 24: 
+                                        f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
+                                    elif h >= 25 and h <= 28: 
+                                        f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
+                                    elif h > 28: 
+                                        f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
+                                    number_tmp += f
                     elif count > 2:
                         set_dawn = 0
                         set_up = 0
                         for z in num_tmp: # определяет количество сеящейся области внизу и вверху сетки
-                            if z < 17:
+                            if z < player_net // 2 + 1:
                                 set_dawn += 1 # количество в вверхней половине сетка
                             else:
                                 set_up += 1
-                        if count // 2 != 0: # отбирает нечетные числа
+                        if count % 2 != 0: # отбирает нечетные числа
                             if set_dawn > set_up:
-                                sev_tmp = [i for i in sev if i > 32 // 2] # отсеивает в списке номера больше 16
-                                h = [i for i in num_tmp if i > 32 // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
+                                sev_tmp = [i for i in sev if i > player_net // 2] # отсеивает в списке номера больше 16
+                                h = [i for i in num_tmp if i > player_net // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
                             else: 
-                                sev_tmp = [i for i in sev if i <= 32 // 2] # отсеивает в списке номера больше 16 
-                                h = [i for i in num_tmp if i <= 32 // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
+                                sev_tmp = [i for i in sev if i <= player_net // 2] # отсеивает в списке номера больше 16 
+                                h = [i for i in num_tmp if i <= player_net // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
                             h = h[0]
-
-                            if h <= 8: # если номер в сетке вверху, то наде сеять вниз
-                                number_tmp = [i for i in sev_tmp if i >= 9 and i <= 16] # отсеивает в списке номера 9-16
-                            elif h > 8 and h < 17: 
-                                number_tmp = [i for i in sev_tmp if i < 9] # отсеивает в списке номера 1-8
-                            elif h >= 17 and h < 25: 
-                                number_tmp = [i for i in sev_tmp if i > 24] # отсеивает в списке номера 25-32
-                            elif h > 24: 
-                                number_tmp = [i for i in sev_tmp if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
+                            # ==== new
+                            if h <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз
+                                number_tmp = [i for i in sev_tmp if i >= player_net // 4 + 1 and i <= player_net // 2] # отсеивает в списке номера 9-16
+                            elif h > player_net // 4 and h < player_net // 2 + 1: 
+                                number_tmp = [i for i in sev_tmp if i < player_net // 2 + 1] # отсеивает в списке номера 1-8
+                            elif h >= player_net // 2 + 1 and h < int(player_net * 0.75 + 1): 
+                                number_tmp = [i for i in sev_tmp if i > int(player_net * 0.75)] # отсеивает в списке номера 25-32
+                            elif h > int(player_net * 0.75): 
+                                number_tmp = [i for i in sev_tmp if i >= player_net // 2 + 1 and i <= int(player_net * 0.75)] # отсеивает в списке номера 17-24
+                            # ========
+                            # if h <= 8: # если номер в сетке вверху, то наде сеять вниз
+                            #     number_tmp = [i for i in sev_tmp if i >= 9 and i <= 16] # отсеивает в списке номера 9-16
+                            # elif h > 8 and h < 17: 
+                            #     number_tmp = [i for i in sev_tmp if i < 9] # отсеивает в списке номера 1-8
+                            # elif h >= 17 and h < 25: 
+                            #     number_tmp = [i for i in sev_tmp if i > 24] # отсеивает в списке номера 25-32
+                            # elif h > 24: 
+                            #     number_tmp = [i for i in sev_tmp if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
 
                     number_posev = number_tmp.copy()
                     possible_number[reg] = number_posev
@@ -4728,7 +4764,8 @@ def choice_setka(fin):
                                               and Game_list.number_group == fin)
         for i in del_choice:
             i.delete_instance()  # удаляет строки финала (fin) из таблицы -Game_list
-        del_result = Result.select().where(Result.number_group == fin)
+        
+        del_result = Result.select().where(Result.title_id == title_id() and Result.number_group == fin)
         for i in del_result:
             i.delete_instance()  # удаляет строки финала (fin) из таблицы -Result-
         # ========= рано отмечает, что сделана жеребьевка
@@ -7664,14 +7701,13 @@ def player_choice_in_setka(fin):
     p_stage = []
 
     system = System.select().where(System.title_id == title_id())
-    # choice = Choice.select().where(Choice.title_id == title_id())  # отбирает все записи жеребьевки данныж соревнований
     # =================
     stage = fin
     flag = ready_choice(stage)
     if flag is False:
         for t in system:
             if t.stage == "Предварительный":
-                p_stage.append(t.stage)
+                p_stage.append(t.stage)               
             elif t.stage == "Полуфиналы":
                 p_stage.append(t.stage)
         count = len(p_stage)
@@ -7681,33 +7717,34 @@ def player_choice_in_setka(fin):
             if ok:
                 pass
         else:  # выходят в финал только из  группового этапа
+            mp = t.max_player
             kpt, ok = QInputDialog.getInt(my_win, "Места в группе", "Введите место, которoе выходит\n"
-                                          f"из группы в {fin}", value=1)
+                                          f"из группы в {fin}", value=1, min=1, max=mp)
             if ok:
                 sys_tem = system.select().where(System.stage == fin).get()
                 sys = system.select().where(System.stage == "Предварительный").get()
                 count_exit = sys_tem.max_player // sys.total_group
                 if count_exit == 1:  # если выходит один человек
                     reply = QMessageBox.information(my_win, 'Уведомление',
-                                                    "Из группы выходят спортсмены,\n"
+                                                    "Из группы выходят в " f"{fin} спортсмены,\n"
                                                     "занявшие " f"{kpt} место, все верно?",
                                                     QMessageBox.Yes,
                                                     QMessageBox.Cancel)
                 elif count_exit == 2: # если выходит два человека
                     reply = QMessageBox.information(my_win, 'Уведомление',
-                                                    "Из группы выходят спортсмены,\n"
+                                                    "Из группы выходят в " f"{fin} спортсмены,\n"
                                                     "занявшие " f"{kpt} и {kpt + 1} места, все верно?",
                                                     QMessageBox.Yes,
                                                     QMessageBox.Cancel)
                 elif count_exit == 3:  # если выходит 4 человека
                     reply = QMessageBox.information(my_win, 'Уведомление',
-                                                    "Из группы выходят спортсмены,\n"
+                                                    "Из группы выходят в " f"{fin} спортсмены,\n"
                                                     "занявшие " f"{kpt}, {kpt + 1} и {kpt + 2} места, все верно?",
                                                     QMessageBox.Yes,
                                                     QMessageBox.Cancel)
                 elif count_exit == 4:  # если выходит 4 человека
                     reply = QMessageBox.information(my_win, 'Уведомление',
-                                                    "Из группы выходят спортсмены,\n"
+                                                    "Из группы выходят в " f"{fin} спортсмены,\n"
                                                     "занявшие " f"{kpt}, {kpt + 1}, {kpt + 2} и {kpt + 3} места, все верно?",
                                                     QMessageBox.Yes,
                                                     QMessageBox.Cancel)   
@@ -7727,7 +7764,8 @@ def player_choice_in_setka(fin):
         posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
     else:  # если была произведена жеребьевка
         sys = system.select().where(System.stage == fin).get()
-        syst = sys.select().where(System.stage == sys.stage_exit).get()
+        place_exit = sys.stage_exit       
+        syst = system.select().where(System.stage == place_exit).get()
 
         count_exit = sys.max_player // syst.total_group
 
@@ -7744,9 +7782,10 @@ def player_choice_in_setka(fin):
    
     # сортировка (списка словарей) по ключу словаря -посев-
     posev_data = sorted(posev_data, key=lambda i: i['посев'])
+    sys_tem = system.select().where(System.stage == fin).get()
     with db:  # записывает в db, что жеребьевка произведена
-        sys.choice_flag = True
-        sys.save()
+        sys_tem.choice_flag = True
+        sys_tem.save()
     return posev_data
 
 
