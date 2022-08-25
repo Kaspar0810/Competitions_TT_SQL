@@ -45,7 +45,7 @@ def print_hi(name):
     print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    print_hi('PyCharm and Alex')
 
 # from playhouse.sqlite_ext import SqliteExtDatabase, backup_to_file, backup
 
@@ -4179,7 +4179,6 @@ def choice_gr_automat():
 def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     """автоматическая жеребьевка сетки""" 
     full_posev = []  # список полного списка участников 1-ого посева
-    # posev_all = []
     group_last = []
     number_last = [] # посеянные номера в сетке
     reg_last = []  # посеянные регионы в сетке
@@ -4477,7 +4476,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
             else:
                 possible_number[reg] = sev
         else: # 2-й посев и последующие 
-            number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev) # возможные номера после ухода от своей группы
+            number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы
             number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n)
             reg_tmp.clear()
             for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
@@ -6530,7 +6529,7 @@ def mesto_in_final(fin):
 
 
 def write_in_setka(data, fin, first_mesto, table):
-    """функция заполнения сетки результатами встреч"""
+    """функция заполнения сетки результатами встреч data поступает чистая только номера в сетке, дальше идет заполнение игроками и счетом"""
     sender = my_win.sender()
     row_num_los = {}
     row_end = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
@@ -6599,7 +6598,7 @@ def write_in_setka(data, fin, first_mesto, table):
             col_first = 0
             row_first = 2
             all_list = setka_data_32(fin)
-        id_name_city = all_list[1]
+        # id_name_city = all_list[1]
         id_sh_name = all_list[2]
     tds = all_list[0]  # список фамилия/ город 1-ого посева
   
@@ -6631,9 +6630,9 @@ def write_in_setka(data, fin, first_mesto, table):
             pl_win = match[1]
             pl_los = match[4]
             if pl_win != "bye":
-                id_win = id_sh_name[f"{pl_win}"]
+                id_win = id_sh_name[pl_win]
             if pl_los != "bye":
-                id_los = id_sh_name[f"{pl_los}"]
+                id_los = id_sh_name[pl_los]
             i = int(i)
             r = str(match[3])
             # ===== определение мест и запись в db
