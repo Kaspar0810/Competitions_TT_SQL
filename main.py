@@ -5819,7 +5819,6 @@ def setka_16_full_made(fin):
     for i in range(0, 32, 2):
         y += 1
         data[i][0] = str(y)  # рисует начальные номера таблицы 1-16
-    # data[0][5] = final
     # ========= нумерация встреч сетки ==========
     draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=4, number_of_game=1, player=16, data=data) # рисует номера встреч 1-32
     draw_num(row_n=32, row_step=2, col_n=6, number_of_columns=2, number_of_game=17, player=4, data=data) # рисует номера встреч 1-32
@@ -6600,7 +6599,12 @@ def write_in_setka(data, fin, first_mesto, table):
             all_list = setka_data_32(fin)
         # id_name_city = all_list[1]
         id_sh_name = all_list[2]
-    tds = all_list[0]  # список фамилия/ город 1-ого посева
+    tds = []
+    tds.append(all_list[0]) # список фамилия/ город 1-ого посева
+    tds.append(id_sh_name)
+    #========
+    # tds_new = all_list
+    #========
   
     for d in range(col_first, column_last, 2):
         for r in range(row_first, row_last):
@@ -6816,17 +6820,37 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     return tdt_tmp
 
 
+
+def setka_player_after_choice(fin):
+    """список игроков сетки после жеребьевки"""
+    p_data = {}
+    posev_data = []
+    # system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    game_list = Game_list.select().where(Game_list.title_id == title_id())
+    pl_list = game_list.select().where(Game_list.number_group == fin)
+    for i in pl_list:
+        p_data['посев'] = i.rank_num_player
+        p_data['фамилия'] = i.player_group_id
+        tmp = p_data.copy()
+        posev_data.append(tmp)
+        p_data.clear()
+    return posev_data
+
+
+
 def setka_data_16(fin):
     """данные сетки на 16"""
     id_ful_name = {}
     id_name = {}
+    tds = []
+    all_list = []
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     for sys in system:  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
             mp = sys.max_player
-    tds = []
-    all_list = []
+    # posev_data = setka_player_after_choice(fin)
     posev_data = player_choice_in_setka(fin)  # посев
+
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
@@ -6897,9 +6921,12 @@ def full_player_id(family):
     """получает словарь -фамилия игрока и его город и соответствующий ему id в таблице Players"""
     full_name = {}
     short_name = {}
-    # получение id последнего соревнования
-    t = Title.select().order_by(Title.id.desc()).get()
-    plr = Player.get(Player.title_id == t and Player.full_name == family)
+ 
+    player = Player.select().where(Player.title_id == title_id())
+    space_mark = family.find("/")  # находит косую черту отделяющий город и игрока
+    player_in_net = family[:space_mark]
+    plr = player.select().where(Player.player == player_in_net).get()
+
     id_player = plr.id
     city = plr.city
     name = plr.player
@@ -7703,7 +7730,7 @@ def player_choice_in_setka(fin):
     # =================
     stage = fin
     flag = ready_choice(stage)
-    if flag is False:
+    if flag is False: # если жеребьевка еще не сделана
         for t in system:
             if t.stage == "Предварительный":
                 p_stage.append(t.stage)               
@@ -8341,7 +8368,7 @@ def tours_list(cp):
 
 # def proba():
 #     """добавление столбца в существующую таблицу"""
-#
+
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
 #     short_name_comp = CharField(default='')
