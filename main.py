@@ -2359,20 +2359,29 @@ def player_in_setka(fin):
     sd = []
     # создание сетки со спортсменами согласно жеребьевки
     if tabel_string == "Сетка (с розыгрышем всех мест) на 16 участников":
-        tds = setka_16_full_made(fin)
+        # tds = setka_16_full_made(fin)
+        tds_new = setka_16_full_made(fin)
     elif tabel_string == "Сетка (с розыгрышем всех мест) на 32 участников":
         tds = setka_32_full_made(fin)
-
+    # tds = tds_new[0]
+    tds = tds_new[1]
+    
     for r in tds:
         if r != "bye":
-            space = r.find(" ")  # находит пробел перед именем
-            symbol = r.find("/")  # находит черту отделяющий город
-            # удаляет все после пробела кроме первой буквы имени
-            sl = r[:space + 2]
-            sl_full = r[:symbol]
-            family = f'{sl}.'  # добавляет точку к имени
+            id_pl = tds[r]
+            family = f'{r}/{id_pl}'  # фамилия игрока и его id
             sd.append(family)
-            sd_full.append(sl_full)
+            sd_full.append(r)
+
+
+            # space = r.find(" ")  # находит пробел перед именем
+            # symbol = r.find("/")  # находит черту отделяющий город
+            # # удаляет все после пробела кроме первой буквы имени
+            # sl = r[:space + 2]
+            # sl_full = r[:symbol]
+            # family = f'{sl}.'  # добавляет точку к имени
+            # sd.append(family)
+            # sd_full.append(sl_full)
         else:
             sd.append(r)
             sd_full.append(r)
@@ -4767,6 +4776,10 @@ def choice_setka(fin):
         del_result = Result.select().where(Result.title_id == title_id() and Result.number_group == fin)
         for i in del_result:
             i.delete_instance()  # удаляет строки финала (fin) из таблицы -Result-
+
+        with db:  # запись в таблицу Choice результата жеребъевки
+            system.choice_flag = False
+            system.save()
         # ========= рано отмечает, что сделана жеребьевка
     player_in_setka(fin)
     load_tableWidget()
@@ -5944,6 +5957,7 @@ def setka_16_full_made(fin):
     return tds
 
 
+
 def setka_32_made(fin):
     """сетка на 32 с розыгрышем 1-3 места"""
     from reportlab.platypus import Table
@@ -6597,7 +6611,6 @@ def write_in_setka(data, fin, first_mesto, table):
             col_first = 0
             row_first = 2
             all_list = setka_data_32(fin)
-        # id_name_city = all_list[1]
         id_sh_name = all_list[2]
     tds = []
     tds.append(all_list[0]) # список фамилия/ город 1-ого посева
@@ -6616,7 +6629,8 @@ def write_in_setka(data, fin, first_mesto, table):
 
     n = 0
     for t in range(row_first, row_end, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
-        data[t][1] = tds[n]
+        # data[t][1] = tds[n]
+        data[t][1] = tds[0][n]
         n += 1
     # ==============
     if flag_clear is False:
@@ -6825,12 +6839,16 @@ def setka_player_after_choice(fin):
     """список игроков сетки после жеребьевки"""
     p_data = {}
     posev_data = []
-    # system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    player = Player.select().where(Player.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     pl_list = game_list.select().where(Game_list.number_group == fin)
     for i in pl_list:
         p_data['посев'] = i.rank_num_player
-        p_data['фамилия'] = i.player_group_id
+        txt = i.player_group_id
+        line = txt.find("/")  # находит черту отделяющий имя от города
+        id_pl = int(txt[line + 1:])
+        pl = player.select().where(Player.id == id_pl).get()
+        p_data['фамилия'] = pl.full_name
         tmp = p_data.copy()
         posev_data.append(tmp)
         p_data.clear()
@@ -6848,8 +6866,11 @@ def setka_data_16(fin):
     for sys in system:  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
             mp = sys.max_player
-    # posev_data = setka_player_after_choice(fin)
-    posev_data = player_choice_in_setka(fin)  # посев
+            flag = sys.choice_flag
+    if flag == True:
+        posev_data = setka_player_after_choice(fin) # получаем списки участников сетки после жеребьевки
+    else:
+        posev_data = player_choice_in_setka(fin)  # получаем списки участников сетки новой или повторной жеребьевки
 
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
