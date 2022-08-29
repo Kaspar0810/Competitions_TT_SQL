@@ -2362,7 +2362,7 @@ def player_in_setka(fin):
         # tds = setka_16_full_made(fin)
         tds_new = setka_16_full_made(fin)
     elif tabel_string == "Сетка (с розыгрышем всех мест) на 32 участников":
-        tds = setka_32_full_made(fin)
+        tds_new = setka_32_full_made(fin)
     # tds = tds_new[0]
     tds = tds_new[1]
     
@@ -2372,16 +2372,6 @@ def player_in_setka(fin):
             family = f'{r}/{id_pl}'  # фамилия игрока и его id
             sd.append(family)
             sd_full.append(r)
-
-
-            # space = r.find(" ")  # находит пробел перед именем
-            # symbol = r.find("/")  # находит черту отделяющий город
-            # # удаляет все после пробела кроме первой буквы имени
-            # sl = r[:space + 2]
-            # sl_full = r[:symbol]
-            # family = f'{sl}.'  # добавляет точку к имени
-            # sd.append(family)
-            # sd_full.append(sl_full)
         else:
             sd.append(r)
             sd_full.append(r)
@@ -3510,26 +3500,27 @@ def enter_score(none_player=0):
         result.save()
 
     if tab == 5:  # записывает в -Result- сыгранный матч со сносками на соответствующие строки победителя и проигравшего
+
         if type == "сетка":
             vid_setki = system.label_string  # вид сетки и кол-во участников
             # список 1-й номер победителя 2-й проигравшего
             snoska = numer_game(num_game, vid_setki)
-
+            res = Result.select().where(Result.title_id == title_id())
+            results = res.select().where(Result.number_group == fin)
             if snoska[0] != 0:
                 with db:  # записывает в db таблицу Result победителя и проигравшего
                     player = winner
+                    match_num = result.tours  # номер встречи
+                    game = snoska[2] * -1
                     for k in range(0, 2):
-                        match_num = result.tours  # номер встречи
-                        game = snoska[2] * -1
                         if int(match_num) == game:
-                            res_id = result.select().where(Result.tours == snoska[k]).get()
+                            res_id = results.select().where(Result.tours == snoska[k]).get()
                             if int(match_num) % 2 != 0:
                                 res_id.player1 = player
                             else:
                                 res_id.player2 = player
                             res_id.save()
                             player = loser
-                            # break
         elif type == "круг":
             pass
     fill_table_results()
@@ -5957,7 +5948,6 @@ def setka_16_full_made(fin):
     return tds
 
 
-
 def setka_32_made(fin):
     """сетка на 32 с розыгрышем 1-3 места"""
     from reportlab.platypus import Table
@@ -5997,12 +5987,13 @@ def setka_32_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    all_list = setka_data_clear(fin)
-    tds = all_list[0]
-    for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
-        n = i - (i // 2)
-        data[i][1] = tds[n]
+    # all_list = setka_data_clear(fin)
+    # tds = all_list[0]
+    # for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
+    #     n = i - (i // 2)
+    #     data[i][1] = tds[n]
     # ==============
+    tds = write_in_setka(data, fin, first_mesto, table)
     cw = ((0.2 * cm, 3.8 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm, 2.7 * cm, 0.35 * cm,
         2.5 * cm, 0.35 * cm, 3.0 * cm, 0.3 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
@@ -6379,11 +6370,12 @@ def setka_32_2_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    all_list = setka_data_clear(fin)
-    tds = all_list[0]
-    for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
-        n = i - (i // 2)
-        data[i][1] = tds[n]
+    # all_list = setka_data_clear(fin)
+    # tds = all_list[0]
+    # for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
+    #     n = i - (i // 2)
+    #     data[i][1] = tds[n]
+    tds = write_in_setka(data, fin, first_mesto, table)
     # ==============
     cw = ((0.2 * cm, 3.5 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm,
         2.4 * cm, 0.35 * cm, 2.6 * cm, 0.35 * cm))
@@ -6834,7 +6826,6 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     return tdt_tmp
 
 
-
 def setka_player_after_choice(fin):
     """список игроков сетки после жеребьевки"""
     p_data = {}
@@ -6853,7 +6844,6 @@ def setka_player_after_choice(fin):
         posev_data.append(tmp)
         p_data.clear()
     return posev_data
-
 
 
 def setka_data_16(fin):
@@ -6907,9 +6897,14 @@ def setka_data_32(fin):
     for sys in system:  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
             mp = sys.max_player
+            flag = sys.choice_flag
     tds = []
     all_list = []
-    posev_data = player_choice_in_setka(fin)  # посев
+    if flag == True:
+        posev_data = setka_player_after_choice(fin) # получаем списки участников сетки после жеребьевки
+    else:
+        posev_data = player_choice_in_setka(fin)  # получаем списки участников сетки новой или повторной жеребьевки
+
 
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
@@ -8263,7 +8258,6 @@ def last_competition():
                 my_win.fifth_comp_Action.setText("Пусто")
         i += 1
     # go_to()
-
 
 def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
