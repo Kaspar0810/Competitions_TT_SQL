@@ -4,7 +4,7 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-from curses import KEY_RIGHT
+# from curses import KEY_RIGHT
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -2359,11 +2359,9 @@ def player_in_setka(fin):
     sd = []
     # создание сетки со спортсменами согласно жеребьевки
     if tabel_string == "Сетка (с розыгрышем всех мест) на 16 участников":
-        # tds = setka_16_full_made(fin)
         tds_new = setka_16_full_made(fin)
     elif tabel_string == "Сетка (с розыгрышем всех мест) на 32 участников":
         tds_new = setka_32_full_made(fin)
-    # tds = tds_new[0]
     tds = tds_new[1]
     
     for r in tds:
@@ -4176,6 +4174,36 @@ def choice_gr_automat():
         group_list.clear()
 
 
+# def timerEvent(self, e):
+
+#         if self.step >= 100:
+#             self.timer.stop()
+#             self.btn.setText('Finished')
+#             return
+
+#         self.step = self.step + 1
+#         self.pbar.setValue(self.step)
+
+
+# def doAction(self):
+
+#         if self.timer.isActive():
+#             self.timer.stop()
+#             self.btn.setText('Start')
+#         else:
+#             self.timer.start(100, self)
+#             self.btn.setText('Stop')
+
+def progress_bar(step, player_net):
+    """прогресс бар""" 
+    msgBox = QMessageBox 
+    patch = step 
+    my_win.progressBar.setValue(patch)
+    if patch == player_net:
+        msgBox.information(my_win, "Уведомление", "Жеребьевка завершена, проверьте ее результаты!")
+        my_win.progressBar.clear()
+
+
 def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     """автоматическая жеребьевка сетки""" 
     full_posev = []  # список полного списка участников 1-ого посева
@@ -4226,7 +4254,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
             posev_4 = [[2, 7, 10, 15, 18, 23, 26, 31]]
             player_net = 32
-
+    s = 0
     for n in range (0, count_exit): # начало основного посева
         if fin == "1-й финал":
             choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
@@ -4346,6 +4374,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 number_posev.remove(l)
                 if i != 0:
                     num_posev.remove(l)
+                s  += 1   
+                step = player_net / 100 * s
+                progress_bar(step, player_net)
                 
         for i in num_id_player.keys():
             tmp_list = list(num_id_player[i])
@@ -4753,7 +4784,7 @@ def posev_test(posev, group, m):
 
 
 def choice_setka(fin):
-    """проба жеребьевки сетки на 16"""
+    """жеребьевки сетки"""
     sys = System.select().where(System.title_id == title_id())  # находит system id последнего
     system = sys.select().where(System.stage == fin).get()
 
@@ -6607,10 +6638,7 @@ def write_in_setka(data, fin, first_mesto, table):
     tds = []
     tds.append(all_list[0]) # список фамилия/ город 1-ого посева
     tds.append(id_sh_name)
-    #========
-    # tds_new = all_list
-    #========
-  
+ 
     for d in range(col_first, column_last, 2):
         for r in range(row_first, row_last):
             key = data[r][d]
@@ -6621,7 +6649,6 @@ def write_in_setka(data, fin, first_mesto, table):
 
     n = 0
     for t in range(row_first, row_end, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
-        # data[t][1] = tds[n]
         data[t][1] = tds[0][n]
         n += 1
     # ==============
@@ -8505,7 +8532,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(proba)
+my_win.Button_proba.clicked.connect(progress_bar)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
