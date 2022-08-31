@@ -4470,40 +4470,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                                     number_tmp += f
                     elif count > 2:
                         number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
-                        # set_dawn = 0
-                        # set_up = 0
-                        # for z in num_tmp: # определяет количество сеящейся области внизу и вверху сетки
-                        #     if z < player_net // 2 + 1:
-                        #         set_dawn += 1 # количество в вверхней половине сетка
-                        #     else:
-                        #         set_up += 1
-                        # if count % 2 != 0: # отбирает нечетные числа
-                            # if set_dawn > set_up:
-                            #     sev_tmp = [i for i in sev if i > player_net // 2] # отсеивает в списке номера больше 16
-                            #     h = [i for i in num_tmp if i > player_net // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
-                            # else: 
-                            #     sev_tmp = [i for i in sev if i <= player_net // 2] # отсеивает в списке номера больше 16 
-                            #     h = [i for i in num_tmp if i <= player_net // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
-                            # h = h[0]
-                            # # ==== new
-                            # if h <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз
-                            #     number_tmp = [i for i in sev_tmp if i >= player_net // 4 + 1 and i <= player_net // 2] # отсеивает в списке номера 9-16
-                            # elif h > player_net // 4 and h < player_net // 2 + 1: 
-                            #     number_tmp = [i for i in sev_tmp if i < player_net // 2 + 1] # отсеивает в списке номера 1-8
-                            # elif h >= player_net // 2 + 1 and h < int(player_net * 0.75 + 1): 
-                            #     number_tmp = [i for i in sev_tmp if i > int(player_net * 0.75)] # отсеивает в списке номера 25-32
-                            # elif h > int(player_net * 0.75): 
-                            #     number_tmp = [i for i in sev_tmp if i >= player_net // 2 + 1 and i <= int(player_net * 0.75)] # отсеивает в списке номера 17-24
-                            # ==============================
-                            # if h <= 8: # если номер в сетке вверху, то наде сеять вниз
-                            #     number_tmp = [i for i in sev_tmp if i >= 9 and i <= 16] # отсеивает в списке номера 9-16
-                            # elif h > 8 and h < 17: 
-                            #     number_tmp = [i for i in sev_tmp if i < 9] # отсеивает в списке номера 1-8
-                            # elif h >= 17 and h < 25: 
-                            #     number_tmp = [i for i in sev_tmp if i > 24] # отсеивает в списке номера 25-32
-                            # elif h > 24: 
-                            #     number_tmp = [i for i in sev_tmp if i >= 17 and i <= 24] # отсеивает в списке номера 17-24
-
+                       
                     number_posev = number_tmp.copy()
                     possible_number[reg] = number_posev
             else:
@@ -4534,31 +4501,6 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                         number_posev = [i for i in number_posev if i > 16 and i < 25] # номера 17-24
                 else:            
                     number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
-                # else:
-
-                #     number_tmp = []
-                #     for k in num_tmp:
-                #         if k <= 4: # в первой четверти (1-4)
-                #             np = [i for i in number_posev if i >= 5 and i <= 8]
-                #         elif k >= 5 and k <= 8: # в первой четверти (5-8)
-                #             np = [i for i in number_posev if i >= 1 and i <= 4]
-                #         elif k >= 9 and k <= 12: # в первой четверти (9-12)
-                #             np = [i for i in number_posev if i >= 13 and i <= 16]
-                #         elif k >= 13 and k <= 16: # в первой четверти (13-16)
-                #             np = [i for i in number_posev if i >= 9 and i <= 12]
-                #         elif k >= 17 and k <= 20: # в первой четверти (17-20)
-                #             np = [i for i in number_posev if i >= 21 and i <= 24]
-                #         elif k >= 21 and k <= 24: # в первой четверти (21-24)
-                #             np = [i for i in number_posev if i >= 17 and i <= 20]
-                #         elif k >= 25 and k <= 28: # в первой четверти (25-28)
-                #             np= [i for i in number_posev if i >= 29 and i <= 32]
-                #         elif k >= 29: # в первой четверти (29-32)
-                #             np = [i for i in number_posev if i >= 25 and i <= 28]
-                #         if len(np) == 1:
-                #             number_tmp.append(np[0]) 
-                #         if len(np) > 1:
-                #             for v in np:
-                #                 number_tmp.append(v)
                     number_posev.clear()
                     number_posev = number_tmp.copy() 
             possible_number[reg] = number_posev 
@@ -4573,35 +4515,29 @@ def alignment_in_half(player_net, num_tmp, sev, count, number_posev):
     set_dawn = 0
     set_up = 0
     if count % 2 != 0: # нечетное число регионов
-        for z in num_tmp: # определяет количество сеящейся области внизу и вверху сетки           
-            if z < player_net // 2 + 1:
-                set_dawn += 1 # количество в вверхней половине сетке
+        set_up = len([i for i in num_tmp if i <= player_net // 2]) # количество областей в верхней половине сетки
+        set_dawn = count - set_up
+        if set_up != count and set_up != 0:
+            if set_dawn < set_up: # сначала отсеиваем номера по поливинам сетки
+                sev_tmp = [i for i in sev if i > player_net // 2] # отсеивает в списке номера больше 16
+                h = [i for i in num_tmp if i > player_net // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
+            else: 
+                sev_tmp = [i for i in sev if i <= player_net // 2] # отсеивает в списке номера больше 16 
+                h = [i for i in num_tmp if i <= player_net // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
+        else: # если все номера в одной половине то разделяет на четверти
+            m_number = max(num_tmp)
+            if m_number <= player_net // 2:
+                sev_tmp = [i for i in sev if i <= player_net // 2] # отсеивает в списке номера больше 16
+                h = [i for i in num_tmp if i <= player_net // 4] # отсеивает в списке номера больше 16
             else:
-                set_up += 1
+                sev_tmp = [i for i in sev if i >= player_net // 2] # отсеивает в списке номера больше 16
+                h = [i for i in num_tmp if i >= player_net * 3 / 4] # отсеивает в списке номера больше 16
 
-        if set_dawn == 0  or set_up == 0:
-            set_dawn = 0
-            set_up = 0
-            if z < player_net // 4 + 1:
-                set_dawn += 1 # количество в вверхней половине сетке
-            else:
-                set_up += 1
-
-        if set_dawn > set_up: # сначала отсеиваем номера по поливинам сетки
-            sev_tmp = [i for i in sev if i > player_net // 2] # отсеивает в списке номера больше 16
-            h = [i for i in num_tmp if i > player_net // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
-        else: 
-            sev_tmp = [i for i in sev if i <= player_net // 2] # отсеивает в списке номера больше 16 
-            h = [i for i in num_tmp if i <= player_net // 2] # отсеивает в списке номеров, где есть такаяже область отставляя больше 16
-
-        # if len(h) == 0:
-        #     pass
-        # else:       
         for k in h:       
             if k <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз 1-8 (1-4)
-                np = [i for i in sev_tmp if i >= player_net // 4 + 1 and i <= player_net // 2] # 1-я четверть 32(1-8) 16(1-4)
+                np = [i for i in sev_tmp if i >= player_net // 4 + 1 and i <= player_net // 2] # 1-я четверть 32(9-16) 16(5-8)
             elif k > player_net // 4 and k <= player_net // 2: # 9-16 (5-8)
-                np = [i for i in sev_tmp if i <= player_net // 2] # 2-я четверть 32(9-16) 16(5-8)
+                np = [i for i in sev_tmp if i <= player_net // 4] # 2-я четверть 32(1-8) 16(1-4)
             elif k >= player_net // 2 + 1 and k <= player_net * 3 / 4: # 17-24 (9-12)
                 np = [i for i in sev_tmp if i > player_net * 3 / 4] # 3-я четверть 32(17-24) 16(9-12)
             elif k > player_net * 3 / 4: 
