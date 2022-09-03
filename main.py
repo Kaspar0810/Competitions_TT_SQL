@@ -4513,33 +4513,76 @@ def alignment_in_half(player_net, num_tmp, sev, count, number_posev):
     """выравнивание количество областей по половинам"""
     number_tmp = [] 
     set_dawn = 0
-    set_up = 0
+    upper_half = 0
     su = 0
     sd = 0
-    m_number = max(num_tmp)
+    max_num = max(num_tmp)
+    min_num = min(num_tmp)
     if count % 2 != 0: # нечетное число регионов
-        set_up = len([i for i in num_tmp if i <= player_net // 2]) # количество областей в верхней половине сетки
-        set_dawn = count - set_up
-        if set_up == count or set_dawn == count: # если все области в одной половине сетки         
-            if m_number >= player_net / 2:
-                quarter = int(player_net / 4)
-            else:
-                quarter = int(player_net * 3 / 4)
-            for t in num_tmp:
-                if t <= quarter:
-                    su += 1 # в верхней четверти
+        upper_half = len([i for i in num_tmp if i <= player_net // 2]) # количество областей в верхней половине сетки 1-16
+        set_dawn = count - upper_half
+        if upper_half == count or set_dawn == count: # все области в верху сетки  1-16
+            quarter_num = len([i for i in num_tmp if i <= player_net // 4]) # количество областей в верхней четверти сетки 1-8
+            if quarter_num == count: # все области с 1 по 8
+                if max_num <= 4 and min_num <= 4: # все области с 1 по 4
+                    quarter = 4
+                elif max_num <= 8 and min_num > 4: # все области с 5 по 8
+                    quarter = 8
+                elif max_num <= 12 and min_num > 8: # все области с 9 по 12
+                    quarter = 12
+                elif max_num <= 16 and min_num > 12: # все области с 13 по 16
+                    quarter = 16
+                elif max_num <= 20 and min_num > 16: # все области с 17 по 20
+                    quarter = 20
+                elif max_num <= 24 and min_num > 20: # все области с 21 по 24
+                    quarter = 24
+                elif max_num <= 28 and min_num > 24: # все области с 25 по 28
+                    quarter = 28
+                elif max_num > 28 and min_num > 28: # все области с 29 по 32
+                    quarter = 32
+            else: # 9-16
+
+        #         if max_num <= 8 and min_num <= 8: # все области с 1 по 8
+        #             quarter = 4
+        #         elif max_num <= 16 and min_num > 8: # все области с 9 по 16
+        #             quarter = 12
+        #         elif max_num <= 24 and min_num > 16: # все области с 17 по 24
+        #             quarter = 20
+        #         elif max_num <= 32 and min_num > 24: # все области с 25 по 32
+        #             quarter = 28
+        #         # elif max_num <= 20 and min_num > 16: # все области с 17 по 20
+        #         #     quarter = 20
+        #         # elif max_num <= 24 and min_num > 20: # все области с 21 по 24
+        #         #     quarter = 24
+        #         # elif max_num <= 28 and min_num > 24: # все области с 25 по 28
+        #         #     quarter = 28
+        #         # elif max_num > 28 and min_num > 28: # все области с 29 по 32
+        #         #     quarter = 32
+        # # else:
+        # #     pass
+
+        #     for t in num_tmp:
+        #         if t <= quarter:
+        #             su += 1 # в верхней четверти
+        #         else:
+        #             sd += 1 # в нижней четверти
+                if quarter_num == 0:
+                    sev_tmp = [i for i in number_posev if i > player_net // 4] # отсеивает в списке номера больше 16
+                    set_up = len([i for i in num_tmp if i > player_net // 4]) # количество областей в верхней половине сетки
+                    if set_up < count / 2:
+                        h = [i for i in num_tmp if i <= player_net // 4] # отсеивает в списке номера больше 16
+                    else:
+                        h = [i for i in num_tmp if i > player_net // 4] # отсеивает в списке номера больше 16
+                elif quarter_num == 1:
+                    sev_tmp = [i for i in number_posev if i > player_net // 4] # отсеивает в списке номера больше 16
+                    set_up = len([i for i in num_tmp if i > player_net // 4]) # количество областей в верхней половине сетки
+                    if set_up < count / 2:
+                        h = [i for i in num_tmp if i <= player_net // 4] # отсеивает в списке номера больше 16
+                    else:
+                        h = [i for i in num_tmp if i > player_net // 4] # отсеивает в списке номера больше 16
                 else:
-                    sd += 1 # в нижней четверти
-            if sd > su:
-                sev_tmp = [i for i in number_posev if i <= player_net // 4] # отсеивает в списке номера больше 16
-                set_up = len([i for i in num_tmp if i <= player_net // 4]) # количество областей в верхней половине сетки
-                if set_up < count / 2:
-                    h = [i for i in num_tmp if i <= player_net // 4] # отсеивает в списке номера больше 16
-                else:
-                    h = [i for i in num_tmp if i > player_net // 4] # отсеивает в списке номера больше 16
-            else:
-                sev_tmp = [i for i in number_posev if i > quarter] # отсеивает в списке номера больше 16
-                h = [i for i in num_tmp if i > quarter] # отсеивает в списке номера больше 16
+                    sev_tmp = [i for i in number_posev if i > quarter] # отсеивает в списке номера больше 16
+                    h = [i for i in num_tmp if i > quarter] # отсеивает в списке номера больше 16
         else:             
             for t in num_tmp:
                 if t > player_net / 2:
@@ -8326,7 +8369,7 @@ def last_competition():
             else:
                 my_win.fifth_comp_Action.setText("Пусто")
         i += 1
-    # go_to()
+
 
 def tours_list(cp):
     """туры таблиц по кругу в зависимости от кол-во участников (-cp- + 3) кол-во участников"""
