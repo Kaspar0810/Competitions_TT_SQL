@@ -4469,6 +4469,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                                         f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
                                     number_tmp += f
                     elif count > 2:
+                        number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net)
                         number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
                        
                     number_posev = number_tmp.copy()
