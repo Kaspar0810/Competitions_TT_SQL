@@ -5,6 +5,7 @@
 
 
 # from curses import KEY_RIGHT
+from urllib.parse import MAX_CACHE_SIZE
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -4199,8 +4200,9 @@ def progress_bar(step):
     msgBox = QMessageBox 
     my_win.progressBar.setValue(step)
     if step >= 100:
-       msgBox.information(my_win, "Уведомление", "Жеребьевка завершена, проверьте ее результаты!")
-      
+       result = msgBox.information(my_win, "Уведомление", "Жеребьевка завершена, проверьте ее результаты!", msgBox.Ok)
+       if result == msgBox.Ok:
+            my_win.progressBar.setValue(0)
 
 
 def choice_setka_automat(fin, count_exit, mesto_first_poseva):
@@ -4221,6 +4223,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == fin).get()
     choice = Choice.select().where(Choice.title_id == title_id())
+    max_player = sys.max_player
     type_setka = sys.label_string
     if count_exit == 1:
         if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
@@ -4260,6 +4263,12 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
         else:
             choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
+        count_player_in_final = len(choice_posev)
+        if count_player_in_final != max_player:
+            free_num = free_place_in_setka(max_player, count_player_in_final)
+            for h in free_num:
+                num_id_player[h] = "bye "
+
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
@@ -4387,6 +4396,27 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             posev_data[i] = family_city
     return posev_data
 
+
+def free_place_in_setka(max_player, count_player_in_final):
+    """вычеркиваем свободные номера в сетке"""
+    free_num = []
+    free_number_16 = [2, 15, 7, 10, 6, 11, 3, 14]
+    free_number_24 = [5, 20, 8, 17, 11, 14, 2, 23]
+    free_number_32 = [2, 31, 15, 18, 10, 23, 7, 26, 6, 27, 11, 22, 14, 19, 3, 30]
+    count = max_player - count_player_in_final # кол-во свободных мест
+
+    if max_player == 16:
+        free_number = free_number_16
+    elif max_player == 24:
+        free_number = free_number_24
+    elif max_player == 32:
+        free_number = free_number_32
+
+    for i in range (0, count):
+        k = free_number[i]
+        free_num.append(k)
+    return free_num
+    
 
 def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net):
     """возможные номера посева"""
