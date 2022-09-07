@@ -4267,10 +4267,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
         count_player_in_final = len(choice_posev)
         if count_player_in_final != max_player:
             free_num = free_place_in_setka(max_player, count_player_in_final)
-            for h in free_num:
-                num_id_player[h] = "bye"
             del_num = 1 # флаг, что есть свободные номера
-
+        free_del = 0
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
@@ -4300,9 +4298,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
         end = player_net // count_exit
         for i in range(0, end):
             number_posev.append(i)
-        if del_num == 1:
-            for b in free_num:
-                number_posev.remove(b)
         if n == 0:
             posev = posev_1
         elif n == 1:
@@ -4317,6 +4312,12 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             current_region_posev.clear()
             sev_tmp = posev[i].copy()
             sev = sev_tmp.copy()
+            if i == count_posev - 1 and free_del == 0: # если есть свободные номера их удаляет из посева
+                if del_num == 1:
+                    for b in free_num:
+                        sev.remove(b)
+                        posev[i].remove(b)
+                    free_del = 1
             sev_tmp.clear()
             count = len(posev[i]) # всего количество номеров в посеве
 
@@ -4398,6 +4399,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             pl_id = Player.get(Player.id == id)
             family_city = pl_id.full_name
             posev_data[i] = family_city
+        for h in free_num:
+            posev_data[h] = "bye"
     return posev_data
 
 
@@ -6967,6 +6970,11 @@ def setka_data_16(fin):
             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
             tds.append(family_city)
         else:
+            id_f_name = full_player_id(family)
+            id_f_n = id_f_name[0]
+            id_s_n = id_f_name[1]
+            # словарь ключ - полное имя/ город, значение - id
+            id_ful_name[id_f_n["name"]] = id_f_n["id"]
             tds.append(family)
     all_list.append(tds)
     all_list.append(id_ful_name)
@@ -7022,22 +7030,28 @@ def full_player_id(family):
     """получает словарь -фамилия игрока и его город и соответствующий ему id в таблице Players"""
     full_name = {}
     short_name = {}
- 
+    
     player = Player.select().where(Player.title_id == title_id())
-    space_mark = family.find("/")  # находит косую черту отделяющий город и игрока
-    player_in_net = family[:space_mark]
-    plr = player.select().where(Player.player == player_in_net).get()
+    if family != "bye":
+        space_mark = family.find("/")  # находит косую черту отделяющий город и игрока
+        player_in_net = family[:space_mark]
+        plr = player.select().where(Player.player == player_in_net).get()
 
-    id_player = plr.id
-    city = plr.city
-    name = plr.player
-    space = name.find(" ")  # находит пробел отделяющий имя от фамилии
-    # получает отдельно фамилия и первую букву имени
-    family_slice = name[:space + 2]
-    full_name["name"] = f"{family_slice}./ {city}"
-    full_name["id"] = id_player
-    short_name["name"] = f"{family_slice}."
-    short_name["id"] = id_player
+        id_player = plr.id
+        city = plr.city
+        name = plr.player
+        space = name.find(" ")  # находит пробел отделяющий имя от фамилии
+        # получает отдельно фамилия и первую букву имени
+        family_slice = name[:space + 2]
+        full_name["name"] = f"{family_slice}./ {city}"
+        full_name["id"] = id_player
+        short_name["name"] = f"{family_slice}."
+        short_name["id"] = id_player
+    else:
+        full_name["name"] = "bye"
+        full_name["id"] = 0
+        short_name["name"] = "bye"
+        short_name["id"] = 0
     name_list = []
     name_list.append(full_name)
     name_list.append(short_name)
