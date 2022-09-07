@@ -4258,6 +4258,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             player_net = 32
     s = 0
     step = 0
+    del_num = 0
     for n in range (0, count_exit): # начало основного посева
         if fin == "1-й финал":
             choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
@@ -4267,7 +4268,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
         if count_player_in_final != max_player:
             free_num = free_place_in_setka(max_player, count_player_in_final)
             for h in free_num:
-                num_id_player[h] = "bye "
+                num_id_player[h] = "bye"
+            del_num = 1 # флаг, что есть свободные номера
 
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
@@ -4298,7 +4300,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
         end = player_net // count_exit
         for i in range(0, end):
             number_posev.append(i)
-
+        if del_num == 1:
+            for b in free_num:
+                number_posev.remove(b)
         if n == 0:
             posev = posev_1
         elif n == 1:
