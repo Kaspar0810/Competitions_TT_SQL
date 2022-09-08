@@ -2925,12 +2925,11 @@ def select_player_in_game():
         my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     if tab == 3 or tab == 4 or tab == 5:
         game_in_visible()
-        # поле победителя (если заполнено, значит встреча сыграна)
+        sc = my_win.tableWidget.item(r, 8).text()
+        pl1 = my_win.tableWidget.item(r, 4).text()
+        pl2 = my_win.tableWidget.item(r, 5).text()
         win_pole = my_win.tableWidget.item(r, 6).text()
         if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
-            sc = my_win.tableWidget.item(r, 8).text()
-            pl1 = my_win.tableWidget.item(r, 4).text()
-            pl2 = my_win.tableWidget.item(r, 5).text()
             if pl1 == my_win.tableWidget.item(r, 6).text():
                 # если в сетке недостающие игроки (bye), то нет счета
                 if sc != "":
@@ -2975,7 +2974,10 @@ def select_player_in_game():
             elif tab == 5:
                 my_win.lineEdit_player1_fin.setText(pl1)
                 my_win.lineEdit_player2_fin.setText(pl2)
-                my_win.lineEdit_pl1_s1_fin.setFocus()
+                if pl1 == "bye" or pl2 == "bye":
+                    my_win.Button_Ok_fin.setEnabled(True)                    
+                else:
+                    my_win.lineEdit_pl1_s1_fin.setFocus()
         my_win.tableWidget.selectRow(r)
 
 
@@ -4175,26 +4177,6 @@ def choice_gr_automat():
         group_list.clear()
 
 
-# def timerEvent(self, e):
-
-#         if self.step >= 100:
-#             self.timer.stop()
-#             self.btn.setText('Finished')
-#             return
-
-#         self.step = self.step + 1
-#         self.pbar.setValue(self.step)
-
-
-# def doAction(self):
-
-#         if self.timer.isActive():
-#             self.timer.stop()
-#             self.btn.setText('Start')
-#         else:
-#             self.timer.start(100, self)
-#             self.btn.setText('Stop')
-
 def progress_bar(step):
     """прогресс бар""" 
     msgBox = QMessageBox 
@@ -5266,8 +5248,6 @@ def check_choice(fin):
                                     msg.Ok)
             check_flag = False
             break                        
-        # else:
-        #     check_flag = True  
     return check_flag
 
 
