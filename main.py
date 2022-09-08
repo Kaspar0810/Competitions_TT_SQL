@@ -4389,7 +4389,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 if i != 0:
                     num_posev.remove(l)
 
-                sp = 100 / player_net 
+                sp = 100 / (player_net - len(free_num))
                 step += sp
                 progress_bar(step)
                 
@@ -6953,14 +6953,15 @@ def setka_data_16(fin):
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
-        if family != "bye":
-            id_f_name = full_player_id(family)
-            id_f_n = id_f_name[0]
-            id_s_n = id_f_name[1]
+        # if family != "bye":
+        id_f_name = full_player_id(family)
+        id_f_n = id_f_name[0]
+        id_s_n = id_f_name[1]
             # словарь ключ - полное имя/ город, значение - id
-            id_ful_name[id_f_n["name"]] = id_f_n["id"]
-            id_name[id_s_n["name"]] = id_s_n["id"]
+        id_ful_name[id_f_n["name"]] = id_f_n["id"]
+        id_name[id_s_n["name"]] = id_s_n["id"]
             # =================
+        if family != "bye":
             # находит пробел отделяющий имя от фамилии
             space = family.find(" ")
             line = family.find("/")  # находит черту отделяющий имя от города
@@ -6970,11 +6971,12 @@ def setka_data_16(fin):
             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
             tds.append(family_city)
         else:
-            id_f_name = full_player_id(family)
-            id_f_n = id_f_name[0]
-            id_s_n = id_f_name[1]
-            # словарь ключ - полное имя/ город, значение - id
-            id_ful_name[id_f_n["name"]] = id_f_n["id"]
+            # id_f_name = full_player_id(family)
+            # id_f_n = id_f_name[0]
+            # id_s_n = id_f_name[1]
+            # # словарь ключ - полное имя/ город, значение - id
+            # id_ful_name[id_f_n["name"]] = id_f_n["id"]
+            # id_name[id_s_n["name"]] = id_s_n["id"]
             tds.append(family)
     all_list.append(tds)
     all_list.append(id_ful_name)
