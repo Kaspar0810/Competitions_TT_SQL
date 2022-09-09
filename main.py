@@ -2975,7 +2975,8 @@ def select_player_in_game():
                 my_win.lineEdit_player1_fin.setText(pl1)
                 my_win.lineEdit_player2_fin.setText(pl2)
                 if pl1 == "bye" or pl2 == "bye":
-                    my_win.Button_Ok_fin.setEnabled(True)                    
+                    my_win.Button_Ok_fin.setEnabled(True)
+                    my_win.Button_Ok_fin.setFocus()                    
                 else:
                     my_win.lineEdit_pl1_s1_fin.setFocus()
         my_win.tableWidget.selectRow(r)
@@ -3487,7 +3488,17 @@ def enter_score(none_player=0):
             # winner_string = ts_winner  # только общий счет
             if type == "сетка":
                 winner_string = ""
-    game_play = False
+    else:
+        if my_win.lineEdit_player1_fin.text() == "bye":
+            winner = my_win.lineEdit_player2_fin.text()
+            loser = my_win.lineEdit_player1_fin.text()
+        else:
+            winner = my_win.lineEdit_player1_fin.text()
+            loser = my_win.lineEdit_player2_fin.text()
+        winner_string = ""
+        ts_winner = ""
+        ts_loser = ""
+        game_play = False
 
     with db:  # записывает в таблицу -Result- сыгранный матч
         result = Result.get(Result.id == id)
@@ -3586,10 +3597,11 @@ def enter_score(none_player=0):
 
 
 def setka_type(none_player):
-    """сетка"""
+    """сетка ставит очки в зависимости от неявки игрока, встреча состоялась ли пропуск встречи -bye-"""
     sc_total = []
     if my_win.lineEdit_player1_fin.text() == "bye" or my_win.lineEdit_player2_fin.text() == "bye":
         if my_win.lineEdit_player1_fin.text() != "bye":
+
             winner = my_win.lineEdit_player1_fin.text()
             loser = my_win.lineEdit_player2_fin.text()
         else:
@@ -3597,25 +3609,28 @@ def setka_type(none_player):
             loser = my_win.lineEdit_player1_fin.text()
         w = ""
         l = ""
-        winner_string = ""
-        ts_winner = ""
-        ts_loser = ""
-    if none_player == 0:
-        st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
-        st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
-        w = 2
-        l = 1
+        st1 = ""
+        st2 = ""
+        # winner_string = ""
+        # ts_winner = ""
+        # ts_loser = ""
     else:
-        if none_player == 1:
-            st1 = "L"
-            st2 = "W"
-        elif none_player == 2:
-            st1 = "W"
-            st2 = "L"
-        w = 2
-        l = 0
-        my_win.lineEdit_pl1_score_total_fin.setText(st1)
-        my_win.lineEdit_pl2_score_total_fin.setText(st2)
+        if none_player == 0:
+            st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
+            st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
+            w = 2
+            l = 1
+        else:
+            if none_player == 1:
+                st1 = "L"
+                st2 = "W"
+            elif none_player == 2:
+                st1 = "W"
+                st2 = "L"
+            w = 2
+            l = 0
+            my_win.lineEdit_pl1_score_total_fin.setText(st1)
+            my_win.lineEdit_pl2_score_total_fin.setText(st2)
     sc_total.append(st1)
     sc_total.append(st2)
     sc_total.append(w)
@@ -6904,10 +6919,13 @@ def setka_player_after_choice(fin):
     for i in pl_list:
         p_data['посев'] = i.rank_num_player
         txt = i.player_group_id
-        line = txt.find("/")  # находит черту отделяющий имя от города
-        id_pl = int(txt[line + 1:])
-        pl = player.select().where(Player.id == id_pl).get()
-        p_data['фамилия'] = pl.full_name
+        if txt != "bye":
+            line = txt.find("/")  # находит черту отделяющий имя от города
+            id_pl = int(txt[line + 1:])
+            pl = player.select().where(Player.id == id_pl).get()
+            p_data['фамилия'] = pl.full_name
+        else:
+            p_data['фамилия'] = "bye"
         tmp = p_data.copy()
         posev_data.append(tmp)
         p_data.clear()
@@ -7680,15 +7698,12 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         else:
             p1_game_win = game_p1[0]
             p1_game_los = game_p1[4]
-            # p2_game_win = game_p2[0]
-            # p2_game_los = game_p2[4]
     else:
         points_p1 = c.points_loser
         points_p2 = c.points_win
         game_p1 = c.score_loser
         game_p2 = c.score_in_game
         # ======= если победа по неявке исправить
-        txt = game_p1
         if game_p1 != "W : L" or game_p1 != "l : W":
             p1_game_win = int(game_p1[0])
             p1_game_los = int(game_p1[4])
@@ -7697,8 +7712,6 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         else:
             p1_game_win = game_p1[0]
             p1_game_los = game_p1[4]
-            # p2_game_win = game_p2[0]
-            # p2_game_los = game_p2[4]
     pp[ki1].append(points_p1)  # добавляет очки 1-ому игроку встречи
     pp[ki2].append(points_p2)  # добавляет очки 2-ому игроку встречи
     # записывает в словарь счет во встречи 1-ого игрока
