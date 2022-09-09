@@ -4261,10 +4261,16 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
         else:
             choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
+        # count_player_in_final = 0
+        # for a in range(0, count_exit):
+        #     z = len(choice.select().where(Choice.mesto_group == mesto_first_poseva + a))
+        #     count_player_in_final += z
         count_player_in_final = len(choice_posev)
-        if count_player_in_final != max_player:
-            free_num = free_place_in_setka(max_player, count_player_in_final)
+        if count_player_in_final != max_player // count_exit:
+            free_num = free_place_in_setka(max_player, count_player_in_final, count_exit)
             del_num = 1 # флаг, что есть свободные номера
+        else:
+            free_num = []
         free_del = 0
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
@@ -4401,13 +4407,13 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     return posev_data
 
 
-def free_place_in_setka(max_player, count_player_in_final):
+def free_place_in_setka(max_player, count_player_in_final, count_exit):
     """вычеркиваем свободные номера в сетке"""
     free_num = []
     free_number_16 = [2, 15, 7, 10, 6, 11, 3, 14]
     free_number_24 = [5, 20, 8, 17, 11, 14, 2, 23]
     free_number_32 = [2, 31, 15, 18, 10, 23, 7, 26, 6, 27, 11, 22, 14, 19, 3, 30]
-    count = max_player - count_player_in_final # кол-во свободных мест
+    count = max_player // count_exit - count_player_in_final # кол-во свободных мест
 
     if max_player == 16:
         free_number = free_number_16
@@ -6683,13 +6689,14 @@ def write_in_setka(data, fin, first_mesto, table):
         system = sys.select().where(System.stage == fin).get()
         setka_string = system.label_string
         if setka_string == "Сетка (с розыгрышем всех мест) на 16 участников":
-            all_list = setka_data_16(fin)
+            # all_list = setka_data_16(fin)
             col_first = 2
             row_first = 0
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
             col_first = 0
             row_first = 2
-            all_list = setka_data_32(fin)
+            # all_list = setka_data_32(fin)
+        all_list = setka_data_16(fin)
         id_sh_name = all_list[2]
     tds = []
     tds.append(all_list[0]) # список фамилия/ город 1-ого посева
@@ -6951,14 +6958,12 @@ def setka_data_16(fin):
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
-        # if family != "bye":
         id_f_name = full_player_id(family)
         id_f_n = id_f_name[0]
         id_s_n = id_f_name[1]
             # словарь ключ - полное имя/ город, значение - id
         id_ful_name[id_f_n["name"]] = id_f_n["id"]
         id_name[id_s_n["name"]] = id_s_n["id"]
-            # =================
         if family != "bye":
             # находит пробел отделяющий имя от фамилии
             space = family.find(" ")
@@ -6969,12 +6974,6 @@ def setka_data_16(fin):
             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
             tds.append(family_city)
         else:
-            # id_f_name = full_player_id(family)
-            # id_f_n = id_f_name[0]
-            # id_s_n = id_f_name[1]
-            # # словарь ключ - полное имя/ город, значение - id
-            # id_ful_name[id_f_n["name"]] = id_f_n["id"]
-            # id_name[id_s_n["name"]] = id_s_n["id"]
             tds.append(family)
     all_list.append(tds)
     all_list.append(id_ful_name)
