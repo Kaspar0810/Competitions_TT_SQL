@@ -5,6 +5,7 @@
 
 
 # from curses import KEY_RIGHT
+from ctypes.wintypes import LCTYPE
 from urllib.parse import MAX_CACHE_SIZE
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
@@ -4315,12 +4316,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             current_region_posev.clear()
             sev_tmp = posev[i].copy()
             sev = sev_tmp.copy()
-            if i == count_posev - 1 and free_del == 0: # если есть свободные номера их удаляет из посева
-                if del_num == 1:
-                    for b in free_num:
-                        sev.remove(b)
-                        posev[i].remove(b)
-                    free_del = 1
             sev_tmp.clear()
             count = len(posev[i]) # всего количество номеров в посеве
 
@@ -4331,40 +4326,64 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                     num_set = sev[w]
                     count_sev = len(sev) # количество номеров в посеве
                 else:
-                    num_set = sev[0] # проверить
-                    count_sev = len(sev) # конкретное число оставшихся в посеве
-                    if count_sev > 1: # если сеющихся номеров больше одного
-                        if w == 0: # 1-й основной посев
-                            gr_region_tmp = []
-                            for k in range(l, l + count_sev):
-                                region = full_posev[k][2]
-                                gr = full_posev[k][3]
-                                gr_region_tmp.append(region)
-                                gr_region_tmp.append(gr)
-                                gr_region = gr_region_tmp.copy()
-                                current_region_posev[k] = gr_region # словарь регионы, в текущем посеве по порядку
-                                gr_region_tmp.clear()
-                        number_last.clear()
-                        number_last = list(num_id_player.keys()) # список уже посеянных номеров в сетке
+                    # === находит группу в которой не полный состав
+                    real_count = len(full_posev) # число участников в данном посеве
+                    if player_net // count_exit != real_count and free_del == 0:
+                        for y in range(0, player_net // count_exit):
+                            txt = full_posev[l][3]
+                            znak = txt.find(" ")
+                            n_gr = txt[:znak]
+                            if y + 1 != int(n_gr):
+                                num_setki_list = list(num_id_player.keys())
+                                index = group_last.index(f"{y + 1} группа")
+                                number_setki = num_setki_list[index] # получаем номер сетки где есть такая же группа от которой надо уйти
+                                if number_setki > player_net // 2:
+                                    f = [i for i in free_num if i > player_net // 2] # номера, который надо убрать
+                                else:
+                                    f = [i for i in free_num if i <= player_net // 2] # номера, который надо убрать
+                                if i == count_posev - 1 and free_del == 0: # если есть свободные номера их удаляет из посева
+                                    if del_num == 1:
+                                        for b in f:
+                                            sev.remove(b)
+                                            posev[i].remove(b)
+                                        free_del = 1 
+                                        break   
+                    # ========          
+                    else:
+                        num_set = sev[0] # проверить
+                        count_sev = len(sev) # конкретное число оставшихся в посеве
+                        if count_sev > 1: # если сеющихся номеров больше одного
+                            if w == 0: # 1-й основной посев
+                                gr_region_tmp = []
+                                for k in range(l, l + count_sev):
+                                    region = full_posev[k][2]
+                                    gr = full_posev[k][3]
+                                    gr_region_tmp.append(region)
+                                    gr_region_tmp.append(gr)
+                                    gr_region = gr_region_tmp.copy()
+                                    current_region_posev[k] = gr_region # словарь регионы, в текущем посеве по порядку
+                                    gr_region_tmp.clear()
+                            number_last.clear()
+                            number_last = list(num_id_player.keys()) # список уже посеянных номеров в сетке
 
-                        reg_last.clear()
-                        group_last.clear()
-                        for v in num_id_player.values():
-                            reg_last.append(v[1]) # список уже посеянных регионов
-                            group_last.append(v[2]) # список номеров групп уже посеянных
-                        if n != 0 or (n == 0 and l > 1):
-            # =========== определения кол-во возможный вариантов посева у каждого региона
-                            possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)
-                            if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
-                                possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
-                                num_posev = list(possible_number.keys())   
-                            l = list(possible_number.keys())[0]
-                            num_set = possible_number[l]
+                            reg_last.clear()
+                            group_last.clear()
+                            for v in num_id_player.values():
+                                reg_last.append(v[1]) # список уже посеянных регионов
+                                group_last.append(v[2]) # список номеров групп уже посеянных
+                            if n != 0 or (n == 0 and l > 1):
+                # =========== определения кол-во возможный вариантов посева у каждого региона
+                                possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)
+                                if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
+                                    possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
+                                    num_posev = list(possible_number.keys())   
+                                l = list(possible_number.keys())[0]
+                                num_set = possible_number[l]
 
-                            if len(num_set) != 1:
-                                num_set = random_generator(num_set)
-                            else:
-                                num_set = num_set[0]
+                                if len(num_set) != 1:
+                                    num_set = random_generator(num_set)
+                                else:
+                                    num_set = num_set[0]
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
                 gr = full_posev[l][3]  
@@ -4410,6 +4429,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
 def free_place_in_setka(max_player, count_player_in_final, count_exit):
     """вычеркиваем свободные номера в сетке"""
     free_num = []
+    end = 0
     free_number_16 = [2, 15, 7, 10, 6, 11, 3, 14]
     free_number_24 = [5, 20, 8, 17, 11, 14, 2, 23]
     free_number_32 = [2, 31, 15, 18, 10, 23, 7, 26, 6, 27, 11, 22, 14, 19, 3, 30]
@@ -4421,8 +4441,11 @@ def free_place_in_setka(max_player, count_player_in_final, count_exit):
         free_number = free_number_24
     elif max_player == 32:
         free_number = free_number_32
-
-    for i in range (0, count):
+    if count_exit == 1:
+        end = count
+    else:
+        end = count + 1
+    for i in range (0, end):
         k = free_number[i]
         free_num.append(k)
     return free_num
