@@ -4196,7 +4196,7 @@ def progress_bar(step):
     """прогресс бар""" 
     msgBox = QMessageBox 
     my_win.progressBar.setValue(step)
-    if step >= 100:
+    if step >= 99:
        result = msgBox.information(my_win, "Уведомление", "Жеребьевка завершена, проверьте ее результаты!", msgBox.Ok)
        if result == msgBox.Ok:
             my_win.progressBar.setValue(0)
@@ -4359,6 +4359,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
 
                             if len(num_set) == 0:
                                 msgBox.information(my_win, "Уведомление", "Жеребьевка не получилась повторите снова.")
+                                sorted_tuple = sorted(num_id_player.items(), key=lambda x: x[0])
+                                dict(sorted_tuple)
+                                
                                 player_choice_in_setka(fin)
                                 step = 0
                             elif len(num_set) != 1:
@@ -4395,8 +4398,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 sp = 100 / (all_player)
                 step += sp
                 progress_bar(step)
-        step = round(step)
-        if step >= 100:    
+        # step = round(step)
+        if step > 99:    
             for i in num_id_player.keys():
                 tmp_list = list(num_id_player[i])
                 id = tmp_list[0]
