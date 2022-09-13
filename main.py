@@ -5,7 +5,6 @@
 
 
 # from curses import KEY_RIGHT
-from ctypes.wintypes import LCTYPE
 from urllib.parse import MAX_CACHE_SIZE
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
@@ -4414,14 +4413,13 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     return posev_data
 
 
-def free_place_in_setka(max_player, count_player_in_final, count_exit):
+def free_place_in_setka(max_player, count_player_in_final):
     """вычеркиваем свободные номера в сетке"""
     free_num = []
-    end = 0
     free_number_16 = [2, 15, 7, 10, 6, 11, 3, 14]
     free_number_24 = [5, 20, 8, 17, 11, 14, 2, 23]
     free_number_32 = [2, 31, 15, 18, 10, 23, 7, 26, 6, 27, 11, 22, 14, 19, 3, 30]
-    count = max_player // count_exit - count_player_in_final # кол-во свободных мест
+    count = max_player - count_player_in_final # кол-во свободных мест
 
     if max_player == 16:
         free_number = free_number_16
@@ -4429,11 +4427,8 @@ def free_place_in_setka(max_player, count_player_in_final, count_exit):
         free_number = free_number_24
     elif max_player == 32:
         free_number = free_number_32
-    if count_exit == 1:
-        end = count
-    else:
-        end = count + 1
-    for i in range (0, end):
+
+    for i in range (0, count):
         k = free_number[i]
         free_num.append(k)
     return free_num
@@ -6700,13 +6695,12 @@ def write_in_setka(data, fin, first_mesto, table):
         system = sys.select().where(System.stage == fin).get()
         setka_string = system.label_string
         if setka_string == "Сетка (с розыгрышем всех мест) на 16 участников":
-            # all_list = setka_data_16(fin)
+            # all_list = setka_data(fin)
             col_first = 2
             row_first = 0
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
             col_first = 0
             row_first = 2
-            # all_list = setka_data_32(fin)
         all_list = setka_data(fin)
         id_sh_name = all_list[2]
     tds = []
@@ -6969,12 +6963,14 @@ def setka_data(fin):
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
+        # if family != "bye":
         id_f_name = full_player_id(family)
         id_f_n = id_f_name[0]
         id_s_n = id_f_name[1]
             # словарь ключ - полное имя/ город, значение - id
         id_ful_name[id_f_n["name"]] = id_f_n["id"]
         id_name[id_s_n["name"]] = id_s_n["id"]
+            # =================
         if family != "bye":
             # находит пробел отделяющий имя от фамилии
             space = family.find(" ")
