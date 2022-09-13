@@ -4398,7 +4398,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 sp = 100 / (all_player)
                 step += sp
                 progress_bar(step)
-        # step = round(step)
         if step > 99:    
             for i in num_id_player.keys():
                 tmp_list = list(num_id_player[i])
@@ -4406,11 +4405,11 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                 pl_id = Player.get(Player.id == id)
                 family_city = pl_id.full_name
                 posev_data[i] = family_city
-            key_set = set(num_id_player.keys())
+            key_set = set(num_id_player.keys()) # получаем сет всех ключей (номеров сетки)
             for j in range(1, player_net + 1):
                 free_num.append(j)
             free_num = set((free_num))
-            free_num.difference_update(key_set)
+            free_num.difference_update(key_set) # вычитаем из всех номеров те которые посеяны и остается номера -bye-
             for h in free_num:
                 posev_data[h] = "bye"
     return posev_data
@@ -6698,7 +6697,6 @@ def write_in_setka(data, fin, first_mesto, table):
         system = sys.select().where(System.stage == fin).get()
         setka_string = system.label_string
         if setka_string == "Сетка (с розыгрышем всех мест) на 16 участников":
-            # all_list = setka_data(fin)
             col_first = 2
             row_first = 0
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
@@ -7901,7 +7899,11 @@ def player_choice_in_setka(fin):
                         sys_tem.save()
                 else:
                     return
-
+            else:
+                player_choice_in_setka(fin)
+                sys_tem = system.select().where(System.stage == fin).get()
+                if sys_tem.choice_flag == True:
+                    exit()
         mesto_first_poseva = kpt
         mesto_second_poseva = kpt + 1
         mesto_third_poseva = kpt + 2
