@@ -5,7 +5,7 @@
 
 
 # from curses import KEY_RIGHT
-from urllib.parse import MAX_CACHE_SIZE
+# from urllib.parse import MAX_CACHE_SIZE
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -120,7 +120,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # подменю без выбора (addAction создает сразу действие)
         system = fileMenu.addMenu("Система")
         choice = fileMenu.addMenu("Жеребьевка")
-        saveList = fileMenu.addMenu("Сохранить")
+        # saveList = fileMenu.addMenu("Сохранить")
         fileMenu.addSeparator()
         last_comp = fileMenu.addMenu("Последние")
         fileMenu.addSeparator()
@@ -139,7 +139,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         choice.addAction(self.choice_gr_Action)  # подменю группы
         choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
         choice.addAction(self.choice_fin_Action)  # подменю финалы
-        saveList.addAction(self.savelist_Action)
+        # saveList.addAction(self.savelist_Action)
         # add_last = last_comp.addMenu("Последние")
         last_comp.addAction(self.first_comp_Action)
         last_comp.addAction(self.second_comp_Action)
@@ -203,7 +203,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
-        self.savelist_Action = QAction("Список")  # подменю сохранить
+        # self.savelist_Action = QAction("Список")  # подменю сохранить
         # подменю жеребьевка -группы-
         self.choice_gr_Action = QAction("Группы")
         # подменю жеребьевка -полуфиналы-
@@ -241,7 +241,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.system_edit_Action.triggered.connect(self.system_edit)
         self.vid_edit_Action.triggered.connect(self.vid_edit)
         self.exitAction.triggered.connect(self.exit)
-        self.savelist_Action.triggered.connect(self.saveList)
+        # self.savelist_Action.triggered.connect(self.saveList)
         self.choice_gr_Action.triggered.connect(self.choice)
         self.choice_fin_Action.triggered.connect(self.choice)
         self.view_list_Action.triggered.connect(self.view)
@@ -284,11 +284,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def exit(self):
         exit_comp()
 
-    def saveList(self):
-        my_win.tabWidget.setCurrentIndex(1)
-        my_win.toolBox.setCurrentIndex(1)
-        list_player_pdf()
-        self.statusbar.showMessage("Список участников сохранен")
+    # def saveList(self):
+    #     my_win.tabWidget.setCurrentIndex(1)
+    #     my_win.toolBox.setCurrentIndex(1)
+    #     list_player_pdf()
+    #     self.statusbar.showMessage("Список участников сохранен")
 
     def choice(self):
         msg = QMessageBox
@@ -5248,17 +5248,26 @@ def ready_choice(stage):
 def select_choice_final():
     """выбор жеребьевки финала"""
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-
+    vid = ["Автоматическая", "Ручная"]
     fin = []
     for sys in system:
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
             fin.append(sys.stage)
     fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
     if ok:
-        return fin
+        vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите вид жеребъевки", vid, 0, False)
+        if vid == "Автоматическая":
+            return fin
+        else:
+            manual_choice_setka(fin)
     else:
         fin = None
         return fin
+
+
+def manual_choice_setka(fin):
+    """Ручная жеребьевка сетки"""
+    pass
 
 
 def check_choice(fin):
