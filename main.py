@@ -6,6 +6,7 @@
 
 # from curses import KEY_RIGHT
 # from urllib.parse import MAX_CACHE_SIZE
+from queue import Empty
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -4218,38 +4219,54 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     sys = system.select().where(System.stage == fin).get()
     choice = Choice.select().where(Choice.title_id == title_id())
     max_player = sys.max_player
-    type_setka = sys.label_string
-    if count_exit == 1:
-        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
-            posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13], [2, 3, 6, 7, 10, 11, 14, 15]]
-            player_net = 16
-        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
-            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29], [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
-            player_net = 32
-    elif count_exit == 2:
-        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
-            posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13]]
-            posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15]]
-            player_net = 16
-        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
-            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29]]
-            posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
-            player_net = 32
-    elif count_exit == 3:
-        pass
-    elif count_exit == 4:
-        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
-            posev_1 = [[1, 16], [8, 9]]
-            posev_2 = [[4, 5, 12, 13]]
-            posev_3 = [[3, 6, 11, 14]]
-            posev_4 = [[2, 7, 10, 15]]
-            player_net = 16
-        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
-            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25]]
-            posev_2 = [[4, 5, 12, 13, 20, 21, 28, 29]]
-            posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
-            posev_4 = [[2, 7, 10, 15, 18, 23, 26, 31]]
-            player_net = 32
+    # type_setka = sys.label_string
+
+    # if count_exit == 1:
+    #     if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+    #         posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13], [2, 3, 6, 7, 10, 11, 14, 15]]
+    #         player_net = 16
+    #     elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+    #         posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29], [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
+    #         player_net = 32
+    # elif count_exit == 2:
+    #     if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+    #         posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13]]
+    #         posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15]]
+    #         player_net = 16
+    #     elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+    #         posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29]]
+    #         posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
+    #         player_net = 32
+    # elif count_exit == 3:
+    #     pass
+    # elif count_exit == 4:
+    #     if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+    #         posev_1 = [[1, 16], [8, 9]]
+    #         posev_2 = [[4, 5, 12, 13]]
+    #         posev_3 = [[3, 6, 11, 14]]
+    #         posev_4 = [[2, 7, 10, 15]]
+    #         player_net = 16
+    #     elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+    #         posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25]]
+    #         posev_2 = [[4, 5, 12, 13, 20, 21, 28, 29]]
+    #         posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
+    #         posev_4 = [[2, 7, 10, 15, 18, 23, 26, 31]]
+    #         player_net = 32
+    posevs = setka_choice_number(fin, count_exit)
+    player_net = posevs[0]
+    posev_1 = posevs[1]
+    z = len(posevs)
+
+    if z == 3:
+        posev_2 = posevs[2]
+    elif z == 4:
+        posev_2 = posevs[2]
+        posev_3 = posevs[3]
+    elif z == 5:
+        posev_2 = posevs[2]
+        posev_3 = posevs[3]
+        posev_4 = posevs[4]
+
     s = 0
     free_seats = 0
     step = 0
@@ -4413,6 +4430,61 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
             for h in free_num:
                 posev_data[h] = "bye"
     return posev_data
+
+
+def setka_choice_number(fin, count_exit):
+    """номера сетки при посеве"""
+    posevs = []
+    posev_1 = []
+    posev_2 = []
+    posev_3 = []
+    posev_4 = []
+
+    system = System.select().where(System.title_id == title_id())
+    sys = system.select().where(System.stage == fin).get()
+
+    type_setka = sys.label_string
+    if count_exit == 1:
+        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+            posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13], [2, 3, 6, 7, 10, 11, 14, 15]]
+            player_net = 16
+        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29], [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
+            player_net = 32
+    elif count_exit == 2:
+        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+            posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13]]
+            posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15]]
+            player_net = 16
+        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29]]
+            posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
+            player_net = 32
+    elif count_exit == 3:
+        pass
+    elif count_exit == 4:
+        if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
+            posev_1 = [[1, 16], [8, 9]]
+            posev_2 = [[4, 5, 12, 13]]
+            posev_3 = [[3, 6, 11, 14]]
+            posev_4 = [[2, 7, 10, 15]]
+            player_net = 16
+        elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25]]
+            posev_2 = [[4, 5, 12, 13, 20, 21, 28, 29]]
+            posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
+            posev_4 = [[2, 7, 10, 15, 18, 23, 26, 31]]
+            player_net = 32
+    posevs.append(player_net)
+    if len(posev_1) != 0:
+        posevs.append(posev_1)
+        if len(posev_2) != 0:
+            posevs.append(posev_2)
+            if len(posev_3) != 0:
+                posevs.append(posev_3)
+                if len(posev_4) != 0:
+                    posevs.append(posev_4)
+    return posevs
 
 
 def free_place_in_setka(max_player, count_player_in_final):
@@ -5248,15 +5320,15 @@ def ready_choice(stage):
 def select_choice_final():
     """выбор жеребьевки финала"""
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    vid = ["Автоматическая", "Ручная"]
+    vid = ["Автоматический", "Ручной"]
     fin = []
     for sys in system:
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
             fin.append(sys.stage)
     fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
     if ok:
-        vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите вид жеребъевки", vid, 0, False)
-        if vid == "Автоматическая":
+        vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
+        if vid == "Автоматический":
             return fin
         else:
             manual_choice_setka(fin)
