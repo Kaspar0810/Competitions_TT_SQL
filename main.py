@@ -5327,19 +5327,15 @@ def select_choice_final():
             fin.append(sys.stage)
     fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
     if ok:
-        vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
-        if vid == "Автоматический":
-            return fin
-        else:
-            manual_choice_setka(fin)
+        return fin
     else:
         fin = None
         return fin
 
 
-def manual_choice_setka(fin):
+def manual_choice_setka(fin, count_exit):
     """Ручная жеребьевка сетки"""
-    pass
+    setka_choice_number(fin, count_exit)
 
 
 def check_choice(fin):
@@ -7986,10 +7982,15 @@ def player_choice_in_setka(fin):
                 if sys_tem.choice_flag == True:
                     exit()
         mesto_first_poseva = kpt
-        mesto_second_poseva = kpt + 1
-        mesto_third_poseva = kpt + 2
-        mesto_fourth_poseva = kpt + 3
-        posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+        # mesto_second_poseva = kpt + 1
+        # mesto_third_poseva = kpt + 2
+        # mesto_fourth_poseva = kpt + 3
+        vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
+        if vid == "Автоматический":
+            posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+        else:
+            manual_choice_setka(fin)
+        # posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
     else:  # если была произведена жеребьевка
         sys = system.select().where(System.stage == fin).get()
         place_exit = sys.stage_exit       
@@ -7998,7 +7999,12 @@ def player_choice_in_setka(fin):
         count_exit = sys.max_player // syst.total_group
 
         mesto_first_poseva = sys.mesta_exit
-        posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+        vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
+        if vid == "Автоматический":
+            posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+        else:
+            manual_choice_setka(fin)
+        # posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
 
     #     count_sec_num = len(second_number)
     #     count_third_num = len(third_number)
