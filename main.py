@@ -4203,7 +4203,22 @@ def progress_bar(step):
             my_win.progressBar.setValue(0)
 
 
-def choice_setka_automat(fin, count_exit, mesto_first_poseva):
+# def check_input(text):
+#     """проверка правильность ввода номера жеребьевки"""
+#     while True:
+#         try:
+#             # n = int(input("Введите число: "))
+#             if n < 1 or n > 10:
+#                 raise  Exception
+#             print("Сумма чисел от 1 до n: ", sum([i for i in range(1,n+1)]))
+#             break
+#         except ValueError:
+#             print('Неверный формат')
+#         except Exception:
+#             print('Введите число от 1 до 10')
+
+
+def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
     """автоматическая жеребьевка сетки""" 
     msgBox = QMessageBox 
     full_posev = []  # список полного списка участников 1-ого посева
@@ -4219,39 +4234,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
     sys = system.select().where(System.stage == fin).get()
     choice = Choice.select().where(Choice.title_id == title_id())
     max_player = sys.max_player
-    # type_setka = sys.label_string
-
-    # if count_exit == 1:
-    #     if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
-    #         posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13], [2, 3, 6, 7, 10, 11, 14, 15]]
-    #         player_net = 16
-    #     elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
-    #         posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29], [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
-    #         player_net = 32
-    # elif count_exit == 2:
-    #     if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
-    #         posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13]]
-    #         posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15]]
-    #         player_net = 16
-    #     elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
-    #         posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29]]
-    #         posev_2 = [[2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
-    #         player_net = 32
-    # elif count_exit == 3:
-    #     pass
-    # elif count_exit == 4:
-    #     if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
-    #         posev_1 = [[1, 16], [8, 9]]
-    #         posev_2 = [[4, 5, 12, 13]]
-    #         posev_3 = [[3, 6, 11, 14]]
-    #         posev_4 = [[2, 7, 10, 15]]
-    #         player_net = 16
-    #     elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
-    #         posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25]]
-    #         posev_2 = [[4, 5, 12, 13, 20, 21, 28, 29]]
-    #         posev_3 = [[3, 6, 11, 14, 19, 22, 27, 30]]
-    #         posev_4 = [[2, 7, 10, 15, 18, 23, 26, 31]]
-    #         player_net = 32
+  
     posevs = setka_choice_number(fin, count_exit)
     player_net = posevs[0]
     posev_1 = posevs[1]
@@ -4283,7 +4266,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
         else:
             choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
         count_player_in_final = len(choice_posev)
-        if count_player_in_final != max_player // count_exit and count_exit == 1: # вычеркиваем определенные номера только если одно место виходит из группы
+        if count_player_in_final != max_player // count_exit and count_exit == 1: # вычеркиваем определенные номера только если одно место выходит из группы
             free_num = free_place_in_setka(max_player, count_player_in_final, count_exit)
             del_num = 1 # флаг, что есть свободные номера
         elif count_player_in_final != max_player // count_exit and count_exit > 1:
@@ -4373,18 +4356,53 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva):
                                 num_posev = list(possible_number.keys())   
                             l = list(possible_number.keys())[0]
                             num_set = possible_number[l]
-
-                            if len(num_set) == 0:
-                                msgBox.information(my_win, "Уведомление", "Жеребьевка не получилась повторите снова.")
-                                sorted_tuple = sorted(num_id_player.items(), key=lambda x: x[0])
-                                dict(sorted_tuple)
-                                
-                                player_choice_in_setka(fin)
-                                step = 0
-                            elif len(num_set) != 1:
-                                 num_set = random_generator(num_set)
-                            elif len(num_set) == 1:
-                                num_set = num_set[0]
+                            # === выбор ручная или автомат ====
+                            if flag is True:
+                                if len(num_set) == 0:
+                                    msgBox.information(my_win, "Уведомление", "Жеребьевка не получилась повторите снова.")
+                                    sorted_tuple = sorted(num_id_player.items(), key=lambda x: x[0])
+                                    dict(sorted_tuple)                                    
+                                    player_choice_in_setka(fin)
+                                    step = 0
+                                elif len(num_set) != 1:
+                                    num_set = random_generator(num_set)
+                                elif len(num_set) == 1:
+                                    num_set = num_set[0]
+                            else: # manual
+                                player_list = []
+                                player_list_tmp = []
+                                for j in number_posev:
+                                    posev_list = full_posev[j]
+                                    pl = posev_list[1]
+                                    reg = posev_list[2]
+                                    player_list_tmp.append(pl)
+                                    player_list_tmp.append(reg)
+                                    player_list.append(player_list_tmp.copy())
+                                    player_list_tmp.clear()
+                                txt_tmp = []
+                                txt_list = []
+                                for g in player_list:
+                                    txt_str = (' - '.join(g))
+                                    txt_tmp.append(txt_str)
+                                    txt_list.append(txt_tmp.copy())                               
+                                    txt_tmp.clear()
+                                text_str = (',\n'.join(txt_list))
+                                tx = "Выберите один из номеров и нажмите -ОК-, или -Cancel- если хотите выбор случайный"
+                                txt = (', '.join(list(map(str, num_set))))
+                                while True:
+                                    try:
+                                        text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
+                                        text = int(text)
+                                    except ValueError:
+                                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.")
+                                        continue
+                                    else:
+                                        if text in num_set:
+                                            num_set = text
+                                            break
+                                        else:
+                                            msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.") 
+                            #===========
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
                 gr = full_posev[l][3]  
@@ -5333,10 +5351,28 @@ def select_choice_final():
         return fin
 
 
-def manual_choice_setka(fin, count_exit):
+def manual_choice_setka(fin, count_exit, mesto_first_poseva):
     """Ручная жеребьевка сетки"""
-    setka_choice_number(fin, count_exit)
+    choice = Choice.select().where(Choice.title_id == title_id())
+    posevs = setka_choice_number(fin, count_exit)
+    player_net = posevs[0]
+    posev_1 = posevs[1]
+    z = len(posevs)
 
+    if z == 3:
+        posev_2 = posevs[2]
+    elif z == 4:
+        posev_2 = posevs[2]
+        posev_3 = posevs[3]
+    elif z == 5:
+        posev_2 = posevs[2]
+        posev_3 = posevs[3]
+        posev_4 = posevs[4]
+    for n in range (0, count_exit): # начало основного посева
+        if fin == "1-й финал":
+            choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
+        else:
+            choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
 
 def check_choice(fin):
     """Проверяет перед жеребьевкой финалов, сыграны ли все партиии в группах"""
@@ -7919,7 +7955,7 @@ def player_choice_one_table(stage):
 def player_choice_in_setka(fin):
     """распределяет спортсменов в сетке согласно жеребьевке"""
     p_stage = []
-
+    vid = ["Автоматический", "Ручной"]
     system = System.select().where(System.title_id == title_id())
     # =================
     stage = fin
@@ -7987,10 +8023,11 @@ def player_choice_in_setka(fin):
         # mesto_fourth_poseva = kpt + 3
         vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
         if vid == "Автоматический":
-            posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+            flag = True
         else:
-            manual_choice_setka(fin)
-        # posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+            flag = False
+            
+        posev = choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
     else:  # если была произведена жеребьевка
         sys = system.select().where(System.stage == fin).get()
         place_exit = sys.stage_exit       
@@ -8001,10 +8038,11 @@ def player_choice_in_setka(fin):
         mesto_first_poseva = sys.mesta_exit
         vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
         if vid == "Автоматический":
-            posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+            flag = True
         else:
-            manual_choice_setka(fin)
-        # posev = choice_setka_automat(fin, count_exit, mesto_first_poseva)
+            flag = False
+            
+        posev = choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
 
     #     count_sec_num = len(second_number)
     #     count_third_num = len(third_number)
