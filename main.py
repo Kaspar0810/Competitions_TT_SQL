@@ -4383,11 +4383,18 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                 txt_list = []
                                 for g in player_list:
                                     txt_str = (' - '.join(g))
+                                    # tx1 = f"{txt_str}\n" + "Петрова даша\n\n"
                                     txt_tmp.append(txt_str)
-                                    txt_list.append(txt_tmp.copy())                               
-                                    txt_tmp.clear()
-                                text_str = (',\n'.join(txt_list))
-                                tx = "Выберите один из номеров и нажмите -ОК-, или -Cancel- если хотите выбор случайный"
+                                    # txt_list.append(txt_tmp.copy())                               
+                                    # txt_tmp.clear()
+                                text_str = (','.join(txt_tmp))
+                                znak = text_str.find(",")
+                                new_str = text_str[:znak]
+                                new_str = new_str + "\n"
+                                # tx1 = f"{text_str}\n" + "Петрова даша\n\n"
+                                tx = new_str + "Выберите один из номеров и нажмите -ОК-, или -Cancel- если хотите выбор случайный"
+
+
                                 txt = (', '.join(list(map(str, num_set))))
                                 while True:
                                     try:
