@@ -4380,28 +4380,29 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                     player_list.append(player_list_tmp.copy())
                                     player_list_tmp.clear()
                                 txt_tmp = []
-<<<<<<< HEAD
-                                # txt_list = []
                                 for g in player_list:
                                     txt_str = (' - '.join(g))
                                     txt_tmp.append(txt_str)
-                                text_str = (','.join(txt_tmp))
-                                znak = text_str.find(",")
-                                new_str = text_str[:znak]
-                                new_str = new_str + "\n"
-                                tx = new_str + "Выберите один из номеров и нажмите -ОК-, или -Cancel- если хотите выбор случайный"
-=======
+                                # text_str = (','.join(txt_tmp))
+                                # znak = text_str.find(",")
+                                # new_str = text_str[:znak]
+                                # new_str = new_str + "\n"
+                                # tx = new_str + "Выберите один из номеров и нажмите -ОК-, или -Cancel- если хотите выбор случайный"
+
                                 for g in player_list:
                                     txt_str = (' - '.join(g))
                                     txt_tmp.append(txt_str)
                                 text_str = (',\n'.join(txt_tmp))
-                                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами\n - Cancel - если хотите выбор случайный"
->>>>>>> 83d7f2b849241624a407d18909bc4df5b7e6a9e7
-
-                                txt = (', '.join(list(map(str, num_set))))
+                                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"
+                                txt = (','.join(list(map(str, num_set))))
                                 while True:
                                     try:
                                         text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
+                                        if not ok:
+                                        #     text = int(text)
+                                        # else:
+                                            num_set = txt.split(",")
+                                            text = random_generator(num_set)
                                         text = int(text)
                                     except ValueError:
                                         msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.")
@@ -4411,7 +4412,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                             num_set = text
                                             break
                                         else:
-                                            msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.") 
+                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.") 
                             #===========
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
