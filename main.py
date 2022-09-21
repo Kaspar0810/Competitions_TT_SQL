@@ -4371,7 +4371,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                             else: # manual
                                 player_list = []
                                 player_list_tmp = []
-                                for j in number_posev:
+                                # if n != 0:
+                                for j in range(count_sev):
                                     posev_list = full_posev[j]
                                     pl = posev_list[1]
                                     reg = posev_list[2]
