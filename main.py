@@ -4380,15 +4380,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                     player_list.append(player_list_tmp.copy())
                                     player_list_tmp.clear()
                                 txt_tmp = []
-                                for g in player_list:
-                                    txt_str = (' - '.join(g))
-                                    txt_tmp.append(txt_str)
-                                # text_str = (','.join(txt_tmp))
-                                # znak = text_str.find(",")
-                                # new_str = text_str[:znak]
-                                # new_str = new_str + "\n"
-                                # tx = new_str + "Выберите один из номеров и нажмите -ОК-, или -Cancel- если хотите выбор случайный"
-
+    
                                 for g in player_list:
                                     txt_str = (' - '.join(g))
                                     txt_tmp.append(txt_str)
@@ -4399,10 +4391,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                     try:
                                         text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
                                         if not ok:
-                                        #     text = int(text)
-                                        # else:
-                                            num_set = txt.split(",")
-                                            text = random_generator(num_set)
+                                            text = random.choice(num_set)
                                         text = int(text)
                                     except ValueError:
                                         msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.")
