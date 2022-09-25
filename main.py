@@ -4388,22 +4388,24 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                 text_str = (',\n'.join(txt_tmp))
                                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"
                                 txt = (','.join(list(map(str, num_set))))
-                                while True:
-                                    try:
-                                        text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
-                                        if not ok:
-                                            text = random.choice(num_set)
-                                        text = int(text)
-                                    except ValueError:
-                                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.")
-                                        continue
-                                    else:
-                                        if text in num_set:
-                                            num_set = text
-                                            break
-                                        else:
-                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.") 
-                            #===========
+                                showdialog()
+                            #     while True:
+                            #         try:
+                            #             text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
+                            #             if not ok:
+                            #                 text = random.choice(num_set)
+                            #                 my_win.QInputDialog.set
+                            #             text = int(text)
+                            #         except ValueError:
+                            #             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.")
+                            #             continue
+                            #         else:
+                            #             if text in num_set:
+                            #                 num_set = text
+                            #                 break
+                            #             else:
+                            #                  msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.") 
+                            # #===========
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
                 gr = full_posev[l][3]  
@@ -4449,6 +4451,20 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             for h in free_num:
                 posev_data[h] = "bye"
     return posev_data
+
+def showdialog():
+        # Создать объект QDialog
+        dialog = QDialog()
+        dialog.setGeometry(300, 300, 290, 150)
+        dialog.setWindowTitle("Dialog")
+        # Создать кнопку для вновь созданного объекта диалога
+        btn = QPushButton('ok',dialog)
+        # Переместить кнопку, установить заголовок диалога
+        btn.move(50, 50)
+        le = QLineEdit()
+        le.move(100, 22)
+        dialog.exec()
+
 
 
 def setka_choice_number(fin, count_exit):
