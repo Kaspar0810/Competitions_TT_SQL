@@ -6,6 +6,7 @@
 
 # from curses import KEY_RIGHT
 # from urllib.parse import MAX_CACHE_SIZE
+from msilib.schema import Font
 from queue import Empty
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
@@ -4388,7 +4389,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                 text_str = (',\n'.join(txt_tmp))
                                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"
                                 txt = (','.join(list(map(str, num_set))))
-                                showdialog()
+                                showdialog(txt)
                             #     while True:
                             #         try:
                             #             text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
@@ -4452,17 +4453,27 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                 posev_data[h] = "bye"
     return posev_data
 
-def showdialog():
+def showdialog(txt):
         # Создать объект QDialog
         dialog = QDialog()
-        dialog.setGeometry(300, 300, 290, 150)
-        dialog.setWindowTitle("Dialog")
+        dialog.setGeometry(300, 300, 290, 550)
+        # dialog.setWindowTitle("Номера посева:")
+        dialog.setWindowTitle(f"Номера посева: {txt}")
         # Создать кнопку для вновь созданного объекта диалога
-        btn = QPushButton('ok',dialog)
+        btn_manual = QPushButton('OK', dialog)
+        btn_random = QPushButton('Рандом', dialog)
         # Переместить кнопку, установить заголовок диалога
-        btn.move(50, 50)
-        le = QLineEdit()
-        le.move(100, 22)
+        btn_manual.setGeometry(150, 30, 50, 50)
+        btn_random.setGeometry(210, 30, 50, 50)
+        te = QTextEdit(dialog)
+        te.setGeometry(30, 30, 50, 50)
+        te.setFocus()
+        te.setTextColor(QColor(255, 0, 0))
+        te.setFontPointSize(20)
+        # te.setAlignment()
+        # font = QFont()
+        # font.setPointSize(48)
+        # self.editor.setFont(font)
         dialog.exec()
 
 
