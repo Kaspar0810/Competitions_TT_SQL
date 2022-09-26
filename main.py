@@ -4,10 +4,7 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-# from curses import KEY_RIGHT
-# from urllib.parse import MAX_CACHE_SIZE
-from msilib.schema import Font
-from queue import Empty
+# from queue import Empty
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -4389,23 +4386,66 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                 text_str = (',\n'.join(txt_tmp))
                                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"
                                 txt = (','.join(list(map(str, num_set))))
-                                showdialog(txt)
-                            #     while True:
-                            #         try:
-                            #             text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
-                            #             if not ok:
-                            #                 text = random.choice(num_set)
-                            #                 my_win.QInputDialog.set
-                            #             text = int(text)
-                            #         except ValueError:
-                            #             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.")
-                            #             continue
-                            #         else:
-                            #             if text in num_set:
-                            #                 num_set = text
-                            #                 break
-                            #             else:
-                            #                  msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.") 
+                                # showdialog(txt)
+                                while True:
+                                    try:
+                                        # text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
+                                        class DialogWindow(QMainWindow):
+                                            def __init__(self):
+                                                # super().__init__()
+                                                # Установить заголовок и начальный размер основного интерфейса
+                                                self.setWindowTitle("Пример диалога")
+                                                self.resize(350, 300)
+
+                                                # Создайте кнопку, обратите внимание, что self in () имеет важное значение, используется для загрузки некоторых настроек его свойств
+                                                self.btn = QPushButton(self)
+                                                # Свойства кнопки #Set: текст, позиция перемещения, функция слота ссылки
+                                                self.btn.setText("Всплывающее диалоговое окно")
+                                                self.btn.move(50,50)
+                                                self.show()
+                                                # self.btn.clicked.connect(self.showdialog)
+
+
+                                            # def showdialog(self):
+
+                                            #         # Создать объект QDialog
+                                            #     dialog = QDialog()
+                                            #     dialog.setGeometry(300, 300, 290, 550)
+                                            #             # dialog.setWindowTitle("Номера посева:")
+                                            #     # dialog.setWindowTitle(f"Номера посева: {txt}")
+                                            #     dialog.setWindowTitle("Номера посева:")
+                                            #             # Создать кнопку для вновь созданного объекта диалога
+                                            #     btn_manual = QPushButton('OK', dialog)
+                                            #     btn_random = QPushButton('Рандом', dialog)
+                                            #             # Переместить кнопку, установить заголовок диалога
+                                            #     btn_manual.setGeometry(150, 30, 50, 50)
+                                            #     btn_random.setGeometry(210, 30, 50, 50)
+                                            #     te = QTextEdit(dialog)
+                                            #     te.setGeometry(30, 30, 50, 50)
+                                            #     te.setFocus()
+                                            #     te.setTextColor(QColor(255, 0, 0))
+                                            #     te.setFontPointSize(20)
+                                            
+                                            #     btn_manual.clicked.connect(my_win.manual)
+                                            #     btn_random.clicked.connect(my_win.manual)
+                                        # if __name__ == '__main__':
+                                        #     app=QApplication(sys.argv)
+                                        #     demo=DialogWindow()
+                                        #     demo.show()
+                                        #     sys.exit(app.exec())
+
+                                        if not ok:
+                                            text = random.choice(num_set)
+                                        text = int(text)
+                                    except ValueError:
+                                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.")
+                                        continue
+                                    else:
+                                        if text in num_set:
+                                            num_set = text
+                                            break
+                                        else:
+                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.") 
                             # #===========
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
@@ -4453,30 +4493,80 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                 posev_data[h] = "bye"
     return posev_data
 
-def showdialog(txt):
-        # Создать объект QDialog
-        dialog = QDialog()
-        dialog.setGeometry(300, 300, 290, 550)
-        # dialog.setWindowTitle("Номера посева:")
-        dialog.setWindowTitle(f"Номера посева: {txt}")
-        # Создать кнопку для вновь созданного объекта диалога
-        btn_manual = QPushButton('OK', dialog)
-        btn_random = QPushButton('Рандом', dialog)
-        # Переместить кнопку, установить заголовок диалога
-        btn_manual.setGeometry(150, 30, 50, 50)
-        btn_random.setGeometry(210, 30, 50, 50)
-        te = QTextEdit(dialog)
-        te.setGeometry(30, 30, 50, 50)
-        te.setFocus()
-        te.setTextColor(QColor(255, 0, 0))
-        te.setFontPointSize(20)
-        # te.setAlignment()
-        # font = QFont()
-        # font.setPointSize(48)
-        # self.editor.setFont(font)
-        dialog.exec()
+
+# class DialogWindow(QMainWindow):
+#     def __init__(self):
+#         super(DialogWindow, self).__init__()
+#         # Установить заголовок и начальный размер основного интерфейса
+#         self.setWindowTitle("Пример диалога")
+#         self.resize(350,300)
+
+#         # Создайте кнопку, обратите внимание, что self in () имеет важное значение, используется для загрузки некоторых настроек его свойств
+#         self.btn=QPushButton(self)
+#         # Свойства кнопки #Set: текст, позиция перемещения, функция слота ссылки
+#         self.btn.setText("Всплывающее диалоговое окно")
+#         self.btn.move(50,50)
+#         self.btn.clicked.connect(self.showdialog)
 
 
+#     def showdialog(txt):
+
+#             # Создать объект QDialog
+#         dialog = QDialog()
+#         dialog.setGeometry(300, 300, 290, 550)
+#                 # dialog.setWindowTitle("Номера посева:")
+#         # dialog.setWindowTitle(f"Номера посева: {txt}")
+#         dialog.setWindowTitle("Номера посева:")
+#                 # Создать кнопку для вновь созданного объекта диалога
+#         btn_manual = QPushButton('OK', dialog)
+#         btn_random = QPushButton('Рандом', dialog)
+#                 # Переместить кнопку, установить заголовок диалога
+#         btn_manual.setGeometry(150, 30, 50, 50)
+#         btn_random.setGeometry(210, 30, 50, 50)
+#         te = QTextEdit(dialog)
+#         te.setGeometry(30, 30, 50, 50)
+#         te.setFocus()
+#         te.setTextColor(QColor(255, 0, 0))
+#         te.setFontPointSize(20)
+    
+#         btn_manual.clicked.connect(my_win.manual)
+#         btn_random.clicked.connect(my_win.manual)
+
+# dialog.exec()
+
+
+
+
+# dialog = QDialog()
+
+# def showdialog(txt):
+#             # Создать объект QDialog
+#     # dialog = QDialog()
+#     dialog.setGeometry(300, 300, 290, 550)
+#             # dialog.setWindowTitle("Номера посева:")
+#     dialog.setWindowTitle(f"Номера посева: {txt}")
+#             # Создать кнопку для вновь созданного объекта диалога
+#     btn_manual = QPushButton('OK', dialog)
+#     btn_random = QPushButton('Рандом', dialog)
+#             # Переместить кнопку, установить заголовок диалога
+#     btn_manual.setGeometry(150, 30, 50, 50)
+#     btn_random.setGeometry(210, 30, 50, 50)
+#     te = QTextEdit(dialog)
+#     te.setGeometry(30, 30, 50, 50)
+#     te.setFocus()
+#     te.setTextColor(QColor(255, 0, 0))
+#     te.setFontPointSize(20)
+ 
+#     # btn_manual.clicked.connect(my_win.manual)
+#     # btn_random.clicked.connect(my_win.manual)
+
+#     dialog.exec()
+#     btn_manual.setFocus()
+# my_win.dialog.btn_manual.clicked.connect(my_win.manual)
+# my_win.dialog.btn_random.clicked.connect(my_win.manual)
+
+def manual():
+    print("ok")
 
 def setka_choice_number(fin, count_exit):
     """номера сетки при посеве"""
