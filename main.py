@@ -4350,8 +4350,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                 # =========== определения кол-во возможный вариантов посева у каждого региона
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
-                                if flag is True:
-                                    possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
+                                possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                                 num_posev = list(possible_number.keys())   
                             l = list(possible_number.keys())[0]
                             num_set = possible_number[l]
@@ -4370,24 +4369,27 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                             else: # manual
                                 player_list = []
                                 player_list_tmp = []
-                                # if n != 0:
-                                for j in range(count_sev):
+
+                                for j in possible_number.keys():
                                     posev_list = full_posev[j]
                                     pl = posev_list[1]
                                     reg = posev_list[2]
+                                    pn = possible_number[j]
                                     player_list_tmp.append(pl)
                                     player_list_tmp.append(reg)
+                                    player_list_tmp.append(pn)
+    
                                     player_list.append(player_list_tmp.copy())
                                     player_list_tmp.clear()
                                 txt_tmp = []
     
                                 for g in player_list:
-                                    txt_str = (' - '.join(g))
+                                    t_str = str(g[2])
+                                    txt_str = f"{g[0]} - {g[1]}: {t_str}" 
                                     txt_tmp.append(txt_str)
                                 text_str = (',\n'.join(txt_tmp))
                                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"
                                 txt = (','.join(list(map(str, num_set))))
-                                # showdialog(txt)
                                 while True:
                                     try:
                                         text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
@@ -4466,23 +4468,23 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
 #     def click():
 #         print("ok")
 
-def showdialog(txt):
-    dialog = QDialog()
-    dialog.setGeometry(300, 300, 290, 550)
-    dialog.setWindowTitle(f"Номера посева: {txt}")
-                # Создать кнопку для вновь созданного объекта диалога
-    btn_manual = QPushButton('OK', dialog)
-    btn_random = QPushButton('Рандом', dialog)
-                # Переместить кнопку, установить заголовок диалога
-    btn_manual.setGeometry(150, 30, 50, 50)
-    btn_random.setGeometry(210, 30, 50, 50)
-    te = QTextEdit(dialog)
-    te.setGeometry(30, 30, 50, 50)
-    te.setFocus()
-    te.setTextColor(QColor(255, 0, 0))
-    te.setFontPointSize(20)
-    dialog.setModal(True)
-    dialog.show()
+# def showdialog(txt):
+#     dialog = QDialog()
+#     dialog.setGeometry(300, 300, 290, 550)
+#     dialog.setWindowTitle(f"Номера посева: {txt}")
+#                 # Создать кнопку для вновь созданного объекта диалога
+#     btn_manual = QPushButton('OK', dialog)
+#     btn_random = QPushButton('Рандом', dialog)
+#                 # Переместить кнопку, установить заголовок диалога
+#     btn_manual.setGeometry(150, 30, 50, 50)
+#     btn_random.setGeometry(210, 30, 50, 50)
+#     te = QTextEdit(dialog)
+#     te.setGeometry(30, 30, 50, 50)
+#     te.setFocus()
+#     te.setTextColor(QColor(255, 0, 0))
+#     te.setFontPointSize(20)
+#     dialog.setModal(True)
+#     dialog.show()
 
 
 def setka_choice_number(fin, count_exit):
