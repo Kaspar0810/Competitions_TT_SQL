@@ -4367,25 +4367,32 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                 elif len(num_set) == 1:
                                     num_set = num_set[0]
                             else: # manual
+
+                                model = QStandardItemModel(3,32)
+                                model.setHorizontalHeaderLabels(['Номер', 'Фамилия', 'регион'])
+                                tableView = QTableView()
+                                tableView.setModel(model)
+                                table = Table()
+                                table.show()
+
                                 player_list = []
                                 player_list_tmp = []
 
                                 for j in possible_number.keys():
                                     posev_list = full_posev[j]
-                                    pl = posev_list[1]
-                                    reg = posev_list[2]
-                                    pn = possible_number[j]
+                                    pl = posev_list[1] # фамилия
+                                    reg = posev_list[2] # регион
+                                    pn = possible_number[j] # возможные номера посева
                                     player_list_tmp.append(pl)
                                     player_list_tmp.append(reg)
-                                    player_list_tmp.append(pn)
-    
+                                    player_list_tmp.append(pn)   
                                     player_list.append(player_list_tmp.copy())
                                     player_list_tmp.clear()
                                 txt_tmp = []
     
                                 for g in player_list:
                                     t_str = str(g[2])
-                                    txt_str = f"{g[0]} - {g[1]}: {t_str}" 
+                                    txt_str = f"{g[0]} - {g[1]} номера: {t_str}" 
                                     txt_tmp.append(txt_str)
                                 text_str = (',\n'.join(txt_tmp))
                                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"
@@ -4397,14 +4404,14 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                             text = random.choice(num_set)
                                         text = int(text)
                                     except ValueError:
-                                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.")
+                                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
                                         continue
                                     else:
                                         if text in num_set:
                                             num_set = text
                                             break
                                         else:
-                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер повторите снова.") 
+                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
                             #===========
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]

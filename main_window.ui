@@ -3228,6 +3228,19 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
+    <widget class="QTableView" name="tableView">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>10</y>
+       <width>221</width>
+       <height>271</height>
+      </rect>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::DashDotLine</enum>
+     </property>
+    </widget>
    </widget>
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
