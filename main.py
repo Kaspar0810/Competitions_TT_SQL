@@ -4367,14 +4367,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                 elif len(num_set) == 1:
                                     num_set = num_set[0]
                             else: # manual
-
-                                model = QStandardItemModel(3,32)
-                                model.setHorizontalHeaderLabels(['Номер', 'Фамилия', 'регион'])
-                                tableView = QTableView()
-                                tableView.setModel(model)
-                                table = Table()
-                                table.show()
-
+                                # wiev_table_choice() # функция реального просмотра жеребьевки
                                 player_list = []
                                 player_list_tmp = []
 
@@ -4400,8 +4393,11 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                 while True:
                                     try:
                                         text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
+                                        znak = text_str.find(":")
+                                        fam_city = text_str[:znak - 7]
                                         if not ok:
                                             text = random.choice(num_set)
+                                        msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер: {text}")
                                         text = int(text)
                                     except ValueError:
                                         msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
@@ -4411,7 +4407,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                                             num_set = text
                                             break
                                         else:
-                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
+                                            msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
                             #===========
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
@@ -4460,6 +4456,15 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
     return posev_data
 
 
+def wiev_table_choice():
+    """показ таблицы жеребьевки"""
+    pass
+    model = QStandardItemModel(3,32)
+    model.setHorizontalHeaderLabels(['Номер', 'Фамилия', 'регион'])
+    tableView = QTableView()
+    tableView.setModel(model)
+    table = Table()
+    table.show()
 # class DialogWindow(QMainWindow):
 #     def __init__(self):
 #         super(DialogWindow, self).__init__()
@@ -7890,6 +7895,7 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
 
 def score_in_circle(tr_all, men_of_circle, num_gr, tr):
     """подсчитывает счет по партиям в крутиловке"""
+    result = Result.select().where(Result.id == title_id())
     plr_win = {0: [], 1: [], 2: []}
     plr_los = {0: [], 1: [], 2: []}
     plr_ratio = {0: [], 1: [], 2: []}
@@ -7900,8 +7906,10 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr):
         p2 = int(tour[znak + 1:])  # игрок под номером в группе
         if p1 > p2:  # меняет последовательность игроков в туре на обратную, чтоб у 1-ого игрока был номер меньше
             tour = f"{p2}-{p1}"
-        c = Result.select().where((Result.number_group == num_gr) &
-                                  (Result.tours == tour)).get()  # ищет в базе
+        c_res = result.select().where(Result.number_group == num_gr)
+        c = c_res.select().where(Result.tours == tour).get()
+        # c = Result.select().where((Result.number_group == num_gr) &
+        #                           (Result.tours == tour)).get()  # ищет в базе
         k1 = tr_all[n][0]  # 1-й игрок в туре
         k2 = tr_all[n][1]  # 2-й игрок в туре
         ki1 = tr.index(k1)  # получение индекса 1-й игрока
