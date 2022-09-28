@@ -1414,10 +1414,9 @@ def fill_table_results():
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
                 item = str(list(result_list[row].values())[column])
-                if column < 6:
+                if column < 6 or column > 6:
                     row_result.append(item)
-                    my_win.tableWidget.setItem(
-                        row, column, QTableWidgetItem(str(item)))
+                    # my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
                 elif column == 6:
                     row_result.append(item)
                     if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
@@ -1434,12 +1433,10 @@ def fill_table_results():
                             QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
                         my_win.tableWidget.item(row, 5).setForeground(
                             QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
-                    row_result.clear()
-                    my_win.tableWidget.setItem(
-                        row, column, QTableWidgetItem(str(item)))
-                elif column > 6:
-                    my_win.tableWidget.setItem(
-                        row, column, QTableWidgetItem(str(item)))
+                    # row_result.clear()
+                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                # elif column > 6:
+                #     my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
         my_win.tableWidget.hideColumn(10)
@@ -7895,7 +7892,7 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
 
 def score_in_circle(tr_all, men_of_circle, num_gr, tr):
     """подсчитывает счет по партиям в крутиловке"""
-    result = Result.select().where(Result.id == title_id())
+    result = Result.select().where(Result.title_id == title_id())
     plr_win = {0: [], 1: [], 2: []}
     plr_los = {0: [], 1: [], 2: []}
     plr_ratio = {0: [], 1: [], 2: []}
@@ -7908,8 +7905,6 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr):
             tour = f"{p2}-{p1}"
         c_res = result.select().where(Result.number_group == num_gr)
         c = c_res.select().where(Result.tours == tour).get()
-        # c = Result.select().where((Result.number_group == num_gr) &
-        #                           (Result.tours == tour)).get()  # ищет в базе
         k1 = tr_all[n][0]  # 1-й игрок в туре
         k2 = tr_all[n][1]  # 2-й игрок в туре
         ki1 = tr.index(k1)  # получение индекса 1-й игрока
