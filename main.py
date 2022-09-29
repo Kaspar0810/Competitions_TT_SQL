@@ -1439,10 +1439,13 @@ def fill_table_results():
                 #     my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
+        my_win.tableWidget.showColumn(9) # столбец счет в партиях
+        my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
         my_win.tableWidget.hideColumn(13)
+        my_win.tableWidget.hideColumn(14)
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
 
@@ -1665,6 +1668,7 @@ def page():
     sf = System.select().where(System.title_id == title_id())
     if tb == 0:
         db_select_title()
+        load_tableWidget()
         my_win.tableWidget.show()
         player_list = Player.select().where(Player.title_id == title_id())
         fill_table(player_list)  # заполняет TableWidget списком игроков
@@ -4809,8 +4813,7 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
 
 
 def number_setka_posev_last(cur_gr, group_last, number_last, n):
-    """промежуточные номера для посева в сетке"""
- 
+    """промежуточные номера для посева в сетке""" 
     if n == 0:
         if cur_gr in group_last:
             index = group_last.index(cur_gr)
@@ -5101,11 +5104,13 @@ def color_region_in_tableWidget(fg):
 
 def hide_show_columns(tb):
     """скрывает или показывает столбцы TableWidget"""
-    if tb == 2:
+    if tb == 1 or tb == 2:
         my_win.tableWidget.hideColumn(1)
+        my_win.tableWidget.showColumn(2)
         my_win.tableWidget.showColumn(9)
-    elif tb == 1:
+    elif tb == 0:
         my_win.tableWidget.showColumn(1)
+        my_win.tableWidget.showColumn(2)
         my_win.tableWidget.hideColumn(9)
     my_win.tableWidget.hideColumn(6)
     my_win.tableWidget.hideColumn(10)
