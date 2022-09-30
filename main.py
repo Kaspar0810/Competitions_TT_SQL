@@ -1019,7 +1019,7 @@ def system_made():
 
 def load_tableWidget():
     """Заполняет таблицу списком или рейтингом в зависимости от выбора"""
-    msgBox = QMessageBox
+    # msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
     tb = my_win.tabWidget.currentIndex()
     # сигнал указывающий какой пункт меню нажат
@@ -1295,7 +1295,7 @@ def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
-    if row_count != 0:  # список удаленных игроков пуст
+    if row_count != 0:  # список удаленных игроков пуст если R = 0
         column_count = len(player_selected[0])  # кол-во столбцов в таблице
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
@@ -1307,8 +1307,7 @@ def fill_table(player_list):
                     item = coach.coach
                 else:
                     item = str(list(player_selected[row].values())[column])
-                my_win.tableWidget.setItem(
-                    row, column, QTableWidgetItem(str(item)))
+                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
@@ -5105,24 +5104,14 @@ def color_region_in_tableWidget(fg):
 def hide_show_columns(tb):
     """скрывает или показывает столбцы TableWidget"""
     if tb == 1 or tb == 2:
-        my_win.tableWidget.hideColumn(1)
-        my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.showColumn(9)
+        my_win.tableWidget.showColumn(1)
+        my_win.tableWidget.hideColumn(9)
+        my_win.tableWidget.hideColumn(10)
+        my_win.tableWidget.hideColumn(11)
     elif tb == 0:
         my_win.tableWidget.showColumn(1)
         my_win.tableWidget.showColumn(2)
         my_win.tableWidget.hideColumn(9)
-    my_win.tableWidget.hideColumn(6)
-    my_win.tableWidget.hideColumn(10)
-    my_win.tableWidget.hideColumn(11)
-    my_win.tableWidget.hideColumn(12)
-    my_win.tableWidget.hideColumn(13)
-    my_win.tableWidget.hideColumn(14)
-    my_win.tableWidget.hideColumn(15)
-    my_win.tableWidget.hideColumn(16)
-    my_win.tableWidget.hideColumn(17)
-    my_win.tableWidget.hideColumn(18)
-    my_win.tableWidget.hideColumn(19)
 
 
 def etap_made():
