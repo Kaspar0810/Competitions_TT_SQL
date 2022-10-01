@@ -408,7 +408,6 @@ my_win.setWindowTitle("Соревнования по настольному те
 
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
-
     def __init__(self):
         super(StartWindow, self).__init__()
         self.setupUi(self)  # загружает настройки формы(окна) из QT
@@ -818,8 +817,7 @@ def tab_enabled(gamer):
                 my_win.toolBox.setItemEnabled(2, True)
                 for i in stage:
                     if i == "Одна таблица":
-                        system = System.get(
-                            System.title_id == title and System.stage == i)
+                        system = System.get(System.title_id == title and System.stage == i)
                         flag = system.choice_flag
                         if flag is True:
                             my_win.tabWidget.setTabEnabled(3, False)
@@ -977,7 +975,7 @@ def db_select_title():
     my_win.lineEdit_sekretar.setText(titles.secretary)
     my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
     my_win.lineEdit_title_gamer.setText(titles.gamer)
-    # tab_enabled(gamer)
+    tab_enabled(gamer)
 
     return gamer
 
@@ -8776,7 +8774,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-my_win.Button_proba.clicked.connect(progress_bar)
+# my_win.Button_proba.clicked.connect(progress_bar)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
