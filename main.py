@@ -847,6 +847,7 @@ def tab_enabled(gamer):
             my_win.tabWidget.setTabEnabled(4, False)
             my_win.tabWidget.setTabEnabled(5, False)
             my_win.tabWidget.setCurrentIndex(0)
+            my_win.lineEdit_title_gamer.setText(gamer)
     else:
         my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
         my_win.tabWidget.setTabEnabled(3, False)
@@ -958,8 +959,8 @@ def db_select_title():
         change_sroki()
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
-        gamer = txt[39:]
-        name = txt[:37]
+        gamer = txt[key +  1:]
+        name = txt[:key]
         sroki = fir_window.label_4.text()
         data = sroki[9:19]
         full_name = f"{name}.{data}.{gamer}"
@@ -1268,26 +1269,42 @@ def title_update():
 
 def find_in_rlist():
     """при создании списка участников ищет спортсмена в текущем R-листе"""
+    msgBox = QMessageBox
+    r_data_m = [R_list_m, R1_list_m]
+    r_data_w = [R_list_d, R1_list_d]
     t_id = Title.get(Title.id == title_id())
     gamer = t_id.gamer
-    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-        r_list = R_list_d
-    else:
-        r_list = R_list_m
-
     my_win.listWidget.clear()
     my_win.textEdit.clear()
     fp = my_win.lineEdit_Family_name.text()
     fp = fp.capitalize()  # Переводит первую букву в заглавную
-    p = r_list.select()
-    p = p.where(r_list.r_fname ** f'{fp}%')  # like
-    if (len(p)) == 0:
-        my_win.textEdit.setText("Нет спортсменов в рейтинг листе")
-    else:
-        for pl in p:
-            full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
-            my_win.listWidget.addItem(full_stroka)
 
+    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+        r_data = r_data_w
+    else:
+        r_data = r_data_m
+    r = 0
+    for r_list in r_data:
+        p = r_list.select()
+        if r == 0:
+            p = p.where(r_list.r_fname ** f'{fp}%')  # like 
+        else:
+            p = p.where(r_list.r1_fname ** f'{fp}%')  # like 
+        count = len(p)
+        if len(p) > 0:
+            for pl in p:
+                if r == 0:
+                    full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+                else:
+                    full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
+                my_win.listWidget.addItem(full_stroka)
+            return
+        else:
+            r += 1
+            reply = msgBox.information(my_win, 'Уведомление', 'Такого спортсмена в текущем рейтинг листе нет\nОтображаю список участников в январском рейтинге',
+                                    msgBox.Ok)
+            continue
+    
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
