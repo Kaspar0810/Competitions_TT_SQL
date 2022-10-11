@@ -1270,7 +1270,6 @@ def title_update():
 def find_in_rlist():
     """при создании списка участников ищет спортсмена в текущем R-листе"""
     msgBox = QMessageBox
-    flag = 0 
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
     t_id = Title.get(Title.id == title_id())
@@ -1285,27 +1284,30 @@ def find_in_rlist():
     else:
         r_data = r_data_m
     r = 0
-    if flag == 0:
-        for r_list in r_data:
-            p = r_list.select()
+    for r_list in r_data:
+        p = r_list.select()
+        if r == 0:
+            p = p.where(r_list.r_fname ** f'{fp}%')  # like поиск в текущем рейтинге
+        if r == 0  and len(p) > 0:
+            for pl in p:
+                full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+            my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+            return
+        elif r == 0:
+            r = 1
+            continue
+        else:
+            p = p.where(r_list.r1_fname ** f'{fp}%')  # like поиск в январском рейтинге
+            for pl in p:
+                full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
+                flag = 1
+            my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+            return
             if r == 0:
-                p = p.where(r_list.r_fname ** f'{fp}%')  # like поиск в текущем рейтинге
-            else:
-                p = p.where(r_list.r1_fname ** f'{fp}%')  # like поиск в январском рейтинге
-            if len(p) > 0:
-                for pl in p:
-                    if r == 0:
-                        full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
-                    else:
-                        full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
-                        flag = 1
-                    my_win.listWidget.addItem(full_stroka)
-                return
-            else:
                 r += 1
                 reply = msgBox.information(my_win, 'Уведомление', 'Такого спортсмена в текущем рейтинг листе нет\nОтображаю список участников в январском рейтинге',
-                                        msgBox.Ok)
-                continue
+                                            msgBox.Ok)
+            continue
     # else:
         
 
