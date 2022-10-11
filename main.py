@@ -1270,6 +1270,7 @@ def title_update():
 def find_in_rlist():
     """при создании списка участников ищет спортсмена в текущем R-листе"""
     msgBox = QMessageBox
+    flag = 0 
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
     t_id = Title.get(Title.id == title_id())
@@ -1284,27 +1285,39 @@ def find_in_rlist():
     else:
         r_data = r_data_m
     r = 0
-    for r_list in r_data:
-        p = r_list.select()
-        if r == 0:
-            p = p.where(r_list.r_fname ** f'{fp}%')  # like 
-        else:
-            p = p.where(r_list.r1_fname ** f'{fp}%')  # like 
-        count = len(p)
-        if len(p) > 0:
-            for pl in p:
-                if r == 0:
-                    full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
-                else:
-                    full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
-                my_win.listWidget.addItem(full_stroka)
-            return
-        else:
-            r += 1
-            reply = msgBox.information(my_win, 'Уведомление', 'Такого спортсмена в текущем рейтинг листе нет\nОтображаю список участников в январском рейтинге',
-                                    msgBox.Ok)
-            continue
-    
+    if flag == 0:
+        for r_list in r_data:
+            p = r_list.select()
+            if r == 0:
+                p = p.where(r_list.r_fname ** f'{fp}%')  # like поиск в текущем рейтинге
+            else:
+                p = p.where(r_list.r1_fname ** f'{fp}%')  # like поиск в январском рейтинге
+            if len(p) > 0:
+                for pl in p:
+                    if r == 0:
+                        full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+                    else:
+                        full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
+                        flag = 1
+                    my_win.listWidget.addItem(full_stroka)
+                return
+            else:
+                r += 1
+                reply = msgBox.information(my_win, 'Уведомление', 'Такого спортсмена в текущем рейтинг листе нет\nОтображаю список участников в январском рейтинге',
+                                        msgBox.Ok)
+                continue
+    # else:
+        
+
+def input_player():
+    """Ввод нового игрока если его нет в рейтинг листе текущем и январском"""
+    text = my_win.lineEdit_Family_name.text()
+    zn = text.find(" ")
+    family = text[:zn]
+    name = text[zn:]
+    my_win.lineEdit_bday.setFocus()
+
+
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
@@ -4832,7 +4845,7 @@ def number_setka_posev_last(cur_gr, group_last, number_last, n):
         if cur_gr in group_last:
             index = group_last.index(cur_gr)
             set_number = number_last[index] # номер где уже посеянна такая же область 
-            if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
+            if set_number <= 32 // 2: # если номер в сетке вверху, то надо сеять вниз
                 number_posev_old  = [i for i in number_last if i > 32 // 2] # отсеивает в списке номера больше 16
             else: 
                 number_posev_old  = [i for i in number_last if i <= 32 // 2] # отсеивает в списке номера больше 16 
@@ -8711,6 +8724,8 @@ my_win.lineEdit_pl1_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
+
+my_win.lineEdit_Family_name.returnPressed.connect(input_player)
 
 # ====== отслеживание изменения текста в полях ============
 
