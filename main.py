@@ -1334,16 +1334,25 @@ def find_city():
     """Поиск городов и область"""
     my_win.listWidget.clear()
     my_win.textEdit.clear()
-    city_f = my_win.lineEdit_city_list.text()
-    city_f = city_f.capitalize()  # Переводит первую букву в заглавную
-    c = City.select()
-    c = c.where(City.city ** f'{city_f}%')  # like
-    if (len(c)) == 0:
-        my_win.textEdit.setText("Нет города в базе")
+    txt_city = my_win.label_63.text()
+    city_field = my_win.lineEdit_city_list.text()
+    if txt_city != "":
+        city_field = city_field.capitalize()  # Переводит первую букву в заглавную
+        c = City.select()
+        c = c.where(City.city ** f'{city_field}%')  # like
+        if (len(c)) == 0:
+            my_win.textEdit.setText("Нет такого города в базе")
+            my_win.comboBox_region.setCurrentText("")
+        else:  # вставляет регион соответсвующий городу
+            for ccp in c:
+                full_stroka = ccp.city
+                my_win.listWidget.addItem(full_stroka)
     else:
-        for ccp in c:
-            full_stroka = ccp.city
-            my_win.listWidget.addItem(full_stroka)
+        cr = City.get(City.city == city_field)
+        rg = Region.get(Region.id == cr.region_id)
+        my_win.comboBox_region.setCurrentText(rg.region)
+        my_win.listWidget.clear()
+
 
 
 def fill_table(player_list):
@@ -1627,7 +1636,8 @@ def dclick_in_listwidget():
     coach_field = my_win.lineEdit_coach.text()
     city_field = my_win.lineEdit_city_list.text()
     if txt_tmp == "Список городов.":
-        my_win.lineEdit_city_list.seText(text)
+        my_win.label_63.setText("")
+        my_win.lineEdit_city_list.setText(text)       
     elif coach_field == "":
         ds = len(text)
         sz = text.index(",")
