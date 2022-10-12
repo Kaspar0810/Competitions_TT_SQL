@@ -1287,28 +1287,27 @@ def find_in_rlist():
     for r_list in r_data:
         p = r_list.select()
         if r == 0:
+            my_win.label_63.setText("Поиск в текущем рейтинг листе.")
             p = p.where(r_list.r_fname ** f'{fp}%')  # like поиск в текущем рейтинге
-        if r == 0  and len(p) > 0:
-            for pl in p:
-                full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
-            my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-            return
-        elif r == 0:
-            r = 1
-            continue
+            if r == 0  and len(p) != 0:
+                for pl in p:
+                    full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+                    my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+                return
+            elif r == 0:
+                r = 1
+                continue
         else:
+            my_win.label_63.setText("Поиск в январском рейтинге.")
             p = p.where(r_list.r1_fname ** f'{fp}%')  # like поиск в январском рейтинге
-            for pl in p:
-                full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
-                flag = 1
-            my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+            if len(p) > 0:
+                for pl in p:
+                    full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
+                    my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+            else:
+                full_stroka = ""
+                my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
             return
-            if r == 0:
-                r += 1
-                reply = msgBox.information(my_win, 'Уведомление', 'Такого спортсмена в текущем рейтинг листе нет\nОтображаю список участников в январском рейтинге',
-                                            msgBox.Ok)
-            continue
-    # else:
         
 
 def input_player():
@@ -1316,9 +1315,35 @@ def input_player():
     text = my_win.lineEdit_Family_name.text()
     zn = text.find(" ")
     family = text[:zn]
-    name = text[zn:]
+    name = text[zn + 1:]
+    family = family.upper()
+    name = name.capitalize()  # Переводит первую букву в заглавную
+    my_win.lineEdit_Family_name.setText(f"{family} {name}")
     my_win.lineEdit_bday.setFocus()
+    my_win.lineEdit_bday.setInputMask('00.00.0000')
 
+
+def next_field():
+    """переход к соледующему полю ввода спортсмена"""
+    my_win.lineEdit_R.setText('0')
+    my_win.label_63.setText("Список городов.")
+    my_win.lineEdit_city_list.setFocus()
+
+
+def find_city():
+    """Поиск городов и область"""
+    my_win.listWidget.clear()
+    my_win.textEdit.clear()
+    city_f = my_win.lineEdit_city_list.text()
+    city_f = city_f.capitalize()  # Переводит первую букву в заглавную
+    c = City.select()
+    c = c.where(City.city ** f'{city_f}%')  # like
+    if (len(c)) == 0:
+        my_win.textEdit.setText("Нет города в базе")
+    else:
+        for ccp in c:
+            full_stroka = ccp.city
+            my_win.listWidget.addItem(full_stroka)
 
 
 def fill_table(player_list):
@@ -1596,10 +1621,14 @@ def add_player():
 
 def dclick_in_listwidget():
     """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""
+    txt_tmp = my_win.label_63.text()
     text = my_win.listWidget.currentItem().text()
     # если строка "тренер" пустая значит заполняются поля игрока
-    tc = my_win.lineEdit_coach.text()
-    if tc == "":
+    coach_field = my_win.lineEdit_coach.text()
+    city_field = my_win.lineEdit_city_list.text()
+    if txt_tmp == "Список городов.":
+        my_win.lineEdit_city_list.seText(text)
+    elif coach_field == "":
         ds = len(text)
         sz = text.index(",")
         sz1 = text.index(",", sz + 1)
@@ -8728,12 +8757,13 @@ my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
 
 my_win.lineEdit_Family_name.returnPressed.connect(input_player)
-
+my_win.lineEdit_bday.returnPressed.connect(next_field)
 # ====== отслеживание изменения текста в полях ============
 
 # my_win.lineEdit_find_name.textChanged.connect(result_filter_name)
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
+my_win.lineEdit_city_list.textChanged.connect(find_city)
 # ============= двойной клик
 # двойной клик по listWidget (рейтинг, тренеры)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
