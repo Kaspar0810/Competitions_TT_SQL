@@ -1332,27 +1332,27 @@ def next_field():
 
 def find_city():
     """Поиск городов и область"""
+    sender = my_win.sender()
     my_win.listWidget.clear()
     my_win.textEdit.clear()
-    txt_city = my_win.label_63.text()
+    txt = my_win.label_63.text()
     city_field = my_win.lineEdit_city_list.text()
-    if txt_city != "":
+    if txt == "Список городов.":
         city_field = city_field.capitalize()  # Переводит первую букву в заглавную
         c = City.select()
         c = c.where(City.city ** f'{city_field}%')  # like
-        if (len(c)) == 0:
-            my_win.textEdit.setText("Нет такого города в базе")
-            my_win.comboBox_region.setCurrentText("")
+        if sender != my_win.comboBox_region:
+            if (len(c)) == 0:
+                my_win.textEdit.setText("Нет такого города в базе")
         else:  # вставляет регион соответсвующий городу
-            for ccp in c:
-                full_stroka = ccp.city
-                my_win.listWidget.addItem(full_stroka)
-    else:
-        cr = City.get(City.city == city_field)
-        rg = Region.get(Region.id == cr.region_id)
-        my_win.comboBox_region.setCurrentText(rg.region)
-        my_win.listWidget.clear()
-
+            if city_field != "":
+                ir = my_win.comboBox_region.currentIndex()
+                ir = ir + 1
+                ct = my_win.lineEdit_city_list.text()
+                with db:
+                    city = City(city=ct, region_id=ir).save()
+    elif txt == "Рейтинг":
+        pass
 
 
 def fill_table(player_list):
@@ -1913,15 +1913,15 @@ def add_city():
     c = City.select()  # находит город и соответсвующий ему регион
     c = c.where(City.city ** f'{ci}')  # like
     if len(c) == 0:  # Если связки город-регион нет в базе то дабавляет
-        result = msgBox.information(my_win, "Уведомление", "Выберите регион в которм находится населенный пункт.",
+        result = msgBox.information(my_win, "Уведомление", "Выберите регион в котором находится населенный пункт.",
                                 msgBox.Ok)
-        if result == msgBox.Ok:
-            my_win.comboBox_region.setCurrentText("")
-        # ir = my_win.comboBox_region.currentIndex()
-        # ir = ir + 1
-        # ct = my_win.lineEdit_city_list.text()
-        # with db:
-        #     city = City(city=ct, region_id=ir).save()
+        # if result == msgBox.Ok:
+        #     # my_win.comboBox_region.setCurrentText("")
+        #     ir = my_win.comboBox_region.currentIndex()
+        #     ir = ir + 1
+        #     ct = my_win.lineEdit_city_list.text()
+        #     with db:
+        #         city = City(city=ct, region_id=ir).save()
 
 
 def find_coach():
@@ -8778,10 +8778,10 @@ my_win.lineEdit_bday.returnPressed.connect(next_field)
 my_win.lineEdit_city_list.returnPressed.connect(add_city)
 # ====== отслеживание изменения текста в полях ============
 
-# my_win.lineEdit_find_name.textChanged.connect(result_filter_name)
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
+my_win.comboBox_region.currentTextChanged.connect(find_city)
 # ============= двойной клик
 # двойной клик по listWidget (рейтинг, тренеры)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
