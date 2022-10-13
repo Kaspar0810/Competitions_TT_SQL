@@ -1908,15 +1908,20 @@ def page():
 
 def add_city():
     """добавляет в таблицу город и соответсвующий ему регион"""
+    msgBox = QMessageBox
     ci = my_win.lineEdit_city_list.text()
     c = City.select()  # находит город и соответсвующий ему регион
     c = c.where(City.city ** f'{ci}')  # like
-    if (len(c)) == 0:  # Если связки город-регион нет в базе то дабавляет
-        ir = my_win.comboBox_region.currentIndex()
-        ir = ir + 1
-        ct = my_win.lineEdit_city_list.text()
-        with db:
-            city = City(city=ct, region_id=ir).save()
+    if len(c) == 0:  # Если связки город-регион нет в базе то дабавляет
+        result = msgBox.information(my_win, "Уведомление", "Выберите регион в которм находится населенный пункт.",
+                                msgBox.Ok)
+        if result == msgBox.Ok:
+            my_win.comboBox_region.setCurrentText("")
+        # ir = my_win.comboBox_region.currentIndex()
+        # ir = ir + 1
+        # ct = my_win.lineEdit_city_list.text()
+        # with db:
+        #     city = City(city=ct, region_id=ir).save()
 
 
 def find_coach():
@@ -1927,12 +1932,14 @@ def find_coach():
     cp = cp.capitalize()  # Переводит первую букву в заглавную
     c = Coach.select()
     c = c.where(Coach.coach ** f'{cp}%')  # like
-    if (len(c)) == 0:
-        my_win.textEdit.setText("Нет тренера в базе")
-    else:
-        for chp in c:
-            full_stroka = chp.coach
-            my_win.listWidget.addItem(full_stroka)
+    tochka = cp.find(".")
+    if tochka == -1:
+        if (len(c)) == 0:
+            my_win.textEdit.setText("Нет тренера в базе")
+        else:
+            for chp in c:
+                full_stroka = chp.coach
+                my_win.listWidget.addItem(full_stroka)
 
 
 def add_coach(ch, num):
@@ -8768,6 +8775,7 @@ my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
 
 my_win.lineEdit_Family_name.returnPressed.connect(input_player)
 my_win.lineEdit_bday.returnPressed.connect(next_field)
+my_win.lineEdit_city_list.returnPressed.connect(add_city)
 # ====== отслеживание изменения текста в полях ============
 
 # my_win.lineEdit_find_name.textChanged.connect(result_filter_name)
