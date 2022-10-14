@@ -1339,6 +1339,11 @@ def find_city():
     city_field = my_win.lineEdit_city_list.text()
     if txt == "Список городов.":
         city_field = city_field.capitalize()  # Переводит первую букву в заглавную
+        index = city_field.find(".")
+        if index != -1:
+            second_word = city_field[index + 1:]
+            second_word = second_word.capitalize()
+            city_field = city_field[:index + 1] + second_word
         c = City.select()
         c = c.where(City.city ** f'{city_field}%')  # like
         if sender != my_win.comboBox_region:
@@ -1349,10 +1354,6 @@ def find_city():
                     full_stroka = f"{pl.city}"
                     my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
                 return
-                # cr = City.get(City.city == city_field)
-                # rg = Region.get(Region.id == cr.region_id)
-                # my_win.comboBox_region.setCurrentText(rg.region)
-                # my_win.listWidget.clear()
         else:  # вставляет регион соответсвующий городу
             if city_field != "":
                 ir = my_win.comboBox_region.currentIndex()
@@ -1641,22 +1642,29 @@ def dclick_in_listwidget():
     """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""
     txt_tmp = my_win.label_63.text()
     text = my_win.listWidget.currentItem().text()
-    # если строка "тренер" пустая значит заполняются поля игрока
     coach_field = my_win.lineEdit_coach.text()
-    city_field = my_win.lineEdit_city_list.text()
-    if txt_tmp == "Список городов.":
+    if txt_tmp == "Список городов.": # если в listwidget список городов которые есть в базе
         my_win.label_63.setText("")
-        my_win.lineEdit_city_list.setText(text)       
-    elif coach_field == "":
+        my_win.lineEdit_city_list.setText(text)    
+        cr = City.get(City.city == text)
+        rg = Region.get(Region.id == cr.region_id)
+        my_win.comboBox_region.setCurrentText(rg.region)
+        my_win.listWidget.clear()   
+    elif coach_field == "": # если строка "тренер" пустая значит заполняются поля игрока
         ds = len(text)
         sz = text.index(",")
         sz1 = text.index(",", sz + 1)
         sz2 = text.index(",", sz1 + 1)
-        fam = text[0:sz]
+        fam_name = text[0:sz]
+        znak = fam_name.find(" ")
+        fam = fam_name[:znak]
+        fam = fam.upper()
+        name = fam_name[znak + 1:]
+        name = name.capitalize()
         r = text[sz + 2:sz1]
         dr = text[sz1 + 2:sz2]
         ci = text[sz2 + 2:ds]
-        my_win.lineEdit_Family_name.setText(fam)
+        my_win.lineEdit_Family_name.setText(f"{fam} {name}")
         my_win.lineEdit_bday.setText(dr)
         my_win.lineEdit_R.setText(r)
         my_win.lineEdit_city_list.setText(ci)
@@ -1917,24 +1925,20 @@ def page():
 
 def add_city():
     """добавляет в таблицу город и соответсвующий ему регион"""
-    msgBox = QMessageBox
-    ci = my_win.lineEdit_city_list.text()
-    c = City.select()  # находит город и соответсвующий ему регион
-    c = c.where(City.city ** f'{ci}')  # like
-    if len(c) == 0:  # Если связки город-регион нет в базе то дабавляет
-        result = msgBox.information(my_win, "Уведомление", "Выберите регион в котором находится населенный пункт.",
-                                msgBox.Ok)
-        # if result == msgBox.Ok:
-        #     # my_win.comboBox_region.setCurrentText("")
-        #     ir = my_win.comboBox_region.currentIndex()
-        #     ir = ir + 1
-        #     ct = my_win.lineEdit_city_list.text()
-        #     with db:
-        #         city = City(city=ct, region_id=ir).save()
+    city_field = my_win.lineEdit_city_list.text()
+    city_field = city_field.capitalize()  # Переводит первую букву в заглавную
+    index = city_field.find(".")
+    if index != -1:
+        second_word = city_field[index + 1:]
+        second_word = second_word.capitalize()
+        city_field = city_field[:index + 1] + second_word
+    my_win.lineEdit_city_list.setText(city_field)
+    my_win.textEdit.setText("Выберите регион в котором находится населенный пункт.")
 
 
 def find_coach():
     """поиск тренера в базе"""
+    my_win.label_63.setText("Список тренеров.")
     my_win.listWidget.clear()
     my_win.textEdit.clear()
     cp = my_win.lineEdit_coach.text()
