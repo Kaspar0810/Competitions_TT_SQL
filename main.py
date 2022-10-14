@@ -1344,6 +1344,15 @@ def find_city():
         if sender != my_win.comboBox_region:
             if (len(c)) == 0:
                 my_win.textEdit.setText("Нет такого города в базе")
+            else:
+                for pl in c:
+                    full_stroka = f"{pl.city}"
+                    my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+                return
+                # cr = City.get(City.city == city_field)
+                # rg = Region.get(Region.id == cr.region_id)
+                # my_win.comboBox_region.setCurrentText(rg.region)
+                # my_win.listWidget.clear()
         else:  # вставляет регион соответсвующий городу
             if city_field != "":
                 ir = my_win.comboBox_region.currentIndex()
