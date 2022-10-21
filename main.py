@@ -1251,7 +1251,6 @@ def title_update():
     kr = title_str[7]
     sk = title_str[8]
     ks = title_str[9]
-    # gm = title_str[10]
 
     nazv = Title.select().order_by(Title.id.desc()).get()
     nazv.name = nm
@@ -1263,26 +1262,35 @@ def title_update():
     nazv.kat_ref = kr
     nazv.secretary = sk
     nazv.kat_sek = ks
-    # nazv.gamer = gm
     nazv.save()
 
 
 def find_in_rlist():
     """при создании списка участников ищет спортсмена в текущем R-листе"""
-    msgBox = QMessageBox
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
     t_id = Title.get(Title.id == title_id())
     gamer = t_id.gamer
     my_win.listWidget.clear()
     my_win.textEdit.clear()
-    fp = my_win.lineEdit_Family_name.text()
-    fp = fp.capitalize()  # Переводит первую букву в заглавную
+    txt = my_win.lineEdit_Family_name.text()
 
+    zn = txt.find(" ")
+    if zn != -1:
+        family = txt[:zn]
+        name = txt[zn + 1:]
+        if name != "":
+            family = family.capitalize()
+            name = name.capitalize()  # Переводит первую букву в заглавную
+            txt = f"{family} {name}"
+    else:
+        txt = txt.capitalize()  # Переводит первую букву в заглавную
+    fp = txt
     if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
         r_data = r_data_w
     else:
         r_data = r_data_m
+     
     r = 0
     for r_list in r_data:
         p = r_list.select()
@@ -1308,7 +1316,7 @@ def find_in_rlist():
                 full_stroka = ""
                 my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
             return
-        
+      
 
 def input_player():
     """Ввод нового игрока если его нет в рейтинг листе текущем и январском"""
@@ -1316,8 +1324,9 @@ def input_player():
     zn = text.find(" ")
     family = text[:zn]
     name = text[zn + 1:]
+    family = family.capitalize()
+    name = name.capitalize()  # Переводит первую букву в заглавную  
     family = family.upper()
-    name = name.capitalize()  # Переводит первую букву в заглавную
     my_win.lineEdit_Family_name.setText(f"{family} {name}")
     my_win.lineEdit_bday.setFocus()
     my_win.lineEdit_bday.setInputMask('00.00.0000')
@@ -1326,6 +1335,8 @@ def input_player():
 def next_field():
     """переход к соледующему полю ввода спортсмена"""
     my_win.lineEdit_R.setText('0')
+    pl = my_win.lineEdit_Family_name.text()
+    check_rejting_pay(pl, txt_edit="")
     my_win.label_63.setText("Список городов.")
     my_win.lineEdit_city_list.setFocus()
 
@@ -1334,7 +1345,7 @@ def find_city():
     """Поиск городов и область"""
     sender = my_win.sender()
     my_win.listWidget.clear()
-    my_win.textEdit.clear()
+    # my_win.textEdit.clear()
     txt = my_win.label_63.text()
     city_field = my_win.lineEdit_city_list.text()
     if txt == "Список городов.":
@@ -1474,7 +1485,6 @@ def fill_table_results():
         elif tb == 5:  # здесь надо выбрать финалы (круг или сетка)
             player_result = result.select().order_by(Result.id).where(Result.title_id == title_id() and
                                                                       Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
-            # player_result = pl_result.select().where(Result.system_stage == stage)
             count_result = len(player_result)
             if count_result == 0:
                 return
@@ -1575,6 +1585,15 @@ def progressbar(count):
     # m = int(count / 100)
     # for i in range(m, count, m):
     #     progress.setValue(100)
+def debtor_R():
+    """показывает список должников оплаты рейтинга"""
+    player_list = Player.select().where(Player.title_id == title_id())
+    if my_win.checkBox_11.isChecked():
+        player_debtor = player_list.select().where(Player.pay_rejting == "долг")
+    else:
+        player_debtor = player_list.select()
+        my_win.Button_pay_R.setEnabled(False)
+    fill_table(player_debtor)
 
 
 def add_player():
@@ -1593,6 +1612,7 @@ def add_player():
     fn = f"{pl}/ {ct}"
 
     add_coach(ch, num)
+    txt_edit = my_win.textEdit.toPlainText()
     ms = "" # записвыает место в базу как пустое
     idc = Coach.get(Coach.coach == ch)
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
@@ -1622,7 +1642,7 @@ def add_player():
         elif txt == "Добавить":
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
-                                coach_id=idc, mesto="", full_name=fn, title_id=title_id()).save()
+                                coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting="", comment="").save()
     spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
     for i in range(0, 9):  # добавляет в tablewidget
         my_win.tableWidget.setItem(count + 1, i, QTableWidgetItem(spisok[i]))
@@ -1636,6 +1656,26 @@ def add_player():
     my_win.lineEdit_R.clear()
     my_win.lineEdit_city_list.clear()
     my_win.lineEdit_coach.clear()
+    check_rejting_pay(pl, txt_edit)
+
+
+def check_rejting_pay(pl, txt_edit):
+    """Проверка игрока на оплату рейтинга и запись в базу данных"""
+    txt_tmp = my_win.label_63.text()
+    if txt_tmp == "Поиск в январском рейтинге.":
+        b_day = my_win.lineEdit_bday.text()
+        year_player = int(b_day[6:])
+        date_current = int(datetime.today().strftime("%Y"))
+        raznica = date_current - year_player
+        if raznica > 11:
+            my_win.textEdit.setText("Спортсмену необходимо оплатить рейтинг!")
+    elif txt_edit == "Спортсмену необходимо оплатить рейтинг!":
+        plr = Player.select().where(Player.title_id == title_id())
+        with db:
+            player_id = plr.select().where(Player.player == pl).get()
+            player_id.pay_rejting = "долг"
+            player_id.comment = ""
+            player_id.save()
 
 
 def dclick_in_listwidget():
@@ -1671,7 +1711,7 @@ def dclick_in_listwidget():
         c = City.select()  # находит город и соответсвующий ему регион
         c = c.where(City.city ** f'{ci}')  # like
         if (len(c)) == 0:
-            my_win.textEdit.setText("Нет такого города в базе")
+            my_win.textEdit.setText("Нет такого города в базе, выберите регион где находится населенный пункт.")
             my_win.comboBox_region.setCurrentText("")
         else:  # вставляет регион соответсвующий городу
             cr = City.get(City.city == ci)
@@ -1763,6 +1803,7 @@ def page():
         my_win.tableWidget.show()
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_clear_del.setEnabled(False)
+        my_win.Button_pay_R.setEnabled(False)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
         player_list = Player.select().where(Player.title_id == title_id())
@@ -1940,16 +1981,16 @@ def find_coach():
     """поиск тренера в базе"""
     my_win.label_63.setText("Список тренеров.")
     my_win.listWidget.clear()
-    my_win.textEdit.clear()
+    # my_win.textEdit.clear()
     cp = my_win.lineEdit_coach.text()
     cp = cp.capitalize()  # Переводит первую букву в заглавную
     c = Coach.select()
     c = c.where(Coach.coach ** f'{cp}%')  # like
     tochka = cp.find(".")
     if tochka == -1:
-        if (len(c)) == 0:
-            my_win.textEdit.setText("Нет тренера в базе")
-        else:
+        if (len(c)) != 0:
+        #     my_win.textEdit.setText("Нет тренера в базе")
+        # else:
             for chp in c:
                 full_stroka = chp.coach
                 my_win.listWidget.addItem(full_stroka)
@@ -1966,7 +2007,7 @@ def add_coach(ch, num):
     for c in coach:
         coa = Coach.select().where(Coach.coach == ch)
         if bool(coa):
-            my_win.textEdit.setText("Такой тренер(ы) существует")
+            # my_win.textEdit.setText("Такой тренер(ы) существует")
             return
         else:
             cch = Coach(coach=ch, player_id=num).save()
@@ -2986,13 +3027,32 @@ def select_player_in_list():
         my_win.Button_del_player.setEnabled(True)
         my_win.Button_add_edit_player.setEnabled(True)
         my_win.Button_add_edit_player.setText("Редактировать")
+    if my_win.checkBox_11.isChecked():  # отмечен флажок -оплата R-
+        my_win.Button_pay_R.setEnabled(True)
+    else:
+        my_win.Button_pay_R.setEnabled(False)
+
+def save_in_db_pay_R():
+    """запись в базу данных оплату рейтинга"""
+    r = my_win.tableWidget.currentRow()
+    family = my_win.tableWidget.item(r, 1).text()
+    player = Player.select().where(Player.title_id == title_id())
+    plr = player.select().where(Player.player == family).get()
+    comment, ok = QInputDialog.getText(my_win, "Коментарий", "Введите коментарий о месте нахождении квитанции.")
+    if ok:
+        with db:
+            plr.pay_rejting = "оплачен"
+            plr.comment = comment
+            plr.save()
+    else:
+        return
+    debtor_R()
 
 
 def select_player_in_game():
     """выводит фамилии игроков встречи"""
     tab = my_win.tabWidget.currentIndex()
     r = my_win.tableWidget.currentRow()
-
     if tab == 1:
         select_player_in_list()
     elif tab ==2:
@@ -8738,7 +8798,7 @@ def tours_list(cp):
 
 
 
-
+# 
 
 
 # def proba():
@@ -8746,14 +8806,14 @@ def tours_list(cp):
 
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
-#     short_name_comp = CharField(default='')
+#     comment = CharField(default='')
 #     # mesta_exit = IntegerField(null=True)  # новый столбец, его поле и значение по умолчанию
 # #
 #     with db:
 #         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
 #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
 #         # migrate(migrator.rename_column('system', 'stage_final', 'stage_exit'))
-#         migrate(migrator.add_column('titles', 'short_name_comp', short_name_comp))
+#         migrate(migrator.add_column('players', 'comment', comment))
 
     # ========================= создание таблицы
     # with db:
@@ -8847,11 +8907,13 @@ my_win.checkBox_7.stateChanged.connect(no_play)  # поражение по не�
 my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по неявке
 my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке
 my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке
+my_win.checkBox_11.stateChanged.connect(debtor_R) # должники рейтинга оплаты
 # =======  нажатие кнопок =========
 
 
 my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
 my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
+my_win.Button_pay_R.clicked.connect(save_in_db_pay_R)
 my_win.Button_clear_del.clicked.connect(clear_del_player)
 my_win.Button_reset_filter.clicked.connect(reset_filter)
 my_win.Button_reset_filter_fin.clicked.connect(reset_filter)
@@ -8869,7 +8931,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(progress_bar)
+# my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)

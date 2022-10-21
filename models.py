@@ -115,6 +115,8 @@ class Player(BaseModel):
     mesto = IntegerField(null=True)
     full_name = CharField()
     title_id = ForeignKeyField(Title)
+    pay_rejting = CharField(50)
+    comment = CharField()
 
     class Meta:
         db_table = "players"
