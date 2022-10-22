@@ -1018,7 +1018,6 @@ def system_made():
 
 def load_tableWidget():
     """Заполняет таблицу списком или рейтингом в зависимости от выбора"""
-    # msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
     tb = my_win.tabWidget.currentIndex()
     # сигнал указывающий какой пункт меню нажат
@@ -1039,12 +1038,12 @@ def load_tableWidget():
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
     elif my_win.checkBox_6.isChecked():
-        z = 11
-        column_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
+        z = 13
+        column_label = ["Id", "№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
-        z = 11  # кол-во столбцов должно быть равно (fill_table -column_count-)
-        column_label = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
+        z = 13  # кол-во столбцов должно быть равно (fill_table -column_count-)
+        column_label = ["Id", "№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
     my_win.tableWidget.setColumnCount(z)
@@ -1160,10 +1159,8 @@ def title_pdf():
 
     if filepatch == None:
         canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(
-            5 * cm, 28 * cm, "Федерация настольного тенниса России")
-        canvas.drawString(
-            3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
+        canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
+        canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
         canvas.setFont("DejaVuSerif-Italic", 20)
         canvas.drawString(2 * cm, 23 * cm, nz)
         canvas.setFont("DejaVuSerif-Italic", 16)
@@ -1175,10 +1172,8 @@ def title_pdf():
         canvas.drawImage(filepatch, 7 * cm, 12 * cm, 6.9 * cm, 4.9 * cm,
                          mask=[0, 2, 0, 2, 0, 2])  # делает фон прозрачным
         canvas.setFont("DejaVuSerif-Italic", 14)
-        canvas.drawString(
-            5 * cm, 28 * cm, "Федерация настольного тенниса России")
-        canvas.drawString(
-            3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
+        canvas.drawString(5 * cm, 28 * cm, "Федерация настольного тенниса России")
+        canvas.drawString(3 * cm, 27 * cm, "Федерация настольного тенниса Нижегородской области")
         canvas.setFont("DejaVuSerif-Italic", 20)
         canvas.drawString(2 * cm, 23 * cm, nz)
         canvas.setFont("DejaVuSerif-Italic", 16)
@@ -1386,17 +1381,25 @@ def fill_table(player_list):
         my_win.tableWidget.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(column_count):
-                if column == 7:  # преобразует id тренера в фамилию
+                if column > 0 and column < 7:
+                    item = str(list(player_selected[row].values())[column])
+                    column += 1
+                elif column == 7:  # преобразует id тренера в фамилию
                     coach_id = str(list(player_selected[row].values())[column])
                     coach = Coach.get(Coach.id == coach_id)
                     item = coach.coach
+                    column += 1
+                elif column == 8:
+                    column += 1
+                    item = str(list(player_selected[row].values())[column])
                 else:
                     item = str(list(player_selected[row].values())[column])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
-            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+            my_win.tableWidget.setItem(i, 1, QTableWidgetItem(str(i + 1)))
+            # my_win.tableWidget.setItem(i, 1, QTableWidgetItem(str(i + 1)))
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
@@ -1599,8 +1602,10 @@ def debtor_R():
 def add_player():
     """добавляет игрока в список и базу данных"""
     player_list = Player.select().where(Player.title_id == title_id())
+    txt = my_win.Button_add_edit_player.text()
     count = len(player_list)
     my_win.tableWidget.setRowCount(count + 1)
+    pl_id = my_win.lineEdit_id.text()
     pl = my_win.lineEdit_Family_name.text()
     bd = my_win.lineEdit_bday.text()
     rn = my_win.lineEdit_R.text()
@@ -1608,9 +1613,22 @@ def add_player():
     rg = my_win.comboBox_region.currentText()
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
+
+    player = Player.select().where(Player.id == pl_id).get()
+    pay_R = player.pay_rejting
+    comment = player.comment
+
     num = count + 1
     fn = f"{pl}/ {ct}"
-
+    if txt != "Редактировать":
+        flag = check_repeat_player(pl_id, bd)
+        if flag is True:
+            my_win.lineEdit_Family_name.clear()
+            my_win.lineEdit_bday.clear()
+            my_win.lineEdit_R.clear()
+            my_win.lineEdit_city_list.clear()
+            my_win.lineEdit_coach.clear()
+            return
     add_coach(ch, num)
     txt_edit = my_win.textEdit.toPlainText()
     ms = "" # записвыает место в базу как пустое
@@ -1619,17 +1637,18 @@ def add_player():
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
         with db:
-            player_del = Delete_player.get(Delete_player.player == my_win.tableWidget.item(row, 1).text())
-            pl_id = player_del.player_del_id
+            player_del = Delete_player.get(Delete_player.id == pl_id)
+            player_id = player_del.player_del_id           
+            pay_R = player_del.pay_rejting
+            comment = player_del.comment
             player_del.delete_instance()
-            plr = Player(player_id=pl_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-                         razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id()).save()
+            plr = Player(player_id=player_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
+                         razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
-        txt = my_win.Button_add_edit_player.text()
         if txt == "Редактировать":
             with db:
-                plr = Player.get(Player.player == pl)
+                plr =  player_list.select().where(Player.id == pl_id).get()
                 plr.player = pl
                 plr.bday = bd
                 plr.rank = rn
@@ -1638,13 +1657,18 @@ def add_player():
                 plr.razryad = rz
                 plr.coach_id = idc
                 plr.full_name = fn
+                plr.pay_rejting = pay_R
+                plr.comment = comment
                 plr.save()
         elif txt == "Добавить":
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting="", comment="").save()
-    spisok = (str(num), pl, bd, rn, ct, rg, rz, ch, ms)
-    for i in range(0, 9):  # добавляет в tablewidget
+        pl_id = Player.select().order_by(Player.id.desc()).get() # id нового игрока
+        player_id = pl_id.id
+        # ========
+    spisok = (player_id, str(num), pl, bd, rn, ct, rg, rz, ch, ms)
+    for i in range(0, 10):  # добавляет в tablewidget
         my_win.tableWidget.setItem(count + 1, i, QTableWidgetItem(spisok[i]))
     load_tableWidget()  # заново обновляет список
     player_list = Player.select().where(Player.title_id == title_id())
@@ -3002,16 +3026,18 @@ def visible_field(state):
 def select_player_in_list():
     """выводит данные игрока в поля редактирования или удаления"""
     r = my_win.tableWidget.currentRow()
-
-    family = my_win.tableWidget.item(r, 1).text()
-    birthday = my_win.tableWidget.item(r, 2).text()
-    rank = my_win.tableWidget.item(r, 3).text()
-    city = my_win.tableWidget.item(r, 4).text()
-    region = my_win.tableWidget.item(r, 5).text()
+    pl_id = my_win.tableWidget.item(r, 0).text()
+    family = my_win.tableWidget.item(r, 2).text()
+    birthday = my_win.tableWidget.item(r, 3).text()
+    rank = my_win.tableWidget.item(r, 4).text()
+    city = my_win.tableWidget.item(r, 5).text()
+    region = my_win.tableWidget.item(r, 6).text()
     rn = len(region)
-    razrayd = my_win.tableWidget.item(r, 6).text()
-    coach = my_win.tableWidget.item(r, 7).text()
+    razrayd = my_win.tableWidget.item(r, 7).text()
+    coach = my_win.tableWidget.item(r, 8).text()
 # ================================
+    my_win.lineEdit_id.setText(pl_id)
+    my_win.lineEdit_id.setEnabled(False)
     my_win.lineEdit_Family_name.setText(family)
     my_win.lineEdit_bday.setText(birthday)
     my_win.lineEdit_R.setText(rank)
@@ -3047,6 +3073,23 @@ def save_in_db_pay_R():
     else:
         return
     debtor_R()
+
+
+def check_repeat_player(pl_id, bd):
+    """фукция проверки повтора ввода одно и того же игрока"""
+    player_list = Player.select().where(Player.title_id == title_id())
+    repeat = player_list.select().where(Player.id == pl_id)  
+    count_family = len(repeat)
+    if count_family != 0:
+        repeat_bd = repeat.select().where(Player.bday == bd)  
+        if len(repeat_bd) != 0:
+            my_win.textEdit.setText("Такой игрок уже присутствует в списках!")   
+            flag = True
+        else:
+            flag = False
+    else:
+        flag = False
+    return flag
 
 
 def select_player_in_game():
@@ -3133,19 +3176,22 @@ def select_player_in_game():
 def delete_player():
     """удаляет игрока из списка и заносит его в архив"""
     msgBox = QMessageBox
+    player_current = Player.select().where(Player.title_id == title_id())
     r = my_win.tableWidget.currentRow()
-
-    player_del = my_win.tableWidget.item(r, 1).text()
-    player_id = Player.get(Player.player == player_del)
-    birthday = my_win.tableWidget.item(r, 2).text()
-    rank = my_win.tableWidget.item(r, 3).text()
-    player_city_del = my_win.tableWidget.item(r, 4).text()
-    region = my_win.tableWidget.item(r, 5).text()
-    razryad = my_win.tableWidget.item(r, 6).text()
-    coach = my_win.tableWidget.item(r, 7).text()
+    player_id = my_win.tableWidget.item(r, 0).text()
+    player_del = my_win.tableWidget.item(r, 2).text()
+    birthday = my_win.tableWidget.item(r, 3).text()
+    rank = my_win.tableWidget.item(r, 4).text()
+    player_city_del = my_win.tableWidget.item(r, 5).text()
+    region = my_win.tableWidget.item(r, 6).text()
+    razryad = my_win.tableWidget.item(r, 7).text()
+    coach = my_win.tableWidget.item(r, 8).text()
     full_name = f"{player_del}/ {player_city_del}"
-
     coach_id = Coach.get(Coach.coach == coach)
+    player = Player.select().where(Player.id == player_id).get()
+    pay_R = player.pay_rejting
+    comment = player.comment
+
     result = msgBox.question(my_win, "", f"Вы действительно хотите удалить\n"
                                          f" {player_del} город {player_city_del}?",
                              msgBox.Ok, msgBox.Cancel)
@@ -3153,10 +3199,10 @@ def delete_player():
         with db:
             del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
                                        region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
-                                       player=player_del, title_id=title_id()).save()
+                                       player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
 
-            player = Player.get(
-                Player.player == my_win.tableWidget.item(r, 1).text())
+            # player = player_current.select().where(Player.player == my_win.tableWidget.item(r, 1).text()).get()
+            player = player_current.select().where(Player.id == player_id).get()
             player.delete_instance()
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
@@ -3166,6 +3212,7 @@ def delete_player():
         player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
+        fill_table(player_list)
     else:
         return
 
@@ -8813,7 +8860,7 @@ def tours_list(cp):
 #         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
 #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
 #         # migrate(migrator.rename_column('system', 'stage_final', 'stage_exit'))
-#         migrate(migrator.add_column('players', 'comment', comment))
+#         migrate(migrator.add_column('delete_players', 'comment', comment))
 
     # ========================= создание таблицы
     # with db:
@@ -8858,7 +8905,7 @@ my_win.comboBox_region.currentTextChanged.connect(find_city)
 # ============= двойной клик
 # двойной клик по listWidget (рейтинг, тренеры)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
-# двойной клик по строке игроков в таблице -результаты-
+# двойной клик по строке игроков в таблице -результаты-, -списки-
 my_win.tableWidget.doubleClicked.connect(select_player_in_game)
 
 my_win.tabWidget.currentChanged.connect(tab)

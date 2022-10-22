@@ -211,6 +211,8 @@ class Delete_player(BaseModel):
     full_name = CharField()
     player_del = ForeignKeyField(Player)
     title_id = ForeignKeyField(Title)
+    pay_rejting = CharField(50)
+    comment = CharField()
 
     class Meta:
         db_table = "delete_players"
