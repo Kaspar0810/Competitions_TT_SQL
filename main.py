@@ -1038,12 +1038,12 @@ def load_tableWidget():
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
     elif my_win.checkBox_6.isChecked():
-        z = 13
-        column_label = ["Id", "№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
+        z = 14
+        column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
-        z = 13  # кол-во столбцов должно быть равно (fill_table -column_count-)
-        column_label = ["Id", "№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
+        z = 14  # кол-во столбцов должно быть равно (fill_table -column_count-) плюс 1 нумерация списка
+        column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
     my_win.tableWidget.setColumnCount(z)
@@ -1380,26 +1380,18 @@ def fill_table(player_list):
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
-            for column in range(column_count):
-                if column > 0 and column < 7:
-                    item = str(list(player_selected[row].values())[column])
-                    column += 1
-                elif column == 7:  # преобразует id тренера в фамилию
-                    coach_id = str(list(player_selected[row].values())[column])
+            for column in range(1, column_count + 1):
+                if column == 8:  # преобразует id тренера в фамилию
+                    coach_id = str(list(player_selected[row].values())[column - 1])
                     coach = Coach.get(Coach.id == coach_id)
                     item = coach.coach
-                    column += 1
-                elif column == 8:
-                    column += 1
-                    item = str(list(player_selected[row].values())[column])
                 else:
-                    item = str(list(player_selected[row].values())[column])
+                    item = str(list(player_selected[row].values())[column - 1])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
         for i in range(0, row_count):  # отсортировывает номера строк по порядку
-            my_win.tableWidget.setItem(i, 1, QTableWidgetItem(str(i + 1)))
-            # my_win.tableWidget.setItem(i, 1, QTableWidgetItem(str(i + 1)))
+            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
@@ -1593,9 +1585,12 @@ def debtor_R():
     player_list = Player.select().where(Player.title_id == title_id())
     if my_win.checkBox_11.isChecked():
         player_debtor = player_list.select().where(Player.pay_rejting == "долг")
+        if len(player_debtor) == 0:
+            my_win.textEdit.setText("Спортсменов, не оплативших регистрационыый взнос за рейтинг нет.")
     else:
         player_debtor = player_list.select()
         my_win.Button_pay_R.setEnabled(False)
+        my_win.textEdit.clear()
     fill_table(player_debtor)
 
 
@@ -1822,6 +1817,7 @@ def page():
         player_list = Player.select().where(Player.title_id == title_id())
         fill_table(player_list)  # заполняет TableWidget списком игроков
     elif tb == 1:  # -список участников-
+        load_combo_fltr_region()
         region()
         load_tableWidget()
         my_win.tableWidget.show()
@@ -1831,8 +1827,10 @@ def page():
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
         player_list = Player.select().where(Player.title_id == title_id())
+        fill_table(player_list)  # заполняет TableWidget списком игроков
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
+        list_player_pdf(player_list)
     elif tb == 2:  # -система-
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
@@ -1986,6 +1984,7 @@ def page():
         load_combo()
         match_score_db()
         my_win.label_16.hide()
+    hide_show_columns(tb)
 
 
 def add_city():
@@ -2047,14 +2046,11 @@ def sort():
     sender = my_win.sender()  # сигнал от кнопки
 
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(
-            Player.rank.desc())  # сортировка по рейтингу
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
     elif sender == my_win.Button_sort_Name:
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(
-            Player.player)  # сортировка по алфавиту
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алфавиту
     elif sender == my_win.Button_sort_mesto:
-        player_list = Player.select().where(Player.title_id == title_id()
-                                            ).order_by(Player.mesto)  # сортировка по месту
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
 
     fill_table(player_list)
     list_player_pdf(player_list)
@@ -2110,16 +2106,16 @@ def list_player_pdf(player_list):
     count = len(player_list)  # количество записей в базе
     kp = count + 1
     my_win.tableWidget.setRowCount(count)
-    for k in range(0, count):  # цикл по списку по строкам
+    for k in range(0, count):  # цикл по списку по строкам (k, 1) - пропущен столбец id
         n = my_win.tableWidget.item(k, 0).text()
-        p = my_win.tableWidget.item(k, 1).text()
-        b = my_win.tableWidget.item(k, 2).text()
-        c = my_win.tableWidget.item(k, 3).text()
-        g = my_win.tableWidget.item(k, 4).text()
-        z = my_win.tableWidget.item(k, 5).text()
-        t = my_win.tableWidget.item(k, 6).text()
-        q = my_win.tableWidget.item(k, 7).text()
-        m = my_win.tableWidget.item(k, 8).text()
+        p = my_win.tableWidget.item(k, 2).text()
+        b = my_win.tableWidget.item(k, 3).text()
+        c = my_win.tableWidget.item(k, 4).text()
+        g = my_win.tableWidget.item(k, 5).text()
+        z = my_win.tableWidget.item(k, 6).text()
+        t = my_win.tableWidget.item(k, 7).text()
+        q = my_win.tableWidget.item(k, 8).text()
+        m = my_win.tableWidget.item(k, 9).text()
         g = chop_line_city(g)
         q = chop_line(q)
         data = [n, p, b, c, g, z, t, q, m]
@@ -2468,7 +2464,7 @@ def view():
         my_win.tabWidget.setCurrentIndex(1)
         player_list = Player.select().where(Player.title_id == title_id())  # сортировка по алфавиту
         list_player_pdf(player_list)
-        change_dir()
+        # change_dir()
         view_file = f"table_list_{short_name}.pdf"
     elif sender == my_win.view_gr_Action:  # вкладка группы
         view_file = f"table_group_{short_name}.pdf"
@@ -3026,7 +3022,7 @@ def visible_field(state):
 def select_player_in_list():
     """выводит данные игрока в поля редактирования или удаления"""
     r = my_win.tableWidget.currentRow()
-    pl_id = my_win.tableWidget.item(r, 0).text()
+    pl_id = my_win.tableWidget.item(r, 1).text()
     family = my_win.tableWidget.item(r, 2).text()
     birthday = my_win.tableWidget.item(r, 3).text()
     rank = my_win.tableWidget.item(r, 4).text()
@@ -3178,7 +3174,7 @@ def delete_player():
     msgBox = QMessageBox
     player_current = Player.select().where(Player.title_id == title_id())
     r = my_win.tableWidget.currentRow()
-    player_id = my_win.tableWidget.item(r, 0).text()
+    player_id = my_win.tableWidget.item(r, 1).text()
     player_del = my_win.tableWidget.item(r, 2).text()
     birthday = my_win.tableWidget.item(r, 3).text()
     rank = my_win.tableWidget.item(r, 4).text()
@@ -3215,6 +3211,25 @@ def delete_player():
         fill_table(player_list)
     else:
         return
+
+
+def load_combo_fltr_region():
+    """загрузка комбобокса риогионами для фильтрации списка"""
+    reg = []
+    # my_win.comboBox_fltr_region.find
+    if my_win.comboBox_fltr_region.currentIndex() > 0:  # проверка на заполненность комбобокса данными
+        return
+    else:
+        player = Player.select().where(Player.title_id == title_id())
+        count = len(player)
+        for r in player:
+            reg_n = r.region
+            if reg_n not in reg:
+                reg.append(reg_n)
+        my_win.comboBox_fltr_region.addItems(reg)
+    
+        my_win.comboBox_fltr_region.setEditable(True)
+
 
 
 def focus():
@@ -5300,14 +5315,20 @@ def color_region_in_tableWidget(fg):
 def hide_show_columns(tb):
     """скрывает или показывает столбцы TableWidget"""
     if tb == 1 or tb == 2:
-        my_win.tableWidget.showColumn(1)
+        my_win.tableWidget.showColumn(0) # нумерация
+        my_win.tableWidget.hideColumn(1) # id
+        my_win.tableWidget.showColumn(9) # место
+        my_win.tableWidget.hideColumn(10)
+        my_win.tableWidget.hideColumn(11)
+        my_win.tableWidget.hideColumn(12)
+    elif tb == 0:
+        my_win.tableWidget.showColumn(0)
+        my_win.tableWidget.hideColumn(1)
+        my_win.tableWidget.showColumn(2)
         my_win.tableWidget.hideColumn(9)
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
-    elif tb == 0:
-        my_win.tableWidget.showColumn(1)
-        my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.hideColumn(9)
+        my_win.tableWidget.hideColumn(12)
 
 
 def etap_made():
@@ -5633,7 +5654,6 @@ def del_player_table():
     """таблица удаленных игроков на данных соревнованиях"""
     if my_win.checkBox_6.isChecked():
         my_win.Button_clear_del.setEnabled(True)
-        my_win.tableWidget.hideColumn(8)
         player_list = Delete_player.select().where(Delete_player.title_id == title_id())
         count = len(player_list)
         if count == 0:
@@ -5642,6 +5662,12 @@ def del_player_table():
             fill_table(player_list)
         else:
             load_tableWidget()
+            my_win.tableWidget.hideColumn(8)
+            my_win.tableWidget.hideColumn(9)
+            my_win.tableWidget.hideColumn(10)
+            my_win.tableWidget.hideColumn(11)
+            my_win.tableWidget.hideColumn(12)
+            my_win.tableWidget.hideColumn(13)
             fill_table(player_list)
             my_win.statusbar.showMessage(
                 "Список удаленных участников соревнований", 10000)
@@ -8386,8 +8412,7 @@ def change_dir():
 def draw_setka(col, row, num, style):
     """рисование сетки встреч игроков
     col - начальный столбец, row - начальный ряд, num - кол-во игроков"""
-    style_set = [] 
-    # style = []   
+    style_set = []  
     s = 1
     cf = 0  # кол-во туров
     if num == 2:  # кол-во игроков

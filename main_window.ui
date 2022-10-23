@@ -3257,7 +3257,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QTableView" name="tableView">
+    <widget class="QTableView" name="tableView_setka32">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -3268,6 +3268,19 @@
      </property>
      <property name="gridStyle">
       <enum>Qt::DashDotLine</enum>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox_fltr_region">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>320</y>
+       <width>201</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>
@@ -3375,8 +3388,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>312</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3695,8 +3708,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>312</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3870,8 +3883,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>312</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3883,8 +3896,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>312</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3896,8 +3909,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>219</width>
-       <height>312</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
