@@ -1262,55 +1262,58 @@ def title_update():
 
 def find_in_rlist():
     """при создании списка участников ищет спортсмена в текущем R-листе"""
-    r_data_m = [R_list_m, R1_list_m]
-    r_data_w = [R_list_d, R1_list_d]
-    t_id = Title.get(Title.id == title_id())
-    gamer = t_id.gamer
-    my_win.listWidget.clear()
-    my_win.textEdit.clear()
-    txt = my_win.lineEdit_Family_name.text()
+    if my_win.checkBox_12.isChecked():
+        find_in_player_list()
+    else:
+        r_data_m = [R_list_m, R1_list_m]
+        r_data_w = [R_list_d, R1_list_d]
+        t_id = Title.get(Title.id == title_id())
+        gamer = t_id.gamer
+        my_win.listWidget.clear()
+        my_win.textEdit.clear()
+        txt = my_win.lineEdit_Family_name.text()
 
-    zn = txt.find(" ")
-    if zn != -1:
-        family = txt[:zn]
-        name = txt[zn + 1:]
-        if name != "":
-            family = family.capitalize()
-            name = name.capitalize()  # Переводит первую букву в заглавную
-            txt = f"{family} {name}"
-    else:
-        txt = txt.capitalize()  # Переводит первую букву в заглавную
-    fp = txt
-    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-        r_data = r_data_w
-    else:
-        r_data = r_data_m
-     
-    r = 0
-    for r_list in r_data:
-        p = r_list.select()
-        if r == 0:
-            my_win.label_63.setText("Поиск в текущем рейтинг листе.")
-            p = p.where(r_list.r_fname ** f'{fp}%')  # like поиск в текущем рейтинге
-            if r == 0  and len(p) != 0:
-                for pl in p:
-                    full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+        zn = txt.find(" ")
+        if zn != -1:
+            family = txt[:zn]
+            name = txt[zn + 1:]
+            if name != "":
+                family = family.capitalize()
+                name = name.capitalize()  # Переводит первую букву в заглавную
+                txt = f"{family} {name}"
+        else:
+            txt = txt.capitalize()  # Переводит первую букву в заглавную
+        fp = txt
+        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+            r_data = r_data_w
+        else:
+            r_data = r_data_m
+        
+        r = 0
+        for r_list in r_data:
+            p = r_list.select()
+            if r == 0:
+                my_win.label_63.setText("Поиск в текущем рейтинг листе.")
+                p = p.where(r_list.r_fname ** f'{fp}%')  # like поиск в текущем рейтинге
+                if r == 0  and len(p) != 0:
+                    for pl in p:
+                        full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+                        my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+                    return
+                elif r == 0:
+                    r = 1
+                    continue
+            else:
+                my_win.label_63.setText("Поиск в январском рейтинге.")
+                p = p.where(r_list.r1_fname ** f'{fp}%')  # like поиск в январском рейтинге
+                if len(p) > 0:
+                    for pl in p:
+                        full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
+                        my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+                else:
+                    full_stroka = ""
                     my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
                 return
-            elif r == 0:
-                r = 1
-                continue
-        else:
-            my_win.label_63.setText("Поиск в январском рейтинге.")
-            p = p.where(r_list.r1_fname ** f'{fp}%')  # like поиск в январском рейтинге
-            if len(p) > 0:
-                for pl in p:
-                    full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
-                    my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-            else:
-                full_stroka = ""
-                my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-            return
       
 
 def input_player():
@@ -2004,19 +2007,34 @@ def find_coach():
     """поиск тренера в базе"""
     my_win.label_63.setText("Список тренеров.")
     my_win.listWidget.clear()
-    # my_win.textEdit.clear()
+    list_coach = []
     cp = my_win.lineEdit_coach.text()
     cp = cp.capitalize()  # Переводит первую букву в заглавную
-    c = Coach.select()
-    c = c.where(Coach.coach ** f'{cp}%')  # like
-    tochka = cp.find(".")
-    if tochka == -1:
-        if (len(c)) != 0:
-        #     my_win.textEdit.setText("Нет тренера в базе")
-        # else:
-            for chp in c:
-                full_stroka = chp.coach
-                my_win.listWidget.addItem(full_stroka)
+    if my_win.checkBox_12.isChecked():
+        player = Player.select().where(Player.title_id == title_id())
+        coach = Coach.select()
+        for pl in player:
+            c_id = pl.coach_id
+            ch = Coach.select().where(Coach.id == c_id).get()
+            list_coach.append(ch.coach)
+        # coach = Coach.select()
+        # player_list = coach.where(Coach.coach ** f'%{cp}%')  # like
+        # for coach_list in player_list:
+        #     list_coach.append(coach_list.coach)
+        # for cl in list_coach:
+        #     pl = Player.select().where(Player.title_id == title_id() and Player.coach == cl)
+        #     count = len(pl)
+        #     print(pl)
+    else:
+        c = Coach.select()
+        c = c.where(Coach.coach ** f'{cp}%')  # like
+        tochka = cp.find(".")
+        if tochka == -1:
+            if (len(c)) != 0:
+                for chp in c:
+                    full_stroka = chp.coach
+                    my_win.listWidget.addItem(full_stroka)
+    fill_table(player_list)
 
 
 def add_coach(ch, num):
@@ -3273,6 +3291,22 @@ def filter_player_list(sender):
         my_win.comboBox_fltr_region.setCurrentIndex(0)
         my_win.comboBox_fltr_city.setCurrentIndex(0)       
     fill_table(player_list)
+
+
+def find_in_player_list():
+    """поиск спортсмена или тренера"""
+    player = Player.select().where(Player.title_id == title_id())
+    txt = my_win.lineEdit_Family_name.text()
+    if txt == "":
+        my_win.textEdit.clear()
+    txt = txt.upper()
+    player_list = player.where(Player.player ** f'{txt}%')  # like
+    if len(player_list) > 0:
+        fill_table(player_list)
+    else:
+        my_win.textEdit.setText("Такого спортсмена нет!")
+
+
 
 
 def focus():
