@@ -1817,7 +1817,7 @@ def page():
         player_list = Player.select().where(Player.title_id == title_id())
         fill_table(player_list)  # заполняет TableWidget списком игроков
     elif tb == 1:  # -список участников-
-        load_combo_fltr_region()
+        load_comboBox_filter()
         region()
         load_tableWidget()
         my_win.tableWidget.show()
@@ -3213,23 +3213,66 @@ def delete_player():
         return
 
 
-def load_combo_fltr_region():
+def load_comboBox_filter():
     """загрузка комбобокса риогионами для фильтрации списка"""
-    reg = []
-    # my_win.comboBox_fltr_region.find
+    my_win.comboBox_fltr_region.clear()
+    my_win.comboBox_fltr_city.clear()
+    reg = [""]
+    gorod = [""]
+    player = Player.select().where(Player.title_id == title_id())
     if my_win.comboBox_fltr_region.currentIndex() > 0:  # проверка на заполненность комбобокса данными
         return
     else:
-        player = Player.select().where(Player.title_id == title_id())
-        count = len(player)
         for r in player:
             reg_n = r.region
             if reg_n not in reg:
                 reg.append(reg_n)
         my_win.comboBox_fltr_region.addItems(reg)
-    
-        my_win.comboBox_fltr_region.setEditable(True)
 
+    if my_win.comboBox_fltr_city.currentIndex() > 0:
+        return
+    else:
+        for c in player:
+            cityes = c.city
+            if cityes not in gorod:
+                gorod.append(cityes)
+        my_win.comboBox_fltr_city.addItems(gorod)
+
+
+def change_city_from_region():
+    """изменяет список городов в комбобоксе фильтра списка в зависимости от региона"""  
+    gorod = [""]
+    my_win.comboBox_fltr_city.clear()
+    player = Player.select().where(Player.title_id == title_id())
+    region = my_win.comboBox_fltr_region.currentText()
+    player_region = player.select().where(Player.region == region)
+    for pl_reg in player_region:
+        if pl_reg.city not in gorod:
+            gorod.append(pl_reg.city)
+    my_win.comboBox_fltr_city.addItems(gorod)
+
+
+def filter_player_list(sender):
+    """фильтрация списка участников по областям, тренерам, городам"""
+    sender = my_win.sender()
+    player = Player.select().where(Player.title_id == title_id())
+    if sender == my_win.Button_fltr_list:
+        region = my_win.comboBox_fltr_region.currentText()
+        city = my_win.comboBox_fltr_city.currentText()
+        if region != "" and city != "":
+            player_list = player.select().where(Player.region == region)
+            player_list = player_list.select().where(Player.city == city)
+        elif region == "" and city != "":
+                player_list = player_list.select().where(Player.city == city)
+        elif region != "" and city == "":
+             player_list = player.select().where(Player.region == region)
+
+
+    elif sender == my_win.Button_reset_fltr_list:
+        player_list = Player.select().where(Player.title_id == title_id())
+        my_win.comboBox_fltr_region.setCurrentIndex(0)
+        my_win.comboBox_fltr_city.setCurrentIndex(0)       
+    fill_table(player_list)
 
 
 def focus():
@@ -8953,6 +8996,7 @@ my_win.comboBox_etap_5.currentTextChanged.connect(system_competition)
 my_win.comboBox_page_vid.currentTextChanged.connect(page_vid)
 my_win.comboBox_filter_final.currentTextChanged.connect(game_in_visible)
 my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
+my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
 
 
 # =======  отслеживание переключение чекбоксов =========
@@ -9008,6 +9052,7 @@ my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
-
+my_win.Button_fltr_list.clicked.connect(filter_player_list)
+my_win.Button_reset_fltr_list.clicked.connect(filter_player_list)
 
 sys.exit(app.exec())
