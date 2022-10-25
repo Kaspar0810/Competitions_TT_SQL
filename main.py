@@ -2012,11 +2012,13 @@ def find_coach():
     cp = cp.capitalize()  # Переводит первую букву в заглавную
     if my_win.checkBox_12.isChecked():
         player = Player.select().where(Player.title_id == title_id())
-        coach = Coach.select()
-        for pl in player:
-            c_id = pl.coach_id
-            ch = Coach.select().where(Coach.id == c_id).get()
-            list_coach.append(ch.coach)
+        # coach = Coach.select()
+        pl_list = Coach.select().where(Coach.coach ** f'%{cp}%')  # like
+        for pl in pl_list:
+            c_id = pl.id
+            player_list = player.select().where(Player.coach_id == c_id)
+            # ch = Coach.select().where(Coach.id == c_id).get()
+            # list_coach.append(ch.coach)
         # coach = Coach.select()
         # player_list = coach.where(Coach.coach ** f'%{cp}%')  # like
         # for coach_list in player_list:
