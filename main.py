@@ -3224,13 +3224,17 @@ def delete_player():
     else:
         return
 
+def sortByAlphabet(inputStr):
+    inputStr = inputStr.lower()
+    return inputStr[0]
+
 
 def load_comboBox_filter():
     """загрузка комбобокса риогионами для фильтрации списка"""
     my_win.comboBox_fltr_region.clear()
     my_win.comboBox_fltr_city.clear()
-    reg = [""]
-    gorod = [""]
+    reg = []
+    gorod = []
     player = Player.select().where(Player.title_id == title_id())
     if my_win.comboBox_fltr_region.currentIndex() > 0:  # проверка на заполненность комбобокса данными
         return
@@ -3239,7 +3243,8 @@ def load_comboBox_filter():
             reg_n = r.region
             if reg_n not in reg:
                 reg.append(reg_n)
-        reg.sort()
+        reg.sort(key=sortByAlphabet)
+        reg.insert(0, "")
         my_win.comboBox_fltr_region.addItems(reg)
 
     if my_win.comboBox_fltr_city.currentIndex() > 0:
@@ -3249,6 +3254,8 @@ def load_comboBox_filter():
             cityes = c.city
             if cityes not in gorod:
                 gorod.append(cityes)
+        gorod.sort(key=sortByAlphabet)
+        gorod.insert(0, "")
         my_win.comboBox_fltr_city.addItems(gorod)
 
 
