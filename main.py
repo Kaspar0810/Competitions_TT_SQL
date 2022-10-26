@@ -34,6 +34,7 @@ import sqlite3
 import pathlib
 from pathlib import Path
 import random
+import collections
 # from playhouse.migrate import *
 
 if not os.path.isdir("table_pdf"):  # создает папку 
@@ -2012,21 +2013,13 @@ def find_coach():
     cp = cp.capitalize()  # Переводит первую букву в заглавную
     if my_win.checkBox_12.isChecked():
         player = Player.select().where(Player.title_id == title_id())
-        # coach = Coach.select()
-        pl_list = Coach.select().where(Coach.coach ** f'%{cp}%')  # like
-        for pl in pl_list:
+        coach_list = Coach.select().where(Coach.coach ** f'%{cp}%')  # создает выборку из базы тренеров фамилии,что начинаются на CP
+        for pl in coach_list: #походит циклом и создает список с их ID
             c_id = pl.id
-            player_list = player.select().where(Player.coach_id == c_id)
-            # ch = Coach.select().where(Coach.id == c_id).get()
-            # list_coach.append(ch.coach)
-        # coach = Coach.select()
-        # player_list = coach.where(Coach.coach ** f'%{cp}%')  # like
-        # for coach_list in player_list:
-        #     list_coach.append(coach_list.coach)
-        # for cl in list_coach:
-        #     pl = Player.select().where(Player.title_id == title_id() and Player.coach == cl)
-        #     count = len(pl)
-        #     print(pl)
+            list_coach.append(c_id)
+
+        player_list = player.select().where(Player.coach_id << list_coach) # окончательная выборка со всеми тренерами (id)
+        fill_table(player_list)
     else:
         c = Coach.select()
         c = c.where(Coach.coach ** f'{cp}%')  # like
@@ -2036,7 +2029,6 @@ def find_coach():
                 for chp in c:
                     full_stroka = chp.coach
                     my_win.listWidget.addItem(full_stroka)
-    fill_table(player_list)
 
 
 def add_coach(ch, num):
@@ -3247,6 +3239,7 @@ def load_comboBox_filter():
             reg_n = r.region
             if reg_n not in reg:
                 reg.append(reg_n)
+        reg.sort()
         my_win.comboBox_fltr_region.addItems(reg)
 
     if my_win.comboBox_fltr_city.currentIndex() > 0:
