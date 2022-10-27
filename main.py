@@ -3249,6 +3249,10 @@ def load_comboBox_filter():
         my_win.comboBox_fltr_region.addItems(reg)
     
     if my_win.comboBox_fltr_city.count() > 0:  # проверка на заполненность комбобокса данными
+        gorod = [my_win.comboBox_fltr_city.itemText(i) for i in range(my_win.comboBox_fltr_city.count())]
+        gorod.remove("")
+        gorod.sort(key=sortByAlphabet)
+        gorod.insert(0, "")
         return
     else:
         for c in player:
