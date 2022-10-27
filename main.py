@@ -3230,13 +3230,13 @@ def sortByAlphabet(inputStr):
 
 
 def load_comboBox_filter():
-    """загрузка комбобокса риогионами для фильтрации списка"""
+    """загрузка комбобокса регионами для фильтрации списка"""
     my_win.comboBox_fltr_region.clear()
     my_win.comboBox_fltr_city.clear()
     reg = []
     gorod = []
     player = Player.select().where(Player.title_id == title_id())
-    if my_win.comboBox_fltr_region.currentIndex() > 0:  # проверка на заполненность комбобокса данными
+    if my_win.comboBox_fltr_region.count() > 0:  # проверка на заполненность комбобокса данными
         return
     else:
         for r in player:
@@ -3247,8 +3247,8 @@ def load_comboBox_filter():
         reg.sort(key=sortByAlphabet)
         reg.insert(0, "")
         my_win.comboBox_fltr_region.addItems(reg)
-
-    if my_win.comboBox_fltr_city.currentIndex() > 0:
+    
+    if my_win.comboBox_fltr_city.count() > 0:  # проверка на заполненность комбобокса данными
         return
     else:
         for c in player:
@@ -3262,11 +3262,15 @@ def load_comboBox_filter():
 
 def change_city_from_region():
     """изменяет список городов в комбобоксе фильтра списка в зависимости от региона"""  
-    gorod = [""]
+    gorod = []
     my_win.comboBox_fltr_city.clear()
     player = Player.select().where(Player.title_id == title_id())
     region = my_win.comboBox_fltr_region.currentText()
-    player_region = player.select().where(Player.region == region)
+    if region == "":
+        player_region = player.select()
+        gorod.insert(0, "")
+    else:
+        player_region = player.select().where(Player.region == region)
     for pl_reg in player_region:
         if pl_reg.city not in gorod:
             gorod.append(pl_reg.city)
@@ -3282,17 +3286,18 @@ def filter_player_list(sender):
         city = my_win.comboBox_fltr_city.currentText()
         if region != "" and city != "":
             player_list = player.select().where(Player.region == region)
-            player_list = player_list.select().where(Player.city == city)
+            player_list = player.select().where(Player.city == city)
         elif region == "" and city != "":
-                player_list = player_list.select().where(Player.city == city)
+            player_list = player.select().where(Player.city == city)
         elif region != "" and city == "":
-             player_list = player.select().where(Player.region == region)
+            player_list = player.select().where(Player.region == region)
 
 
     elif sender == my_win.Button_reset_fltr_list:
         player_list = Player.select().where(Player.title_id == title_id())
         my_win.comboBox_fltr_region.setCurrentIndex(0)
         my_win.comboBox_fltr_city.setCurrentIndex(0)       
+        load_comboBox_filter()
     fill_table(player_list)
 
 
@@ -3308,8 +3313,6 @@ def find_in_player_list():
         fill_table(player_list)
     else:
         my_win.textEdit.setText("Такого спортсмена нет!")
-
-
 
 
 def focus():
