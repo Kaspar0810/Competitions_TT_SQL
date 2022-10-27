@@ -3239,7 +3239,7 @@ def load_comboBox_filter():
             reg_n = r.region
             if reg_n not in reg:
                 reg.append(reg_n)
-        reg.sort()
+            reg.sort()
         my_win.comboBox_fltr_region.addItems(reg)
 
     if my_win.comboBox_fltr_city.currentIndex() > 0:
