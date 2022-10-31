@@ -2362,8 +2362,8 @@ def system_competition():
 
 def one_table(fin, mesto_in_group, group):
     """система соревнований из одной таблицы запись в System"""
-    t_id = title_id()
-    system = System.select().where(System.title_id == t_id)
+    system = System.select().where(System.title_id == title_id())
+    flag = ready_system()
     for sys in system:
         if sys.stage == fin:  # если финал играется по кругу
             type_tbl = sys.type_table
@@ -2381,8 +2381,8 @@ def one_table(fin, mesto_in_group, group):
 
             load_tableWidget()
 
-            choice = Choice.select().where(
-                Choice.title_id == t_id and Choice.mesto_group == mesta_exit)  # отбирает
+            ch = Choice.select().where(Choice.title_id == title_id())
+            choice = ch.select().where(Choice.mesto_group == mesta_exit)  # отбирает
             # записи жеребьевки после игр в группах (места которые вышли в финал)
             player_choice = choice.select().order_by(Choice.group)
             con = len(player_choice)
@@ -2567,8 +2567,7 @@ def player_fin_on_circle(fin):
     player_final = {}
     parametrs_final = {}
     mesto = 1
-    system = System.select().where(System.title_id == title_id()
-                                   )  # находит system id последнего
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
     for s in system:
         if s.stage == "Предварительный":
             sys = system.select().where(System.stage == "Предварительный").get()
@@ -5424,7 +5423,7 @@ def etap_made():
     sender = my_win.sender()
     if sender != my_win.comboBox_etap_1:
         if my_win.comboBox_etap_1.currentText() == "Одна таблица":
-            one_table()
+            one_table(fin="1-финал", mesto_in_group=1, group="")
             player_in_table()
         if my_win.comboBox_etap_1.currentText() == "Предварительный" and my_win.comboBox_etap_2.isHidden():
             kol_player_in_group()
@@ -5794,11 +5793,11 @@ def kol_player_in_final():
     """после выбора из комбобокс системы финала подсчитывает сколько игр в финале"""
     sender = my_win.sender()
     pv = my_win.comboBox_page_vid.currentText()
+    player = Player.select().where(Player.title_id == title_id())
+    count = len(player)
     fin = ""
     if sender == my_win.comboBox_one_table:
         if my_win.comboBox_one_table.currentText() == "Круговая система":
-            player = Player.select().where(Player.title_id == title_id())
-            count = len(player)
             kol_game = count // 2 * (count - 1)
             my_win.label_50.show()
             my_win.label_19.show()
@@ -5807,7 +5806,26 @@ def kol_player_in_final():
             my_win.label_50.setText(f"{count} человек по круговой системе.")
             my_win.comboBox_one_table.hide()
         else:
-            pass
+            vid = ["Автоматический", "Ручной"]
+            cur_index = my_win.comboBox_one_table.currentIndex()
+            player_in_final = 16
+            total_game = numbers_of_games(cur_index, player_in_final)
+            my_win.label_50.show()
+            my_win.label_19.show()
+            my_win.label_19.setText(f"{total_game} игр.")
+            my_win.label_33.setText(f"Всего: {total_game} игр.")
+            my_win.label_50.setText(f"{count} человек в сетке.")
+            my_win.comboBox_one_table.hide()
+            mesto_first_poseva = 1
+            count_exit = 1
+            # vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
+            # if vid == "Автоматический":
+            #     flag = True
+            # else:
+            #     flag = False
+            # posev = choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
+            # print(posev)
+
     else:
         if sender == my_win.comboBox_table:
             cur_index = my_win.comboBox_table.currentIndex()
