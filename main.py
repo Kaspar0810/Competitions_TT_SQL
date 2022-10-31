@@ -5806,6 +5806,8 @@ def kol_player_in_final():
             my_win.label_33.setText(f"Всего: {kol_game} игр.")
             my_win.label_50.setText(f"{count} человек по круговой системе.")
             my_win.comboBox_one_table.hide()
+        else:
+            pass
     else:
         if sender == my_win.comboBox_table:
             cur_index = my_win.comboBox_table.currentIndex()
@@ -6587,7 +6589,7 @@ def setka_16_2_made(fin):
     cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm,
            0.4 * cm, 4.4 * cm, 0.4 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
-    color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
+    style_color = color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
     t = Table(data, cw, 86 * [0.55 * cm])
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки 
@@ -6633,34 +6635,34 @@ def setka_16_2_made(fin):
         style.append(fn)
 
     for i in range(1, 10, 2):
-        # fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
-        fn = ('TEXTCOLOR', (i, 0), (i, 120), colors.black)  # цвет шрифта игроков
+        fn = ('TEXTCOLOR', (i, 0), (i, 85), colors.black)  # цвет шрифта игроков
         style.append(fn)
-        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 120), colors.green)  # цвет шрифта номеров встреч
+        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 85), colors.green)  # цвет шрифта номеров встреч
         style.append(fn)
         # выравнивание фамилий игроков по левому краю
-        fn = ('ALIGN', (i, 0), (i, 120), 'LEFT') 
+        fn = ('ALIGN', (i, 0), (i, 85), 'LEFT') 
         style.append(fn)
         # центрирование номеров встреч
-        fn = ('ALIGN', (i + 1, 0), (i + 1, 120), 'CENTER')
+        fn = ('ALIGN', (i + 1, 0), (i + 1, 85), 'CENTER')
         style.append(fn)
     # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
     # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
+
+    for b in style_color: # цикл окрашивания мест красным цветом
+        ts.append(b)
+
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
                            ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
-                           ('FONTSIZE', (1, 0), (1, 32), 7),
-                           # 10 столбец с 0 по 68 ряд (цвет места)
-                           ('TEXTCOLOR', (10, 0), (10, 120), colors.red),
-                        #    ('ALIGN', (10, 0), (10, 68), 'RIGHT'),
-                           ('ALIGN', (9, 0), (9, 120), 'LEFT'),
+                           ('FONTSIZE', (1, 0), (1, 32), 7)] + ts 
+                           + [
                            # цвет шрифта игроков 1 ого тура
-                           ('TEXTCOLOR', (0, 0), (0, 120), colors.blue),
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-                           ] + ts))
+                           ('TEXTCOLOR', (0, 0), (0, 40), colors.blue),
+                           ('TEXTCOLOR', (0, 41), (0, 85), colors.green),
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
 
     elements.append(t)
     pv = A4
@@ -7270,11 +7272,6 @@ def setka_32_2_made(fin):
             if key != "":
                 dict_num_game[key] = r
     # ===== добавить данные игроков и счета в data ==================
-    # all_list = setka_data_clear(fin)
-    # tds = all_list[0]
-    # for i in range(0, 31, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
-    #     n = i - (i // 2)
-    #     data[i][1] = tds[n]
     tds = write_in_setka(data, fin, first_mesto, table)
     # ==============
     cw = ((0.2 * cm, 3.5 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm, 2.4 * cm, 0.35 * cm,
@@ -9064,8 +9061,8 @@ def color_mesta(data, first_mesto, table):
     """окрашивает места в красный цвет"""
     b = 0
     style_color = []
-    ml = []
-    f = 0
+    ml = [] # столбец, ряд -1 ого места, ряд 2-ого места, шаг между местами
+    f = 0 # количество столбцов
     if table == "setka_32":
         f = 2
     elif table == "setka_32_full":
@@ -9074,6 +9071,8 @@ def color_mesta(data, first_mesto, table):
         f = 16
     elif table == "setka_16_full":
         f = 8
+    elif table == "setka_16_2":
+        f= 8
 
     for c in range(0, f):
         if c == 0: # 1-2 место
@@ -9081,6 +9080,8 @@ def color_mesta(data, first_mesto, table):
                 ml = [13, 31, 54, 22] 
             elif table == "setka_16_full":
                 ml = [10, 15, 26, 10] 
+            elif table == "setka_16_2":
+                ml = [9, 15, 33, 17]
             else:
                 ml = [11, 31, 54, 22] 
         elif c == 1: # 3-4 место
@@ -9088,6 +9089,8 @@ def color_mesta(data, first_mesto, table):
                 ml = [13, 80, 97, 16]  
             elif table == "setka_16_full":
                 ml = [10, 29, 32, 2] 
+            elif table == "setka_16_2":
+                ml = [9, 48, 56, 7] 
             else:                
                 ml = [11, 59, 65, 5] 
         elif c == 2: # 5-6 место
@@ -9095,6 +9098,8 @@ def color_mesta(data, first_mesto, table):
                 ml = [13, 101, 106, 4]  
             elif table == "setka_16_full":
                 ml = [10, 34, 38, 3] 
+            elif table == "setka_16_2":
+                ml = [9, 60, 64, 3] 
             else:
                 ml = [11, 72, 92, 5]
         elif c == 3: # 7-8 место
@@ -9102,6 +9107,8 @@ def color_mesta(data, first_mesto, table):
                 ml = [13, 109, 114, 4]  
             elif table == "setka_16_full":
                 ml = [10, 39, 42, 2] 
+            elif table == "setka_16_2":
+                ml = [9, 66, 70, 3] 
             else:
                 ml = [11, 94, 95, 1]
         elif c == 4: # 9-10 место
@@ -9109,6 +9116,8 @@ def color_mesta(data, first_mesto, table):
                 ml = [5, 113, 118, 4]  
             elif table == "setka_16_full":
                 ml = [10, 47, 53, 5] 
+            elif table == "setka_16_2":
+                ml = [5, 63, 70, 6] 
             else:
                 ml = [11, 99, 133, 5]
         elif c == 5: # 11-12 место
@@ -9116,20 +9125,26 @@ def color_mesta(data, first_mesto, table):
                 ml = [11, 119, 124, 4]  
             elif table == "setka_16_full":
                 ml = [10, 55, 58, 2] 
+            elif table == "setka_16_2":
+                ml = [9, 72, 76, 3] 
             else:
                 ml = [11, 152, 163, 10]
         elif c == 6: # 13-14 место
             if table == "setka_32_2":
                 ml = [5, 125, 130, 4]  
             elif table == "setka_16_full":
-                ml = [10, 60, 64, 3] 
+                ml = [10, 60, 64, 3]
+            elif table == "setka_16_2":
+                ml = [5, 75, 82, 6]  
             else:
                 ml = [11, 167, 172, 4]
         elif c == 7: # 15-16 место
             if table == "setka_32_2":
                 ml = [11, 127, 132, 4] 
             elif table == "setka_16_full":
-                ml = [10, 65, 68, 2] 
+                ml = [10, 65, 68, 2]
+            elif table == "setka_16_2":
+                ml = [9, 78, 82, 3]  
             else:
                 ml = [9, 173, 178, 4]
         elif c == 8: # 17-18 место
