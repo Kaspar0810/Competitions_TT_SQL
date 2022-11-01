@@ -2363,7 +2363,48 @@ def system_competition():
 def one_table(fin, mesto_in_group, group):
     """система соревнований из одной таблицы запись в System"""
     system = System.select().where(System.title_id == title_id())
-    flag = ready_system()
+    ch = Choice.select().where(Choice.title_id == title_id())
+    count = len(Player.select().where(Player.title_id == title_id()))
+    if count <= 16:
+        max_player = 16
+    elif count > 16 and count <= 32:
+        max_player = 32
+
+    etap = my_win.comboBox_etap_1.currentText()
+    cur_index = my_win.comboBox_one_table.currentIndex()
+    if etap == "Одна таблица":
+        if cur_index == 1:
+            vt = "Сетка (-2) на"
+            my_win.comboBox_page_vid.setCurrentText("книжная")
+            type_table = "сетка"
+        elif cur_index == 2:
+            vt = "Сетка (с розыгрышем всех мест) на"
+            my_win.comboBox_page_vid.setCurrentText("книжная")
+            type_table = "сетка"
+        elif cur_index == 3:
+            vt = "Сетка (с играми за 1-3 места) на"
+            my_win.comboBox_page_vid.setCurrentText("книжная")
+            type_table = "сетка"
+        elif cur_index == 4:
+            vt = "Круговая таблица на"
+            type_table = "круг"
+        flag = ready_system()
+        if flag is False:
+            sys_m = System.select().where(System.title_id == title_id()).get()
+            total_game = numbers_of_games(cur_index, player_in_final=max_player)
+            if vt == "Круговая система на":
+                pass
+            else:
+                sys_m.max_player = max_player
+                sys_m.total_athletes = count
+                sys_m.total_group = group
+                sys_m.stage = my_win.comboBox_etap_1.currentText()
+                sys_m.type_table = type_table
+                sys_m.page_vid = my_win.comboBox_page_vid.currentText()
+                sys_m.label_string = f"{vt} {max_player} участников"
+                sys_m.kol_game_string =f"{total_game} игр"
+                sys_m.save()
+
     for sys in system:
         if sys.stage == fin:  # если финал играется по кругу
             type_tbl = sys.type_table
@@ -2381,22 +2422,28 @@ def one_table(fin, mesto_in_group, group):
 
             load_tableWidget()
 
-            ch = Choice.select().where(Choice.title_id == title_id())
             choice = ch.select().where(Choice.mesto_group == mesta_exit)  # отбирает
             # записи жеребьевки после игр в группах (места которые вышли в финал)
             player_choice = choice.select().order_by(Choice.group)
-            con = len(player_choice)
 
             for i in player_choice:  # записывает в таблицу Choice
                 i.final = fin
                 i.posev_final = mesta_exit
                 i.save()
+        else:
+            fin = etap
+            # player_choice = choice.select().order_by(Choice.group)
 
-            string_table = my_win.label_50.text()
-            system = System.get(System.title_id == title_id() and System.stage == fin)
-            system.choice_flag = 1
-            system.save()
-            return
+            # for i in player_choice:  # записывает в таблицу Choice
+            #     i.final = fin
+            #     i.posev_final = mesta_exit
+            #     i.save()
+
+        # string_table = my_win.label_50.text()
+        sys_m.stage = fin
+        sys_m.choice_flag = 1
+        sys_m.save()
+        # return
 
 
 def kol_player_in_group():
@@ -5317,10 +5364,9 @@ def choice_setka(fin):
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребьевки"""
-    title = title_id()
-    player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title)
-    system = System.select().where(System.title_id == title)
-    choice = Choice.select().where(Choice.title_id == title)
+    player = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title_id())
+    system = System.select().where(System.title_id == title_id())
+    choice = Choice.select().where(Choice.title_id == title_id())
     for k in system:
         stage = k.stage
         if stage == "Одна таблица":
@@ -5332,7 +5378,7 @@ def choice_tbl_made():
             cch = Coach.get(Coach.id == pl.coach_id)
             coach = cch.coach
             chc = Choice(player_choice=pl, family=pl.player, region=pl.region, coach=coach, rank=pl.rank,
-                         title_id=title).save()
+                         title_id=title_id()).save()
 
 
 def choice_filter_group():
@@ -5423,7 +5469,7 @@ def etap_made():
     sender = my_win.sender()
     if sender != my_win.comboBox_etap_1:
         if my_win.comboBox_etap_1.currentText() == "Одна таблица":
-            one_table(fin="1-финал", mesto_in_group=1, group="")
+            one_table(fin="1-финал", mesto_in_group=1, group=1)
             player_in_table()
         if my_win.comboBox_etap_1.currentText() == "Предварительный" and my_win.comboBox_etap_2.isHidden():
             kol_player_in_group()
@@ -5806,6 +5852,7 @@ def kol_player_in_final():
             my_win.label_50.setText(f"{count} человек по круговой системе.")
             my_win.comboBox_one_table.hide()
         else:
+            my_win.comboBox_page_vid.setCurrentText("книжная")
             vid = ["Автоматический", "Ручной"]
             cur_index = my_win.comboBox_one_table.currentIndex()
             player_in_final = 16
