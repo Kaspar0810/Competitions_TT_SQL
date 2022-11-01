@@ -131,6 +131,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # last_comp.addAction(self.last_Action)  # подменю прошлых соревнований
         system.addAction(self.system_made_Action)  # подменю создание системы
         system.addAction(self.system_edit_Action)  # подменю редактирование системы
+        choice.addAction(self.choice_one_table_Action) # подменю одна таблица
         choice.addAction(self.choice_gr_Action)  # подменю группы
         choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
         choice.addAction(self.choice_fin_Action)  # подменю финалы
@@ -142,6 +143,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         last_comp.addAction(self.fourth_comp_Action)
         last_comp.addAction(self.fifth_comp_Action)
         ed_Menu = editMenu.addMenu("Жеребьевка")
+        ed_Menu.addAction(self.ed_one_table_Action)
         ed_Menu.addAction(self.ed_gr_Action)
         ed_Menu.addAction(self.ed_pf_Action)
         ed_Menu.addAction(self.ed_fin_Action)
@@ -191,6 +193,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.third_comp_Action = QAction("пусто")
         self.fourth_comp_Action = QAction("пусто")
         self.fifth_comp_Action = QAction("пусто")
+        self.ed_one_table_Action = QAction("Редакитровать таблицу")
         self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
         self.ed_pf_Action = QAction("Редактировать полуфиналы")
         self.ed_fin_Action = QAction("Редактировать финалы")
@@ -199,6 +202,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
         # self.savelist_Action = QAction("Список")  # подменю сохранить
+        self.choice_one_table_Action = QAction("Одна таблица")
         # подменю жеребьевка -группы-
         self.choice_gr_Action = QAction("Группы")
         # подменю жеребьевка -полуфиналы-
@@ -237,7 +241,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.vid_edit_Action.triggered.connect(self.vid_edit)
         self.exitAction.triggered.connect(self.exit)
         # self.savelist_Action.triggered.connect(self.saveList)
+        self.choice_one_table_Action.triggered.connect(self.choice)
         self.choice_gr_Action.triggered.connect(self.choice)
+        self.choice_pf_Action.triggered.connect(self.choice)
         self.choice_fin_Action.triggered.connect(self.choice)
         self.view_list_Action.triggered.connect(self.view)
         self.view_one_table_Action.triggered.connect(self.view)
@@ -289,8 +295,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def choice(self):
         msg = QMessageBox
         sender = self.sender()
-        if sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
-            system = System.select().where(System.title_id == title_id())
+        system = System.select().where(System.title_id == title_id())
+        if sender == self.choice_one_table_Action: # одна таблица
+            sys = system.select().where(System.stage == "Одна таблица").get()
+            type = sys.type_table
+            fin = "Одна таблица"
+            check_flag = check_choice(fin)
+            if check_flag is True:
+                if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
+                    reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
+                                                                            f"\nесли хотите сделать "
+                                                                            "повторно\nнажмите-ОК-, "
+                                                                            "если нет то - Cancel-",
+                                                    msg.Ok,
+                                                    msg.Cancel)
+                    if reply == msg.Ok:
+                        if type == "круг":
+                            player_fin_on_circle(fin)
+                        else:
+                            choice_setka(fin)
+                    else:
+                        return
+                else:
+                    if type == "круг":
+                        player_fin_on_circle(fin)
+                    else:
+                        choice_setka(fin)
+                # else:
+                #     return
+        elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
+            # system = System.select().where(System.title_id == title_id())
             for stage in system:
                 if stage.stage == "Предварительный":
                     if stage.choice_flag == True:
@@ -309,18 +343,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     else:
                         my_win.tabWidget.setCurrentIndex(2)
                         choice_gr_automat()
+        elif sender == self.choice_pf_Action: # подменю полуфиналы
+            pass
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
                 return
-            sys = System.select().where(System.title_id == title_id())
-            system = sys.select().where(System.stage == fin).get()
-            type = system.type_table
+            # sys = System.select().where(System.title_id == title_id())
+            sys = system.select().where(System.stage == fin).get()
+            type = sys.type_table
 
             if fin is not None:
                 check_flag = check_choice(fin)
                 if check_flag is True:
-                    if system.choice_flag == True:  # проверка флаг на жеребьевку финала
+                    if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
                         reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
                                                                             f"\nесли хотите сделать "
                                                                             "повторно\nнажмите-ОК-, "
@@ -2441,9 +2477,8 @@ def one_table(fin, mesto_in_group, group):
 
         # string_table = my_win.label_50.text()
         sys_m.stage = fin
-        sys_m.choice_flag = 1
+        sys_m.choice_flag = 0 # запись о том что сделана жеребьевка
         sys_m.save()
-        # return
 
 
 def kol_player_in_group():
@@ -5470,7 +5505,7 @@ def etap_made():
     if sender != my_win.comboBox_etap_1:
         if my_win.comboBox_etap_1.currentText() == "Одна таблица":
             one_table(fin="1-финал", mesto_in_group=1, group=1)
-            player_in_table()
+            # player_in_table()
         if my_win.comboBox_etap_1.currentText() == "Предварительный" and my_win.comboBox_etap_2.isHidden():
             kol_player_in_group()
         elif my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
@@ -5769,17 +5804,24 @@ def check_choice(fin):
     msg = QMessageBox
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     final = system.select().where(System.stage == fin).get() # получаем запись конкретного финала
-    exit = final.stage_exit  # запись откуда идет выход в финал
-    res = Result.select().where(Result.title_id == title_id())  # отбираем записи с выходом в финал
-    gr = res.select().where(Result.system_stage == exit)
-    for i in gr:
-        game = i.points_win 
-        check_flag = True      
-        if game is None:
-            result = msg.information(my_win, "Предварительный этап", "Еще не все встречи сыграны в предварительном этапе.",
-                                    msg.Ok)
+    if fin == "Одна таблица":
+        flag = final.choice_flag
+        if flag == 1:
+            check_flag = True
+        else:
             check_flag = False
-            break                        
+    else:    
+        exit = final.stage_exit  # запись откуда идет выход в финал
+        res = Result.select().where(Result.title_id == title_id())  # отбираем записи с выходом в финал
+        gr = res.select().where(Result.system_stage == exit)
+        for i in gr:
+            game = i.points_win 
+            check_flag = True      
+            if game is None:
+                result = msg.information(my_win, "Предварительный этап", "Еще не все встречи сыграны в предварительном этапе.",
+                                        msg.Ok)
+                check_flag = False
+                break                        
     return check_flag
 
 
