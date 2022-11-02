@@ -321,8 +321,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         player_fin_on_circle(fin)
                     else:
                         choice_setka(fin)
-                # else:
-                #     return
+            else:
+                return
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
             # system = System.select().where(System.title_id == title_id())
             for stage in system:
@@ -2397,6 +2397,7 @@ def system_competition():
 
 
 def one_table(fin, mesto_in_group, group):
+    msgBox = QMessageBox()
     """система соревнований из одной таблицы запись в System"""
     system = System.select().where(System.title_id == title_id())
     ch = Choice.select().where(Choice.title_id == title_id())
@@ -2424,8 +2425,8 @@ def one_table(fin, mesto_in_group, group):
         elif cur_index == 4:
             vt = "Круговая таблица на"
             type_table = "круг"
-        flag = ready_system()
-        if flag is False:
+        flag_ready_system = ready_system()
+        if flag_ready_system is False:
             sys_m = System.select().where(System.title_id == title_id()).get()
             total_game = numbers_of_games(cur_index, player_in_final=max_player)
             if vt == "Круговая система на":
@@ -2467,13 +2468,21 @@ def one_table(fin, mesto_in_group, group):
                 i.posev_final = mesta_exit
                 i.save()
         else:
+            my_win.Button_etap_made.setEnabled(False)
+            my_win.comboBox_page_vid.setEnabled(False)
+            string_table = my_win.label_50.text()
             fin = etap
-            # player_choice = choice.select().order_by(Choice.group)
-
-            # for i in player_choice:  # записывает в таблицу Choice
-            #     i.final = fin
-            #     i.posev_final = mesta_exit
-            #     i.save()
+            result = msgBox.question(my_win, "", "Система соревнований создана.\n"
+                                                 "Теперь необходимо сделать жеребъевку\n"
+                                                 "Хотите ее сделать сейчас?",
+                                     msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
+                count_exit = 1
+                mesto_first_poseva = 1
+                choice_setka_automat(fin, count_exit, mesto_first_poseva, flag=False)
+                pass
+            else:
+                return
 
         # string_table = my_win.label_50.text()
         sys_m.stage = fin
@@ -2605,8 +2614,15 @@ def player_in_setka(fin):
     # создание сетки со спортсменами согласно жеребьевки
     if tabel_string == "Сетка (с розыгрышем всех мест) на 16 участников":
         tds_new = setka_16_full_made(fin)
+    elif tabel_string == "Сетка (-2) на 16 участников":
+        tds_new = setka_16_2_made(fin)
     elif tabel_string == "Сетка (с розыгрышем всех мест) на 32 участников":
         tds_new = setka_32_full_made(fin)
+    elif tabel_string == "Сетка (-2) на 32 участников":
+        tds_new = setka_32_2_made(fin)
+    elif tabel_string == "Сетка на 32 участников":
+        tds_new = setka_32_made(fin)
+
     tds = tds_new[1]
     
     for r in tds:
@@ -3147,6 +3163,7 @@ def select_player_in_list():
         my_win.Button_pay_R.setEnabled(True)
     else:
         my_win.Button_pay_R.setEnabled(False)
+
 
 def save_in_db_pay_R():
     """запись в базу данных оплату рейтинга"""
@@ -4597,7 +4614,8 @@ def progress_bar(step):
 
 
 def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
-    """автоматическая жеребьевка сетки""" 
+    """автоматическая жеребьевка сетки, fin - финал, count_exit - сколько выходят в финал
+    mesto_first_poseva - номер 1-ого места, flag - флаг вида жеребьевки ручная или автомат""" 
     msgBox = QMessageBox 
     full_posev = []  # список полного списка участников 1-ого посева
     group_last = []
@@ -4895,7 +4913,13 @@ def setka_choice_number(fin, count_exit):
         if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
             posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13], [2, 3, 6, 7, 10, 11, 14, 15]]
             player_net = 16
+        elif type_setka == "Сетка (-2) на 16 участников":
+            posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13], [2, 3, 6, 7, 10, 11, 14, 15]]
+            player_net = 16
         elif type_setka == "Сетка (с розыгрышем всех мест) на 32 участников":
+            posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29], [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
+            player_net = 32
+        elif type_setka == "Сетка (-2) на 32 участников":
             posev_1 = [[1, 32], [16, 17], [8, 9, 24, 25], [4, 5, 12, 13, 20, 21, 28, 29], [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31]]
             player_net = 32
     elif count_exit == 2:
@@ -5505,7 +5529,7 @@ def etap_made():
     if sender != my_win.comboBox_etap_1:
         if my_win.comboBox_etap_1.currentText() == "Одна таблица":
             one_table(fin="1-финал", mesto_in_group=1, group=1)
-            # player_in_table()
+            player_in_table()
         if my_win.comboBox_etap_1.currentText() == "Предварительный" and my_win.comboBox_etap_2.isHidden():
             kol_player_in_group()
         elif my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
