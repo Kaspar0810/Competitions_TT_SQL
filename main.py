@@ -2467,11 +2467,15 @@ def one_table(fin, mesto_in_group, group):
                 i.final = fin
                 i.posev_final = mesta_exit
                 i.save()
-        else:
+        else: # финал или одна таблица сетка
             my_win.Button_etap_made.setEnabled(False)
             my_win.comboBox_page_vid.setEnabled(False)
             string_table = my_win.label_50.text()
             fin = etap
+            for k in ch: # записывает в DB после создании системы из одной таблицы basic - Одна таблица
+                k.basic = fin
+                k.save()
+
             result = msgBox.question(my_win, "", "Система соревнований создана.\n"
                                                  "Теперь необходимо сделать жеребъевку\n"
                                                  "Хотите ее сделать сейчас?",
@@ -4647,23 +4651,28 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
         posev_4 = posevs[4]
 
     s = 0
-    free_seats = 0
+    free_seats = 0 # кол-во свободных мест в сетке
     step = 0
     del_num = 0
     free_num = []
     all_player = []
     for d in range(0, count_exit):
-        all_player.append(len(choice.select().where(Choice.mesto_group == mesto_first_poseva + d)))
+        if sys.stage == "Одна таблица":
+            all_player.append(len(choice.select().where(Choice.basic == fin)))
+        else:
+            all_player.append(len(choice.select().where(Choice.mesto_group == mesto_first_poseva + d)))
     all_player = sum(all_player)
 
     for n in range (0, count_exit): # начало основного посева
         if fin == "1-й финал":
             choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
+        elif fin == "Одна таблица":
+            choice_posev = choice.select().order_by(Choice.rank.desc()).where(Choice.basic == fin)
         else:
-            choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
+            choice_posev = choice.select().order_by(Choice.rank.desc()).where(Choice.mesto_group == mesto_first_poseva + n)
         count_player_in_final = len(choice_posev)
         if count_player_in_final != max_player // count_exit and count_exit == 1: # вычеркиваем определенные номера только если одно место выходит из группы
-            free_num = free_place_in_setka(max_player, count_player_in_final, count_exit)
+            free_num = free_place_in_setka(max_player, count_player_in_final)
             del_num = 1 # флаг, что есть свободные номера
         elif count_player_in_final != max_player // count_exit and count_exit > 1:
             del_num = 1 # флаг, что есть свободные номера
@@ -4672,13 +4681,18 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             psv = []
         
             family = posev.family
-            group = posev.group
-            ind = group.find(' ')
-            group_number = int(group[:ind])
+            if fin != "Одна таблица":
+                group = posev.group
+                ind = group.find(' ')
+                group_number = int(group[:ind])
+            else:
+                group = ""
+                group_number = 1
             pl_id = posev.player_choice_id
             region = posev.region
             player = Player.get(Player.id == pl_id)
             city = player.city
+            rank = player.rank
 
             psv.append(pl_id)
             psv.append(family)
@@ -4686,12 +4700,18 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             psv.append(group_number)
             psv.append(group)
             psv.append(city)
+            psv.append(rank)
             full_posev.append(psv)
+        
+            # full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
+        if fin != "1-й финал" or fin == "Одна таблица":
+            full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
+        else:
             full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
-        if fin != "1-й финал":
-            full_posev.sort(key=lambda k: k[0], reverse=True) # сортировка списка участников по рейтингу
+
         for k in full_posev:
             k.remove(k[3])
+            k.remove(k[5])
         # ======== начало жеребьевки =========
         end = player_net // count_exit
         for i in range(0, end):
@@ -5428,7 +5448,9 @@ def choice_tbl_made():
     choice = Choice.select().where(Choice.title_id == title_id())
     for k in system:
         stage = k.stage
-        if stage == "Одна таблица":
+        if stage == "Одна таблица":            
+            if k.choice_flag is True:
+                system_competition()
             sys = System(choice_flag=True).save()
     chc = len(choice)
     if chc == 0:
@@ -5931,14 +5953,6 @@ def kol_player_in_final():
             my_win.comboBox_one_table.hide()
             mesto_first_poseva = 1
             count_exit = 1
-            # vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
-            # if vid == "Автоматический":
-            #     flag = True
-            # else:
-            #     flag = False
-            # posev = choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
-            # print(posev)
-
     else:
         if sender == my_win.comboBox_table:
             cur_index = my_win.comboBox_table.currentIndex()
