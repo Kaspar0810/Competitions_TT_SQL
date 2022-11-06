@@ -7890,7 +7890,7 @@ def table_data(stage, kg):
         # список словарей участник и его регион
         posev_data = player_choice_one_table(stage)
         count_player_group = len(posev_data)
-        num_gr = "1 группа"
+        # num_gr = "1 группа"
         max_gamer = count_player_group
         num_gr = stage
         tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
