@@ -2774,10 +2774,11 @@ def player_fin_on_circle(fin):
 def player_in_table_group():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
     встречи по турам в таблицу -Result- """
-    system = System.select().where(System.title_id == title_id()).get()  # находит system id последнего
+    sys = System.select().where(System.title_id == title_id())  # находит system id последнего
+    system = sys.select().where(System.stage == "Предварительный")
     kg = system.total_group
     stage = system.stage
-    table = system.label_string
+    # table = system.label_string
     pv = system.page_vid
     # создание таблиц групп со спортсменами согласно жеребьевки в PDF
     table_made(pv, stage)
@@ -6576,7 +6577,6 @@ def table_made(pv, stage):
     change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     change_dir()
-
 
 
 def setka_16_2_made_land(fin):
