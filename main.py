@@ -2775,7 +2775,7 @@ def player_in_table_group():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
     встречи по турам в таблицу -Result- """
     sys = System.select().where(System.title_id == title_id())  # находит system id последнего
-    system = sys.select().where(System.stage == "Предварительный")
+    system = sys.select().where(System.stage == "Предварительный").get()
     kg = system.total_group
     stage = system.stage
     # table = system.label_string
