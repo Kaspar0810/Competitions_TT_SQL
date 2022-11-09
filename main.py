@@ -7926,6 +7926,8 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
         posev = posev_data[((i + 1) // 2) - 1]
         tbl_tmp[i - 1][1] = posev["фамилия"]
         tbl_tmp[i][1] = posev["регион"]
+        # добавил ид
+        # tbl_tmp[i + 1]
     td = tbl_tmp.copy()  # cписок (номер, фамилия, город и пустые ячейки очков)
     td_color = []
 
@@ -8830,14 +8832,19 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr):
 def player_choice_in_group(num_gr):
     """распределяет спортсменов по группам согласно жеребьевке"""
     posev_data = []
-    t_id = title_id()
-    choice = Choice.select().where(Choice.title_id == t_id)
+    choice = Choice.select().where(Choice.title_id == title_id())
     choice_group = choice.select().where(Choice.group == num_gr)
+    players = Player.select().where(Player.title_id == title_id())
     for posev in choice_group:
+        pl = players.select().where(Player.id == posev.player_choice_id)
+        city = pl.city
         posev_data.append({
             'фамилия': posev.family,
-            'регион': posev.region,
+            'регион': city,
+            # 'регион': posev.region,
         })
+        # добавил ид спортсмена
+        # posev_data.append(posev.player_choice_id)
     return posev_data
 
 
