@@ -2814,10 +2814,18 @@ def player_in_table_group():
                     first = int(match[:znak])  # игрок под номером в группе
                     # игрок под номером в группе
                     second = int(match[znak + 1:])
-                    pl1 = gr[first * 2 - 2][1]  # фамилия первого игрока
-                    pl2 = gr[second * 2 - 2][1]  # фамилия второго игрока
+                    pl1_id = gr[first * 2 - 2][1]  # фамилия первого игрока /id
+                    z = pl1_id.find("/") # находит черту
+                    pl1 = pl1_id[:z] # отделяет фамилия от ид
+                    pl2_id = gr[second * 2 - 2][1]  # фамилия второго игрока
+                    z = pl2_id.find("/")
+                    pl2 = pl2_id[:z]
+                    cit1 = gr[first * 2 - 1][1] # город 1-ого игрока
+                    cit2 = gr[second * 2 - 1][1] # город 2-ого игрока
+                    full_pl1 = f"{pl1}/{cit1}"
+                    full_pl2 = f"{pl2}/{cit2}"
                     with db:
-                        results = Result(number_group=number_group, system_stage=stage, player1=pl1, player2=pl2,
+                        results = Result(number_group=number_group, system_stage=stage, player1=full_pl1, player2=full_pl2,
                                          tours=match, title_id=title_id(), round=round).save()
 
 
@@ -4423,7 +4431,6 @@ def filter_gr(pl=False):
     msgBox = QMessageBox
     group = my_win.comboBox_filter_group.currentText()
     name = my_win.comboBox_find_name.currentText()
-    name = name.title()  # делает Заглавными буквы слов
     played = my_win.comboBox_filter_played.currentText()
     # отфильтровывает записи с id соревнования (title_id)
     fltr_id = Result.select().where(Result.title_id == title_id())
@@ -7890,7 +7897,6 @@ def table_data(stage, kg):
         # список словарей участник и его регион
         posev_data = player_choice_one_table(stage)
         count_player_group = len(posev_data)
-        # num_gr = "1 группа"
         max_gamer = count_player_group
         num_gr = stage
         tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
@@ -7924,10 +7930,13 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
         tbl_tmp.append(s)
     for i in range(1, count_player_group * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
-        tbl_tmp[i - 1][1] = posev["фамилия"]
+        # убирает из фамилии его ид
+        fam = posev["фамилия"]
+        zn = fam.find("/")
+        family = fam[:zn]
+        tbl_tmp[i - 1][1] = family
         tbl_tmp[i][1] = posev["регион"]
-        # добавил ид
-        # tbl_tmp[i + 1]
+ 
     td = tbl_tmp.copy()  # cписок (номер, фамилия, город и пустые ячейки очков)
     td_color = []
 
@@ -7984,7 +7993,6 @@ def setka_data(fin):
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия']
-        # if family != "bye":
         id_f_name = full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
         id_f_n = id_f_name[0] # словарь name: фамилия/город, id: номер игрока
         id_s_n = id_f_name[1] # {name: фамилия, id: номер игрока}
@@ -8836,15 +8844,13 @@ def player_choice_in_group(num_gr):
     choice_group = choice.select().where(Choice.group == num_gr)
     players = Player.select().where(Player.title_id == title_id())
     for posev in choice_group:
-        pl = players.select().where(Player.id == posev.player_choice_id)
+        pl = players.select().where(Player.id == posev.player_choice_id).get()
         city = pl.city
+        id_pl = posev.player_choice_id
         posev_data.append({
-            'фамилия': posev.family,
+            'фамилия': f"{posev.family}/{id_pl}",
             'регион': city,
-            # 'регион': posev.region,
         })
-        # добавил ид спортсмена
-        # posev_data.append(posev.player_choice_id)
     return posev_data
 
 
@@ -8852,14 +8858,17 @@ def player_choice_one_table(stage):
     """список спортсменов одной таблицы"""
     posev_data = []
     choices = Choice.select().where(Choice.title_id == title_id())
+    players = Player.select().where(Player.title_id == title_id())
     if stage == "Одна таблица":
         choice = choices.select().where(Choice.basic == "Одна таблица")
     else:
         choice = choices.select().order_by(Choice.posev_final).where(Choice.final == stage)
     for posev in choice:
+        pl = players.select().where(Player.id == posev.player_choice_id).get()
+        city = pl.city
         posev_data.append({
             'фамилия': posev.family,
-            'регион': posev.region,
+            'регион': posev.city,
         })
     return posev_data
 
