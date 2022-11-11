@@ -326,7 +326,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             else:
                 return
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
-            # system = System.select().where(System.title_id == title_id())
             for stage in system:
                 if stage.stage == "Предварительный":
                     if stage.choice_flag == True:
@@ -2403,7 +2402,7 @@ def system_competition():
 def one_table(fin, group):
     """система соревнований из одной таблицы запись в System, Game_list, Result"""
     msgBox = QMessageBox()
-    # system = System.select().where(System.title_id == title_id())
+    system = System.select().where(System.title_id == title_id())
     ch = Choice.select().where(Choice.title_id == title_id())
     count = len(Player.select().where(Player.title_id == title_id()))
     # в зависмости сетка или круг
@@ -2453,32 +2452,33 @@ def one_table(fin, group):
         # if type_table == "круг":
         #     player_in_one_table(fin)
         # else:
-        #     pass
-    # for sys in system:
-    #     if sys.stage == fin:  # если финал играется по кругу
-    #         type_tbl = sys.type_table
-    #         if type_tbl == "круг":
-    #             count_player = mesto_in_group["выход"]
-    #             mesta_exit = mesto_in_group["место"]
-    #             count = group * count_player
+    #     #     pass
+    # else:
+    #     for sys in system:
+    #         if sys.stage == fin:  # если финал играется по кругу
+    #             type_tbl = sys.type_table
+    #             if type_tbl == "круг":
+    #                 count_player = mesto_in_group["выход"]
+    #                 mesta_exit = mesto_in_group["место"]
+    #                 count = group * count_player
 
-    #             kol_game = f"{count // 2 * (count - 1)} игр"
-    #             my_win.Button_etap_made.setEnabled(False)
-    #             my_win.comboBox_page_vid.setEnabled(False)
-    #         elif type_tbl == "сетка":
-    #             count_player = mesto_in_group["выход"]
-    #             mesta_exit = mesto_in_group["место"]
+    #                 kol_game = f"{count // 2 * (count - 1)} игр"
+    #                 my_win.Button_etap_made.setEnabled(False)
+    #                 my_win.comboBox_page_vid.setEnabled(False)
+    #             elif type_tbl == "сетка":
+    #                 count_player = mesto_in_group["выход"]
+    #                 mesta_exit = mesto_in_group["место"]
 
-    #         load_tableWidget()
+    #             load_tableWidget()
 
-    #         choice = ch.select().where(Choice.mesto_group == mesta_exit)  # отбирает
-    #         # записи жеребьевки после игр в группах (места которые вышли в финал)
-    #         player_choice = choice.select().order_by(Choice.group)
+    #             choice = ch.select().where(Choice.mesto_group == mesta_exit)  # отбирает
+    #             # записи жеребьевки после игр в группах (места которые вышли в финал)
+    #             player_choice = choice.select().order_by(Choice.group)
 
-    #         for i in player_choice:  # записывает в таблицу Choice
-    #             i.final = fin
-    #             i.posev_final = mesta_exit
-    #             i.save()
+    #             for i in player_choice:  # записывает в таблицу Choice
+    #                 i.final = fin
+    #                 i.posev_final = mesta_exit
+    #                 i.save()
         # else: # Соревнования состоят из одной таблице сетка или в круг
             my_win.Button_etap_made.setEnabled(False)
             my_win.comboBox_page_vid.setEnabled(False)
@@ -2713,68 +2713,68 @@ def player_in_one_table(fin):
             results.save()    
 
 
-# def player_fin_on_circle(fin):
-#     """заполняет таблицу Game_list данными спортсменами из группы, которые будут играть в финале по кругу
-#      td - список списков данных из групп"""
-#     gr = []
-#     player_final = {}
-#     parametrs_final = {}
-#     mesto = 1
-#     players = Player.select().where(Player.title_id == title_id())
-#     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-#     for s in system:
-#         if s.stage == "Предварительный":
-#             sys = system.select().where(System.stage == "Предварительный").get()
-#             group = sys.total_group
-#         else: # если игают соревнования из одной таблицы по кругу
-#             final = s.stage
-#             if final == fin:
-#                 pl_final = s.max_player // group
-#                 parametrs_final["выход"] = pl_final
-#                 parametrs_final["место"] = mesto
+def player_fin_on_circle(fin):
+    """заполняет таблицу Game_list данными спортсменами из группы, которые будут играть в финале по кругу
+     td - список списков данных из групп"""
+    gr = []
+    player_final = {}
+    parametrs_final = {}
+    mesto = 1
+    players = Player.select().where(Player.title_id == title_id())
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    for s in system:
+        if s.stage == "Предварительный":
+            sys = system.select().where(System.stage == "Предварительный").get()
+            group = sys.total_group
+        else: # если игают соревнования из одной таблицы по кругу
+            final = s.stage
+            if final == fin:
+                pl_final = s.max_player // group
+                parametrs_final["выход"] = pl_final
+                parametrs_final["место"] = mesto
 
-#                 player_final[final] = parametrs_final.copy()
-#                 mesto = mesto + s.max_player
-#                 break
+                player_final[final] = parametrs_final.copy()
+                mesto = mesto + s.max_player
+                break
 
-#     mesto_in_group = player_final[fin]
+    mesto_in_group = player_final[fin]
 
-#     # вызов функции, где получаем список всех участников по группам
-#     one_table(fin, mesto_in_group, group)
-#     choice = Choice.select().order_by(Choice.group).where(Choice.title_id == title_id() and
-#                                                           Choice.mesto_group == mesto_in_group["место"])
+    # вызов функции, где получаем список всех участников по группам
+    one_table(fin, mesto_in_group, group)
+    choice = Choice.select().order_by(Choice.group).where(Choice.title_id == title_id() and
+                                                          Choice.mesto_group == mesto_in_group["место"])
 
-#     system_id = System.get(System.title_id == title_id()
-#                            and System.stage == fin)
-#     st = "Финальный"
-#     k = 0
+    system_id = System.get(System.title_id == title_id()
+                           and System.stage == fin)
+    st = "Финальный"
+    k = 0
 
-#     for p in choice:  # цикл заполнения db таблиц -game list-
-#         k += 1
-#         player = p.family
-#         pl_id = p.player_choice_id
-#         player_id = f"{player}/{pl_id}"
-#         pl_city = players.select().where(Player.id == pl_id).get()
-#         city = pl_city.city
-#         one_table.append(f"{player}/{city}")
-#         gr.append(player)
-#         game_list = Game_list(number_group=fin, rank_num_player=k, player_group=player_id, system_id=system_id,
-#                               title_id=title_id())
-#         game_list.save()
+    for p in choice:  # цикл заполнения db таблиц -game list-
+        k += 1
+        player = p.family
+        pl_id = p.player_choice_id
+        player_id = f"{player}/{pl_id}"
+        pl_city = players.select().where(Player.id == pl_id).get()
+        city = pl_city.city
+        one_table.append(f"{player}/{city}")
+        gr.append(player)
+        game_list = Game_list(number_group=fin, rank_num_player=k, player_group=player_id, system_id=system_id,
+                              title_id=title_id())
+        game_list.save()
 
-#     tours = tours_list(k - 3)
-#     round = 0
-#     for tour in tours:
-#         round += 1
-#         for match in tour:
-#             znak = match.find("-")
-#             first = int(match[:znak])  # игрок под номером в группе
-#             second = int(match[znak + 1:])  # игрок под номером в группе
-#             pl1 = gr[first - 1]
-#             pl2 = gr[second - 1]
-#             results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
-#                              tours=match, title_id=title_id(), round=round)
-#             results.save()
+    tours = tours_list(k - 3)
+    round = 0
+    for tour in tours:
+        round += 1
+        for match in tour:
+            znak = match.find("-")
+            first = int(match[:znak])  # игрок под номером в группе
+            second = int(match[znak + 1:])  # игрок под номером в группе
+            pl1 = gr[first - 1]
+            pl2 = gr[second - 1]
+            results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
+                             tours=match, title_id=title_id(), round=round)
+            results.save()
 
 
 def player_in_table_group():
@@ -9293,7 +9293,7 @@ def color_mesta(data, first_mesto, table):
     """окрашивает места в красный цвет"""
     b = 0
     style_color = []
-    ml = [] # столбец, ряд -1 ого места, ряд 2-ого места, шаг между местами
+    ml = [] # столбец, ряд -1 ого места, ряд 2-ого места + 1, шаг между местами
     f = 0 # количество столбцов
     if table == "setka_32":
         f = 2
