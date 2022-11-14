@@ -1118,9 +1118,8 @@ def load_tableWidget():
                     stg.append(stage)
                     flag = ready_choice(stage)
                     choice_flag[stage] = flag
-
+            p = 0
             for k in stg:
-                p = 0
                 if choice_flag[k] == True:
                     p += 1
             if p > 0:
@@ -2740,6 +2739,8 @@ def player_fin_on_circle(fin):
 
     mesto_in_group = player_final[fin]
 
+    # for l in in range()
+
     # вызов функции, где получаем список всех участников по группам
     # choice_fin = choice.select().order_by(Choice.group).where(Choice.mesto_group == mesto_in_group["место"])
 
@@ -2756,12 +2757,16 @@ def player_fin_on_circle(fin):
             player = p.family
             pl_id = p.player_choice_id
             player_id = f"{player}/{pl_id}"
-            # pl_city = players.select().where(Player.id == pl_id).get()
-            # city = pl_city.city
             fin_list.append(player_id)
             game_list = Game_list(number_group=fin, rank_num_player=k, player_group=player_id, system_id=system_id,
                                 title_id=title_id())
             game_list.save()
+            # === вставить запись в db
+            with db :
+                p.final = fin
+                p.save()
+            # ch = choice_fin.select().where(Choice.player_choice_id == pl_id).get()
+            # ch_fin =  ch(final=fin).save()
 # =========== новый вариант с использованием Game_list =========
     player_in_final = system_id.max_player
     cp = player_in_final - 3
@@ -2794,6 +2799,7 @@ def player_fin_on_circle(fin):
             with db:
                 results = Result(number_group=fin, system_stage=st, player1=full_pl1, player2=full_pl2,
                                 tours=match, title_id=title_id(), round=round).save()
+        sys =  system_id(choice_flag=True).save()    
 # ====================
     # player_in_final = system_id.max_player
     # # if fp == 0 and m != 0 or m == player_in_final:
@@ -8190,7 +8196,6 @@ def score_in_table(td, num_gr):
         r = result.select().where(Result.number_group == num_gr)
         choice = ch.select().where(Choice.group == num_gr)  # фильтрует по группе
     elif stage == "Одна таблица":
-        # r = result.select().where(Result.number_group == "1 группа")
         r = result.select().where(Result.number_group == "Одна таблица")
         choice = ch.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
     else:
@@ -8435,7 +8440,6 @@ def rank_in_group(total_score, max_person, td, num_gr):
 
     for key, value in total_score.items():
         rev_dict.setdefault(value, set()).add(key)
-    # result = [key for key, values in rev_dict.items() if len(values) > 1]
     res = [key for key, values in rev_dict.items() if len(values) > 1]
 
     # отдельно составляет список ключей (группы)
