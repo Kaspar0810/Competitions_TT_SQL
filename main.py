@@ -2752,6 +2752,7 @@ def player_fin_on_circle(fin):
 
     for m in range(rank_group, rank_group + mesto_in_group["выход"]):
         choice_fin = choice.select().order_by(Choice.group).where(Choice.mesto_group == m)
+        con = len(choice_fin)
         for p in choice_fin:  # цикл заполнения db таблиц -game list-
             k += 1
             player = p.family
@@ -2762,11 +2763,9 @@ def player_fin_on_circle(fin):
                                 title_id=title_id())
             game_list.save()
             # === вставить запись в db
-            with db :
-                p.final = fin
+            with db:
+                p.final = final
                 p.save()
-            # ch = choice_fin.select().where(Choice.player_choice_id == pl_id).get()
-            # ch_fin =  ch(final=fin).save()
 # =========== новый вариант с использованием Game_list =========
     player_in_final = system_id.max_player
     cp = player_in_final - 3
@@ -2799,56 +2798,10 @@ def player_fin_on_circle(fin):
             with db:
                 results = Result(number_group=fin, system_stage=st, player1=full_pl1, player2=full_pl2,
                                 tours=match, title_id=title_id(), round=round).save()
-        sys =  system_id(choice_flag=True).save()    
-# ====================
-    # player_in_final = system_id.max_player
-    # # if fp == 0 and m != 0 or m == player_in_final:
-    # cp = player_in_final - 3
-    # tour = tours_list(cp)
-    # kol_tours = len(tour)  # кол-во туров
-    # game = len(tour[0])  # кол-во игр в туре
-    # for r in range(0, kol_tours):
-    #     round = r + 1
-    #     tours = tour[r]  # игры тура
-    #     for d in range(0, game):  # цикл по играм тура
-    #         match = tours[d]  # матч в туре
-    #         znak = match.find("-")
-    #         first = int(match[:znak])  # игрок под номером в группе
-    #         # игрок под номером в группе
-    #         second = int(match[znak + 1:])
-    #         # pl1_id = fin_list[first * 2 - 2] # фамилия первого игрока /id
-    #         pl1_id = fin_list[first - 1] # фамилия первого игрока /id
-    #         z = pl1_id.find("/") # находит черту
-    #         pl1 = pl1_id[:z] # отделяет фамилия от ид
-    #         # pl2_id = fin_list[second * 2 - 2] # фамилия второго игрока
-    #         pl2_id = fin_list[second - 1] # фамилия второго игрока
-    #         z = pl2_id.find("/")
-    #         pl2 = pl2_id[:z]
-    #         cit1 = fin_list[first * 2 - 1] # город 1-ого игрока
-    #         cit2 = fin_list[second * 2 - 1] # город 2-ого игрока
-    #         full_pl1 = f"{pl1}/{cit1}"
-    #         full_pl2 = f"{pl2}/{cit2}"
-    #         with db:
-    #             results = Result(number_group=fin, system_stage=st, player1=full_pl1, player2=full_pl2,
-    #                             tours=match, title_id=title_id(), round=round).save()
-    
+        with db:
+            system_id.choice_flag = True
+            system_id.save()    
 
-    # player_in_final = system_id.max_player
-    # tours = tours_list(player_in_final - 3)
-    # round = 0
-    # for tour in tours:
-    #     round += 1
-    #     for match in tour:
-    #         znak = match.find("-")
-    #         first = int(match[:znak])  # игрок под номером в группе
-    #         second = int(match[znak + 1:])  # игрок под номером в группе
-    #         pl1 = gr[0]
-    #         pl2 = gr[1]
-    #         # pl1 = gr[first - 1]
-    #         # pl2 = gr[second - 1]
-    #         results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
-    #                          tours=match, title_id=title_id(), round=round)
-    #         results.save()
 
 
 def player_in_table_group():
@@ -4453,6 +4406,12 @@ def filter_fin(pl=False):
             count_pl = len(fltr_played)
             my_win.label_38.setText(
                 f' Всего сыграно во всех финалах {count_pl} игры')
+        elif final == "все финалы" and played == "не сыгранные" and num_game_fin == "":
+            fl = filter.select().where(Result.system_stage == "Финальный")
+            fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
+            count = len(fltr)
+            my_win.label_38.setText(
+                f'Всего в {final} не сыгранно {count} игры')
         else:
             if final != "все финалы" and num_game_fin != "":
                 fltr = filter.select().where(Result.number_group == final)
@@ -8011,10 +7970,11 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     for i in range(1, count_player_group * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         # убирает из фамилии его ид
-        fam = posev["фамилия"]
-        zn = fam.find("/")
-        family = fam[:zn]
-        tbl_tmp[i - 1][1] = family
+        # fam = posev["фамилия"]
+        # zn = fam.find("/")
+        # family = fam[:zn]
+        # tbl_tmp[i - 1][1] = family
+        tbl_tmp[i - 1][1] = posev["фамилия"]
         tbl_tmp[i][1] = posev["регион"]
  
     td = tbl_tmp.copy()  # cписок (номер, фамилия, город и пустые ячейки очков)
@@ -8946,7 +8906,7 @@ def player_choice_one_table(stage):
         city = pl.city
         posev_data.append({
             'фамилия': posev.family,
-            'регион': posev.city,
+            'регион': city,
         })
     return posev_data
 
