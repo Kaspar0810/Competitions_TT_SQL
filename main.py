@@ -5670,12 +5670,21 @@ def etap_made():
 
 def total_game_table(kpt, fin, pv, cur_index):
     """количество участников и кол-во игр"""
+    sum_player = [0]
     msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
-    system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
-    total_player = system.total_athletes
+    # system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
+    system = System.select().where(System.title_id == title_id()) # находит system id последнего
+    for sys in system:
+        if sys.stage == "Предварительный":
+            total_player = sys.total_athletes
+            total_gr = sys.total_group
+        else:
+            fin_player = sys.max_player
+            sum_player.append(fin_player)
+        sum_pl = sum(sum_player)
+    # total_player = system.total_athletes
     if kpt != 0:  # подсчет кол-во игр из выбора кол-ва игроков вышедших из группы и системы финала
-        player_in_final = system.total_group * kpt
         if cur_index == 1:
             vt = "Сетка (-2) на"
             my_win.comboBox_page_vid.setCurrentText("книжная")
@@ -5691,14 +5700,29 @@ def total_game_table(kpt, fin, pv, cur_index):
         elif cur_index == 4:
             vt = "Круговая таблица на"
             type_table = "круг"
+# =========================
+        player_in_final = total_gr * kpt + sum_pl
+        if player_in_final < total_player:
+            balance = total_player - sum_pl
+        player_in_final = balance
+        # if total_player % total_gr == 0: # колличество участников ровно делется на все группы
+        #     player_in_final = total_gr * kpt
+        # else:
+        #     pass
+
+            # else:
+        #         mp = sys.max_player
+        #         sum_player.append(mp)
+        # player_in_final = sum_player[0]
+        # == уточнить если в группах не равное кол-во участников то и в финале не будет выход из группы умножить на колво групп
 
         total_games = numbers_of_games(cur_index, player_in_final)  # подсчет кол-во игр
 
         pv = my_win.comboBox_page_vid.currentText()
         str_setka = f"{vt} {player_in_final} участников"
         stage_list = []
-        sys = System.select().where(System.id == title_id())
-        for k in sys:
+        # sys = System.select().where(System.id == title_id())
+        for k in system:
             st = k.stage
             stage_list.append(st)
 
@@ -5710,11 +5734,8 @@ def total_game_table(kpt, fin, pv, cur_index):
         s = System.select().order_by(System.id.desc()).get()
 
         total_athletes = s.total_athletes
-        # stage_exit = ""
         stroka_kol_game = f"{total_games} игр"
 
-        # if total_athletes == player_in_final:
-        #     stage_exit = "Предварительный"
         final = fin
 
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=0, kol_game_string=stroka_kol_game,
