@@ -5702,9 +5702,9 @@ def total_game_table(kpt, fin, pv, cur_index):
             type_table = "круг"
 # =========================
         player_in_final = total_gr * kpt + sum_pl
-        if player_in_final < total_player:
+        if player_in_final > total_player:
             balance = total_player - sum_pl
-        player_in_final = balance
+            player_in_final = balance
         # if total_player % total_gr == 0: # колличество участников ровно делется на все группы
         #     player_in_final = total_gr * kpt
         # else:
