@@ -2528,7 +2528,7 @@ def kol_player_in_group():
     else:
         stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(g2)} чел."
         p = int(p)
-        skg = int((((p * (p - 1)) / 2 * g1) + ((g2 * (g2 - 1)) / 2 * e1)))
+        skg = int((((p * (p - 1)) / 2 * g1) + ((g2 * (g2 - 1)) / 2 * e1))) # общее количество игр в группах
         mp = g2
     stroka_kol_game = f"{skg} игр"
     my_win.label_11.hide()
@@ -6292,34 +6292,41 @@ def table_made(pv, stage):
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     for s_id in system:
         if s_id.stage == stage:
-            ta = s_id.max_player
+            # ta = s_id.max_player
+            max_pl = s_id.max_player
             type_tbl = s_id.type_table
             break
-    if stage == "Одна таблица":
+    if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
         kg = 1
-        t = ta
-    elif stage != "Одна таблица" and type_tbl == "круг":  # финальные игры по кругу
-        kg = 1
-        t = ta
+        # t = ta
+    # elif stage != "Одна таблица" and type_tbl == "круг":  # финальные игры по кругу
+    #     kg = 1
+        # t = ta
     else:  # групповые игры
-        all_player = s_id.total_athletes  # кол-во участников
+        # all_player = s_id.total_athletes  # кол-во участников
         kg = s_id.total_group  # кол-во групп
-        if int(all_player) % int(kg) == 0:
-            t = ta
-        else:
-            t = ta + 1
+
+        # if int(all_player) % int(kg) == 0:
+        #     t = ta
+        # else:
+        #     t = ta + 1
     if pv == "альбомная":  # альбомная ориентация стр
         pv = landscape(A4)
-        if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:
+        # if kg == 1 or t in [10, 11, 12, 13, 14, 15, 16]:
+        if kg == 1 or max_pl in [10, 11, 12, 13, 14, 15, 16]:
             # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
-            wcells = 21.4 / t
+            # wcells = 21.4 / t
+            wcells = 21.4 / max_pl
         else:
             # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
-            wcells = 7.4 / t
+            # wcells = 7.4 / t
+            wcells = 7.4 / max_pl
     else:  # книжная ориентация стр
         pv = A4
-        wcells = 12.8 / t  # ширина столбцов таблицы в зависимости от кол-во чел
-    col = ((wcells * cm,) * t)
+        # wcells = 12.8 / t  # ширина столбцов таблицы в зависимости от кол-во чел
+        wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
+    # col = ((wcells * cm,) * t)
+    col = ((wcells * cm,) * max_pl)
 
     elements = []
 
@@ -6331,7 +6338,7 @@ def table_made(pv, stage):
         rH = (0.34 * cm)  # высота строки
     # rH = None  # высота строки
     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
-    for i in range(0, t):
+    for i in range(0, max_pl):
         i += 1
         i = str(i)
         num_columns.append(i)
@@ -6339,7 +6346,7 @@ def table_made(pv, stage):
 
     tblstyle = []
     # =========  цикл создания стиля таблицы ================
-    for q in range(1, t + 1):  # город участника делает курсивом
+    for q in range(1, max_pl + 1):  # город участника делает курсивом
         # город участника делает курсивом
         fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
         tblstyle.append(fn)
@@ -6353,13 +6360,13 @@ def table_made(pv, stage):
         fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))
         tblstyle.append(fn)
         # объединяет клетки очки
-        fn = ('SPAN', (t + 2, q * 2 - 1), (t + 2, q * 2))
+        fn = ('SPAN', (max_pl + 2, q * 2 - 1), (max_pl + 2, q * 2))
         tblstyle.append(fn)
         # объединяет клетки соот
-        fn = ('SPAN', (t + 3, q * 2 - 1), (t + 3, q * 2))
+        fn = ('SPAN', (max_pl + 3, q * 2 - 1), (max_pl + 3, q * 2))
         tblstyle.append(fn)
         # объединяет клетки  место
-        fn = ('SPAN', (t + 4, q * 2 - 1), (t + 4, q * 2))
+        fn = ('SPAN', (max_pl + 4, q * 2 - 1), (max_pl + 4, q * 2))
         tblstyle.append(fn)
         # объединяет диагональные клетки
         fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
@@ -6375,10 +6382,10 @@ def table_made(pv, stage):
                      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                      ('FONTSIZE', (0, 0), (-1, -1), 7),
                      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                     ('FONTNAME', (0, 0), (t + 5, 0), "DejaVuSerif-Bold"),
-                     ('VALIGN', (0, 0), (t + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
+                     ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
+                     ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
                     + tblstyle +
-                    [('BACKGROUND', (0, 0), (t + 5, 0), colors.yellow),
+                    [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
                      # цвет шрифта в ячейках
                      ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
                      ('LINEABOVE', (0, 0), (-1, 1), 1,
@@ -6800,7 +6807,6 @@ def setka_16_2_made_land(fin):
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     change_dir()
     return tds
-
 
 
 def setka_16_2_made(fin):
