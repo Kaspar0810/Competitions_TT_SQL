@@ -5673,7 +5673,6 @@ def total_game_table(kpt, fin, pv, cur_index):
     sum_player = [0]
     msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
-    # system = System.select().order_by(System.id).where(System.title_id == title_id()).get()  # находит system id последнего
     system = System.select().where(System.title_id == title_id()) # находит system id последнего
     for sys in system:
         if sys.stage == "Предварительный":
@@ -5683,7 +5682,6 @@ def total_game_table(kpt, fin, pv, cur_index):
             fin_player = sys.max_player
             sum_player.append(fin_player)
         sum_pl = sum(sum_player)
-    # total_player = system.total_athletes
     if kpt != 0:  # подсчет кол-во игр из выбора кол-ва игроков вышедших из группы и системы финала
         if cur_index == 1:
             vt = "Сетка (-2) на"
@@ -5705,15 +5703,6 @@ def total_game_table(kpt, fin, pv, cur_index):
         if player_in_final > total_player:
             balance = total_player - sum_pl
             player_in_final = balance
-        # if total_player % total_gr == 0: # колличество участников ровно делется на все группы
-        #     player_in_final = total_gr * kpt
-        # else:
-        #     pass
-
-            # else:
-        #         mp = sys.max_player
-        #         sum_player.append(mp)
-        # player_in_final = sum_player[0]
         # == уточнить если в группах не равное кол-во участников то и в финале не будет выход из группы умножить на колво групп
 
         total_games = numbers_of_games(cur_index, player_in_final)  # подсчет кол-во игр
@@ -5721,7 +5710,6 @@ def total_game_table(kpt, fin, pv, cur_index):
         pv = my_win.comboBox_page_vid.currentText()
         str_setka = f"{vt} {player_in_final} участников"
         stage_list = []
-        # sys = System.select().where(System.id == title_id())
         for k in system:
             st = k.stage
             stage_list.append(st)
@@ -5740,7 +5728,7 @@ def total_game_table(kpt, fin, pv, cur_index):
 
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=0, kol_game_string=stroka_kol_game,
                         max_player=player_in_final, stage=final, type_table=type_table, page_vid=pv, label_string=str_setka,
-                        choice_flag=0, score_flag=5, visible_game=True, stage_exit=stage_exit).save()    
+                        choice_flag=0, score_flag=5, visible_game=True, stage_exit=stage_exit, mesta_exit=kpt).save()    
         
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
     else:  # нажата кнопка создания этапа, если еще не все игроки посеяны в финал, то продолжает этапы соревнования
@@ -9418,6 +9406,21 @@ def tours_list(cp):
     tour_list = tr[cp]
     return tour_list
 
+
+# def proba():
+#     """растановка в финале игроков со встречей сыгранной в группе"""
+#     mesto_gr = []
+#     system = System.select().where(System.title_id == title_id())
+#     sys = system.select().where(System.stage == "Предварительный").get()
+#     kol_gr = sys.total_group
+#     choice = Choice.select().where(Choice.title_id == title_id())
+
+#     for i in range(1, kol_gr + 1):
+#         for k in 
+#             choice_mesto_gr = choice.select().where(Choice.group == f"{i} группа") & Choice.mesto_group == 1).get()
+#         pl_id = choice_mesto_gr.player_choice_id
+#         mesto_gr.append(pl_id)
+#         print(pl_id)
 
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
