@@ -2811,7 +2811,6 @@ def player_in_table_group():
     system = sys.select().where(System.stage == "Предварительный").get()
     kg = system.total_group
     stage = system.stage
-    # table = system.label_string
     pv = system.page_vid
     # создание таблиц групп со спортсменами согласно жеребьевки в PDF
     table_made(pv, stage)
@@ -2847,7 +2846,7 @@ def player_in_table_group():
                     first = int(match[:znak])  # игрок под номером в группе
                     # игрок под номером в группе
                     second = int(match[znak + 1:])
-                    pl1_id = gr[first * 2 - 2][1]  # фамилия первого игрока /id
+                    pl1_id = gr[first * 2 - 2][1]  # фамилия первого игрока
                     z = pl1_id.find("/") # находит черту
                     pl1 = pl1_id[:z] # отделяет фамилия от ид
                     pl2_id = gr[second * 2 - 2][1]  # фамилия второго игрока
@@ -5799,23 +5798,22 @@ def numbers_of_games(cur_index, player_in_final):
 
 def clear_db_before_edit():
     """очищает таблицы при повторном создании системы"""
-    t_id = title_id()
     system = System.select().where(System.title_id == title_id())
     for i in system:  # удаляет все записи
         i.delete_instance()
-    sys = System(title_id=t_id, total_athletes=0, total_group=0, max_player=0, stage="", type_table="", page_vid="",
+    sys = System(title_id=title_id(), total_athletes=0, total_group=0, max_player=0, stage="", type_table="", page_vid="",
                  label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True,
                  stage_exit="", mesta_exit="").save()
 
-    gl = Game_list.select().where(Game_list.title_id == t_id)
+    gl = Game_list.select().where(Game_list.title_id == title_id())
     for i in gl:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
-    chc = Choice.select().where(Choice.title_id == t_id)
+    chc = Choice.select().where(Choice.title_id == title_id())
     for i in chc:
         ch_d = Choice.get(Choice.id == i)
         ch_d.delete_instance()
-    rs = Result.select().where(Result.title_id == t_id)
+    rs = Result.select().where(Result.title_id == title_id())
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
@@ -7762,9 +7760,9 @@ def table_data(stage, kg):
     tdt_all = []  # список списков [tdt_new] и [tdt_color]
     tdt_color = []
     tdt_new = []
-    ta = Result.select().where(Result.title_id == title_id())  # находит system id последнего
+    result = Result.select().where(Result.title_id == title_id())  # находит system id последнего
     # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
-    tr = len(ta)  # общее кол-во игр в группах
+    tr = len(result)  # общее кол-во игр в группах
     if kg == 1:  # система одна таблица круг или финалу по кругу
         # список словарей участник и его регион
         posev_data = player_choice_one_table(stage)
@@ -7802,10 +7800,10 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
         tbl_tmp.append(s)
     for i in range(1, count_player_group * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
-        fam = posev["фамилия"]
-        znak = fam.find("/")
-        family = fam[:znak]
-        tbl_tmp[i - 1][1] = family
+        # fam = posev["фамилия"] # фамилия имя/id
+        # znak = fam.find("/")
+        # family = fam[:znak]
+        tbl_tmp[i - 1][1] = posev["фамилия"]
         tbl_tmp[i][1] = posev["регион"]
  
     td = tbl_tmp.copy()  # cписок (номер, фамилия, город и пустые ячейки очков)
@@ -9407,20 +9405,24 @@ def tours_list(cp):
     return tour_list
 
 
-# def proba():
-#     """растановка в финале игроков со встречей сыгранной в группе"""
-#     mesto_gr = []
-#     system = System.select().where(System.title_id == title_id())
-#     sys = system.select().where(System.stage == "Предварительный").get()
-#     kol_gr = sys.total_group
-#     choice = Choice.select().where(Choice.title_id == title_id())
+def proba():
+    """растановка в финале игроков со встречей сыгранной в группе"""
+    mesto_gr = []
+    fin = "1-й финал"
+    system = System.select().where(System.title_id == title_id())
+    sys = system.select().where(System.stage == "Предварительный").get()
+    sys_fin = system.select().where(System.stage == fin).get()
+    kol_gr = sys.total_group
+    mesto_exit = sys_fin.mesta_exit
+    choice = Choice.select().where(Choice.title_id == title_id())
 
-#     for i in range(1, kol_gr + 1):
-#         for k in 
-#             choice_mesto_gr = choice.select().where(Choice.group == f"{i} группа") & Choice.mesto_group == 1).get()
-#         pl_id = choice_mesto_gr.player_choice_id
-#         mesto_gr.append(pl_id)
-#         print(pl_id)
+    for i in range(1, kol_gr + 1):
+        for k in range(1, mesto_exit + 1):
+            choice_group = choice.select().where(Choice.group == f"{i} группа")
+            ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
+        pl_id = ch_mesto_exit.player_choice_id
+        mesto_gr.append(pl_id)
+        print(pl_id)
 
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
@@ -9593,7 +9595,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(proba)
+my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
