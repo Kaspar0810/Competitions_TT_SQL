@@ -2816,9 +2816,10 @@ def player_in_table_group():
     table_made(pv, stage)
     # вызов функции, где получаем список всех участников по группам
     tdt_all = table_data(stage, kg)
-    tdt = tdt_all[0]
+    # tdt = tdt_all[0]
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
-        gr = tdt[p]
+        # gr = tdt[p]
+        gr = tdt_all[0][p]
         count_player = len(gr) // 2  # максимальное кол-во участников в группе
         number_group = str(p + 1) + ' группа'
         k = 0  # кол-во спортсменов в группе
@@ -6258,6 +6259,18 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     tdt_all = table_data(stage, kg)  # данные результатов в группах
     # данные результатов победителей в группах для окрашивания очков в красный цвет
     tdt_new = tdt_all[0]
+    # отделяет фамилия игрока от ид
+    for k in tdt_new:
+        p = 1
+        for m in k:
+            if p % 2 != 0:
+                text = m[1]
+                znak = text.find("/")
+                fam = text[:znak]
+                f = m[1].pop(1)
+                m.insert(1, fam)
+                p += 1
+
     for i in range(0, kg):
         tdt_new[i].insert(0, zagolovok)       
         dict_tbl[i] = Table(tdt_new[i], colWidths=cW, rowHeights=rH)
@@ -7778,7 +7791,7 @@ def table_data(stage, kg):
         max_gamer = kol_player()
         for p in range(0, kg):
             num_gr = f"{p + 1} группа"
-            posev_data = player_choice_in_group(num_gr)
+            posev_data = player_choice_in_group(num_gr) # словарь фамилия:игрок/id регион: область
             count_player_group = len(posev_data)
             tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
             tdt_new.append(tdt_tmp[0])
