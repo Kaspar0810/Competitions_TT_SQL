@@ -6276,6 +6276,8 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
         tdt_new_temp =tdt_temp.copy()
         tdt_new_tmp.append(tdt_new_temp)
         tdt_temp.clear()
+    tdt_new.clear()
+    tdt_new = tdt_new_tmp.copy()
 
     for i in range(0, kg):
         tdt_new[i].insert(0, zagolovok)       
@@ -6452,7 +6454,7 @@ def table_made(pv, stage):
                 tmp_copy = s_tmp.copy()
                 shell_table.append(tmp_copy)
                 s_tmp.clear()
-                elements.append(Paragraph(f'группа {l}', h2))
+                elements.append(Paragraph(f'группа {l + 1}', h2))
                 elements.append(shell_table[l][0])
 
     if pv == A4:
