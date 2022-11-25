@@ -6255,6 +6255,8 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
     from reportlab.platypus import Table
+    tdt_temp = []
+    tdt_new_tmp = []
     dict_tbl = {}
     tdt_all = table_data(stage, kg)  # данные результатов в группах
     # данные результатов победителей в группах для окрашивания очков в красный цвет
@@ -6264,12 +6266,16 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
         p = 1
         for m in k:
             if p % 2 != 0:
-                text = m[1]
+                text = m.pop(1)
                 znak = text.find("/")
                 fam = text[:znak]
-                f = m[1].pop(1)
                 m.insert(1, fam)
-                p += 1
+            p += 1
+        tdt_temp = k.copy()
+        k.clear()
+        tdt_new_temp =tdt_temp.copy()
+        tdt_new_tmp.append(tdt_new_temp)
+        tdt_temp.clear()
 
     for i in range(0, kg):
         tdt_new[i].insert(0, zagolovok)       
