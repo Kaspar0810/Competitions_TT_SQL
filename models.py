@@ -99,6 +99,7 @@ class Title(BaseModel):
     full_name_comp = CharField()
     pdf_comp = BlobField()
     short_name_comp = CharField()
+    tab_enabled = CharField()
 
     class Meta:
         db_table = "titles"
