@@ -9455,24 +9455,24 @@ def tours_list(cp):
     return tour_list
 
 
-# def proba():
-#     """растановка в финале игроков со встречей сыгранной в группе"""
-#     mesto_gr = []
-#     fin = "1-й финал"
-#     system = System.select().where(System.title_id == title_id())
-#     sys = system.select().where(System.stage == "Предварительный").get()
-#     sys_fin = system.select().where(System.stage == fin).get()
-#     kol_gr = sys.total_group
-#     mesto_exit = sys_fin.mesta_exit
-#     choice = Choice.select().where(Choice.title_id == title_id())
+def proba():
+    """растановка в финале игроков со встречей сыгранной в группе"""
+    mesto_gr = []
+    fin = "1-й финал"
+    system = System.select().where(System.title_id == title_id())
+    sys = system.select().where(System.stage == "Предварительный").get()
+    sys_fin = system.select().where(System.stage == fin).get()
+    kol_gr = sys.total_group
+    mesto_exit = sys_fin.mesta_exit
+    choice = Choice.select().where(Choice.title_id == title_id())
 
-#     for i in range(1, kol_gr + 1):
-#         for k in range(1, mesto_exit + 1):
-#             choice_group = choice.select().where(Choice.group == f"{i} группа")
-#             ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
-#         pl_id = ch_mesto_exit.player_choice_id
-#         mesto_gr.append(pl_id)
-#         print(pl_id)
+    for i in range(1, kol_gr + 1):
+        for k in range(1, mesto_exit + 1):
+            choice_group = choice.select().where(Choice.group == f"{i} группа")
+            ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
+        pl_id = ch_mesto_exit.player_choice_id
+        mesto_gr.append(pl_id)
+        print(pl_id)
 
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
@@ -9645,7 +9645,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(proba)
+my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
