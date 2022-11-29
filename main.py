@@ -1689,7 +1689,7 @@ def add_player():
         comment = player.comment
 
     num = count + 1
-    fn = f"{pl}/ {ct}"
+    fn = f"{pl}/{ct}"
     if txt != "Редактировать":
         if flag is True:
             my_win.lineEdit_Family_name.clear()
@@ -9458,6 +9458,7 @@ def tours_list(cp):
 def proba():
     """растановка в финале игроков со встречей сыгранной в группе"""
     mesto_gr = []
+    player_exit = []
     fin = "1-й финал"
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == "Предварительный").get()
@@ -9465,15 +9466,32 @@ def proba():
     kol_gr = sys.total_group
     mesto_exit = sys_fin.mesta_exit
     choice = Choice.select().where(Choice.title_id == title_id())
-
+    results = Result.select().where(Result.title_id == title_id())
     for i in range(1, kol_gr + 1):
         for k in range(1, mesto_exit + 1):
             choice_group = choice.select().where(Choice.group == f"{i} группа")
             ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
-        pl_id = ch_mesto_exit.player_choice_id
-        mesto_gr.append(pl_id)
+            pl_id = ch_mesto_exit.player_choice_id
+            mesto_gr.append(pl_id)
         print(pl_id)
-
+        result_pre = results.select().where(Result.system_stage == "Предварительный")
+        for l in mesto_gr:
+            players = Player.select().where(Player.id == l).get()
+            family = players.full_name
+            player_exit.append(family)
+        result_gr = result_pre.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get()
+        result_pre_fin = results.select().where(Result.number_group == fin)
+        result_fin = result_pre_fin.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get()
+        with db:
+            result_fin.winner = result_gr.winner
+            result_fin.points_win = result_gr.points_win
+            result_fin.score_in_game = result_gr.score_in_game
+            result_fin.score_win = result_gr.score_win
+            result_fin.loser = result_gr.loser
+            result_fin.points_loser = result_gr.points_loser
+            result_fin.score_loser = result_gr.score_loser
+            result_fin.save()
+        print(result_gr)
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
 #     # filename = input("Введите любое существующее имя файла:\n")
