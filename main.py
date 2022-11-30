@@ -359,6 +359,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                                         msg.Cancel)
                         if reply == msg.Ok:
                             if type == "круг":
+                                clear_db_before_choice_final(fin)
                                 player_fin_on_circle(fin)
                             else:
                                 choice_setka(fin)
@@ -5911,6 +5912,21 @@ def clear_db_before_choice():
     choice_tbl_made()
     # choice_gr_automat()
 
+def clear_db_before_choice_final(fin):
+    """очищает базу данных -Game_list- и -Result- перед повторной жеребьевкой финалов"""
+    gamelist = Game_list.select().where(Game_list.title_id == title_id())
+    gl = gamelist.select().where(Game_list.number_group == fin)
+    for i in gl:
+        gl_d = Game_list.get(Game_list.id == i)
+        gl_d.delete_instance()
+    results = Result.select().where(Result.title_id == title_id())
+    rs = results.select().where(Result.number_group == fin)
+    for i in rs:
+        r_d = Result.get(Result.id == i)
+        r_d.delete_instance()
+    # choice_tbl_made()
+
+    
 
 def ready_system():
     """проверка на готовность системы"""
