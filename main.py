@@ -8279,7 +8279,7 @@ def rank_in_group(total_score, td, num_gr):
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
     player_rank_group = []
     sys = System.select().where(System.title_id == title_id())
-    system = sys.select().where(System.stage == "Предварительный").get()
+    system = sys.select().where(System.stage == num_gr).get()
     result = Result.select().where(Result.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     game_list_group = game_list.select().where(Game_list.number_group == num_gr)
@@ -8572,7 +8572,7 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
             pg_win[k] = sum(pg_win[k])  # сумма выигранных партий
             pg_los[k] = sum(pg_los[k])  # сумма проигранных партий
             x = pg_win[k] / pg_los[k]
-            x = float('{:.3f}'.format(x))
+            x = float('{:.3f}'.format(x)) # соотношение выйгранных партий к проигранным
             ps.append(x)
             pps.append(pp[k])
         # получает словарь(ключ, номер участника)
@@ -9487,13 +9487,20 @@ def proba():
             pl_id = ch_mesto_exit.player_choice_id
             id_player_exit_out_gr.append(pl_id)
         result_pre = results.select().where(Result.system_stage == "Предварительный")
+        player_exit.clear()
         for l in id_player_exit_out_gr:
             players = Player.select().where(Player.id == l).get()
             family_city = players.full_name
             player_exit.append(family_city)
         result_gr = result_pre.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get()
+        # count_gr = len(result_gr)
+        # if count_gr == 0:
+        #     result_gr = result_pre.select().where(Result.player1 == player_exit[1] and Result.player2 == player_exit[0]).get()
         result_pre_fin = results.select().where(Result.number_group == fin)
         result_fin = result_pre_fin.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get()
+        count_fin = len(result_fin)
+        # if count_fin == 0:
+        #     result_fin = result_pre_fin.select().where(Result.player1 == player_exit[1] and Result.player2 == player_exit[0]).get()
         with db:
             result_fin.winner = result_gr.winner
             result_fin.points_win = result_gr.points_win
