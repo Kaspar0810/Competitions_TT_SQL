@@ -844,86 +844,6 @@ def tab_enabled(gamer):
         gamer = my_win.lineEdit_title_gamer.text()
   
 
-
-# def tab_enabled_old(gamer):
-#     """Включает вкладки в зависимости от создании системы и жеребьевки"""
-#     sender = my_win.sender()
-#     title = title_id()  # id текущего соревнования
-#     count_title = len(Title.select())
-#     tit = Title.select().order_by(Title.id.desc()).get()  # получает последний title.id
-#     system = System.select().where(System.title_id == title)  # находит system id первого
-#     t_next = tit.id
-#     n = 6
-#     if sender == fir_window.LinkButton:  # если переход со стартового окна последение соревнование
-#         t = t_next - 1
-#         t_id = Title.get(Title.id == t)
-#     else:
-#         if t_next > title:
-#             t_id = Title.get(Title.id == t_next)
-#         else:
-#             t_id = Title.get(Title.id == t_next - 1)
-
-#             old_comp = t_id.name
-#             old_data = t_id.data_start
-#             old_gamer = t_id.gamer
-#             comp = f"{old_comp}.{old_data}.{old_gamer}"
-#             my_win.go_to_Action.setText(comp)
-#             last_competition()
-#     if gamer == "":
-#         gamer = my_win.lineEdit_title_gamer.text()
-#     if count_title != 0:  # если count = 0 создаются новые соревнования
-#         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
-#         # system = System.select().where(System.title_id == title)  # находит system id первого
-#         count = len(system)
-#         stage = []
-#         for i in system:
-#             st = i.stage
-#             stage.append(st)
-#         count_stage = len(stage)
-#         if st != "":
-#             if count > 0:
-#                 # выключает отдельные вкладки
-#                 my_win.tabWidget.setTabEnabled(2, True)
-#                 my_win.toolBox.setItemEnabled(2, True)
-#                 for i in stage:
-#                     if i == "Одна таблица":
-#                         sys = system.select().where(System.stage == i).get()
-#                         flag = sys.choice_flag
-#                         if flag is True:
-#                             my_win.tabWidget.setTabEnabled(3, False)
-#                             my_win.tabWidget.setTabEnabled(5, True)
-#                     elif i == "Предварительный":
-#                         sys = system.select().where(System.stage == i).get()
-#                         flag = sys.choice_flag
-#                         if flag is True:
-#                             my_win.tabWidget.setTabEnabled(3, True)
-#                     elif i == "Полуфиналы":
-#                         my_win.tabWidget.setTabEnabled(4, True)
-#                     elif i == "1-й финал" or i == "финальный":
-#                         sys = system.select().where(System.stage == i).get()
-#                         flag = sys.choice_flag
-#                         if flag is True:
-#                             my_win.tabWidget.setTabEnabled(5, True)
-#                     elif i == "":
-#                         my_win.tabWidget.setTabEnabled(3, False)
-#                         my_win.tabWidget.setTabEnabled(4, False)
-#                         my_win.tabWidget.setTabEnabled(5, False)
-#                 my_win.tabWidget.setCurrentIndex(1)
-#         else:
-#             # выключает отдельные вкладки
-#             my_win.tabWidget.setTabEnabled(2, True)
-#             my_win.tabWidget.setTabEnabled(3, False)
-#             my_win.tabWidget.setTabEnabled(4, False)
-#             my_win.tabWidget.setTabEnabled(5, False)
-#             my_win.tabWidget.setCurrentIndex(0)
-#             my_win.lineEdit_title_gamer.setText(gamer)
-#     # else: # соревнования еще не созданы включает вкладку -списки-
-#         my_win.tabWidget.setTabEnabled(2, True)  # выключает отдельные вкладки
-#         my_win.tabWidget.setTabEnabled(3, False)
-#         my_win.tabWidget.setTabEnabled(4, False)
-#         my_win.tabWidget.setTabEnabled(5, False)
-
-
 def db_insert_title(title_str):
     """Вставляем запись в таблицу титул"""
     nm = title_str[0]
@@ -2713,7 +2633,7 @@ def player_in_one_table(fin):
     system = System.select().where(System.title_id == title_id())
     sys_id = system.select().where(System.stage == fin).get()
     system_id = sys_id.id
-    count = len(choice)
+    # count = len(choice)
     k = 0
     for p in choice:  # цикл заполнения db таблиц -game list-
         k += 1
@@ -2745,6 +2665,7 @@ def player_in_one_table(fin):
 def player_fin_on_circle(fin):
     """заполняет таблицу Game_list данными спортсменами из группы, которые будут играть в финале по кругу
      td - список списков данных из групп"""
+    fin_dict = {}
     fin_list = []
     player_final = {}
     parametrs_final = {}
@@ -2772,31 +2693,49 @@ def player_fin_on_circle(fin):
     system_id = system.select().where(System.stage == fin).get()
     st = "Финальный"
 
-    k = 0
     rank_group = mesto_in_group["место"] # место с которого выходят в финал
 
-    for m in range(rank_group, rank_group + mesto_in_group["выход"]):
-        choice_fin = choice.select().order_by(Choice.group).where(Choice.mesto_group == m)
-        con = len(choice_fin)
-        for p in choice_fin:  # цикл заполнения db таблиц -game list-
-            k += 1
-            player = p.family
-            pl_id = p.player_choice_id
-            player_id = f"{player}/{pl_id}"
-            fin_list.append(player_id)
-            game_list = Game_list(number_group=fin, rank_num_player=k, player_group=player_id, system_id=system_id,
-                                title_id=title_id())
-            game_list.save()
-            # === вставить запись в db
-            with db:
-                p.final = final
-                p.save()
-# =========== новый вариант с использованием Game_list =========
     player_in_final = system_id.max_player
     cp = player_in_final - 3
     tour = tours_list(cp)
     kol_tours = len(tour)  # кол-во туров
     game = len(tour[0])  # кол-во игр в туре
+    # ===== получение списка номеров игроков в порядке 1-ого тура
+    number_tours = []
+    first_tour = tour[0].copy()
+    first_tour.sort()
+    for n in first_tour:
+        z = n.find("-")
+        num = int(n[:z])
+        number_tours.append(num)
+    for n in first_tour:
+        z = n.find("-")
+        num = int(n[z + 1:])
+        number_tours.append(num)
+
+    k = 0
+    for m in range(rank_group, rank_group + mesto_in_group["выход"]):
+        choice_fin = choice.select().order_by(Choice.group).where(Choice.mesto_group == m)
+        # надо сделать нумерация в посеве согласно первому туру, если выход игруппы два человека
+        for p in choice_fin:  # цикл заполнения db таблиц -game list-
+            nt = number_tours[k]
+            player = p.family
+            pl_id = p.player_choice_id
+            player_id = f"{player}/{pl_id}"
+            fin_dict[nt] = player_id
+            k += 1
+    sorted_fin_dict = dict(sorted(fin_dict.items()))
+    for nt in sorted_fin_dict.keys():
+        fin_list.append(sorted_fin_dict[nt])
+        game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=sorted_fin_dict[nt], system_id=system_id,
+                            title_id=title_id())
+        game_list.save()
+            # === запись в db игроки которые попали в финал
+        p.final = final
+        p.posev_final = nt
+        p.save()
+
+
     for r in range(0, kol_tours):
         round = r + 1
         tours = tour[r]  # игры тура
@@ -2823,18 +2762,21 @@ def player_fin_on_circle(fin):
             with db:
                 results = Result(number_group=fin, system_stage=st, player1=full_pl1, player2=full_pl2,
                                 tours=match, title_id=title_id(), round=round).save()
-        with db:
-            system_id.choice_flag = True
-            system_id.save()    
-        title = Title.select().where(Title.id == title_id()).get()
-        page_title = title.tab_enabled
-        page_title = f"{page_title} Финалы"
+    with db:
+        system_id.choice_flag = True
+        system_id.save()    
+    title = Title.select().where(Title.id == title_id()).get()
+    page_title = title.tab_enabled
+    page_title = f"{page_title} Финалы"
     gamer = title.gamer
     with db:
         title.tab_enabled = page_title
         title.save()
     tab_enabled(gamer)
-
+    pv = system_id.page_vid
+    st = "Финальный"
+    stage = fin
+    table_made(pv,stage)
 
 def player_in_table_group():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
@@ -2848,9 +2790,7 @@ def player_in_table_group():
     table_made(pv, stage)
     # вызов функции, где получаем список всех участников по группам
     tdt_all = table_data(stage, kg)
-    # tdt = tdt_all[0]
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
-        # gr = tdt[p]
         gr = tdt_all[0][p]
         count_player = len(gr) // 2  # максимальное кол-во участников в группе
         number_group = str(p + 1) + ' группа'
@@ -8221,7 +8161,7 @@ def score_in_setka(fin):
     return dict_setka
 
 
-def result_rank_group(num_gr, player_rank_group):
+def result_rank_group_in_choice(num_gr, player_rank_group):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
     tab = my_win.tabWidget.currentIndex()
@@ -8362,7 +8302,7 @@ def rank_in_group(total_score, td, num_gr):
         player_rank_tmp.clear()
     if kol_tours_played == kol_tours_in_group:  # когда все встречи сыграны
         # функция простановки мест из группы в -Choice-
-        result_rank_group(num_gr, player_rank_group)
+        result_rank_group_in_choice(num_gr, player_rank_group)
 
 
 def get_unique_numbers(pp_all):
@@ -9472,8 +9412,10 @@ def tours_list(cp):
 
 def proba():
     """растановка в финале игроков со встречей сыгранной в группе"""
-    id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы
+    id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы в порядке занятых место по возрастанию
+    posev_player_exit_out_gr = []
     player_exit = []
+    flag_change = False # флаг была ли замена порядка игроков в группе согласно занятым местам
     fin = "1-й финал"
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == "Предварительный").get()
@@ -9482,34 +9424,33 @@ def proba():
     mesto_exit = sys_fin.mesta_exit
     choice = Choice.select().where(Choice.title_id == title_id())
     results = Result.select().where(Result.title_id == title_id())
+    posev_player_exit_out_gr.clear()
     for i in range(1, kol_gr + 1):
         id_player_exit_out_gr.clear()
         for k in range(1, mesto_exit + 1):
             choice_group = choice.select().where(Choice.group == f"{i} группа")
             ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
             pl_id = ch_mesto_exit.player_choice_id
+            pl_posev = ch_mesto_exit.posev_group
             id_player_exit_out_gr.append(pl_id)
+            posev_player_exit_out_gr.append(pl_posev)
+
         result_pre = results.select().where(Result.system_stage == "Предварительный")
+        if posev_player_exit_out_gr[0] > posev_player_exit_out_gr[1]: # если спортсмены заняли места не по расстановки в табл меняем на номера встречи в правильном порядке по возр
+            id_player_exit_out_gr.reverse()
+            flag_change = True
+        
         player_exit.clear()
+        posev_player_exit_out_gr.clear()
         for l in id_player_exit_out_gr:
             players = Player.select().where(Player.id == l).get()
             family_city = players.full_name
-            player_exit.append(family_city)
-        result_pl = result_pre.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get()
+            player_exit.append(family_city)   
+            # номер ид в таблице -Result- встречи игроков, попавших в финал идущих по расстоновке в таблице   
+        result_gr = result_pre.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get() 
 
-        c = len(result_pl)
-        if len(result_pl) != 0: 
-            result_gr = result_pre.select().where(Result.player1 == player_exit[0]) 
-            if len(result_gr) != 0:        
-                result_gr = result_pre.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get()
-            else:
-                result_gr = result_pre.select().where(Result.player1 == player_exit[1] and Result.player2 == player_exit[0]).get()
-        else:
-            result_gr = result_pre.select().where(Result.player1 == player_exit[1] and Result.player2 == player_exit[0]).get()
         result_pre_fin = results.select().where(Result.number_group == fin)
-        result_fin_pl1 = result_pre_fin.select().where(Result.player1 == player_exit[0])
-        c1 = len(result_fin_pl1)
-        if len(result_fin_pl1) != 0:
+        if flag_change is False:
             result_fin = result_pre_fin.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get()
         else:
             result_fin = result_pre_fin.select().where(Result.player1 == player_exit[1] and Result.player2 == player_exit[0]).get()
@@ -9524,6 +9465,12 @@ def proba():
             result_fin.score_loser = result_gr.score_loser
             result_fin.save()
 
+
+    # my_win.tabWidget.setCurrentIndex(5)
+    # fill_table_results()
+    stage = fin
+    pv = sys_fin.page_vid
+    table_made(pv, stage)
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
 #     # filename = input("Введите любое существующее имя файла:\n")
