@@ -498,7 +498,7 @@ class StartWindow(QMainWindow, Ui_Form):
 
             title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
                           kat_ref="", secretary="", kat_sek="", gamer=gamer, full_name_comp="", pdf_comp="",
-                          short_name_comp="", tab_enabled="Титул Участники Система").save()
+                          short_name_comp="", tab_enabled="Титул Участники").save()
             # получение последней записи в таблице
             t_id = Title.select().order_by(Title.id.desc()).get()
             title_id = t_id.id
@@ -833,6 +833,7 @@ def tab_enabled(gamer):
     title_id_cur = Title.select().where(Title.id == title_id_current).get()
     tab_str = title_id_cur.tab_enabled
     tab_list = tab_str.split(" ")
+    my_win.tabWidget.setTabEnabled(2, False)
     my_win.tabWidget.setTabEnabled(3, False)
     my_win.tabWidget.setTabEnabled(4, False)
     my_win.tabWidget.setTabEnabled(5, False)
@@ -5717,16 +5718,23 @@ def total_game_table(kpt, fin, pv, cur_index):
         total_final = sum(sum_final)
         t = total_player - total_final
         txt = ""
-        if total_final == total_player or t <= 3: # подсчитывает все ли игроки распределены по финалам
+        if total_final == total_player or t <= 2: # подсчитывает все ли игроки распределены по финалам
             if t == 1:     
                 txt = "Остался 1 участник, не вошедший в финальную часть"
                 msgBox.information(my_win, "Уведомление", txt)
             elif t == 2:
                 txt = "Остались 2 игрока, они могут сыграть за место между собой"
                 msgBox.information(my_win, "Уведомление", txt)   
-            elif t == 3:  
-                txt = "Остались 3 игрока, они могут сыграть за места по кругу" 
-                msgBox.information(my_win, "Уведомление", txt)
+            # elif t == 3:  
+            #     txt = "Остались 3 игрока, они могут сыграть за места по кругу" 
+            #     msgBox.information(my_win, "Уведомление", txt)
+            #     # вставить финал из 3 человек по кругу
+            #     kol_etap = len(system)
+            #     if kol_etap == 2:
+            #         index = my_win.comboBox_etap_2.currentIndex()
+            #         my_win.comboBox_etap_3.show()
+            #         my_win.comboBox_etap_3.setCurrentIndex(index + 1)
+
             result = msgBox.question(my_win, "", "Система соревнований создана.\n"
                                                  "Теперь необходимо сделать жеребъевку\n"
                                                  "предварительного этапа.\n"
@@ -5737,7 +5745,7 @@ def total_game_table(kpt, fin, pv, cur_index):
                 tab_enabled(gamer)
             else:
                 return    
-        elif t >= 4:
+        elif t >= 3:
             my_win.comboBox_table.hide()
             if tot_fin == 1:
                 my_win.comboBox_etap_3.show()
@@ -5850,7 +5858,7 @@ def clear_db_before_choice():
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
     choice_tbl_made()
-    # choice_gr_automat()
+
 
 def clear_db_before_choice_final(fin):
     """очищает базу данных -Game_list- и -Result- перед повторной жеребьевкой финалов"""
@@ -5864,8 +5872,6 @@ def clear_db_before_choice_final(fin):
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
-    # choice_tbl_made()
-
     
 
 def ready_system():
@@ -5947,6 +5953,7 @@ def manual_choice_setka(fin, count_exit, mesto_first_poseva):
             choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
         else:
             choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
+
 
 def check_choice(fin):
     """Проверяет перед жеребьевкой финалов, сыграны ли все партиии в группах"""
@@ -6100,43 +6107,43 @@ def kol_player_in_final():
                                                                   f"из группы в {fin}", min=1)
                 
         # возвращает из функции несколько значения в списке
-        list = total_game_table(kpt, fin, pv, cur_index)
+        list_pl_final = total_game_table(kpt, fin, pv, cur_index)
         if ok:
             if sender == my_win.comboBox_table:
                 my_win.label_27.show()
                 # пишет кол-во игр 2-ого этапа
-                my_win.label_27.setText(list[3])
+                my_win.label_27.setText(list_pl_final[3])
                 my_win.label_28.show()
-                my_win.label_28.setText(list[0])
-                if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
+                my_win.label_28.setText(list_pl_final[0])
+                if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
                     my_win.statusbar.showMessage("Система создана.", 10000)
                 else:
                     my_win.comboBox_table.hide()
             elif sender == my_win.comboBox_table_2:
-                my_win.label_30.setText(list[3])
+                my_win.label_30.setText(list_pl_final[3])
                 my_win.label_30.show()
-                my_win.label_31.setText(list[0])
+                my_win.label_31.setText(list_pl_final[0])
                 my_win.label_31.show()
-                if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-                    my_win.statusbar("Система создана.", 10000)
+                if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
+                    my_win.statusbar.showMessage("Система создана.", 10000)
                 else:
                     my_win.comboBox_table_2.hide()
             elif sender == my_win.comboBox_table_3:
-                my_win.label_53.setText(list[3])
+                my_win.label_53.setText(list_pl_final[3])
                 my_win.label_53.show()
-                my_win.label_61.setText(list[0])
+                my_win.label_61.setText(list_pl_final[0])
                 my_win.label_61.show()
-                if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-                    my_win.statusbar("Система создана.", 10000)
+                if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
+                    my_win.statusbar.showMessage("Система создана.", 10000)
                 else:
                     my_win.comboBox_table_3.hide()
             elif sender == my_win.comboBox_table_4:
-                my_win.label_58.setText(list[3])
+                my_win.label_58.setText(list_pl_final[3])
                 my_win.label_58.show()
-                my_win.label_62.setText(list[0])
+                my_win.label_62.setText(list_pl_final[0])
                 my_win.label_62.show()
-                if list[2] - list[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-                    my_win.statusbar("Система создана.", 10000)
+                if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
+                    my_win.statusbar.showMessage("Система создана.", 10000)
                 else:
                     my_win.comboBox_table_4.hide()
             my_win.Button_etap_made.setEnabled(True)
