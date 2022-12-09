@@ -6248,16 +6248,7 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     tdt_all = table_data(stage, kg)  # данные результатов в группах
     # данные результатов победителей в группах для окрашивания очков в красный цвет
     tdt_new = tdt_all[0]
-    # отделяет фамилия игрока от ид
     for k in tdt_new:
-        p = 1
-        for m in k:
-            if p % 2 != 0:
-                text = m.pop(1)
-                znak = text.find("/")
-                fam = text[:znak]
-                m.insert(1, fam)
-            p += 1
         tdt_temp = k.copy()
         k.clear()
         tdt_new_temp =tdt_temp.copy()
