@@ -331,6 +331,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             my_win.tabWidget.setCurrentIndex(2)
                             clear_db_before_choice()
                             choice_gr_automat()
+                            add_open_tab(sender)
                             my_win.tabWidget.setCurrentIndex(3)
                             return
                         else:
@@ -810,7 +811,7 @@ my_win.dateEdit_end.setDate(date.today())
 def tab_enabled(gamer):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
     sender = my_win.sender()
-    tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
+    # tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
     title_id_current = title_id() # id текущего соревнования
     count_title = len(Title.select())
     title_last = Title.select().order_by(Title.id.desc()).get()  # получает последний title.id
@@ -830,20 +831,47 @@ def tab_enabled(gamer):
             my_win.go_to_Action.setText(comp)
             last_competition()
     # включает вкладки в зависимости от соревнования и сделанных жеребьевок
-    title_id_cur = Title.select().where(Title.id == title_id_current).get()
-    tab_str = title_id_cur.tab_enabled
-    tab_list = tab_str.split(" ")
+    # add_open_tab()
+    # title_id_cur = Title.select().where(Title.id == title_id_current).get()
+    # tab_str = title_id_cur.tab_enabled
+    # tab_list = tab_str.split(" ")
     my_win.tabWidget.setTabEnabled(2, False)
     my_win.tabWidget.setTabEnabled(3, False)
     my_win.tabWidget.setTabEnabled(4, False)
     my_win.tabWidget.setTabEnabled(5, False)
-    for k in tab_list:
-        ind = tab_index.index(k)
-        my_win.tabWidget.setTabEnabled(ind, True)
-
+    add_open_tab(sender)
+    # for k in tab_list:
+    #     ind = tab_index.index(k)
+    #     my_win.tabWidget.setTabEnabled(ind, True)
     if gamer == "":
         gamer = my_win.lineEdit_title_gamer.text()
   
+
+def add_open_tab(sender):
+    """добавляет в таблицу -Title- список открытых вкладок"""
+    tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
+    titles = Title.select().where(Title.id == title_id()).get()
+    tab_page = ""
+    if sender == my_win.choice_gr_Action:
+        tab_page = "Группы"
+    elif sender == my_win.choice_pf_Action:
+        tab_page = "Полуфиналы"
+    elif sender == my_win.choice_fin_Action:
+        tab_page = "Финалы"
+    if tab_page != "":
+        tab_str = titles.tab_enabled
+        tab_list = tab_str.split(" ")   
+        if tab_page not in tab_list:
+            tab_list.append(tab_page)        
+
+        for k in tab_list:
+            ind = tab_index.index(k)
+            my_win.tabWidget.setTabEnabled(ind, True)
+        tab_str = (' '.join(tab_list))
+        titles.tab_enabled = tab_str
+        titles.save()
+
+
 
 def db_insert_title(title_str):
     """Вставляем запись в таблицу титул"""
@@ -1002,6 +1030,7 @@ def system_made():
                             max_player=max_player, stage=sg, page_vid=page_v, label_string="", kol_game_string="",
                             choice_flag=False, score_flag=5, visible_game=True).save()
     player_in_table_group()
+    my_win.label_33.setText("Всего: 0 игр.")
     my_win.checkBox_2.setChecked(False)
     my_win.checkBox_3.setChecked(False)
     my_win.Button_system_made.setEnabled(False)
@@ -2398,42 +2427,10 @@ def one_table(fin, group):
             sys_m.label_string = f"{vt} {count} участников"
             sys_m.kol_game_string =f"{total_game} игр"
             sys_m.save()
-        # # записывает в Game_list и Result
-        # if type_table == "круг":
-        #     player_in_one_table(fin)
-        # else:
-    #     #     pass
-    # else:
-    #     for sys in system:
-    #         if sys.stage == fin:  # если финал играется по кругу
-    #             type_tbl = sys.type_table
-    #             if type_tbl == "круг":
-    #                 count_player = mesto_in_group["выход"]
-    #                 mesta_exit = mesto_in_group["место"]
-    #                 count = group * count_player
 
-    #                 kol_game = f"{count // 2 * (count - 1)} игр"
-    #                 my_win.Button_etap_made.setEnabled(False)
-    #                 my_win.comboBox_page_vid.setEnabled(False)
-    #             elif type_tbl == "сетка":
-    #                 count_player = mesto_in_group["выход"]
-    #                 mesta_exit = mesto_in_group["место"]
-
-    #             load_tableWidget()
-
-    #             choice = ch.select().where(Choice.mesto_group == mesta_exit)  # отбирает
-    #             # записи жеребьевки после игр в группах (места которые вышли в финал)
-    #             player_choice = choice.select().order_by(Choice.group)
-
-    #             for i in player_choice:  # записывает в таблицу Choice
-    #                 i.final = fin
-    #                 i.posev_final = mesta_exit
-    #                 i.save()
-        # else: # Соревнования состоят из одной таблице сетка или в круг
             my_win.Button_etap_made.setEnabled(False)
             my_win.comboBox_page_vid.setEnabled(False)
-            # string_table = my_win.label_50.text()
-            # fin = etap
+
             for k in ch: # записывает в DB после создании системы из одной таблицы basic - Одна таблица
                 k.basic = fin
                 k.save()
@@ -5625,6 +5622,8 @@ def hide_show_columns(tb):
 def etap_made():
     """создание этапов соревнований"""
     sender = my_win.sender()
+    system = System.select().where(System.title_id == title_id())
+    sum_game = []
     if sender != my_win.comboBox_etap_1:
         if my_win.comboBox_etap_1.currentText() == "Одна таблица":
             fin = my_win.comboBox_etap_1.currentText()
@@ -5639,6 +5638,13 @@ def etap_made():
             total_game_table(kpt=0, fin="", pv="", cur_index=0)
         elif my_win.comboBox_etap_4.currentText() == "Финальный" and my_win.comboBox_etap_5.isHidden():
             total_game_table(kpt=0, fin="", pv="", cur_index=0)
+        for k in system:
+            kol_game_str = k.kol_game_string
+            zn = kol_game_str.find(" ")
+            number = int(kol_game_str[:zn])
+            sum_game.append(number)
+        all_sum_game = sum(sum_game)
+        my_win.label_33.setText(f"Всего:{all_sum_game} игр.")
 
 
 def total_game_table(kpt, fin, pv, cur_index):
@@ -5672,8 +5678,9 @@ def total_game_table(kpt, fin, pv, cur_index):
             vt = "Круговая таблица на"
             type_table = "круг"
 # =========================
-        player_in_final = total_gr * kpt + sum_pl
-        if player_in_final > total_player:
+        all_player_in_final = total_gr * kpt + sum_pl # общее кол-во спортсменов во всех финалах
+        player_in_final = total_gr * kpt # колво участников в конкретном финале
+        if all_player_in_final > total_player:
             balance = total_player - sum_pl
             player_in_final = balance
         # == уточнить если в группах не равное кол-во участников то и в финале не будет выход из группы умножить на колво групп
@@ -5725,16 +5732,14 @@ def total_game_table(kpt, fin, pv, cur_index):
             elif t == 2:
                 txt = "Остались 2 игрока, они могут сыграть за место между собой"
                 msgBox.information(my_win, "Уведомление", txt)   
-            # elif t == 3:  
-            #     txt = "Остались 3 игрока, они могут сыграть за места по кругу" 
-            #     msgBox.information(my_win, "Уведомление", txt)
-            #     # вставить финал из 3 человек по кругу
-            #     kol_etap = len(system)
-            #     if kol_etap == 2:
-            #         index = my_win.comboBox_etap_2.currentIndex()
-            #         my_win.comboBox_etap_3.show()
-            #         my_win.comboBox_etap_3.setCurrentIndex(index + 1)
 
+            titles = Title.select().where(Title.id == title_id()).get()
+            tab_enabled_str = titles.tab_enabled
+            tab_list = tab_enabled_str.split(" ")
+            if "Система" not in tab_list:
+                tab_enabled_str = tab_enabled_str + " Система"
+                titles.tab_enabled = tab_enabled_str
+                titles.save()
             result = msgBox.question(my_win, "", "Система соревнований создана.\n"
                                                  "Теперь необходимо сделать жеребъевку\n"
                                                  "предварительного этапа.\n"
@@ -5746,17 +5751,21 @@ def total_game_table(kpt, fin, pv, cur_index):
             else:
                 return    
         elif t >= 3:
-            my_win.comboBox_table.hide()
+            my_win.comboBox_table.hide() # скрывает комбобокс с выбором вида финала
             if tot_fin == 1:
+                my_win.comboBox_table_2.hide() # скрывает комбобокс с выбором вида финала
                 my_win.comboBox_etap_3.show()
             elif tot_fin ==2:
+                my_win.comboBox_table_3.hide() # скрывает комбобокс с выбором вида финала
                 my_win.comboBox_etap_4.show()
             elif tot_fin == 3:
+                my_win.comboBox_table_4.hide() # скрывает комбобокс с выбором вида финала
                 my_win.comboBox_etap_5.show()
 
             my_win.Button_etap_made.setEnabled(True)
             my_win.comboBox_page_vid.setEnabled(True)
-        
+
+
 
 def numbers_of_games(cur_index, player_in_final):
     """подсчет количество игр в зависимости от системы (пока сетки на 16)"""
@@ -6054,12 +6063,14 @@ def kol_player_in_final():
             my_win.label_10.hide()
             my_win.comboBox_one_table.hide()
             my_win.comboBox_page_vid.setCurrentText("альбомная")
-        else:
+        else: # система из одной таблицы по олимпийской системе
             my_win.comboBox_page_vid.setCurrentText("книжная")
             vid = ["Автоматический", "Ручной"]
             cur_index = my_win.comboBox_one_table.currentIndex()
-            player_in_final = 16
-            total_game = numbers_of_games(cur_index, player_in_final)
+            total_game = 0
+            if cur_index != 0:
+                player_in_final = count
+                total_game = numbers_of_games(cur_index, player_in_final)
             my_win.label_50.show()
             my_win.label_19.show()
             my_win.label_19.setText(f"{total_game} игр.")
