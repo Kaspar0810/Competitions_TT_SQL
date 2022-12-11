@@ -87,7 +87,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Button_title_made.setEnabled(False)
         self.Button_system_made.setEnabled(False)
         self.tabWidget.setCurrentIndex(0)  # текущая страница
-        self.toolBox.setCurrentIndex(0)
+        # self.toolBox.setCurrentIndex(0)
         # ++ отключение страниц
         self.tabWidget.setTabEnabled(1, True)
         self.tabWidget.setTabEnabled(2, False)
@@ -331,7 +331,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             my_win.tabWidget.setCurrentIndex(2)
                             clear_db_before_choice()
                             choice_gr_automat()
-                            add_open_tab(sender)
+                            add_open_tab(tab_page="Группы")
                             my_win.tabWidget.setCurrentIndex(3)
                             return
                         else:
@@ -362,6 +362,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             if type == "круг":
                                 clear_db_before_choice_final(fin)
                                 player_fin_on_circle(fin)
+                                add_open_tab(tab_page="Финалы")
                             else:
                                 choice_setka(fin)
                         else:
@@ -811,56 +812,51 @@ my_win.dateEdit_end.setDate(date.today())
 def tab_enabled(gamer):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
     sender = my_win.sender()
-    # tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
-    title_id_current = title_id() # id текущего соревнования
+    tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
+    titles = Title.select().where(Title.id == title_id()).get() # id текущего соревнования
+    title_id_current = titles.id # текущий ид соревнования
     count_title = len(Title.select())
     title_last = Title.select().order_by(Title.id.desc()).get()  # получает последний title.id
-    title_id_last = title_last.id
+    title_id_last = title_last.id # последний ид соревнования
  
     if count_title > 0: # если соревнования не первые
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
         if sender == fir_window.LinkButton or sender == my_win.toolBox:  # если переход со стартового окна последение соревнование
-            if title_id_last > title_id_current:
+            if title_id_last == title_id_current:
                 tit_id = Title.get(Title.id == title_id_last)
             else:
-                tit_id = Title.get(Title.id == title_id_last - 1)
+                tit_id = Title.get(Title.id == title_id_current)
             old_comp = tit_id.name
             old_data = tit_id.data_start
             old_gamer = tit_id.gamer
             comp = f"{old_comp}.{old_data}.{old_gamer}"
             my_win.go_to_Action.setText(comp)
             last_competition()
-    # включает вкладки в зависимости от соревнования и сделанных жеребьевок
-    # add_open_tab()
-    # title_id_cur = Title.select().where(Title.id == title_id_current).get()
-    # tab_str = title_id_cur.tab_enabled
-    # tab_list = tab_str.split(" ")
     my_win.tabWidget.setTabEnabled(2, False)
     my_win.tabWidget.setTabEnabled(3, False)
     my_win.tabWidget.setTabEnabled(4, False)
     my_win.tabWidget.setTabEnabled(5, False)
-    add_open_tab(sender)
-    # for k in tab_list:
-    #     ind = tab_index.index(k)
-    #     my_win.tabWidget.setTabEnabled(ind, True)
+# включает вкладки записаные в Титул
+    tab_str = titles.tab_enabled
+    tab_list = tab_str.split(" ")
+    for k in tab_list:
+        ind = tab_index.index(k)
+        my_win.tabWidget.setTabEnabled(ind, True)
+        my_win.toolBox.setItemEnabled(ind, True)
     if gamer == "":
         gamer = my_win.lineEdit_title_gamer.text()
-  
+    my_win.toolBox.setCurrentIndex(0) # включает toolbox вкладку титул
 
-def add_open_tab(sender):
+
+def add_open_tab(tab_page):
     """добавляет в таблицу -Title- список открытых вкладок"""
     tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
     titles = Title.select().where(Title.id == title_id()).get()
-    tab_page = ""
-    if sender == my_win.choice_gr_Action:
-        tab_page = "Группы"
-    elif sender == my_win.choice_pf_Action:
-        tab_page = "Полуфиналы"
-    elif sender == my_win.choice_fin_Action:
-        tab_page = "Финалы"
+
     if tab_page != "":
         tab_str = titles.tab_enabled
-        tab_list = tab_str.split(" ")   
+        tab_list = tab_str.split(" ")
+
         if tab_page not in tab_list:
             tab_list.append(tab_page)        
 
@@ -1823,6 +1819,13 @@ def tab():
     """Изменяет вкладку tabWidget в зависимости от вкладки toolBox"""
     tw = my_win.tabWidget.currentIndex()
     my_win.toolBox.setCurrentIndex(tw)
+
+
+def tool_page():
+    """Изменяет вкладку toolWidget в зависимости от вкладки tabWidget"""
+    tw = my_win.toolBox.currentIndex()
+    my_win.tabWidget.setCurrentIndex(tw)
+    page()
 
 
 def page():
@@ -5732,14 +5735,15 @@ def total_game_table(kpt, fin, pv, cur_index):
             elif t == 2:
                 txt = "Остались 2 игрока, они могут сыграть за место между собой"
                 msgBox.information(my_win, "Уведомление", txt)   
+            add_open_tab(tab_page="Система")
 
-            titles = Title.select().where(Title.id == title_id()).get()
-            tab_enabled_str = titles.tab_enabled
-            tab_list = tab_enabled_str.split(" ")
-            if "Система" not in tab_list:
-                tab_enabled_str = tab_enabled_str + " Система"
-                titles.tab_enabled = tab_enabled_str
-                titles.save()
+            # titles = Title.select().where(Title.id == title_id()).get()
+            # tab_enabled_str = titles.tab_enabled
+            # tab_list = tab_enabled_str.split(" ")
+            # if "Система" not in tab_list:
+            #     tab_enabled_str = tab_enabled_str + " Система"
+            #     titles.tab_enabled = tab_enabled_str
+            #     titles.save()
             result = msgBox.question(my_win, "", "Система соревнований создана.\n"
                                                  "Теперь необходимо сделать жеребъевку\n"
                                                  "предварительного этапа.\n"
@@ -5747,6 +5751,7 @@ def total_game_table(kpt, fin, pv, cur_index):
                                      msgBox.Ok, msgBox.Cancel)
             if result == msgBox.Ok:
                 choice_gr_automat()
+                add_open_tab(tab_page="Группы")
                 tab_enabled(gamer)
             else:
                 return    
@@ -9581,7 +9586,7 @@ my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
 my_win.tableWidget.doubleClicked.connect(select_player_in_game)
 
 my_win.tabWidget.currentChanged.connect(tab)
-my_win.toolBox.currentChanged.connect(page)
+my_win.toolBox.currentChanged.connect(tool_page)
 # ==================================
 my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
