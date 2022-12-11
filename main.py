@@ -811,6 +811,10 @@ my_win.dateEdit_end.setDate(date.today())
 
 def tab_enabled(gamer):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
+    # включает вкладки меню системы
+    my_win.system_edit_Action.setVisible(True) # делает меню  -редактировать- видиммым
+    my_win.system_made_Action.setVisible(True) # делает меню  -редактировать- видиммым
+
     sender = my_win.sender()
     tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
     titles = Title.select().where(Title.id == title_id()).get() # id текущего соревнования
@@ -846,6 +850,11 @@ def tab_enabled(gamer):
     if gamer == "":
         gamer = my_win.lineEdit_title_gamer.text()
     my_win.toolBox.setCurrentIndex(0) # включает toolbox вкладку титул
+    # Скрывает подменю системы в зависимости от созданной системы или нет
+    if "Система" not in tab_list:
+        my_win.system_edit_Action.setVisible(False) # делает меню  -редактировать- не видиммым
+    else:
+        my_win.system_made_Action.setVisible(False) # делает меню - создать- не видиммым
 
 
 def add_open_tab(tab_page):
@@ -1005,6 +1014,7 @@ def system_edit():
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
+
     t = Title.select().where(Title.id == title_id())  # последний id соревнований (текуших)
     # находит system id последнего
     ce = System.select().where(System.title_id == t).get()
