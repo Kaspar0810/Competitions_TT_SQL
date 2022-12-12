@@ -167,6 +167,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню просмотр
         view_Menu = menuBar.addMenu("Просмотр")
         view_Menu.addAction(self.all_comp_Action)
+        view_Menu.addAction(self.view_title_Action)
         view_Menu.addAction(self.view_list_Action)
         view_Menu.addAction(self.view_gr_Action)
         view_Menu.addAction(self.view_pf_Action)
@@ -209,6 +210,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.choice_pf_Action = QAction("Полуфиналы")
         self.choice_fin_Action = QAction("Финалы")  # подменю жеребьевка -финалы-
         self.all_comp_Action = QAction("Полные соревнования")
+        self.view_title_Action = QAction("Титульный лист")
         self.view_list_Action = QAction("Список участников")
         self.view_gr_Action = QAction("Группы")
         self.view_pf_Action = QAction("Полуфиналы")
@@ -248,6 +250,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.choice_gr_Action.triggered.connect(self.choice)
         self.choice_pf_Action.triggered.connect(self.choice)
         self.choice_fin_Action.triggered.connect(self.choice)
+        self.view_title_Action.triggered.connect(self.view)
         self.view_list_Action.triggered.connect(self.view)
         self.view_one_table_Action.triggered.connect(self.view)
         self.view_gr_Action.triggered.connect(self.view)
@@ -381,7 +384,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     return
             else:
                 return
-           
+        visible_menu_after_choice()
+
     def system_made(self):
         system_competition()
 
@@ -402,7 +406,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def print_clear(self):
         """Печать чистых таблиц"""
-
         sender = self.sender()
 
         if sender == self.clear_s32_Action:
@@ -1214,7 +1217,7 @@ def title_pdf():
 
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
-    canvas = Canvas(f"title_{short_name}.pdf", pagesize=A4)
+    canvas = Canvas(f"{short_name}_title.pdf", pagesize=A4)
 
     if filepatch == None:
         canvas.setFont("DejaVuSerif-Italic", 14)
@@ -1240,6 +1243,7 @@ def title_pdf():
         canvas.setFont("DejaVuSerif-Italic", 14)
         canvas.drawString(5.5 * cm, 5 * cm, f"г. {ct} Нижегородская область")
         canvas.drawString(7.5 * cm, 4 * cm, string_data)
+    change_dir()
     canvas.save()
 
 
@@ -1248,6 +1252,7 @@ def title_made():
     title_str = title_string()
     if my_win.Button_title_made.text() == "Редактировать":
         title_update()
+        my_win.checkBox.setChecked(False)
         return
     else:
         db_insert_title(title_str)
@@ -1317,6 +1322,7 @@ def title_update():
     nazv.secretary = sk
     nazv.kat_sek = ks
     nazv.save()
+    title_pdf()
 
 
 def find_in_rlist():
@@ -2228,7 +2234,7 @@ def list_player_pdf(player_list):
     story.append(Paragraph(f'Список участников. {gamer}', h3))
     story.append(t)
 
-    doc = SimpleDocTemplate(f"table_list_{short_name}.pdf", pagesize=A4)
+    doc = SimpleDocTemplate(f"{short_name}_player_list.pdf", pagesize=A4)
     change_dir()
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     change_dir()
@@ -2571,21 +2577,22 @@ def view():
     dir_path = pathlib.Path.cwd()
     p = str(dir_path)
     if sender == my_win.all_comp_Action:
-        view_file = f"Title_{short_name}.pdf"
+        pass
+    elif sender == my_win.view_title_Action:
+        view_file = f"{short_name}_title.pdf"
     elif sender == my_win.view_list_Action:
         my_win.tabWidget.setCurrentIndex(1)
         player_list = Player.select().where(Player.title_id == title_id())  # сортировка по алфавиту
         list_player_pdf(player_list)
-        # change_dir()
-        view_file = f"table_list_{short_name}.pdf"
+        view_file = f"{short_name}_player_list.pdf"
     elif sender == my_win.view_gr_Action:  # вкладка группы
-        view_file = f"table_group_{short_name}.pdf"
+        view_file = f"{short_name}_table_group.pdf"
     elif sender == my_win.view_fin1_Action:
-        view_file = f"1-финал_{short_name}.pdf"
+        view_file = f"_{short_name}_1-финал.pdf"
     elif sender == my_win.view_fin2_Action:
-        view_file = f"2-финал_{short_name}.pdf"
+        view_file = f"{short_name}_2-финал.pdf"
     elif sender == my_win.view_one_table_Action:
-        view_file = f"one_table_{short_name}.pdf"
+        view_file = f"{short_name}_one_table.pdf"
     elif sender == my_win.clear_s32_Action:
         view_file = "чист_32_сетка.pdf"
     elif sender == my_win.clear_s16_Action:
@@ -2596,8 +2603,6 @@ def view():
         view_file = "чист_32_2_сетка.pdf"
     elif sender == my_win.clear_s16_2_Action:
         view_file = "чист_16_2_сетка.pdf"
-    
-    
  
     if platform == "linux" or platform == "linux2":  # linux
         pass
@@ -6501,13 +6506,13 @@ def table_made(pv, stage):
     short_name = t_id.short_name_comp
 
     if stage == "Одна таблица":
-        name_table = f"one_table_{short_name}.pdf"
+        name_table = f"{short_name}_one_table.pdf"
     elif stage == "Предварительный":
-        name_table = f"table_group_{short_name}.pdf"
+        name_table = f"{short_name}_table_group.pdf"
     else:
         txt = stage.rfind("-")
         stage = stage[:txt + 1]
-        name_table = f"{stage}финал_{short_name}.pdf"
+        name_table = f"{short_name}_{stage}финал.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -6821,7 +6826,7 @@ def setka_16_2_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{f}-финал_{short_name}.pdf"
+        name_table_final = f"{short_name}_{f}-финал.pdf"
     else:
         short_name = "чист_16_2_сетка"  # имя для чистой сетки
     name_table_final = f"{short_name}.pdf"
@@ -6974,7 +6979,7 @@ def setka_16_full_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{f}-финал_{short_name}.pdf"
+        name_table_final = f"{short_name}_{f}-финал.pdf"
     else:
         short_name = "чист_16_full_сетка"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
@@ -7092,7 +7097,7 @@ def setka_32_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{f}-финал_{short_name}.pdf"
+        name_table_final = f"{short_name}_{f}-финал.pdf"
     else:
         short_name = "чист_32_сетка"
         name_table_final = f"{short_name}.pdf"
@@ -7305,7 +7310,7 @@ def setka_32_full_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{f}-финал_{short_name}.pdf"
+        name_table_final = f"{short_name}_{f}-финал.pdf"
     else:
         short_name = "чист_32_full_сетка"
         name_table_final = f"{short_name}.pdf"
@@ -7539,7 +7544,7 @@ def setka_32_2_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{f}-финал_{short_name}.pdf"
+        name_table_final = f"{short_name}_{f}-финал.pdf"
     else:
         short_name = "чист_32_2_сетка"
         name_table_final = f"{short_name}.pdf"
