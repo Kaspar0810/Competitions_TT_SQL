@@ -223,13 +223,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.clear_s32_full_Action = QAction("Сетка 32 прогрессивная")
         self.clear_s32_Action = QAction("Сетка 32 (1-3 места)")
         # ======== подменю финалы ============= сделать в зависимости от кол-во финалов остальные невидимые
-
         self.view_fin1_Action = QAction("1-финал")
         self.view_fin2_Action = QAction("2-финал")
         self.view_fin3_Action = QAction("3-финал")
         self.view_fin4_Action = QAction("4-финал")
-        self.view_fin1_Action.setVisible(True)  # делает пункт меню не видимым
-        self.view_fin2_Action.setVisible(True)  # делает пункт меню не видимым
+
+        self.view_one_table_Action.setVisible(False)
+        self.view_gr_Action.setVisible(False)
+        self.view_pf_Action.setVisible(False)
+        self.view_fin1_Action.setVisible(False)  # делает пункт меню не видимым
+        self.view_fin2_Action.setVisible(False)  # делает пункт меню не видимым
         self.view_fin3_Action.setVisible(False)  # делает пункт меню не видимым
         self.view_fin4_Action.setVisible(False)  # делает пункт меню не видимым
 
@@ -855,6 +858,7 @@ def tab_enabled(gamer):
         my_win.system_edit_Action.setVisible(False) # делает меню  -редактировать- не видиммым
     else:
         my_win.system_made_Action.setVisible(False) # делает меню - создать- не видиммым
+    visible_menu_after_choice()
 
 
 def add_open_tab(tab_page):
@@ -875,6 +879,34 @@ def add_open_tab(tab_page):
         tab_str = (' '.join(tab_list))
         titles.tab_enabled = tab_str
         titles.save()
+
+
+def visible_menu_after_choice():
+    """Скрывает меню просомтр если еще не сделана жеребьевка"""
+    my_win.view_gr_Action.setVisible(False)
+    my_win.view_pf_Action.setVisible(False)
+    # my_win.wiev_fin1_Action.setVisible(False)
+
+    systems = System.select().where(System.title_id == title_id())
+    for k in systems:
+        choice = k.choice_flag
+        if choice is True:
+            stage = k.stage
+            if stage == "Предварительный":
+                my_win.view_gr_Action.setVisible(True)
+            elif stage == "Полуфиналы":
+                my_win.view_pf_Action.setVisible(True)
+            elif stage == "1-й финал":
+                my_win.view_fin1_Action.setVisible(True)
+            elif stage == "2-й финал":
+                my_win.view_fin2_Action.setVisible(True)
+            elif stage == "3-й финал":
+                my_win.view_fin3_Action.setVisible(True)
+            elif stage == "4-й финал":
+                my_win.view_fin4_Action.setVisible(True)
+            
+
+
 
 
 
