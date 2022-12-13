@@ -885,9 +885,9 @@ def add_open_tab(tab_page):
 
 
 def visible_menu_after_choice():
-    """Скрывает меню просомтр если еще не сделана жеребьевка"""
-    my_win.view_gr_Action.setVisible(False)
-    my_win.view_pf_Action.setVisible(False)
+    """Скрывает меню просмотр если еще не сделана жеребьевка"""
+    # my_win.view_gr_Action.setVisible(False)
+    # my_win.view_pf_Action.setVisible(False)
     # my_win.wiev_fin1_Action.setVisible(False)
 
     systems = System.select().where(System.title_id == title_id())
