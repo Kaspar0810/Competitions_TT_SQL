@@ -229,14 +229,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin2_Action = QAction("2-финал")
         self.view_fin3_Action = QAction("3-финал")
         self.view_fin4_Action = QAction("4-финал")
+        # выключает пункты меню пока не создана система
+        self.choice_one_table_Action.setEnabled(False)
+        self.choice_gr_Action.setEnabled(False)
+        self.choice_pf_Action.setEnabled(False)
+        self.choice_fin_Action.setEnabled(False)
 
-        self.view_one_table_Action.setVisible(False)
-        self.view_gr_Action.setVisible(False)
-        self.view_pf_Action.setVisible(False)
-        self.view_fin1_Action.setVisible(False)  # делает пункт меню не видимым
-        self.view_fin2_Action.setVisible(False)  # делает пункт меню не видимым
-        self.view_fin3_Action.setVisible(False)  # делает пункт меню не видимым
-        self.view_fin4_Action.setVisible(False)  # делает пункт меню не видимым
+        self.view_one_table_Action.setEnabled(False)
+        self.view_gr_Action.setEnabled(False)
+        self.view_pf_Action.setEnabled(False)
+        self.view_fin1_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.view_fin2_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.view_fin3_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.view_fin4_Action.setEnabled(False)  # делает пункт меню не видимым
 
     def _connectActions(self):
         # Connect File actions
@@ -384,7 +389,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     return
             else:
                 return
-        visible_menu_after_choice()
+        enabled_menu_after_choice()
 
     def system_made(self):
         system_competition()
@@ -818,8 +823,8 @@ my_win.dateEdit_end.setDate(date.today())
 def tab_enabled(gamer):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
     # включает вкладки меню системы
-    my_win.system_edit_Action.setVisible(True) # делает меню  -редактировать- видиммым
-    my_win.system_made_Action.setVisible(True) # делает меню  -редактировать- видиммым
+    my_win.system_edit_Action.setEnabled(True) # делает меню  -редактировать- видиммым
+    my_win.system_made_Action.setEnabled(True) # делает меню  -редактировать- видиммым
 
     sender = my_win.sender()
     tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
@@ -858,10 +863,10 @@ def tab_enabled(gamer):
     my_win.toolBox.setCurrentIndex(0) # включает toolbox вкладку титул
     # Скрывает подменю системы в зависимости от созданной системы или нет
     if "Система" not in tab_list:
-        my_win.system_edit_Action.setVisible(False) # делает меню  -редактировать- не видиммым
+        my_win.system_edit_Action.setEnabled(False) # делает меню  -редактировать- не видиммым
     else:
-        my_win.system_made_Action.setVisible(False) # делает меню - создать- не видиммым
-    visible_menu_after_choice()
+        my_win.system_made_Action.setEnabled(False) # делает меню - создать- не видиммым
+    enabled_menu_after_choice()
 
 
 def add_open_tab(tab_page):
@@ -884,31 +889,35 @@ def add_open_tab(tab_page):
         titles.save()
 
 
-def visible_menu_after_choice():
+def enabled_menu_after_choice():
     """Скрывает меню просмотр если еще не сделана жеребьевка"""
-    # my_win.view_gr_Action.setVisible(False)
-    # my_win.view_pf_Action.setVisible(False)
-    # my_win.wiev_fin1_Action.setVisible(False)
-
     systems = System.select().where(System.title_id == title_id())
     for k in systems:
         choice = k.choice_flag
         if choice is True:
             stage = k.stage
             if stage == "Предварительный":
-                my_win.view_gr_Action.setVisible(True)
+                my_win.view_gr_Action.setEnabled(True)
             elif stage == "Полуфиналы":
-                my_win.view_pf_Action.setVisible(True)
+                my_win.view_pf_Action.setEnabled(True)
             elif stage == "1-й финал":
-                my_win.view_fin1_Action.setVisible(True)
+                my_win.view_fin1_Action.setEnabled(True)
             elif stage == "2-й финал":
-                my_win.view_fin2_Action.setVisible(True)
+                my_win.view_fin2_Action.setEnabled(True)
             elif stage == "3-й финал":
-                my_win.view_fin3_Action.setVisible(True)
+                my_win.view_fin3_Action.setEnabled(True)
             elif stage == "4-й финал":
-                my_win.view_fin4_Action.setVisible(True)
+                my_win.view_fin4_Action.setEnabled(True)
             
-
+        stage = k.stage
+        if stage == "Одна таблица":
+            my_win.choice_one_table_Action.setEnabled(True)
+        elif stage == "Предварительный":
+            my_win.choice_gr_Action.setEnabled(True)
+        elif stage == "Полуфиналы":
+            my_win.choice_pf_Action.setEnabled(True)
+        else:
+            my_win.choice_fin_Action.setEnabled(True)
 
 
 
@@ -1077,6 +1086,8 @@ def system_made():
     my_win.Button_system_made.setEnabled(False)
     my_win.Button_1etap_made.setEnabled(False)
     my_win.Button_2etap_made.setEnabled(False)
+    my_win.Button_3etap_made.setEnabled(False)
+    my_win.Button_4etap_made.setEnabled(False)
 
 
 def load_tableWidget():
@@ -2493,6 +2504,7 @@ def one_table(fin, group):
             if result == msgBox.Ok:
                 count_exit = 1
                 mesto_first_poseva = 1
+
                 if type_table == "круг":
                     # функция жеребьевки таблицы по кругу
                     player_in_one_table(fin)
