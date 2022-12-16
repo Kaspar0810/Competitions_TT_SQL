@@ -2600,9 +2600,13 @@ def view():
     elif sender == my_win.view_gr_Action:  # вкладка группы
         view_file = f"{short_name}_table_group.pdf"
     elif sender == my_win.view_fin1_Action:
-        view_file = f"_{short_name}_1-финал.pdf"
+        view_file = f"{short_name}_1-финал.pdf"
     elif sender == my_win.view_fin2_Action:
         view_file = f"{short_name}_2-финал.pdf"
+    elif sender == my_win.view_fin3_Action:
+        view_file = f"{short_name}_3-финал.pdf"
+    elif sender == my_win.view_fin4_Action:
+        view_file = f"{short_name}_4-финал.pdf"
     elif sender == my_win.view_one_table_Action:
         view_file = f"{short_name}_one_table.pdf"
     elif sender == my_win.clear_s32_Action:
@@ -2790,11 +2794,16 @@ def player_fin_on_circle(fin):
         game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=sorted_fin_dict[nt], system_id=system_id,
                             title_id=title_id())
         game_list.save()
-            # === запись в db игроки которые попали в финал
-        p.final = final
-        p.posev_final = nt
-        p.save()
-
+        
+    # === запись в db игроков которые попали в финал из группы
+    ps_final = 1
+    for l in fin_list:
+        id_pl = int(l[l.find("/") + 1:])
+        choices = choice.select().where(Choice.player_choice_id == id_pl).get()
+        choices.final = final
+        choices.posev_final = ps_final
+        choices.save()
+        ps_final += 1
 
     for r in range(0, kol_tours):
         round = r + 1
@@ -2827,7 +2836,8 @@ def player_fin_on_circle(fin):
         system_id.save()    
     title = Title.select().where(Title.id == title_id()).get()
     page_title = title.tab_enabled
-    page_title = f"{page_title} Финалы"
+    if "Финалы" not in page_title:
+        page_title = f"{page_title} Финалы"
     gamer = title.gamer
     with db:
         title.tab_enabled = page_title
@@ -2836,7 +2846,7 @@ def player_fin_on_circle(fin):
     pv = system_id.page_vid
     st = "Финальный"
     stage = fin
-    table_made(pv,stage)
+    table_made(pv, stage)
 
 def player_in_table_group():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
@@ -6333,7 +6343,7 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     for k in tdt_new:
         tdt_temp = k.copy()
         k.clear()
-        tdt_new_temp =tdt_temp.copy()
+        tdt_new_temp = tdt_temp.copy()
         tdt_new_tmp.append(tdt_new_temp)
         tdt_temp.clear()
     tdt_new.clear()
@@ -6523,8 +6533,8 @@ def table_made(pv, stage):
         name_table = f"{short_name}_table_group.pdf"
     else:
         txt = stage.rfind("-")
-        stage = stage[:txt + 1]
-        name_table = f"{short_name}_{stage}финал.pdf"
+        number_fin = stage[:txt]
+        name_table = f"{short_name}_{number_fin}-финал.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
