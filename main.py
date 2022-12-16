@@ -910,6 +910,7 @@ def enabled_menu_after_choice():
                 my_win.view_fin4_Action.setEnabled(True)
             
         stage = k.stage
+        
         if stage == "Одна таблица":
             my_win.choice_one_table_Action.setEnabled(True)
         elif stage == "Предварительный":
