@@ -910,7 +910,7 @@ def enabled_menu_after_choice():
                 my_win.view_fin4_Action.setEnabled(True)
             
         stage = k.stage
-        
+
         if stage == "Одна таблица":
             my_win.choice_one_table_Action.setEnabled(True)
         elif stage == "Предварительный":
@@ -9505,7 +9505,7 @@ def proba():
     sys = system.select().where(System.stage == "Предварительный").get()
     sys_fin = system.select().where(System.stage == fin).get()
     kol_gr = sys.total_group
-    mesto_exit = sys_fin.mesta_exit
+    mesto_exit = sys_fin.mesta_exit # кол-во мест, попадающих в финал из группы
     choice = Choice.select().where(Choice.title_id == title_id())
     results = Result.select().where(Result.title_id == title_id())
     posev_player_exit_out_gr.clear()
@@ -9531,13 +9531,13 @@ def proba():
             family_city = players.full_name
             player_exit.append(family_city)   
             # номер ид в таблице -Result- встречи игроков, попавших в финал идущих по расстоновке в таблице   
-        result_gr = result_pre.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get() 
+        result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
 
         result_pre_fin = results.select().where(Result.number_group == fin)
         if flag_change is False:
-            result_fin = result_pre_fin.select().where(Result.player1 == player_exit[0] and Result.player2 == player_exit[1]).get()
+            result_fin = result_pre_fin.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get()
         else:
-            result_fin = result_pre_fin.select().where(Result.player1 == player_exit[1] and Result.player2 == player_exit[0]).get()
+            result_fin = result_pre_fin.select().where((Result.player1 == player_exit[1]) & (Result.player2 == player_exit[0])).get()
 
         with db:
             result_fin.winner = result_gr.winner
