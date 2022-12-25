@@ -9536,6 +9536,8 @@ def proba():
     mesto_rank = 1 # начальное место
     fin = "2-й финал"
     system = System.select().where(System.title_id == title_id())
+    choice = Choice.select().where(Choice.title_id == title_id())
+    results = Result.select().where(Result.title_id == title_id())
     sys = system.select().where(System.stage == "Предварительный").get()
     sys_fin = system.select().where(System.stage == fin).get()
     sys_fin_id = sys_fin.id
@@ -9546,16 +9548,14 @@ def proba():
         sys_fin_last = system.select().where(System.id == sys_fin_id - 1).get()
         mesto_rank = sys_fin_last.mesta_exit + 1 # кол-во мест, попадающих в финал из группы начало
 
-    choice = Choice.select().where(Choice.title_id == title_id())
-    results = Result.select().where(Result.title_id == title_id())
-    posev_player_exit_out_gr.clear()
-    for i in range(1, kol_gr + 1):
+    for i in range(1, kol_gr + 1): # цикл по группам
+        posev_player_exit_out_gr.clear()
         id_player_exit_out_gr.clear()
-        choice_group = choice.select().where(Choice.group == f"{i} группа")
+        choice_group = choice.select().where(Choice.group == f"{i} группа") 
         kol_player = len(choice_group) # число участников в группе
-        for k in range(mesto_rank, kol_player + 1):
+        for k in range(mesto_rank, kol_player + 1): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
             ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
-            pl_id = ch_mesto_exit.player_choice_id
+            pl_id = ch_mesto_exit.player_choice_id # id игрока, занявшего данное место
             pl_posev = ch_mesto_exit.posev_group
             id_player_exit_out_gr.append(pl_id)
             posev_player_exit_out_gr.append(pl_posev) # номера игроков в группе вышедших в финал
@@ -9576,8 +9576,9 @@ def proba():
             posev_pl.append(posev_player_exit)
             all_posev_id_pl.append(posev_id_pl)
 
-        result_pre = results.select().where(Result.system_stage == "Предварительный")
+        result_pre = results.select().where(Result.system_stage == "Предварительный") # изменить откуда выходят из группы или пф
         for d in range(0, len(posev_pl)):
+            flag_change = False
             posev_exit = posev_pl[d]
             id_player_exit = all_posev_id_pl[d]
             if posev_exit[0] > posev_exit[1]: # если спортсмены заняли места не по расстановки в табл меняем на номера встречи в правильном порядке по возр
