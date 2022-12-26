@@ -1519,18 +1519,19 @@ def fill_table_R1_list():
 def fill_table_results():
     """заполняет таблицу результатов QtableWidget из db result"""
     msg = QMessageBox
+    result = Result.select().where(Result.title_id == title_id())
     tb = my_win.tabWidget.currentIndex()
     if tb == 3:
         stage = "Предварительный"
     elif tb == 4:
-        pass
+        stage = "Полуфиналы"
     else:
         stage = my_win.comboBox_filter_final.currentText()
         if stage == "Одна таблица":
             stage = "Одна таблица"
         else:
             stage = "Финальный"
-    result = Result.select().where(Result.title_id == title_id())
+    # result = Result.select().where(Result.title_id == title_id())
     pl_result = result.select().order_by(Result.id)
     pr = pl_result.select().where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
     count = len(pr)  # если 0, то записей нет
@@ -1552,16 +1553,23 @@ def fill_table_results():
             return
     else:
         # надо выбрать, что загружать в зависимости от вкладки группы, пф или финалы
-        if tb == 3:
-            player_result = pl_result.select().where(Result.system_stage == "Предварительный")
-        elif tb == 4:
-            player_result = result.select().order_by(Result.id)
-        elif tb == 5:  # здесь надо выбрать финалы (круг или сетка)
-            player_result = result.select().order_by(Result.id).where(Result.title_id == title_id() and
-                                                                      Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
-            count_result = len(player_result)
-            if count_result == 0:
-                return
+        # if tb == 3:
+        #     player_result = pl_result.select().where(Result.system_stage == "Предварительный")
+        # elif tb == 4:
+        #     player_result = result.select().order_by(Result.id)
+        # elif tb == 5:  # здесь надо выбрать финалы (круг или сетка)
+        #     player_result = result.select().order_by(Result.id).where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
+        #     count_result = len(player_result)
+        #     if count_result == 0:
+        
+        
+        #         return
+
+        player_result = pl_result.select().where(Result.system_stage == stage) 
+        count_result = len(player_result)
+        if count_result == 0:
+            return
+
         result_list = player_result.dicts().execute()
         row_count = len(result_list)  # кол-во строк в таблице
         column_count = len(result_list[0])  # кол-во столбцов в таблице
@@ -7870,7 +7878,7 @@ def kol_player():
 
 
 def table_data(stage, kg):
-    """циклом создаем список участников каждой группы"""
+    """циклом создаем список участников каждой группы или финалов если играют по кругу"""
     tdt_all = []  # список списков [tdt_new] и [tdt_color]
     tdt_color = []
     tdt_new = []
@@ -7928,7 +7936,8 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     td = tbl_tmp.copy()  # cписок (номер, фамилия, город и пустые ячейки очков)
     td_color = []
 
-    if tr != 0 and (tab == 3 or tab == 4 or tab == 5):  # если еще не была жеребьевка, то пропуск счета в группе
+    # if tr != 0 and (tab == 3 or tab == 4 or tab == 5):  # если еще не была жеребьевка, то пропуск счета в группе
+    if tr != 0:  # если еще не была жеребьевка, то пропуск счета в группе
         # список очки победителя красные (ряд, столбец) без заголовка
         td_color = score_in_table(td, num_gr)
 
@@ -8089,29 +8098,29 @@ def score_in_table(td, num_gr):
     total_score = {}  # словарь, где ключ - номер участника группы, а значение - очки
     tab = my_win.tabWidget.currentIndex()
     system = System.select().where(System.title_id == title_id())
+    result = Result.select().where(Result.title_id == title_id())
+    choice = Choice.select().where(Choice.title_id == title_id())
     if tab == 3:
         ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
     elif tab == 4:
-        pass
+        ta = system.select().where(System.stage == "Полуфиналы").get()  # находит system id последнего
     else:
         ta = system.select().where(System.stage == num_gr).get()  # находит system id последнего
     mp = ta.max_player
     stage = ta.stage
 
-    result = Result.select().where(Result.title_id == title_id())
-    ch = Choice.select().where(Choice.title_id == title_id())
     if stage == "Предварительный":
         r = result.select().where(Result.number_group == num_gr)
-        choice = ch.select().where(Choice.group == num_gr)  # фильтрует по группе
+        ch = choice.select().where(Choice.group == num_gr)  # фильтрует по группе
     elif stage == "Одна таблица":
         r = result.select().where(Result.number_group == "Одна таблица")
-        choice = ch.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
+        ch = choice.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
     else:
         r = result.select().where(Result.number_group == num_gr)
-        choice = ch.select().where(Choice.final == num_gr)  # фильтрует финал по кругу
+        ch = choice.select().where(Choice.final == num_gr)  # фильтрует финал по кругу
 
     count = len(r)  # сколько игр в группе
-    count_player = len(choice)  # определяет сколько игроков в группе
+    count_player = len(ch)  # определяет сколько игроков в группе
     result_list = r.dicts().execute()
     for s in range(1, count_player + 1):
         total_score[s] = 0
@@ -8183,13 +8192,12 @@ def score_in_table(td, num_gr):
         td[t * 2][mp + 2] = total_score[t + 1]
     # ===== если сыграны все игры группе то выставляет места =========
     count_game = (count_player * (count_player - 1)) // 2
-    result_id = Result.select().where(Result.title_id == title_id())
     if num_gr == "Одна таблица":
-        result = result_id.select().where(Result.system_stage == num_gr)
+        results = result.select().where(Result.system_stage == num_gr)
     else:
-        result = result_id.select().where(Result.number_group == num_gr)
+        results = result.select().where(Result.number_group == num_gr)
     a = 0
-    for r in result:
+    for r in results:
         if r.points_win == 2:
             a += 1
     if a == count_game:
@@ -9610,9 +9618,6 @@ def proba():
                 result_fin.points_loser = result_gr.points_loser
                 result_fin.score_loser = result_gr.score_loser
                 result_fin.save()
-
-
-    # my_win.tabWidget.setCurrentIndex(5)
     # fill_table_results()
     stage = fin
     pv = sys_fin.page_vid
