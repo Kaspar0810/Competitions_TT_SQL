@@ -373,6 +373,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             if type == "круг":
                                 clear_db_before_choice_final(fin)
                                 player_fin_on_circle(fin)
+                                load_playing_game_in_table_for_final(fin)
                                 add_open_tab(tab_page="Финалы")
                             else:
                                 choice_setka(fin)
@@ -383,6 +384,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             s = system.select().where(System.stage == "Предварительный").get()
                             group = s.total_group
                             player_fin_on_circle(fin)
+                            load_playing_game_in_table_for_final(fin)
                         else:
                             choice_setka(fin)
                 else:
@@ -2837,12 +2839,11 @@ def player_fin_on_circle(fin):
     for l in fin_list:
         id_pl = int(l[l.find("/") + 1:])
         choices = choice.select().where(Choice.player_choice_id == id_pl).get()
-        # choices.final = final
         choices.final = fin
         choices.posev_final = ps_final
         choices.save()
         ps_final += 1
-
+    # исправить если из группы выходят больше 2-ух игроков
     for r in range(0, kol_tours):
         round = r + 1
         tours = tour[r]  # игры тура
@@ -9535,14 +9536,14 @@ def tours_list(cp):
     return tour_list
 
 
-def proba():
+def load_playing_game_in_table_for_final(fin):
     """растановка в финале игроков со встречей сыгранной в группе"""
     id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы в порядке занятых место по возрастанию
     posev_player_exit_out_gr = []
     player_exit = []
     flag_change = False # флаг была ли замена порядка игроков в группе согласно занятым местам
     mesto_rank = 1 # начальное место
-    fin = "2-й финал"
+    # fin = "2-й финал"
     system = System.select().where(System.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     results = Result.select().where(Result.title_id == title_id())
@@ -9598,8 +9599,7 @@ def proba():
             for l in id_player_exit:
                 players = Player.select().where(Player.id == l).get()
                 family_city = players.full_name
-                player_exit.append(family_city) 
-  
+                player_exit.append(family_city)  
                 # номер ид в таблице -Result- встречи игроков, попавших в финал идущих по расстоновке в таблице   
             result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
 
@@ -9618,10 +9618,12 @@ def proba():
                 result_fin.points_loser = result_gr.points_loser
                 result_fin.score_loser = result_gr.score_loser
                 result_fin.save()
-    # fill_table_results()
     stage = fin
     pv = sys_fin.page_vid
     table_made(pv, stage)
+
+
+
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
 #     # filename = input("Введите любое существующее имя файла:\n")
@@ -9793,7 +9795,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-my_win.Button_proba.clicked.connect(proba)
+# my_win.Button_proba.clicked.connect(proba)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
