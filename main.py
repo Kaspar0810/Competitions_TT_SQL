@@ -2748,25 +2748,32 @@ def player_fin_on_circle(fin):
     players = Player.select().where(Player.title_id == title_id())
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     choice = Choice.select().order_by(Choice.group).where(Choice.title_id == title_id())
-    for s in system:
-        if s.stage == "Одна таблица":
-            pass
-        elif s.stage == "Предварительный":
-            sys = system.select().where(System.stage == "Предварительный").get()
-            group = sys.total_group
-        else: # если играют соревнования из одной таблицы по кругу
-            final = s.stage
-            if final == "1-й финал":
-                pl_final = s.mesta_exit # кол-во человек выходящих из группы в 1-й финал
-            else:
-                sys_id = s.id - 1
-                system_last = System.select().where(System.id == sys_id).get()
-                max_player_last_final = system_last.max_player  // group # кол-во игроков в предыдущем финале
-                parametrs_final["место"] = mesto + max_player_last_final
-                break
+    # =======
+    system_id = system.select().where(System.stage == fin).get()
+    stage_exit = system_id.stage_exit
+    sys = system.select().where(System.stage == stage_exit).get()
+    group = sys.total_group
+    max_player_last_final = 0
+    
+    # for s in system:
+
+
+    #     if s.stage == "Одна таблица":
+    #         pass
+    #     elif s.stage == "Предварительный":
+    #         sys = system.select().where(System.stage == "Предварительный").get()
+    #         group = sys.total_group
+    #     else: # если играют соревнования из одной таблицы по кругу
+    #         final = s.stage
+    if fin != "1-й финал":
+        sys_id = system_id.id - 1
+        system_last = System.select().where(System.id == sys_id).get()
+        max_player_last_final = system_last.max_player  // group # кол-во игроков в предыдущем финале
+    parametrs_final["место"] = mesto + max_player_last_final
+    #             break
 
     st = "Финальный"
-    system_id = system.select().where(System.stage == fin).get()
+    # system_id = system.select().where(System.stage == fin).get()
     pl_final = system_id.mesta_exit
     parametrs_final["выход"] = pl_final # кол-во игроков которые выходят из группы
     rank_group = parametrs_final["место"] # место с которого выходят в финал
@@ -2777,20 +2784,32 @@ def player_fin_on_circle(fin):
     kol_tours = len(tour)  # кол-во туров
     game = len(tour[0])  # кол-во игр в туре
     # ===== получение списка номеров игроков в порядке 1-ого тура
-    number_tours = []
-    first_tour = tour[0].copy()
-    first_tour.sort()
-    for n in first_tour:
-        z = n.find("-")
-        num = int(n[:z])
-        number_tours.append(num)
-    for n in first_tour:
-        z = n.find("-")
-        num = int(n[z + 1:])
-        number_tours.append(num)
+    # number_tours = []
+    # first_tour = tour[0].copy()
+    # first_tour.sort()
+    # for n in first_tour:
+    #     z = n.find("-")
+    #     num = int(n[:z])
+    #     number_tours.append(num)
+    # for n in first_tour:
+    #     z = n.find("-")
+    #     num = int(n[z + 1:])
+    #     number_tours.append(num)
 
     k = 0
     if pl_final == 2: 
+        number_tours = []
+        first_tour = tour[0].copy()
+        first_tour.sort()
+        for n in first_tour:
+            z = n.find("-")
+            num = int(n[:z])
+            number_tours.append(num)
+        for n in first_tour:
+            z = n.find("-")
+            num = int(n[z + 1:])
+            number_tours.append(num)
+
         for m in range(rank_group, rank_group + parametrs_final["место"]):
             choice_fin = choice.select().order_by(Choice.group).where(Choice.mesto_group == m)
             number_mest = len(choice_fin) 
@@ -2816,7 +2835,8 @@ def player_fin_on_circle(fin):
         for b in range(1, group + 1):
             choice_group = choice.select().where(Choice.group == f"{b} группа")
             player_in_group = len(choice_group)
-            for i in range(rank_group, player_in_group + 1):
+            # for i in range(rank_group, player_in_group + 1):
+            for i in range(rank_group, pl_final + 1):
                 choice_fin = choice_group.select().where(Choice.mesto_group == i).get()
                 player = choice_fin.family
                 pl_id = choice_fin.player_choice_id
@@ -2886,6 +2906,7 @@ def player_fin_on_circle(fin):
     st = "Финальный"
     stage = fin
     table_made(pv, stage)
+
 
 def player_in_table_group():
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
@@ -6444,7 +6465,8 @@ def table_made(pv, stage):
         rH = (0.34 * cm)  # высота строки
     # rH = None  # высота строки
     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
-    for i in range(0, max_pl):
+    # num_columns = list(range(max_pl))
+    for i in range(max_pl):
         i += 1
         i = str(i)
         num_columns.append(i)
@@ -9543,7 +9565,6 @@ def load_playing_game_in_table_for_final(fin):
     player_exit = []
     flag_change = False # флаг была ли замена порядка игроков в группе согласно занятым местам
     mesto_rank = 1 # начальное место
-    # fin = "2-й финал"
     system = System.select().where(System.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     results = Result.select().where(Result.title_id == title_id())
