@@ -9564,7 +9564,7 @@ def load_playing_game_in_table_for_final(fin):
     posev_player_exit_out_gr = []
     player_exit = []
     flag_change = False # флаг была ли замена порядка игроков в группе согласно занятым местам
-    mesto_rank = 1 # начальное место
+    mesto_rank = 1 # начальное место с которого вышли в финал
     system = System.select().where(System.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     results = Result.select().where(Result.title_id == title_id())
@@ -9576,14 +9576,15 @@ def load_playing_game_in_table_for_final(fin):
         mesto_rank = 1
     else:
         sys_fin_last = system.select().where(System.id == sys_fin_id - 1).get()
-        mesto_rank = sys_fin_last.mesta_exit + 1 # кол-во мест, попадающих в финал из группы начало
-
+        mesto_rank = sys_fin_last.mesta_exit + 1 # место, попадающих в финал из группы начало
+    how_many_mest_exit = sys_fin.mesta_exit # количество мест попадающих из предварительного этапа
     for i in range(1, kol_gr + 1): # цикл по группам
         posev_player_exit_out_gr.clear()
         id_player_exit_out_gr.clear()
         choice_group = choice.select().where(Choice.group == f"{i} группа") 
         kol_player = len(choice_group) # число участников в группе
-        for k in range(mesto_rank, kol_player + 1): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
+        # for k in range(mesto_rank, kol_player + 1): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
+        for k in range(mesto_rank, how_many_mest_exit + 1): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
             ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
             pl_id = ch_mesto_exit.player_choice_id # id игрока, занявшего данное место
             pl_posev = ch_mesto_exit.posev_group
