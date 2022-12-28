@@ -358,7 +358,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 return
             sys = system.select().where(System.stage == fin).get()
             type = sys.type_table
-
+            kol_player_exit = sys.mesta_exit
+            etap_exit = sys.stage_exit
+            if etap_exit == "Предварительный":
+                etap_replacing = etap_exit.replace("ый", "ом")
+            elif etap_exit == "Полуфинал":
+                etap_replacing = etap_exit + "е"
+            fin_replacing = fin.replace("й", "ого") + "а"
             if fin is not None:
                 check_flag = check_choice(fin)
                 if check_flag is True:
@@ -373,7 +379,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             if type == "круг":
                                 clear_db_before_choice_final(fin)
                                 player_fin_on_circle(fin)
-                                load_playing_game_in_table_for_final(fin)
+                                if kol_player_exit > 1:
+                                    reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить игры {fin_replacing} результатами "
+                                                                            f"встреч, сыгранных в {etap_replacing} этапе.",
+                                                                            
+                                                        msg.Ok,
+                                                        msg.Cancel)
+                                    if reply == msg.Ok:
+                                        load_playing_game_in_table_for_final(fin)
+                                    else:
+                                        return
                                 add_open_tab(tab_page="Финалы")
                             else:
                                 choice_setka(fin)
@@ -384,7 +399,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             s = system.select().where(System.stage == "Предварительный").get()
                             group = s.total_group
                             player_fin_on_circle(fin)
-                            load_playing_game_in_table_for_final(fin)
+                            if kol_player_exit > 1:
+                                reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить игры {fin_replacing} результатами "
+                                                                            f"встреч, сыгранных в {etap_replacing} этапе.",
+                                                                            
+                                                        msg.Ok,
+                                                        msg.Cancel)
+                            if reply == msg.Ok:
+                                load_playing_game_in_table_for_final(fin)
+                            else:
+                                return
                         else:
                             choice_setka(fin)
                 else:
