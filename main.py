@@ -2834,7 +2834,7 @@ def player_fin_on_circle(fin):
             num = int(n[z + 1:])
             number_tours.append(num)
 
-        for m in range(rank_group, rank_group + parametrs_final["место"]):
+        for m in range(rank_group, rank_group + parametrs_final["выход"]):
             choice_fin = choice.select().order_by(Choice.group).where(Choice.mesto_group == m)
             number_mest = len(choice_fin) 
             if number_mest == group: # если кол-во групп четное
@@ -2845,7 +2845,7 @@ def player_fin_on_circle(fin):
                     player_id = f"{player}/{pl_id}"
                     fin_dict[nt] = player_id
                     k += 1
-            else:
+            else: # кол-во спортсменов в группе меньше количества выходящих в финал
                 choice_fin = choice.select().order_by(Choice.group).where(Choice.mesto_group == m).get() # id группы где только остался один спортсмен
                 player = choice_fin.family
                 pl_id = choice_fin.player_choice_id
