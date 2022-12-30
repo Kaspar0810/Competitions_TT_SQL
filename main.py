@@ -9607,63 +9607,70 @@ def load_playing_game_in_table_for_final(fin):
         id_player_exit_out_gr.clear()
         choice_group = choice.select().where(Choice.group == f"{i} группа") 
         kol_player = len(choice_group) # число участников в группе
-        # for k in range(mesto_rank, kol_player + 1): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
-        for k in range(mesto_rank, how_many_mest_exit + 1): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
+        if mesto_rank + how_many_mest_exit < kol_player:
+            mesto_rank_end = mesto_rank + how_many_mest_exit + 1
+        else:
+            mesto_rank_end = kol_player + 1
+        n = 0
+        for k in range(mesto_rank, mesto_rank_end): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
+        # for k in range(mesto_rank, how_many_mest_exit + 1): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
             ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
             pl_id = ch_mesto_exit.player_choice_id # id игрока, занявшего данное место
             pl_posev = ch_mesto_exit.posev_group
             id_player_exit_out_gr.append(pl_id)
             posev_player_exit_out_gr.append(pl_posev) # номера игроков в группе вышедших в финал
+            n += 1
 
         posev_pl = []
         temp = []
         posev_id_pl = []
         all_posev_id_pl = []
-        # получаем все варианты встреч, сыгранных в группе игроков которые попали в финал
-        for i in combinations(posev_player_exit_out_gr, 2):
-            posev_player_exit = list(i)
-            for v in posev_player_exit:
-                ind = posev_player_exit_out_gr.index(v)
-                id_player = id_player_exit_out_gr[ind]
-                temp.append(id_player)
-                posev_id_pl = temp.copy()
-            temp.clear()
-            posev_pl.append(posev_player_exit)
-            all_posev_id_pl.append(posev_id_pl)
+        if n > 1:
+            # получаем все варианты встреч, сыгранных в группе игроков которые попали в финал
+            for i in combinations(posev_player_exit_out_gr, 2):
+                posev_player_exit = list(i)
+                for v in posev_player_exit:
+                    ind = posev_player_exit_out_gr.index(v)
+                    id_player = id_player_exit_out_gr[ind]
+                    temp.append(id_player)
+                    posev_id_pl = temp.copy()
+                temp.clear()
+                posev_pl.append(posev_player_exit)
+                all_posev_id_pl.append(posev_id_pl)
 
-        result_pre = results.select().where(Result.system_stage == "Предварительный") # изменить откуда выходят из группы или пф
-        for d in range(0, len(posev_pl)):
-            flag_change = False
-            posev_exit = posev_pl[d]
-            id_player_exit = all_posev_id_pl[d]
-            if posev_exit[0] > posev_exit[1]: # если спортсмены заняли места не по расстановки в табл меняем на номера встречи в правильном порядке по возр
-                id_player_exit.reverse()
-                flag_change = True
-                
-            player_exit.clear()
-            posev_exit.clear()
-            for l in id_player_exit:
-                players = Player.select().where(Player.id == l).get()
-                family_city = players.full_name
-                player_exit.append(family_city)  
-                # номер ид в таблице -Result- встречи игроков, попавших в финал идущих по расстоновке в таблице   
-            result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
+            result_pre = results.select().where(Result.system_stage == "Предварительный") # изменить откуда выходят из группы или пф
+            for d in range(0, len(posev_pl)):
+                flag_change = False
+                posev_exit = posev_pl[d]
+                id_player_exit = all_posev_id_pl[d]
+                if posev_exit[0] > posev_exit[1]: # если спортсмены заняли места не по расстановки в табл меняем на номера встречи в правильном порядке по возр
+                    id_player_exit.reverse()
+                    flag_change = True
+                    
+                player_exit.clear()
+                posev_exit.clear()
+                for l in id_player_exit:
+                    players = Player.select().where(Player.id == l).get()
+                    family_city = players.full_name
+                    player_exit.append(family_city)  
+                    # номер ид в таблице -Result- встречи игроков, попавших в финал идущих по расстоновке в таблице   
+                result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
 
-            result_pre_fin = results.select().where(Result.number_group == fin)
-            if flag_change is False:
-                result_fin = result_pre_fin.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get()
-            else:
-                result_fin = result_pre_fin.select().where((Result.player1 == player_exit[1]) & (Result.player2 == player_exit[0])).get()
+                result_pre_fin = results.select().where(Result.number_group == fin)
+                if flag_change is False:
+                    result_fin = result_pre_fin.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get()
+                else:
+                    result_fin = result_pre_fin.select().where((Result.player1 == player_exit[1]) & (Result.player2 == player_exit[0])).get()
 
-            with db:
-                result_fin.winner = result_gr.winner
-                result_fin.points_win = result_gr.points_win
-                result_fin.score_in_game = result_gr.score_in_game
-                result_fin.score_win = result_gr.score_win
-                result_fin.loser = result_gr.loser
-                result_fin.points_loser = result_gr.points_loser
-                result_fin.score_loser = result_gr.score_loser
-                result_fin.save()
+                with db:
+                    result_fin.winner = result_gr.winner
+                    result_fin.points_win = result_gr.points_win
+                    result_fin.score_in_game = result_gr.score_in_game
+                    result_fin.score_win = result_gr.score_win
+                    result_fin.loser = result_gr.loser
+                    result_fin.points_loser = result_gr.points_loser
+                    result_fin.score_loser = result_gr.score_loser
+                    result_fin.save()
     stage = fin
     pv = sys_fin.page_vid
     table_made(pv, stage)
