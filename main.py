@@ -128,15 +128,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # ============ создание подменю
 
         go_to.addAction(self.go_to_Action)  # подменю выбора соревнования
-        # last_comp.addAction(self.last_Action)  # подменю прошлых соревнований
         system.addAction(self.system_made_Action)  # подменю создание системы
         system.addAction(self.system_edit_Action)  # подменю редактирование системы
         choice.addAction(self.choice_one_table_Action) # подменю одна таблица
         choice.addAction(self.choice_gr_Action)  # подменю группы
         choice.addAction(self.choice_pf_Action)  # подменю полуфиналы
         choice.addAction(self.choice_fin_Action)  # подменю финалы
-        # saveList.addAction(self.savelist_Action)
-        # add_last = last_comp.addMenu("Последние")
+    
         last_comp.addAction(self.first_comp_Action)
         last_comp.addAction(self.second_comp_Action)
         last_comp.addAction(self.third_comp_Action)
@@ -171,13 +169,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         view_Menu.addAction(self.view_list_Action)
         view_Menu.addAction(self.view_gr_Action)
         view_Menu.addAction(self.view_pf_Action)
+        view_Menu.addAction(self.view_one_table_Action)
         v_Menu = view_Menu.addMenu("Финалы")
         v_Menu.addAction(self.view_fin1_Action)
         v_Menu.addAction(self.view_fin2_Action)
         v_Menu.addAction(self.view_fin3_Action)
         v_Menu.addAction(self.view_fin4_Action)
 
-        view_Menu.addAction(self.view_one_table_Action)
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
     #  создание действий меню
@@ -217,7 +215,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.view_one_table_Action = QAction("Одна таблица")
         self.go_to_Action = QAction("пусто")
-        # self.last_Action = QAction("пусто")
         # подменю -печать-
         self.clear_s16_Action = QAction("Сетка 16")
         self.clear_s16_2_Action = QAction("Сетка 16 минус 2")
@@ -238,6 +235,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_one_table_Action.setEnabled(False)
         self.view_gr_Action.setEnabled(False)
         self.view_pf_Action.setEnabled(False)
+        # self.v_menu
         self.view_fin1_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin2_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin3_Action.setEnabled(False)  # делает пункт меню не видимым
@@ -308,7 +306,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             fin = "Одна таблица"
             check_flag = check_choice(fin)
             if check_flag  is True:
-                # if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
                 reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
                                                                             f"\nесли хотите сделать "
                                                                             "повторно\nнажмите-ОК-, "
@@ -319,7 +316,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     if type == "круг":
                         one_table(fin, group)
                     else:
-                        # stage = fin
                         choice_setka(fin)
                     add_open_tab(tab_page="Финалы")
                 else:
@@ -420,9 +416,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def system_made(self):
         system_competition()
-
-    # def system_edit(self):
-    #     system_competition()
 
     def help(self):
         pass
@@ -706,7 +699,7 @@ def control_R_list(fname, gamer):
     d = date.today()
     current_month = d.strftime("%m")
     if current_month != month_vybor:
-        message = "Вы выбрали файл не с актуальным рейтингом!\nесли все равно хотите его использовать, нажмите <Ок>\nесли хотите вернуться, нажмите <Отмена>"
+        message = "Вы выбрали файл с не актуальным рейтингом!\nесли все равно хотите его использовать, нажмите <Ок>\nесли хотите вернуться, нажмите <Cancel>"
         reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
                                                   QtWidgets.QMessageBox.Ok,
                                                   QtWidgets.QMessageBox.Cancel)
@@ -727,7 +720,7 @@ def load_listR_in_db(fname, table_db):
     elif table_db == R1_list_m or table_db == R1_list_d:
         r = "январским"
     if filepatch == "":
-        message = f"Вы не выбрали файл с {r} рейтингом!\nесли хотите выйти, нажмите <Ок>\nесли хотите вернуться, нажмите <Отмена>"
+        message = f"Вы не выбрали файл с {r} рейтингом!\nесли хотите выйти, нажмите <Ок>\nесли хотите вернуться, нажмите <Cancel>"
         reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
                                                   QtWidgets.QMessageBox.Ok,
                                                   QtWidgets.QMessageBox.Cancel)
@@ -923,7 +916,9 @@ def enabled_menu_after_choice():
         choice = k.choice_flag
         if choice is True:
             stage = k.stage
-            if stage == "Предварительный":
+            if stage == "Одна таблица":
+                my_win.view_one_table_Action.setEnabled(True)
+            elif stage == "Предварительный":
                 my_win.view_gr_Action.setEnabled(True)
             elif stage == "Полуфиналы":
                 my_win.view_pf_Action.setEnabled(True)
@@ -935,8 +930,6 @@ def enabled_menu_after_choice():
                 my_win.view_fin3_Action.setEnabled(True)
             elif stage == "4-й финал":
                 my_win.view_fin4_Action.setEnabled(True)
-            
-        stage = k.stage
 
         if stage == "Одна таблица":
             my_win.choice_one_table_Action.setEnabled(True)
@@ -946,8 +939,6 @@ def enabled_menu_after_choice():
             my_win.choice_pf_Action.setEnabled(True)
         else:
             my_win.choice_fin_Action.setEnabled(True)
-
-
 
 
 def db_insert_title(title_str):
@@ -6898,7 +6889,7 @@ def setka_16_2_made(fin):
     if tds is not None:
         short_name = t_id.short_name_comp
         if fin == "Одна таблица":
-            name_table_final = f"{short_name}_{f}.pdf"
+            name_table_final = f"{short_name}_one_table.pdf"
         else:
             name_table_final = f"{short_name}_{f}-финал.pdf"
     else:
@@ -7053,7 +7044,11 @@ def setka_16_full_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{short_name}_{f}-финал.pdf"
+        if fin == "Одна таблица":
+            name_table_final = f"{short_name}_one_table.pdf"
+        else:
+            name_table_final = f"{short_name}_{f}-финал.pdf"
+        # name_table_final = f"{short_name}_{f}-финал.pdf"
     else:
         short_name = "чист_16_full_сетка"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
@@ -7676,15 +7671,14 @@ def write_in_setka(data, fin, first_mesto, table):
                     15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
                  # ======= list mest
         mesta_dict = {15: 15, 16: 29, 19: 34, 20: 39, 27: 47, 28: 55, 31: 60, 32: 65}
-    elif table == "setka_16_2":
-        row_last = 69
+    elif table == "setka_16_2": # встречи, где играют победители и проигравший из основного тура  например 22: [54, 54] в списке одинаковые строки
+        row_last = 85
         column_last = 11
         row_end = 33
-        row_num_win = {9: [3, 7], 10: [11, 15], 11: [19, 23], 12: [27, 31], 13: [5, 13], 14: [21, 29], 20: [44, 46], 21: [48, 50], 
-                    22: [52, 54], 23: [56, 58], 24: [45, 49], 25: [53, 57], 26: [43, 47], 27: [51, 55], 15: [9, 25], 33: [62, 66], 
-                    37: [74, 78]}
+        row_num_win = {9: [3, 7], 10: [11, 15], 11: [19, 23], 12: [27, 31], 13: [5, 13], 14: [21, 29], 20: [46, 46], 21: [50, 50], 
+                    22: [54, 54], 23: [58, 58], 24: [45, 49], 25: [53, 57], 26: [47, 47], 27: [55, 55], 15: [9, 25]} 
                  # ======= list mest
-        mesta_dict = {15: 17, 28: 49, 29: 61, 33: 64, 30: 67, 34: 73, 37: 76, 38: 79}
+        mesta_dict = {15: 17, 28: 49, 29: 61, 33: 64, 30: 67, 34: 73, 37: 76, 38: 79} # номер встречи - номер строки
     elif table == "setka_32":
         row_last = 69
         column_last = 11
@@ -7783,8 +7777,8 @@ def write_in_setka(data, fin, first_mesto, table):
                 id_win = id_sh_name[pl_win]
             if pl_los != "X":
                 id_los = id_sh_name[pl_los]
-            i = int(i)
-            r = str(match[3])
+            i = int(i) # номер матча
+            r = str(match[3]) # сноска проигравшего
             # ===== определение мест и запись в db
             if i in mesta_list:
                 index = mesta_list.index(i)
@@ -7825,11 +7819,11 @@ def write_in_setka(data, fin, first_mesto, table):
             c1.clear()
             # цикл создания списков номеров встреч по столбцам
             for rd in range(0, row_last):
-                d1 = data[rd][2]
-                d2 = data[rd][4]
-                d3 = data[rd][6]
-                d4 = data[rd][8]
-                d5 = data[rd][10]
+                d1 = data[rd][2] # пересечение строки -rd- и столбце № 2 где номер встречи
+                d2 = data[rd][4] # встречи в столбце № 4
+                d3 = data[rd][6] # встречи в столбце № 6
+                d4 = data[rd][8] # встречи в столбце № 8
+                d5 = data[rd][10] # встречи в столбце № 10
 
                 if d1 != "":
                     if type(d1) == str:
@@ -7838,9 +7832,9 @@ def write_in_setka(data, fin, first_mesto, table):
                             col_win = 1
                             break
                 if d2 != "":
-                    if type(d2) == str:
-                        c1.append(d2)
-                        if c in c1:
+                    if type(d2) == str: # если значение строка - это номер встречи
+                        c1.append(d2) # добавляет в список
+                        if c in c1: # проверяет если этот номер, чтоб определить номер столбца победителя
                             col_win = 3
                             break
                 if d3 != "":
@@ -8251,7 +8245,8 @@ def numer_game(num_game, vid_setki):
         dict_loser = {1:16, 2:16, 3:17, 4:17, 5:18, 6:18, 7:19, 8:19, 9:23, 10:22, 11:21, 12:20, 13:26, 14:27,
                   16:35, 17:35, 18:36, 19:36, 20:31, 21:31, 22:32, 23:32, 24:30, 25:30, 26:29, 27:29, 31:34, 32:34, 35:38, 36:38}
         dict_loser_pdf = {1: -1, 2: -2, 3: -3, 4: -4, 5: -5, 6: -6, 7: -7, 8: -8, 9: -9, 10: -10, 11: -11, 12: -12, 13: -13,
-                      14: -14, 17: -17, 18: -18, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 29: -29, 30: -30}
+                      14: -14, 16: -16, 17: -17, 18: -18, 19: -19, 20: -20, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 
+                      27: -27, 31: -31, 32: -32, 35: -35, 36: -36}
         dict_mesta = [15, 28, 29, 30, 33, 34, 37, 38]
     elif vid_setki == 'Сетка (с розыгрышем всех мест) на 32 участников':
         dict_winner = {1: 17, 2: 17, 3: 18, 4: 18, 5: 19, 6: 19, 7: 20, 8: 20, 9: 21, 10: 21, 11: 22, 12: 22, 13: 23, 14: 23,
