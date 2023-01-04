@@ -4088,25 +4088,39 @@ def enter_score(none_player=0):
         result.save()
 
     if tab == 5:  # записывает в -Result- сыгранный матч со сносками на соответствующие строки победителя и проигравшего
-
         if type == "сетка":
+            game_minus = [] # номера встреч, откуда попадают победители на игроков после первого поражения
             vid_setki = system.label_string  # вид сетки и кол-во участников
+            # если сетка минус 2
+            if vid_setki == "Сетка (-2) на 8 участников":
+                game_minus = [] # номера встреч, откуда попадают победители на игроков после первого поражения
+            elif vid_setki == "Сетка (-2) на 16 участников":
+                # game_minus = [9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27] # номера встреч, откуда попадают победители на игроков после первого поражения
+                game_minus = [16, 17, 18, 19, 24, 25] # номера встреч, откуда попадают победители на игроков после первого поражения
+            elif vid_setki == "Сетка (-2) на 32 участников":
+                game_minus = [32, 33, 34, 35, 36, 37, 38, 48, 49, 50, 51, 56, 57]
             # список 1-й номер победителя 2-й проигравшего
-            snoska = numer_game(num_game, vid_setki)
+            snoska = numer_game(num_game, vid_setki) # snoska список [номер встречи победителя, номер встречи приогравшего, номер в сетке куда сносится проигравший]
             res = Result.select().where(Result.title_id == title_id())
             results = res.select().where(Result.number_group == fin)
             if snoska[0] != 0:
                 with db:  # записывает в db таблицу Result победителя и проигравшего
                     player = winner
-                    match_num = result.tours  # номер встречи
-                    game = snoska[2] * -1
+                    match_num = result.tours  # номер встречи, в строке
+                    game = snoska[2] * -1 # номер встречи число
                     for k in range(0, 2):
                         if int(match_num) == game:
-                            res_id = results.select().where(Result.tours == snoska[k]).get()
-                            if int(match_num) % 2 != 0:
+                            res_id = results.select().where(Result.tours == snoska[k]).get() # id встречи, куда попадает победитель и проигравший
+                            # =========                            
+                            if res_id.player1 == "":
                                 res_id.player1 = player
                             else:
                                 res_id.player2 = player
+                            # else:
+                            #     if int(match_num) % 2 != 0:
+                            #         res_id.player1 = player
+                            #     else:
+                            #         res_id.player2 = player
                             res_id.save()
                             player = loser
         elif type == "круг":
@@ -4204,11 +4218,11 @@ def setka_type(none_player):
             l = 1
         else:
             if none_player == 1:
-                st1 = "L"
-                st2 = "W"
+                st1 = "П"
+                st2 = "В"
             elif none_player == 2:
-                st1 = "W"
-                st2 = "L"
+                st1 = "В"
+                st2 = "П"
             w = 2
             l = 0
             my_win.lineEdit_pl1_score_total_fin.setText(st1)
@@ -4235,11 +4249,11 @@ def circle_type(none_player, stage):
             l = 1
         else:
             if none_player == 1:  # не явился 1-й игрок
-                st1 = "L"
-                st2 = "W"
+                st1 = "П"
+                st2 = "В"
             elif none_player == 2:  # не явился 2-й игрок
-                st1 = "W"
-                st2 = "L"
+                st1 = "В"
+                st2 = "П"
             w = 2
             l = 0
             my_win.lineEdit_pl1_score_total.setText(st1)
@@ -4253,11 +4267,11 @@ def circle_type(none_player, stage):
             l = 1
         else:
             if none_player == 1:  # не явился 1-й игрок
-                st1 = "L"
-                st2 = "W"
+                st1 = "П"
+                st2 = "В"
             elif none_player == 2:  # не явился 2-й игрок
-                st1 = "W"
-                st2 = "L"
+                st1 = "В"
+                st2 = "П"
             w = 2
             l = 0
             my_win.lineEdit_pl1_score_total_fin.setText(st1)
@@ -6581,162 +6595,6 @@ def table_made(pv, stage):
     change_dir()
 
 
-# def setka_16_2_made_land(fin):
-#     """сетка на 16_2 в pdf"""
-#     from reportlab.platypus import Table
-#     sender = my_win.sender()
-#     table = "setka_16_2"
-#     elements = []
-#     data = []
-#     style = []
-#     column = ['']
-#     column_count = column * 19
-#     # добавить в аргументы функции
-#     final = fin
-#     if sender != my_win.clear_s16_2_Action:
-#         first_mesto = mesto_in_final(fin)
-#     else:
-#         first_mesto = 1  # временный финал для чистой сетки
-#     for i in range(0, 40):
-#         column_count[18] = i  # нумерация 10 столбца для удобного просмотра таблицы
-#         list_tmp = column_count.copy()
-#         data.append(list_tmp)
-#     # ========= места ==========
-#     y = 0
-#     for i in range(0, 32, 2):
-#         y += 1
-#         data[i][0] = str(y)  # рисует начальные номера таблицы 1-16
-#     # ========= нумерация встреч сетки ==========
-#     # draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=4, number_of_game=1, player=16, data=data) # рисует номера встреч 1-32
-#     # # draw_num(row_n=33, row_step=2, col_n=0, number_of_columns=2, number_of_game=17, player=8, data=data) # рисует номера встреч 1-32
-#     # # draw_num(row_n=41, row_step=2, col_n=4, number_of_columns=3, number_of_game=21, player=8, data=data) # рисует номера встреч 1-32
-#     # # draw_num(row_n=58, row_step=2, col_n=6, number_of_columns=2, number_of_game=29, player=4, data=data) # рисует номера встреч 1-32
-#     # draw_num_lost(row_n=33, row_step=2, col_n=0, number_of_game=1, player=8, data=data) # номера минус проигравшие встречи -1 -16
-#     # draw_num_lost(row_n=32, row_step=2, col_n=4, number_of_game=9, player=4, data=data) # номера минус проигравшие встречи -1 -16
-#     # draw_num_lost(row_n=39, row_step=2, col_n=6, number_of_game=17, player=2, data=data) # номера минус проигравшие встречи -1 -16
-#     # draw_num_lost(row_n=41, row_step=2, col_n=2, number_of_game=1, player=8, data=data) # номера минус проигравшие встречи -1 -16
-#     # draw_num_lost(row_n=58, row_step=2, col_n=4, number_of_game=21, player=4, data=data) # номера минус проигравшие встречи -1 -16
-#     # draw_num_lost(row_n=55, row_step=2, col_n=6, number_of_game=25, player=2, data=data) # номера минус проигравшие встречи -1 -16
-#     # draw_num_lost(row_n=65, row_step=2, col_n=6, number_of_game=29, player=2, data=data) # номера минус проигравшие встречи -1 -16
-   
-#     # data[8][8] = str(15)  # создание номеров встреч 15
-#     # data[25][8] = str(-15)
-#     # data[29][8] = str(16)  # создание номеров встреч 16
-#     # data[31][8] = str(-16)
-#     # data[37][8] = str(-19)
-#     # data[39][8] = str(20)
-#     # data[41][8] = str(-20)
-#     # data[44][8] = str(27)  # создание номеров встреч 27
-#     # data[52][8] = str(-27)
-#     # data[55][8] = str(28)  # создание номеров встреч 28
-#     # data[57][8] = str(-28)
-#     # data[63][8] = str(-31)
-#     # data[65][8] = str(32)  # создание номеров встреч 32
-#     # data[67][8] = str(-32)
-
-#     # ============= данные игроков и встреч и размещение по сетке =============
-#     tds = write_in_setka(data, fin, first_mesto, table)
-#     #===============
-#     cw = ((0.3 * cm, 4.4 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm,
-#            0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm))
-#     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
-#     color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
-#     t = Table(data, cw, 40 * [0.35 * cm])
-#     # =========  цикл создания стиля таблицы ================
-#     # ==== рисует основной столбец сетки 
-#     style = draw_setka(1, 1, 16, style) # рисует кусок сетки(номер столбца, номер строки на 16 человека)
-#     # # draw_num_lost_2(row_n=33, row_step=2, col_n=0, revers_number=1, number_of_game=1, player=8, data=data) # номера минус проигравшие встречи -17-24
-#     # style = draw_setka(1, 49, 4, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-#     # style = draw_setka(1, 61, 4, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-#     # style = draw_setka_2(1, 33, 8, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-#     # style = draw_mesta(row=52, col=5, player=2, style=style) # рисует линии сетки за места(номер строки, участники)
-#     # style = draw_mesta(row=64, col=5, player=2, style=style) # рисует линии сетки за места(номер строки, участники)
-#     # style = draw_setka_made(9, 33, 2, 8, 1, style) # рисует кусок сетки(номер столбца, колво уч, шаг между линиями)
-#     # style = draw_setka(5, 47, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-#     # style = draw_setka(7, 51, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-#     # style = draw_setka(1, 57, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-#     # ======= встречи за места =====
-#     # for q in range(0, 11, 10):
-#     #     fn = ('LINEABOVE', (9, q + 16), (11, q + 16),
-#     #           1, colors.darkblue)  # за 1-2 место
-#     #     style.append(fn)
-#     # for q in range(0, 9, 8):
-#     #     fn = ('LINEABOVE', (9, q + 33), (11, q + 33),
-#     #           1, colors.darkblue)  # за 3-4 место
-#     #     style.append(fn)
-#         # fn = ('LINEABOVE', (9, q + 40), (10, q + 40),
-#     #           1, colors.darkblue)  # за 7-8 место
-#     #     style.append(fn)
-#     #     fn = ('LINEABOVE', (9, q + 56), (10, q + 56),
-#     #           1, colors.darkblue)  # за 11-12 место
-#     #     style.append(fn)
-#     #     fn = ('LINEABOVE', (9, q + 66), (10, q + 66),
-#     #           1, colors.darkblue)  # за 15-16 место
-#     #     style.append(fn)
-#     # for q in range(0, 4, 3):
-#     #     fn = ('LINEABOVE', (9, q + 35), (10, q + 35),
-#     #           1, colors.darkblue)  # за 5-6 место
-#     #     style.append(fn)
-#     #     fn = ('LINEABOVE', (9, q + 61), (10, q + 61),
-#     #           1, colors.darkblue)  # за 13-14 место
-#     #     style.append(fn)
-#     # for q in range(0, 6, 5):
-#     #     fn = ('LINEABOVE', (9, q + 48), (10, q + 48),
-#     #           1, colors.darkblue)  # за 9-10 место
-#     #     style.append(fn)
-
-#     for i in range(1, 8, 2):
-#         fn = ('TEXTCOLOR', (i, 0), (i, 68), colors.black)  # цвет шрифта игроков
-#         style.append(fn)
-#         fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 68), colors.green)  # цвет шрифта номеров встреч
-#         style.append(fn)
-#         # выравнивание фамилий игроков по левому краю
-#         fn = ('ALIGN', (i, 0), (i, 68), 'LEFT') 
-#         style.append(fn)
-#         # центрирование номеров встреч
-#         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
-#         style.append(fn)
-#     fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-#     style.append(fn)
-
-#     ts = style   # стиль таблицы (список оформления строк и шрифта)
-#     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
-#                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
-#                            ('FONTSIZE', (0, 0), (-1, -1), 7),
-#                            ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
-#                            ('FONTSIZE', (1, 0), (1, 32), 7),
-#                            # 10 столбец с 0 по 68 ряд (цвет места)
-#                            ('TEXTCOLOR', (10, 0), (10, 68), colors.red),
-#                         #    ('ALIGN', (10, 0), (10, 68), 'RIGHT'),
-#                            ('ALIGN', (9, 0), (9, 68), 'LEFT'),
-#                            # цвет шрифта игроков 1 ого тура
-#                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
-#                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
-#                            ] + ts))
-
-#     elements.append(t)
-#     pv = landscape(A4) # ориентация страницы
-#     znak = final.rfind("-")
-#     f = final[:znak]
-
-#     if pv == A4:
-#         pv = A4
-#     else:
-#         pv = landscape(A4)
-#     t_id = Title.get(Title.id == title_id())
-#     if tds is not None:
-#         short_name = t_id.short_name_comp
-#         name_table_final = f"{f}-финал_{short_name}.pdf"
-#     else:
-#         short_name = "чист_16_2_сетка"  # имя для чистой сетки
-#     name_table_final = f"{short_name}.pdf"
-#     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
-#     change_dir()
-#     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-#     change_dir()
-#     return tds
-
-
 def setka_16_2_made(fin):
     """сетка на 16_2 в pdf"""
     from reportlab.platypus import Table
@@ -6754,7 +6612,7 @@ def setka_16_2_made(fin):
     else:
         first_mesto = 1  # временный финал для чистой сетки
     for i in range(0, 86):
-        column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -6857,8 +6715,9 @@ def setka_16_2_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i + 1, 0), (i + 1, 85), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+   
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
 
@@ -7656,7 +7515,7 @@ def mesto_in_final(fin):
 
 def write_in_setka(data, fin, first_mesto, table):
     """функция заполнения сетки результатами встреч data поступает чистая только номера в сетке, дальше идет заполнение игроками и счетом"""
-    "row_num_win - словарь, ключ - номер игры, значение - список(номер строки 1-ого игрока, номер строки 2-ого игрока)"
+    "row_num_win - словарь, ключ - номер игры, значение - список(номер строки 1-ого игрока, номер строки 2-ого игрока) и записвает итоговые места в db"
     sender = my_win.sender()
     row_num_los = {}
     row_end = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
@@ -7675,8 +7534,9 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 85
         column_last = 11
         row_end = 33
-        row_num_win = {9: [3, 7], 10: [11, 15], 11: [19, 23], 12: [27, 31], 13: [5, 13], 14: [21, 29], 20: [46, 46], 21: [50, 50], 
-                    22: [54, 54], 23: [58, 58], 24: [45, 49], 25: [53, 57], 26: [47, 47], 27: [55, 55], 15: [9, 25]} 
+        row_num_win = {9: [3, 7], 10: [11, 15], 11: [19, 23], 12: [27, 31], 13: [5, 13], 14: [21, 29], 16: [46, 46], 17: [50, 50], 18: [54, 54], 19: [58, 58],
+                    20: [46, 46], 21: [50, 50], 22: [54, 54], 23: [58, 58], 24: [49, 45], 25: [57, 53], 26: [55, 47], 27: [55, 47], 28: [53, 45], 33: [62, 66],
+                    37: [74, 78], 15: [9, 25]} 
                  # ======= list mest
         mesta_dict = {15: 17, 28: 49, 29: 61, 33: 64, 30: 67, 34: 73, 37: 76, 38: 79} # номер встречи - номер строки
     elif table == "setka_32":
@@ -7688,8 +7548,8 @@ def write_in_setka(data, fin, first_mesto, table):
         35: [72, 76], 41: [89, 93], 42: [97, 101], 43: [91, 99], 47: [114, 118],  57: [140, 144], 58: [148, 152], 
         59: [156, 160], 60: [164, 168], 61: [142, 150], 62: [158, 166], 63: [146, 162], 67: [172, 176], 73: [179, 183],
         74: [187, 191], 75: [181, 189], 79: [197, 201]}
-        mesta_list = [31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
-                        64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80]
+        mesta_dict= {31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
+                        64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80}
     elif table == "setka_32_2":
         row_last = 207
         column_last = 15
@@ -7777,26 +7637,21 @@ def write_in_setka(data, fin, first_mesto, table):
                 id_win = id_sh_name[pl_win]
             if pl_los != "X":
                 id_los = id_sh_name[pl_los]
-            i = int(i) # номер матча
             r = str(match[3]) # сноска проигравшего
-            # ===== определение мест и запись в db
+            # ===== определение итоговых мест и запись в db
             if i in mesta_list:
                 index = mesta_list.index(i)
-                mesto = first_mesto + index
-                pl1 = match[1]
-                pl1_mesto = mesto - 1
-                pl2 = match[4]
-                pl2_mesto = mesto
+                mesto = first_mesto + (index * 2)
                 # записывает места в таблицу -Player-
                 player = Player.get(Player.id == id_win)
                 win = f"{player.player}/ {player.city}"
-                player.mesto = pl1_mesto
+                player.mesto = mesto
                 player.save()
                 player = Player.get(Player.id == id_los)
                 los = f"{player.player}/ {player.city}"
-                player.mesto = pl2_mesto
+                player.mesto = mesto + 1
                 player.save()
-            c = match[0]
+            c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
             c_mesto = 1
             # ========== расстановка для сетки на 16
             if c != 0: # встречи в сетке не за места
@@ -7805,17 +7660,14 @@ def write_in_setka(data, fin, first_mesto, table):
                     row_win = row_win_list[0]
                 else:
                     row_win = row_win_list[1]
-
                 c1 = []
                 c = str(c)
-
                 win = match[1]
                 los = match[4]
             elif c == 0:  # встречи за места
                 c_mesto = 0
-                win_r = int(r) * -1 # номер встречи
-                row_win = mesta_dict[win_r]
-                c = str(win_r)
+                row_win = mesta_dict[i]
+                c = str(i)
             c1.clear()
             # цикл создания списков номеров встреч по столбцам
             for rd in range(0, row_last):
@@ -7855,14 +7707,16 @@ def write_in_setka(data, fin, first_mesto, table):
                         if c in c1:
                             col_win = 9
                             break
-
+ 
             if c_mesto == 0: # если игры за место номер столбца меняется на +2
-                col_win += 2
+                if table == "setka_16_2" and c != "28": # нет смещения по столбцам если игра за 3-е место (№ 28) сетка 16 минус 2
+                    col_win += 2
+
 
             row_los = row_num_los[r]  # строка проигравшего
             score = match[2]  # счет во встречи
             row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
-            col_los = row_list_los.index(r) # номер столбца проигравшего
+            col_los = row_list_los.index(r) # номер столбца проигравшего            
             data[row_win][col_win] = win
             data[row_win + 1][col_win] = score
             data[row_los][col_los + 1] = los
@@ -8300,7 +8154,7 @@ def score_in_setka(fin):
     x = len(result)
     for res in result:
         num_game = int(res.tours)
-        family_win = res.winner
+        # family_win = res.winner
         if res.winner is not None and res.winner != "":
             snoska = numer_game(num_game, vid_setki)
             tmp_match.append(snoska[0])
@@ -8755,7 +8609,7 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         game_p1 = c.score_in_game
         # счет во встречи (выигранные и проигранные партии) проигравшего
         game_p2 = c.score_loser
-        if game_p1 != "W : L" or game_p1 != "l : W":
+        if game_p1 != "В : П" or game_p1 != "П : В":
             p1_game_win = int(game_p1[0])
             p1_game_los = int(game_p1[4])
             p2_game_win = int(game_p2[0])
@@ -8769,7 +8623,7 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         game_p1 = c.score_loser
         game_p2 = c.score_in_game
         # ======= если победа по неявке исправить
-        if game_p1 != "W : L" or game_p1 != "l : W":
+        if game_p1 != "В : П" or game_p1 != "П : В":
             p1_game_win = int(game_p1[0])
             p1_game_los = int(game_p1[4])
             p2_game_win = int(game_p2[0])
