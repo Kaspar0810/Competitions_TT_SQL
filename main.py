@@ -295,7 +295,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def exit(self):
         exit_comp()
 
-
     def choice(self):
         msg = QMessageBox
         sender = self.sender()
@@ -930,7 +929,7 @@ def enabled_menu_after_choice():
                 my_win.view_fin3_Action.setEnabled(True)
             elif stage == "4-й финал":
                 my_win.view_fin4_Action.setEnabled(True)
-
+        stage = k.stage
         if stage == "Одна таблица":
             my_win.choice_one_table_Action.setEnabled(True)
         elif stage == "Предварительный":
@@ -2339,7 +2338,7 @@ def system_competition():
         my_win.comboBox_table_3.hide()
         my_win.comboBox_table_4.hide()
         my_win.tabWidget.setTabEnabled(2, True)
-        # my_win.toolBox.setTabEnabled(2, True)
+
 
         if flag_system is True:
             flag_choice = ready_choice(stage)
@@ -2496,7 +2495,9 @@ def one_table(fin, group):
             sys_m.stage = my_win.comboBox_etap_1.currentText()
             sys_m.type_table = type_table
             sys_m.page_vid = my_win.comboBox_page_vid.currentText()
-            sys_m.label_string = f"{vt} {count} участников"
+            #========
+            # sys_m.label_string = f"{vt} {count} участников"
+            sys_m.label_string = f"{vt} {total_athletes} участников"
             sys_m.kol_game_string =f"{total_game} игр"
             sys_m.save()
 
@@ -2519,7 +2520,8 @@ def one_table(fin, group):
                     # функция жеребьевки таблицы по кругу
                     player_in_one_table(fin)
                 else:
-                    choice_setka_automat(fin, count_exit, mesto_first_poseva, flag=False)
+                    flag = selection_of_the_draw_mode()
+                    choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
             else:
                 return
 
@@ -2528,6 +2530,18 @@ def one_table(fin, group):
         sys_m.save()
 
 
+def selection_of_the_draw_mode():
+    """Выбор режима жеребьевки сетки -автомат- или -ручной-"""
+    vid = ["Автоматическая", "Ручная"]
+    vid, ok = QInputDialog.getItem(
+                    my_win, "Жеребьевка", "Выберите режим жеребьевки сетки.", vid, 0, False)
+    if vid == "Автоматическая":
+        flag = True
+    else:
+        flag = False
+    return flag
+    
+              
 def kol_player_in_group():
     """подсчет кол-во групп и человек в группах"""
     sender = my_win.sender()  # сигнал от кнопки
@@ -2645,7 +2659,7 @@ def player_in_setka_and_write_Game_list_and_Result(fin):
     s = System.select().where(System.title_id == title_id())  # находит system id последнего
     for i in s:  # перебирает в цикле строки в табл System где последний titul_id
         if i.stage == fin:
-            mp = i.max_player
+            mp = i.total_athletes
             mg = i.kol_game_string
             tabel_string = i.label_string
     space = mg.find(" ")
@@ -4061,7 +4075,6 @@ def enter_score(none_player=0):
         if none_player == 0:
             winner_string = string_score_game()  # пишет счет в партии
         else:
-            # winner_string = ts_winner  # только общий счет
             if type == "сетка":
                 winner_string = ""
     else:
@@ -4800,7 +4813,7 @@ def progress_bar(step):
        result = msgBox.information(my_win, "Уведомление", "Жеребьевка завершена, проверьте ее результаты!", msgBox.Ok)
        if result == msgBox.Ok:
             my_win.progressBar.setValue(0)
-
+    return step
 
 # def check_input(text):
 #     """проверка правильность ввода номера жеребьевки"""
@@ -4833,7 +4846,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == fin).get()
     choice = Choice.select().where(Choice.title_id == title_id())
-    max_player = sys.max_player
+    max_player = sys.total_athletes
+    # max_player = sys.max_player
   
     posevs = setka_choice_number(fin, count_exit)
     player_net = posevs[0]
@@ -4861,7 +4875,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             all_player.append(len(choice.select().where(Choice.basic == fin)))
         else:
             all_player.append(len(choice.select().where(Choice.mesto_group == mesto_first_poseva + d)))
-    all_player = sum(all_player)
+    all_player = sum(all_player) # реальное число игроков в сетке
 
     for n in range (0, count_exit): # начало основного посева
         if fin == "1-й финал":
@@ -4871,6 +4885,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
         else:
             choice_posev = choice.select().order_by(Choice.rank.desc()).where(Choice.mesto_group == mesto_first_poseva + n)
         count_player_in_final = len(choice_posev)
+
         if count_player_in_final != max_player // count_exit and count_exit == 1: # вычеркиваем определенные номера только если одно место выходит из группы
             free_num = free_place_in_setka(max_player, count_player_in_final)
             del_num = 1 # флаг, что есть свободные номера
@@ -4931,11 +4946,15 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             sev_tmp = posev[i].copy()
             sev = sev_tmp.copy()
             sev_tmp.clear()
-            if del_num == 0:
-                count = len(posev[i]) # всего количество номеров в посеве
-            elif del_num == 1 and i == count_posev - 1:
-                count = len(full_posev)
-                free_seats = player_net // count_exit - count # сколько свободных мест в сетке
+            count = len(posev[i]) # всего количество номеров в посеве
+            if del_num == 1 and i == count_posev - 1:
+                for h in free_num:
+                    sev.remove(h)
+                    # posev_data[h] = "X"
+                # free_seats = player_net // count_exit - count # сколько свободных мест в сетке
+                free_seats = len(free_num) # сколько свободных мест в сетке
+                count = len(posev[i]) - free_seats
+                del_num = 0
             for w in range(0, count): # внутренний цикл посева
                 l = number_posev[0] # общий список всего посева
                 if i == 0 and n == 0: #  ===== 1-й посев
@@ -4944,7 +4963,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                     count_sev = len(sev) # количество номеров в посеве
                 else:
                     num_set = sev[0] # проверить
-                    count_sev = len(sev) - free_seats # конкретное число оставшихся в посеве минус свободных мест(если они есть)
+                    # count_sev = len(sev) - free_seats # конкретное число оставшихся в посеве минус свободных мест(если они есть)
+                    count_sev = len(sev) # конкретное число оставшихся в посеве минус свободных мест(если они есть)
                     if count_sev > 1: # если сеющихся номеров больше одного
                         if w == 0: # 1-й основной посев
                             gr_region_tmp = []
@@ -4975,7 +4995,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                             # === выбор ручная или автомат ====
                             if flag is True:
                                 if len(num_set) == 0:
-                                    msgBox.information(my_win, "Уведомление", "Жеребьевка не получилась повторите снова.")
+                                    msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась,я повторите снова.")
                                     sorted_tuple = sorted(num_id_player.items(), key=lambda x: x[0])
                                     dict(sorted_tuple)                                    
                                     player_choice_in_setka(fin)
@@ -5039,6 +5059,9 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                 if count_sev > 1:
                     c = len(current_region_posev)
                     if c != 0:
+                        # delete_free_seats(current_region_posev, possible_number, num_set, sev, l)
+                    # c = len(current_region_posev)
+                    # if c != 0:
                         del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
                         del current_region_posev[l] # удаляет из словаря текущий посеянный регион
                         if num_set in sev: # проверяет посеянный номер в посеве
@@ -5072,6 +5095,20 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             for h in free_num:
                 posev_data[h] = "X"
     return posev_data
+
+
+# def delete_free_seats(current_region_posev, possible_number, num_set, sev, l):
+#     """удаляет из возможных посевов номера отсутствующих игроков"""
+#     # c = len(current_region_posev)
+#     # if c != 0:
+#     del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
+#     del current_region_posev[l] # удаляет из словаря текущий посеянный регион
+#     if num_set in sev: # проверяет посеянный номер в посеве
+#         sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
+#     for z in possible_number.keys():
+#         possible_tmp = possible_number[z]
+#         if num_set in possible_tmp: # проверяет посеянный номер в возможных номерах
+#             possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
 
 
 def wiev_table_choice():
@@ -5903,6 +5940,13 @@ def numbers_of_games(cur_index, player_in_final):
     if cur_index == 1:  # сетка - 2
         if player_in_final == 16:
             total_games = 38
+        elif player_in_final > 8 and player_in_final < 16:
+            tours = 4
+            free = 16 - player_in_final
+            if free == 1:
+                total_games = 38 - free * tours
+            elif free > 1:
+                total_games = 38 - (free * tours - 1)
         elif player_in_final == 32:
             total_games = 94
     elif cur_index == 2:  # прогрессивная сетка
@@ -6058,7 +6102,7 @@ def ready_choice(stage):
 def select_choice_final():
     """выбор жеребьевки финала"""
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    vid = ["Автоматический", "Ручной"]
+    # vid = ["Автоматический", "Ручной"]
     fin = []
     for sys in system:
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
@@ -7519,7 +7563,7 @@ def write_in_setka(data, fin, first_mesto, table):
     sender = my_win.sender()
     row_num_los = {}
     row_end = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
-    column = 3
+    # column = 3
     flag_clear = False
     # уточнить кол-во столбцов
     if table == "setka_16_full":
@@ -7615,7 +7659,7 @@ def write_in_setka(data, fin, first_mesto, table):
                 row_num_los[key] = r # словарь номер игры, сноски - номер строки
 
     n = 0
-    for t in range(row_first, row_end, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве
+    for t in range(row_first, row_end, 2):  # цикл расстановки игроков по своим номерам в 1-ом посеве (фамилия инциалы имени/ город)
         data[t][1] = tds[0][n]
         n += 1
     # ==============
@@ -7855,9 +7899,9 @@ def setka_data(fin):
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     for sys in system:  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
-            mp = sys.max_player
+            mp = sys.total_athletes
             flag = sys.choice_flag
-    if flag == True:
+    if flag == True: # 
         posev_data = setka_player_after_choice(fin) # получаем списки участников сетки после жеребьевки
     else:
         posev_data = player_choice_in_setka(fin)  # получаем списки участников сетки новой или повторной жеребьевки
