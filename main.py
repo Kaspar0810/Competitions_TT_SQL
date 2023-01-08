@@ -316,7 +316,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         one_table(fin, group)
                     else:
                         choice_setka(fin)
-                    add_open_tab(tab_page="Финалы")
+                    # add_open_tab(tab_page="Финалы")
                 else:
                     return
             else:
@@ -324,7 +324,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     player_fin_on_circle(fin)
                 else:
                     choice_setka(fin)
-                add_open_tab(tab_page="Финалы")
+            add_open_tab(tab_page="Финалы")
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
             for stage in system:
                 if stage.stage == "Предварительный":
@@ -930,6 +930,8 @@ def enabled_menu_after_choice():
             elif stage == "4-й финал":
                 my_win.view_fin4_Action.setEnabled(True)
         stage = k.stage
+        # if stage == "":
+        #     return
         if stage == "Одна таблица":
             my_win.choice_one_table_Action.setEnabled(True)
         elif stage == "Предварительный":
@@ -1076,11 +1078,6 @@ def system_edit():
 
 def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
-    # t = Title.select().where(Title.id == title_id())  # последний id соревнований (текуших)
-    # # находит system id последнего
-    # ce = System.select().where(System.title_id == t).get()
-    # # все строки, где title_id соревнований
-    # cs = System.select().where(System.id == ce)
     systems  = System.select().where(System.title_id == title_id()).get()
     count_system = len(systems)  # получение количества записей (этапов) в системе
     sg = my_win.comboBox_one_table.currentText()
@@ -1548,7 +1545,6 @@ def fill_table_results():
             stage = "Одна таблица"
         else:
             stage = "Финальный"
-    result = Result.select().where(Result.title_id == title_id())
     player_result = result.select().where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result-
     count = len(player_result)  # если 0, то записей нет
     flag = ready_system()
@@ -2478,7 +2474,7 @@ def one_table(fin, group):
 
         if type_table == "круг":
             total_athletes = count
-        else:
+        else: # на сколько участников таблица
             if count <= 16:
                 total_athletes = 16
             elif count > 16 and count <= 32:
@@ -2495,8 +2491,6 @@ def one_table(fin, group):
             sys_m.stage = my_win.comboBox_etap_1.currentText()
             sys_m.type_table = type_table
             sys_m.page_vid = my_win.comboBox_page_vid.currentText()
-            #========
-            # sys_m.label_string = f"{vt} {count} участников"
             sys_m.label_string = f"{vt} {total_athletes} участников"
             sys_m.kol_game_string =f"{total_game} игр"
             sys_m.save()
@@ -2513,18 +2507,18 @@ def one_table(fin, group):
                                                  "Хотите ее сделать сейчас?",
                                      msgBox.Ok, msgBox.Cancel)
             if result == msgBox.Ok:
-                count_exit = 1
-                mesto_first_poseva = 1
-
-                if type_table == "круг":
-                    # функция жеребьевки таблицы по кругу
+                # count_exit = 1
+                # mesto_first_poseva = 1
+                if type_table == "круг":  # функция жеребьевки таблицы по кругу
                     player_in_one_table(fin)
                 else:
-                    flag = selection_of_the_draw_mode()
-                    choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
+                    # flag = selection_of_the_draw_mode() # выбор вида жеребьевки сетки автомат или ручная
+                    # choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
+                    posev_data = player_choice_in_setka(fin)
+                    player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
+                add_open_tab(tab_page="Финалы")
             else:
                 return
-
         sys_m.stage = fin
         sys_m.choice_flag = 1 # запись о том что сделана жеребьевка
         sys_m.save()
@@ -2653,58 +2647,43 @@ def view():
     change_dir()
 
 
-def player_in_setka_and_write_Game_list_and_Result(fin):
+def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     """заполняет таблицу Game_list данными спортсменами из сетки tds - список списков данных из сетки, а затем
     заполняет таблицу -Result-"""
     s = System.select().where(System.title_id == title_id())  # находит system id последнего
-    for i in s:  # перебирает в цикле строки в табл System где последний titul_id
-        if i.stage == fin:
-            mp = i.total_athletes
-            mg = i.kol_game_string
-            tabel_string = i.label_string
-    space = mg.find(" ")
-    game = int(mg[:space])
-    sd_full = []
-    sd = []
-    # создание сетки со спортсменами согласно жеребьевки
-    if tabel_string == "Сетка (с розыгрышем всех мест) на 16 участников":
-        tds_new = setka_16_full_made(fin)
-    elif tabel_string == "Сетка (-2) на 16 участников":
-        tds_new = setka_16_2_made(fin)
-    elif tabel_string == "Сетка (с розыгрышем всех мест) на 32 участников":
-        tds_new = setka_32_full_made(fin)
-    elif tabel_string == "Сетка (-2) на 32 участников":
-        tds_new = setka_32_2_made(fin)
-    elif tabel_string == "Сетка на 32 участников":
-        tds_new = setka_32_made(fin)
-
-    tds = tds_new[1]
-    
-    for r in tds:
-        if r != "X":
-            id_pl = tds[r]
-            family = f'{r}/{id_pl}'  # фамилия игрока и его id
-            sd.append(family)
-            sd_full.append(r)
-        else:
-            sd.append(r)
-            sd_full.append(r)
-    k = 0
-    for i in range(1, mp + 1):  # записывает в Game_List спортсменов участников сетки
-        family_player = sd[i - 1]
-        k += 1
-        with db:
-            game_list = Game_list(number_group=fin, rank_num_player=k, player_group=family_player,
-                                  system_id=s, title_id=title_id()).save()
-
     st = "Финальный"
     if fin == "Одна таблица":
         st = "Одна таблица"
 
+    for i in s:  # перебирает в цикле строки в табл System где последний titul_id
+        if i.stage == fin:
+            mp = i.total_athletes
+            mg = i.kol_game_string
+    space = mg.find(" ")
+    game = int(mg[:space])
+    # создание сетки со спортсменами согласно жеребьевки
+    all_list = setka_data(fin, posev_data)
+    tds = all_list[1]
+    tds_full_name_city = all_list[3]
+    k = 0
+    for r in tds:
+        if r != "X":
+            znak = r.find("/")
+            family = r[:znak]
+            id_pl = all_list[2][family]
+            family_id = f'{family}/{id_pl}'  # фамилия игрока и его id
+        else:
+            family_id = r
+        k += 1
+    # записывает в Game_List спортсменов участников сетки и присваивает встречи 1-ого тура и записывает в тбл Results
+        with db:
+            game_list = Game_list(number_group=fin, rank_num_player=k, player_group=family_id,
+                                  system_id=s, title_id=title_id()).save()
+
     for i in range(1, mp // 2 + 1):  # присваивает встречи 1-ого тура и записывает в тбл Results
         num_game = i
-        pl1 = sd_full[i * 2 - 2]
-        pl2 = sd_full[i * 2 - 1]
+        pl1 = tds_full_name_city[i * 2 - 2]
+        pl2 = tds_full_name_city[i * 2 - 1]
         if pl1 is not None and pl2 is not None:
             with db:
                 results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
@@ -4049,6 +4028,7 @@ def enter_score(none_player=0):
     st2 = sc_total[1]  # партии проигранные
     w = sc_total[2]  # очки победителя
     l = sc_total[3]  # очки проигравшего
+    flag = 1
     if my_win.lineEdit_player1_fin.text() != "X" and my_win.lineEdit_player2_fin.text() != "X":
         if st1 > st2 or none_player == 2:  # выиграл 1-й участник
             if tab == 3:
@@ -4077,25 +4057,36 @@ def enter_score(none_player=0):
         else:
             if type == "сетка":
                 winner_string = ""
-    else:
+    else: # если нет одного игрока -X-
+        flag = 0 #
         if my_win.lineEdit_player1_fin.text() == "X":
             winner = my_win.lineEdit_player2_fin.text()
             loser = my_win.lineEdit_player1_fin.text()
         else:
             winner = my_win.lineEdit_player1_fin.text()
             loser = my_win.lineEdit_player2_fin.text()
+        loser_fam_name = loser # оставляет -X-
+        # === убирает город ======
         winner_string = ""
         ts_winner = ""
         ts_loser = ""
         game_play = False
+     # === убирает город ======
+    if flag == 0:
+        loser_fam_name = loser # оставляет -X-
+    else:
+        znak_los = loser.find("/")
+        loser_fam_name = loser[:znak_los]
+    znak_win = winner.find("/")
+    winner_fam_nam = winner[:znak_win]
 
     with db:  # записывает в таблицу -Result- сыгранный матч
         result = Result.get(Result.id == id)
-        result.winner = winner
+        result.winner = winner_fam_nam
         result.points_win = w
         result.score_win = winner_string
         result.score_in_game = ts_winner
-        result.loser = loser
+        result.loser = loser_fam_name
         result.points_loser = l
         result.score_loser = ts_loser
         result.save()
@@ -4673,20 +4664,20 @@ def reset_filter():
     load_combo()
 
 
-def choice_table():
-    """заполняется таблица жеребьевка из меню -создание системы-"""
-    msgBox = QMessageBox()
-    s = System.select().order_by(System.id.desc()).get()
-    system = System.get(System.id == s)
-    pl = Player.select()
-    pl = len(pl)
-    mp = system.total_athletes
-    if mp == 0:  # система еще не создана (mp - всего человек в списке)
-        result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
-                                    msgBox.Ok, msgBox.Cancel)
-        if result == msgBox.Ok:
-            choice_tbl_made()  # заполняет db жеребьевка
-            system_competition()  # создает систему соревнований
+# def choice_table():
+#     """заполняется таблица жеребьевка из меню -создание системы-"""
+#     msgBox = QMessageBox()
+#     s = System.select().order_by(System.id.desc()).get()
+#     system = System.get(System.id == s)
+#     pl = Player.select()
+#     pl = len(pl)
+#     mp = system.total_athletes
+#     if mp == 0:  # система еще не создана (mp - всего человек в списке)
+#         result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
+#                                     msgBox.Ok, msgBox.Cancel)
+#         if result == msgBox.Ok:
+#             choice_tbl_made()  # заполняет db жеребьевка
+#             system_competition()  # создает систему соревнований
 
 
 def choice_gr_automat():
@@ -4813,6 +4804,7 @@ def progress_bar(step):
        result = msgBox.information(my_win, "Уведомление", "Жеребьевка завершена, проверьте ее результаты!", msgBox.Ok)
        if result == msgBox.Ok:
             my_win.progressBar.setValue(0)
+
     return step
 
 # def check_input(text):
@@ -4846,8 +4838,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == fin).get()
     choice = Choice.select().where(Choice.title_id == title_id())
+    # coun = len(choice)
     max_player = sys.total_athletes
-    # max_player = sys.max_player
   
     posevs = setka_choice_number(fin, count_exit)
     player_net = posevs[0]
@@ -4918,7 +4910,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             psv.append(rank)
             full_posev.append(psv)
         
-            # full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
         if fin != "1-й финал" or fin == "Одна таблица":
             full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
         else:
@@ -4950,8 +4941,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             if del_num == 1 and i == count_posev - 1:
                 for h in free_num:
                     sev.remove(h)
-                    # posev_data[h] = "X"
-                # free_seats = player_net // count_exit - count # сколько свободных мест в сетке
                 free_seats = len(free_num) # сколько свободных мест в сетке
                 count = len(posev[i]) - free_seats
                 del_num = 0
@@ -4963,7 +4952,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                     count_sev = len(sev) # количество номеров в посеве
                 else:
                     num_set = sev[0] # проверить
-                    # count_sev = len(sev) - free_seats # конкретное число оставшихся в посеве минус свободных мест(если они есть)
                     count_sev = len(sev) # конкретное число оставшихся в посеве минус свободных мест(если они есть)
                     if count_sev > 1: # если сеющихся номеров больше одного
                         if w == 0: # 1-й основной посев
@@ -4995,7 +4983,7 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                             # === выбор ручная или автомат ====
                             if flag is True:
                                 if len(num_set) == 0:
-                                    msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась,я повторите снова.")
+                                    msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась, повторите снова.")
                                     sorted_tuple = sorted(num_id_player.items(), key=lambda x: x[0])
                                     dict(sorted_tuple)                                    
                                     player_choice_in_setka(fin)
@@ -5059,9 +5047,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
                 if count_sev > 1:
                     c = len(current_region_posev)
                     if c != 0:
-                        # delete_free_seats(current_region_posev, possible_number, num_set, sev, l)
-                    # c = len(current_region_posev)
-                    # if c != 0:
                         del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
                         del current_region_posev[l] # удаляет из словаря текущий посеянный регион
                         if num_set in sev: # проверяет посеянный номер в посеве
@@ -5094,6 +5079,8 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             free_num.difference_update(key_set) # вычитаем из всех номеров те которые посеяны и остается номера -X-
             for h in free_num:
                 posev_data[h] = "X"
+            # sys.choice_flag = 1 # отмечает, что жеребьевка выполнена
+            # sys.save()
     return posev_data
 
 
@@ -5674,32 +5661,27 @@ def choice_setka(fin):
             system.choice_flag = False
             system.save()
         # ========= рано отмечает, что сделана жеребьевка
-    player_in_setka_and_write_Game_list_and_Result(fin)
+    # player_in_setka_and_write_Game_list_and_Result(fin)
     load_tableWidget()
 
 
 def choice_tbl_made():
     """создание таблицы жеребьевка, заполняет db списком участников для жеребьевки"""
     players = Player.select().order_by(Player.rank.desc()).where(Player.title_id == title_id())
-    system = System.select().where(System.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
-    for k in system:
-        stage = k.stage
-        if stage == "Одна таблица":            
-            if k.choice_flag is True:
-                system_competition()
-            sys = System(choice_flag=True).save()
-    chc = len(choice)
-    if chc == 0: # таблица DB -Choice- еще не заполнена
-        for i in players:
-            family = i.player
-            region = i.region
-            rank = i.rank
-            coach_id = i.coach_id
-            coachs =Coach.select().where(Coach.id == coach_id).get()
-            coach = coachs.coach
-            chc = Choice(player_choice=i, family=family, region=region, coach=coach, rank=rank,
-                         title_id=title_id()).save()
+    if len(choice) != 0:
+        for i in choice:
+            ch_d = Choice.get(Choice.id == i)
+            ch_d.delete_instance()
+    for i in players:
+        family = i.player
+        region = i.region
+        rank = i.rank
+        coach_id = i.coach_id
+        coachs =Coach.select().where(Coach.id == coach_id).get()
+        coach = coachs.coach
+        chc = Choice(player_choice=i, family=family, region=region, coach=coach, rank=rank,
+                    title_id=title_id()).save()
 
 
 def choice_filter_group():
@@ -5759,8 +5741,6 @@ def color_region_in_tableWidget(fg):
                             break
             rid = list(set(rid))  # получает список индексов повторяющихся регионов
             rows = my_win.tableWidget.rowCount()  # кол-во строк в отсортированной таблице
-            # for u in range(0, rows):
-            #     my_win.tableWidget.item(u, 3).setForeground(QBrush(QColor(0, 0, 0)))  # окрашивает текст в черный цвет
             if rows != 0:
                 for k in rid:
                     my_win.tableWidget.item(k, 3).setForeground(QBrush(QColor(255, 0, 0)))  # окрашивает текст в красный цвет
@@ -5900,13 +5880,6 @@ def total_game_table(kpt, fin, pv, cur_index):
                 msgBox.information(my_win, "Уведомление", txt)   
             add_open_tab(tab_page="Система")
 
-            # titles = Title.select().where(Title.id == title_id()).get()
-            # tab_enabled_str = titles.tab_enabled
-            # tab_list = tab_enabled_str.split(" ")
-            # if "Система" not in tab_list:
-            #     tab_enabled_str = tab_enabled_str + " Система"
-            #     titles.tab_enabled = tab_enabled_str
-            #     titles.save()
             result = msgBox.question(my_win, "", "Система соревнований создана.\n"
                                                  "Теперь необходимо сделать жеребъевку\n"
                                                  "предварительного этапа.\n"
@@ -6102,7 +6075,6 @@ def ready_choice(stage):
 def select_choice_final():
     """выбор жеребьевки финала"""
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    # vid = ["Автоматический", "Ручной"]
     fin = []
     for sys in system:
         if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
@@ -6236,7 +6208,7 @@ def kol_player_in_final():
             my_win.comboBox_page_vid.setCurrentText("альбомная")
         else: # система из одной таблицы по олимпийской системе
             my_win.comboBox_page_vid.setCurrentText("книжная")
-            vid = ["Автоматический", "Ручной"]
+            # vid = ["Автоматический", "Ручной"]
             cur_index = my_win.comboBox_one_table.currentIndex()
             total_game = 0
             if cur_index != 0:
@@ -6248,8 +6220,8 @@ def kol_player_in_final():
             my_win.label_33.setText(f"Всего: {total_game} игр.")
             my_win.label_50.setText(f"{count} человек в сетке.")
             my_win.comboBox_one_table.hide()
-            mesto_first_poseva = 1
-            count_exit = 1
+            # mesto_first_poseva = 1
+            # count_exit = 1
     else:
         if sender == my_win.comboBox_table:
             cur_index = my_win.comboBox_table.currentIndex()
@@ -7642,8 +7614,10 @@ def write_in_setka(data, fin, first_mesto, table):
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
             col_first = 0
             row_first = 2
-        all_list = setka_data(fin)
+        posev_data = setka_player_after_choice(fin)
+        all_list = setka_data(fin, posev_data)
         id_sh_name = all_list[2] # словарь {Фамилия Имя: id}
+        # id_sh_name = all_list[1] # словарь {Фамилия Имя: id}
     tds = []
     tds.append(all_list[0]) # список фамилия/ город 1-ого посева
     # ======
@@ -7688,11 +7662,11 @@ def write_in_setka(data, fin, first_mesto, table):
                 mesto = first_mesto + (index * 2)
                 # записывает места в таблицу -Player-
                 player = Player.get(Player.id == id_win)
-                win = f"{player.player}/ {player.city}"
+                win = f"{player.player}/{player.city}"
                 player.mesto = mesto
                 player.save()
                 player = Player.get(Player.id == id_los)
-                los = f"{player.player}/ {player.city}"
+                los = f"{player.player}/{player.city}"
                 player.mesto = mesto + 1
                 player.save()
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
@@ -7890,28 +7864,26 @@ def setka_player_after_choice(fin):
     return posev_data
 
 
-def setka_data(fin):
-    """данные сетки на 16"""
+def setka_data(fin, posev_data):
+    """данные сетки"""
     id_ful_name = {}
     id_name = {}
     tds = []
+    fam_name_city = []
     all_list = []
+
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     for sys in system:  # проходит циклом по всем отобранным записям
         if sys.stage == fin:
             mp = sys.total_athletes
-            flag = sys.choice_flag
-    if flag == True: # 
-        posev_data = setka_player_after_choice(fin) # получаем списки участников сетки после жеребьевки
-    else:
-        posev_data = player_choice_in_setka(fin)  # получаем списки участников сетки новой или повторной жеребьевки
-
+  
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
-        family = posev['фамилия']
-        id_f_name = full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
-        id_f_n = id_f_name[0] # словарь name: фамилия/город, id: номер игрока
-        id_s_n = id_f_name[1] # {name: фамилия, id: номер игрока}
+        family = posev['фамилия'] # фамилия имя / город
+        # id_f_name = full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
+        name_list = full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
+        id_f_n = name_list[0] # словарь name: фамилия/город, id: номер игрока
+        id_s_n = name_list[1] # {name: фамилия, id: номер игрока}
             # словарь ключ - полное имя/ город, значение - id
         id_ful_name[id_f_n["name"]] = id_f_n["id"]
         id_name[id_s_n["name"]] = id_s_n["id"]
@@ -7925,56 +7897,59 @@ def setka_data(fin):
             family_slice = family[:space + 2]
             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
             tds.append(family_city)
+            fam_name_city.append(family)
         else:
             tds.append(family)
+            fam_name_city.append(family)
     all_list.append(tds)
     all_list.append(id_ful_name)
     all_list.append(id_name)
+    all_list.append(fam_name_city)
     return all_list
 
 
-def setka_data_32(fin):
-    """данные сетки на 32"""
-    id_ful_name = {}
-    id_name = {}
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    for sys in system:  # проходит циклом по всем отобранным записям
-        if sys.stage == fin:
-            mp = sys.max_player
-            flag = sys.choice_flag
-    tds = []
-    all_list = []
-    if flag == True:
-        posev_data = setka_player_after_choice(fin) # получаем списки участников сетки после жеребьевки
-    else:
-        posev_data = player_choice_in_setka(fin)  # получаем списки участников сетки новой или повторной жеребьевки
+# def setka_data_32(fin):
+#     """данные сетки на 32"""
+#     id_ful_name = {}
+#     id_name = {}
+#     system = System.select().where(System.title_id == title_id())  # находит system id последнего
+#     for sys in system:  # проходит циклом по всем отобранным записям
+#         if sys.stage == fin:
+#             mp = sys.max_player
+#             flag = sys.choice_flag
+#     tds = []
+#     all_list = []
+#     if flag == True:
+#         posev_data = setka_player_after_choice(fin) # получаем списки участников сетки после жеребьевки
+#     else:
+#         posev_data = player_choice_in_setka(fin)  # получаем списки участников сетки новой или повторной жеребьевки
 
 
-    for i in range(1, mp * 2 + 1, 2):
-        posev = posev_data[((i + 1) // 2) - 1]
-        family = posev['фамилия']
-        if family != "X":
-            id_f_name = full_player_id(family)
-            id_f_n = id_f_name[0]
-            id_s_n = id_f_name[1]
-            # словарь ключ - полное имя/ город, значение - id
-            id_ful_name[id_f_n["name"]] = id_f_n["id"]
-            id_name[id_s_n["name"]] = id_s_n["id"]
-            # =================
-            # находит пробел отделяющий имя от фамилии
-            space = family.find(" ")
-            line = family.find("/")  # находит черту отделяющий имя от города
-            city_slice = family[line:]  # получает отдельно город
-            # получает отдельно фамилия и первую букву имени
-            family_slice = family[:space + 2]
-            family_city = f'{family_slice}.{city_slice}'   # все это соединяет
-            tds.append(family_city)
-        else:
-            tds.append(family)
-    all_list.append(tds)
-    all_list.append(id_ful_name)
-    all_list.append(id_name)
-    return all_list
+#     for i in range(1, mp * 2 + 1, 2):
+#         posev = posev_data[((i + 1) // 2) - 1]
+#         family = posev['фамилия']
+#         if family != "X":
+#             id_f_name = full_player_id(family)
+#             id_f_n = id_f_name[0]
+#             id_s_n = id_f_name[1]
+#             # словарь ключ - полное имя/ город, значение - id
+#             id_ful_name[id_f_n["name"]] = id_f_n["id"]
+#             id_name[id_s_n["name"]] = id_s_n["id"]
+#             # =================
+#             # находит пробел отделяющий имя от фамилии
+#             space = family.find(" ")
+#             line = family.find("/")  # находит черту отделяющий имя от города
+#             city_slice = family[line:]  # получает отдельно город
+#             # получает отдельно фамилия и первую букву имени
+#             family_slice = family[:space + 2]
+#             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
+#             tds.append(family_city)
+#         else:
+#             tds.append(family)
+#     all_list.append(tds)
+#     all_list.append(id_ful_name)
+#     all_list.append(id_name)
+#     return all_list
 
 
 def full_player_id(family):
@@ -7991,13 +7966,22 @@ def full_player_id(family):
         id_player = plr.id
         city = plr.city
         name = plr.player
+        # ====  вариант фамилия и имя
         space = name.find(" ")  # находит пробел отделяющий имя от фамилии
-        # получает отдельно фамилия и первую букву имени
         family_slice = name[:space + 2]
-        full_name["name"] = f"{family_slice}./ {city}"
+        full_name["name"] = f"{name}/{city}"
         full_name["id"] = id_player
-        short_name["name"] = f"{family_slice}."
+        short_name["name"] = f"{name}"
         short_name["id"] = id_player
+        # =======
+
+        # space = name.find(" ")  # находит пробел отделяющий имя от фамилии
+        # # получает отдельно фамилия и первую букву имени
+        # family_slice = name[:space + 2]
+        # full_name["name"] = f"{family_slice}./ {city}"
+        # full_name["id"] = id_player
+        # short_name["name"] = f"{family_slice}."
+        # short_name["id"] = id_player
     else:
         full_name["name"] = "X"
         full_name["id"] = 0
@@ -8803,7 +8787,6 @@ def player_choice_one_table(stage):
 def player_choice_in_setka(fin):
     """распределяет спортсменов в сетке согласно жеребьевке"""
     p_stage = []
-    vid = ["Автоматический", "Ручной"]
     system = System.select().where(System.title_id == title_id())
 
     flag = check_choice(fin)
@@ -8880,12 +8863,7 @@ def player_choice_in_setka(fin):
             count_exit = sys.max_player // syst.total_group
             mesto_first_poseva = sys.mesta_exit
 
-    vid, ok = QInputDialog.getItem(my_win, "Выбор жеребьевки", "Выберите режим жеребъевки", vid, 0, False)
-    if vid == "Автоматический":
-        flag = True
-    else:
-        flag = False
-            
+    flag = selection_of_the_draw_mode()
     posev = choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
 
     posev_data = []
