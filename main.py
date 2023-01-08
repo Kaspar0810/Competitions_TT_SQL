@@ -2652,15 +2652,28 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     заполняет таблицу -Result-"""
     s = System.select().where(System.title_id == title_id())  # находит system id последнего
     st = "Финальный"
+    game = 0
     if fin == "Одна таблица":
         st = "Одна таблица"
 
     for i in s:  # перебирает в цикле строки в табл System где последний titul_id
         if i.stage == fin:
             mp = i.total_athletes
-            mg = i.kol_game_string
-    space = mg.find(" ")
-    game = int(mg[:space])
+            system_table = i.label_string
+    if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
+        game = 12
+    elif system_table == "Сетка (-2) на 8 участников":
+        game = 14
+    elif system_table == "Сетка (с розыгрышем всех мест) на 16 участников":
+        game = 32
+    elif system_table == "Сетка (-2) на 16 участников":
+        game = 38
+    elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
+        game = 80
+    elif system_table == "Сетка (-2) на 32 участников":
+        game = 96
+    elif system_table == "Сетка (1-3 место) на 32 участников":
+        game = 32
     # создание сетки со спортсменами согласно жеребьевки
     all_list = setka_data(fin, posev_data)
     tds = all_list[1]
@@ -4072,17 +4085,21 @@ def enter_score(none_player=0):
         ts_loser = ""
         game_play = False
      # === убирает город ======
-    if flag == 0:
-        loser_fam_name = loser # оставляет -X-
-    else:
-        znak_los = loser.find("/")
-        loser_fam_name = loser[:znak_los]
+    if flag == 1:
+        znak_los = loser.find("/") # если игрок с городом, то удаляет название города
+        if znak_los != -1:
+            loser_fam_name = loser[:znak_los]
+        else:
+            loser_fam_name = loser
     znak_win = winner.find("/")
-    winner_fam_nam = winner[:znak_win]
+    if znak_win != -1:
+        winner_fam_name = winner[:znak_win]
+    else:
+        winner_fam_name = winner
 
     with db:  # записывает в таблицу -Result- сыгранный матч
         result = Result.get(Result.id == id)
-        result.winner = winner_fam_nam
+        result.winner = winner_fam_name
         result.points_win = w
         result.score_win = winner_string
         result.score_in_game = ts_winner
@@ -4126,7 +4143,7 @@ def enter_score(none_player=0):
                             #     else:
                             #         res_id.player2 = player
                             res_id.save()
-                            player = loser
+                            player = loser_fam_name
         elif type == "круг":
             pass
     fill_table_results()
@@ -4211,9 +4228,6 @@ def setka_type(none_player):
         l = ""
         st1 = ""
         st2 = ""
-        # winner_string = ""
-        # ts_winner = ""
-        # ts_loser = ""
     else:
         if none_player == 0:
             st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
@@ -5661,7 +5675,6 @@ def choice_setka(fin):
             system.choice_flag = False
             system.save()
         # ========= рано отмечает, что сделана жеребьевка
-    # player_in_setka_and_write_Game_list_and_Result(fin)
     load_tableWidget()
 
 
@@ -6220,8 +6233,6 @@ def kol_player_in_final():
             my_win.label_33.setText(f"Всего: {total_game} игр.")
             my_win.label_50.setText(f"{count} человек в сетке.")
             my_win.comboBox_one_table.hide()
-            # mesto_first_poseva = 1
-            # count_exit = 1
     else:
         if sender == my_win.comboBox_table:
             cur_index = my_win.comboBox_table.currentIndex()
@@ -7617,7 +7628,6 @@ def write_in_setka(data, fin, first_mesto, table):
         posev_data = setka_player_after_choice(fin)
         all_list = setka_data(fin, posev_data)
         id_sh_name = all_list[2] # словарь {Фамилия Имя: id}
-        # id_sh_name = all_list[1] # словарь {Фамилия Имя: id}
     tds = []
     tds.append(all_list[0]) # список фамилия/ город 1-ого посева
     # ======
@@ -7655,6 +7665,8 @@ def write_in_setka(data, fin, first_mesto, table):
                 id_win = id_sh_name[pl_win]
             if pl_los != "X":
                 id_los = id_sh_name[pl_los]
+            else:
+                id_los = ""
             r = str(match[3]) # сноска проигравшего
             # ===== определение итоговых мест и запись в db
             if i in mesta_list:
@@ -7665,10 +7677,13 @@ def write_in_setka(data, fin, first_mesto, table):
                 win = f"{player.player}/{player.city}"
                 player.mesto = mesto
                 player.save()
-                player = Player.get(Player.id == id_los)
-                los = f"{player.player}/{player.city}"
-                player.mesto = mesto + 1
-                player.save()
+                if id_los != "":
+                    player = Player.get(Player.id == id_los)
+                    los = f"{player.player}/{player.city}"
+                    player.mesto = mesto + 1
+                    player.save()
+                else:
+                    los = "X"
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
             c_mesto = 1
             # ========== расстановка для сетки на 16
@@ -7729,8 +7744,6 @@ def write_in_setka(data, fin, first_mesto, table):
             if c_mesto == 0: # если игры за место номер столбца меняется на +2
                 if table == "setka_16_2" and c != "28": # нет смещения по столбцам если игра за 3-е место (№ 28) сетка 16 минус 2
                     col_win += 2
-
-
             row_los = row_num_los[r]  # строка проигравшего
             score = match[2]  # счет во встречи
             row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
@@ -7738,7 +7751,6 @@ def write_in_setka(data, fin, first_mesto, table):
             data[row_win][col_win] = win
             data[row_win + 1][col_win] = score
             data[row_los][col_los + 1] = los
-
         return tds
 
 
@@ -7820,16 +7832,12 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
         tbl_tmp.append(s)
     for i in range(1, count_player_group * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
-        # fam = posev["фамилия"] # фамилия имя/id
-        # znak = fam.find("/")
-        # family = fam[:znak]
         tbl_tmp[i - 1][1] = posev["фамилия"]
         tbl_tmp[i][1] = posev["регион"]
  
     td = tbl_tmp.copy()  # cписок (номер, фамилия, город и пустые ячейки очков)
     td_color = []
 
-    # if tr != 0 and (tab == 3 or tab == 4 or tab == 5):  # если еще не была жеребьевка, то пропуск счета в группе
     if tr != 0:  # если еще не была жеребьевка, то пропуск счета в группе
         # список очки победителя красные (ряд, столбец) без заголовка
         td_color = score_in_table(td, num_gr)
@@ -7968,20 +7976,12 @@ def full_player_id(family):
         name = plr.player
         # ====  вариант фамилия и имя
         space = name.find(" ")  # находит пробел отделяющий имя от фамилии
-        family_slice = name[:space + 2]
+        # family_slice = name[:space + 2]
         full_name["name"] = f"{name}/{city}"
         full_name["id"] = id_player
         short_name["name"] = f"{name}"
         short_name["id"] = id_player
         # =======
-
-        # space = name.find(" ")  # находит пробел отделяющий имя от фамилии
-        # # получает отдельно фамилия и первую букву имени
-        # family_slice = name[:space + 2]
-        # full_name["name"] = f"{family_slice}./ {city}"
-        # full_name["id"] = id_player
-        # short_name["name"] = f"{family_slice}."
-        # short_name["id"] = id_player
     else:
         full_name["name"] = "X"
         full_name["id"] = 0
