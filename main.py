@@ -315,15 +315,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     if type == "круг":
                         one_table(fin, group)
                     else:
-                        choice_setka(fin)
-                    # add_open_tab(tab_page="Финалы")
+                        clear_db_before_choice_final(fin)
+                        posev_data = player_choice_in_setka(fin)
+                        player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
+                        load_combobox_filter_final()
                 else:
                     return
             else:
                 if type == "круг":
                     player_fin_on_circle(fin)
                 else:
-                    choice_setka(fin)
+                    posev_data = player_choice_in_setka(fin)
+                    player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
+                    load_combobox_filter_final()
             add_open_tab(tab_page="Финалы")
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
             for stage in system:
@@ -2507,13 +2511,9 @@ def one_table(fin, group):
                                                  "Хотите ее сделать сейчас?",
                                      msgBox.Ok, msgBox.Cancel)
             if result == msgBox.Ok:
-                # count_exit = 1
-                # mesto_first_poseva = 1
                 if type_table == "круг":  # функция жеребьевки таблицы по кругу
                     player_in_one_table(fin)
                 else:
-                    # flag = selection_of_the_draw_mode() # выбор вида жеребьевки сетки автомат или ручная
-                    # choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
                     posev_data = player_choice_in_setka(fin)
                     player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
                 add_open_tab(tab_page="Финалы")
@@ -4836,7 +4836,7 @@ def progress_bar(step):
 #             print('Введите число от 1 до 10')
 
 
-def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
+def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
     """автоматическая жеребьевка сетки, fin - финал, count_exit - сколько выходят в финал
     mesto_first_poseva - номер 1-ого места, flag - флаг вида жеребьевки ручная или автомат""" 
     msgBox = QMessageBox 
@@ -4852,7 +4852,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
     system = System.select().where(System.title_id == title_id())
     sys = system.select().where(System.stage == fin).get()
     choice = Choice.select().where(Choice.title_id == title_id())
-    # coun = len(choice)
     max_player = sys.total_athletes
   
     posevs = setka_choice_number(fin, count_exit)
@@ -5093,8 +5092,6 @@ def choice_setka_automat(fin, count_exit, mesto_first_poseva, flag):
             free_num.difference_update(key_set) # вычитаем из всех номеров те которые посеяны и остается номера -X-
             for h in free_num:
                 posev_data[h] = "X"
-            # sys.choice_flag = 1 # отмечает, что жеребьевка выполнена
-            # sys.save()
     return posev_data
 
 
@@ -8864,7 +8861,7 @@ def player_choice_in_setka(fin):
             mesto_first_poseva = sys.mesta_exit
 
     flag = selection_of_the_draw_mode()
-    posev = choice_setka_automat(fin, count_exit, mesto_first_poseva, flag)
+    posev = choice_setka_automat(fin, flag, count_exit, mesto_first_poseva)
 
     posev_data = []
     for key in posev.keys():
