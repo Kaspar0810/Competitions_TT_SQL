@@ -765,7 +765,6 @@ def region():
 
 fir_window = StartWindow()  # Создаём объект класса ExampleApp
 fir_window.show()  # Показываем окно
-# my_win.tabWidget.setCurrentIndex(0)
 
 
 def change_sroki():
@@ -934,8 +933,7 @@ def enabled_menu_after_choice():
             elif stage == "4-й финал":
                 my_win.view_fin4_Action.setEnabled(True)
         stage = k.stage
-        # if stage == "":
-        #     return
+
         if stage == "Одна таблица":
             my_win.choice_one_table_Action.setEnabled(True)
         elif stage == "Предварительный":
