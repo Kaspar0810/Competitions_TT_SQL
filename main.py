@@ -2715,7 +2715,6 @@ def player_in_one_table(fin):
     system = System.select().where(System.title_id == title_id())
     sys_id = system.select().where(System.stage == fin).get()
     system_id = sys_id.id
-    # count = len(choice)
     k = 0
     for p in choice:  # цикл заполнения db таблиц -game list-
         k += 1
@@ -2749,7 +2748,6 @@ def player_fin_on_circle(fin):
      td - список списков данных из групп"""
     fin_dict = {}
     fin_list = []
-    # player_final = {}
     parametrs_final = {}
     mesto = 1
     players = Player.select().where(Player.title_id == title_id())
@@ -5839,7 +5837,7 @@ def total_game_table(kpt, fin, pv, cur_index):
             player_in_final = balance
         # == уточнить если в группах не равное кол-во участников то и в финале не будет выход из группы умножить на колво групп
 
-        total_games = numbers_of_games(cur_index, player_in_final)  # подсчет кол-во игр
+        total_games = numbers_of_games(cur_index, player_in_final, kpt) # подсчет кол-во игр
 
         pv = my_win.comboBox_page_vid.currentText()
         str_setka = f"{vt} {player_in_final} участников"
@@ -5916,8 +5914,11 @@ def total_game_table(kpt, fin, pv, cur_index):
 
 
 
-def numbers_of_games(cur_index, player_in_final):
+def numbers_of_games(cur_index, player_in_final, kpt):
     """подсчет количество игр в зависимости от системы (пока сетки на 16)"""
+    systems = System.select().where(System.title_id == title_id())
+    system = systems.select().where(System.stage == "Предварительный").get()
+    gr = system.total_group
     if cur_index == 1:  # сетка - 2
         if player_in_final == 16:
             total_games = 38
@@ -5938,7 +5939,11 @@ def numbers_of_games(cur_index, player_in_final):
     elif cur_index == 3:  # сетка с розыгрышем призовых мест
         pass
     else: # игры в круг
-        total_games = (player_in_final * (player_in_final - 1)) // 2
+        if kpt > 1:
+            total_games = (player_in_final * (player_in_final - 1)) // 2
+            total_games = total_games - ((kpt - 1) * gr)
+        else:
+            total_games = (player_in_final * (player_in_final - 1)) // 2
     return total_games
 
 
@@ -6216,7 +6221,6 @@ def kol_player_in_final():
             my_win.comboBox_page_vid.setCurrentText("альбомная")
         else: # система из одной таблицы по олимпийской системе
             my_win.comboBox_page_vid.setCurrentText("книжная")
-            # vid = ["Автоматический", "Ручной"]
             cur_index = my_win.comboBox_one_table.currentIndex()
             total_game = 0
             if cur_index != 0:
