@@ -5831,6 +5831,8 @@ def total_game_table(kpt, fin, pv, cur_index):
             type_table = "круг"
 # =========================
         all_player_in_final = total_gr * kpt + sum_pl # общее кол-во спортсменов во всех финалах
+        # ===== определяем точное кол-во участников в финале
+         
         player_in_final = total_gr * kpt # колво участников в конкретном финале
         if all_player_in_final > total_player:
             balance = total_player - sum_pl
