@@ -5832,7 +5832,7 @@ def total_game_table(kpt, fin, pv, cur_index):
 # =========================
         all_player_in_final = total_gr * kpt + sum_pl # общее кол-во спортсменов во всех финалах
         # ===== определяем точное кол-во участников в финале
-         
+        total_games_in_final_without_group_games(player_in_final, total_gr, kpt)
         player_in_final = total_gr * kpt # колво участников в конкретном финале
         if all_player_in_final > total_player:
             balance = total_player - sum_pl
@@ -5915,6 +5915,21 @@ def total_game_table(kpt, fin, pv, cur_index):
             my_win.comboBox_page_vid.setEnabled(True)
 
 
+def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
+    """всего игр в финале без учета сыранных игр в предварительном этап"""
+    # остаток отделения, если 0, то участники равно делится на группы
+    remains = player_in_final % int(total_gr)
+    # если количество участников равно делится на группы (кол-во групп)
+    p = player_in_final // int(total_gr)
+    g1 = int(total_gr) - remains  # кол-во групп, где наименьшее кол-во спортсменов
+    g2 = int(p + 1)  # кол-во человек в группе с наибольшим их количеством
+    if remains == 0:  # то в группах равное количество человек -e1-"
+        skg = int((p * (p - 1) / 2) * int(total_gr))
+        mp = p
+    else:
+        skg = int((((p * (p - 1)) / 2 * g1) + ((g2 * (g2 - 1)) / 2 * remains))) # общее количество игр в группах
+        mp = g2
+
 
 def numbers_of_games(cur_index, player_in_final, kpt):
     """подсчет количество игр в зависимости от системы (пока сетки на 16)"""
@@ -5941,6 +5956,7 @@ def numbers_of_games(cur_index, player_in_final, kpt):
     elif cur_index == 3:  # сетка с розыгрышем призовых мест
         pass
     else: # игры в круг
+        total_game = total_games_in_final_without_group_games(player_in_final, gr, kpt)
         if kpt > 1:
             total_games = (player_in_final * (player_in_final - 1)) // 2
             total_games = total_games - ((kpt - 1) * gr)
