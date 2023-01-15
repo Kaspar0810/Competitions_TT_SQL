@@ -5531,11 +5531,22 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
             tmp = current_region_group[i] 
             kol_reg = len(tmp)  # колво регионов (посевов)
             kol_group_free[i] = kol_reg
+        # =====
+        sorted_tuple = sorted(kol_group_free.items(), key=lambda x: x[1])
+        kol_group_free = dict(sorted_tuple)
+        # =====
         free_list = list(kol_group_free.values())  # список кол-во свободных групп, куда можно сеять
         reg_list = list(kol_group_free.keys())  # список ключей (регионов)
         last = len(reg_list)  # кол-во остатка посева
-        region = key_reg_current[0]  # номер региона, который сейчас сеется
-        free_gr = kol_group_free[region]  # кол-во групп куда можно сеять
+        # for i in kol_group_free:  # получение словаря (регион и кол-во мест (групп) куда можно сеять)
+        #     tmp = current_region_group[i] 
+        #     kol_reg = len(tmp)  # колво регионов (посевов)
+        #     kol_group_free[i] = kol_reg
+        region = reg_list[0]  # номер региона, который сейчас сеется
+        free_gr = kol_group_free[i]  # кол-во групп куда можно сеять
+        # ==== сделать последний посев по наименшему количеству вариантов посева
+
+        # =========================
         if 1 in free_list and last > 1 or last == 1 and free_gr == 1 :  # проверка есть ли группа где осталось только одно места для посева
             # сделать посев 1 регион но много групп
             region = reg_list[free_list.index(1)]  # регион если в списке free list есть значение -1-, т.е. осталась одна группа
