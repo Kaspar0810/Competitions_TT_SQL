@@ -5832,8 +5832,8 @@ def total_game_table(kpt, fin, pv, cur_index):
 # =========================
         all_player_in_final = total_gr * kpt + sum_pl # общее кол-во спортсменов во всех финалах
         # ===== определяем точное кол-во участников в финале
-        total_games_in_final_without_group_games(player_in_final, total_gr, kpt)
         player_in_final = total_gr * kpt # колво участников в конкретном финале
+        # total_games_in_final_without_group_games(player_in_final, total_gr, kpt)
         if all_player_in_final > total_player:
             balance = total_player - sum_pl
             player_in_final = balance
@@ -5919,16 +5919,17 @@ def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
     """всего игр в финале без учета сыранных игр в предварительном этап"""
     # остаток отделения, если 0, то участники равно делится на группы
     remains = player_in_final % int(total_gr)
-    # если количество участников равно делится на группы (кол-во групп)
-    p = player_in_final // int(total_gr)
-    g1 = int(total_gr) - remains  # кол-во групп, где наименьшее кол-во спортсменов
-    g2 = int(p + 1)  # кол-во человек в группе с наибольшим их количеством
-    if remains == 0:  # то в группах равное количество человек -e1-"
-        skg = int((p * (p - 1) / 2) * int(total_gr))
-        mp = p
+    if remains == 0:  # если в группах равное количество человек
+        playing_game = (kpt * (kpt - 1)) // 2 * total_gr
     else:
-        skg = int((((p * (p - 1)) / 2 * g1) + ((g2 * (g2 - 1)) / 2 * remains))) # общее количество игр в группах
-        mp = g2
+        full_group = player_in_final // kpt # кол-во групп с полным количеством участников
+        no_full_group = total_gr - remains
+        playing_game_in_full_group = (kpt * (kpt - 1)) // 2 * full_group
+        kpt_min = kpt - 1
+        playing_game_in_no_full_group = (kpt_min * (kpt_min - 1)) // 2 * no_full_group
+        playing_game = playing_game_in_full_group + playing_game_in_no_full_group
+    total_games = (player_in_final * (player_in_final - 1)) // 2 - playing_game
+    return total_games
 
 
 def numbers_of_games(cur_index, player_in_final, kpt):
@@ -5956,12 +5957,7 @@ def numbers_of_games(cur_index, player_in_final, kpt):
     elif cur_index == 3:  # сетка с розыгрышем призовых мест
         pass
     else: # игры в круг
-        total_game = total_games_in_final_without_group_games(player_in_final, gr, kpt)
-        if kpt > 1:
-            total_games = (player_in_final * (player_in_final - 1)) // 2
-            total_games = total_games - ((kpt - 1) * gr)
-        else:
-            total_games = (player_in_final * (player_in_final - 1)) // 2
+        total_games = total_games_in_final_without_group_games(player_in_final, gr, kpt)
     return total_games
 
 
@@ -6437,6 +6433,17 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     tdt_all = table_data(stage, kg)  # данные результатов в группах
     # данные результатов победителей в группах для окрашивания очков в красный цвет
     tdt_new = tdt_all[0]
+    # убирает id от фамилии и перезаписывает tdt_new
+    l = 0
+    for group in tdt_new:
+        for z in group:
+            if l % 2 == 0:
+                fam_id = z[1]
+                znak = fam_id.find("/")
+                family = fam_id[:znak]
+                z[1] = family 
+            l += 1
+
     for k in tdt_new:
         tdt_temp = k.copy()
         k.clear()
