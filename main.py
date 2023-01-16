@@ -8075,6 +8075,11 @@ def score_in_table(td, num_gr):
 
         win = str(list(result_list[i].values())[6])
         player1 = str(list(result_list[i].values())[4])
+        # ==== убираю город из фамилии, чтоб сравнивать игроков 
+        znak_player1 = player1.find("/") # если игрок с городом, то удаляет название города
+        if znak_player1 != -1:
+            player1 = player1[:znak_player1]
+        # ==============
         if win != "" and win != "None":  # если нет сыгранной встречи данного тура
             if win == player1:  # если победитель игрок под первым номером в туре
                 # очки 1-ого игрока
