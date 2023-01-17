@@ -7864,7 +7864,12 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
         tbl_tmp.append(s)
     for i in range(1, count_player_group * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
-        tbl_tmp[i - 1][1] = posev["фамилия"]
+        fam_id = posev["фамилия"]
+        znak = fam_id.find("/")
+        if znak != -1:
+            tbl_tmp[i - 1][1] = fam_id[:znak]
+        else:
+            tbl_tmp[i - 1][1] = posev["фамилия"]
         tbl_tmp[i][1] = posev["регион"]
  
     td = tbl_tmp.copy()  # cписок (номер, фамилия, город и пустые ячейки очков)
@@ -8136,10 +8141,15 @@ def score_in_table(td, num_gr):
         results = result.select().where(Result.system_stage == num_gr)
     else:
         results = result.select().where(Result.number_group == num_gr)
-    a = 0
-    for r in results:
-        if r.points_win == 2:
-            a += 1
+
+    results_playing = results.select().where(Result.points_win == 2)
+    a = len(results_playing) # кол-во сыгранных игр
+
+
+    # a = 0
+    # for r in results:
+    #     if r.points_win == 2:
+    #         a += 1
     if a == count_game:
         rank_in_group(total_score, td, num_gr)  # определяет места в группе
 
@@ -8348,7 +8358,7 @@ def rank_in_group(total_score, td, num_gr):
         # если кол-во очков у двух спортсмена (определение мест по игре между собой)
         elif m_new == 2:
             player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr)
-        elif m_new == 3:
+        elif m_new == 3: # если кол-во очков у трех спортсмена
             men_of_circle = m_new
             # получает список 1-й уникальные
             u = summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr)
@@ -8488,7 +8498,9 @@ def tour_circle(pp, per_circ, circ):
 
 
 def summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr):
-    """подсчитывает сумму очков у спортсменов в крутиловке"""
+    """подсчитывает сумму очков у спортсменов в крутиловке 
+    -tr- номера игроков в группе, у которых крутиловка
+    -tr_all- все варианты встреч в крутиловке"""
     pp_all = []
     u = []
     tr_all.clear()
@@ -8667,7 +8679,15 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
     else:
         res = result.select().where(Result.number_group == num_gr)
     c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу
-    if c.winner == c.player1:  # победил 1-й игрок
+    # ====== оставляем только фамилия и имя, без города
+    family = c.player1
+    znak_city = family.find("/")
+    if znak_city != -1:
+        fam_name = family[:znak_city]
+    else:
+        fam_name = c.player1
+    # ===============
+    if c.winner == fam_name:  # победил 1-й игрок
         points_p1 = c.points_win  # очки победителя
         points_p2 = c.points_loser  # очки проигравшего
         # счет во встречи (выигранные и проигранные партии) победителя
@@ -8731,8 +8751,15 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr):
         g_len = len(g)
         g = g[1:g_len - 1]
         sc_game = g.split(",")
-
-        if c.winner == c.player1:  # победил 1-й игрок
+        # ====== оставляем только фамилия и имя, без города
+        family = c.player1
+        znak_city = family.find("/")
+        if znak_city != -1:
+            fam_name = family[:znak_city]
+        else:
+            fam_name = c.player1
+        # ===============
+        if c.winner == fam_name:  # победил 1-й игрок
             for i in sc_game:
                 i = int(i)
                 if i < 0:
