@@ -3577,7 +3577,6 @@ def filter_player_list(sender):
         elif region != "" and city == "":
             player_list = player.select().where(Player.region == region)
 
-
     elif sender == my_win.Button_reset_fltr_list:
         player_list = Player.select().where(Player.title_id == title_id())
         my_win.comboBox_fltr_region.setCurrentIndex(0)
@@ -4133,11 +4132,6 @@ def enter_score(none_player=0):
                                 res_id.player1 = player
                             else:
                                 res_id.player2 = player
-                            # else:
-                            #     if int(match_num) % 2 != 0:
-                            #         res_id.player1 = player
-                            #     else:
-                            #         res_id.player2 = player
                             res_id.save()
                             player = loser_fam_name
         elif type == "круг":
@@ -6451,7 +6445,10 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
             if l % 2 == 0:
                 fam_id = z[1]
                 znak = fam_id.find("/")
-                family = fam_id[:znak]
+                if znak != -1:
+                    family = fam_id[:znak]
+                else:
+                    family = fam_id
                 z[1] = family 
             l += 1
 
@@ -7817,7 +7814,7 @@ def kol_player():
     return max_gamer
 
 
-def table_data(stage, kg):
+def  table_data(stage, kg):
     """циклом создаем список участников каждой группы или финалов если играют по кругу"""
     tdt_all = []  # список списков [tdt_new] и [tdt_color]
     tdt_color = []
