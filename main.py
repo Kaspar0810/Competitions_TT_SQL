@@ -243,12 +243,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def _connectActions(self):
         # Connect File actions
-        # self.newAction.triggered.connect(self.newFile)
         self.system_made_Action.triggered.connect(self.system_made)
         self.system_edit_Action.triggered.connect(self.system_made)
         self.vid_edit_Action.triggered.connect(self.vid_edit)
         self.exitAction.triggered.connect(self.exit)
-        # self.savelist_Action.triggered.connect(self.saveList)
         self.choice_one_table_Action.triggered.connect(self.choice)
         self.choice_gr_Action.triggered.connect(self.choice)
         self.choice_pf_Action.triggered.connect(self.choice)
@@ -405,10 +403,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                                                             
                                                         msg.Ok,
                                                         msg.Cancel)
-                            if reply == msg.Ok:
-                                load_playing_game_in_table_for_final(fin)
-                            else:
-                                return
+                                if reply == msg.Ok:
+                                    load_playing_game_in_table_for_final(fin)
+                                else:
+                                    return
                         else:
                             choice_setka(fin)
                 else:
@@ -4004,9 +4002,9 @@ def enter_score(none_player=0):
     num_game = my_win.tableWidget.item(r, 3).text()
     fin = my_win.tableWidget.item(r, 2).text()
        
-    if tab == 3:
+    if tab == 3: # группы
         stage = "Предварительный"
-    elif tab == 4:
+    elif tab == 4:# полуфиналы
         pass
     else:  # финальный
         if fin == "1 группа":
@@ -4017,7 +4015,7 @@ def enter_score(none_player=0):
     sys = System.select().where(System.title_id == title_id())
     system = sys.select().where(System.stage == stage).get()
     type = system.type_table
-
+    flag = 0
     if stage == "Предварительный":
         sc_total = circle_type(none_player, stage)
     elif stage == "Полуфиналы":
@@ -4025,18 +4023,20 @@ def enter_score(none_player=0):
     elif stage == "Одна таблица":
         if type == "сетка":
             sc_total = setka_type(none_player)
+            flag = 1
         else:
             sc_total = circle_type(none_player, stage)
     else:  # финалы
         if type == "сетка":
             sc_total = setka_type(none_player)
+            flag = 1
         else:  # по кругу
             sc_total = circle_type(none_player, stage)
     st1 = sc_total[0]  # партия выигранные
     st2 = sc_total[1]  # партии проигранные
     w = sc_total[2]  # очки победителя
     l = sc_total[3]  # очки проигравшего
-    flag = 1
+
     if my_win.lineEdit_player1_fin.text() != "X" and my_win.lineEdit_player2_fin.text() != "X":
         if st1 > st2 or none_player == 2:  # выиграл 1-й участник
             if tab == 3:
@@ -4066,7 +4066,6 @@ def enter_score(none_player=0):
             if type == "сетка":
                 winner_string = ""
     else: # если нет одного игрока -X-
-        flag = 0 #
         if my_win.lineEdit_player1_fin.text() == "X":
             winner = my_win.lineEdit_player2_fin.text()
             loser = my_win.lineEdit_player1_fin.text()
@@ -4074,31 +4073,27 @@ def enter_score(none_player=0):
             winner = my_win.lineEdit_player1_fin.text()
             loser = my_win.lineEdit_player2_fin.text()
         loser_fam_name = loser # оставляет -X-
-        # === убирает город ======
         winner_string = ""
         ts_winner = ""
         ts_loser = ""
         game_play = False
      # === убирает город ======
-    if flag == 1:
+    if flag == 1: # если сетка, то убирает город
         znak_los = loser.find("/") # если игрок с городом, то удаляет название города
         if znak_los != -1:
-            loser_fam_name = loser[:znak_los]
-        else:
-            loser_fam_name = loser
-    znak_win = winner.find("/")
-    if znak_win != -1:
-        winner_fam_name = winner[:znak_win]
-    else:
-        winner_fam_name = winner
+            loser = loser[:znak_los]
 
-    with db:  # записывает в таблицу -Result- сыгранный матч
+        znak_win = winner.find("/")
+        if znak_win != -1:
+            winner = winner[:znak_win]
+
+    with db:  # записывает в таблицу -Result- сыгранный матч в группах или финал по кругу
         result = Result.get(Result.id == id)
-        result.winner = winner_fam_name
+        result.winner = winner
         result.points_win = w
         result.score_win = winner_string
         result.score_in_game = ts_winner
-        result.loser = loser_fam_name
+        result.loser = loser
         result.points_loser = l
         result.score_loser = ts_loser
         result.save()
@@ -8078,9 +8073,9 @@ def score_in_table(td, num_gr):
         win = str(list(result_list[i].values())[6])
         player1 = str(list(result_list[i].values())[4])
         # ==== убираю город из фамилии, чтоб сравнивать игроков 
-        znak_player1 = player1.find("/") # если игрок с городом, то удаляет название города
-        if znak_player1 != -1:
-            player1 = player1[:znak_player1]
+        # znak_player1 = player1.find("/") # если игрок с городом, то удаляет название города
+        # if znak_player1 != -1:
+        #     player1 = player1[:znak_player1]
         # ==============
         if win != "" and win != "None":  # если нет сыгранной встречи данного тура
             if win == player1:  # если победитель игрок под первым номером в туре
@@ -8145,11 +8140,6 @@ def score_in_table(td, num_gr):
     results_playing = results.select().where(Result.points_win == 2)
     a = len(results_playing) # кол-во сыгранных игр
 
-
-    # a = 0
-    # for r in results:
-    #     if r.points_win == 2:
-    #         a += 1
     if a == count_game:
         rank_in_group(total_score, td, num_gr)  # определяет места в группе
 
@@ -8680,14 +8670,14 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         res = result.select().where(Result.number_group == num_gr)
     c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу
     # ====== оставляем только фамилия и имя, без города
-    family = c.player1
-    znak_city = family.find("/")
-    if znak_city != -1:
-        fam_name = family[:znak_city]
-    else:
-        fam_name = c.player1
+    # family = c.player1
+    # znak_city = family.find("/")
+    # if znak_city != -1:
+    #     fam_name = family[:znak_city]
+    # else:
+    #     fam_name = c.player1
     # ===============
-    if c.winner == fam_name:  # победил 1-й игрок
+    if c.winner == c.player1:  # победил 1-й игрок
         points_p1 = c.points_win  # очки победителя
         points_p2 = c.points_loser  # очки проигравшего
         # счет во встречи (выигранные и проигранные партии) победителя
@@ -8752,14 +8742,14 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr):
         g = g[1:g_len - 1]
         sc_game = g.split(",")
         # ====== оставляем только фамилия и имя, без города
-        family = c.player1
-        znak_city = family.find("/")
-        if znak_city != -1:
-            fam_name = family[:znak_city]
-        else:
-            fam_name = c.player1
+        # family = c.player1
+        # znak_city = family.find("/")
+        # if znak_city != -1:
+        #     fam_name = family[:znak_city]
+        # else:
+        #     fam_name = c.player1
         # ===============
-        if c.winner == fam_name:  # победил 1-й игрок
+        if c.winner == c.player1:  # победил 1-й игрок
             for i in sc_game:
                 i = int(i)
                 if i < 0:
