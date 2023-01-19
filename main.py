@@ -1422,7 +1422,7 @@ def input_player():
 
 
 def next_field():
-    """переход к соледующему полю ввода спортсмена"""
+    """переход к следующему полю ввода спортсмена"""
     my_win.lineEdit_R.setText('0')
     pl = my_win.lineEdit_Family_name.text()
     check_rejting_pay(pl, txt_edit="")
@@ -1675,7 +1675,7 @@ def debtor_R():
     fill_table(player_debtor)
 
 
-def add_player():
+def add_player(): 
     """добавляет игрока в список и базу данных"""
     player_list = Player.select().where(Player.title_id == title_id())
     txt = my_win.Button_add_edit_player.text()
@@ -1720,7 +1720,8 @@ def add_player():
             comment = player_del.comment
             player_del.delete_instance()
             plr = Player(player_id=player_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-                         razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
+                         razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
+                         comment=comment).save()
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
         if txt == "Редактировать":
@@ -2153,19 +2154,19 @@ def sort():
     list_player_pdf(player_list)
 
 
-def button_etap_made_enabled(state):
-    """включает кнопку - создание таблиц - если отмечен чекбокс, защита от случайного нажатия"""
-    if state == 2:
-        my_win.tabWidget.setTabEnabled(2, True)
-        pass
-        # my_win.Button_etap_made.setEnabled(True)
-        # my_win.Button_2etap_made.setEnabled(True)
-        # my_win.spinBox_kol_group.show()
-    else:
-        pass
-        # my_win.Button_1etap_made.setEnabled(False)
-        # my_win.Button_2etap_made.setEnabled(False)
-        # my_win.spinBox_kol_group.hide()
+# def button_etap_made_enabled(state):
+#     """включает кнопку - создание таблиц - если отмечен чекбокс, защита от случайного нажатия"""
+#     if state == 2:
+#         my_win.tabWidget.setTabEnabled(2, True)
+#         pass
+#         # my_win.Button_etap_made.setEnabled(True)
+#         # my_win.Button_2etap_made.setEnabled(True)
+#         # my_win.spinBox_kol_group.show()
+#     else:
+#         pass
+#         # my_win.Button_1etap_made.setEnabled(False)
+#         # my_win.Button_2etap_made.setEnabled(False)
+#         # my_win.spinBox_kol_group.hide()
 
 
 def button_title_made_enable(state):
@@ -6467,6 +6468,186 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
             ts.add('TEXTCOLOR', (col, row + 1), (col, row + 1), colors.red)  # красный цвет очков победителя
         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
     return dict_tbl
+
+
+def begunki_made(pv, stage):
+    """создание бегунков"""
+    from reportlab.platypus import Table
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    for s_id in system:
+        if s_id.stage == stage:
+            max_pl = s_id.max_player
+            type_tbl = s_id.type_table
+            break
+    if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
+        kg = 1
+    else:  # групповые игры
+        kg = s_id.total_group  # кол-во групп
+        
+    family_col = 3.2
+    # if pv == "альбомная":  # альбомная ориентация стр
+    #     pv = landscape(A4)
+    #     if kg == 1 or max_pl in [10, 11, 12, 13, 14, 15, 16]:
+    #         # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
+    #         wcells = 21.4 / max_pl
+    #     else:
+    #         # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
+    #         wcells = 7.4 / max_pl
+    # else:  # книжная ориентация стр
+    #     pv = A4
+    #     if max_pl < 7:
+    #         family_col = 4.0
+    #         wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
+    #     else:
+    #         family_col = 3.2
+    #         wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
+    # col = ((wcells * cm,) * max_pl)
+    elements = []
+
+    # кол-во столбцов в таблице и их ширина
+    cW = (3 * cm, 1.5 * cm, 1.5 * cm)
+    # if kg == 1:
+    rH = (0.8 * cm)  # высота строки
+    # else:
+    #     rH = (0.34 * cm)  # высота строки
+    # rH = None  # высота строки
+    num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
+
+    # for i in range(max_pl):
+    #     i += 1
+    #     i = str(i)
+    #     num_columns.append(i)
+    # zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
+
+    tblstyle = []
+    # =========  цикл создания стиля таблицы ================
+    for q in range(1, max_pl + 1):  # город участника делает курсивом
+        # город участника делает курсивом
+        fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
+        tblstyle.append(fn)
+        fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1),
+              "DejaVuSerif-Bold")  # участника делает жирным шрифтом
+        tblstyle.append(fn)
+        # центрирование текста в ячейках)
+        fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')
+        tblstyle.append(fn)
+        # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
+        fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))
+        tblstyle.append(fn)
+        # объединяет клетки очки
+        fn = ('SPAN', (max_pl + 2, q * 2 - 1), (max_pl + 2, q * 2))
+        tblstyle.append(fn)
+        # объединяет клетки соот
+        fn = ('SPAN', (max_pl + 3, q * 2 - 1), (max_pl + 3, q * 2))
+        tblstyle.append(fn)
+        # объединяет клетки  место
+        fn = ('SPAN', (max_pl + 4, q * 2 - 1), (max_pl + 4, q * 2))
+        tblstyle.append(fn)
+        # объединяет диагональные клетки
+        fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
+        tblstyle.append(fn)
+        fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
+              colors.lightgreen)  # заливает диагональные клетки
+        tblstyle.append(fn)
+
+    ts = []
+    ts.append(tblstyle)
+    # ============= полный стиль таблицы ======================
+    ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
+                     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                     ('FONTSIZE', (0, 0), (-1, -1), 7),
+                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                     ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
+                     ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
+                    + tblstyle +
+                    [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
+                     # цвет шрифта в ячейках
+                     ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
+                     ('LINEABOVE', (0, 0), (-1, 1), 1,
+                      colors.black),  # цвет линий нижней
+                     # цвет и толщину внутренних линий
+                     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                     ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
+
+    #  ============ создание таблиц и вставка данных =================
+    # h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+    #         leftIndent=150)  # стиль параграфа (номера таблиц)
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+            #========
+    # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+    dict_table = tbl(cW, rH)
+    if kg == 1:  # одна таблицу
+        data = [[dict_table[0]]]
+        shell_table = Table(data, colWidths=["*"])
+        elements.append(shell_table)
+    else:
+        data_tmp = []
+        data_temp = []
+        tmp = []
+        temp = []
+        data = []
+        if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+            for k in range(1, kg // 2 + 1):
+                for i in range(0, 2):
+                    data_tmp.append(dict_table[(k * 2 - 2) + i])  
+                tmp = data_tmp.copy()
+                data_temp.append(tmp) 
+                temp = data_temp.copy()
+                data.append(temp)
+                data_tmp.clear()
+                data_temp.clear()
+            shell_table = []
+            s_tmp = []
+            for l in range(0, kg // 2): 
+                shell_tmp = Table(data[l], colWidths=["*"])
+                s_tmp.append(shell_tmp)
+                tmp_copy = s_tmp.copy()
+                shell_table.append(tmp_copy)
+                s_tmp.clear()
+                text = f'группа {l * 2 + 1} группа {l * 2 + 2}'
+                elements.append(Paragraph(text, h2))
+                elements.append(shell_table[l][0])
+        else:  # страница книжная, то таблицы размещаются обе в столбец
+            for k in range(1, kg // 2 + 1):
+                for i in range(0, kg):
+                    data_tmp.append(dict_table[i])  
+                    tmp = data_tmp.copy()
+                    data_temp.append(tmp) 
+                    temp = data_temp.copy()
+                    data.append(temp)
+                    data_tmp.clear()
+                    data_temp.clear()
+            shell_table = []
+            s_tmp = []
+            for l in range(0, kg): 
+                shell_tmp = Table(data[l], colWidths=["*"])
+                s_tmp.append(shell_tmp)
+                tmp_copy = s_tmp.copy()
+                shell_table.append(tmp_copy)
+                s_tmp.clear()
+                elements.append(Paragraph(f'группа {l + 1}', h2))
+                elements.append(shell_table[l][0])
+
+    if pv == A4:
+        pv = A4
+    else:
+        pv = landscape(A4)
+    t_id = Title.get(Title.id == title_id())
+    short_name = t_id.short_name_comp
+
+    if stage == "Одна таблица":
+        name_table = f"{short_name}_one_table.pdf"
+    elif stage == "Предварительный":
+        name_table = f"{short_name}_table_group.pdf"
+    else:
+        txt = stage.rfind("-")
+        number_fin = stage[:txt]
+        name_table = f"{short_name}_{number_fin}-финал.pdf"
+    doc = SimpleDocTemplate(name_table, pagesize=pv)
+    change_dir()
+    doc.build(elements)
+    change_dir()
 
 
 def table_made(pv, stage):
