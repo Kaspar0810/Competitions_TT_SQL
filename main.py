@@ -9933,7 +9933,7 @@ my_win.Button_Ok.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 
-# my_win.Button_proba.clicked.connect(proba)
+my_win.Button_proba.clicked.connect(begunki_made)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
