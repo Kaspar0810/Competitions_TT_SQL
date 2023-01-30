@@ -6470,19 +6470,67 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     return dict_tbl
 
 
-def begunki_made(pv, stage):
+def tbl_begunki(cW, rH):
+    """данные таблицы и применение стиля и добавления заголовка столбцов
+    tdt_new - [[[участник],[регион счет в партиях]]]"""
+    from reportlab.platypus import Table
+    tdt_temp = []
+    tdt_new_tmp = []
+    dict_tbl = {}
+    tdt_all = table_data(stage, kg)  # данные результатов в группах
+    # данные результатов победителей в группах для окрашивания очков в красный цвет
+    tdt_new = tdt_all[0]
+    # убирает id от фамилии и перезаписывает tdt_new
+    l = 0
+    for group in tdt_new:
+        for z in group:
+            if l % 2 == 0:
+                fam_id = z[1]
+                znak = fam_id.find("/")
+                if znak != -1:
+                    family = fam_id[:znak]
+                else:
+                    family = fam_id
+                z[1] = family 
+            l += 1
+
+    for k in tdt_new:
+        tdt_temp = k.copy()
+        k.clear()
+        tdt_new_temp = tdt_temp.copy()
+        tdt_new_tmp.append(tdt_new_temp)
+        tdt_temp.clear()
+    tdt_new.clear()
+    tdt_new = tdt_new_tmp.copy()
+    # ===========================
+    for i in range(0, kg):
+        tdt_new[i].insert(0, zagolovok)       
+        dict_tbl[i] = Table(tdt_new[i], colWidths=cW, rowHeights=rH)
+        # ставит всю таблицу в синий цвет
+        ts.add('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue)
+        for k in tdt_all[1][i]:
+            col = k[0]  # столбец очков победителя
+            row = k[1]  # ряд очков победителя
+            ts.add('TEXTCOLOR', (col, row + 1), (col, row + 1), colors.red)  # красный цвет очков победителя
+        dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
+    return dict_tbl
+
+
+
+def begunki_made():
     """создание бегунков"""
     from reportlab.platypus import Table
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    stage = "Предварительный"
     for s_id in system:
         if s_id.stage == stage:
             max_pl = s_id.max_player
             type_tbl = s_id.type_table
             break
-    if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
-        kg = 1
-    else:  # групповые игры
-        kg = s_id.total_group  # кол-во групп
+    # if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
+    #     kg = 1
+    # else:  # групповые игры
+    #     kg = s_id.total_group  # кол-во групп
         
     family_col = 3.2
     # if pv == "альбомная":  # альбомная ориентация стр
@@ -6570,13 +6618,11 @@ def begunki_made(pv, stage):
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
 
     #  ============ создание таблиц и вставка данных =================
-    # h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-    #         leftIndent=150)  # стиль параграфа (номера таблиц)
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
     # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-    dict_table = tbl(cW, rH)
+    dict_table = tbl_begunki(cW, rH)
     if kg == 1:  # одна таблицу
         data = [[dict_table[0]]]
         shell_table = Table(data, colWidths=["*"])
