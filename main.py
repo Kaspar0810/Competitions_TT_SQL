@@ -6570,35 +6570,39 @@ def begunki_made():
 
     tblstyle = []
     # =========  цикл создания стиля таблицы ================
-    for q in range(1, max_pl + 1):  # город участника делает курсивом
-        # город участника делает курсивом
-        fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
-        tblstyle.append(fn)
-        fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1),
-              "DejaVuSerif-Bold")  # участника делает жирным шрифтом
-        tblstyle.append(fn)
-        # центрирование текста в ячейках)
-        fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')
-        tblstyle.append(fn)
-        # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
-        fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))
-        tblstyle.append(fn)
-        # объединяет клетки очки
-        fn = ('SPAN', (max_pl + 2, q * 2 - 1), (max_pl + 2, q * 2))
-        tblstyle.append(fn)
-        # объединяет клетки соот
-        fn = ('SPAN', (max_pl + 3, q * 2 - 1), (max_pl + 3, q * 2))
-        tblstyle.append(fn)
-        # объединяет клетки  место
-        fn = ('SPAN', (max_pl + 4, q * 2 - 1), (max_pl + 4, q * 2))
-        tblstyle.append(fn)
-        # объединяет диагональные клетки
-        fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
-        tblstyle.append(fn)
-        fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
-              colors.lightgreen)  # заливает диагональные клетки
-        tblstyle.append(fn)
-
+    # for q in range(1, max_pl + 1):  # город участника делает курсивом
+    #     # город участника делает курсивом
+    #     fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
+    #     tblstyle.append(fn)
+    #     fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1),
+    #           "DejaVuSerif-Bold")  # участника делает жирным шрифтом
+    #     tblstyle.append(fn)
+    #     # центрирование текста в ячейках)
+    #     fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')
+    #     tblstyle.append(fn)
+    #     # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
+    #     fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))
+    #     tblstyle.append(fn)
+    #     # объединяет клетки очки
+    #     fn = ('SPAN', (max_pl + 2, q * 2 - 1), (max_pl + 2, q * 2))
+    #     tblstyle.append(fn)
+    #     # объединяет клетки соот
+    #     fn = ('SPAN', (max_pl + 3, q * 2 - 1), (max_pl + 3, q * 2))
+    #     tblstyle.append(fn)
+    #     # объединяет клетки  место
+    #     fn = ('SPAN', (max_pl + 4, q * 2 - 1), (max_pl + 4, q * 2))
+    #     tblstyle.append(fn)
+    #     # объединяет диагональные клетки
+    #     fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
+    #     tblstyle.append(fn)
+    #     fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
+    #           colors.lightgreen)  # заливает диагональные клетки
+    #     tblstyle.append(fn)
+    data=  [['A',   'B', 'C',   "E", 'D'],
+               ['00', '01', '02', '03', '04'],
+               ['10', '11', '12', '13', '14'],
+               ['20', '21', '22',  '23', '24'],
+               ['30', '31', '32',  '33', '34']]
     ts = []
     ts.append(tblstyle)
     # ============= полный стиль таблицы ======================
@@ -6626,8 +6630,8 @@ def begunki_made():
     # dict_table = tbl_begunki(cW, rH)
     # if kg == 1:  # одна таблицу
     #     data = [[dict_table[0]]]
-    #     shell_table = Table(data, colWidths=["*"])
-    #     elements.append(shell_table)
+    shell_table = Table(data, colWidths=["*"])
+    elements.append(shell_table)
     # else:
     data_tmp = []
     data_temp = []
