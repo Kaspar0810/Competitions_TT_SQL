@@ -6519,6 +6519,7 @@ def tbl_begunki(cW, rH):
 
 def begunki_made():
     """создание бегунков"""
+    from sys import platform
     from reportlab.platypus import Table
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     stage = "Предварительный"
@@ -6555,7 +6556,7 @@ def begunki_made():
     # кол-во столбцов в таблице и их ширина
     cW = (3 * cm, 1.5 * cm, 1.5 * cm)
     # if kg == 1:
-    rH = (0.8 * cm)  # высота строки
+    rH = 10 * (0.8 * cm)  # высота строки
     # else:
     #     rH = (0.34 * cm)  # высота строки
     # rH = None  # высота строки
@@ -6608,9 +6609,9 @@ def begunki_made():
                      ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
                      ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
                     + tblstyle +
-                    [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
+                    # [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
                      # цвет шрифта в ячейках
-                     ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
+                    [('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
                      ('LINEABOVE', (0, 0), (-1, 1), 1,
                       colors.black),  # цвет линий нижней
                      # цвет и толщину внутренних линий
@@ -6622,7 +6623,7 @@ def begunki_made():
             leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
     # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-    dict_table = tbl_begunki(cW, rH)
+    # dict_table = tbl_begunki(cW, rH)
     # if kg == 1:  # одна таблицу
     #     data = [[dict_table[0]]]
     #     shell_table = Table(data, colWidths=["*"])
@@ -6655,45 +6656,48 @@ def begunki_made():
         #         elements.append(Paragraph(text, h2))
         #         elements.append(shell_table[l][0])
         # else:  # страница книжная, то таблицы размещаются обе в столбец
-    for k in range(1, kg // 2 + 1):
-        for i in range(0, kg):
-            data_tmp.append(dict_table[i])  
-            tmp = data_tmp.copy()
-            data_temp.append(tmp) 
-            temp = data_temp.copy()
-            data.append(temp)
-            data_tmp.clear()
-            data_temp.clear()
-    shell_table = []
-    s_tmp = []
-    for l in range(0, kg): 
-        shell_tmp = Table(data[l], colWidths=["*"])
-        s_tmp.append(shell_tmp)
-        tmp_copy = s_tmp.copy()
-        shell_table.append(tmp_copy)
-        s_tmp.clear()
-        elements.append(Paragraph(f'группа {l + 1}', h2))
-        elements.append(shell_table[l][0])
+    # for k in range(1, kg // 2 + 1):
+    #     for i in range(0, kg):
+    #         data_tmp.append(dict_table[i])  
+    #         tmp = data_tmp.copy()
+    #         data_temp.append(tmp) 
+    #         temp = data_temp.copy()
+    #         data.append(temp)
+    #         data_tmp.clear()
+    #         data_temp.clear()
+    # shell_table = []
+    # s_tmp = []
+    # for l in range(0, kg): 
+    #     shell_tmp = Table(data[l], colWidths=["*"])
+    #     s_tmp.append(shell_tmp)
+    #     tmp_copy = s_tmp.copy()
+    #     shell_table.append(tmp_copy)
+    #     s_tmp.clear()
+    #     elements.append(Paragraph(f'группа {l + 1}', h2))
+    #     elements.append(shell_table[l][0])
 
-    if pv == A4:
-        pv = A4
-    else:
-        pv = landscape(A4)
+    # if pv == A4:
+    #     pv = A4
+    # else:
+    #     pv = landscape(A4)
     t_id = Title.get(Title.id == title_id())
-    short_name = t_id.short_name_comp
+    # short_name = t_id.short_name_comp
 
-    if stage == "Одна таблица":
-        name_table = f"{short_name}_one_table.pdf"
-    elif stage == "Предварительный":
-        name_table = f"{short_name}_table_group.pdf"
-    else:
-        txt = stage.rfind("-")
-        number_fin = stage[:txt]
-        name_table = f"{short_name}_{number_fin}-финал.pdf"
-    doc = SimpleDocTemplate(name_table, pagesize=pv)
+    # if stage == "Одна таблица":
+    #     name_table = f"{short_name}_one_table.pdf"
+    # elif stage == "Предварительный":
+    #     name_table = f"{short_name}_table_group.pdf"
+    # else:
+    #     txt = stage.rfind("-")
+    #     number_fin = stage[:txt]
+    name_table = "begunki.pdf"
+    doc = SimpleDocTemplate(name_table, pagesize=A4)
     change_dir()
     doc.build(elements)
     change_dir()
+    # view_file = name_table
+    # platform == "darwin" # OS X
+    # os.system(f"open {view_file}")
 
 
 def table_made(pv, stage):
