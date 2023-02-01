@@ -6523,17 +6523,17 @@ def begunki_made():
     from reportlab.platypus import Table
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     stage = "Предварительный"
-    for s_id in system:
-        if s_id.stage == stage:
-            max_pl = s_id.max_player
-            type_tbl = s_id.type_table
-            break
-    # if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
-    #     kg = 1
-    # else:  # групповые игры
-    #     kg = s_id.total_group  # кол-во групп
+    # for s_id in system:
+    #     if s_id.stage == stage:
+    #         max_pl = s_id.max_player
+    #         type_tbl = s_id.type_table
+    #         break
+    # # if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
+    # #     kg = 1
+    # # else:  # групповые игры
+    # #     kg = s_id.total_group  # кол-во групп
         
-    family_col = 3.2
+    # family_col = 3.2
     # if pv == "альбомная":  # альбомная ориентация стр
     #     pv = landscape(A4)
     #     if kg == 1 or max_pl in [10, 11, 12, 13, 14, 15, 16]:
@@ -6552,15 +6552,16 @@ def begunki_made():
     #         wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
     # col = ((wcells * cm,) * max_pl)
     elements = []
-
-    # кол-во столбцов в таблице и их ширина
-    cW = (3 * cm, 1.5 * cm, 1.5 * cm)
-    # if kg == 1:
-    rH = 10 * (0.8 * cm)  # высота строки
-    # else:
-    #     rH = (0.34 * cm)  # высота строки
-    # rH = None  # высота строки
-    num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
+    # cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm,
+    #        0.4 * cm, 4.4 * cm, 0.4 * cm))
+    # # кол-во столбцов в таблице и их ширина
+    # cW = 5 * (1 * cm)
+    # # if kg == 1:
+    # rH = 5 * (0.8 * cm)  # высота строки
+    # # else:
+    # #     rH = (0.34 * cm)  # высота строки
+    # # rH = None  # высота строки
+    # num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
 
     # for i in range(max_pl):
     #     i += 1
@@ -6598,38 +6599,68 @@ def begunki_made():
     #     fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
     #           colors.lightgreen)  # заливает диагональные клетки
     #     tblstyle.append(fn)
-    data=  [['A',   'B', 'C',   "E", 'D'],
-               ['00', '01', '02', '03', '04'],
-               ['10', '11', '12', '13', '14'],
-               ['20', '21', '22',  '23', '24'],
-               ['30', '31', '32',  '33', '34']]
-    ts = []
-    ts.append(tblstyle)
+    # data=  [['A',   'B', 'C',   "E", 'D'],
+    #            ['00', '01', '02', '03', '04'],
+    #            ['10', '11', '12', '13', '14'],
+    #            ['20', '21', '22',  '23', '24'],
+    #            ['30', '31', '32',  '33', '34']]
+    # ts = []
+    # ts.append(tblstyle)
+
+    data_first =  [['Ф', 'тур', 'вст', 'стол'],
+        ['', '1', '1-2', '13'],
+        ['Иванов', '21', 'Петров', '23'],
+        ['30', '31', '32', '33'],
+        ['20', '21', '22', '43'],
+        ['20', '21', '22', '53'],
+        ['20', '21', '22', '63'],
+        ['20', '21', '22', '73'],
+        ['20', '21', '22', '83']]
+    t = Table(data_first, 4 * [1.5 * cm], 9 * [0.7 * cm])
+    # span (0,0), (0,1) - объединяет на 0 ряду и строки 0-1
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
+                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                        ('FONTSIZE', (0, 0), (-1, -1), 10),
+                        ('ALIGN',(1,1),(-2,-2),'RIGHT'),
+                        ('TEXTCOLOR',(1,1),(-2,-2),colors.red),
+                        ('VALIGN',(0,0),(0,-1),'TOP'),
+                        ('TEXTCOLOR',(0,0),(0,-1),colors.blue),
+                        ('ALIGN',(0,-1),(-1,-1),'CENTER'),
+                        ('VALIGN',(0,-1),(-1,-1),'MIDDLE'),
+                        ('TEXTCOLOR',(0,-1),(-1,-1),colors.green),
+                        ('INNERGRID', (0,0), (-1,-1), 1, colors.black),
+                        ('BOX', (0,0), (-1,-1), 1, colors.black),
+                        ('SPAN',(0,0),(0,1)), 
+                        ('SPAN',(0,2),(1,2)),
+                        ('SPAN',(2,2),(3,2)),
+                        ]))
+
+
     # ============= полный стиль таблицы ======================
-    ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
-                     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                     ('FONTSIZE', (0, 0), (-1, -1), 7),
-                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                     ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
-                     ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
-                    + tblstyle +
-                    # [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
-                     # цвет шрифта в ячейках
-                    [('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
-                     ('LINEABOVE', (0, 0), (-1, 1), 1,
-                      colors.black),  # цвет линий нижней
-                     # цвет и толщину внутренних линий
-                     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                     ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
+    # ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
+    #                  ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    #                  ('FONTSIZE', (0, 0), (-1, -1), 7),
+    #                  ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    #                  ('FONTNAME', (0, 0), (5, 0), "DejaVuSerif-Bold"),
+    #                  ('VALIGN', (0, 0), (5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
+    #                 + tblstyle +
+    #                 # [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
+    #                  # цвет шрифта в ячейках
+    #                 [('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
+    #                  ('LINEABOVE', (0, 0), (-1, 1), 1,
+    #                   colors.black),  # цвет линий нижней
+    #                  # цвет и толщину внутренних линий
+    #                  ('INNERGRID', (0, 0), (-1, -1), 1, colors.black),
+    #                  ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
 
     #  ============ создание таблиц и вставка данных =================
-    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    # h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            # leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
     # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
     # dict_table = tbl_begunki(cW, rH)
     # if kg == 1:  # одна таблицу
-    #     data = [[dict_table[0]]]
+    data = [[t]]
     shell_table = Table(data, colWidths=["*"])
     elements.append(shell_table)
     # else:
@@ -6639,17 +6670,17 @@ def begunki_made():
     temp = []
     data = []
         # if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-        #     for k in range(1, kg // 2 + 1):
-        #         for i in range(0, 2):
-        #             data_tmp.append(dict_table[(k * 2 - 2) + i])  
-        #         tmp = data_tmp.copy()
-        #         data_temp.append(tmp) 
-        #         temp = data_temp.copy()
-        #         data.append(temp)
-        #         data_tmp.clear()
-        #         data_temp.clear()
-        #     shell_table = []
-        #     s_tmp = []
+    for k in range(1, kg // 2 + 1):
+        for i in range(0, 2):
+            data_tmp.append(dict_table[(k * 2 - 2) + i])  
+        tmp = data_tmp.copy()
+        data_temp.append(tmp) 
+        temp = data_temp.copy()
+        data.append(temp)
+        data_tmp.clear()
+        data_temp.clear()
+    shell_table = []
+    s_tmp = []
         #     for l in range(0, kg // 2): 
         #         shell_tmp = Table(data[l], colWidths=["*"])
         #         s_tmp.append(shell_tmp)
@@ -6684,7 +6715,7 @@ def begunki_made():
     #     pv = A4
     # else:
     #     pv = landscape(A4)
-    t_id = Title.get(Title.id == title_id())
+    # t_id = Title.get(Title.id == title_id())
     # short_name = t_id.short_name_comp
 
     # if stage == "Одна таблица":
