@@ -6658,11 +6658,13 @@ def begunki_made():
             # leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
     # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-    # dict_table = tbl_begunki(cW, rH)
-    # if kg == 1:  # одна таблицу
-    data = [[t]]
-    shell_table = Table(data, colWidths=["*"])
-    elements.append(shell_table)
+    dict_table = {}
+    for m in range(0, 2):
+        dict_table[m] = data_first
+            # if kg == 1:  # одна таблицу
+    # data = [[t]]
+    # shell_table = Table(data)
+    # elements.append(shell_table)
     # else:
     data_tmp = []
     data_temp = []
@@ -6670,9 +6672,9 @@ def begunki_made():
     temp = []
     data = []
         # if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-    for k in range(1, kg // 2 + 1):
+    for k in range(1, 3 // 2 + 1):
         for i in range(0, 2):
-            data_tmp.append(dict_table[(k * 2 - 2) + i])  
+            data_tmp.append(dict_table[i])
         tmp = data_tmp.copy()
         data_temp.append(tmp) 
         temp = data_temp.copy()
@@ -6681,15 +6683,13 @@ def begunki_made():
         data_temp.clear()
     shell_table = []
     s_tmp = []
-        #     for l in range(0, kg // 2): 
-        #         shell_tmp = Table(data[l], colWidths=["*"])
-        #         s_tmp.append(shell_tmp)
-        #         tmp_copy = s_tmp.copy()
-        #         shell_table.append(tmp_copy)
-        #         s_tmp.clear()
-        #         text = f'группа {l * 2 + 1} группа {l * 2 + 2}'
-        #         elements.append(Paragraph(text, h2))
-        #         elements.append(shell_table[l][0])
+    for l in range(0, 3 // 2): 
+        shell_tmp = Table(dict_table[l])
+        s_tmp.append(shell_tmp)
+        tmp_copy = s_tmp.copy()
+        shell_table.append(tmp_copy)
+        s_tmp.clear()
+        elements.append(shell_table[l])
         # else:  # страница книжная, то таблицы размещаются обе в столбец
     # for k in range(1, kg // 2 + 1):
     #     for i in range(0, kg):
@@ -6729,10 +6729,10 @@ def begunki_made():
     doc = SimpleDocTemplate(name_table, pagesize=A4)
     change_dir()
     doc.build(elements)
-    change_dir()
-    # view_file = name_table
-    # platform == "darwin" # OS X
-    # os.system(f"open {view_file}")
+    # change_dir()
+    view_file = name_table
+    platform == "darwin" # OS X
+    os.system(f"open {view_file}")
 
 
 def table_made(pv, stage):
