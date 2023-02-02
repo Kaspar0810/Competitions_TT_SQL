@@ -6659,7 +6659,7 @@ def begunki_made():
             #========
     # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
     dict_table = {}
-    for m in range(0, 2):
+    for m in range(0, 3):
         dict_table[m] = data_first
             # if kg == 1:  # одна таблицу
     # data = [[t]]
@@ -6672,18 +6672,18 @@ def begunki_made():
     temp = []
     data = []
         # if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-    for k in range(1, 3 // 2 + 1):
-        for i in range(0, 2):
-            data_tmp.append(dict_table[i])
-        tmp = data_tmp.copy()
-        data_temp.append(tmp) 
-        temp = data_temp.copy()
-        data.append(temp)
-        data_tmp.clear()
-        data_temp.clear()
+    # for k in range(1, 4):
+    #     for i in range(0, 2):
+    #         data_tmp.append(dict_table[i])
+    #     tmp = data_tmp.copy()
+    #     data_temp.append(tmp) 
+    #     temp = data_temp.copy()
+    #     data.append(temp)
+    #     data_tmp.clear()
+    #     data_temp.clear()
     shell_table = []
     s_tmp = []
-    for l in range(0, 3 // 2): 
+    for l in range(0, 3): 
         shell_tmp = Table(dict_table[l])
         s_tmp.append(shell_tmp)
         tmp_copy = s_tmp.copy()
