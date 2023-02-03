@@ -6470,48 +6470,44 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     return dict_tbl
 
 
-def tbl_begunki(cW, rH):
+def tbl_begunki(ts, number_group="1-й финал"):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
     from reportlab.platypus import Table
-    tdt_temp = []
-    tdt_new_tmp = []
+    result = Result.select().where(Result.title_id == title_id())
+    result_group = result.select().where(Result.number_group == number_group)
+     # # кол-во столбцов в таблице и их ширина
+    cW = (1.5 * cm)
+    rH = (0.6 * cm)  # высота строки
     dict_tbl = {}
-    tdt_all = table_data(stage, kg)  # данные результатов в группах
-    # данные результатов победителей в группах для окрашивания очков в красный цвет
-    tdt_new = tdt_all[0]
-    # убирает id от фамилии и перезаписывает tdt_new
-    l = 0
-    for group in tdt_new:
-        for z in group:
-            if l % 2 == 0:
-                fam_id = z[1]
-                znak = fam_id.find("/")
-                if znak != -1:
-                    family = fam_id[:znak]
-                else:
-                    family = fam_id
-                z[1] = family 
-            l += 1
-
-    for k in tdt_new:
-        tdt_temp = k.copy()
-        k.clear()
+    # tdt_all = table_data(stage, kg)  # данные результатов в группах
+    # # данные результатов победителей в группах для окрашивания очков в красный цвет
+    # tdt_new = []
+    tdt_new_tmp = []
+    for res_id in result_group:
+        tours = res_id.tours
+        pl1 = res_id.player1
+        pl2 = res_id.player2
+        d_tmp =  [['Ф', 'тур', 'вст', 'стол'],
+        ['', '1', tours, '13'],
+        [pl1, '21', pl2, '23'],
+        ['30', '31', '32', '33'],
+        ['20', '21', '22', '43'],
+        ['20', '21', '22', '53'],
+        ['20', '21', '22', '63'],
+        ['20', '21', '22', '73'],
+        ['20', '21', '22', '83']]
+        tdt_temp = d_tmp.copy()
+        d_tmp.clear()
         tdt_new_temp = tdt_temp.copy()
         tdt_new_tmp.append(tdt_new_temp)
         tdt_temp.clear()
-    tdt_new.clear()
-    tdt_new = tdt_new_tmp.copy()
+    game = len(tdt_new_tmp)
     # ===========================
-    for i in range(0, kg):
-        tdt_new[i].insert(0, zagolovok)       
-        dict_tbl[i] = Table(tdt_new[i], colWidths=cW, rowHeights=rH)
+    for i in range(0, game):      
+        dict_tbl[i] = Table(tdt_new_tmp[i], colWidths=cW, rowHeights=rH)
         # ставит всю таблицу в синий цвет
         ts.add('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue)
-        for k in tdt_all[1][i]:
-            col = k[0]  # столбец очков победителя
-            row = k[1]  # ряд очков победителя
-            ts.add('TEXTCOLOR', (col, row + 1), (col, row + 1), colors.red)  # красный цвет очков победителя
         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
     return dict_tbl
 
@@ -6523,42 +6519,15 @@ def begunki_made():
     from reportlab.platypus import Table
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     stage = "Предварительный"
-    # for s_id in system:
-    #     if s_id.stage == stage:
-    #         max_pl = s_id.max_player
-    #         type_tbl = s_id.type_table
-    #         break
-    # # if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
-    # #     kg = 1
-    # # else:  # групповые игры
-    # #     kg = s_id.total_group  # кол-во групп
-        
-    # family_col = 3.2
-    # if pv == "альбомная":  # альбомная ориентация стр
-    #     pv = landscape(A4)
-    #     if kg == 1 or max_pl in [10, 11, 12, 13, 14, 15, 16]:
-    #         # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
-    #         wcells = 21.4 / max_pl
-    #     else:
-    #         # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
-    #         wcells = 7.4 / max_pl
-    # else:  # книжная ориентация стр
-    #     pv = A4
-    #     if max_pl < 7:
-    #         family_col = 4.0
-    #         wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
-    #     else:
-    #         family_col = 3.2
-    #         wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
-    # col = ((wcells * cm,) * max_pl)
+  
     elements = []
     # cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm,
     #        0.4 * cm, 4.4 * cm, 0.4 * cm))
     # # кол-во столбцов в таблице и их ширина
-    # cW = 5 * (1 * cm)
-    # # if kg == 1:
-    # rH = 5 * (0.8 * cm)  # высота строки
-    # # else:
+    # cW = (1.5 * cm)
+    # # # if kg == 1:
+    # rH = (0.6 * cm)  # высота строки
+    # # # else:
     # #     rH = (0.34 * cm)  # высота строки
     # # rH = None  # высота строки
     # num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
@@ -6569,56 +6538,13 @@ def begunki_made():
     #     num_columns.append(i)
     # zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
 
-    tblstyle = []
-    # =========  цикл создания стиля таблицы ================
-    # for q in range(1, max_pl + 1):  # город участника делает курсивом
-    #     # город участника делает курсивом
-    #     fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
-    #     tblstyle.append(fn)
-    #     fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1),
-    #           "DejaVuSerif-Bold")  # участника делает жирным шрифтом
-    #     tblstyle.append(fn)
-    #     # центрирование текста в ячейках)
-    #     fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')
-    #     tblstyle.append(fn)
-    #     # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
-    #     fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))
-    #     tblstyle.append(fn)
-    #     # объединяет клетки очки
-    #     fn = ('SPAN', (max_pl + 2, q * 2 - 1), (max_pl + 2, q * 2))
-    #     tblstyle.append(fn)
-    #     # объединяет клетки соот
-    #     fn = ('SPAN', (max_pl + 3, q * 2 - 1), (max_pl + 3, q * 2))
-    #     tblstyle.append(fn)
-    #     # объединяет клетки  место
-    #     fn = ('SPAN', (max_pl + 4, q * 2 - 1), (max_pl + 4, q * 2))
-    #     tblstyle.append(fn)
-    #     # объединяет диагональные клетки
-    #     fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
-    #     tblstyle.append(fn)
-    #     fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
-    #           colors.lightgreen)  # заливает диагональные клетки
-    #     tblstyle.append(fn)
-    # data=  [['A',   'B', 'C',   "E", 'D'],
-    #            ['00', '01', '02', '03', '04'],
-    #            ['10', '11', '12', '13', '14'],
-    #            ['20', '21', '22',  '23', '24'],
-    #            ['30', '31', '32',  '33', '34']]
-    # ts = []
-    # ts.append(tblstyle)
+    # tblstyle = []
 
-    data_first =  [['Ф', 'тур', 'вст', 'стол'],
-        ['', '1', '1-2', '13'],
-        ['Иванов', '21', 'Петров', '23'],
-        ['30', '31', '32', '33'],
-        ['20', '21', '22', '43'],
-        ['20', '21', '22', '53'],
-        ['20', '21', '22', '63'],
-        ['20', '21', '22', '73'],
-        ['20', '21', '22', '83']]
-    t = Table(data_first, 4 * [1.5 * cm], 9 * [0.7 * cm])
+    ts = []
+
+    # ts = Table(data_begunki, 4 * [1.5 * cm], 9 * [0.6 * cm])
     # span (0,0), (0,1) - объединяет на 0 ряду и строки 0-1
-    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
+    ts = (TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                         ('FONTSIZE', (0, 0), (-1, -1), 10),
                         ('ALIGN',(1,1),(-2,-2),'RIGHT'),
@@ -6628,7 +6554,7 @@ def begunki_made():
                         ('ALIGN',(0,-1),(-1,-1),'CENTER'),
                         ('VALIGN',(0,-1),(-1,-1),'MIDDLE'),
                         ('TEXTCOLOR',(0,-1),(-1,-1),colors.green),
-                        ('INNERGRID', (0,0), (-1,-1), 1, colors.black),
+                        ('INNERGRID', (0,0), (-1,-1), 0.5, colors.black),
                         ('BOX', (0,0), (-1,-1), 1, colors.black),
                         ('SPAN',(0,0),(0,1)), 
                         ('SPAN',(0,2),(1,2)),
@@ -6658,38 +6584,34 @@ def begunki_made():
             # leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
     # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-    dict_table = {}
-    for m in range(0, 3):
-        dict_table[m] = data_first
-            # if kg == 1:  # одна таблицу
-    # data = [[t]]
-    # shell_table = Table(data)
-    # elements.append(shell_table)
-    # else:
+    # dict_table = {}
+    # for m in range(0, 3): # кол-во бегунков в строке
+    dict_table = tbl_begunki(ts, number_group="1-й финал") # здесь надо менять данные бегунков
+
     data_tmp = []
     data_temp = []
     tmp = []
     temp = []
     data = []
-        # if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+
     # for k in range(1, 4):
-    #     for i in range(0, 2):
-    #         data_tmp.append(dict_table[i])
-    #     tmp = data_tmp.copy()
-    #     data_temp.append(tmp) 
-    #     temp = data_temp.copy()
-    #     data.append(temp)
-    #     data_tmp.clear()
-    #     data_temp.clear()
+    for i in range(0, 9): # кол-во бегунков в 
+        data_tmp.append(dict_table[i])
+        tmp = data_tmp.copy()
+        data_temp.append(tmp) 
+        temp = data_temp.copy()
+        data.append(temp)
+        data_tmp.clear()
+        data_temp.clear()
     shell_table = []
     s_tmp = []
-    for l in range(0, 3): 
-        shell_tmp = Table(dict_table[l])
+    for l in range(0, 9): 
+        shell_tmp = Table(data[l], colWidths=["*"])
         s_tmp.append(shell_tmp)
         tmp_copy = s_tmp.copy()
         shell_table.append(tmp_copy)
         s_tmp.clear()
-        elements.append(shell_table[l])
+        elements.append(shell_table[l][0])
         # else:  # страница книжная, то таблицы размещаются обе в столбец
     # for k in range(1, kg // 2 + 1):
     #     for i in range(0, kg):
@@ -8116,7 +8038,7 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     tdt_tmp = []
     tbl_tmp = []  # временный список группы tbl
     # цикл нумерации строк (по 2-е строки на каждого участника)
-    tab = my_win.tabWidget.currentIndex()
+    # tab = my_win.tabWidget.currentIndex()
     for k in range(1, max_gamer * 2 + 1):
         st = ['']
         # получаем пустой список (номер, фамилия и регион, клетки (кол-во уч), оч, соот, место)
