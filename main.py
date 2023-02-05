@@ -86,7 +86,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.Button_title_made.setEnabled(False)
         self.Button_system_made.setEnabled(False)
-        self.tabWidget.setCurrentIndex(0)  # текущая страница
+        self.tabWidget.setCurrentIndex(0)  # включает вкладку титул
         # self.toolBox.setCurrentIndex(0)
         # ++ отключение страниц
         self.tabWidget.setTabEnabled(1, True)
@@ -95,7 +95,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setTabEnabled(4, False)
         self.tabWidget.setTabEnabled(5, False)
 
-        self.toolBox.setItemEnabled(1, True)
+        self.toolBox.setItemEnabled(0, False)
+        self.toolBox.setItemEnabled(1, False)
         self.toolBox.setItemEnabled(2, False)
         self.toolBox.setItemEnabled(3, False)
         self.toolBox.setItemEnabled(4, False)
@@ -1884,7 +1885,10 @@ def load_combobox_filter_group():
 def tab():
     """Изменяет вкладку tabWidget в зависимости от вкладки toolBox"""
     tw = my_win.tabWidget.currentIndex()
+    # if tw != 0:
     my_win.toolBox.setCurrentIndex(tw)
+    # else:
+    #     load_combo_etap_begunki()
 
 
 def tool_page():
@@ -1900,7 +1904,7 @@ def page():
     gamer = my_win.lineEdit_title_gamer.text()
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
-    if tb == 0:
+    if tb == 0: # -титул-
         db_select_title()
         load_tableWidget()
         my_win.tableWidget.show()
@@ -2060,9 +2064,9 @@ def page():
             load_combo()
             match_score_db()  # флаг, показывающий записывать счет в партиях или нет
             my_win.label_16.hide()
-    elif tb == 4:
+    elif tb == 4:  # вкладка -полуфиналы-
         my_win.tableWidget.hide()
-    elif tb == 5:
+    elif tb == 5: # вкладка -финалы-
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
         my_win.checkBox_9.setEnabled(False)
@@ -2074,6 +2078,9 @@ def page():
         load_combo()
         match_score_db()
         my_win.label_16.hide()
+    elif tb == 6:
+        load_combo_etap_begunki()
+
     hide_show_columns(tb)
 
 
@@ -2132,6 +2139,15 @@ def add_coach(ch, num):
             return
         else:
             cch = Coach(coach=ch, player_id=num).save()
+
+
+def find_player():
+    """Установка курсора в строку поиска спортсмена в загруженном списке"""
+    if my_win.checkBox_find_player.isChecked():
+        my_win.lineEdit_Family_name.setFocus()
+    else:
+        pass
+
 
 
 def find_player_in_R():
@@ -4643,6 +4659,18 @@ def load_combo():
     my_win.comboBox_find_name_fin.setCurrentText("")
 
 
+def load_combo_etap_begunki():
+    """загружает комбобокс выбора этапов системы на вкладке дополнительно"""
+    my_win.comboBox_select_stage_begunki.clear()
+    stage_system = ["-Выбор этапа"]
+    results = Result.select().where(Result.title_id == title_id())
+    for i in results:
+        stage = i.system_stage
+        if stage not in stage_system:
+            stage_system.append(stage)
+    my_win.comboBox_select_stage_begunki.addItems(stage_system)
+
+
 def reset_filter():
     """сбрасывает критерии фильтрации"""
     sender = my_win.sender()
@@ -6470,33 +6498,46 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     return dict_tbl
 
 
-def tbl_begunki(ts, number_group="1-й финал"):
+def tbl_begunki(ts, number_group):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
+    stiker = []
     from reportlab.platypus import Table
     result = Result.select().where(Result.title_id == title_id())
-    result_group = result.select().where(Result.number_group == number_group)
+    # result_group = result.select().where(Result.number_group == number_group)
+    result_group = result.select().where(Result.system_stage == "Финальный")
      # # кол-во столбцов в таблице и их ширина
-    cW = (1.5 * cm)
-    rH = (0.6 * cm)  # высота строки
+    cW = (1.6 * cm)
+    # rH = (0.4 * cm, 0.6 * cm, 1 * cm, 0.55 * cm, 0.55 * cm, 0.55 * cm, 0.55 * cm, 0.55 * cm,
+    #        0.55 * cm, 0.5 * cm)
+    rH = (0.4 * cm, 0.6 * cm, 1 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm,
+           0.6 * cm, 0.5 * cm)
     dict_tbl = {}
-    # tdt_all = table_data(stage, kg)  # данные результатов в группах
-    # # данные результатов победителей в группах для окрашивания очков в красный цвет
-    # tdt_new = []
     tdt_new_tmp = []
     for res_id in result_group:
         tours = res_id.tours
         pl1 = res_id.player1
         pl2 = res_id.player2
+
+        s1 = pl1.find("/")  
+        s2 = pl2.find("/")   
+        player1 = pl1[:s1]
+        city1 = pl1[s1 + 1:]
+        player2 = pl2[:s2]
+        city2 = pl2[s2 + 1:]
+        pl1 = f"{player1}\n{city1}"
+        pl2 = f"{player2}\n{city2}"
+
         d_tmp =  [['Ф', 'тур', 'вст', 'стол'],
-        ['', '1', tours, '13'],
+        ['', '1', tours, ''],
         [pl1, '21', pl2, '23'],
-        ['30', '31', '32', '33'],
-        ['20', '21', '22', '43'],
-        ['20', '21', '22', '53'],
-        ['20', '21', '22', '63'],
-        ['20', '21', '22', '73'],
-        ['20', '21', '22', '83']]
+        ['', '', '', ''],
+        ['', '', '', ''],
+        ['', '', '', ''],
+        ['', '', '', ''],
+        ['', '', '', ''],
+        ['общ счет:', '', '', ''],
+        ['Победитель', '', '', '']]
         tdt_temp = d_tmp.copy()
         d_tmp.clear()
         tdt_new_temp = tdt_temp.copy()
@@ -6506,61 +6547,53 @@ def tbl_begunki(ts, number_group="1-й финал"):
     # ===========================
     for i in range(0, game):      
         dict_tbl[i] = Table(tdt_new_tmp[i], colWidths=cW, rowHeights=rH)
-        # ставит всю таблицу в синий цвет
-        ts.add('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue)
         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
-    return dict_tbl
+    stiker.append(dict_tbl)
+    stiker.append(game)
+    return stiker
 
 
-
-def begunki_made():
+def begunki_made(number_group=""):
     """создание бегунков"""
     from sys import platform
     from reportlab.platypus import Table
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     stage = "Предварительный"
-  
+    number_group = "1-й финал"
     elements = []
-    # cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm,
-    #        0.4 * cm, 4.4 * cm, 0.4 * cm))
-    # # кол-во столбцов в таблице и их ширина
-    # cW = (1.5 * cm)
-    # # # if kg == 1:
-    # rH = (0.6 * cm)  # высота строки
-    # # # else:
-    # #     rH = (0.34 * cm)  # высота строки
-    # # rH = None  # высота строки
-    # num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
-
-    # for i in range(max_pl):
-    #     i += 1
-    #     i = str(i)
-    #     num_columns.append(i)
-    # zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
-
-    # tblstyle = []
-
     ts = []
+    tblstyle = []
+    for p in range(0, 8):
+        fn = ('SPAN',(0, 2 + p), (1, 2 + p))
+        tblstyle.append(fn)
+        fn = ('SPAN',(2, 2 + p), (3, 2 + p))
+        tblstyle.append(fn)
 
-    # ts = Table(data_begunki, 4 * [1.5 * cm], 9 * [0.6 * cm])
-    # span (0,0), (0,1) - объединяет на 0 ряду и строки 0-1
-    ts = (TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
-                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                        ('FONTSIZE', (0, 0), (-1, -1), 10),
-                        ('ALIGN',(1,1),(-2,-2),'RIGHT'),
-                        ('TEXTCOLOR',(1,1),(-2,-2),colors.red),
-                        ('VALIGN',(0,0),(0,-1),'TOP'),
-                        ('TEXTCOLOR',(0,0),(0,-1),colors.blue),
-                        ('ALIGN',(0,-1),(-1,-1),'CENTER'),
-                        ('VALIGN',(0,-1),(-1,-1),'MIDDLE'),
-                        ('TEXTCOLOR',(0,-1),(-1,-1),colors.green),
+    ts.append(tblstyle)
+    # span (0,2), (1,2) - объединяет 0 и 1 столбец и строки 2 (0-столбец, 2-строка), (1-столбец, 2-строка)
+    ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                         ('INNERGRID', (0,0), (-1,-1), 0.5, colors.black),
                         ('BOX', (0,0), (-1,-1), 1, colors.black),
-                        ('SPAN',(0,0),(0,1)), 
-                        ('SPAN',(0,2),(1,2)),
-                        ('SPAN',(2,2),(3,2)),
-                        ]))
+                        ('SPAN',(0,0),(0,1)),
+                        ('FONTSIZE', (0, 0), (0, 1), 22)]
+                        + tblstyle +
+                        [('VALIGN', (0, 0), (0, 1), 'TOP'),
+                        ('ALIGN',(0, 0), (0, 1),'CENTER'),
+                        ('FONTSIZE', (0, 2), (3, 2), 7), 
+                        ('VALIGN', (1, 0), (3, 0), 'MIDDLE'),
+                        ('FONTSIZE', (1, 1), (3, 1), 11), 
+                        ('VALIGN', (1, 0), (3, 0), 'MIDDLE'),
+                        ('ALIGN',(1, 0), (3, 0),'CENTER')])
+   
 
+                        # ]))
+    # for p in range(0, 4):
+    #     fn = ('SPAN',(p, 4), (p + 1, 4))
+    #     tblstyle.append(fn)
+    # for p in range(2, 10):
+    #     fn = ('SPAN',(2, p), (3, p))
+    #     tblstyle.append(fn)
+    # ts.append(tblstyle)
 
     # ============= полный стиль таблицы ======================
     # ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
@@ -6586,7 +6619,9 @@ def begunki_made():
     # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
     # dict_table = {}
     # for m in range(0, 3): # кол-во бегунков в строке
-    dict_table = tbl_begunki(ts, number_group="1-й финал") # здесь надо менять данные бегунков
+    stiker = tbl_begunki(ts, number_group) # здесь надо менять данные бегунков
+    dict_table = stiker[0]
+    game = stiker[1]
 
     data_tmp = []
     data_temp = []
@@ -6594,9 +6629,9 @@ def begunki_made():
     temp = []
     data = []
 
-    # for k in range(1, 4):
-    for i in range(0, 9): # кол-во бегунков в 
-        data_tmp.append(dict_table[i])
+    for k in range(1, game // 3):
+        for i in range(0, 3): # кол-во бегунков в 
+            data_tmp.append(dict_table[(k * 2 - 2) + i])
         tmp = data_tmp.copy()
         data_temp.append(tmp) 
         temp = data_temp.copy()
@@ -6605,7 +6640,7 @@ def begunki_made():
         data_temp.clear()
     shell_table = []
     s_tmp = []
-    for l in range(0, 9): 
+    for l in range(0, game // 3 - 1): 
         shell_tmp = Table(data[l], colWidths=["*"])
         s_tmp.append(shell_tmp)
         tmp_copy = s_tmp.copy()
@@ -9917,6 +9952,7 @@ my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по не�
 my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке
 my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке
 my_win.checkBox_11.stateChanged.connect(debtor_R) # должники рейтинга оплаты
+my_win.checkBox_find_player.stateChanged.connect(find_player)
 # =======  нажатие кнопок =========
 
 
@@ -9931,7 +9967,7 @@ my_win.Button_filter.clicked.connect(filter_gr)
 # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_etap_made.clicked.connect(etap_made)
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
-my_win.Button_group.clicked.connect(player_in_table_group_and_write_Game_list_Result)  # вносит спортсменов в группы
+# my_win.Button_group.clicked.connect(player_in_table_group_and_write_Game_list_Result)  # вносит спортсменов в группы
 # записывает в базу или редактирует титул
 my_win.Button_title_made.clicked.connect(title_made)
 # записывает в базу счет в партии встречи
