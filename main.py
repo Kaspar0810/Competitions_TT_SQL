@@ -2079,6 +2079,7 @@ def page():
         match_score_db()
         my_win.label_16.hide()
     elif tb == 6:
+        my_win.lineEdit_range_tours.hide()
         load_combo_etap_begunki()
 
     hide_show_columns(tb)
@@ -4662,7 +4663,7 @@ def load_combo():
 def load_combo_etap_begunki():
     """загружает комбобокс выбора этапов системы на вкладке дополнительно"""
     my_win.comboBox_select_stage_begunki.clear()
-    stage_system = ["-Выбор этапа"]
+    stage_system = ["-Выбор этапа-"]
     results = Result.select().where(Result.title_id == title_id())
     for i in results:
         stage = i.system_stage
@@ -6498,22 +6499,28 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     return dict_tbl
 
 
-def tbl_begunki(ts, number_group):
+def tbl_begunki(ts, stage, number_group, tours):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
     stiker = []
     from reportlab.platypus import Table
+    systems = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
     # result_group = result.select().where(Result.number_group == number_group)
-    result_group = result.select().where(Result.system_stage == "Финальный")
+    system = systems.select().where(System.stage == stage).get()
+    total_group = system.total_group
+    # result_group = result.select().where(Result.system_stage == stage)
      # # кол-во столбцов в таблице и их ширина
     cW = (1.6 * cm)
-    # rH = (0.4 * cm, 0.6 * cm, 1 * cm, 0.55 * cm, 0.55 * cm, 0.55 * cm, 0.55 * cm, 0.55 * cm,
-    #        0.55 * cm, 0.5 * cm)
     rH = (0.4 * cm, 0.6 * cm, 1 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm,
            0.6 * cm, 0.5 * cm)
     dict_tbl = {}
     tdt_new_tmp = []
+    if number_group == "все":
+        result_group = result.select().where(Result.system_stage == stage)
+    else:
+        result_group = result.select().where(Result.number_group == number_group)
+
     for res_id in result_group:
         tours = res_id.tours
         pl1 = res_id.player1
@@ -6553,13 +6560,14 @@ def tbl_begunki(ts, number_group):
     return stiker
 
 
-def begunki_made(number_group=""):
+def begunki_made():
     """создание бегунков"""
     from sys import platform
     from reportlab.platypus import Table
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    stage = "Предварительный"
-    number_group = "1-й финал"
+    number_group = my_win.comboBox_select_group_begunki.currentText()
+    stage = my_win.comboBox_select_stage_begunki.currentText()
+    tours = my_win.comboBox_select_tours.currentText()
     elements = []
     ts = []
     tblstyle = []
@@ -6584,42 +6592,8 @@ def begunki_made(number_group=""):
                         ('FONTSIZE', (1, 1), (3, 1), 11), 
                         ('VALIGN', (1, 0), (3, 0), 'MIDDLE'),
                         ('ALIGN',(1, 0), (3, 0),'CENTER')])
-   
-
-                        # ]))
-    # for p in range(0, 4):
-    #     fn = ('SPAN',(p, 4), (p + 1, 4))
-    #     tblstyle.append(fn)
-    # for p in range(2, 10):
-    #     fn = ('SPAN',(2, p), (3, p))
-    #     tblstyle.append(fn)
-    # ts.append(tblstyle)
-
-    # ============= полный стиль таблицы ======================
-    # ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
-    #                  ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    #                  ('FONTSIZE', (0, 0), (-1, -1), 7),
-    #                  ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-    #                  ('FONTNAME', (0, 0), (5, 0), "DejaVuSerif-Bold"),
-    #                  ('VALIGN', (0, 0), (5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
-    #                 + tblstyle +
-    #                 # [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
-    #                  # цвет шрифта в ячейках
-    #                 [('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
-    #                  ('LINEABOVE', (0, 0), (-1, 1), 1,
-    #                   colors.black),  # цвет линий нижней
-    #                  # цвет и толщину внутренних линий
-    #                  ('INNERGRID', (0, 0), (-1, -1), 1, colors.black),
-    #                  ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
-
-    #  ============ создание таблиц и вставка данных =================
-    # h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            # leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-            #========
-    # dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-    # dict_table = {}
-    # for m in range(0, 3): # кол-во бегунков в строке
-    stiker = tbl_begunki(ts, number_group) # здесь надо менять данные бегунков
+ 
+    stiker = tbl_begunki(ts, stage, number_group, tours) # здесь надо менять данные бегунков
     dict_table = stiker[0]
     game = stiker[1]
 
@@ -6690,6 +6664,50 @@ def begunki_made(number_group=""):
     view_file = name_table
     platform == "darwin" # OS X
     os.system(f"open {view_file}")
+
+
+def select_stage_for_begunki():
+    """выбор финалов или номеров групп для печати бегунков"""
+    my_win.comboBox_select_group_begunki.clear()
+    systems = System.select().where(System.title_id == title_id())
+    group_list = ["все"]
+    stage = my_win.comboBox_select_stage_begunki.currentText()
+    if stage == "-Выбор этапа-":
+        pass
+    elif stage == "Предварительный":
+        sys_id = systems.select().where(System.stage == stage).get()
+        group = sys_id.total_group
+        for k in range(1, group + 1):
+            group_list.append(f"{k} группа")
+    elif stage == "Полуфинал":
+        pass
+    else:
+        i = 0
+        for k in systems:
+            if k.stage != "Предварительный" or k.stage != "олуфинал":
+                i += 1
+                group_list.append(f"{k} финал")
+
+        my_win.comboBox_select_group_begunki.addItems(group_list)
+
+        
+def select_tour_for_begunki():
+    """выбор номеров тура или диапазона туров""" 
+    my_win.comboBox_select_tours.clear()
+    tour_list = ["все", "диапазон"]
+    my_win.comboBox_select_tours.addItems(tour_list)
+    index = my_win.comboBox_select_tours.currentIndex()
+    if index != 0:
+        my_win.lineEdit_range_tours.show()
+
+
+def select_diapazon():
+    """показывает поле для ввода дмапазона туров"""
+    index = my_win.comboBox_select_tours.currentIndex()
+    if index != 0:
+        my_win.lineEdit_range_tours.show()
+    else:
+        my_win.lineEdit_range_tours.hide()
 
 
 def table_made(pv, stage):
@@ -9925,6 +9943,9 @@ my_win.comboBox_page_vid.currentTextChanged.connect(page_vid)
 my_win.comboBox_filter_final.currentTextChanged.connect(game_in_visible)
 my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
 my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
+my_win.comboBox_select_stage_begunki.currentTextChanged.connect(select_stage_for_begunki)
+my_win.comboBox_select_group_begunki.currentTextChanged.connect(select_tour_for_begunki)
+my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)
 
 
 # =======  отслеживание переключение чекбоксов =========
@@ -9975,8 +9996,9 @@ my_win.Button_Ok.clicked.connect(enter_score)
 # записывает в базу счет в партии встречи
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
+my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-my_win.Button_proba.clicked.connect(begunki_made)
+# my_win.Button_proba.clicked.connect(begunki_made)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
