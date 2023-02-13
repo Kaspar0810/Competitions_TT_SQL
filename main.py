@@ -6684,9 +6684,13 @@ def select_stage_for_begunki():
     else:
         i = 0
         for k in systems:
-            if k.stage != "Предварительный" or k.stage != "олуфинал":
+            if k.stage != "Предварительный":
+                pass
+            elif k.stage != "Полуфинал":
+                pass
+            else:
                 i += 1
-                group_list.append(f"{k} финал")
+                group_list.append(f"{i} финал")
 
         my_win.comboBox_select_group_begunki.addItems(group_list)
 
