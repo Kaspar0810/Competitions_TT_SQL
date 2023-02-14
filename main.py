@@ -2079,6 +2079,7 @@ def page():
         match_score_db()
         my_win.label_16.hide()
     elif tb == 6:
+        my_win.Button_print_begunki.setEnabled(False)
         my_win.lineEdit_range_tours.hide()
         load_combo_etap_begunki()
 
@@ -6507,8 +6508,9 @@ def tbl_begunki(ts, stage, number_group, tours):
     systems = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
     # result_group = result.select().where(Result.number_group == number_group)
-    system = systems.select().where(System.stage == stage).get()
-    total_group = system.total_group
+    if stage != "Финальный":
+        system = systems.select().where(System.stage == stage).get()
+        total_group = system.total_group
     # result_group = result.select().where(Result.system_stage == stage)
      # # кол-во столбцов в таблице и их ширина
     cW = (1.6 * cm)
@@ -6520,12 +6522,23 @@ def tbl_begunki(ts, stage, number_group, tours):
         result_group = result.select().where(Result.system_stage == stage)
     else:
         result_group = result.select().where(Result.number_group == number_group)
+    num_stage = ""    
+    count = len(result_group)
+    shot_stage = ""
+    if stage == "Предварительный":
+        shot_stage = "ПР"
+    elif stage == "Полуфиналы":
+        shot_stage = "ПФ"
+    elif stage == "Финальный":
+        shot_stage = "Ф"
 
     for res_id in result_group:
         tours = res_id.tours
         pl1 = res_id.player1
         pl2 = res_id.player2
-
+        st = res_id.number_group
+        mark = st.find("-")
+        num_stage = f"{st[:mark]}{shot_stage}"
         s1 = pl1.find("/")  
         s2 = pl2.find("/")   
         player1 = pl1[:s1]
@@ -6535,7 +6548,7 @@ def tbl_begunki(ts, stage, number_group, tours):
         pl1 = f"{player1}\n{city1}"
         pl2 = f"{player2}\n{city2}"
 
-        d_tmp =  [['Ф', 'тур', 'вст', 'стол'],
+        d_tmp =  [[num_stage, 'тур', 'вст', 'стол'],
         ['', '1', tours, ''],
         [pl1, '21', pl2, '23'],
         ['', '', '', ''],
@@ -6621,41 +6634,7 @@ def begunki_made():
         shell_table.append(tmp_copy)
         s_tmp.clear()
         elements.append(shell_table[l][0])
-        # else:  # страница книжная, то таблицы размещаются обе в столбец
-    # for k in range(1, kg // 2 + 1):
-    #     for i in range(0, kg):
-    #         data_tmp.append(dict_table[i])  
-    #         tmp = data_tmp.copy()
-    #         data_temp.append(tmp) 
-    #         temp = data_temp.copy()
-    #         data.append(temp)
-    #         data_tmp.clear()
-    #         data_temp.clear()
-    # shell_table = []
-    # s_tmp = []
-    # for l in range(0, kg): 
-    #     shell_tmp = Table(data[l], colWidths=["*"])
-    #     s_tmp.append(shell_tmp)
-    #     tmp_copy = s_tmp.copy()
-    #     shell_table.append(tmp_copy)
-    #     s_tmp.clear()
-    #     elements.append(Paragraph(f'группа {l + 1}', h2))
-    #     elements.append(shell_table[l][0])
-
-    # if pv == A4:
-    #     pv = A4
-    # else:
-    #     pv = landscape(A4)
-    # t_id = Title.get(Title.id == title_id())
-    # short_name = t_id.short_name_comp
-
-    # if stage == "Одна таблица":
-    #     name_table = f"{short_name}_one_table.pdf"
-    # elif stage == "Предварительный":
-    #     name_table = f"{short_name}_table_group.pdf"
-    # else:
-    #     txt = stage.rfind("-")
-    #     number_fin = stage[:txt]
+ 
     name_table = "begunki.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=A4)
     change_dir()
@@ -6669,6 +6648,8 @@ def begunki_made():
 def select_stage_for_begunki():
     """выбор финалов или номеров групп для печати бегунков"""
     my_win.comboBox_select_group_begunki.clear()
+    if my_win.comboBox_select_stage_begunki.currentIndex() != 0:
+        my_win.Button_print_begunki.setEnabled(True)
     systems = System.select().where(System.title_id == title_id())
     group_list = ["все"]
     stage = my_win.comboBox_select_stage_begunki.currentText()
@@ -6681,16 +6662,16 @@ def select_stage_for_begunki():
             group_list.append(f"{k} группа")
     elif stage == "Полуфинал":
         pass
+    elif stage == "Одна таблица":
+        pass
     else:
-        i = 0
         for k in systems:
-            if k.stage != "Предварительный":
+            if k.stage == "Предварительный":
                 pass
-            elif k.stage != "Полуфинал":
+            elif k.stage == "Полуфинал":
                 pass
             else:
-                i += 1
-                group_list.append(f"{i} финал")
+                group_list.append(k.stage)
 
         my_win.comboBox_select_group_begunki.addItems(group_list)
 
