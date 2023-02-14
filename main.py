@@ -6615,9 +6615,19 @@ def begunki_made():
     tmp = []
     temp = []
     data = []
+    celoe = game // 3
+    ostatok = game % 3
+    end = 0
+    row = 3
+    if ostatok == 0:
+        end = celoe + 1
+    else:
+        end = celoe + 2
 
-    for k in range(1, game // 3):
-        for i in range(0, 3): # кол-во бегунков в 
+    for k in range(1, end):
+        if k == end - 1:
+            row = ostatok
+        for i in range(0, row): # кол-во бегунков в 
             data_tmp.append(dict_table[(k * 2 - 2) + i])
         tmp = data_tmp.copy()
         data_temp.append(tmp) 
@@ -6626,8 +6636,9 @@ def begunki_made():
         data_tmp.clear()
         data_temp.clear()
     shell_table = []
+    count_data = len(data)
     s_tmp = []
-    for l in range(0, game // 3 - 1): 
+    for l in range(0, count_data): 
         shell_tmp = Table(data[l], colWidths=["*"])
         s_tmp.append(shell_tmp)
         tmp_copy = s_tmp.copy()
