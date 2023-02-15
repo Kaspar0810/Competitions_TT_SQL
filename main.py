@@ -6500,7 +6500,7 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     return dict_tbl
 
 
-def tbl_begunki(ts, stage, number_group, tours, max_num):
+def tbl_begunki(ts, stage, number_group, tours, list_tours):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
     stiker = []
@@ -6521,10 +6521,10 @@ def tbl_begunki(ts, stage, number_group, tours, max_num):
     if number_group == "все":
         result_group = result.select().where(Result.system_stage == stage)
     else:
-        if max_num == 0:
+        if len(list_tours) == 0:
             result_group = result.select().where(Result.number_group == number_group)
         else:
-            result_group = result.select().where((Result.number_group == number_group) & (Result.round <= max_num))
+            result_group = result.select().where((Result.number_group == number_group) & (Result.round.in_(list_tours)))
  
     count = len(result_group)
     shot_stage = ""
@@ -6624,21 +6624,24 @@ def begunki_made():
                         ('FONTSIZE', (0, 0), (0, 0), 12), 
                         ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
                         ('ALIGN',(0, 0), (0, 0),'CENTER')])
-    max_num = 0
+  
     if tours != "Все":
         range_tours_str = my_win.lineEdit_range_tours.text()
         range_tours_list = list(range_tours_str)
-        range_tours_list_int = []
+        list_tours = []
         if "-" in range_tours_list:
             range_tours_list.remove("-")
-            for b in range_tours_list:
+            for b in range (range_tours_list[0], range_tours_list[1]) + 1:
                 b = int(b)
-                range_tours_list_int.append(b)
-            max_num = max( range_tours_list_int)
-
-            
- 
-    stiker = tbl_begunki(ts, stage, number_group, tours, max_num) # здесь надо менять данные бегунков
+                list_tours.append(b)
+        else:
+            tours_list = range_tours_list
+            for b in tours_list:
+                if b != ",":
+                    b = int(b)
+                    list_tours.append(b)
+        
+    stiker = tbl_begunki(ts, stage, number_group, tours, list_tours) # здесь надо менять данные бегунков
     dict_table = stiker[0]
     game = stiker[1]
 
@@ -6740,8 +6743,16 @@ def select_diapazon():
     index = my_win.comboBox_select_tours.currentIndex()
     if index != 0:
         my_win.lineEdit_range_tours.show()
+        my_win.lineEdit_range_tours.setFocus()
     else:
         my_win.lineEdit_range_tours.hide()
+
+
+def enter_print_begunki():
+    """Печать бегунков при нажатии энтер на поле диапазона"""
+    sender = my_win.sender()
+    if sender == my_win.lineEdit_range_tours:
+        begunki_made()
 
 
 def table_made(pv, stage):
@@ -9940,6 +9951,7 @@ my_win.lineEdit_pl1_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
+my_win.lineEdit_range_tours.returnPressed.connect(enter_print_begunki)
 
 my_win.lineEdit_Family_name.returnPressed.connect(input_player)
 my_win.lineEdit_bday.returnPressed.connect(next_field)
@@ -10022,7 +10034,6 @@ my_win.Button_filter.clicked.connect(filter_gr)
 # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_etap_made.clicked.connect(etap_made)
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
-# my_win.Button_group.clicked.connect(player_in_table_group_and_write_Game_list_Result)  # вносит спортсменов в группы
 # записывает в базу или редактирует титул
 my_win.Button_title_made.clicked.connect(title_made)
 # записывает в базу счет в партии встречи
