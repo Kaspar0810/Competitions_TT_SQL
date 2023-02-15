@@ -2851,7 +2851,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>501</height>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2863,8 +2863,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>222</width>
-       <height>534</height>
+       <width>225</width>
+       <height>565</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3237,7 +3237,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>501</height>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3249,7 +3249,7 @@
         <x>0</x>
         <y>0</y>
         <width>165</width>
-        <height>126</height>
+        <height>133</height>
        </rect>
       </property>
       <layout class="QFormLayout" name="formLayout">
@@ -3637,7 +3637,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>501</height>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3814,7 +3814,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>501</height>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3827,7 +3827,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>501</height>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4076,7 +4076,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>501</height>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4087,7 +4087,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>191</width>
+        <width>211</width>
         <height>241</height>
        </rect>
       </property>
@@ -4131,7 +4131,7 @@
         <rect>
          <x>9</x>
          <y>80</y>
-         <width>141</width>
+         <width>201</width>
          <height>16</height>
         </rect>
        </property>
@@ -4150,7 +4150,7 @@
         <rect>
          <x>9</x>
          <y>27</y>
-         <width>75</width>
+         <width>161</width>
          <height>16</height>
         </rect>
        </property>
@@ -4167,7 +4167,7 @@
       <widget class="QPushButton" name="Button_view_begunki">
        <property name="geometry">
         <rect>
-         <x>90</x>
+         <x>110</x>
          <y>200</y>
          <width>85</width>
          <height>32</height>
@@ -4195,7 +4195,7 @@
         <rect>
          <x>6</x>
          <y>100</y>
-         <width>171</width>
+         <width>191</width>
          <height>26</height>
         </rect>
        </property>
@@ -4211,7 +4211,7 @@
         <rect>
          <x>6</x>
          <y>50</y>
-         <width>171</width>
+         <width>191</width>
          <height>26</height>
         </rect>
        </property>
@@ -4222,9 +4222,9 @@
       <widget class="QComboBox" name="comboBox_select_tours">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>140</y>
-         <width>91</width>
+         <x>6</x>
+         <y>160</y>
+         <width>101</width>
          <height>26</height>
         </rect>
        </property>
@@ -4232,11 +4232,30 @@
       <widget class="QLineEdit" name="lineEdit_range_tours">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>170</y>
-         <width>161</width>
-         <height>21</height>
+         <x>120</x>
+         <y>160</y>
+         <width>73</width>
+         <height>23</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_70">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>137</y>
+         <width>201</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>Диапазон печати</string>
        </property>
       </widget>
      </widget>

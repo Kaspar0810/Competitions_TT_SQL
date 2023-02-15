@@ -6500,7 +6500,7 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
     return dict_tbl
 
 
-def tbl_begunki(ts, stage, number_group, tours):
+def tbl_begunki(ts, stage, number_group, tours, max_num):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
     stiker = []
@@ -6514,15 +6514,18 @@ def tbl_begunki(ts, stage, number_group, tours):
     # result_group = result.select().where(Result.system_stage == stage)
      # # кол-во столбцов в таблице и их ширина
     cW = (1.6 * cm)
-    rH = (0.4 * cm, 0.6 * cm, 1 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm,
-           0.6 * cm, 0.5 * cm)
+    rH = (0.6 * cm, 0.9 * cm, 1 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm,
+           0.5 * cm, 0.5 * cm)
     dict_tbl = {}
     tdt_new_tmp = []
     if number_group == "все":
         result_group = result.select().where(Result.system_stage == stage)
     else:
-        result_group = result.select().where(Result.number_group == number_group)
-    num_stage = ""    
+        if max_num == 0:
+            result_group = result.select().where(Result.number_group == number_group)
+        else:
+            result_group = result.select().where((Result.number_group == number_group) & (Result.round <= max_num))
+ 
     count = len(result_group)
     shot_stage = ""
     if stage == "Предварительный":
@@ -6533,31 +6536,45 @@ def tbl_begunki(ts, stage, number_group, tours):
         shot_stage = "Ф"
 
     for res_id in result_group:
-        tours = res_id.tours
-        pl1 = res_id.player1
-        pl2 = res_id.player2
-        st = res_id.number_group
-        mark = st.find("-")
-        num_stage = f"{st[:mark]}{shot_stage}"
+        tours = res_id.tours # номера игроков в туре
+        pl1 = res_id.player1 # 1-й игроков и его город в туре
+        pl2 = res_id.player2 # 2-й игроков и его город в туре
+        st = res_id.number_group # этап
+        n_gr = ""
+        if stage == "Предварительный":
+            shot_stage = "ПР"
+            mark = st.find(" ")
+            gr = st[:mark]
+            sys_stage = f"{shot_stage}"
+            n_gr = f"{gr}гр"
+            sys_stage = f"{shot_stage}"
+        elif stage == "Полуфиналы":
+            shot_stage = "ПФ"
+        elif stage == "Финальный":
+            shot_stage = "Ф"
+            mark = st.find("-")
+            sys_stage = f"{st[:mark]}{shot_stage}"
+
+        round = res_id.round # раунд
         s1 = pl1.find("/")  
         s2 = pl2.find("/")   
         player1 = pl1[:s1]
         city1 = pl1[s1 + 1:]
         player2 = pl2[:s2]
         city2 = pl2[s2 + 1:]
-        pl1 = f"{player1}\n{city1}"
+        pl1 = f"{player1}\n{city1}" # делает фамилия и город на разнызх строчках
         pl2 = f"{player2}\n{city2}"
-
-        d_tmp =  [[num_stage, 'тур', 'вст', 'стол'],
-        ['', '1', tours, ''],
-        [pl1, '21', pl2, '23'],
-        ['', '', '', ''],
-        ['', '', '', ''],
-        ['', '', '', ''],
-        ['', '', '', ''],
-        ['', '', '', ''],
-        ['общ счет:', '', '', ''],
-        ['Победитель', '', '', '']]
+        # список строк бегунка
+        d_tmp = [[n_gr, 'тур', 'вст', 'стол'],
+                [sys_stage, round, tours, ''],
+                [pl1, '', pl2, ''],
+                ['', '', '', ''],
+                ['', '', '', ''],
+                ['', '', '', ''],
+                ['', '', '', ''],
+                ['', '', '', ''],
+                ['общ счет:', '', '', ''],
+                ['Победитель', '', '', '']]
         tdt_temp = d_tmp.copy()
         d_tmp.clear()
         tdt_new_temp = tdt_temp.copy()
@@ -6594,19 +6611,34 @@ def begunki_made():
     # span (0,2), (1,2) - объединяет 0 и 1 столбец и строки 2 (0-столбец, 2-строка), (1-столбец, 2-строка)
     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                         ('INNERGRID', (0,0), (-1,-1), 0.5, colors.black),
-                        ('BOX', (0,0), (-1,-1), 1, colors.black),
-                        ('SPAN',(0,0),(0,1)),
-                        ('FONTSIZE', (0, 0), (0, 1), 22)]
+                        ('BOX', (0,0), (-1,-1), 1, colors.black)]
                         + tblstyle +
-                        [('VALIGN', (0, 0), (0, 1), 'TOP'),
-                        ('ALIGN',(0, 0), (0, 1),'CENTER'),
+                        [('FONTSIZE', (0, 1), (0, 1), 20),
+                        ('VALIGN', (0, 1), (0, 1), 'TOP'),
+                        ('ALIGN',(0, 1), (0, 1),'CENTER'),
                         ('FONTSIZE', (0, 2), (3, 2), 7), 
                         ('VALIGN', (1, 0), (3, 0), 'MIDDLE'),
-                        ('FONTSIZE', (1, 1), (3, 1), 11), 
-                        ('VALIGN', (1, 0), (3, 0), 'MIDDLE'),
-                        ('ALIGN',(1, 0), (3, 0),'CENTER')])
+                        ('FONTSIZE', (1, 1), (3, 1), 12), 
+                        ('VALIGN', (1, 1), (3, 1), 'MIDDLE'),
+                        ('ALIGN',(1, 1), (3, 1),'CENTER'),
+                        ('FONTSIZE', (0, 0), (0, 0), 12), 
+                        ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
+                        ('ALIGN',(0, 0), (0, 0),'CENTER')])
+    max_num = 0
+    if tours != "Все":
+        range_tours_str = my_win.lineEdit_range_tours.text()
+        range_tours_list = list(range_tours_str)
+        range_tours_list_int = []
+        if "-" in range_tours_list:
+            range_tours_list.remove("-")
+            for b in range_tours_list:
+                b = int(b)
+                range_tours_list_int.append(b)
+            max_num = max( range_tours_list_int)
+
+            
  
-    stiker = tbl_begunki(ts, stage, number_group, tours) # здесь надо менять данные бегунков
+    stiker = tbl_begunki(ts, stage, number_group, tours, max_num) # здесь надо менять данные бегунков
     dict_table = stiker[0]
     game = stiker[1]
 
@@ -6623,12 +6655,13 @@ def begunki_made():
         end = celoe + 1
     else:
         end = celoe + 2
-
+    a = 0
     for k in range(1, end):
-        if k == end - 1:
+        if ostatok !=0 and k == end - 1:
             row = ostatok
         for i in range(0, row): # кол-во бегунков в 
-            data_tmp.append(dict_table[(k * 2 - 2) + i])
+            data_tmp.append(dict_table[a])
+            a += 1
         tmp = data_tmp.copy()
         data_temp.append(tmp) 
         temp = data_temp.copy()
@@ -6647,12 +6680,17 @@ def begunki_made():
         elements.append(shell_table[l][0])
  
     name_table = "begunki.pdf"
-    doc = SimpleDocTemplate(name_table, pagesize=A4)
+    # устанавливает поля на странице pdf
+    doc = SimpleDocTemplate(name_table, pagesize=A4, rightMargin=1*cm, leftMargin=1*cm, topMargin=1*cm, bottomMargin=1*cm)
     change_dir()
     doc.build(elements)
-    # change_dir()
+
     view_file = name_table
-    platform == "darwin" # OS X
+    if platform == "darwin":  # OS X
+        os.system(f"open {view_file}")
+    elif platform == "win32":  # Windows...
+        os.system(f"{view_file}")
+
     os.system(f"open {view_file}")
 
 
@@ -6684,7 +6722,7 @@ def select_stage_for_begunki():
             else:
                 group_list.append(k.stage)
 
-        my_win.comboBox_select_group_begunki.addItems(group_list)
+    my_win.comboBox_select_group_begunki.addItems(group_list)
 
         
 def select_tour_for_begunki():
