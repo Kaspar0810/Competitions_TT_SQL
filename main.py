@@ -6511,6 +6511,10 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     if stage != "Финальный":
         system = systems.select().where(System.stage == stage).get()
         total_group = system.total_group
+    else:
+        system = systems.select().where(System.stage == number_group).get()
+        final_type = system.type_table
+
     # result_group = result.select().where(Result.system_stage == stage)
      # # кол-во столбцов в таблице и их ширина
     cW = (1.6 * cm)
@@ -6518,14 +6522,24 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
            0.5 * cm, 0.5 * cm)
     dict_tbl = {}
     tdt_new_tmp = []
-    if number_group == "все":
-        result_group = result.select().where(Result.system_stage == stage)
-    else:
-        if len(list_tours) == 0:
+
+    if final_type == "сетка":
+        result_setka = result.select().where(Result.number_group == number_group)
+        result_all = result_setka.select().where((Result.player1 != "") & (Result.player2 != ""))
+        c = len(result_all)
+        for h in result_all:
+            win = h.winner
+        result_group = result_all.select().where(Result.winner == None)
+    else:    
+        if number_group == "все" and tours == "все":
+            result_group = result.select().where(Result.system_stage == stage)
+        elif number_group == "все" and tours == "диапазон":
+            result_group = result.select().where((Result.system_stage == stage) & (Result.round.in_(list_tours)))
+        elif number_group != "все" and tours == "все":
             result_group = result.select().where(Result.number_group == number_group)
-        else:
+        elif number_group != "все" and tours == "диапазон":
             result_group = result.select().where((Result.number_group == number_group) & (Result.round.in_(list_tours)))
- 
+    
     count = len(result_group)
     shot_stage = ""
     if stage == "Предварительный":
@@ -6624,22 +6638,29 @@ def begunki_made():
                         ('FONTSIZE', (0, 0), (0, 0), 12), 
                         ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
                         ('ALIGN',(0, 0), (0, 0),'CENTER')])
-  
-    if tours != "Все":
-        range_tours_str = my_win.lineEdit_range_tours.text()
-        range_tours_list = list(range_tours_str)
-        list_tours = []
-        if "-" in range_tours_list:
-            range_tours_list.remove("-")
-            for b in range (range_tours_list[0], range_tours_list[1]) + 1:
-                b = int(b)
-                list_tours.append(b)
-        else:
-            tours_list = range_tours_list
-            for b in tours_list:
-                if b != ",":
+    #  ========= формирование диапазона печати бегунков ==========
+    sys = system.select().where(System.stage == number_group).get()
+    final_type = sys.type_table
+    list_tours = []
+    if final_type == "сетка":
+        list_tours.append("несыгранные")
+    elif final_type == "круг":
+        if tours != "все":
+            range_tours_str = my_win.lineEdit_range_tours.text()
+            txt = range_tours_str.replace(" ", "")
+            range_tours_list = list(txt)
+            if "-" in range_tours_list:
+                range_tours_list.remove("-")
+                result_int = [int(item) for item in range_tours_list] # преобразовывает список строковых данных в числовой тип
+                for b in range (result_int[0], result_int[1] + 1):
                     b = int(b)
                     list_tours.append(b)
+            else:
+                tours_list = range_tours_list
+                for b in tours_list:
+                    if b != ",":
+                        b = int(b)
+                        list_tours.append(b)
         
     stiker = tbl_begunki(ts, stage, number_group, tours, list_tours) # здесь надо менять данные бегунков
     dict_table = stiker[0]
@@ -6687,7 +6708,8 @@ def begunki_made():
     doc = SimpleDocTemplate(name_table, pagesize=A4, rightMargin=1*cm, leftMargin=1*cm, topMargin=1*cm, bottomMargin=1*cm)
     change_dir()
     doc.build(elements)
-
+    my_win.lineEdit_range_tours.clear()
+    my_win.lineEdit_range_tours.hide()
     view_file = name_table
     if platform == "darwin":  # OS X
         os.system(f"open {view_file}")
@@ -6740,6 +6762,7 @@ def select_tour_for_begunki():
 
 def select_diapazon():
     """показывает поле для ввода дмапазона туров"""
+    my_win.lineEdit_range_tours.clear()
     index = my_win.comboBox_select_tours.currentIndex()
     if index != 0:
         my_win.lineEdit_range_tours.show()
@@ -6752,7 +6775,7 @@ def enter_print_begunki():
     """Печать бегунков при нажатии энтер на поле диапазона"""
     sender = my_win.sender()
     if sender == my_win.lineEdit_range_tours:
-        begunki_made()
+         begunki_made()
 
 
 def table_made(pv, stage):
