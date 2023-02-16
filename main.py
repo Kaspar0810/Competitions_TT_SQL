@@ -6526,10 +6526,7 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     if final_type == "сетка":
         result_setka = result.select().where(Result.number_group == number_group)
         result_all = result_setka.select().where((Result.player1 != "") & (Result.player2 != ""))
-        c = len(result_all)
-        for h in result_all:
-            win = h.winner
-        result_group = result_all.select().where(Result.winner == None)
+        result_group = result_all.select().where(Result.winner.is_null())
     else:    
         if number_group == "все" and tours == "все":
             result_group = result.select().where(Result.system_stage == stage)
