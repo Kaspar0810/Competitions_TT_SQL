@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>3</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -1672,258 +1672,6 @@
         <string>Неявка</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s7">
-       <property name="geometry">
-        <rect>
-         <x>684</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s7">
-       <property name="geometry">
-        <rect>
-         <x>684</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s6">
-       <property name="geometry">
-        <rect>
-         <x>640</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s6">
-       <property name="geometry">
-        <rect>
-         <x>640</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s2">
-       <property name="geometry">
-        <rect>
-         <x>464</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s4">
-       <property name="geometry">
-        <rect>
-         <x>552</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s4">
-       <property name="geometry">
-        <rect>
-         <x>552</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s2">
-       <property name="geometry">
-        <rect>
-         <x>464</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s3">
-       <property name="geometry">
-        <rect>
-         <x>508</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s1">
-       <property name="geometry">
-        <rect>
-         <x>420</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s3">
-       <property name="geometry">
-        <rect>
-         <x>508</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s5">
-       <property name="geometry">
-        <rect>
-         <x>596</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s5">
-       <property name="geometry">
-        <rect>
-         <x>596</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s1">
-       <property name="geometry">
-        <rect>
-         <x>420</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
       <widget class="QLineEdit" name="lineEdit_pl1_score_total">
        <property name="geometry">
         <rect>
@@ -2015,6 +1763,306 @@
          <pointsize>16</pointsize>
         </font>
        </property>
+      </widget>
+      <widget class="QFrame" name="frame_gr_three">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>41</y>
+         <width>131</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s1">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s3">
+        <property name="geometry">
+         <rect>
+          <x>88</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s2">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s1">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s2">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s3">
+        <property name="geometry">
+         <rect>
+          <x>88</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_gr_five">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>41</y>
+         <width>91</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s5">
+        <property name="geometry">
+         <rect>
+          <x>46</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s5">
+        <property name="geometry">
+         <rect>
+          <x>46</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s4">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s4">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_gr_seven">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>41</y>
+         <width>88</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s6">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s7">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s6">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s7">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_kolvo_vstrech">
@@ -2250,258 +2298,6 @@
         <string>Неявка</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s7_fin">
-       <property name="geometry">
-        <rect>
-         <x>684</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s7_fin">
-       <property name="geometry">
-        <rect>
-         <x>684</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s6_fin">
-       <property name="geometry">
-        <rect>
-         <x>640</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s6_fin">
-       <property name="geometry">
-        <rect>
-         <x>640</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s1_fin">
-       <property name="geometry">
-        <rect>
-         <x>420</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s2_fin">
-       <property name="geometry">
-        <rect>
-         <x>464</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s3_fin">
-       <property name="geometry">
-        <rect>
-         <x>508</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s4_fin">
-       <property name="geometry">
-        <rect>
-         <x>552</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_s5_fin">
-       <property name="geometry">
-        <rect>
-         <x>596</x>
-         <y>71</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s1_fin">
-       <property name="geometry">
-        <rect>
-         <x>420</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s2_fin">
-       <property name="geometry">
-        <rect>
-         <x>464</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s3_fin">
-       <property name="geometry">
-        <rect>
-         <x>508</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s4_fin">
-       <property name="geometry">
-        <rect>
-         <x>552</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_s5_fin">
-       <property name="geometry">
-        <rect>
-         <x>596</x>
-         <y>41</y>
-         <width>43</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
       <widget class="QLineEdit" name="lineEdit_pl1_score_total_fin">
        <property name="geometry">
         <rect>
@@ -2593,6 +2389,306 @@
          <pointsize>14</pointsize>
         </font>
        </property>
+      </widget>
+      <widget class="QFrame" name="frame_fin_three">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>41</y>
+         <width>132</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s1_fin">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s1_fin">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s3_fin">
+        <property name="geometry">
+         <rect>
+          <x>88</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s2_fin">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s3_fin">
+        <property name="geometry">
+         <rect>
+          <x>88</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s2_fin">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_fin_five">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>41</y>
+         <width>91</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s4_fin">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s4_fin">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s5_fin">
+        <property name="geometry">
+         <rect>
+          <x>46</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s5_fin">
+        <property name="geometry">
+         <rect>
+          <x>46</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_fin_seven">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>41</y>
+         <width>90</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s6_fin">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s6_fin">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s7_fin">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s7_fin">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_kolvo_vstrech_fin">
@@ -2809,7 +2905,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>0</y>
+      <y>10</y>
       <width>239</width>
       <height>741</height>
      </rect>
@@ -2843,15 +2939,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2863,7 +2959,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>196</width>
+       <width>222</width>
        <height>534</height>
       </rect>
      </property>
@@ -3236,175 +3332,13 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
       <string>Система</string>
      </attribute>
-     <widget class="QWidget" name="layoutWidget_4">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>165</width>
-        <height>133</height>
-       </rect>
-      </property>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_10">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>1-й этап:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_15">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>2-й этап:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_17">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>3-й этап:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_29">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>4-й этап:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_59">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>5-й этап:</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="1">
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <property name="spacing">
-          <number>1</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QComboBox" name="comboBox_etap_1">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_etap_2">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_etap_3">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_etap_4">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_etap_5">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>false</italic>
-            </font>
-           </property>
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
      <widget class="QPushButton" name="Button_system_made">
       <property name="geometry">
        <rect>
@@ -3550,7 +3484,7 @@
         <x>10</x>
         <y>220</y>
         <width>216</width>
-        <height>47</height>
+        <height>71</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -3562,8 +3496,8 @@
       <widget class="QPushButton" name="Button_etap_made">
        <property name="geometry">
         <rect>
-         <x>129</x>
-         <y>18</y>
+         <x>128</x>
+         <y>40</y>
          <width>83</width>
          <height>32</height>
         </rect>
@@ -3581,8 +3515,8 @@
       <widget class="QComboBox" name="comboBox_page_vid">
        <property name="geometry">
         <rect>
-         <x>4</x>
-         <y>20</y>
+         <x>2</x>
+         <y>42</y>
          <width>124</width>
          <height>26</height>
         </rect>
@@ -3591,8 +3525,8 @@
       <widget class="QLabel" name="label_13">
        <property name="geometry">
         <rect>
-         <x>18</x>
-         <y>2</y>
+         <x>23</x>
+         <y>26</y>
          <width>91</width>
          <height>20</height>
         </rect>
@@ -3600,10 +3534,36 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
+         <italic>true</italic>
         </font>
        </property>
        <property name="text">
         <string>Вид страницы</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_visible_game">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>4</y>
+         <width>181</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Запись счета в партии</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>
@@ -3630,14 +3590,204 @@
        <string>Создание этапа</string>
       </property>
      </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>8</y>
+        <width>53</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>1-й этап:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>32</y>
+        <width>54</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>2-й этап:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>56</y>
+        <width>55</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>3-й этап:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_29">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>55</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>4-й этап:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_59">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>104</y>
+        <width>55</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>5-й этап:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_etap_1">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>2</y>
+        <width>150</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_etap_2">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>26</y>
+        <width>150</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_etap_4">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>74</y>
+        <width>150</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_etap_5">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>98</y>
+        <width>150</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_etap_3">
+      <property name="geometry">
+       <rect>
+        <x>75</x>
+        <y>50</y>
+        <width>150</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>false</italic>
+       </font>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_3">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3813,8 +3963,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3826,8 +3976,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
