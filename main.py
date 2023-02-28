@@ -3226,73 +3226,42 @@ def visible_field():
     tab = my_win.tabWidget.currentIndex()
     r = my_win.tableWidget.currentRow()
     state_visible_current = my_win.checkBox_5.isChecked()
+    flag = 0
     for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
         if i.isChecked():
             match_current = int(i.text())
+            flag = 1
             break
     # ================
-    if r == -1:
-        state_visible = True
-        match = 5
+    if r == -1 and flag == 0: # если просто открыта вкладка (значения по умолчанию)
+        state_visible_current = True
+        match_current = 5
         my_win.checkBox_5.setChecked(True)
         stage = "все финалы"
-    else:
+        match_db = 5
+        state_visible_db = True
+        my_win.radioButton_match_6.setChecked(True)
+    elif r != -1:
         stage = my_win.tableWidget.item(r, 2).text()
             # то что записано в базе на данный финал (из скольки партий и игра со счетом)
-        sf = system.select().where(System.stage == stage).get()
-        match_db = sf.score_flag
-        state_visible_db = sf.visible_game  # флаг, показывающий записывать счет в партиях или нет
-    if (sender == my_win.checkBox_5 or sender == my_win.checkBox_4) and stage != "все финалы":
-        system_stage = System.get((System.title_id == title_id()) & (System.stage == stage))
-        game_score = system_stage.score_flag
-        state_visible_db = system_stage.visible_game
-        if match!= game_score:
-            with db:
-                system_stage.score_flag = match
-                system_stage.save()
-        if state_visible != state_visible_db:
-            with db:
-                system_stage.vivible_game = state_visible
-                system_stage.save()
-    else:
-        if tab == 3:
-            pass
-        elif tab == 4:
-            pass
-        else:
-            if stage == "все финалы":
-                match_match_current = 5
-                state_visible_current = True
-            # else:
-            #     system_stage = System.get((System.title_id == title_id()) & (System.stage == stage))
-            #     state_visible = system_stage.visible_game # что записано в базе показывать поля ввода счета или нет
-            #     match = system_stage.score_flag # что записано в базе из скольких партий игра
-        if state_visible_current is False:
-            if tab == 3:
-                my_win.frame_gr_three.setVisible(False)
-                my_win.frame_gr_five.setVisible(False)
-                my_win.frame_gr_seven.setVisible(False)
-            elif tab == 4:
-                pass
-            else:
-                my_win.frame_fin_three.setVisible(False)
-                my_win.frame_fin_five.setVisible(False)
-                my_win.frame_fin_seven.setVisible(False)
-            my_win.label_22.setVisible(False)
-        else:
-            # вкладка -группы- проверка какая стоит галочка (сколько партий)        
+        system_stage = system.select().where(System.stage == stage).get()
+        match_db = system_stage.score_flag
+        state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
+        # system_stage = System.get((System.title_id == title_id()) & (System.stage == stage))
+        if match_db != match_current:
             if tab == 3:
                 if match_current == 3:
+                    my_win.radioButton_match_3.setChecked(True)
                     my_win.frame_gr_three.setVisible(True)
                     my_win.frame_gr_five.setVisible(False)
                     my_win.frame_gr_seven.setVisible(False)
                 elif match_current == 5:
-                    my_win.radioButton_match_5.isChecked()
+                    my_win.radioButton_match_5.setChecked(True)
                     my_win.frame_gr_three.setVisible(True)
                     my_win.frame_gr_five.setVisible(True)
                     my_win.frame_gr_seven.setVisible(False)
                 elif match_current == 7:
-                    my_win.radioButton_match_7.isChecked()
+                    my_win.radioButton_match_7.setChecked(True)
                     my_win.frame_gr_three.setVisible(True)
                     my_win.frame_gr_five.setVisible(True)
                     my_win.frame_gr_seven.setVisible(True)
@@ -3301,7 +3270,6 @@ def visible_field():
                 pass
             else:
                 if match_current == 3:
-                    # my_win.radioButton_match_4.isChecked()
                     my_win.radioButton_match_4.setChecked(True)
                     my_win.frame_fin_three.setVisible(True)
                     my_win.frame_fin_five.setVisible(False)
@@ -3317,15 +3285,109 @@ def visible_field():
                     my_win.frame_fin_five.setVisible(True)
                     my_win.frame_fin_seven.setVisible(True)
                 my_win.label_40.setVisible(True)
-
-            if match_db!= match_current:
                 with db:
                     system_stage.score_flag = match_current
                     system_stage.save()
-            if state_visible_db != state_visible_current:
+        if state_visible_db != state_visible_current:
+            if state_visible_current is False:
+                if tab == 3:
+                    my_win.frame_gr_three.setVisible(False)
+                    my_win.frame_gr_five.setVisible(False)
+                    my_win.frame_gr_seven.setVisible(False)
+                elif tab == 4:
+                    pass
+                else:
+                    my_win.frame_fin_three.setVisible(False)
+                    my_win.frame_fin_five.setVisible(False)
+                    my_win.frame_fin_seven.setVisible(False)
+                my_win.label_22.setVisible(False)   
                 with db:
                     system_stage.vivible_game = state_visible_current
                     system_stage.save()
+
+    # if (sender == my_win.checkBox_5 or sender == my_win.checkBox_4) and stage != "все финалы":
+    #     system_stage = System.get((System.title_id == title_id()) & (System.stage == stage))
+    #     match_db = system_stage.score_flag
+    #     state_visible_db = system_stage.visible_game
+    #     if match_current != match_db:
+    #         with db:
+    #             system_stage.score_flag = match_current
+    #             system_stage.save()
+    #     if state_visible_current != state_visible_db:
+    #         with db:
+    #             system_stage.vivible_game = state_visible_current
+    #             system_stage.save()
+    # else:
+        # if tab == 3:
+        #     pass
+        # elif tab == 4:
+        #     pass
+        # else:
+        #     if stage == "все финалы":
+        #         match_current = 5
+        #         state_visible_current = True
+            # else:
+            #     system_stage = System.get((System.title_id == title_id()) & (System.stage == stage))
+            #     state_visible = system_stage.visible_game # что записано в базе показывать поля ввода счета или нет
+            #     match = system_stage.score_flag # что записано в базе из скольких партий игра
+        # if state_visible_current is False:
+        #     if tab == 3:
+        #         my_win.frame_gr_three.setVisible(False)
+        #         my_win.frame_gr_five.setVisible(False)
+        #         my_win.frame_gr_seven.setVisible(False)
+        #     elif tab == 4:
+        #         pass
+        #     else:
+        #         my_win.frame_fin_three.setVisible(False)
+        #         my_win.frame_fin_five.setVisible(False)
+        #         my_win.frame_fin_seven.setVisible(False)
+        #     my_win.label_22.setVisible(False)
+        # else:
+            # вкладка -группы- проверка какая стоит галочка (сколько партий)        
+            # if tab == 3:
+            #     if match_current == 3:
+            #         my_win.frame_gr_three.setVisible(True)
+            #         my_win.frame_gr_five.setVisible(False)
+            #         my_win.frame_gr_seven.setVisible(False)
+            #     elif match_current == 5:
+            #         my_win.radioButton_match_5.isChecked()
+            #         my_win.frame_gr_three.setVisible(True)
+            #         my_win.frame_gr_five.setVisible(True)
+            #         my_win.frame_gr_seven.setVisible(False)
+            #     elif match_current == 7:
+            #         my_win.radioButton_match_7.isChecked()
+            #         my_win.frame_gr_three.setVisible(True)
+            #         my_win.frame_gr_five.setVisible(True)
+            #         my_win.frame_gr_seven.setVisible(True)
+            #     my_win.label_22.setVisible(True)
+            # elif tab == 4:
+            #     pass
+            # else:
+            #     if match_current == 3:
+            #         my_win.radioButton_match_4.setChecked(True)
+            #         my_win.frame_fin_three.setVisible(True)
+            #         my_win.frame_fin_five.setVisible(False)
+            #         my_win.frame_fin_seven.setVisible(False)
+            #     elif match_current == 5:
+            #         my_win.radioButton_match_6.setChecked(True)
+            #         my_win.frame_fin_three.setVisible(True)
+            #         my_win.frame_fin_five.setVisible(True)
+            #         my_win.frame_fin_seven.setVisible(False)
+            #     elif match_current == 7:
+            #         my_win.radioButton_match_8.setChecked(True)
+            #         my_win.frame_fin_three.setVisible(True)
+            #         my_win.frame_fin_five.setVisible(True)
+            #         my_win.frame_fin_seven.setVisible(True)
+            #     my_win.label_40.setVisible(True)
+            # # изменяет в db колво партий и запись счета если они не совпадают
+            # if match_db != match_current:
+            #     with db:
+            #         system_stage.score_flag = match_current
+            #         system_stage.save()
+            # if state_visible_db != state_visible_current:
+            #     with db:
+            #         system_stage.vivible_game = state_visible_current
+            #         system_stage.save()
             # my_win.checkBox_5.setChecked(True)
 
         # system_stage = System.get((System.title_id == title_id()) & (System.stage == stage))
@@ -3345,7 +3407,8 @@ def visible_field():
                 #     pass
                 # else:
                 #     my_win.checkBox_5.setChecked(state_visible)
-        return state_visible
+        return state_visible_current
+
 
 def select_player_in_list():
     """выводит данные игрока в поля редактирования или удаления"""
