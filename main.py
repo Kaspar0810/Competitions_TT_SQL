@@ -3018,13 +3018,8 @@ def chop_line_city(g, maxline=15):
 
 def match_score_db():
     """кол-во партий и запись счета партий по умолчанию в db"""
-    # etap = []
     tab = my_win.tabWidget.currentIndex()
     system = System.select().where(System.title_id == title_id())
-    # for i in system:
-    #     e = i.stage
-    #     etap.append(e)  # получает список этапов на данных соревнованиях
-
     if tab == 3:
         sf = system.select().where(System.stage == "Предварительный").get()
         match = sf.score_flag
@@ -3056,9 +3051,7 @@ def match_score_db():
             sf = system.select().where(System.stage == stage).get()
             match = sf.score_flag
             state = sf.visible_game  # флаг, показывающий записывать счет в партиях или нет
-            # stage = sf.stage
-
-
+ 
             if my_win.radioButton_match_4.isChecked():  # устанавливает галочку при нажатии на RadioBox
                 my_win.radioButton_match_4.setChecked(True)
                 score = 3  
@@ -3078,29 +3071,6 @@ def match_score_db():
             state = True
             stage = "1-й финал"
             match = 5
-        # ====================
-        # if my_win.radioButton_match_4.isChecked():  # устанавливает галочку при нажатии на RadioBox
-        #     my_win.radioButton_match_4.setChecked(True)
-        #     score = 3  
-        # elif my_win.radioButton_match_6.isChecked():
-        #     my_win.radioButton_match_6.setChecked(True)
-        #     score = 5  
-        # elif my_win.radioButton_match_8.isChecked():
-        #     my_win.radioButton_match_8.setChecked(True)
-        #     score = 7
-        # if score != match:
-        #     system_stage = system.select().where(System.stage == stage).get()
-        #     with db:
-        #         system_stage.score_flag = score
-        #         system_stage.save()
-
-        # if match == 3: # устанавливает галочку исходя что установлено в базе данных
-        #     my_win.radioButton_match_4.setChecked(True)  
-        # elif match == 5:
-        #     my_win.radioButton_match_6.setChecked(True)  
-        # else:
-        #     my_win.radioButton_match_8.setChecked(True)
-
     visible_field()       
 
 
@@ -3248,6 +3218,12 @@ def visible_field():
         system_stage = system.select().where(System.stage == stage).get()
         match_db = system_stage.score_flag
         state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
+        # ======= записывает изменение в базу данных
+        if state_visible != state_visible_db:
+            with db:
+                system_stage.visible_game = state_visible
+                system_stage.save()
+
         state_visible = state_visible_db
     if sender == my_win.checkBox_4 or sender == my_win.checkBox_5: # изменяет состояние чекбокса игра со счетом или нет
         state_visible = my_win.checkBox_5.isChecked()
@@ -3515,6 +3491,7 @@ def delete_player():
     else:
         return
 
+
 def sortByAlphabet(inputStr):
     inputStr = inputStr.lower()
     return inputStr[0]
@@ -3601,6 +3578,12 @@ def find_in_player_list():
         fill_table(player_list)
     else:
         my_win.textEdit.setText("Такого спортсмена нет!")
+
+
+def enter_total_score():
+    """ввод счета во встречи без счета в партиях"""
+    my_win.lineEdit_pl2_score_total_fin.setFocus()
+
 
 
 def focus():
@@ -9960,6 +9943,8 @@ my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_range_tours.returnPressed.connect(enter_print_begunki)
+
+my_win.lineEdit_pl1_score_total_fin.returnPressed.connect(enter_total_score)
 
 my_win.lineEdit_Family_name.returnPressed.connect(input_player)
 my_win.lineEdit_bday.returnPressed.connect(next_field)

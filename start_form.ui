@@ -22,7 +22,7 @@
      <x>150</x>
      <y>53</y>
      <width>591</width>
-     <height>26</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="font">
@@ -41,7 +41,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>134</y>
+     <y>130</y>
      <width>591</width>
      <height>26</height>
     </rect>
@@ -117,7 +117,7 @@
    <property name="geometry">
     <rect>
      <x>640</x>
-     <y>161</y>
+     <y>155</y>
      <width>101</width>
      <height>24</height>
     </rect>
@@ -187,7 +187,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>155</y>
+     <y>159</y>
      <width>261</width>
      <height>16</height>
     </rect>
@@ -195,7 +195,7 @@
    <property name="font">
     <font>
      <family>Times New Roman</family>
-     <pointsize>14</pointsize>
+     <pointsize>12</pointsize>
      <weight>75</weight>
      <italic>true</italic>
      <bold>true</bold>
@@ -231,16 +231,19 @@
     <number>24</number>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>6</x>
      <y>53</y>
      <width>131</width>
      <height>131</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>1</number>
+    </property>
     <item>
      <widget class="QPushButton" name="Button_new">
       <property name="font">
@@ -271,43 +274,36 @@
      </spacer>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="spacing">
-       <number>1</number>
+     <widget class="QPushButton" name="Button_old">
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
       </property>
-      <item>
-       <widget class="QPushButton" name="Button_old">
-        <property name="font">
-         <font>
-          <family>Times New Roman</family>
-          <pointsize>10</pointsize>
-          <weight>75</weight>
-          <italic>true</italic>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>Архив</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="Button_R">
-        <property name="font">
-         <font>
-          <family>Times New Roman</family>
-          <pointsize>10</pointsize>
-          <weight>75</weight>
-          <italic>true</italic>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>Рейтинг</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+      <property name="text">
+       <string>Архив</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="Button_R">
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Рейтинг</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
