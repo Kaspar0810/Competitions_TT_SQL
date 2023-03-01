@@ -2946,8 +2946,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2959,8 +2959,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>222</width>
-       <height>534</height>
+       <width>225</width>
+       <height>565</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3333,7 +3333,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>501</height>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3383,7 +3383,7 @@
       <property name="font">
        <font>
         <family>Times New Roman</family>
-        <pointsize>16</pointsize>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>true</italic>
         <bold>false</bold>
@@ -3412,9 +3412,9 @@
       <widget class="QComboBox" name="comboBox_filter_choice">
        <property name="geometry">
         <rect>
-         <x>77</x>
+         <x>87</x>
          <y>2</y>
-         <width>131</width>
+         <width>127</width>
          <height>26</height>
         </rect>
        </property>
@@ -3427,7 +3427,7 @@
         <rect>
          <x>2</x>
          <y>2</y>
-         <width>71</width>
+         <width>81</width>
          <height>20</height>
         </rect>
        </property>
@@ -3456,7 +3456,7 @@
         <rect>
          <x>2</x>
          <y>40</y>
-         <width>80</width>
+         <width>101</width>
          <height>20</height>
         </rect>
        </property>
@@ -3469,7 +3469,7 @@
         <rect>
          <x>2</x>
          <y>59</y>
-         <width>141</width>
+         <width>181</width>
          <height>20</height>
         </rect>
        </property>
@@ -3496,10 +3496,10 @@
       <widget class="QPushButton" name="Button_etap_made">
        <property name="geometry">
         <rect>
-         <x>128</x>
-         <y>40</y>
+         <x>129</x>
+         <y>42</y>
          <width>83</width>
-         <height>32</height>
+         <height>27</height>
         </rect>
        </property>
        <property name="font">
@@ -3515,7 +3515,7 @@
       <widget class="QComboBox" name="comboBox_page_vid">
        <property name="geometry">
         <rect>
-         <x>2</x>
+         <x>3</x>
          <y>42</y>
          <width>124</width>
          <height>26</height>
@@ -3525,15 +3525,16 @@
       <widget class="QLabel" name="label_13">
        <property name="geometry">
         <rect>
-         <x>23</x>
+         <x>14</x>
          <y>26</y>
-         <width>91</width>
+         <width>111</width>
          <height>20</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Times New Roman</family>
+         <pointsize>12</pointsize>
          <italic>true</italic>
         </font>
        </property>
@@ -3553,6 +3554,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
+         <pointsize>12</pointsize>
          <italic>true</italic>
         </font>
        </property>
@@ -3572,7 +3574,7 @@
        <rect>
         <x>45</x>
         <y>200</y>
-        <width>121</width>
+        <width>171</width>
         <height>20</height>
        </rect>
       </property>
@@ -3786,8 +3788,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3963,8 +3965,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3976,8 +3978,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4225,8 +4227,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
