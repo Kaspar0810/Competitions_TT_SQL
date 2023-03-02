@@ -3189,6 +3189,62 @@ def game_in_visible():
         return state_visible
 
 
+def change_status_visible_and_score_game(state_visible, match_current):
+    """изменение статуса колво партий и ввод счета во встречи"""
+    tab = my_win.tabWidget.currentIndex()
+        # вкладка -группы- проверка какая стоит галочка (сколько партий)        
+    if tab == 3:
+        if match_current == 3:
+            my_win.radioButton_match_3.setChecked(True)
+            my_win.frame_gr_three.setVisible(True)
+            my_win.frame_gr_five.setVisible(False)
+            my_win.frame_gr_seven.setVisible(False)
+        elif match_current == 5:
+            my_win.radioButton_match_5.setChecked(True)
+            my_win.frame_gr_three.setVisible(True)
+            my_win.frame_gr_five.setVisible(True)
+            my_win.frame_gr_seven.setVisible(False)
+        elif match_current == 7:
+            my_win.radioButton_match_7.setChecked(True)
+            my_win.frame_gr_three.setVisible(True)
+            my_win.frame_gr_five.setVisible(True)
+            my_win.frame_gr_seven.setVisible(True)
+        my_win.label_22.setVisible(True)
+    elif tab == 4:
+        pass
+    else:
+        if match_current == 3:
+            my_win.radioButton_match_4.setChecked(True)
+            my_win.frame_fin_three.setVisible(True)
+            my_win.frame_fin_five.setVisible(False)
+            my_win.frame_fin_seven.setVisible(False)
+        elif match_current == 5:
+            my_win.radioButton_match_6.setChecked(True)
+            my_win.frame_fin_three.setVisible(True)
+            my_win.frame_fin_five.setVisible(True)
+            my_win.frame_fin_seven.setVisible(False)
+        elif match_current == 7:
+            my_win.radioButton_match_8.setChecked(True)
+            my_win.frame_fin_three.setVisible(True)
+            my_win.frame_fin_five.setVisible(True)
+            my_win.frame_fin_seven.setVisible(True)
+        my_win.label_40.setVisible(True)
+    if state_visible is False:
+        if tab == 3:
+            my_win.frame_gr_three.setVisible(False)
+            my_win.frame_gr_five.setVisible(False)
+            my_win.frame_gr_seven.setVisible(False)
+            my_win.checkBox_4.setChecked(False)
+        elif tab == 4:
+            pass
+        else:
+            my_win.frame_fin_three.setVisible(False)
+            my_win.frame_fin_five.setVisible(False)
+            my_win.frame_fin_seven.setVisible(False)
+            my_win.checkBox_5.setChecked(False)
+        my_win.label_22.setVisible(False)
+
+
 def visible_field():
     """включает или выключает поля для ввода счета, state - игра со счетом, True если включить поля для счета"""
     sender = my_win.sender()
@@ -3218,6 +3274,10 @@ def visible_field():
         system_stage = system.select().where(System.stage == stage).get()
         match_db = system_stage.score_flag
         state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
+        if sender == my_win.tableWidget: # если просто открыта вкладка
+            state_visible = state_visible_db
+            match_current = match_db
+            change_status_visible_and_score_game(state_visible, match_current)
         # ======= записывает изменение в базу данных
         if state_visible != state_visible_db:
             with db:
@@ -3232,58 +3292,9 @@ def visible_field():
         else:
             my_win.lineEdit_pl1_score_total_fin.setFocus()
 
-    if state_visible is False:
-        if tab == 3:
-            my_win.frame_gr_three.setVisible(False)
-            my_win.frame_gr_five.setVisible(False)
-            my_win.frame_gr_seven.setVisible(False)
-        elif tab == 4:
-            pass
-        else:
-            my_win.frame_fin_three.setVisible(False)
-            my_win.frame_fin_five.setVisible(False)
-            my_win.frame_fin_seven.setVisible(False)
-        my_win.label_22.setVisible(False)
-    else:
-        # вкладка -группы- проверка какая стоит галочка (сколько партий)        
-        if tab == 3:
-            if match_current == 3:
-                my_win.radioButton_match_3.setChecked(True)
-                my_win.frame_gr_three.setVisible(True)
-                my_win.frame_gr_five.setVisible(False)
-                my_win.frame_gr_seven.setVisible(False)
-            elif match_current == 5:
-                my_win.radioButton_match_5.setChecked(True)
-                my_win.frame_gr_three.setVisible(True)
-                my_win.frame_gr_five.setVisible(True)
-                my_win.frame_gr_seven.setVisible(False)
-            elif match_current == 7:
-                my_win.radioButton_match_7.setChecked(True)
-                my_win.frame_gr_three.setVisible(True)
-                my_win.frame_gr_five.setVisible(True)
-                my_win.frame_gr_seven.setVisible(True)
-            my_win.label_22.setVisible(True)
-        elif tab == 4:
-            pass
-        else:
-            if match_current == 3:
-                my_win.radioButton_match_4.setChecked(True)
-                my_win.frame_fin_three.setVisible(True)
-                my_win.frame_fin_five.setVisible(False)
-                my_win.frame_fin_seven.setVisible(False)
-            elif match_current == 5:
-                my_win.radioButton_match_6.setChecked(True)
-                my_win.frame_fin_three.setVisible(True)
-                my_win.frame_fin_five.setVisible(True)
-                my_win.frame_fin_seven.setVisible(False)
-            elif match_current == 7:
-                my_win.radioButton_match_8.setChecked(True)
-                my_win.frame_fin_three.setVisible(True)
-                my_win.frame_fin_five.setVisible(True)
-                my_win.frame_fin_seven.setVisible(True)
-            my_win.label_40.setVisible(True)
+    change_status_visible_and_score_game(state_visible, match_current)
  
-        return state_visible
+    return state_visible
 
 
 def select_player_in_list():
@@ -3383,7 +3394,6 @@ def select_player_in_game():
         my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
-        # state_visible = match_score_db()
         state_visible = visible_field()
         sc = my_win.tableWidget.item(r, 8).text()
         pl1 = my_win.tableWidget.item(r, 4).text()
@@ -3582,7 +3592,41 @@ def find_in_player_list():
 
 def enter_total_score():
     """ввод счета во встречи без счета в партиях"""
+    tab = my_win.tabWidget.currentIndex()
+    mark = 0
+    if tab == 3:
+        mark = my_win.lineEdit_pl1_score_total.text()
+    elif tab == 4:
+        pass
+    else:
+        mark = my_win.lineEdit_pl1_score_total_fin.text()
+        mark = int(mark)
+    check_input_total_score(mark)
     my_win.lineEdit_pl2_score_total_fin.setFocus()
+
+
+def check_input_total_score(mark):
+    """проверка ввода счета встречи и его правильность"""
+    msgBox = QMessageBox
+    mark_int = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+        if i.isChecked():
+            match_current = int(i.text())
+            break
+    if mark in mark_int:
+        if mark >= match_current:
+            reply = QMessageBox.information(my_win, 'Уведомление',
+                                                "Проверьте правильность ввода счета!",
+                                                msgBox.Ok)
+            return
+    else:
+        reply = QMessageBox.information(my_win, 'Уведомление',
+                                                "Проверьте правильность ввода счета!",
+                                                msgBox.Ok)
+        return
+                 
+
+
 
 
 
@@ -9980,7 +10024,7 @@ my_win.comboBox_etap_4.currentTextChanged.connect(system_competition)
 my_win.comboBox_etap_5.currentTextChanged.connect(system_competition)
 my_win.comboBox_page_vid.currentTextChanged.connect(page_vid)
 # my_win.comboBox_filter_final.currentTextChanged.connect(game_in_visible)
-my_win.comboBox_filter_final.currentTextChanged.connect(visible_field)
+# my_win.comboBox_filter_final.currentTextChanged.connect(visible_field)
 my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
 my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
 my_win.comboBox_select_stage_begunki.currentTextChanged.connect(select_stage_for_begunki)
