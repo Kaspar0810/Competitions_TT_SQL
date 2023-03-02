@@ -3592,17 +3592,36 @@ def find_in_player_list():
 
 def enter_total_score():
     """ввод счета во встречи без счета в партиях"""
+    sender = my_win.sender()
     tab = my_win.tabWidget.currentIndex()
     mark = 0
-    if tab == 3:
+    flag = 0
+    if sender == my_win.lineEdit_pl1_score_total:
         mark = my_win.lineEdit_pl1_score_total.text()
-    elif tab == 4:
-        pass
-    else:
+        flag = 0
+    elif sender == my_win.lineEdit_pl2_score_total:
+        mark = my_win.lineEdit_pl1_score_total.text()
+        flag = 1 
+    elif sender == my_win.lineEdit_pl1_score_total_fin:
         mark = my_win.lineEdit_pl1_score_total_fin.text()
-        mark = int(mark)
+        flag = 0
+    elif sender == my_win.lineEdit_pl2_score_total_fin:
+        mark = my_win.lineEdit_pl2_score_total_fin.text()
+        flag = 1    
+    mark = int(mark)
     check_input_total_score(mark)
-    my_win.lineEdit_pl2_score_total_fin.setFocus()
+    if tab == 3 and flag == 0:
+        my_win.lineEdit_pl2_score_total.setFocus()
+    elif tab == 4 and flag == 0:
+        pass
+    elif tab == 5 and flag == 0:
+       my_win.lineEdit_pl2_score_total_fin.setFocus()
+    elif tab == 3 and flag == 1:
+        pass    
+    elif tab == 4 and flag == 1:
+       pass
+    elif tab == 5 and flag == 1:
+       enter_score(none_player=0)
 
 
 def check_input_total_score(mark):
@@ -9988,7 +10007,10 @@ my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_range_tours.returnPressed.connect(enter_print_begunki)
 
+my_win.lineEdit_pl1_score_total.returnPressed.connect(enter_total_score)
+my_win.lineEdit_pl2_score_total.returnPressed.connect(enter_total_score)
 my_win.lineEdit_pl1_score_total_fin.returnPressed.connect(enter_total_score)
+my_win.lineEdit_pl2_score_total_fin.returnPressed.connect(enter_total_score)
 
 my_win.lineEdit_Family_name.returnPressed.connect(input_player)
 my_win.lineEdit_bday.returnPressed.connect(next_field)
