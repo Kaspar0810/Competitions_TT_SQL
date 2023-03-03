@@ -3266,10 +3266,23 @@ def visible_field():
         my_win.checkBox_5.setChecked(True)
         stage = "все финалы"
         state_visible = state_visible_current
-        my_win.radioButton_match_6.setChecked(True)
+        if tab == 3:
+            my_win.checkBox_4.setChecked(True)
+            my_win.radioButton_match_5.setChecked(True)
+        elif tab == 4:
+            pass
+        else:
+            my_win.checkBox_5.setChecked(True)
+            my_win.radioButton_match_6.setChecked(True)
     elif r != -1: # если двойной клик по встрече игроков
-        my_win.checkBox_5.setEnabled(True)
-        stage = my_win.tableWidget.item(r, 2).text() # из какого финала играют встречу
+        if tab == 3:
+            my_win.checkBox_4.setEnabled(True)
+            stage = "Предварительный" # из какого финала играют встречу
+        elif tab == 4:
+            pass
+        else:
+            my_win.checkBox_5.setEnabled(True)
+            stage = my_win.tableWidget.item(r, 2).text() # из какого финала играют встречу
             # то что записано в базе на данный финал (из скольки партий и игра со счетом)
         system_stage = system.select().where(System.stage == stage).get()
         match_db = system_stage.score_flag
@@ -4342,12 +4355,21 @@ def circle_type(none_player, stage):
 def string_score_game():
     """создает строку со счетом победителя"""
     tab = my_win.tabWidget.currentIndex()
-    if my_win.radioButton_match_3.isChecked() or my_win.radioButton_match_4.isChecked():  # зависимости от кол-во партий
-        g = 2
-    elif my_win.radioButton_match_5.isChecked() or my_win.radioButton_match_6.isChecked():
-        g = 3
+    visible_flag = True
+    if tab == 3:
+        visible_flag = my_win.checkBox_4.isChecked()
+        for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            if i.isChecked():
+                g = (int(i.text()) + 1) // 2
+                break
+    elif tab == 4:
+        pass
     else:
-        g = 4
+        visible_flag = my_win.checkBox_5.isChecked()
+        for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            if i.isChecked():
+                g = (int(i.text()) + 1) // 2
+                break
     if tab == 3:
         # поля ввода счета в партии
         st1 = int(my_win.lineEdit_pl1_score_total.text())
@@ -4379,78 +4401,84 @@ def string_score_game():
         s25 = my_win.lineEdit_pl2_s5_fin.text()
     # создание строки счета победителя
     if st1 > st2:
-        if int(s11) > int(s21):  # 1-й сет
-            n1 = s21
+        if visible_flag is True:
+            if int(s11) > int(s21):  # 1-й сет
+                n1 = s21
+            else:
+                n1 = str(f"-{s11}")
+            if int(s12) > int(s22):  # 2-й сет
+                n2 = s22
+            else:
+                n2 = str(f"-{s12}")
+            if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st2 == 0 and st1 == 2):  # из 3-х партий 2-0
+                winner_string = f"({n1},{n2})"
+                return winner_string
+            if int(s13) > int(s23):  # 3-й сет
+                n3 = s23
+            else:
+                n3 = str(f"-{s13}")
+            if (g == 2 and st1 == 2 and st2 == 1) or (g == 2 and st2 == 2 and st1 == 1) or \
+                    (g == 3 and st1 == 3 and st2 == 0) or (g == 3 and st1 == 0 and st2 == 3):  # из 3-х  2-1 или из 5-и 3-0
+                winner_string = f"({n1},{n2},{n3})"
+                return winner_string
+            if int(s14) > int(s24):  # 4-й сет
+                n4 = s24
+            else:
+                n4 = str(f"-{s14}")
+            if (g == 4 and st1 == 4 and st2 == 0) or (g == 4 and st1 == 0 and st2 == 4) or \
+                    (g == 3 and st1 == 3 and st2 == 1) or (g == 3 and st1 == 1 and st2 == 3):  # из 5-и 3-1 или из 7-и 4-0
+                winner_string = f"({n1},{n2},{n3},{n4})"
+                return winner_string
+            if int(s15) > int(s25):  # 5-й сет
+                n5 = s25
+            else:
+                n5 = str(f"-{s15}")
+            if (g == 4 and st1 == 4 and st2 == 1) or (g == 4 and st1 == 1 and st2 == 4) or \
+                    (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
+                winner_string = f"({n1},{n2},{n3},{n4},{n5})"
         else:
-            n1 = str(f"-{s11}")
-        if int(s12) > int(s22):  # 2-й сет
-            n2 = s22
-        else:
-            n2 = str(f"-{s12}")
-        if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st2 == 0 and st1 == 2):  # из 3-х партий 2-0
-            winner_string = f"({n1},{n2})"
-            return winner_string
-        if int(s13) > int(s23):  # 3-й сет
-            n3 = s23
-        else:
-            n3 = str(f"-{s13}")
-        if (g == 2 and st1 == 2 and st2 == 1) or (g == 2 and st2 == 2 and st1 == 1) or \
-                (g == 3 and st1 == 3 and st2 == 0) or (g == 3 and st1 == 0 and st2 == 3):  # из 3-х  2-1 или из 5-и 3-0
-            winner_string = f"({n1},{n2},{n3})"
-            return winner_string
-        if int(s14) > int(s24):  # 4-й сет
-            n4 = s24
-        else:
-            n4 = str(f"-{s14}")
-        if (g == 4 and st1 == 4 and st2 == 0) or (g == 4 and st1 == 0 and st2 == 4) or \
-                (g == 3 and st1 == 3 and st2 == 1) or (g == 3 and st1 == 1 and st2 == 3):  # из 5-и 3-1 или из 7-и 4-0
-            winner_string = f"({n1},{n2},{n3},{n4})"
-            return winner_string
-        if int(s15) > int(s25):  # 5-й сет
-            n5 = s25
-        else:
-            n5 = str(f"-{s15}")
-        if (g == 4 and st1 == 4 and st2 == 1) or (g == 4 and st1 == 1 and st2 == 4) or \
-                (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
-            winner_string = f"({n1},{n2},{n3},{n4},{n5})"
-            return winner_string
+            winner_string = f"({st1} : {st2})"        
+        return winner_string
 
     else:
-        if int(s11) < int(s21):  # 1-й сет
-            n1 = s11
+        if visible_flag is True:
+            if int(s11) < int(s21):  # 1-й сет
+                n1 = s11
+            else:
+                n1 = str(f"-{s21}")
+            if int(s12) < int(s22):  # 2-й сет
+                n2 = s12
+            else:
+                n2 = str(f"-{s22}")
+            if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st1 == 0 and st2 == 2):  # из 3-х партий 2-0
+                winner_string = f"({n1},{n2})"
+                return winner_string
+            if int(s13) < int(s23):  # 3-й сет
+                n3 = s13
+            else:
+                n3 = str(f"-{s23}")
+            if (g == 2 and st1 == 2 and st2 == 1) or (g == 2 and st2 == 2 and st1 == 1) or \
+                    (g == 3 and st1 == 3 and st2 == 0) or (g == 3 and st1 == 0 and st2 == 3):  # из 3-х  2-1 или из 5-и 3-0
+                winner_string = f"({n1},{n2},{n3})"
+                return winner_string
+            if int(s14) < int(s24):  # 4-й сет
+                n4 = s14
+            else:
+                n4 = str(f"-{s24}")
+            if (g == 4 and st1 == 4 and st2 == 0) or (g == 4 and st1 == 0 and st2 == 4) or \
+                    (g == 3 and st1 == 3 and st2 == 1) or (g == 3 and st1 == 1 and st2 == 3):  # из 5-и 3-1 или из 7-и 4-0
+                winner_string = f"({n1},{n2},{n3},{n4})"
+                return winner_string
+            if int(s15) < int(s25):  # 5-й сет
+                n5 = s15
+            else:
+                n5 = str(f"-{s25}")
+            if (g == 4 and st1 == 4 and st2 == 1) or (g == 4 and st1 == 1 and st2 == 4) or \
+                    (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
+                winner_string = f"({n1},{n2},{n3},{n4},{n5})"
         else:
-            n1 = str(f"-{s21}")
-        if int(s12) < int(s22):  # 2-й сет
-            n2 = s12
-        else:
-            n2 = str(f"-{s22}")
-        if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st1 == 0 and st2 == 2):  # из 3-х партий 2-0
-            winner_string = f"({n1},{n2})"
-            return winner_string
-        if int(s13) < int(s23):  # 3-й сет
-            n3 = s13
-        else:
-            n3 = str(f"-{s23}")
-        if (g == 2 and st1 == 2 and st2 == 1) or (g == 2 and st2 == 2 and st1 == 1) or \
-                (g == 3 and st1 == 3 and st2 == 0) or (g == 3 and st1 == 0 and st2 == 3):  # из 3-х  2-1 или из 5-и 3-0
-            winner_string = f"({n1},{n2},{n3})"
-            return winner_string
-        if int(s14) < int(s24):  # 4-й сет
-            n4 = s14
-        else:
-            n4 = str(f"-{s24}")
-        if (g == 4 and st1 == 4 and st2 == 0) or (g == 4 and st1 == 0 and st2 == 4) or \
-                (g == 3 and st1 == 3 and st2 == 1) or (g == 3 and st1 == 1 and st2 == 3):  # из 5-и 3-1 или из 7-и 4-0
-            winner_string = f"({n1},{n2},{n3},{n4})"
-            return winner_string
-        if int(s15) < int(s25):  # 5-й сет
-            n5 = s15
-        else:
-            n5 = str(f"-{s25}")
-        if (g == 4 and st1 == 4 and st2 == 1) or (g == 4 and st1 == 1 and st2 == 4) or \
-                (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
-            winner_string = f"({n1},{n2},{n3},{n4},{n5})"
-            return winner_string
+            winner_string = f"({st2} : {st1})"
+        return winner_string
 
 
 def result_filter_name():

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>762</width>
+    <width>743</width>
     <height>245</height>
    </rect>
   </property>
@@ -27,7 +27,7 @@
    </property>
    <property name="font">
     <font>
-     <family>Times New Roman</family>
+     <family>Segoe UI</family>
      <pointsize>12</pointsize>
      <italic>true</italic>
      <strikeout>false</strikeout>
@@ -40,9 +40,9 @@
   <widget class="QComboBox" name="comboBox">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>130</y>
-     <width>591</width>
+     <x>153</x>
+     <y>132</y>
+     <width>580</width>
      <height>26</height>
     </rect>
    </property>
@@ -113,28 +113,6 @@
     <string>Архив соревнований:</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="Button_open">
-   <property name="geometry">
-    <rect>
-     <x>640</x>
-     <y>155</y>
-     <width>101</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Times New Roman</family>
-     <pointsize>10</pointsize>
-     <weight>75</weight>
-     <italic>true</italic>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Открыть</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
@@ -160,10 +138,10 @@
   <widget class="Line" name="line">
    <property name="geometry">
     <rect>
-     <x>134</x>
-     <y>30</y>
+     <x>137</x>
+     <y>40</y>
      <width>16</width>
-     <height>151</height>
+     <height>155</height>
     </rect>
    </property>
    <property name="orientation">
@@ -175,7 +153,7 @@
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>731</width>
+     <width>725</width>
      <height>16</height>
     </rect>
    </property>
@@ -183,34 +161,12 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>159</y>
-     <width>261</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Times New Roman</family>
-     <pointsize>12</pointsize>
-     <weight>75</weight>
-     <italic>true</italic>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="Line" name="line_3">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>180</y>
-     <width>741</width>
+     <width>723</width>
      <height>16</height>
     </rect>
    </property>
@@ -231,7 +187,7 @@
     <number>24</number>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>6</x>
@@ -302,6 +258,69 @@
       </property>
       <property name="text">
        <string>Рейтинг</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>153</x>
+     <y>159</y>
+     <width>581</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QLabel" name="label_4">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="Button_open">
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Открыть</string>
       </property>
      </widget>
     </item>
