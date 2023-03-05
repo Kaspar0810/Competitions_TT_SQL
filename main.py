@@ -1886,10 +1886,7 @@ def load_combobox_filter_group():
 def tab():
     """Изменяет вкладку tabWidget в зависимости от вкладки toolBox"""
     tw = my_win.tabWidget.currentIndex()
-    # if tw != 0:
     my_win.toolBox.setCurrentIndex(tw)
-    # else:
-    #     load_combo_etap_begunki()
 
 
 def tool_page():
@@ -2048,7 +2045,6 @@ def page():
         my_win.checkBox_8.setEnabled(False)
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
-        # my_win.frame_three_game.setVisible(False)
         flag = ready_choice(stage="Предварительный")
         if flag is False:
             result = msgBox.information(my_win, "", "Необходимо сделать жеребьевку\nпредварительного этапа.",
@@ -2067,7 +2063,7 @@ def page():
             load_combobox_filter_group()
             load_tableWidget()
             load_combo()
-            match_score_db()  # флаг, показывающий записывать счет в партиях или нет
+            visible_field()
             my_win.label_16.hide()
     elif tb == 4:  # вкладка -полуфиналы-
         my_win.tableWidget.hide()
@@ -2080,13 +2076,10 @@ def page():
         my_win.tableWidget.show()
         my_win.Button_Ok_fin.setEnabled(False)
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(False)
-        # match_score_db()
-        # visible_field()
         load_combobox_filter_final()
         load_tableWidget()
         load_combo()
         visible_field()
-        # match_score_db()
         my_win.label_16.hide()
     elif tb == 6:
         my_win.Button_print_begunki.setEnabled(False)
@@ -3016,184 +3009,34 @@ def chop_line_city(g, maxline=15):
     return g
 
 
-def match_score_db():
-    """кол-во партий и запись счета партий по умолчанию в db"""
-    tab = my_win.tabWidget.currentIndex()
-    system = System.select().where(System.title_id == title_id())
-    if tab == 3:
-        sf = system.select().where(System.stage == "Предварительный").get()
-        match = sf.score_flag
-        state = sf.visible_game  # флаг, показывающий записывать счет в партиях или нет
-        my_win.checkBox_4.setChecked(state)
-
-        if my_win.radioButton_match_3.isChecked():  # устанавливает галочку при нажатии на RadioBox
-            my_win.radioButton_match_3.setChecked(True)  
-        elif my_win.radioButton_match_5.isChecked():
-            my_win.radioButton_match_5.setChecked(True)  
-        elif my_win.radioButton_match_7.isChecked():
-            my_win.radioButton_match_7.setChecked(True)  
-        elif match == 3: # устанавливает галочку исходя что установлено в базе данных
-            my_win.radioButton_match_3.setChecked(True)  
-        elif match == 5:
-            my_win.radioButton_match_5.setChecked(True)  
-        else:
-            my_win.radioButton_match_7.setChecked(True) 
-        stage = "Предварительный" 
-    elif tab == 4:  # вкладка -полуфиналы-
-        pass
-    else:  # вкладка -финалы-
-        r = my_win.tableWidget.currentRow()
-        if r != -1: # двойной клик по встрече игроков
-            
-            my_win.checkBox_5.setEnabled(True)
-            stage = my_win.tableWidget.item(r, 2).text()
-            # то что записано в базе на данный финал (из скольки партий и игра со счетом)
-            sf = system.select().where(System.stage == stage).get()
-            match = sf.score_flag
-            state = sf.visible_game  # флаг, показывающий записывать счет в партиях или нет
- 
-            if my_win.radioButton_match_4.isChecked():  # устанавливает галочку при нажатии на RadioBox
-                my_win.radioButton_match_4.setChecked(True)
-                score = 3  
-            elif my_win.radioButton_match_6.isChecked():
-                my_win.radioButton_match_6.setChecked(True)
-                score = 5  
-            elif my_win.radioButton_match_8.isChecked():
-                my_win.radioButton_match_8.setChecked(True)
-                score = 7
-            if score != match:
-                system_stage = system.select().where(System.stage == stage).get()
-                with db:
-                    system_stage.score_flag = score
-                    system_stage.save()
-
-        else: # открытие по умолчанию (встречи из 5 партий со счетом)
-            state = True
-            stage = "1-й финал"
-            match = 5
-    visible_field()       
-
-
-def game_in_visible():
-    """видимость полей для счета в партии, flag показывает из скольки партий играется матч,
-    state_check - нажат чекбокс (видимость полей счета или нет), если 2 значит нажат"""
-    r = my_win.tableWidget.currentRow()  # если r -1, то не нажата не одна строка
-    tab = my_win.tabWidget.currentIndex()
+def change_status_visible_and_score_game():
+    """изменение статуса колво партий и ввод счета во встречи"""
     sender = my_win.sender()
     system = System.select().where(System.title_id == title_id())
-    # =================
-    count = len(system)
-    # flag = 0  # флаг переключения состояния чекбокса
-
-    if count == 1:  # значит соревнования из одной таблицы
-        k = System.get(System.title_id == title_id())
-        # state_visible = k.visible_game
-        stage = k.stage
-        # if flag != 1:
-        #     if state != state_check:
-        #         with db:
-        #             k.visible_game = state_check
-        #             k.save()
-        #         state = k.visible_game
-        visible_field(stage)
-    elif count > 1:
-        if r >= 0:  # двойной клик по строке встречи
-            if tab == 3:
-                my_win.checkBox_4.setEnabled(True)
-                # из какой группы пара игроков в данный момент
-                stage = my_win.tableWidget.item(r, 1).text()
-            elif tab == 4:
-                pass
-            else:
-                # my_win.checkBox_5.setEnabled(True)
-                # из какого финала пара игроков в данный момент
-                stage = my_win.tableWidget.item(r, 2).text()
-            # ===============
-            if stage != "":
-                # k = system.select().where(System.stage == stage).get()
-                # state_visible = k.visible_game
-                # match = k.score_flag
-                
-                visible_field(stage)
-            else:
-                return
-            # === если visible True, то фокус ставить на поле ввода счета в партии если False то на поле общего счета
-            if state_visible is True:
-                if tab == 3:
-                    state_check = my_win.checkBox_4.isChecked()
-                elif tab == 4:
-                    pass
-                else:
-                    my_win.checkBox_5.setChecked(state_visible)
-                    state_check = my_win.checkBox_5.isChecked()
-            else:
-                if tab == 3:
-                    state_check = my_win.checkBox_4.isChecked()
-                elif tab == 4:
-                    pass
-                else:
-                    # my_win.checkBox_5.setChecked(state_visible)
-                    my_win.lineEdit_pl1_score_total_fin.setFocus()
-                    # my_win.checkBox_5.setChecked(state_visible)
-        else:  # просто загружена вкладка
-            if tab == 3:
-                system_stage = system.select().where(System.stage == "Предварительный").get()
-                state = my_win.checkBox_4.isChecked()
-                state_db = system_stage.visible_game # записанный в базе флаг видимости полей ввода
-                if state_db != state:
-                    with db:
-                        system_stage.visible_game = state
-                        system_stage.save()
-                    my_win.checkBox_4.setChecked(state)
-                stage = "Предварительный"
-            elif tab == 4:
-                pass
-            elif tab == 5:
-                # my_win.checkBox_5.setChecked(True)
-                # state = my_win.checkBox_5.isChecked()
-                if count == 1:
-                    final = "Одна таблица"
-                    system_stage = System.get((System.title_id == title_id()) & (System.stage == final))
-                    state_db = system_stage.visible_game
-                    score = system_stage.score_flag
-                    if score == 3:
-                        my_win.radioButton_match_4.setChecked(True)
-                    elif score == 5:
-                        my_win.radioButton_match_6.setChecked(True)
-                    else:
-                        my_win.radioButton_match_8.setChecked(True)
-                else:
-                    if r == -1: # не выбрана не одна пара игроков финала (делаем по умолчанию встреча из 5-ти партий)
-                        my_win.checkBox_5.setChecked(True)
-                        my_win.radioButton_match_6.setChecked(True)
-                        state = my_win.checkBox_5.isChecked()
-                        index = my_win.comboBox_filter_final.currentIndex()
-                        if index == 0:
-                            stage = "1-й финал"
-                        else:
-                            stage = my_win.comboBox_filter_final.currentText()
-                        # system_stage = System.get((System.title_id == title_id()) & (System.stage == stage))
-                        # state = system_stage.visible_game
-                    else:
-                        # из какого финала пара игроков в данный момент
-                        stage = my_win.tableWidget.item(r, 2).text()
-                    system_stage = System.get((System.title_id == title_id()) & (System.stage == stage))
-                    state_visible = system_stage.visible_game
-                    # if state_db != state:
-                    #     with db:
-                    #         system_stage.visible_game = state
-                    #         system_stage.save()
-                    #     my_win.checkBox_5.setChecked(state)
-                    # stage = final
-        visible_field(stage)
-        return state_visible
-
-
-def change_status_visible_and_score_game(state_visible, match_current):
-    """изменение статуса колво партий и ввод счета во встречи"""
     tab = my_win.tabWidget.currentIndex()
-        # вкладка -группы- проверка какая стоит галочка (сколько партий)        
+    match_current = 5
+    state_visible = True # значения по умолчанию 
+    my_win.checkBox_4.setEnabled(state_visible)      
     if tab == 3:
+        system_stage = system.select().where(System.stage == "Предварительный").get()
+        match_db = system_stage.score_flag
+        state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
+        match_current = match_db
+        #  ==== изменение состояние =====
+        if sender == my_win.checkBox_4:
+            for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                if i.isChecked():
+                    match_current = int(i.text())
+                    break
+            state_visible = my_win.checkBox_4.isChecked()
+        elif (sender == my_win.radioButton_match_3 or 
+            sender == my_win.radioButton_match_5 or sender == my_win.radioButton_match_7):
+            for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                if i.isChecked():
+                    match_current = int(i.text())
+                    break
+            state_visible = state_visible_db
+
         if match_current == 3:
             my_win.radioButton_match_3.setChecked(True)
             my_win.frame_gr_three.setVisible(True)
@@ -3213,6 +3056,25 @@ def change_status_visible_and_score_game(state_visible, match_current):
     elif tab == 4:
         pass
     else:
+        system_stage = system.select().where(System.stage == "1-й финал").get()
+        match_db = system_stage.score_flag
+        state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
+        match_current = match_db
+        #  ==== изменение состояние =====
+        if sender == my_win.checkBox_5:
+            for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                if i.isChecked():
+                    match_current = int(i.text())
+                    break
+            state_visible = my_win.checkBox_5.isChecked()
+        elif (sender == my_win.radioButton_match_4 or 
+            sender == my_win.radioButton_match_6 or sender == my_win.radioButton_match_8):
+            for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                if i.isChecked():
+                    match_current = int(i.text())
+                    break
+            state_visible = state_visible_db
+
         if match_current == 3:
             my_win.radioButton_match_4.setChecked(True)
             my_win.frame_fin_three.setVisible(True)
@@ -3244,6 +3106,17 @@ def change_status_visible_and_score_game(state_visible, match_current):
             my_win.checkBox_5.setChecked(False)
         my_win.label_22.setVisible(False)
 
+    if state_visible_db != state_visible:
+        with db:
+            system_stage.visible_game = state_visible
+            system_stage.save()
+    if match_current != match_db:
+        with db:
+            system_stage.score_flag = match_current
+            system_stage.save()
+            
+    return state_visible
+
 
 def visible_field():
     """включает или выключает поля для ввода счета, state - игра со счетом, True если включить поля для счета"""
@@ -3252,26 +3125,20 @@ def visible_field():
     # ==== текущее состояние радиокнопок и чекбокса кол-во партий и ввод счета =====
     tab = my_win.tabWidget.currentIndex()
     r = my_win.tableWidget.currentRow()
-    state_visible = my_win.checkBox_5.isChecked()
     flag = 0
-    for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-        if i.isChecked():
-            match_current = int(i.text())
-            flag = 1
-            break
-    # ================
+
     if r == -1 and flag == 0: # если просто открыта вкладка устанавливает значения по умолчанию
         state_visible_current = True
-        match_current = 5
-        my_win.checkBox_5.setChecked(True)
-        stage = "все финалы"
         state_visible = state_visible_current
         if tab == 3:
-            my_win.checkBox_4.setChecked(True)
-            my_win.radioButton_match_5.setChecked(True)
+            state_visible = change_status_visible_and_score_game()
+            flag = 1
+            my_win.checkBox_4.setChecked(state_visible)
         elif tab == 4:
             pass
         else:
+            # устанавливает начальное значение - со счетом ищ 5-ти партий
+            stage = "все финалы"
             my_win.checkBox_5.setChecked(True)
             my_win.radioButton_match_6.setChecked(True)
     elif r != -1: # если двойной клик по встрече игроков
@@ -3281,16 +3148,14 @@ def visible_field():
         elif tab == 4:
             pass
         else:
-            my_win.checkBox_5.setEnabled(True)
+            state_visible = my_win.checkBox_5.isChecked()
             stage = my_win.tableWidget.item(r, 2).text() # из какого финала играют встречу
             # то что записано в базе на данный финал (из скольки партий и игра со счетом)
         system_stage = system.select().where(System.stage == stage).get()
         match_db = system_stage.score_flag
         state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-        if sender == my_win.tableWidget: # если просто открыта вкладка
-            state_visible = state_visible_db
-            match_current = match_db
-            change_status_visible_and_score_game(state_visible, match_current)
+        state_visible = state_visible_db
+        change_status_visible_and_score_game()
         # ======= записывает изменение в базу данных
         if state_visible != state_visible_db:
             with db:
@@ -3299,13 +3164,21 @@ def visible_field():
 
         state_visible = state_visible_db
     if sender == my_win.checkBox_4 or sender == my_win.checkBox_5: # изменяет состояние чекбокса игра со счетом или нет
-        state_visible = my_win.checkBox_5.isChecked()
-        if state_visible is True:
-            my_win.lineEdit_pl1_s1_fin.setFocus()
+        if tab == 3:
+            state_visible = my_win.checkBox_4.isChecked()
+            if state_visible is True:
+                my_win.lineEdit_pl1_s1.setFocus()
+            else:
+                my_win.lineEdit_pl1_score_total.setFocus()
+        elif tab == 4:
+            pass
         else:
-            my_win.lineEdit_pl1_score_total_fin.setFocus()
-
-    change_status_visible_and_score_game(state_visible, match_current)
+            state_visible = my_win.checkBox_5.isChecked()
+            if state_visible is True:
+                my_win.lineEdit_pl1_s1_fin.setFocus()
+            else:
+                my_win.lineEdit_pl1_score_total_fin.setFocus()
+    change_status_visible_and_score_game()
  
     return state_visible
 
@@ -3407,7 +3280,8 @@ def select_player_in_game():
         my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
-        state_visible = visible_field()
+        # state_visible = visible_field()
+        state_visible = change_status_visible_and_score_game()
         sc = my_win.tableWidget.item(r, 8).text()
         pl1 = my_win.tableWidget.item(r, 4).text()
         pl2 = my_win.tableWidget.item(r, 5).text()
@@ -3458,6 +3332,7 @@ def select_player_in_game():
             elif tab == 4:
                 pass
             elif tab == 5:
+                my_win.checkBox_5.setEnabled(True)
                 my_win.lineEdit_player1_fin.setText(pl1)
                 my_win.lineEdit_player2_fin.setText(pl2)
                 if pl1 == "X" or pl2 == "X":
@@ -3499,7 +3374,6 @@ def delete_player():
                                        region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
                                        player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
 
-            # player = player_current.select().where(Player.player == my_win.tableWidget.item(r, 1).text()).get()
             player = player_current.select().where(Player.id == player_id).get()
             player.delete_instance()
         my_win.lineEdit_Family_name.clear()
@@ -10085,12 +9959,12 @@ my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
-my_win.radioButton_match_3.toggled.connect(match_score_db)
-my_win.radioButton_match_5.toggled.connect(match_score_db)
-my_win.radioButton_match_7.toggled.connect(match_score_db)
-my_win.radioButton_match_4.toggled.connect(match_score_db)
-my_win.radioButton_match_6.toggled.connect(match_score_db)
-my_win.radioButton_match_8.toggled.connect(match_score_db)
+my_win.radioButton_match_3.toggled.connect(change_status_visible_and_score_game)
+my_win.radioButton_match_5.toggled.connect(change_status_visible_and_score_game)
+my_win.radioButton_match_7.toggled.connect(change_status_visible_and_score_game)
+my_win.radioButton_match_4.toggled.connect(change_status_visible_and_score_game)
+my_win.radioButton_match_6.toggled.connect(change_status_visible_and_score_game)
+my_win.radioButton_match_8.toggled.connect(change_status_visible_and_score_game)
 
 my_win.radioButton_4.toggled.connect(change_choice_group)
 
@@ -10102,10 +9976,10 @@ my_win.checkBox.stateChanged.connect(button_title_made_enable)
 my_win.checkBox_3.stateChanged.connect(button_system_made_enable)
 # при изменении чекбокса показывает поля для ввода счета
 # my_win.checkBox_4.stateChanged.connect(game_in_visible)
-my_win.checkBox_4.stateChanged.connect(visible_field)
+my_win.checkBox_4.stateChanged.connect(change_status_visible_and_score_game)
 # при изменении чекбокса показывает поля для ввода счета финала
 # my_win.checkBox_5.stateChanged.connect(game_in_visible)
-my_win.checkBox_5.stateChanged.connect(visible_field)
+my_win.checkBox_5.stateChanged.connect(change_status_visible_and_score_game)
 # при изменении чекбокса показывает список удаленных игроков
 my_win.checkBox_6.stateChanged.connect(del_player_table)
 my_win.checkBox_7.stateChanged.connect(no_play)  # поражение по неявке
