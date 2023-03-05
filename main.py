@@ -652,7 +652,8 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
                                                   msgbox.Ok)
  
     fname = QFileDialog.getOpenFileName(
-        my_win, "Выбрать файл R-листа", "OK", f"Excels files {ext}")
+        my_win, "Выбрать файл R-листа", "OK", f"{ext}")
+        # my_win, "Выбрать файл R-листа", "", "*_m.xlsx")
     if fname == ("", ""):
         # получение последней записи в таблице
         title = Title.select().order_by(Title.id.desc()).get()
@@ -3022,6 +3023,7 @@ def change_status_visible_and_score_game():
         match_db = system_stage.score_flag
         state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
         match_current = match_db
+        state_visible = state_visible_db
         #  ==== изменение состояние =====
         if sender == my_win.checkBox_4:
             for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
@@ -3056,7 +3058,13 @@ def change_status_visible_and_score_game():
     elif tab == 4:
         pass
     else:
-        system_stage = system.select().where(System.stage == "1-й финал").get()
+        r = my_win.tableWidget.currentRow()
+        if r == -1:
+            stage = "1-й финал"
+        else:
+            stage = my_win.tableWidget.item(r, 2).text() # из какого финала играют встречу
+
+        system_stage = system.select().where(System.stage == stage).get()
         match_db = system_stage.score_flag
         state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
         match_current = match_db
@@ -3097,6 +3105,7 @@ def change_status_visible_and_score_game():
             my_win.frame_gr_five.setVisible(False)
             my_win.frame_gr_seven.setVisible(False)
             my_win.checkBox_4.setChecked(False)
+            my_win.lineEdit_pl1_score_total.setFocus(True)
         elif tab == 4:
             pass
         else:
@@ -3104,12 +3113,14 @@ def change_status_visible_and_score_game():
             my_win.frame_fin_five.setVisible(False)
             my_win.frame_fin_seven.setVisible(False)
             my_win.checkBox_5.setChecked(False)
+            my_win.lineEdit_pl1_score_total_fin.setFocus(True)
         my_win.label_22.setVisible(False)
 
     if state_visible_db != state_visible:
         with db:
             system_stage.visible_game = state_visible
             system_stage.save()
+            my_win.checkBox_5.setEnabled(state_visible)
     if match_current != match_db:
         with db:
             system_stage.score_flag = match_current
@@ -3504,7 +3515,7 @@ def enter_total_score():
     elif tab == 5 and flag == 0:
        my_win.lineEdit_pl2_score_total_fin.setFocus()
     elif tab == 3 and flag == 1:
-        pass    
+        enter_score(none_player=0) 
     elif tab == 4 and flag == 1:
        pass
     elif tab == 5 and flag == 1:
@@ -3514,11 +3525,20 @@ def enter_total_score():
 def check_input_total_score(mark):
     """проверка ввода счета встречи и его правильность"""
     msgBox = QMessageBox
+    tab = my_win.tabWidget.currentIndex() 
     mark_int = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-        if i.isChecked():
-            match_current = int(i.text())
-            break
+    if tab == 3:
+        for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            if i.isChecked():
+                match_current = int(i.text())
+                break
+    elif tab == 4:
+        pass
+    else:
+        for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            if i.isChecked():
+                match_current = int(i.text())
+                break
     if mark in mark_int:
         if mark >= match_current:
             reply = QMessageBox.information(my_win, 'Уведомление',
@@ -3999,6 +4019,7 @@ def enter_score(none_player=0):
                 loser = my_win.lineEdit_player1_fin.text()
             ts_winner = f"{st2} : {st1}"
             ts_loser = f"{st1} : {st2}"
+        loser_fam_name = loser 
         if none_player == 0:
             winner_string = string_score_game()  # пишет счет в партии
         else:
@@ -4234,7 +4255,7 @@ def string_score_game():
         visible_flag = my_win.checkBox_4.isChecked()
         for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
             if i.isChecked():
-                g = (int(i.text()) + 1) // 2
+                g = (int(i.text()) + 1) // 2 # число, максимальное кол-во партий для победы
                 break
     elif tab == 4:
         pass
@@ -4311,7 +4332,10 @@ def string_score_game():
                     (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
                 winner_string = f"({n1},{n2},{n3},{n4},{n5})"
         else:
-            winner_string = f"({st1} : {st2})"        
+            if visible_flag is True:
+                winner_string = f"({st1} : {st2})" 
+            else:
+                winner_string = f"{st1} : {st2}"      
         return winner_string
 
     else:
@@ -4351,7 +4375,10 @@ def string_score_game():
                     (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
                 winner_string = f"({n1},{n2},{n3},{n4},{n5})"
         else:
-            winner_string = f"({st2} : {st1})"
+            if visible_flag is True:
+                winner_string = f"({st2} : {st1})"
+            else:
+                winner_string = f"{st2} : {st1}"
         return winner_string
 
 
@@ -8557,9 +8584,9 @@ def rank_in_group(total_score, td, num_gr):
         rev_dict.setdefault(value, set()).add(key)
     res = [key for key, values in rev_dict.items() if len(values) > 1]
 
-    # отдельно составляет список ключей (группы)
+    # отдельно составляет список ключей (номера участников группы)
     key_list = list(total_score.keys())
-    # отдельно составляет список значений (очки)
+    # отдельно составляет список значений (очки каждого игрока)
     val_list = list(total_score.values())
     # ======== новый вариант =========
     # получает словарь(ключ - номер участника, значение - очки)
@@ -8732,7 +8759,9 @@ def tour_circle(pp, per_circ, circ):
 def summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr):
     """подсчитывает сумму очков у спортсменов в крутиловке 
     -tr- номера игроков в группе, у которых крутиловка
-    -tr_all- все варианты встреч в крутиловке"""
+    -tr_all- все варианты встреч в крутиловке
+    -pg_los- словарь (номер игрока: список (кол-во проигранных партий)
+    -pg_win- словарь (номер игрока: список (кол-во выйгранных партий)"""
     pp_all = []
     u = []
     tr_all.clear()
@@ -8866,6 +8895,8 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
                 # получает ключ, по которому в списке ищет игрока
                 w = key_l[val_l.index(i)]
                 # получает номер участника, соответствующий
+                # новый вариант получения номера участника
+                # wq = key_l[q] # получает номер группы, соответствующий
                 wq = int(d.setdefault(w))
                 # записывает соотношения игроку
                 td[wq * 2 - 2][max_person + 3] = str(i)
@@ -8879,12 +8910,13 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
         d = {index: value for index, value in enumerate(tr)}
         # сортирует словарь по убыванию соот
         sorted_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}
-        key_l = list(sorted_tuple.keys())
-        val_l = list(sorted_tuple.values())
+        key_l = list(sorted_tuple.keys()) # номера игроков по убыванию очков
+        val_l = list(sorted_tuple.values()) # очки игроков по убыванию
         m = 0
         for i in val_l:
-            q = val_l.index(i)
-            wq = int(d.setdefault(q))  # получает номер группы, соответствующий
+            q = val_l.index(i) # индекс в списке
+            # wq = int(d.setdefault(q))  # получает номер группы, соответствующий
+            wq = key_l[q] # получает номер группы, соответствующий
             # записывает соотношения игроку
             td[wq * 2 - 2][max_person + 3] = str(i)
             td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
@@ -8911,14 +8943,7 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
     else:
         res = result.select().where(Result.number_group == num_gr)
     c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу
-    # ====== оставляем только фамилия и имя, без города
-    # family = c.player1
-    # znak_city = family.find("/")
-    # if znak_city != -1:
-    #     fam_name = family[:znak_city]
-    # else:
-    #     fam_name = c.player1
-    # ===============
+ 
     if c.winner == c.player1:  # победил 1-й игрок
         points_p1 = c.points_win  # очки победителя
         points_p2 = c.points_loser  # очки проигравшего
@@ -8927,21 +8952,21 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp):
         # счет во встречи (выигранные и проигранные партии) проигравшего
         game_p2 = c.score_loser
         if game_p1 != "В : П" or game_p1 != "П : В":
-            p1_game_win = int(game_p1[0])
+            p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
             p1_game_los = int(game_p1[4])
             p2_game_win = int(game_p2[0])
             p2_game_los = int(game_p2[4])
         else:
             p1_game_win = game_p1[0]
             p1_game_los = game_p1[4]
-    else:
-        points_p1 = c.points_loser
-        points_p2 = c.points_win
-        game_p1 = c.score_loser
-        game_p2 = c.score_in_game
+    else: # победил 2-й игрок
+        points_p1 = c.points_loser # очки 1-ого игрока проигранные
+        points_p2 = c.points_win # очки 2-ого игрока выигранные
+        game_p1 = c.score_loser # счет во встречи 1-ого игрока
+        game_p2 = c.score_in_game # счет во встречи 2-ого игрока
         # ======= если победа по неявке исправить
         if game_p1 != "В : П" or game_p1 != "П : В":
-            p1_game_win = int(game_p1[0])
+            p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
             p1_game_los = int(game_p1[4])
             p2_game_win = int(game_p2[0])
             p2_game_los = int(game_p2[4])
@@ -9947,8 +9972,6 @@ my_win.comboBox_etap_3.currentTextChanged.connect(system_competition)
 my_win.comboBox_etap_4.currentTextChanged.connect(system_competition)
 my_win.comboBox_etap_5.currentTextChanged.connect(system_competition)
 my_win.comboBox_page_vid.currentTextChanged.connect(page_vid)
-# my_win.comboBox_filter_final.currentTextChanged.connect(game_in_visible)
-# my_win.comboBox_filter_final.currentTextChanged.connect(visible_field)
 my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
 my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
 my_win.comboBox_select_stage_begunki.currentTextChanged.connect(select_stage_for_begunki)
