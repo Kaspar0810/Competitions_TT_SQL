@@ -644,16 +644,20 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     msgbox = QMessageBox
     if gamer == "Мальчики" or gamer == "Юноши" or gamer == "Мужчины":
         table_db = R_list_m
-        ext = f"(*_m.xlsx, *_m.xls)"
+        ext = "Excel(*m.xlsx, *m.xls)"
     else:
         table_db = R_list_d
-        ext = f"(*_w.xlsx, *_w.xls)"
+        ext = "Excel(*w.xlsx, *w.xls)"
     reply = msgbox.information(my_win, 'Уведомление', "Выберите файл с текущим рейтингом, \nзатем файл рейтинга за январь месяц.",
                                                   msgbox.Ok)
  
     fname = QFileDialog.getOpenFileName(
-        my_win, "Выбрать файл R-листа", "OK", f"{ext}")
-        # my_win, "Выбрать файл R-листа", "", "*_m.xlsx")
+        my_win, "Выбрать файл R-листа", "", "Excel(*m.xlsx, *m.xls)")
+    #     # my_win, "Выбрать файл R-листа", "", "Excel (**_m.xlsx")
+
+    # fname = QFileDialog.getOpenFileName(my_win, "Open File",
+    #                                             "",
+    #                                         "Excel (*.xlsx *.xls)")
     if fname == ("", ""):
         # получение последней записи в таблице
         title = Title.select().order_by(Title.id.desc()).get()
