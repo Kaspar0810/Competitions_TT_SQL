@@ -644,20 +644,15 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     msgbox = QMessageBox
     if gamer == "Мальчики" or gamer == "Юноши" or gamer == "Мужчины":
         table_db = R_list_m
-        ext = "Excel(*m.xlsx, *m.xls)"
+        # ext = "Excel(*.xls, *.xlsx)"
     else:
         table_db = R_list_d
-        ext = "Excel(*w.xlsx, *w.xls)"
+        # ext = "Excel(*w.xlsx, *w.xls)"
     reply = msgbox.information(my_win, 'Уведомление', "Выберите файл с текущим рейтингом, \nзатем файл рейтинга за январь месяц.",
                                                   msgbox.Ok)
  
     fname = QFileDialog.getOpenFileName(
-        my_win, "Выбрать файл R-листа", "", "Excel(*m.xlsx, *m.xls)")
-    #     # my_win, "Выбрать файл R-листа", "", "Excel (**_m.xlsx")
-
-    # fname = QFileDialog.getOpenFileName(my_win, "Open File",
-    #                                             "",
-    #                                         "Excel (*.xlsx *.xls)")
+        my_win, "Выбрать файл R-листа", "", "Excel files(*.xls *.xlsx)")
     if fname == ("", ""):
         # получение последней записи в таблице
         title = Title.select().order_by(Title.id.desc()).get()
@@ -670,10 +665,10 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     my_win.statusbar.showMessage("Текущий рейтинг загружен")
     if gamer == "Мальчики" or gamer == "Юноши" or gamer == "Мужчины":
         table_db = R1_list_m
-        ext = "(*01_m.xlsx, *01_m.xls)"
+        ext = "(*01_m.xlsx *01_m.xls)"
     else:
         table_db = R1_list_d
-        ext = "(*01_w.xlsx, *01_w.xls)"
+        ext = "(*01_w.xlsx *01_w.xls)"
     fname = QFileDialog.getOpenFileName(
         my_win, "Выбрать файл R-листа", "", f"Excels files {ext}")
     load_listR_in_db(fname, table_db)
@@ -749,6 +744,10 @@ def load_listR_in_db(fname, table_db):
         for i in range(0, count):  # цикл по строкам
             for col in column:  # цикл по столбцам
                 val = data_pandas.iloc[i][col]
+                if isinstance(val, float) == True: # узнает тип 
+                    val = int(val) 
+                if isinstance(val, datetime) == True:
+                    val = val.strftime("%d.%m.%Y")
                 data_tmp.append(val)  # получает временный список строки
             data.append(data_tmp.copy())  # добавляет в список Data
             data_tmp.clear()  # очищает временный список
