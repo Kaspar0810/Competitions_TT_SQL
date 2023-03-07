@@ -24,6 +24,7 @@ from itertools import *
 import os
 import openpyxl as op
 import pandas as pd
+import xlrd
 import sys
 import sqlite3
 import pathlib
@@ -678,7 +679,8 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     t = Title.select().order_by(Title.id.desc()).get()
     title = t.id
     if title == 1:
-        wb = op.load_workbook("регионы.xlsx")
+        # wb = op.load_workbook("регионы.xlsx")
+        wb = xlrd.load_workbook("регионы.xlsx")
         s = wb.sheetnames[0]
         sheet = wb[s]
         reg = []
@@ -736,17 +738,20 @@ def load_listR_in_db(fname, table_db):
 
         rlist = table_db.delete().execute()
 
+        # excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
         excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
         data_pandas = pd.DataFrame(excel_data)  # получает Dataframe
+        # print(data_pandas[data_pandas['Рейтинг']. isnull ()])
         # создает список заголовков столбцов
         column = data_pandas.columns.ravel().tolist()
         count = len(data_pandas)  # кол-во строк в excel файле
         for i in range(0, count):  # цикл по строкам
             for col in column:  # цикл по столбцам
                 val = data_pandas.iloc[i][col]
-                if isinstance(val, float) == True: # узнает тип 
-                    val = int(val) 
-                if isinstance(val, datetime) == True:
+                # заменяет пустые строки рейтинга на ноль и преобразовывает в тип int
+                data_pandas['Рейтинг'] = data_pandas['Рейтинг']. fillna (0)
+                data_pandas['Рейтинг'] = data_pandas['Рейтинг']. astype(int)
+                if isinstance(val, datetime) == True: # преобразовывает к нормальному виду даты
                     val = val.strftime("%d.%m.%Y")
                 data_tmp.append(val)  # получает временный список строки
             data.append(data_tmp.copy())  # добавляет в список Data
@@ -9892,18 +9897,18 @@ def load_playing_game_in_table_for_final(fin):
 
 
 # def proba():
-#     """добавление столбца в существующую таблицу"""
+#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
 
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
-#     tab_enabled = CharField(default='')
+#     r_district = CharField(default='', null=True)
 #     # mesta_exit = IntegerField(null=True)  # новый столбец, его поле и значение по умолчанию
-# #
+# # #
 #     with db:
-#         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
-#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         # migrate(migrator.rename_column('system', 'stage_final', 'stage_exit'))
-#         migrate(migrator.add_column('titles', 'tab_enabled', tab_enabled)) # таблица, столбец, повтор название столбца
+# #         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
+# #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+# #         # migrate(migrator.rename_column('system', 'stage_final', 'stage_exit'))
+#         migrate(migrator.add_column('r1_lists_m', 'r_district', r_district)) # таблица, столбец, повтор название столбца
 
     # ========================= создание таблицы
     # with db:
@@ -10037,7 +10042,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(begunki_made)
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)

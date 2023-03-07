@@ -25,7 +25,8 @@ class R_list_m(BaseModel):
     r_fname = CharField(50)
     r_bithday = DateField()
     r_city = CharField(30)
-
+    r_region = CharField()
+    r_district = CharField()
     class Meta:
         db_table = "r_lists_m"
         order_by = "r_fname"
@@ -37,6 +38,8 @@ class R_list_d(BaseModel):
     r_fname = CharField(50)
     r_bithday = DateField()
     r_city = CharField(30)
+    r_region = CharField()
+    r_district = CharField()
 
     class Meta:
         db_table = "r_lists_d"
@@ -49,7 +52,8 @@ class R1_list_m(BaseModel):
     r1_fname = CharField(50)
     r1_bithday = DateField()
     r1_city = CharField(30)
-
+    r1_region = CharField(100)
+    r1_district = CharField()
     class Meta:
         db_table = "r1_lists_m"
         order_by = "r1_fname"
@@ -61,7 +65,8 @@ class R1_list_d(BaseModel):
     r1_fname = CharField(50)
     r1_bithday = DateField()
     r1_city = CharField(30)
-
+    r1_region = CharField(100)
+    r1_district = CharField()
     class Meta:
         db_table = "r1_lists_d"
         order_by = "r1_fname"
