@@ -24,13 +24,12 @@ from itertools import *
 import os
 import openpyxl as op
 import pandas as pd
-import xlrd
 import sys
 import sqlite3
 import pathlib
 from pathlib import Path
 import random
-import collections
+# import collections
 # from playhouse.migrate import *
 
 if not os.path.isdir("table_pdf"):  # создает папку 
@@ -243,6 +242,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin3_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin4_Action.setEnabled(False)  # делает пункт меню не видимым
 
+
+
     def _connectActions(self):
         # Connect File actions
         self.system_made_Action.triggered.connect(self.system_made)
@@ -272,6 +273,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.third_comp_Action.triggered.connect(self.last)
         self.fourth_comp_Action.triggered.connect(self.last)
         self.fifth_comp_Action.triggered.connect(self.last)
+
+        self.ed_gr_Action.triggered.connect(self.edit_group)
 
         self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
@@ -423,6 +426,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def help(self):
         pass
 
+    def edit_group(self):
+        """редактирование жеребьевки групп"""
+        edit_group_after_draw()
+
     def open(self):
         go_to()
 
@@ -505,7 +512,7 @@ class StartWindow(QMainWindow, Ui_Form):
             self.LinkButton.setText("Список прошедших соревнований пуст")
             self.LinkButton.setEnabled(False)
             self.Button_open.setEnabled(False)
-            self.Button_old.setEnabled(False)
+            self.Button_old.setEnabled(False)   
 
     def last_comp(self):
         """открытие последних соревнований"""
@@ -631,6 +638,16 @@ class StartWindow(QMainWindow, Ui_Form):
             fir_window.comboBox.setCurrentText(f"{old_comp}.{gamer}")
             fir_window.label_4.setText(f"сроки: с {data_start} по {data_finish}")
 
+    def progress_bar_start_form(step):
+        """Прогресс бар стартового окна"""
+        # msgBox = QMessageBox
+        # fir_window.activate()
+        fir_window.pb.setValue(step)
+        # if step >= 99:
+        #     result = fir_window.msgBox.information(my_win, "Уведомление", "Загрузка рейтинг листа завершена.", msgBox.Ok)
+        #     if result == fir_window.msgBox.Ok:
+        #             fir_window.pb.setValue(0)
+        return step
 
 def dbase():
     """Создание DB и таблиц"""
@@ -645,10 +662,8 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     msgbox = QMessageBox
     if gamer == "Мальчики" or gamer == "Юноши" or gamer == "Мужчины":
         table_db = R_list_m
-        # ext = "Excel(*.xls, *.xlsx)"
     else:
         table_db = R_list_d
-        # ext = "Excel(*w.xlsx, *w.xls)"
     reply = msgbox.information(my_win, 'Уведомление', "Выберите файл с текущим рейтингом, \nзатем файл рейтинга за январь месяц.",
                                                   msgbox.Ok)
  
@@ -679,8 +694,7 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     t = Title.select().order_by(Title.id.desc()).get()
     title = t.id
     if title == 1:
-        # wb = op.load_workbook("регионы.xlsx")
-        wb = xlrd.load_workbook("регионы.xlsx")
+        wb = op.load_workbook("регионы.xlsx")
         s = wb.sheetnames[0]
         sheet = wb[s]
         reg = []
@@ -718,6 +732,8 @@ def control_R_list(fname, gamer):
 def load_listR_in_db(fname, table_db):
     """при отсутствии выбора файла рейтинга, позволяет выбрать вторично или выйти из диалога
     если выбор был сделан загружает в базу данных"""
+    msgBox = QMessageBox
+    step = 0
     filepatch = str(fname[0])
     if table_db == R_list_m or table_db == R_list_d:
         r = "текущим"
@@ -725,10 +741,10 @@ def load_listR_in_db(fname, table_db):
         r = "январским"
     if filepatch == "":
         message = f"Вы не выбрали файл с {r} рейтингом!\nесли хотите выйти, нажмите <Ок>\nесли хотите вернуться, нажмите <Cancel>"
-        reply = QtWidgets.QMessageBox.information(my_win, 'Уведомление', message,
-                                                  QtWidgets.QMessageBox.Ok,
-                                                  QtWidgets.QMessageBox.Cancel)
-        if reply == QMessageBox.Ok:
+        reply = msgBox.information(my_win, 'Уведомление', message,
+                                                  msgBox.Ok,
+                                                  msgBox.Cancel)
+        if reply == msgBox.Ok:
             return
         else:
             db_r(table_db)
@@ -738,26 +754,52 @@ def load_listR_in_db(fname, table_db):
 
         rlist = table_db.delete().execute()
 
-        # excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
         excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
         data_pandas = pd.DataFrame(excel_data)  # получает Dataframe
         # print(data_pandas[data_pandas['Рейтинг']. isnull ()])
         # создает список заголовков столбцов
         column = data_pandas.columns.ravel().tolist()
+
+        count = len(data_pandas)  # кол-во строк в excel файле
+        sp = 100 / (count)
+        sp = round(sp, 3) # округление числа до 3-х знаков
+
+        count_column = len(column)
+        if count_column == 5:
+            data_list_new = []
+            data_list = [""]
+            data_list_new = data_list * count
+            data_pandas["Субъект РФ"] = data_list_new
+            data_pandas["Федеральный округ"] = data_list_new
+            column = data_pandas.columns.ravel().tolist()
         count = len(data_pandas)  # кол-во строк в excel файле
         for i in range(0, count):  # цикл по строкам
             for col in column:  # цикл по столбцам
                 val = data_pandas.iloc[i][col]
                 # заменяет пустые строки рейтинга на ноль и преобразовывает в тип int
-                data_pandas['Рейтинг'] = data_pandas['Рейтинг']. fillna (0)
-                data_pandas['Рейтинг'] = data_pandas['Рейтинг']. astype(int)
+                data_pandas['Рейтинг'] = data_pandas['Рейтинг'].fillna (0)
+                data_pandas['Рейтинг'] = data_pandas['Рейтинг'].astype(int)
                 if isinstance(val, datetime) == True: # преобразовывает к нормальному виду даты
                     val = val.strftime("%d.%m.%Y")
                 data_tmp.append(val)  # получает временный список строки
             data.append(data_tmp.copy())  # добавляет в список Data
             data_tmp.clear()  # очищает временный список
-        with db:
-            table_db.insert_many(data).execute()
+            step += sp
+            StartWindow.progress_bar_start_form(step)
+        with db.atomic():
+            for idx in range(0, len(data), 100):
+                table_db.insert_many(data[idx:idx+100]).execute()
+
+
+# def progress_bar_start_form(step):
+#     """Прогресс бар стартового окна"""
+#     msgBox = QMessageBox
+#     StartWindow.self.     .pb.setValue(step)
+#     if step >= 99:
+#        result = msgBox.information(my_win, "Уведомление", "Загрузка рейтинг листа завершена.", msgBox.Ok)
+#        if result == msgBox.Ok:
+#             my_win.pb.setValue(0)
+#     return step
 
 
 def region():
@@ -3498,6 +3540,7 @@ def find_in_player_list():
 
 def enter_total_score():
     """ввод счета во встречи без счета в партиях"""
+    msgBox = QMessageBox
     sender = my_win.sender()
     tab = my_win.tabWidget.currentIndex()
     mark = 0
@@ -3506,29 +3549,35 @@ def enter_total_score():
         mark = my_win.lineEdit_pl1_score_total.text()
         flag = 0
     elif sender == my_win.lineEdit_pl2_score_total:
-        mark = my_win.lineEdit_pl1_score_total.text()
+        mark = my_win.lineEdit_pl2_score_total.text()
         flag = 1 
     elif sender == my_win.lineEdit_pl1_score_total_fin:
         mark = my_win.lineEdit_pl1_score_total_fin.text()
         flag = 0
     elif sender == my_win.lineEdit_pl2_score_total_fin:
         mark = my_win.lineEdit_pl2_score_total_fin.text()
-        flag = 1    
-    mark = int(mark)
-    check_input_total_score(mark)
-    if tab == 3 and flag == 0:
-        my_win.lineEdit_pl2_score_total.setFocus()
-    elif tab == 4 and flag == 0:
-        pass
-    elif tab == 5 and flag == 0:
-       my_win.lineEdit_pl2_score_total_fin.setFocus()
-    elif tab == 3 and flag == 1:
-        enter_score(none_player=0) 
-    elif tab == 4 and flag == 1:
-       pass
-    elif tab == 5 and flag == 1:
-       enter_score(none_player=0)
-
+        flag = 1  
+    if mark != "":  
+        mark = int(mark)
+        check_input_total_score(mark)
+        if tab == 3 and flag == 0:
+            my_win.lineEdit_pl2_score_total.setFocus()
+        elif tab == 4 and flag == 0:
+            pass
+        elif tab == 5 and flag == 0:
+            my_win.lineEdit_pl2_score_total_fin.setFocus()
+        elif tab == 3 and flag == 1:
+            enter_score(none_player=0) 
+        elif tab == 4 and flag == 1:
+            pass
+        elif tab == 5 and flag == 1:
+            enter_score(none_player=0)
+    else:
+        reply = msgBox.information(my_win, 'Уведомление',
+                                                "Проверьте правильность ввода счета!",
+                                                msgBox.Ok)
+        return
+    
 
 def check_input_total_score(mark):
     """проверка ввода счета встречи и его правильность"""
@@ -3549,7 +3598,7 @@ def check_input_total_score(mark):
                 break
     if mark in mark_int:
         if mark >= match_current:
-            reply = QMessageBox.information(my_win, 'Уведомление',
+            reply = msgBox.information(my_win, 'Уведомление',
                                                 "Проверьте правильность ввода счета!",
                                                 msgBox.Ok)
             return
@@ -5670,6 +5719,35 @@ def choice_setka(fin):
             system.save()
         # ========= рано отмечает, что сделана жеребьевка
     load_tableWidget()
+
+
+def edit_group_after_draw():
+    """редактирование групп после жеребьевки"""
+    group = []
+    player = []
+    my_win.comboBox_player_group_edit.clear()
+    my_win.comboBox_number_group_edit.clear()
+    my_win.tabWidget.setCurrentIndex(3)
+    sender = my_win.sender()
+    system = System.select().where(System.title_id == title_id())
+    system_group = system.select().where(System.stage == "Предварительный").get()
+    players = Player.select().where(Player.title_id == title_id())
+    total_gr = system_group.total_group
+    for i in range(1, total_gr + 1):
+        group.append(f"{i} группа")
+    my_win.comboBox_number_group_edit.addItems(group)
+    for k in players:
+        player.append(k.full_name)
+    player.sort()
+    my_win.comboBox_player_group_edit.addItems(player)
+
+
+def add_player_to_group():
+    """добавление игрока в группу при редактировании"""
+    player_choice_tmp = []
+    n_group = my_win.comboBox_number_group_edit.currentText()
+    player_gr = my_win.comboBox_player_group_edit.currentText()
+    edit_group_after_draw()
 
 
 def choice_tbl_made():
@@ -9901,14 +9979,14 @@ def load_playing_game_in_table_for_final(fin):
 
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
-#     r_district = CharField(default='', null=True)
+#     # r1_district = CharField(default='', null=True)
 #     # mesta_exit = IntegerField(null=True)  # новый столбец, его поле и значение по умолчанию
-# # #
+# # # #
 #     with db:
-# #         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
-# #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-# #         # migrate(migrator.rename_column('system', 'stage_final', 'stage_exit'))
-#         migrate(migrator.add_column('r1_lists_m', 'r_district', r_district)) # таблица, столбец, повтор название столбца
+# # #         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
+# # #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+#         migrate(migrator.rename_column('r1_lists_m', 'r_region', 'r1_region')) # Переименование столбца (таблица, старое название, новое название столбца)
+        # migrate(migrator.add_column('r1_lists_m', 'r1_district', r1_district)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
     # ========================= создание таблицы
     # with db:
