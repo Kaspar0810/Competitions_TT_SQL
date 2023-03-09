@@ -5725,9 +5725,10 @@ def edit_group_after_draw():
     """редактирование групп после жеребьевки"""
     group = []
     player = []
+    my_win.tabWidget.setCurrentIndex(3)
+    my_win.tableWidget.setVisible(False)
     my_win.comboBox_player_group_edit.clear()
     my_win.comboBox_number_group_edit.clear()
-    my_win.tabWidget.setCurrentIndex(3)
     sender = my_win.sender()
     system = System.select().where(System.title_id == title_id())
     system_group = system.select().where(System.stage == "Предварительный").get()
