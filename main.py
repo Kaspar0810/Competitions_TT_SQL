@@ -5723,24 +5723,47 @@ def choice_setka(fin):
 
 def edit_group_after_draw():
     """редактирование групп после жеребьевки"""
-    group = []
+    group = [""]
     player = []
     my_win.tabWidget.setCurrentIndex(3)
     my_win.tableWidget.setVisible(False)
-    my_win.comboBox_player_group_edit.clear()
-    my_win.comboBox_number_group_edit.clear()
-    sender = my_win.sender()
+    my_win.comboBox_first_group.clear()
+    my_win.comboBox_second_group.clear()
     system = System.select().where(System.title_id == title_id())
     system_group = system.select().where(System.stage == "Предварительный").get()
     players = Player.select().where(Player.title_id == title_id())
     total_gr = system_group.total_group
     for i in range(1, total_gr + 1):
         group.append(f"{i} группа")
-    my_win.comboBox_number_group_edit.addItems(group)
+    my_win.comboBox_first_group.addItems(group)
+    my_win.comboBox_second_group.addItems(group)
     for k in players:
         player.append(k.full_name)
     player.sort()
     my_win.comboBox_player_group_edit.addItems(player)
+    # add_item_listwidget()
+
+
+def add_item_listwidget():
+    """добавление элементов в листвиджет"""
+    my_win.listWidget_first_group.clear()
+    gr = my_win.comboBox_first_group.currentText()
+    data_item = []
+    data_item_tmp = []
+    data_item_temp = []
+    item = QListWidgetItem()
+    item.setCheckState(QtCore.Qt.Unchecked)
+    choices = Choice.select().where(Choice.title_id == title_id())
+    if gr != "":
+        group = choices.select().order_by(Choice.posev_group).where(Choice.group == gr)
+        count = len(group)
+        for k in group:
+            n = k.posev_group
+            family = k.family
+            region = k.region
+            text = f"{n}: {family}/ {region}" 
+            data_item.append(text)
+        my_win.listWidget_first_group.addItems(data_item)
 
 
 def add_player_to_group():
@@ -10064,6 +10087,7 @@ my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
 my_win.comboBox_select_stage_begunki.currentTextChanged.connect(select_stage_for_begunki)
 my_win.comboBox_select_group_begunki.currentTextChanged.connect(select_tour_for_begunki)
 my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)
+my_win.comboBox_first_group.currentTextChanged.connect(add_item_listwidget)
 
 
 # =======  отслеживание переключение чекбоксов =========

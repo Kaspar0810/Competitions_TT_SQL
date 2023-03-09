@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1354</width>
+    <width>1359</width>
     <height>798</height>
    </rect>
   </property>
@@ -2766,7 +2766,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2778,8 +2778,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>225</width>
-       <height>565</height>
+       <width>222</width>
+       <height>534</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3152,7 +3152,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3608,7 +3608,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3894,7 +3894,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3907,7 +3907,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4156,7 +4156,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4354,13 +4354,13 @@
      <string>Проверка</string>
     </property>
    </widget>
-   <widget class="QTableView" name="tableView_setka32">
+   <widget class="QTableView" name="tableView">
     <property name="geometry">
      <rect>
       <x>1110</x>
       <y>24</y>
-      <width>231</width>
-      <height>681</height>
+      <width>241</width>
+      <height>221</height>
      </rect>
     </property>
     <property name="gridStyle">
@@ -4370,8 +4370,8 @@
    <widget class="QComboBox" name="comboBox_first_group">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>270</y>
+      <x>270</x>
+      <y>260</y>
       <width>181</width>
       <height>22</height>
      </rect>
@@ -4380,10 +4380,40 @@
    <widget class="QListWidget" name="listWidget_first_group">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>320</y>
-      <width>341</width>
-      <height>361</height>
+      <x>270</x>
+      <y>290</y>
+      <width>400</width>
+      <height>320</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTableView" name="tableView_2">
+    <property name="geometry">
+     <rect>
+      <x>1110</x>
+      <y>250</y>
+      <width>241</width>
+      <height>192</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listWidget_second_group">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>290</y>
+      <width>400</width>
+      <height>320</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_second_group">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>260</y>
+      <width>181</width>
+      <height>22</height>
      </rect>
     </property>
    </widget>
@@ -4391,9 +4421,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>260</y>
+      <y>250</y>
       <width>841</width>
-      <height>481</height>
+      <height>501</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -4468,7 +4498,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1354</width>
+     <width>1359</width>
      <height>21</height>
     </rect>
    </property>
