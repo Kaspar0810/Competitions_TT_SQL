@@ -804,11 +804,12 @@ def load_listR_in_db(fname, table_db):
 
 def region():
     """добавляет из таблицы в комбобокс регионы"""
+    count = len(Region.select())
     if my_win.comboBox_region.currentIndex() > 0:  # проверка на заполненность комбобокса данными
         return
     else:
         with db:
-            for r in range(1, 86):
+            for r in range(1, count + 1):
                 reg = Region.get(Region.id == r)
                 my_win.comboBox_region.addItem(reg.region)
 
@@ -5746,24 +5747,36 @@ def edit_group_after_draw():
 
 def add_item_listwidget():
     """добавление элементов в листвиджет"""
-    my_win.listWidget_first_group.clear()
-    gr = my_win.comboBox_first_group.currentText()
-    data_item = []
-    data_item_tmp = []
-    data_item_temp = []
-    item = QListWidgetItem()
-    item.setCheckState(QtCore.Qt.Unchecked)
+    sender = my_win.sender()
+    if sender == my_win.comboBox_first_group:
+        my_win.listWidget_first_group.clear()
+        gr = my_win.comboBox_first_group.currentText()
+    else:
+        my_win.listWidget_second_group.clear()
+        gr = my_win.comboBox_second_group.currentText()
+
     choices = Choice.select().where(Choice.title_id == title_id())
     if gr != "":
         group = choices.select().order_by(Choice.posev_group).where(Choice.group == gr)
-        count = len(group)
         for k in group:
+            item = QListWidgetItem()
+            item.setCheckState(QtCore.Qt.Unchecked)
             n = k.posev_group
             family = k.family
             region = k.region
-            text = f"{n}: {family}/ {region}" 
-            data_item.append(text)
-        my_win.listWidget_first_group.addItems(data_item)
+            coach = k.coach
+            text = f"{n}:{family}/ {region}/ {coach}"
+            item.setText(text) 
+            if sender == my_win.comboBox_first_group:
+                my_win.listWidget_first_group.addItem(item)
+            else:
+                my_win.listWidget_second_group.addItem(item)
+
+
+def change_player_between_group_after_draw():
+    """Смена игроков в группах после жеребьевки при отметки в listwidget при редакитровании"""
+    player_first = my_win.listWidget_first_group.currentRow()
+
 
 
 def add_player_to_group():
@@ -10088,7 +10101,7 @@ my_win.comboBox_select_stage_begunki.currentTextChanged.connect(select_stage_for
 my_win.comboBox_select_group_begunki.currentTextChanged.connect(select_tour_for_begunki)
 my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)
 my_win.comboBox_first_group.currentTextChanged.connect(add_item_listwidget)
-
+my_win.comboBox_second_group.currentTextChanged.connect(add_item_listwidget)
 
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
