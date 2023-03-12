@@ -2765,8 +2765,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2778,8 +2778,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>225</width>
-       <height>565</height>
+       <width>196</width>
+       <height>534</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3151,8 +3151,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3608,7 +3608,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3893,8 +3893,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3906,8 +3906,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4155,8 +4155,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4388,7 +4388,8 @@
     </property>
     <property name="font">
      <font>
-      <pointsize>7</pointsize>
+      <family>Times New Roman</family>
+      <pointsize>11</pointsize>
      </font>
     </property>
    </widget>
@@ -4411,6 +4412,12 @@
       <height>320</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
    </widget>
    <widget class="QComboBox" name="comboBox_second_group">
     <property name="geometry">
@@ -4422,13 +4429,86 @@
      </rect>
     </property>
    </widget>
+   <widget class="QPushButton" name="Button_add_pl1">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>680</y>
+      <width>221</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Добавить игрока 1-ой группы</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Button_add_pl2">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>680</y>
+      <width>221</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Добавить игрока 2- ой группы</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>269</x>
+      <y>630</y>
+      <width>831</width>
+      <height>33</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QLineEdit" name="lineEdit_change_pl1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>11</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Buttom_change_player">
+       <property name="text">
+        <string>&lt;     &gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit_change_pl2">
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>11</pointsize>
+         <italic>true</italic>
+        </font>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
       <x>260</x>
       <y>250</y>
       <width>841</width>
-      <height>501</height>
+      <height>511</height>
      </rect>
     </property>
     <property name="sizePolicy">

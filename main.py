@@ -5748,6 +5748,7 @@ def edit_group_after_draw():
 def add_item_listwidget():
     """добавление элементов в листвиджет"""
     sender = my_win.sender()
+    coach_list = []
     if sender == my_win.comboBox_first_group:
         my_win.listWidget_first_group.clear()
         gr = my_win.comboBox_first_group.currentText()
@@ -5760,23 +5761,84 @@ def add_item_listwidget():
         group = choices.select().order_by(Choice.posev_group).where(Choice.group == gr)
         for k in group:
             item = QListWidgetItem()
-            item.setCheckState(QtCore.Qt.Unchecked)
+            # item.setCheckState(QtCore.Qt.Unchecked)
             n = k.posev_group
             family = k.family
             region = k.region
             coach = k.coach
-            text = f"{n}:{family}/ {region}/ {coach}"
+            text = f"{n}:{family}/{region}/{coach}"
             item.setText(text) 
             if sender == my_win.comboBox_first_group:
                 my_win.listWidget_first_group.addItem(item)
             else:
                 my_win.listWidget_second_group.addItem(item)
+            coach_list.append(coach)
+        double_coach_in_group(coach_list)
+
+
+def list_player_in_group_after_draw():
+    """Смена игроков в группах после жеребьевки при отметки в listwidget при редакитровании"""
+    sender = my_win.sender()
+    if sender == my_win.Button_add_pl1:
+        item = my_win.listWidget_first_group.item
+        for row in range(my_win.listWidget_first_group.count()):
+            select_item = my_win.listWidget_first_group.selectedItems()
+        for i in select_item:
+            player_first = i.text()
+            my_win.lineEdit_change_pl1.setText(player_first)
+    else:
+        item = my_win.listWidget_second_group.item
+        for row in range(my_win.listWidget_second_group.count()):
+            select_item = my_win.listWidget_second_group.selectedItems()
+            for i in select_item:
+                player_second = i.text()
+                my_win.lineEdit_change_pl2.setText(player_second)
 
 
 def change_player_between_group_after_draw():
     """Смена игроков в группах после жеребьевки при отметки в listwidget при редакитровании"""
-    player_first = my_win.listWidget_first_group.currentRow()
-
+    msgBox = QMessageBox
+    # stage = "Предварительный"
+    # system = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()
+    # kg = system.total_group
+    gamelist = Game_list.select().where(Game_list.title_id == title_id())
+    choices = Choice.select().where(Choice.title_id == title_id())
+    player1 = my_win.lineEdit_change_pl1.text()
+    player2 = my_win.lineEdit_change_pl2.text()
+    if player1 == "" or player2 == "":
+        result = msgBox.information(my_win, "Уведомление", "Вы не выбрали игрока из одной группы!", msgBox.Ok)
+        return
+    else:
+        gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы
+        gr_pl2 = my_win.comboBox_second_group.currentText() # номер группы
+        znak = player1.find(":")
+        znak1 = player1.find("/")  
+        number_posev1 = int(player1[:znak]) # номера посева
+        family1 = player1[znak + 1:znak1]
+        znak = player2.find(":")
+        znak1 = player2.find("/")  
+        number_posev2 = int(player2[:znak]) # номера посева
+        family2 = player2[znak + 1:znak1]
+        player_family = [family1, family2]
+        group_player = [gr_pl2, gr_pl1]
+        n_posev = [number_posev2, number_posev1]
+        p = 0
+        for k in player_family:
+            g_list = gamelist.select().where(Game_list.player_group_id == k).get()
+            with db:
+                g_list.number_group = group_player[p] 
+                g_list.rank_number_group = n_posev[p]
+                g_list.save()
+            choice = choices.select().where(Choice.family== k).get()
+            with db:
+                choice.group = group_player[p] 
+                choice.posev_group = n_posev[p]
+                choice.save()
+            p += 1
+    my_win.lineEdit_change_pl1.clear()
+    my_win.lineEdit_change_pl2.clear()
+    player_in_table_group_and_write_Game_list_Result()
+    # table_data(stage, kg)
 
 
 def add_player_to_group():
@@ -5808,6 +5870,7 @@ def choice_tbl_made():
 
 def choice_filter_group():
     """фильтрует таблицу жеребьевка по группам"""
+    coach_list = []
     gamer = my_win.lineEdit_title_gamer.text()
     fg = my_win.comboBox_filter_choice.currentText()
     choice = Choice.select().where(Choice.title_id == title_id())
@@ -5830,12 +5893,40 @@ def choice_filter_group():
             for column in range(column_count):
                 item = str(list(choice_list[row].values())[column])
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                if column == 4:
+                    coach_list.append(item)
 
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
         color_region_in_tableWidget(fg)
         for d in range(0, row_count):  # сортирует нумерация по порядку
             my_win.tableWidget.setItem(d, 0, QTableWidgetItem(str(d + 1)))
+    double_coach_in_group(coach_list)
+
+
+def double_coach_in_group(coach_list):
+    """поиск совпадения тренеров в одной группе"""
+    tmp_list = []
+    count = len(coach_list)
+    for i in coach_list:
+        znak = i.find(",")
+        if znak == -1:
+            tmp_list.append(i)
+        else:
+            coach_1 = i[:znak]
+            tmp_list.append(coach_1)
+            if i.find(",", znak) == -1:
+                znak_1 = i.find(",", znak + 1)
+                coach_2 = i[znak: znak_1]
+                tmp_list.append(coach_2)
+            else:
+                coach_2 = i[znak + 2:]
+                tmp_list.append(coach_2)
+    count_list = len(tmp_list)
+    count_uniq = len(set(tmp_list)) 
+    if count_list > count_uniq:
+        dup = [x for i, x in enumerate(tmp_list) if i != tmp_list.index(x)]
+
 
 
 def color_region_in_tableWidget(fg):
@@ -10159,6 +10250,9 @@ my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
 # my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
+my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
+my_win.Buttom_change_player.clicked.connect(change_player_between_group_after_draw)
 
 my_win.Button_sort_mesto.clicked.connect(sort)
 my_win.Button_sort_R.clicked.connect(sort)
