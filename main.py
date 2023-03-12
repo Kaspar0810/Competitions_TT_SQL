@@ -5761,7 +5761,6 @@ def add_item_listwidget():
         group = choices.select().order_by(Choice.posev_group).where(Choice.group == gr)
         for k in group:
             item = QListWidgetItem()
-            # item.setCheckState(QtCore.Qt.Unchecked)
             n = k.posev_group
             family = k.family
             region = k.region
@@ -5773,7 +5772,7 @@ def add_item_listwidget():
             else:
                 my_win.listWidget_second_group.addItem(item)
             coach_list.append(coach)
-        double_coach_in_group(coach_list)
+        duplicat_coach_in_group(coach_list)
 
 
 def list_player_in_group_after_draw():
@@ -5798,19 +5797,29 @@ def list_player_in_group_after_draw():
 def change_player_between_group_after_draw():
     """Смена игроков в группах после жеребьевки при отметки в listwidget при редакитровании"""
     msgBox = QMessageBox
-    # stage = "Предварительный"
-    # system = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()
-    # kg = system.total_group
+
     gamelist = Game_list.select().where(Game_list.title_id == title_id())
     choices = Choice.select().where(Choice.title_id == title_id())
     player1 = my_win.lineEdit_change_pl1.text()
     player2 = my_win.lineEdit_change_pl2.text()
-    if player1 == "" or player2 == "":
-        result = msgBox.information(my_win, "Уведомление", "Вы не выбрали игрока из одной группы!", msgBox.Ok)
+    gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы
+    gr_pl2 = my_win.comboBox_second_group.currentText() # номер группы
+    if player1 == "" and player2 == "":
+        result = msgBox.information(my_win, "Уведомление", "Вы не выбрали игроков группы!", msgBox.Ok)
         return
+    elif player1 == "" and player2 != "":
+        family1 = ""
+        znak = player2.find(":")
+        znak1 = player2.find("/")  
+        number_posev2 = int(player2[:znak]) # номера посева
+        number_posev1 = number_posev2
+        family2 = player2[znak + 1:znak1]
+        player_family = [family2]
+        group_player = [gr_pl2, gr_pl1]
+        n_posev = [number_posev2, number_posev1]
+    elif player1 != "" and player2 == "":
+        pass
     else:
-        gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы
-        gr_pl2 = my_win.comboBox_second_group.currentText() # номер группы
         znak = player1.find(":")
         znak1 = player1.find("/")  
         number_posev1 = int(player1[:znak]) # номера посева
@@ -5822,23 +5831,22 @@ def change_player_between_group_after_draw():
         player_family = [family1, family2]
         group_player = [gr_pl2, gr_pl1]
         n_posev = [number_posev2, number_posev1]
-        p = 0
-        for k in player_family:
-            g_list = gamelist.select().where(Game_list.player_group_id == k).get()
-            with db:
-                g_list.number_group = group_player[p] 
-                g_list.rank_number_group = n_posev[p]
-                g_list.save()
-            choice = choices.select().where(Choice.family== k).get()
-            with db:
-                choice.group = group_player[p] 
-                choice.posev_group = n_posev[p]
-                choice.save()
-            p += 1
+    p = 0
+    for k in player_family:
+        g_list = gamelist.select().where(Game_list.player_group_id == k).get()
+        with db:
+            g_list.number_group = group_player[p] 
+            g_list.rank_number_group = n_posev[p]
+            g_list.save()
+        choice = choices.select().where(Choice.family== k).get()
+        with db:
+            choice.group = group_player[p] 
+            choice.posev_group = n_posev[p]
+            choice.save()
+        p += 1
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
     player_in_table_group_and_write_Game_list_Result()
-    # table_data(stage, kg)
 
 
 def add_player_to_group():
@@ -5901,10 +5909,11 @@ def choice_filter_group():
         color_region_in_tableWidget(fg)
         for d in range(0, row_count):  # сортирует нумерация по порядку
             my_win.tableWidget.setItem(d, 0, QTableWidgetItem(str(d + 1)))
-    double_coach_in_group(coach_list)
+    duplicat = duplicat_coach_in_group(coach_list)
+    color_coach_in_table_widget(duplicat, coach_list)
 
 
-def double_coach_in_group(coach_list):
+def duplicat_coach_in_group(coach_list):
     """поиск совпадения тренеров в одной группе"""
     tmp_list = []
     count = len(coach_list)
@@ -5925,8 +5934,22 @@ def double_coach_in_group(coach_list):
     count_list = len(tmp_list)
     count_uniq = len(set(tmp_list)) 
     if count_list > count_uniq:
-        dup = [x for i, x in enumerate(tmp_list) if i != tmp_list.index(x)]
+        duplicat = [x for i, x in enumerate(tmp_list) if i != tmp_list.index(x)]
+        return duplicat
 
+
+def color_coach_in_table_widget(duplicat, coach_list):
+    """окаршиваает в красный цвет повторяющиеся фамилия тренеров"""
+    if duplicat is not None:
+        num_gr = []
+        coach = duplicat[0]
+        p = 0
+        for i in coach_list:
+            p += 1
+            if coach == i:
+                num_gr.append(p) 
+        for k in num_gr:
+            my_win.tableWidget.item(k - 1, 4).setForeground(QBrush(QColor(0, 0, 255)))  # окрашивает текст в красный цвет
 
 
 def color_region_in_tableWidget(fg):
