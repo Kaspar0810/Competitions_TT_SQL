@@ -761,8 +761,8 @@ def load_listR_in_db(fname, table_db):
         column = data_pandas.columns.ravel().tolist()
 
         count = len(data_pandas)  # кол-во строк в excel файле
-        sp = 100 / (count)
-        sp = round(sp, 3) # округление числа до 3-х знаков
+        # sp = 100 / (count)
+        # sp = round(sp, 3) # округление числа до 3-х знаков
 
         count_column = len(column)
         if count_column == 5:
@@ -784,8 +784,8 @@ def load_listR_in_db(fname, table_db):
                 data_tmp.append(val)  # получает временный список строки
             data.append(data_tmp.copy())  # добавляет в список Data
             data_tmp.clear()  # очищает временный список
-            step += sp
-            StartWindow.progress_bar_start_form(step)
+            # step += sp
+            # StartWindow.progress_bar_start_form(step)
         with db.atomic():
             for idx in range(0, len(data), 100):
                 table_db.insert_many(data[idx:idx+100]).execute()
@@ -5772,7 +5772,8 @@ def add_item_listwidget():
             else:
                 my_win.listWidget_second_group.addItem(item)
             coach_list.append(coach)
-        duplicat_coach_in_group(coach_list)
+        duplicat = duplicat_coach_in_group(coach_list)
+        color_coach_in_table_widget(duplicat, coach_list)
 
 
 def list_player_in_group_after_draw():
@@ -5847,6 +5848,8 @@ def change_player_between_group_after_draw():
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
     player_in_table_group_and_write_Game_list_Result()
+    # choice_filter_group()
+    # color_coach_in_table_widget()
 
 
 def add_player_to_group():
@@ -8328,7 +8331,7 @@ def  table_data(stage, kg):
         # список словарей участник и его регион
         result_fin = result.select().where(Result.number_group == stage)
         tr = len(result_fin)  # общее кол-во игр в финалах или одной таблице
-        posev_data = player_choice_one_table(stage)
+        posev_data = player_choice_one_table(stage) # posev_data (фамилия/ id)
         count_player_group = len(posev_data)
         max_gamer = count_player_group
         num_gr = stage
