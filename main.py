@@ -2972,6 +2972,14 @@ def player_in_table_group_and_write_Game_list_Result():
     встречи по турам в таблицу -Result- """
     sys = System.select().where(System.title_id == title_id())  # находит system id последнего
     system = sys.select().where(System.stage == "Предварительный").get()
+    # удаление старых записей в game_list после редактирования жеребьевки групп
+    gamelist = Game_list.select().where(Game_list.title_id == title_id())
+    # gl = gamelist.select().where(Game_list.system_id == system)
+    # gl.delete_many.instance()
+    result = Result.select().where(Result.title_id == title_id())
+    # res = result.select().where(Result.system_stage == "Предварительный")
+    # res.delete_many.instance()
+    #==========
     kg = system.total_group
     stage = system.stage
     pv = system.page_vid
@@ -2986,13 +2994,24 @@ def player_in_table_group_and_write_Game_list_Result():
         k = 0  # кол-во спортсменов в группе
         for i in range(0, count_player * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
+            posev = int(gr[i][0]) # посев (номер игрока в группе)
+            gl_id = gamelist.select().where((Game_list.player_group_id == family_player) & 
+                                            (Game_list.rank_num_player == posev) & 
+                                            (Game_list.number_group == number_group)).get()
             # подсчет кол-во знаков в фамилия, если 0 значит игрока нет
             fp = len(family_player)
-            if fp > 0:  # если строка (фамилия игрока) не пустая идет запись в db
+            if fp > 0 and gl_id == "":  # если строка (фамилия игрока) не пустая идет запись в db
                 k += 1
                 with db:
                     game_list = Game_list(number_group=number_group, rank_num_player=k, player_group=family_player,
                                           system_id=system, title_id=title_id()).save()
+            else:
+                with db:
+                    game_list = (Game_list.update(number_group=number_group, rank_num_player=posev, player_group=family_player).
+                                 where(Game_list.id == gl_id)).execute()
+ 
+        query = Result.delete().where(Result.title_id == title_id())
+        query.execute()
         # если 1-я строка (фамилия игрока) пустая выход из группы
         if fp == 0 and k != 0 or k == count_player:
             cp = k - 3
@@ -5815,9 +5834,9 @@ def change_player_between_group_after_draw():
         number_posev2 = int(player2[:znak]) # номера посева
         number_posev1 = number_posev2
         family2 = player2[znak + 1:znak1]
-        player_family = [family2]
-        group_player = [gr_pl2, gr_pl1]
-        n_posev = [number_posev2, number_posev1]
+        # player_family = [family2]
+        # group_player = [gr_pl2, gr_pl1]
+        # n_posev = [number_posev2, number_posev1]
     elif player1 != "" and player2 == "":
         pass
     else:
@@ -5829,22 +5848,32 @@ def change_player_between_group_after_draw():
         znak1 = player2.find("/")  
         number_posev2 = int(player2[:znak]) # номера посева
         family2 = player2[znak + 1:znak1]
-        player_family = [family1, family2]
-        group_player = [gr_pl2, gr_pl1]
-        n_posev = [number_posev2, number_posev1]
-    p = 0
-    for k in player_family:
-        g_list = gamelist.select().where(Game_list.player_group_id == k).get()
-        with db:
-            g_list.number_group = group_player[p] 
-            g_list.rank_number_group = n_posev[p]
-            g_list.save()
-        choice = choices.select().where(Choice.family== k).get()
-        with db:
-            choice.group = group_player[p] 
-            choice.posev_group = n_posev[p]
-            choice.save()
-        p += 1
+        # player_family = [family1, family2]
+        # group_player = [gr_pl2, gr_pl1]
+        # n_posev = [number_posev2, number_posev1]
+    # p = 0
+    # for k in player_family:
+    g_list = gamelist.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get()
+    with db:
+        g_list.number_group = gr_pl2
+        g_list.rank_number_group = number_posev2
+        g_list.save()
+    g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get()
+    with db:
+        g_list.number_group = gr_pl1
+        g_list.rank_number_group = number_posev1
+        g_list.save()    
+    choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+    with db:
+        choice.group = gr_pl2 
+        choice.posev_group = number_posev2
+        choice.save()
+    choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
+    with db:
+        choice.group = gr_pl1 
+        choice.posev_group = number_posev1
+        choice.save()
+           # p += 1
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
     player_in_table_group_and_write_Game_list_Result()
