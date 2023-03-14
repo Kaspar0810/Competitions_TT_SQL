@@ -2973,13 +2973,10 @@ def player_in_table_group_and_write_Game_list_Result():
     sys = System.select().where(System.title_id == title_id())  # находит system id последнего
     system = sys.select().where(System.stage == "Предварительный").get()
     # удаление старых записей в game_list после редактирования жеребьевки групп
-    gamelist = Game_list.select().where(Game_list.title_id == title_id())
-    # gl = gamelist.select().where(Game_list.system_id == system)
-    # gl.delete_many.instance()
-    result = Result.select().where(Result.title_id == title_id())
-    # res = result.select().where(Result.system_stage == "Предварительный")
-    # res.delete_many.instance()
-    gamelist_count = len(gamelist)
+    gamelist = Game_list.delete().where(Game_list.title_id == title_id())
+    gamelist.execute()
+    query = Result.delete().where(Result.title_id == title_id()) # 
+    query.execute()
     #==========
     kg = system.total_group
     stage = system.stage
@@ -2993,34 +2990,17 @@ def player_in_table_group_and_write_Game_list_Result():
         count_player = len(gr) // 2  # максимальное кол-во участников в группе
         number_group = str(p + 1) + ' группа'
         k = 0  # кол-во спортсменов в группе
-        flag_results_clear = 0
         for i in range(0, count_player * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
+            posev = int(gr[i][0]) # посев (номер игрока в группе)
             fp = len(family_player) # кол-во знаков фамилии, если 0 значит игрока нет
-            if gamelist_count != 0: # если повторная жеребьевка групп
-                posev = int(gr[i][0]) # посев (номер игрока в группе)
-                gl_id = gamelist.select().where((Game_list.player_group_id == family_player) & 
-                                                (Game_list.rank_num_player == posev) & 
-                                                (Game_list.number_group == number_group)).get()
-                with db:
-                    game_list = (Game_list.update(number_group=number_group, rank_num_player=posev,
-                                player_group=family_player).
-                                where(Game_list.id == gl_id)).execute() 
-                flag_results_clear = 1
-                k = posev
-            else:                              
                 # подсчет кол-во знаков в фамилия, если 0 значит игрока нет
-                if fp > 0:  # если строка (фамилия игрока) не пустая идет запись в db
-                    k += 1
-                    with db:
-                        game_list = Game_list(number_group=number_group, rank_num_player=k, 
-                                                player_group=family_player,
-                                                system_id=system, title_id=title_id()).save()
-        
-        if flag_results_clear == 1: # очищает Results перед сменой игроков в группе
-            # очищает таблицу результаты перед сменой игроков в группе
-            query = Result.delete().where(Result.title_id == title_id()) # 
-            query.execute()
+            if fp > 0:  # если строка (фамилия игрока) не пустая идет запись в db
+                k += 1
+                with db:
+                    game_list = Game_list(number_group=number_group, rank_num_player=posev, 
+                                            player_group=family_player,
+                                            system_id=system, title_id=title_id()).save()
 
         # если 1-я строка (фамилия игрока) пустая выход из группы
         if fp == 0 and k != 0 or k == count_player:
@@ -5990,6 +5970,8 @@ def color_coach_in_table_widget(duplicat, coach_list):
             p += 1
             if coach == i:
                 num_gr.append(p) 
+        # my_win.listWidget_first_group.setStyleSheet()
+        #     print(i)
         for k in num_gr:
             my_win.tableWidget.item(k - 1, 4).setForeground(QBrush(QColor(0, 0, 255)))  # окрашивает текст в красный цвет
 
