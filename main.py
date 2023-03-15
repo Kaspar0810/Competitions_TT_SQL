@@ -6734,6 +6734,7 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
     stiker = []
+    final_type = "круг"
     from reportlab.platypus import Table
     systems = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
@@ -6741,6 +6742,7 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     if stage != "Финальный":
         system = systems.select().where(System.stage == stage).get()
         total_group = system.total_group
+
     else:
         system = systems.select().where(System.stage == number_group).get()
         final_type = system.type_table
@@ -6836,6 +6838,7 @@ def begunki_made():
     from sys import platform
     from reportlab.platypus import Table
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    result = Result.select().where(Result.title_id == title_id())
     number_group = my_win.comboBox_select_group_begunki.currentText()
     stage = my_win.comboBox_select_stage_begunki.currentText()
     tours = my_win.comboBox_select_tours.currentText()
@@ -6866,12 +6869,13 @@ def begunki_made():
                         ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
                         ('ALIGN',(0, 0), (0, 0),'CENTER')])
     #  ========= формирование диапазона печати бегунков ==========
-    sys = system.select().where(System.stage == number_group).get()
+    # sys = system.select().where(System.stage == number_group).get()
+    sys = system.select().where(System.stage == stage).get()
     final_type = sys.type_table
     list_tours = []
     if final_type == "сетка":
         list_tours.append("несыгранные")
-    elif final_type == "круг":
+    elif final_type == "круг" or final_type == "группы":
         if tours != "все":
             range_tours_str = my_win.lineEdit_range_tours.text()
             txt = range_tours_str.replace(" ", "")
@@ -6888,6 +6892,15 @@ def begunki_made():
                     if b != ",":
                         b = int(b)
                         list_tours.append(b)
+        else:
+            if number_group != "все":
+                result_group = result.select().where(Result.number_group == number_group)
+                for i in result_group:
+                    r = int(i.round)
+                    if r not in list_tours:
+                        list_tours.append(r)
+
+
         
     stiker = tbl_begunki(ts, stage, number_group, tours, list_tours) # здесь надо менять данные бегунков
     dict_table = stiker[0]
@@ -6943,7 +6956,7 @@ def begunki_made():
     elif platform == "win32":  # Windows...
         os.system(f"{view_file}")
 
-    os.system(f"open {view_file}")
+    # os.system(f"open {view_file}")
 
 
 def select_stage_for_begunki():
