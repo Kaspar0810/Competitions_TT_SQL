@@ -1518,10 +1518,11 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>14</pointsize>
+         <pointsize>11</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
+         <kerning>false</kerning>
         </font>
        </property>
        <property name="text">
@@ -1540,10 +1541,11 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>14</pointsize>
+         <pointsize>11</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
+         <kerning>false</kerning>
         </font>
        </property>
        <property name="text">
@@ -1571,17 +1573,18 @@
         <rect>
          <x>87</x>
          <y>22</y>
-         <width>121</width>
+         <width>171</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>14</pointsize>
+         <pointsize>11</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
+         <kerning>false</kerning>
         </font>
        </property>
        <property name="text">
@@ -1600,10 +1603,11 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>14</pointsize>
+         <pointsize>11</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
+         <kerning>false</kerning>
         </font>
        </property>
        <property name="text">
@@ -2758,15 +2762,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>237</width>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2777,9 +2781,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
-       <width>196</width>
-       <height>534</height>
+       <y>-88</y>
+       <width>225</width>
+       <height>565</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3151,8 +3155,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>237</width>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3608,7 +3612,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>501</height>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3893,8 +3897,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>237</width>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3906,8 +3910,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>237</width>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4155,8 +4159,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>237</width>
+       <height>494</height>
       </rect>
      </property>
      <attribute name="label">
