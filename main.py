@@ -3024,15 +3024,15 @@ def player_in_table_group_and_write_Game_list_Result():
                     # игрок под номером в группе
                     second = int(match[znak + 1:])
                     pl1_id = gr[first * 2 - 2][1]  # фамилия первого игрока
-                    z = pl1_id.find("/") # находит черту
-                    pl1 = pl1_id[:z] # отделяет фамилия от ид
+                    # z = pl1_id.find("/") # находит черту
+                    # pl1 = pl1_id[:z] # отделяет фамилия от ид
                     pl2_id = gr[second * 2 - 2][1]  # фамилия второго игрока
-                    z = pl2_id.find("/")
-                    pl2 = pl2_id[:z]
+                    # z = pl2_id.find("/")
+                    # pl2 = pl2_id[:z]
                     cit1 = gr[first * 2 - 1][1] # город 1-ого игрока
                     cit2 = gr[second * 2 - 1][1] # город 2-ого игрока
-                    full_pl1 = f"{pl1}/{cit1}"
-                    full_pl2 = f"{pl2}/{cit2}"
+                    full_pl1 = f"{pl1_id}/{cit1}"
+                    full_pl2 = f"{pl2_id}/{cit2}"
                     with db:
                         results = Result(number_group=number_group, system_stage=stage, player1=full_pl1, player2=full_pl2,
                                          tours=match, title_id=title_id(), round=round).save()
@@ -4210,7 +4210,7 @@ def enter_score(none_player=0):
     if system.stage == "Предварительный":
         pv = system.page_vid
         table_made(pv, stage)
-        filter_gr(pl=False)
+        filter_gr()
     elif system.stage == "Одна таблица" or system.stage == fin:
         if system.type_table == "круг":
             pv = system.page_vid
@@ -4621,19 +4621,19 @@ def filter_fin(pl=False):
         my_win.comboBox_find_name_fin.clear()
 
 
-def filter_gr(pl=False):
+def filter_gr():
     """фильтрует таблицу -результаты- на вкладке группы"""
-    msgBox = QMessageBox
+    find_player = []
     group = my_win.comboBox_filter_group.currentText()
     name = my_win.comboBox_find_name.currentText()
     played = my_win.comboBox_filter_played.currentText()
+    find_player.append(name)
     # отфильтровывает записи с id соревнования (title_id)
     fltr_id = Result.select().where(Result.title_id == title_id())
     if group == "все группы" and my_win.comboBox_find_name.currentText() != "":
-        if pl == False:
-            fltr = fltr_id.select().where(Result.player1 == name)
-        else:
-            fltr = fltr_id.select().where(Result.player2 == name)
+        pl1_query = fltr_id.select().where(Result.player1 == name)
+        pl2_query = fltr_id.select().where(Result.player2 == name)
+        fltr = pl1_query | pl2_query
     elif group == "все группы" and played == "все игры":
         fltr = fltr_id.select()
     elif group == "все группы" and played == "завершенные":
@@ -4667,19 +4667,6 @@ def filter_gr(pl=False):
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(
                 row, column, QTableWidgetItem(str(item)))
-
-    if my_win.comboBox_find_name.currentText() != "" and pl == False:
-        result = msgBox.question(my_win, "", "Продолжить поиск игр с участием\n"
-                                             f"{name} ?",
-                                 msgBox.Ok, msgBox.Cancel)
-        if result == msgBox.Ok:
-            pl = True
-            filter_gr(pl)
-        elif result == msgBox.Cancel:
-            my_win.comboBox_find_name.clear()
-            return
-    else:
-        my_win.comboBox_find_name.clear()
 
 
 def load_combo():
