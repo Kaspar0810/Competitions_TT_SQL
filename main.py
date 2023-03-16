@@ -4628,12 +4628,11 @@ def filter_gr():
     name = my_win.comboBox_find_name.currentText()
     played = my_win.comboBox_filter_played.currentText()
     find_player.append(name)
-    # отфильтровывает записи с id соревнования (title_id)
     fltr_id = Result.select().where(Result.title_id == title_id())
     if group == "все группы" and my_win.comboBox_find_name.currentText() != "":
         pl1_query = fltr_id.select().where(Result.player1 == name)
         pl2_query = fltr_id.select().where(Result.player2 == name)
-        fltr = pl1_query | pl2_query
+        fltr = pl1_query | pl2_query # объдиняет два запроса в один
     elif group == "все группы" and played == "все игры":
         fltr = fltr_id.select()
     elif group == "все группы" and played == "завершенные":
