@@ -5760,6 +5760,7 @@ def add_item_listwidget():
     choices = Choice.select().where(Choice.title_id == title_id())
     if gr != "":
         group = choices.select().order_by(Choice.posev_group).where(Choice.group == gr)
+        count = len(group)
         for k in group:
             item = QListWidgetItem()
             n = k.posev_group
@@ -5768,12 +5769,17 @@ def add_item_listwidget():
             coach = k.coach
             text = f"{n}:{family}/{region}/{coach}"
             item.setText(text) 
+            # item.setForeground(QColor(255, 0, 0)) # изменяет весь текст на красный
             if sender == my_win.comboBox_first_group:
                 my_win.listWidget_first_group.addItem(item)
             else:
                 my_win.listWidget_second_group.addItem(item)
             coach_list.append(coach)
         duplicat = duplicat_coach_in_group(coach_list)
+        # циклом получаю все элементы ListWidget
+        for i in range(0, count):
+            data_lw = item.item(i)
+
         color_coach_in_table_widget(duplicat, coach_list)
 
 
@@ -5855,10 +5861,14 @@ def change_player_between_group_after_draw():
         choice.group = gr_pl1 
         choice.posev_group = number_posev1
         choice.save()
-           # p += 1
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
     player_in_table_group_and_write_Game_list_Result()
+    my_win.comboBox_first_group.setCurrentText("")
+    my_win.comboBox_first_group.setCurrentText(gr_pl1)
+    my_win.comboBox_second_group.setCurrentText("")
+    my_win.comboBox_second_group.setCurrentText(gr_pl2)
+
     # choice_filter_group()
     # color_coach_in_table_widget()
 
