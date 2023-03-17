@@ -5743,11 +5743,11 @@ def edit_group_after_draw():
         player.append(k.full_name)
     player.sort()
     my_win.comboBox_player_group_edit.addItems(player)
-    # add_item_listwidget()
 
 
 def add_item_listwidget():
     """добавление элементов в листвиджет"""
+    flag_combo = 0
     sender = my_win.sender()
     coach_list = []
     if sender == my_win.comboBox_first_group:
@@ -5769,18 +5769,48 @@ def add_item_listwidget():
             coach = k.coach
             text = f"{n}:{family}/{region}/{coach}"
             item.setText(text) 
-            # item.setForeground(QColor(255, 0, 0)) # изменяет весь текст на красный
             if sender == my_win.comboBox_first_group:
                 my_win.listWidget_first_group.addItem(item)
+                flag_combo = 1
             else:
                 my_win.listWidget_second_group.addItem(item)
+                flag_combo = 2
             coach_list.append(coach)
         duplicat = duplicat_coach_in_group(coach_list)
-        # циклом получаю все элементы ListWidget
-        for i in range(0, count):
-            data_lw = item.item(i)
+        color_coach_in_listwidget(coach, flag_combo)
+        color_coach_in_tablewidget(duplicat, coach_list)
 
-        color_coach_in_table_widget(duplicat, coach_list)
+
+def color_coach_in_listwidget(coach, flag_combo):
+    """отмечает строки с повторяющимися тренерами"""
+    if flag_combo == 1:
+        item = my_win.listWidget_first_group.item
+        count = my_win.listWidget_first_group.count()
+    else:
+        item = my_win.listWidget_second_group.item
+        count = my_win.listWidget_second_group.count()
+    for row in range(count):
+        find_coach = []
+        data_lw = item(row).text()
+        mark = data_lw.rfind("/")
+        coach_in_row = data_lw[mark + 1:]
+        find_mark_1 = coach_in_row.find(",")
+        if find_mark_1 != -1:
+            coach_first = coach_in_row[:find_mark_1]
+            find_mark_2 = coach_in_row.find(",", find_mark_1 + 1)
+            find_coach.append(coach_first)
+            if find_mark_2 == -1:
+                coach_second = coach_in_row[find_mark_1 + 2:]
+                find_coach.append(coach_second)
+            else:
+                coach_second = coach_in_row[find_mark_1 + 2:find_mark_2]
+                coach_third = coach_in_row[find_mark_2 + 2:]
+                find_coach.append(coach_second)
+                find_coach.append(coach_third)
+        else:
+            find_coach.append(coach_in_row)
+        if coach in find_coach:
+            item(row).setForeground(QColor(0, 0, 255)) # изменяет весь текст на синий
 
 
 def list_player_in_group_after_draw():
@@ -5839,8 +5869,6 @@ def change_player_between_group_after_draw():
         # player_family = [family1, family2]
         # group_player = [gr_pl2, gr_pl1]
         # n_posev = [number_posev2, number_posev1]
-    # p = 0
-    # for k in player_family:
     g_list = gamelist.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get()
     with db:
         g_list.number_group = gr_pl2
@@ -5868,9 +5896,6 @@ def change_player_between_group_after_draw():
     my_win.comboBox_first_group.setCurrentText(gr_pl1)
     my_win.comboBox_second_group.setCurrentText("")
     my_win.comboBox_second_group.setCurrentText(gr_pl2)
-
-    # choice_filter_group()
-    # color_coach_in_table_widget()
 
 
 def add_player_to_group():
@@ -5934,7 +5959,7 @@ def choice_filter_group():
         for d in range(0, row_count):  # сортирует нумерация по порядку
             my_win.tableWidget.setItem(d, 0, QTableWidgetItem(str(d + 1)))
     duplicat = duplicat_coach_in_group(coach_list)
-    color_coach_in_table_widget(duplicat, coach_list)
+    color_coach_in_tablewidget(duplicat, coach_list)
 
 
 def duplicat_coach_in_group(coach_list):
@@ -5962,7 +5987,7 @@ def duplicat_coach_in_group(coach_list):
         return duplicat
 
 
-def color_coach_in_table_widget(duplicat, coach_list):
+def color_coach_in_tablewidget(duplicat, coach_list):
     """окаршиваает в красный цвет повторяющиеся фамилия тренеров"""
     if duplicat is not None:
         num_gr = []
@@ -5972,8 +5997,6 @@ def color_coach_in_table_widget(duplicat, coach_list):
             p += 1
             if coach == i:
                 num_gr.append(p) 
-        # my_win.listWidget_first_group.setStyleSheet()
-        #     print(i)
         for k in num_gr:
             my_win.tableWidget.item(k - 1, 4).setForeground(QBrush(QColor(0, 0, 255)))  # окрашивает текст в красный цвет
 
