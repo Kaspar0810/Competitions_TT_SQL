@@ -5725,7 +5725,7 @@ def choice_setka(fin):
 
 def edit_group_after_draw():
     """редактирование групп после жеребьевки"""
-    group = [""]
+    group = ["-выберите группу-"]
     player = []
     my_win.tabWidget.setCurrentIndex(3)
     my_win.tableWidget.setVisible(False)
@@ -5750,6 +5750,7 @@ def add_item_listwidget():
     flag_combo = 0
     sender = my_win.sender()
     coach_list = []
+    coach = ""
     if sender == my_win.comboBox_first_group:
         my_win.listWidget_first_group.clear()
         gr = my_win.comboBox_first_group.currentText()
@@ -5777,11 +5778,13 @@ def add_item_listwidget():
                 flag_combo = 2
             coach_list.append(coach)
         duplicat = duplicat_coach_in_group(coach_list)
-        color_coach_in_listwidget(coach, flag_combo)
+        if duplicat is not None:
+            # duplicat_str = (', '.join(duplicat))
+            color_coach_in_listwidget(duplicat, flag_combo)
         color_coach_in_tablewidget(duplicat, coach_list)
 
 
-def color_coach_in_listwidget(coach, flag_combo):
+def color_coach_in_listwidget(duplicat, flag_combo):
     """отмечает строки с повторяющимися тренерами"""
     if flag_combo == 1:
         item = my_win.listWidget_first_group.item
@@ -5809,8 +5812,9 @@ def color_coach_in_listwidget(coach, flag_combo):
                 find_coach.append(coach_third)
         else:
             find_coach.append(coach_in_row)
-        if coach in find_coach:
-            item(row).setForeground(QColor(0, 0, 255)) # изменяет весь текст на синий
+        for k in duplicat:
+            if k in find_coach:
+                item(row).setForeground(QColor(0, 0, 255)) # изменяет весь текст на синий
 
 
 def list_player_in_group_after_draw():
@@ -5845,18 +5849,42 @@ def change_player_between_group_after_draw():
     if player1 == "" and player2 == "":
         result = msgBox.information(my_win, "Уведомление", "Вы не выбрали игроков группы!", msgBox.Ok)
         return
-    elif player1 == "" and player2 != "":
+    elif player1 == "" and player2 != "": # из правой группы перемещает в левую
         family1 = ""
         znak = player2.find(":")
         znak1 = player2.find("/")  
         number_posev2 = int(player2[:znak]) # номера посева
         number_posev1 = number_posev2
         family2 = player2[znak + 1:znak1]
-        # player_family = [family2]
-        # group_player = [gr_pl2, gr_pl1]
-        # n_posev = [number_posev2, number_posev1]
-    elif player1 != "" and player2 == "":
-        pass
+        # =====
+        g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 1 - ого игрока
+        with db:
+            g_list.number_group = gr_pl1
+            g_list.rank_number_group = number_posev1
+            g_list.save()
+        choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
+        with db:
+            choice.group = gr_pl1 
+            choice.posev_group = number_posev1
+            choice.save()
+    elif player1 != "" and player2 == "": # из левой группы перемещает в правую
+        family2 = ""
+        znak = player1.find(":")
+        znak1 = player1.find("/")  
+        number_posev1 = int(player1[:znak]) # номера посева
+        number_posev2 = number_posev1
+        family1 = player1[znak + 1:znak1]
+        # ======
+        g_list = gamelist.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get() # находит 2 - ого игрока
+        with db:
+            g_list.number_group = gr_pl2
+            g_list.rank_number_group = number_posev2
+            g_list.save()
+        choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        with db:
+            choice.group = gr_pl2 
+            choice.posev_group = number_posev2
+            choice.save()
     else:
         znak = player1.find(":")
         znak1 = player1.find("/")  
@@ -5866,36 +5894,39 @@ def change_player_between_group_after_draw():
         znak1 = player2.find("/")  
         number_posev2 = int(player2[:znak]) # номера посева
         family2 = player2[znak + 1:znak1]
-        # player_family = [family1, family2]
-        # group_player = [gr_pl2, gr_pl1]
-        # n_posev = [number_posev2, number_posev1]
-    g_list = gamelist.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get()
-    with db:
-        g_list.number_group = gr_pl2
-        g_list.rank_number_group = number_posev2
-        g_list.save()
-    g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get()
-    with db:
-        g_list.number_group = gr_pl1
-        g_list.rank_number_group = number_posev1
-        g_list.save()    
-    choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
-    with db:
-        choice.group = gr_pl2 
-        choice.posev_group = number_posev2
-        choice.save()
-    choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
-    with db:
-        choice.group = gr_pl1 
-        choice.posev_group = number_posev1
-        choice.save()
+# ================= 
+        g_list = gamelist.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get() # находит 1 - ого игрока
+        with db:
+            g_list.number_group = gr_pl2
+            g_list.rank_number_group = number_posev2
+            g_list.save()
+        g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 2 - ого игрока
+        with db:
+            g_list.number_group = gr_pl1
+            g_list.rank_number_group = number_posev1
+            g_list.save()   
+#  ==================
+        choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        with db:
+            choice.group = gr_pl2 
+            choice.posev_group = number_posev2
+            choice.save()
+        choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
+        with db:
+            choice.group = gr_pl1 
+            choice.posev_group = number_posev1
+            choice.save()
+# =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
     player_in_table_group_and_write_Game_list_Result()
-    my_win.comboBox_first_group.setCurrentText("")
+    my_win.comboBox_first_group.setCurrentText("-выберите группу-")
+    my_win.listWidget_first_group.clear()
     my_win.comboBox_first_group.setCurrentText(gr_pl1)
-    my_win.comboBox_second_group.setCurrentText("")
+    my_win.comboBox_second_group.setCurrentText("-выберите группу-")
+    my_win.listWidget_second_group.clear()
     my_win.comboBox_second_group.setCurrentText(gr_pl2)
+    
 
 
 def add_player_to_group():
@@ -5991,12 +6022,13 @@ def color_coach_in_tablewidget(duplicat, coach_list):
     """окаршиваает в красный цвет повторяющиеся фамилия тренеров"""
     if duplicat is not None:
         num_gr = []
-        coach = duplicat[0]
         p = 0
         for i in coach_list:
             p += 1
-            if coach == i:
-                num_gr.append(p) 
+            for n in duplicat:
+                if n in i:
+                    if p not in num_gr:
+                        num_gr.append(p) 
         for k in num_gr:
             my_win.tableWidget.item(k - 1, 4).setForeground(QBrush(QColor(0, 0, 255)))  # окрашивает текст в красный цвет
 
