@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>0</y>
+      <y>10</y>
       <width>841</width>
       <height>251</height>
      </rect>
@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -906,7 +906,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -927,7 +927,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -946,7 +946,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -977,7 +977,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -996,7 +996,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1044,7 +1044,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1063,51 +1063,13 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
        <property name="text">
         <string>Этапы соревнования - </string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_34">
-       <property name="geometry">
-        <rect>
-         <x>205</x>
-         <y>28</y>
-         <width>55</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>групп:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_35">
-       <property name="geometry">
-        <rect>
-         <x>205</x>
-         <y>49</y>
-         <width>55</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>групп:</string>
        </property>
       </widget>
       <widget class="Line" name="line">
@@ -1135,7 +1097,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1154,7 +1116,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1173,7 +1135,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1202,7 +1164,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1221,7 +1183,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1240,7 +1202,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1259,7 +1221,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -1290,7 +1252,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -1311,7 +1273,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1340,7 +1302,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1359,7 +1321,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1378,7 +1340,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1397,7 +1359,221 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_76">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>111</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_77">
+       <property name="geometry">
+        <rect>
+         <x>247</x>
+         <y>135</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_78">
+       <property name="geometry">
+        <rect>
+         <x>649</x>
+         <y>113</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_79">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>132</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_table_6">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>134</y>
+         <width>161</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_80">
+       <property name="geometry">
+        <rect>
+         <x>649</x>
+         <y>135</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_81">
+       <property name="geometry">
+        <rect>
+         <x>571</x>
+         <y>114</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_82">
+       <property name="geometry">
+        <rect>
+         <x>571</x>
+         <y>135</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_83">
+       <property name="geometry">
+        <rect>
+         <x>247</x>
+         <y>113</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_table_5">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>112</y>
+         <width>161</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_84">
+       <property name="geometry">
+        <rect>
+         <x>248</x>
+         <y>114</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_85">
+       <property name="geometry">
+        <rect>
+         <x>248</x>
+         <y>136</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1532,7 +1708,7 @@
       <widget class="QLabel" name="label_24">
        <property name="geometry">
         <rect>
-         <x>330</x>
+         <x>345</x>
          <y>22</y>
          <width>91</width>
          <height>16</height>
@@ -1552,7 +1728,7 @@
         <string>Общий счет</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="Button_Ok">
+      <widget class="QPushButton" name="Button_Ok_gr">
        <property name="geometry">
         <rect>
          <x>730</x>
@@ -1594,7 +1770,7 @@
       <widget class="QLabel" name="label_45">
        <property name="geometry">
         <rect>
-         <x>270</x>
+         <x>290</x>
          <y>20</y>
          <width>51</width>
          <height>16</height>
@@ -1614,7 +1790,7 @@
         <string>Неявка</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_pl1_score_total">
+      <widget class="QLineEdit" name="lineEdit_pl1_score_total_gr">
        <property name="geometry">
         <rect>
          <x>350</x>
@@ -1632,7 +1808,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_pl2_score_total">
+      <widget class="QLineEdit" name="lineEdit_pl2_score_total_gr">
        <property name="geometry">
         <rect>
          <x>350</x>
@@ -1676,7 +1852,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_player1">
+      <widget class="QLineEdit" name="lineEdit_player1_gr">
        <property name="geometry">
         <rect>
          <x>11</x>
@@ -1691,7 +1867,7 @@
         </font>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_player2">
+      <widget class="QLineEdit" name="lineEdit_player2_gr">
        <property name="geometry">
         <rect>
          <x>11</x>
@@ -1721,7 +1897,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="QLineEdit" name="lineEdit_pl2_s1">
+       <widget class="QLineEdit" name="lineEdit_pl2_s1_gr">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -1739,7 +1915,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl1_s3">
+       <widget class="QLineEdit" name="lineEdit_pl1_s3_gr">
         <property name="geometry">
          <rect>
           <x>88</x>
@@ -1757,7 +1933,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl1_s2">
+       <widget class="QLineEdit" name="lineEdit_pl1_s2_gr">
         <property name="geometry">
          <rect>
           <x>44</x>
@@ -1775,7 +1951,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl1_s1">
+       <widget class="QLineEdit" name="lineEdit_pl1_s1_gr">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -1793,7 +1969,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl2_s2">
+       <widget class="QLineEdit" name="lineEdit_pl2_s2_gr">
         <property name="geometry">
          <rect>
           <x>44</x>
@@ -1811,7 +1987,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl2_s3">
+       <widget class="QLineEdit" name="lineEdit_pl2_s3_gr">
         <property name="geometry">
          <rect>
           <x>88</x>
@@ -1845,7 +2021,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="QLineEdit" name="lineEdit_pl2_s5">
+       <widget class="QLineEdit" name="lineEdit_pl2_s5_gr">
         <property name="geometry">
          <rect>
           <x>46</x>
@@ -1863,7 +2039,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl1_s5">
+       <widget class="QLineEdit" name="lineEdit_pl1_s5_gr">
         <property name="geometry">
          <rect>
           <x>46</x>
@@ -1881,7 +2057,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl1_s4">
+       <widget class="QLineEdit" name="lineEdit_pl1_s4_gr">
         <property name="geometry">
          <rect>
           <x>2</x>
@@ -1899,7 +2075,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl2_s4">
+       <widget class="QLineEdit" name="lineEdit_pl2_s4_gr">
         <property name="geometry">
          <rect>
           <x>2</x>
@@ -1933,7 +2109,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="QLineEdit" name="lineEdit_pl2_s6">
+       <widget class="QLineEdit" name="lineEdit_pl2_s6_gr">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -1951,7 +2127,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl1_s7">
+       <widget class="QLineEdit" name="lineEdit_pl1_s7_gr">
         <property name="geometry">
          <rect>
           <x>44</x>
@@ -1969,7 +2145,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl1_s6">
+       <widget class="QLineEdit" name="lineEdit_pl1_s6_gr">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -1987,7 +2163,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_pl2_s7">
+       <widget class="QLineEdit" name="lineEdit_pl2_s7_gr">
         <property name="geometry">
          <rect>
           <x>44</x>
@@ -2011,7 +2187,7 @@
       <property name="geometry">
        <rect>
         <x>520</x>
-        <y>2</y>
+        <y>10</y>
         <width>271</width>
         <height>41</height>
        </rect>
@@ -2107,6 +2283,626 @@
      <attribute name="title">
       <string>Полуфиналы</string>
      </attribute>
+     <widget class="QGroupBox" name="groupBox_match_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>35</y>
+        <width>810</width>
+        <height>100</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>14</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="title">
+       <string>Встреча</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <widget class="QLabel" name="label_71">
+       <property name="geometry">
+        <rect>
+         <x>460</x>
+         <y>22</y>
+         <width>141</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+         <kerning>false</kerning>
+        </font>
+       </property>
+       <property name="text">
+        <string>Счет по партиям</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_72">
+       <property name="geometry">
+        <rect>
+         <x>345</x>
+         <y>22</y>
+         <width>91</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+         <kerning>false</kerning>
+        </font>
+       </property>
+       <property name="text">
+        <string>Общий счет</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="Button_Ok_pf">
+       <property name="geometry">
+        <rect>
+         <x>730</x>
+         <y>36</y>
+         <width>71</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Ok</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_73">
+       <property name="geometry">
+        <rect>
+         <x>87</x>
+         <y>22</y>
+         <width>171</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+         <kerning>false</kerning>
+        </font>
+       </property>
+       <property name="text">
+        <string>Фамилия/ Город</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_74">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>20</y>
+         <width>51</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+         <kerning>false</kerning>
+        </font>
+       </property>
+       <property name="text">
+        <string>Неявка</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_pl1_score_total_pf">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>41</y>
+         <width>49</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_pl2_score_total_pf">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>69</y>
+         <width>49</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_12">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>43</y>
+         <width>21</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_13">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>70</y>
+         <width>21</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_player1_pf">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>41</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_player2_pf">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>71</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame_gr_three_2">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>41</y>
+         <width>131</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s1_pf">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s3_pf">
+        <property name="geometry">
+         <rect>
+          <x>88</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s2_pf">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s1_pf">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s2_pf">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s3_pf">
+        <property name="geometry">
+         <rect>
+          <x>88</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_gr_five_2">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>41</y>
+         <width>91</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s5_pf">
+        <property name="geometry">
+         <rect>
+          <x>46</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s5_pf">
+        <property name="geometry">
+         <rect>
+          <x>46</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s4_pf">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s4_pf">
+        <property name="geometry">
+         <rect>
+          <x>2</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_gr_seven_2">
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>41</y>
+         <width>88</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_pl2_s6_pf">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s7_pf">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl1_s6_pf">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_pl2_s7_pf">
+        <property name="geometry">
+         <rect>
+          <x>44</x>
+          <y>30</y>
+          <width>43</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="layoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>10</y>
+        <width>271</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_10">
+       <item>
+        <widget class="QGroupBox" name="groupBox_kolvo_vstrech_pf">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="title">
+          <string>Матч из:</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <widget class="QRadioButton" name="radioButton_match_9">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>20</y>
+            <width>31</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>3</string>
+          </property>
+         </widget>
+         <widget class="QRadioButton" name="radioButton_match_10">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>20</y>
+            <width>31</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>5</string>
+          </property>
+         </widget>
+         <widget class="QRadioButton" name="radioButton_match_11">
+          <property name="geometry">
+           <rect>
+            <x>90</x>
+            <y>20</y>
+            <width>31</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>7</string>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_14">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <italic>true</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Счет в партиях</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -2161,7 +2957,7 @@
       <widget class="QLabel" name="label_41">
        <property name="geometry">
         <rect>
-         <x>330</x>
+         <x>345</x>
          <y>22</y>
          <width>101</width>
          <height>16</height>
@@ -2199,7 +2995,7 @@
       <widget class="QLabel" name="label_42">
        <property name="geometry">
         <rect>
-         <x>41</x>
+         <x>87</x>
          <y>22</y>
          <width>171</width>
          <height>20</height>
@@ -2221,7 +3017,7 @@
       <widget class="QLabel" name="label_44">
        <property name="geometry">
         <rect>
-         <x>260</x>
+         <x>290</x>
          <y>20</y>
          <width>71</width>
          <height>20</height>
@@ -2636,8 +3432,8 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>492</x>
-        <y>2</y>
+        <x>510</x>
+        <y>10</y>
         <width>291</width>
         <height>41</height>
        </rect>
@@ -2762,15 +3558,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -2782,7 +3578,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>222</width>
+       <width>196</width>
        <height>534</height>
       </rect>
      </property>
@@ -3304,8 +4100,8 @@
      <widget class="QFrame" name="frame_2">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>220</y>
+        <x>11</x>
+        <y>230</y>
         <width>216</width>
         <height>71</height>
        </rect>
@@ -3396,7 +4192,7 @@
       <property name="geometry">
        <rect>
         <x>45</x>
-        <y>200</y>
+        <y>207</y>
         <width>171</width>
         <height>20</height>
        </rect>
@@ -3415,195 +4211,300 @@
        <string>Создание этапа</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_10">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>8</y>
-        <width>53</width>
-        <height>16</height>
+        <y>0</y>
+        <width>221</width>
+        <height>204</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>1-й этап:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_15">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>32</y>
-        <width>54</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>2-й этап:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_17">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>56</y>
-        <width>55</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>3-й этап:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_29">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>80</y>
-        <width>55</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>4-й этап:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_59">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>104</y>
-        <width>55</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>5-й этап:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_etap_1">
-      <property name="geometry">
-       <rect>
-        <x>75</x>
-        <y>2</y>
-        <width>150</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="editable">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_etap_2">
-      <property name="geometry">
-       <rect>
-        <x>75</x>
-        <y>26</y>
-        <width>150</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="editable">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_etap_4">
-      <property name="geometry">
-       <rect>
-        <x>75</x>
-        <y>74</y>
-        <width>150</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="editable">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_etap_5">
-      <property name="geometry">
-       <rect>
-        <x>75</x>
-        <y>98</y>
-        <width>150</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="editable">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_etap_3">
-      <property name="geometry">
-       <rect>
-        <x>75</x>
-        <y>50</y>
-        <width>150</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-        <italic>false</italic>
-       </font>
-      </property>
-      <property name="editable">
-       <bool>true</bool>
-      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>1-й этап:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_etap_1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_15">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>2-й этап:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_etap_2">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_13">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_17">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>3-й этап:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_etap_3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_14">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_29">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>4-й этап:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_etap_4">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_15">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_59">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>5-й этап:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_etap_5">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_16">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_34">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>6-й этап:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_etap_6">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_17">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_75">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>7-й этап:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_etap_7">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="page_3">
@@ -3611,8 +4512,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3884,8 +4785,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3897,8 +4798,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4146,8 +5047,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">

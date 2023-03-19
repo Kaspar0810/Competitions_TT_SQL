@@ -1,5 +1,4 @@
 
-# from queue import Empty
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -846,9 +845,9 @@ res = ("все игры", "завершенные", "не сыгранные")
 stages1 = ("", "Одна таблица", "Предварительный",
            "Полуфиналы", "Финальный", "Суперфинал")
 stages2 = ("", "Полуфиналы", "Финальный", "Суперфинал")
-stages3 = ("", "Финальный", "Суперфинал")
+stages3 = ("", "Полуфиналы", "Финальный", "Суперфинал")
 vid_setki = ("", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
-             "Сетка (за 1-3 место)", "Круговая система")
+             "Сетка (за 1-3 место)", "Круговая система", "Группы полуфинала")
 
 
 my_win.comboBox_page_vid.addItems(page_orient)
@@ -2008,25 +2007,35 @@ def page():
         my_win.label_31.hide()
         my_win.label_32.hide()
         my_win.label_34.hide()
-        my_win.label_35.hide()
         my_win.label_50.hide()
         my_win.label_59.hide()
         my_win.label_55.hide()
         my_win.label_56.hide()
-        my_win.label_53.hide()
+        my_win.label_53.hide()       
         my_win.label_58.hide()
         my_win.label_60.hide()
         my_win.label_61.hide()
         my_win.label_62.hide()
+        my_win.label_75.hide()
+        my_win.label_76.hide()
+        my_win.label_79.hide()
+        my_win.label_78.hide()
+        my_win.label_80.hide()
+        my_win.label_84.hide()
+        my_win.label_85.hide()
         my_win.comboBox_etap_1.hide()
         my_win.comboBox_etap_2.hide()
         my_win.comboBox_etap_3.hide()
         my_win.comboBox_etap_4.hide()
         my_win.comboBox_etap_5.hide()
+        my_win.comboBox_etap_6.hide()
+        my_win.comboBox_etap_7.hide()
         my_win.comboBox_table.hide()
         my_win.comboBox_table_2.hide()
         my_win.comboBox_table_3.hide()
         my_win.comboBox_table_4.hide()
+        my_win.comboBox_table_5.hide()
+        my_win.comboBox_table_6.hide()
         my_win.spinBox_kol_group.hide()
         my_win.comboBox_one_table.hide()
 
@@ -2124,7 +2133,33 @@ def page():
             visible_field()
             my_win.label_16.hide()
     elif tb == 4:  # вкладка -полуфиналы-
-        my_win.tableWidget.hide()
+        system_stage = sf.select().where(System.stage == "Полуфиналы").get()
+        game_visible = system_stage.visible_game
+        my_win.checkBox_4.setChecked(game_visible)
+        my_win.checkBox_7.setEnabled(False)
+        my_win.checkBox_8.setEnabled(False)
+        my_win.checkBox_7.setChecked(False)
+        my_win.checkBox_8.setChecked(False)
+        flag = ready_choice(stage="Полуфиналы")
+        if flag is False:
+            result = msgBox.information(my_win, "", "Необходимо сделать жеребьевку\nполуфинального этапа.",
+                                        msgBox.Ok, msgBox.Cancel)
+            if result != msgBox.Ok:
+                return
+            else:
+                my_win.tabWidget.setCurrentIndex(2)
+                choice_gr_automat()
+                sf.choice_flag = True
+                sf.save()
+            my_win.tabWidget.setCurrentIndex(3)
+        else:  # жеребьевка сделана
+            my_win.tableWidget.show()
+            my_win.Button_Ok.setEnabled(False)
+            load_combobox_filter_group()
+            load_tableWidget()
+            load_combo()
+            visible_field()
+            my_win.label_16.hide()
     elif tb == 5: # вкладка -финалы-
         my_win.checkBox_5.setEnabled(False)
         my_win.checkBox_9.setChecked(False)
@@ -3244,9 +3279,9 @@ def visible_field():
         if tab == 3:
             state_visible = my_win.checkBox_4.isChecked()
             if state_visible is True:
-                my_win.lineEdit_pl1_s1.setFocus()
+                my_win.lineEdit_pl1_s1_gr.setFocus()
             else:
-                my_win.lineEdit_pl1_score_total.setFocus()
+                my_win.lineEdit_pl1_gr_score_total.setFocus()
         elif tab == 4:
             pass
         else:
@@ -3381,11 +3416,11 @@ def select_player_in_game():
                     sc1 = ""
                     sc2 = ""
             if tab == 3:
-                my_win.lineEdit_pl1_score_total.setText(sc1)
-                my_win.lineEdit_pl2_score_total.setText(sc2)
+                my_win.lineEdit_pl1_score_total_gr.setText(sc1)
+                my_win.lineEdit_pl2_score_total_gr.setText(sc2)
                 my_win.lineEdit_player1.setText(pl1)
                 my_win.lineEdit_player2.setText(pl2)
-                my_win.lineEdit_pl1_s1.setFocus()
+                my_win.lineEdit_pl1_s1_gr.setFocus()
             elif tab == 4:
                 pass
             else:
@@ -3400,12 +3435,12 @@ def select_player_in_game():
             if tab == 3:
                 my_win.checkBox_7.setEnabled(True)
                 my_win.checkBox_8.setEnabled(True)
-                my_win.lineEdit_player1.setText(pl1)
-                my_win.lineEdit_player2.setText(pl2)
+                my_win.lineEdit_player1_gr.setText(pl1)
+                my_win.lineEdit_player2_gr.setText(pl2)
                 if state_visible is True:
-                    my_win.lineEdit_pl1_s1.setFocus()
+                    my_win.lineEdit_pl1_s1_gr.setFocus()
                 else:
-                    my_win.lineEdit_pl1_score_total.setFocus()
+                    my_win.lineEdit_pl1_score_total_gr.setFocus()
             elif tab == 4:
                 pass
             elif tab == 5:
@@ -6095,8 +6130,10 @@ def etap_made():
             tab_enabled(gamer)
         if my_win.comboBox_etap_1.currentText() == "Предварительный" and my_win.comboBox_etap_2.isHidden():
             kol_player_in_group()
-        elif my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
+        elif my_win.comboBox_etap_2.currentText() == "Полуфиналы" or my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
             total_game_table(kpt=0, fin="", pv="", cur_index=0)
+        # elif my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
+        #     total_game_table(kpt=0, fin="", pv="", cur_index=0)
         elif my_win.comboBox_etap_3.currentText() == "Финальный" and my_win.comboBox_etap_4.isHidden():
             total_game_table(kpt=0, fin="", pv="", cur_index=0)
         elif my_win.comboBox_etap_4.currentText() == "Финальный" and my_win.comboBox_etap_5.isHidden():
@@ -6141,10 +6178,16 @@ def total_game_table(kpt, fin, pv, cur_index):
         elif cur_index == 4:
             vt = "Круговая таблица на"
             type_table = "круг"
+        elif cur_index == 5:
+            vt = "группы"
+            type_table = "круг"
 # =========================
         all_player_in_final = total_gr * kpt + sum_pl # общее кол-во спортсменов во всех финалах
         # ===== определяем точное кол-во участников в финале
-        player_in_final = total_gr * kpt # колво участников в конкретном финале
+        if fin == "1-й полуфинал" or fin == "2-й полуфинал":
+            player_in_final = (total_gr // 2) * (kpt * 2) # колво участников в полуфинале
+        else:
+            player_in_final = total_gr * kpt # колво участников в конкретном финале
         # total_games_in_final_without_group_games(player_in_final, total_gr, kpt)
         if all_player_in_final > total_player:
             balance = total_player - sum_pl
@@ -6154,7 +6197,12 @@ def total_game_table(kpt, fin, pv, cur_index):
         total_games = numbers_of_games(cur_index, player_in_final, kpt) # подсчет кол-во игр
 
         pv = my_win.comboBox_page_vid.currentText()
-        str_setka = f"{vt} {player_in_final} участников"
+        if cur_index == 5:
+            # my_win.label_34.setVisible(True)
+            gr_pf = total_gr // 2
+            str_setka = f"{gr_pf} {vt} по {kpt * 2} участника"
+        else:
+            str_setka = f"{vt} {player_in_final} участников"
         stage_list = []
         for k in system:
             st = k.stage
@@ -6178,18 +6226,17 @@ def total_game_table(kpt, fin, pv, cur_index):
         
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
     else:  # нажата кнопка создания этапа, если еще не все игроки посеяны в финал, то продолжает этапы соревнования
-        sys_last = System.select().where(System.title_id == title_id())
-        sys_fin = sys_last.select().where(System.stage ** '%финал') # отбирает записи, где
         # титул id и стадия содержит слово финал (1 и 2 заменяет %)
         system = System.select().order_by(System.id).where(System.title_id == title_id())
         system_id = system.select().where(System.stage ** '%финал')
         tot_fin = len(system_id)
         sum_final = []
         for i in system_id:
-            player_in_etap = i.max_player
-            sum_final.append(player_in_etap)
+            if i.stage != "Предварительный" and i.stage != "1-й полуфинал" and i.stage != "2-й полуфинал":
+                player_in_etap = i.max_player
+                sum_final.append(player_in_etap)
         total_final = sum(sum_final)
-        t = total_player - total_final
+        t = total_player - total_final # оставшиеся не распределенные участники по финалам
         txt = ""
         if total_final == total_player or t <= 2: # подсчитывает все ли игроки распределены по финалам
             if t == 1:     
@@ -6222,13 +6269,16 @@ def total_game_table(kpt, fin, pv, cur_index):
             elif tot_fin == 3:
                 my_win.comboBox_table_4.hide() # скрывает комбобокс с выбором вида финала
                 my_win.comboBox_etap_5.show()
+            elif tot_fin == 4:
+                my_win.comboBox_table_5.hide() # скрывает комбобокс с выбором вида финала
+                my_win.comboBox_etap_6.show()
 
             my_win.Button_etap_made.setEnabled(True)
             my_win.comboBox_page_vid.setEnabled(True)
 
 
 def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
-    """всего игр в финале без учета сыранных игр в предварительном этап"""
+    """всего игр в финале без учета сыгранных игр в предварительном этапе"""
     # остаток отделения, если 0, то участники равно делится на группы
     remains = player_in_final % int(total_gr)
     if remains == 0:  # если в группах равное количество человек
@@ -6241,6 +6291,25 @@ def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
         playing_game_in_no_full_group = (kpt_min * (kpt_min - 1)) // 2 * no_full_group
         playing_game = playing_game_in_full_group + playing_game_in_no_full_group
     total_games = (player_in_final * (player_in_final - 1)) // 2 - playing_game
+    return total_games
+
+
+def total_games_in_final_with_group_games(player_in_final, gr_pf, kpt):
+    """всего игр в полуфинале с учетом сыгранных игр в предварительном этапе"""
+    # остаток отделения, если 0, то участники равно делится на группы
+    remains = player_in_final % int(gr_pf)
+    if remains == 0:  # если в группах равное количество человек
+        playing_game_in_group = (kpt * (kpt - 1)) # кол-во игр, сыгранных в группе
+        total_games = (((kpt * 2 * (kpt * 2 - 1)) // 2) - playing_game_in_group) * gr_pf # всего игр в пф
+    else:
+        full_group = player_in_final // kpt # кол-во групп с полным количеством участников
+        no_full_group = gr_pf - remains
+        playing_game_in_group = (kpt * (kpt - 1)) # кол-во игр, сыгранных в группе
+        playing_game_in_full_group = (((kpt * (kpt - 1)) // 2) - playing_game_in_group) * full_group
+        kpt_min = kpt - 1
+        playing_game_in_no_full_group = ((kpt_min * (kpt_min - 1)) // 2 - playing_game_in_group) * no_full_group
+        total_games = playing_game_in_full_group + playing_game_in_no_full_group
+        # total_games = (player_in_final * (player_in_final - 1)) // 2 - playing_game
     return total_games
 
 
@@ -6268,8 +6337,11 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             total_games = 80
     elif cur_index == 3:  # сетка с розыгрышем призовых мест
         pass
-    else: # игры в круг
+    elif cur_index == 4: # игры в круг
         total_games = total_games_in_final_without_group_games(player_in_final, gr, kpt)
+    else: # игры в группах полуфиналов
+        gr_pf = gr // 2
+        total_games = total_games_in_final_with_group_games(player_in_final, gr_pf, kpt)
     return total_games
 
 
@@ -6563,7 +6635,8 @@ def kol_player_in_final():
             cur_index = my_win.comboBox_table.currentIndex()
             ct = my_win.comboBox_etap_2.currentText()
             if ct == "Полуфиналы":
-                my_win.label_23.setText("Полуфиналы")
+                my_win.label_23.setText("1-й полуфинал")
+                fin = "1-й полуфинал"
             elif ct == "Финальный":
                 my_win.label_23.setText("Финальный этап")
                 fin = "1-й финал"
@@ -6572,7 +6645,10 @@ def kol_player_in_final():
         elif sender == my_win.comboBox_table_2:
             cur_index = my_win.comboBox_table_2.currentIndex()
             ct = my_win.comboBox_etap_3.currentText()
-            if ct == "Финальный":
+            if ct == "Полуфиналы":
+                my_win.label_32.setText("2-й полуфинал")
+                fin = "2-й полуфинал"
+            elif ct == "Финальный":
                 my_win.label_32.setText("Финальный этап")
                 fin = "2-й финал"
             else:
@@ -7109,7 +7185,10 @@ def table_made(pv, stage):
     if kg == 1:
         rH = (0.45 * cm)  # высота строки
     else:
-        rH = (0.34 * cm)  # высота строки
+        if max_pl < 5:
+            rH = (0.34 * cm)  # высота строки
+        else:
+            rH = (0.33 * cm)  # высота строки
     # rH = None  # высота строки
     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
     # num_columns = list(range(max_pl))
@@ -10242,16 +10321,27 @@ def load_playing_game_in_table_for_final(fin):
     #              kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
-my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s1.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s2.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s2.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s3.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s3.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s4.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s4.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s5.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s5.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s1_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s1_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s2_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s2_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s3_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s3_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s4_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s4_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s5_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s5_gr.returnPressed.connect(focus)
+# ===== переводит фокус на поле ввода счета в партии вкладки -группа-
+my_win.lineEdit_pl1_s1_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s1_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s2_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s2_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s3_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s3_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s4_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s4_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s5_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s5_pf.returnPressed.connect(focus)
 # ===== переводит фокус на полее ввода счета в партии вкладки -финалы-
 my_win.lineEdit_pl1_s1_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s1_fin.returnPressed.connect(focus)
@@ -10263,10 +10353,13 @@ my_win.lineEdit_pl1_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
+
 my_win.lineEdit_range_tours.returnPressed.connect(enter_print_begunki)
 
-my_win.lineEdit_pl1_score_total.returnPressed.connect(enter_total_score)
-my_win.lineEdit_pl2_score_total.returnPressed.connect(enter_total_score)
+my_win.lineEdit_pl1_score_total_gr.returnPressed.connect(enter_total_score)
+my_win.lineEdit_pl2_score_total_gr.returnPressed.connect(enter_total_score)
+my_win.lineEdit_pl1_score_total_pf.returnPressed.connect(enter_total_score)
+my_win.lineEdit_pl2_score_total_pf.returnPressed.connect(enter_total_score)
 my_win.lineEdit_pl1_score_total_fin.returnPressed.connect(enter_total_score)
 my_win.lineEdit_pl2_score_total_fin.returnPressed.connect(enter_total_score)
 
@@ -10346,8 +10439,8 @@ my_win.checkBox_find_player.stateChanged.connect(find_player)
 # =======  нажатие кнопок =========
 
 
-my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
-my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
+# my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
+# my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
 my_win.Button_pay_R.clicked.connect(save_in_db_pay_R)
 my_win.Button_clear_del.clicked.connect(clear_del_player)
 my_win.Button_reset_filter.clicked.connect(reset_filter)
@@ -10360,8 +10453,8 @@ my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет 
 # записывает в базу или редактирует титул
 my_win.Button_title_made.clicked.connect(title_made)
 # записывает в базу счет в партии встречи
-my_win.Button_Ok.clicked.connect(enter_score)
-# записывает в базу счет в партии встречи
+my_win.Button_Ok_gr.clicked.connect(enter_score)
+my_win.Button_Ok_pf.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
