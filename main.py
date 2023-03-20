@@ -2537,6 +2537,10 @@ def system_competition():
         my_win.label_30.hide()
         my_win.label_53.hide()
         my_win.label_58.hide()
+        my_win.label_81.hide()
+        my_win.label_84.hide()
+        my_win.label_82.hide()
+        my_win.label_85.hide()
         my_win.comboBox_table.show()
     elif sender == my_win.comboBox_etap_3:
         my_win.label_32.show()
@@ -5814,7 +5818,6 @@ def add_item_listwidget():
             coach_list.append(coach)
         duplicat = duplicat_coach_in_group(coach_list)
         if duplicat is not None:
-            # duplicat_str = (', '.join(duplicat))
             color_coach_in_listwidget(duplicat, flag_combo)
         color_coach_in_tablewidget(duplicat, coach_list)
 
@@ -6138,6 +6141,7 @@ def etap_made():
             total_game_table(kpt=0, fin="", pv="", cur_index=0)
         elif my_win.comboBox_etap_4.currentText() == "Финальный" and my_win.comboBox_etap_5.isHidden():
             total_game_table(kpt=0, fin="", pv="", cur_index=0)
+        # суммирует все игры этапов    
         for k in system:
             kol_game_str = k.kol_game_string
             zn = kol_game_str.find(" ")
@@ -6180,7 +6184,7 @@ def total_game_table(kpt, fin, pv, cur_index):
             type_table = "круг"
         elif cur_index == 5:
             vt = "группы"
-            type_table = "круг"
+            type_table = "группы"
 # =========================
         all_player_in_final = total_gr * kpt + sum_pl # общее кол-во спортсменов во всех финалах
         # ===== определяем точное кол-во участников в финале
@@ -6188,7 +6192,6 @@ def total_game_table(kpt, fin, pv, cur_index):
             player_in_final = (total_gr // 2) * (kpt * 2) # колво участников в полуфинале
         else:
             player_in_final = total_gr * kpt # колво участников в конкретном финале
-        # total_games_in_final_without_group_games(player_in_final, total_gr, kpt)
         if all_player_in_final > total_player:
             balance = total_player - sum_pl
             player_in_final = balance
@@ -6308,8 +6311,7 @@ def total_games_in_final_with_group_games(player_in_final, gr_pf, kpt):
         playing_game_in_full_group = (((kpt * (kpt - 1)) // 2) - playing_game_in_group) * full_group
         kpt_min = kpt - 1
         playing_game_in_no_full_group = ((kpt_min * (kpt_min - 1)) // 2 - playing_game_in_group) * no_full_group
-        total_games = playing_game_in_full_group + playing_game_in_no_full_group
-        # total_games = (player_in_final * (player_in_final - 1)) // 2 - playing_game
+        total_games = playing_game_in_full_group + playing_game_in_no_full_groupe
     return total_games
 
 
@@ -6601,6 +6603,8 @@ def kol_player_in_final():
     sender = my_win.sender()
     pv = my_win.comboBox_page_vid.currentText()
     player = Player.select().where(Player.title_id == title_id())
+    system_last = System.select().order_by(System.id).where(System.title_id == title_id()).get()
+    last_stage = system_last.stage # последний этап
     count = len(player)
     fin = ""
     if sender == my_win.comboBox_one_table:
