@@ -842,9 +842,10 @@ mylist = ('мальчиков и девочек', 'юношей и девуше�
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р",
        "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
 res = ("все игры", "завершенные", "не сыгранные")
-stages1 = ("", "Одна таблица", "Предварительный",
-           "Полуфиналы", "Финальный", "Суперфинал")
-stages2 = ("", "Полуфиналы", "Финальный", "Суперфинал")
+# stages1 = ("", "Одна таблица", "Предварительный",
+#            "Полуфиналы", "Финальный", "Суперфинал")
+stages1 = ("-выбор этапа-", "Одна таблица", "Предварительный")
+stages2 = ("-выбор этапа-", "Полуфиналы", "Финальный", "Суперфинал")
 stages3 = ("", "Полуфиналы", "Финальный", "Суперфинал")
 stages4 = ("", "Финальный", "Суперфинал")
 vid_setki = ("", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
@@ -871,16 +872,16 @@ my_win.comboBox_filter_played_fin.addItems(res)
 
 def clear_add_combobox():
     """"""
-    my_win.comboBox_etap_1.clear()
-    my_win.comboBox_etap_2.clear()
-    my_win.comboBox_etap_3.clear()
-    my_win.comboBox_etap_4.clear()
-    my_win.comboBox_etap_5.clear()
-    my_win.comboBox_etap_1.addItems(stages1)
-    my_win.comboBox_etap_2.addItems(stages2)
-    my_win.comboBox_etap_3.addItems(stages3)
-    my_win.comboBox_etap_4.addItems(stages4)
-    my_win.comboBox_etap_5.addItems(stages4)
+    my_win.comboBox_etap.clear()
+    # my_win.comboBox_etap_2.clear()
+    # my_win.comboBox_etap_3.clear()
+    # my_win.comboBox_etap_4.clear()
+    # my_win.comboBox_etap_5.clear()
+    my_win.comboBox_etap.addItems(stages1)
+    # my_win.comboBox_etap_2.addItems(stages2)
+    # my_win.comboBox_etap_3.addItems(stages3)
+    # my_win.comboBox_etap_4.addItems(stages4)
+    # my_win.comboBox_etap_5.addItems(stages4)
     my_win.comboBox_table.clear()
     my_win.comboBox_table_2.clear()
     my_win.comboBox_table_3.clear()
@@ -1997,19 +1998,19 @@ def page():
         my_win.label_10.hide()
         my_win.label_11.hide()
         my_win.label_12.hide()
-        my_win.label_15.hide()
-        my_win.label_17.hide()
+        # my_win.label_15.hide()
+        # my_win.label_17.hide()
         my_win.label_19.hide()
         my_win.label_23.hide()
         my_win.label_27.hide()
         my_win.label_28.hide()
-        my_win.label_29.hide()
+        # my_win.label_29.hide()
         my_win.label_30.hide()
         my_win.label_31.hide()
         my_win.label_32.hide()
-        my_win.label_34.hide()
+        # my_win.label_34.hide()
         my_win.label_50.hide()
-        my_win.label_59.hide()
+        # my_win.label_59.hide()
         my_win.label_55.hide()
         my_win.label_56.hide()
         my_win.label_53.hide()       
@@ -2017,20 +2018,20 @@ def page():
         my_win.label_60.hide()
         my_win.label_61.hide()
         my_win.label_62.hide()
-        my_win.label_75.hide()
+        # my_win.label_75.hide()
         my_win.label_76.hide()
         my_win.label_79.hide()
         my_win.label_78.hide()
         my_win.label_80.hide()
         my_win.label_84.hide()
         my_win.label_85.hide()
-        my_win.comboBox_etap_1.hide()
-        my_win.comboBox_etap_2.hide()
-        my_win.comboBox_etap_3.hide()
-        my_win.comboBox_etap_4.hide()
-        my_win.comboBox_etap_5.hide()
-        my_win.comboBox_etap_6.hide()
-        my_win.comboBox_etap_7.hide()
+        my_win.comboBox_etap.hide()
+        # my_win.comboBox_etap_2.hide()
+        # my_win.comboBox_etap_3.hide()
+        # my_win.comboBox_etap_4.hide()
+        # my_win.comboBox_etap_5.hide()
+        # my_win.comboBox_etap_6.hide()
+        # my_win.comboBox_etap_7.hide()
         my_win.comboBox_table.hide()
         my_win.comboBox_table_2.hide()
         my_win.comboBox_table_3.hide()
@@ -2045,7 +2046,7 @@ def page():
         if flag is False:  # система еще не создана
             my_win.statusbar.showMessage("Создание системы соревнования", 10000)
             my_win.label_10.show()
-            my_win.comboBox_etap_1.show()
+            my_win.comboBox_etap.show()
         else:
             stage = []
             table = []
@@ -2430,12 +2431,12 @@ def system_competition():
         # my_win.comboBox_etap_4.hide()
         # my_win.comboBox_etap_5.hide()
         my_win.label_10.hide()
-        my_win.label_15.hide()
-        my_win.label_17.hide()
+        # my_win.label_15.hide()
+        # my_win.label_17.hide()
         my_win.label_23.hide()
         my_win.label_27.hide()
         my_win.label_28.hide()
-        my_win.label_29.hide()
+        # my_win.label_29.hide()
         my_win.label_30.hide()
         my_win.label_31.hide()
         my_win.label_32.hide()
@@ -2443,7 +2444,7 @@ def system_competition():
         my_win.label_56.hide()
         my_win.label_53.hide()
         my_win.label_58.hide()
-        my_win.label_59.hide()
+        # my_win.label_59.hide()
         
         my_win.comboBox_table.hide()
         my_win.comboBox_table_2.hide()
@@ -2473,8 +2474,8 @@ def system_competition():
             # my_win.comboBox_etap_3.hide()
             # my_win.comboBox_etap_4.hide()
             my_win.label_10.hide()
-            my_win.label_15.hide()
-            my_win.label_17.hide()
+            # my_win.label_15.hide()
+            # my_win.label_17.hide()
             my_win.label_23.hide()
             my_win.label_27.hide()
             my_win.label_28.hide()
@@ -2510,11 +2511,11 @@ def system_competition():
         # my_win.comboBox_etap_5.hide()
         my_win.label_10.show()
         my_win.label_15.hide()
-        my_win.label_17.hide()
-        my_win.label_29.hide()
-        my_win.label_59.hide()
-    elif sender == my_win.comboBox_etap_1:
-        ct = my_win.comboBox_etap_1.currentText()
+        # my_win.label_17.hide()
+        # my_win.label_29.hide()
+        # my_win.label_59.hide()
+    elif sender == my_win.comboBox_etap:
+        ct = my_win.comboBox_etap.currentText()
         if ct == "Одна таблица":
             my_win.comboBox_one_table.show()
             my_win.spinBox_kol_group.hide()
@@ -2528,38 +2529,38 @@ def system_competition():
             my_win.label_11.show()
             my_win.label_12.hide()
             my_win.comboBox_page_vid.setEnabled(True)
-    elif sender == my_win.comboBox_etap_2:
-        my_win.label_23.show()
-        my_win.label_27.hide()
-        my_win.label_28.hide()
-        my_win.label_32.hide()
-        my_win.label_55.hide()
-        my_win.label_56.hide()
-        my_win.label_30.hide()
-        my_win.label_53.hide()
-        my_win.label_58.hide()
-        my_win.label_81.hide()
-        my_win.label_84.hide()
-        my_win.label_82.hide()
-        my_win.label_85.hide()
-        my_win.comboBox_table.show()
-    elif sender == my_win.comboBox_etap_3:
-        my_win.label_32.show()
-        my_win.label_30.hide()
-        my_win.label_31.hide()
-        my_win.comboBox_table_2.show()
-    elif sender == my_win.comboBox_etap_4:
-        my_win.label_55.show()
-        my_win.label_53.hide()
-        my_win.comboBox_table_3.show()
-    elif sender == my_win.comboBox_etap_5:
-        my_win.label_56.show()
-        my_win.label_58.hide()
-        my_win.comboBox_table_4.show()
+    # elif sender == my_win.comboBox_etap_2:
+    #     my_win.label_23.show()
+    #     my_win.label_27.hide()
+    #     my_win.label_28.hide()
+    #     my_win.label_32.hide()
+    #     my_win.label_55.hide()
+    #     my_win.label_56.hide()
+    #     my_win.label_30.hide()
+    #     my_win.label_53.hide()
+    #     my_win.label_58.hide()
+    #     my_win.label_81.hide()
+    #     my_win.label_84.hide()
+    #     my_win.label_82.hide()
+    #     my_win.label_85.hide()
+    #     my_win.comboBox_table.show()
+    # elif sender == my_win.comboBox_etap_3:
+    #     my_win.label_32.show()
+    #     my_win.label_30.hide()
+    #     my_win.label_31.hide()
+    #     my_win.comboBox_table_2.show()
+    # elif sender == my_win.comboBox_etap_4:
+    #     my_win.label_55.show()
+    #     my_win.label_53.hide()
+    #     my_win.comboBox_table_3.show()
+    # elif sender == my_win.comboBox_etap_5:
+    #     my_win.label_56.show()
+    #     my_win.label_58.hide()
+    #     my_win.comboBox_table_4.show()
     else:  # скрывает и выключает label и combobox этапов систем
         my_win.label_10.hide()
         my_win.label_15.hide()
-        my_win.label_17.hide()
+        # my_win.label_17.hide()
         my_win.comboBox_etap.setEnabled(False)
         # my_win.comboBox_etap_2.setEnabled(False)
         # my_win.comboBox_etap_3.setEnabled(False)
@@ -2687,22 +2688,26 @@ def kol_player_in_group():
         my_win.Button_etap_made.setEnabled(False)
         my_win.comboBox_page_vid.setEnabled(False)
         my_win.spinBox_kol_group.hide()
-        my_win.comboBox_etap_2.setVisible(True)
-        my_win.comboBox_etap_2.setCurrentText("")
-        my_win.label_15.show()
+        # my_win.comboBox_etap.clear()
+        # my_win.comboBox_etap.addItems(stages2)
+        # my_win.comboBox_etap.setCurrentIndex(0)
+        # my_win.label_15.show()
         # ====== запись в таблицу db -system- первый этап
         s = System.select().order_by(System.id.desc()).get()
         system = System.get(System.id == s)
         system.max_player = mp
         system.total_athletes = count
         system.total_group = kg
-        system.stage = my_win.comboBox_etap_1.currentText()
+        system.stage = my_win.comboBox_etap.currentText()
         system.type_table = type_table
         system.page_vid = my_win.comboBox_page_vid.currentText()
         system.label_string = stroka_kol_group
         system.kol_game_string = stroka_kol_game
         system.visible_game = flag_visible
         system.save()
+        # my_win.comboBox_etap.clear()
+        # my_win.comboBox_etap.addItems(stages2)
+        # my_win.comboBox_etap.setCurrentIndex(0)
     load_combobox_filter_group()
 
 
@@ -6126,22 +6131,22 @@ def etap_made():
     sender = my_win.sender()
     system = System.select().where(System.title_id == title_id())
     sum_game = []
-    if sender != my_win.comboBox_etap_1:
-        if my_win.comboBox_etap_1.currentText() == "Одна таблица":
-            fin = my_win.comboBox_etap_1.currentText()
+    if sender != my_win.comboBox_etap:
+        if my_win.comboBox_etap.currentText() == "Одна таблица":
+            fin = my_win.comboBox_etap.currentText()
             one_table(fin, group=1)
             gamer = my_win.lineEdit_title_gamer.text()
             tab_enabled(gamer)
-        if my_win.comboBox_etap_1.currentText() == "Предварительный" and my_win.comboBox_etap_2.isHidden():
+        if my_win.comboBox_etap.currentText() == "Предварительный":
             kol_player_in_group()
-        elif my_win.comboBox_etap_2.currentText() == "Полуфиналы" or my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
+        elif my_win.comboBox_etap.currentText() == "Полуфиналы" or my_win.comboBox_etap.currentText() == "Финальный":
             total_game_table(kpt=0, fin="", pv="", cur_index=0)
         # elif my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
         #     total_game_table(kpt=0, fin="", pv="", cur_index=0)
-        elif my_win.comboBox_etap_3.currentText() == "Финальный" and my_win.comboBox_etap_4.isHidden():
-            total_game_table(kpt=0, fin="", pv="", cur_index=0)
-        elif my_win.comboBox_etap_4.currentText() == "Финальный" and my_win.comboBox_etap_5.isHidden():
-            total_game_table(kpt=0, fin="", pv="", cur_index=0)
+        # elif my_win.comboBox_etap_3.currentText() == "Финальный" and my_win.comboBox_etap_4.isHidden():
+        #     total_game_table(kpt=0, fin="", pv="", cur_index=0)
+        # elif my_win.comboBox_etap_4.currentText() == "Финальный" and my_win.comboBox_etap_5.isHidden():
+        #     total_game_table(kpt=0, fin="", pv="", cur_index=0)
         # суммирует все игры этапов    
         for k in system:
             kol_game_str = k.kol_game_string
@@ -6151,6 +6156,7 @@ def etap_made():
         all_sum_game = sum(sum_game)
         my_win.label_33.setText(f"Всего:{all_sum_game} игр.")
         my_win.checkBox_visible_game.setChecked(True)
+
 
 def total_game_table(kpt, fin, pv, cur_index):
     """количество участников и кол-во игр"""
@@ -6641,7 +6647,7 @@ def kol_player_in_final():
     else:
         if sender == my_win.comboBox_table:
             cur_index = my_win.comboBox_table.currentIndex()
-            ct = my_win.comboBox_etap_2.currentText()
+            ct = my_win.comboBox_etap.currentText()
             if ct == "Полуфиналы":
                 my_win.label_23.setText("1-й полуфинал")
                 fin = "1-й полуфинал"
@@ -6654,7 +6660,7 @@ def kol_player_in_final():
                 return
         elif sender == my_win.comboBox_table_2:
             cur_index = my_win.comboBox_table_2.currentIndex()
-            ct = my_win.comboBox_etap_3.currentText()
+            ct = my_win.comboBox_etap.currentText()
             if ct == "Полуфиналы":
                 my_win.label_32.setText("2-й полуфинал")
                 fin = "2-й полуфинал"
@@ -6670,7 +6676,7 @@ def kol_player_in_final():
                 return
         elif sender == my_win.comboBox_table_3:
             cur_index = my_win.comboBox_table_3.currentIndex()
-            ct = my_win.comboBox_etap_4.currentText()
+            ct = my_win.comboBox_etap.currentText()
             my_win.label_55.setText("Финальный этап")
             if ct == "Финальный" and last_stage == "2-й полуфинал":
                 fin = "1-й финал"
@@ -6680,7 +6686,7 @@ def kol_player_in_final():
                 return
         elif sender == my_win.comboBox_table_4:
             cur_index = my_win.comboBox_table_4.currentIndex()
-            ct = my_win.comboBox_etap_5.currentText()
+            ct = my_win.comboBox_etap.currentText()
             if ct == "Финальный":
                 my_win.label_56.setText("Финальный этап")
                 fin = "4-й финал"
