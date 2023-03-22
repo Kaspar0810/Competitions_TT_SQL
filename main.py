@@ -846,9 +846,9 @@ res = ("все игры", "завершенные", "не сыгранные")
 #            "Полуфиналы", "Финальный", "Суперфинал")
 stages1 = ("-выбор этапа-", "Одна таблица", "Предварительный")
 stages2 = ("-выбор этапа-", "Полуфиналы", "Финальный", "Суперфинал")
-stages3 = ("", "Полуфиналы", "Финальный", "Суперфинал")
-stages4 = ("", "Финальный", "Суперфинал")
-vid_setki = ("", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
+stages3 = ("-выбор этапа-", "Полуфиналы", "Финальный", "Суперфинал")
+stages4 = ("-выбор этапа-", "Финальный", "Суперфинал")
+vid_setki = ("-выбор типа таблицы-", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
              "Сетка (за 1-3 место)", "Круговая система", "Группы полуфинала")
 
 
@@ -870,28 +870,28 @@ my_win.comboBox_filter_played_fin.addItems(res)
 # my_win.comboBox_table_4.addItems(vid_setki)
 # my_win.comboBox_one_table.addItems(vid_setki)
 
-def clear_add_combobox():
-    """"""
-    my_win.comboBox_etap.clear()
-    # my_win.comboBox_etap_2.clear()
-    # my_win.comboBox_etap_3.clear()
-    # my_win.comboBox_etap_4.clear()
-    # my_win.comboBox_etap_5.clear()
-    my_win.comboBox_etap.addItems(stages1)
-    # my_win.comboBox_etap_2.addItems(stages2)
-    # my_win.comboBox_etap_3.addItems(stages3)
-    # my_win.comboBox_etap_4.addItems(stages4)
-    # my_win.comboBox_etap_5.addItems(stages4)
-    my_win.comboBox_table.clear()
-    my_win.comboBox_table_2.clear()
-    my_win.comboBox_table_3.clear()
-    my_win.comboBox_table_4.clear()
-    my_win.comboBox_one_table.clear()
-    my_win.comboBox_table.addItems(vid_setki)
-    my_win.comboBox_table_2.addItems(vid_setki)
-    my_win.comboBox_table_3.addItems(vid_setki)
-    my_win.comboBox_table_4.addItems(vid_setki)
-    my_win.comboBox_one_table.addItems(vid_setki) 
+# def clear_add_combobox():
+#     """"""
+#     my_win.comboBox_etap.clear()
+#     # my_win.comboBox_etap_2.clear()
+#     # my_win.comboBox_etap_3.clear()
+#     # my_win.comboBox_etap_4.clear()
+#     # my_win.comboBox_etap_5.clear()
+#     my_win.comboBox_etap.addItems(stages1)
+#     # my_win.comboBox_etap_2.addItems(stages2)
+#     # my_win.comboBox_etap_3.addItems(stages3)
+#     # my_win.comboBox_etap_4.addItems(stages4)
+#     # my_win.comboBox_etap_5.addItems(stages4)
+#     my_win.comboBox_table.clear()
+#     my_win.comboBox_table_2.clear()
+#     my_win.comboBox_table_3.clear()
+#     my_win.comboBox_table_4.clear()
+#     my_win.comboBox_one_table.clear()
+#     my_win.comboBox_table.addItems(vid_setki)
+#     my_win.comboBox_table_2.addItems(vid_setki)
+#     my_win.comboBox_table_3.addItems(vid_setki)
+#     my_win.comboBox_table_4.addItems(vid_setki)
+#     my_win.comboBox_one_table.addItems(vid_setki) 
 
 
 # ставит сегодняшнюю дату в виджете календарь
@@ -2394,7 +2394,8 @@ def system_competition():
     gamer = tit.gamer
     flag_system = ready_system()
     if sender == my_win.system_made_Action or sender == my_win.system_edit_Action:
-        clear_add_combobox()
+        my_win.comboBox_etap.clear()
+        my_win.comboBox_etap.addItems(stages1) 
         # нажат меню -система- или -жеребьевка- или вкладка -система-
         if sender == my_win.system_edit_Action:
             sb = "Изменение системы проведения соревнования."
@@ -2529,6 +2530,15 @@ def system_competition():
             my_win.label_11.show()
             my_win.label_12.hide()
             my_win.comboBox_page_vid.setEnabled(True)
+        elif ct == "Полуфиналы":
+            my_win.comboBox_table.show()
+            my_win.label_23.show()
+            my_win.label_23.setText("1-й полуфинал")
+            my_win.label_28.show()
+            # my_win.label_12.hide()
+            my_win.comboBox_page_vid.setEnabled(True)
+            my_win.comboBox_table.show()
+            my_win.combobBox_table.additems(vid_setki)
     # elif sender == my_win.comboBox_etap_2:
     #     my_win.label_23.show()
     #     my_win.label_27.hide()
@@ -2609,7 +2619,7 @@ def one_table(fin, group):
             sys_m.max_player = count
             sys_m.total_athletes = total_athletes
             sys_m.total_group = group
-            sys_m.stage = my_win.comboBox_etap_1.currentText()
+            sys_m.stage = my_win.comboBox_etap.currentText()
             sys_m.type_table = type_table
             sys_m.page_vid = my_win.comboBox_page_vid.currentText()
             sys_m.label_string = f"{vt} {total_athletes} участников"
@@ -2708,6 +2718,7 @@ def kol_player_in_group():
         # my_win.comboBox_etap.clear()
         # my_win.comboBox_etap.addItems(stages2)
         # my_win.comboBox_etap.setCurrentIndex(0)
+    made_system_load_combobox_etap
     load_combobox_filter_group()
 
 
@@ -6141,6 +6152,7 @@ def etap_made():
             kol_player_in_group()
         elif my_win.comboBox_etap.currentText() == "Полуфиналы" or my_win.comboBox_etap.currentText() == "Финальный":
             total_game_table(kpt=0, fin="", pv="", cur_index=0)
+        made_system_load_combobox_etap(tot_fin=0)
         # elif my_win.comboBox_etap_2.currentText() == "Финальный" and my_win.comboBox_etap_3.isHidden():
         #     total_game_table(kpt=0, fin="", pv="", cur_index=0)
         # elif my_win.comboBox_etap_3.currentText() == "Финальный" and my_win.comboBox_etap_4.isHidden():
@@ -6268,23 +6280,33 @@ def total_game_table(kpt, fin, pv, cur_index):
                 tab_enabled(gamer)
             else:
                 return    
-        elif t >= 3:
-            my_win.comboBox_table.hide() # скрывает комбобокс с выбором вида финала
-            if tot_fin == 1:
-                my_win.comboBox_table_2.hide() # скрывает комбобокс с выбором вида финала
-                my_win.comboBox_etap_3.show()
-            elif tot_fin ==2:
-                my_win.comboBox_table_3.hide() # скрывает комбобокс с выбором вида финала
-                my_win.comboBox_etap_4.show()
-            elif tot_fin == 3:
-                my_win.comboBox_table_4.hide() # скрывает комбобокс с выбором вида финала
-                my_win.comboBox_etap_5.show()
-            elif tot_fin == 4:
-                my_win.comboBox_table_5.hide() # скрывает комбобокс с выбором вида финала
-                my_win.comboBox_etap_6.show()
+        elif t >= 3: # продолжает создание системы
+            made_system_load_combobox_etap(tot_fin)
 
-            my_win.Button_etap_made.setEnabled(True)
-            my_win.comboBox_page_vid.setEnabled(True)
+
+def made_system_load_combobox_etap(tot_fin):
+    """подготовка комбобокса для дальнейшего создания системы"""
+    my_win.comboBox_table.hide() # скрывает комбобокс с выбором вида финала
+    if tot_fin == 0:
+        my_win.comboBox_one_table.hide() # скрывает комбобокс с выбором вида финала
+        my_win.comboBox_etap.clear()
+        my_win.comboBox_etap.addItems(stages2)
+    elif tot_fin == 1:
+        my_win.comboBox_table_2.hide() # скрывает комбобокс с выбором вида финала
+        # my_win.comboBox_etap_3.show()
+    elif tot_fin ==2:
+        my_win.comboBox_table_3.hide() # скрывает комбобокс с выбором вида финала
+        my_win.comboBox_etap_4.show()
+    elif tot_fin == 3:
+        my_win.comboBox_table_4.hide() # скрывает комбобокс с выбором вида финала
+        my_win.comboBox_etap_5.show()
+    elif tot_fin == 4:
+        my_win.comboBox_table_5.hide() # скрывает комбобокс с выбором вида финала
+        my_win.comboBox_etap_6.show()
+
+    my_win.Button_etap_made.setEnabled(True)
+    my_win.comboBox_page_vid.setEnabled(True)
+
 
 
 def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
