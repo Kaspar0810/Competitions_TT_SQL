@@ -848,8 +848,10 @@ stages1 = ("-выбор этапа-", "Одна таблица", "Предвар
 stages2 = ("-выбор этапа-", "Полуфиналы", "Финальный", "Суперфинал")
 stages3 = ("-выбор этапа-", "Полуфиналы", "Финальный", "Суперфинал")
 stages4 = ("-выбор этапа-", "Финальный", "Суперфинал")
-vid_setki = ("-выбор типа таблицы-", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
-             "Сетка (за 1-3 место)", "Круговая система", "Группы полуфинала")
+vid_setki_one_table = ("-выбор типа таблицы-", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
+             "Сетка (за 1-3 место)", "Круговая система")
+# vid_setki_pf = ("Группы полуфинала")
+
 
 
 my_win.comboBox_page_vid.addItems(page_orient)
@@ -1140,7 +1142,7 @@ def system_made():
     """Заполняет таблицу система кол-во игроков, кол-во групп и прочее"""
     systems  = System.select().where(System.title_id == title_id()).get()
     count_system = len(systems)  # получение количества записей (этапов) в системе
-    sg = my_win.comboBox_one_table.currentText()
+    sg = my_win.comboBox_table.currentText()
     page_v = my_win.comboBox_page_1.currentText()
     total_group = systems.total_group
     total_athletes = systems.total_athletes
@@ -2039,7 +2041,7 @@ def page():
         my_win.comboBox_table_5.hide()
         my_win.comboBox_table_6.hide()
         my_win.spinBox_kol_group.hide()
-        my_win.comboBox_one_table.hide()
+        my_win.comboBox_table.hide()
 
         flag = ready_system()
 
@@ -2447,7 +2449,7 @@ def system_competition():
         my_win.label_58.hide()
         # my_win.label_59.hide()
         
-        my_win.comboBox_table.hide()
+        my_win.comboBox_table_1.hide()
         my_win.comboBox_table_2.hide()
         my_win.comboBox_table_3.hide()
         my_win.comboBox_table_4.hide()
@@ -2518,27 +2520,29 @@ def system_competition():
     elif sender == my_win.comboBox_etap:
         ct = my_win.comboBox_etap.currentText()
         if ct == "Одна таблица":
-            my_win.comboBox_one_table.show()
+            my_win.comboBox_table.show()
             my_win.spinBox_kol_group.hide()
             my_win.label_11.hide()
             my_win.label_9.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
-            my_win.comboBox_one_table.hide()
+            my_win.comboBox_table.hide()
             my_win.label_9.show()
             my_win.label_9.setText("Предварительный этап")
             my_win.label_11.show()
             my_win.label_12.hide()
             my_win.comboBox_page_vid.setEnabled(True)
         elif ct == "Полуфиналы":
-            my_win.comboBox_table.show()
+            my_win.comboBox_table_1.show()
             my_win.label_23.show()
             my_win.label_23.setText("1-й полуфинал")
-            my_win.label_28.show()
+            # my_win.label_28.show()
             # my_win.label_12.hide()
             my_win.comboBox_page_vid.setEnabled(True)
-            my_win.comboBox_table.show()
-            my_win.combobBox_table.additems(vid_setki)
+            my_win.comboBox_table_1.hide()
+
+            # my_win.comboBox_table_1.addItems(vid_setki_pf)
+            # my_win.comboBox_table_1.addItem("Группы полуфинала")
     # elif sender == my_win.comboBox_etap_2:
     #     my_win.label_23.show()
     #     my_win.label_27.hide()
@@ -2584,7 +2588,7 @@ def one_table(fin, group):
     ch = Choice.select().where(Choice.title_id == title_id())
     count = len(Player.select().where(Player.title_id == title_id()))
     # в зависмости сетка или круг
-    cur_index = my_win.comboBox_one_table.currentIndex()
+    cur_index = my_win.comboBox_table.currentIndex()
     if fin == "Одна таблица":
         if cur_index == 1:
             vt = "Сетка (-2) на"
@@ -6174,6 +6178,7 @@ def total_game_table(kpt, fin, pv, cur_index):
     """количество участников и кол-во игр"""
     sum_player = [0]
     msgBox = QMessageBox
+    etap_text = my_win.comboBox_etap.currentText()
     gamer = my_win.lineEdit_title_gamer.text()
     flag_visible = my_win.checkBox_visible_game.isChecked()
     system = System.select().where(System.title_id == title_id()) # находит system id последнего
@@ -6186,24 +6191,28 @@ def total_game_table(kpt, fin, pv, cur_index):
             sum_player.append(fin_player)
         sum_pl = sum(sum_player)
     if kpt != 0:  # подсчет кол-во игр из выбора кол-ва игроков вышедших из группы и системы финала
-        if cur_index == 1:
-            vt = "Сетка (-2) на"
-            my_win.comboBox_page_vid.setCurrentText("книжная")
-            type_table = "сетка"
-        elif cur_index == 2:
-            vt = "Сетка (с розыгрышем всех мест) на"
-            my_win.comboBox_page_vid.setCurrentText("книжная")
-            type_table = "сетка"
-        elif cur_index == 3:
-            vt = "Сетка (с играми за 1-3 места) на"
-            my_win.comboBox_page_vid.setCurrentText("книжная")
-            type_table = "сетка"
-        elif cur_index == 4:
-            vt = "Круговая таблица на"
-            type_table = "круг"
-        elif cur_index == 5:
+        if etap_text == "Полуфиналы":
             vt = "группы"
             type_table = "группы"
+        elif etap_text == "Финальный" or etap_text == "Суперфинал":
+            if cur_index == 1:
+                vt = "Сетка (-2) на"
+                my_win.comboBox_page_vid.setCurrentText("книжная")
+                type_table = "сетка"
+            elif cur_index == 2:
+                vt = "Сетка (с розыгрышем всех мест) на"
+                my_win.comboBox_page_vid.setCurrentText("книжная")
+                type_table = "сетка"
+            elif cur_index == 3:
+                vt = "Сетка (с играми за 1-3 места) на"
+                my_win.comboBox_page_vid.setCurrentText("книжная")
+                type_table = "сетка"
+            elif cur_index == 4:
+                vt = "Круговая таблица на"
+                type_table = "круг"
+        # elif cur_index == 5:
+        #     vt = "группы"
+        #     type_table = "группы"
 # =========================
         all_player_in_final = total_gr * kpt + sum_pl # общее кол-во спортсменов во всех финалах
         # ===== определяем точное кол-во участников в финале
@@ -6288,7 +6297,7 @@ def made_system_load_combobox_etap(tot_fin):
     """подготовка комбобокса для дальнейшего создания системы"""
     my_win.comboBox_table.hide() # скрывает комбобокс с выбором вида финала
     if tot_fin == 0:
-        my_win.comboBox_one_table.hide() # скрывает комбобокс с выбором вида финала
+        my_win.comboBox_table.hide() # скрывает комбобокс с выбором вида финала
         my_win.comboBox_etap.clear()
         my_win.comboBox_etap.addItems(stages2)
     elif tot_fin == 1:
@@ -6639,8 +6648,8 @@ def kol_player_in_final():
     count = len(player)
     fin = ""
     exit_stage = ""
-    if sender == my_win.comboBox_one_table:
-        if my_win.comboBox_one_table.currentText() == "Круговая система":
+    if sender == my_win.comboBox_table:
+        if my_win.comboBox_table.currentText() == "Круговая система":
             kol_game = count * (count - 1) // 2
             my_win.label_50.show()
             my_win.label_19.show()
@@ -6651,11 +6660,11 @@ def kol_player_in_final():
             my_win.label_50.setText(f"{count} человек по круговой системе.")
             my_win.comboBox_etap_1.hide()
             my_win.label_10.hide()
-            my_win.comboBox_one_table.hide()
+            my_win.comboBox_table.hide()
             my_win.comboBox_page_vid.setCurrentText("альбомная")
         else: # система из одной таблицы по олимпийской системе
             my_win.comboBox_page_vid.setCurrentText("книжная")
-            cur_index = my_win.comboBox_one_table.currentIndex()
+            cur_index = my_win.comboBox_table.currentIndex()
             total_game = 0
             if cur_index != 0:
                 player_in_final = count
@@ -6665,10 +6674,14 @@ def kol_player_in_final():
             my_win.label_19.setText(f"{total_game} игр.")
             my_win.label_33.setText(f"Всего: {total_game} игр.")
             my_win.label_50.setText(f"{count} человек в сетке.")
-            my_win.comboBox_one_table.hide()
+            my_win.comboBox_table.hide()
+    elif my_win.comboBox_etap.currentText() == "Полуфиналы":
+        my_win.label_23.setText("1-й полуфинал")
+        fin = "1-й полуфинал"
+        exit_stage = "группы"
     else:
-        if sender == my_win.comboBox_table:
-            cur_index = my_win.comboBox_table.currentIndex()
+        if sender == my_win.comboBox_table_1:
+            cur_index = my_win.comboBox_table_1.currentIndex()
             ct = my_win.comboBox_etap.currentText()
             if ct == "Полуфиналы":
                 my_win.label_23.setText("1-й полуфинал")
@@ -6679,7 +6692,7 @@ def kol_player_in_final():
                 fin = "1-й финал"
                 exit_stage = "группы"
             else:
-                return
+                return           
         elif sender == my_win.comboBox_table_2:
             cur_index = my_win.comboBox_table_2.currentIndex()
             ct = my_win.comboBox_etap.currentText()
@@ -10430,8 +10443,8 @@ my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 
 fir_window.comboBox.currentTextChanged.connect(change_sroki)
-my_win.comboBox_one_table.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_1.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_2.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_3.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_4.currentTextChanged.connect(kol_player_in_final)
