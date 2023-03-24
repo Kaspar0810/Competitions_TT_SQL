@@ -845,9 +845,9 @@ res = ("все игры", "завершенные", "не сыгранные")
 # stages1 = ("", "Одна таблица", "Предварительный",
 #            "Полуфиналы", "Финальный", "Суперфинал")
 stages1 = ("-выбор этапа-", "Одна таблица", "Предварительный")
-stages2 = ("-выбор этапа-", "Полуфиналы", "Финальный", "Суперфинал")
-# stages3 = ("-выбор этапа-", "Полуфиналы", "Финальный", "Суперфинал")
+stages2 = ("-выбор этапа-", "Полуфиналы", "Финальный")
 stages3 = ("-выбор этапа-", "Финальный", "Суперфинал")
+# stages3 = ("-выбор этапа-", "Финальный", "Суперфинал")
 vid_setki_one_table = ("-выбор типа таблицы-", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
              "Сетка (за 1-3 место)", "Круговая система")
 # vid_setki_pf = ("Группы полуфинала")
@@ -2457,16 +2457,9 @@ def system_competition():
             my_win.statusbar.showMessage(sb)
             my_win.spinBox_kol_group.hide()
             my_win.comboBox_etap.setEnabled(True)
-            # my_win.comboBox_etap_2.setEnabled(True)
-            # my_win.comboBox_etap_3.setEnabled(True)
-            # my_win.comboBox_etap_4.setEnabled(True)
+
             my_win.comboBox_etap.show()
-            # my_win.comboBox_etap_2.hide()
-            # my_win.comboBox_etap_3.hide()
-            # my_win.comboBox_etap_4.hide()
-            my_win.label_10.hide()
-            # my_win.label_15.hide()
-            # my_win.label_17.hide()
+
             my_win.label_23.hide()
             my_win.label_27.hide()
             my_win.label_28.hide()
@@ -2488,6 +2481,7 @@ def system_competition():
                     my_win.lineEdit_Family_name.setFocus()
                 else:
                     return
+    # после выбора из комбобокса соответсвенно этапу включает label               
     elif sender == my_win.tabWidget:
         my_win.spinBox_kol_group.hide()
         my_win.comboBox_etap.setEnabled(True)
@@ -2659,9 +2653,6 @@ def kol_player_in_group():
         system.kol_game_string = stroka_kol_game
         system.visible_game = flag_visible
         system.save()
-        # my_win.comboBox_etap.clear()
-        # my_win.comboBox_etap.addItems(stages2)
-        # my_win.comboBox_etap.setCurrentIndex(0)
     made_system_load_combobox_etap
     load_combobox_filter_group()
 
@@ -6093,10 +6084,10 @@ def etap_made():
             gamer = my_win.lineEdit_title_gamer.text()
             tab_enabled(gamer)
         if my_win.comboBox_etap.currentText() == "Предварительный":
-            kol_player_in_group()
+            kol_player_in_group() # кол-во участников в группах
             my_win.label_10.setText("2-й этап")
         elif my_win.comboBox_etap.currentText() == "Полуфиналы" or my_win.comboBox_etap.currentText() == "Финальный":
-            total_game_table(kpt=0, fin="", pv="", cur_index=0)
+            total_game_table(kpt=0, fin="", pv="", cur_index=0) # сколько игр в финале или пф
         made_system_load_combobox_etap(tot_fin=0)
         # суммирует все игры этапов    
         for k in system:
@@ -6160,7 +6151,7 @@ def total_game_table(kpt, fin, pv, cur_index):
         total_games = numbers_of_games(cur_index, player_in_final, kpt) # подсчет кол-во игр
 
         pv = my_win.comboBox_page_vid.currentText()
-        if etap_txt == "Полуфиналы":
+        if etap_text == "Полуфиналы":
             gr_pf = total_gr // 2
             str_setka = f"{gr_pf} {vt} по {kpt * 2} участника"
         else:
@@ -6645,7 +6636,7 @@ def kol_player_in_final():
         # возвращает из функции несколько значения в списке
     list_pl_final = total_game_table(kpt, fin, pv, cur_index=0)
     if ok:
-        if sender == my_win.comboBox_table:
+        if sender == my_win.comboBox_table or fin == "1-й полуфинал":
             my_win.label_27.show()
                 # пишет кол-во игр 2-ого этапа
             my_win.label_27.setText(list_pl_final[3])
@@ -6654,7 +6645,9 @@ def kol_player_in_final():
             if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
                 my_win.statusbar.showMessage("Система создана.", 10000)
             else:
-                my_win.comboBox_table.hide()
+                my_win.comboBox_etap.clear()
+                my_win.comboBox_etap.addItems(stages2)
+                my_win.label_10.setText("3-й этап")
         elif sender == my_win.comboBox_table_2:
             my_win.label_30.setText(list_pl_final[3])
             my_win.label_30.show()
