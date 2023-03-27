@@ -6052,9 +6052,9 @@ def etap_made():
 def total_game_table(kpt, fin, pv, cur_index):
     """количество участников и кол-во игр"""
     sum_player = [0]
-    msgBox = QMessageBox
+    # msgBox = QMessageBox
     etap_text = my_win.comboBox_etap.currentText()
-    gamer = my_win.lineEdit_title_gamer.text()
+    # gamer = my_win.lineEdit_title_gamer.text()
     flag_visible = my_win.checkBox_visible_game.isChecked()
     system = System.select().where(System.title_id == title_id()) # находит system id последнего
     for sys in system:
@@ -6128,41 +6128,85 @@ def total_game_table(kpt, fin, pv, cur_index):
         
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
     else:  # нажата кнопка создания этапа, если еще не все игроки посеяны в финал, то продолжает этапы соревнования
-        # титул id и стадия содержит слово финал (1 и 2 заменяет %)
-        system = System.select().order_by(System.id).where(System.title_id == title_id())
-        system_id = system.select().where(System.stage ** '% финал')
-        tot_fin = len(system_id)
-        sum_final = []
-        for i in system_id:
-            if i.stage != "Предварительный" and i.stage != "1-й полуфинал" and i.stage != "2-й полуфинал":
-                player_in_etap = i.max_player
-                sum_final.append(player_in_etap)
-        if tot_fin != 0:
-            total_final = sum(sum_final)
-            t = total_player - total_final # оставшиеся не распределенные участники по финалам
-            txt = ""
-            if total_final == total_player or t <= 2: # подсчитывает все ли игроки распределены по финалам
-                if t == 1:     
-                    txt = "Остался 1 участник, не вошедший в финальную часть"
-                    msgBox.information(my_win, "Уведомление", txt)
-                elif t == 2:
-                    txt = "Остались 2 игрока, они могут сыграть за место между собой"
-                    msgBox.information(my_win, "Уведомление", txt)   
-                add_open_tab(tab_page="Система")
+        control_all_player_in_final()
+        # # титул id и стадия содержит слово финал (1 и 2 заменяет %)
+        # system = System.select().order_by(System.id).where(System.title_id == title_id())
+        # system_id = system.select().where(System.stage ** '% финал')
+        # tot_fin = len(system_id)
+        # sum_final = []
+        # for i in system_id:
+        #     if i.stage != "Предварительный" and i.stage != "1-й полуфинал" and i.stage != "2-й полуфинал":
+        #         player_in_etap = i.max_player
+        #         sum_final.append(player_in_etap)
+        # if tot_fin != 0:
+        #     total_final = sum(sum_final)
+        #     t = total_player - total_final # оставшиеся не распределенные участники по финалам
+        #     txt = ""
+        #     if total_final == total_player or t <= 2: # подсчитывает все ли игроки распределены по финалам
+        #         if t == 1:     
+        #             txt = "Остался 1 участник, не вошедший в финальную часть"
+        #             msgBox.information(my_win, "Уведомление", txt)
+        #         elif t == 2:
+        #             txt = "Остались 2 игрока, они могут сыграть за место между собой"
+        #             msgBox.information(my_win, "Уведомление", txt)   
+        #         add_open_tab(tab_page="Система")
 
-                result = msgBox.question(my_win, "", "Система соревнований создана.\n"
-                                                    "Теперь необходимо сделать жеребъевку\n"
-                                                    "предварительного этапа.\n"
-                                                    "Хотите ее сделать сейчас?",
-                                        msgBox.Ok, msgBox.Cancel)
-                if result == msgBox.Ok:
-                    choice_gr_automat()
-                    add_open_tab(tab_page="Группы")
-                    tab_enabled(gamer)
-                else:
-                    return    
-            elif t >= 3: # продолжает создание системы
-                made_system_load_combobox_etap()
+        #         result = msgBox.question(my_win, "", "Система соревнований создана.\n"
+        #                                             "Теперь необходимо сделать жеребъевку\n"
+        #                                             "предварительного этапа.\n"
+        #                                             "Хотите ее сделать сейчас?",
+        #                                 msgBox.Ok, msgBox.Cancel)
+        #         if result == msgBox.Ok:
+        #             choice_gr_automat()
+        #             add_open_tab(tab_page="Группы")
+        #             tab_enabled(gamer)
+        #         else:
+        #             return    
+        #     elif t >= 3: # продолжает создание системы
+        #         made_system_load_combobox_etap()
+
+
+def control_all_player_in_final():
+    """проверка все ли игроки распределены по финалам и дает сигнал об окончании создании системы"""
+     # титул id и стадия содержит слово финал (1 и 2 заменяет %)
+    msgBox = QMessageBox
+    gamer = my_win.lineEdit_title_gamer.text()
+    system = System.select().order_by(System.id).where(System.title_id == title_id())
+    system_stage = system.select().where(System.stage == "Предварительный").get()
+    total_player = system_stage.stage
+    system_id = system.select().where(System.stage ** '% финал')
+    tot_fin = len(system_id)
+    sum_final = []
+    for i in system_id:
+        if i.stage != "Предварительный" and i.stage != "1-й полуфинал" and i.stage != "2-й полуфинал":
+            player_in_etap = i.max_player
+            sum_final.append(player_in_etap)
+    if tot_fin != 0:
+        total_final = sum(sum_final)
+        t = total_player - total_final # оставшиеся не распределенные участники по финалам
+        txt = ""
+        if total_final == total_player or t <= 2: # подсчитывает все ли игроки распределены по финалам
+            if t == 1:     
+                txt = "Остался 1 участник, не вошедший в финальную часть"
+                msgBox.information(my_win, "Уведомление", txt)
+            elif t == 2:
+                txt = "Остались 2 игрока, они могут сыграть за место между собой"
+                msgBox.information(my_win, "Уведомление", txt)   
+            add_open_tab(tab_page="Система")
+
+            result = msgBox.question(my_win, "", "Система соревнований создана.\n"
+                                                "Теперь необходимо сделать жеребъевку\n"
+                                                "предварительного этапа.\n"
+                                                "Хотите ее сделать сейчас?",
+                                    msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
+                choice_gr_automat()
+                add_open_tab(tab_page="Группы")
+                tab_enabled(gamer)
+            else:
+                return    
+        elif t >= 3: # продолжает создание системы
+            made_system_load_combobox_etap()
 
 
 def made_system_load_combobox_etap():
@@ -6252,7 +6296,6 @@ def made_system_load_combobox_etap():
         my_win.comboBox_etap.setEnabled(True)
         my_win.comboBox_etap.show()
         my_win.label_10.show()
-
 
 
 def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
