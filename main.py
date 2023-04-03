@@ -6254,16 +6254,18 @@ def made_system_load_combobox_etap():
                 combo_flag = 2  
                 my_win.comboBox_etap.addItems(stages3) 
         elif  label_text == "3-й этап":  
+            if ct == "Полуфиналы" or combo_flag == 1:
+                my_win.label_55.setText("1-й финал")
+                combo_flag = 1
+            elif ct == "Финальный" or combo_flag == 2:
+                my_win.label_55.setText("2-й финал")
+                combo_flag = 2          
             my_win.comboBox_etap.clear() 
-            # my_win.label_10.setText("4-й этап") 
-            # if ct == "Полуфиналы":
-            #     my_win.label_55.setText("1-й финал")
-            # elif ct == "Финальный":
-            #     my_win.label_55.setText("2-й финал")
-            # else:
-                # my_win.label_55.show()
             my_win.label_10.setText("4-й этап")
             my_win.comboBox_etap.addItems(stages3)
+            # i = my_win.comboBox_etap.items()
+            # for k in i:
+            #     print(k)
             # kol_player_in_final()  
         elif  label_text == "4-й этап": 
             txt = my_win.label_55.text() 
@@ -6688,14 +6690,14 @@ def kol_player_in_final():
             my_win.label_50.setText(f"{count} человек в сетке.")
             my_win.comboBox_table.hide()
     elif my_win.comboBox_etap.currentText() == "Полуфиналы" and label_text == "2-й этап":
-            my_win.label_23.setText("1-й полуфинал")
+            # my_win.label_23.setText("1-й полуфинал")
             fin = "1-й полуфинал"
             exit_stage = "группы"
     elif my_win.comboBox_etap.currentText() == "Полуфиналы" and label_text == "3-й этап":
-            my_win.label_32.setText("2-й полуфинал")
+            # my_win.label_32.setText("2-й полуфинал")
             fin = "2-й полуфинал"
             exit_stage = "группы"
-    elif my_win.comboBox_etap.currentText() == "Финылы" and label_text == "2-й этап":
+    elif my_win.comboBox_etap.currentText() == "Финалы" and label_text == "2-й этап":
             my_win.label_23.setText("1-й финал")
             fin = "1-й финал"
     elif sender == my_win.comboBox_table_3:
