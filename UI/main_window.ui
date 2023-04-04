@@ -894,7 +894,7 @@
         <string>групп:</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_9">
+      <widget class="QLabel" name="label_101">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -934,7 +934,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_23">
+      <widget class="QLabel" name="label_102">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1051,7 +1051,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_32">
+      <widget class="QLabel" name="label_103">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1209,7 +1209,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_55">
+      <widget class="QLabel" name="label_104">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1240,7 +1240,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_56">
+      <widget class="QLabel" name="label_105">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1366,7 +1366,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_76">
+      <widget class="QLabel" name="label_106">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1425,7 +1425,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_79">
+      <widget class="QLabel" name="label_107">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -3565,8 +3565,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3578,7 +3578,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>222</width>
+       <width>196</width>
        <height>534</height>
       </rect>
      </property>
@@ -4238,8 +4238,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4511,8 +4511,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4524,8 +4524,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4773,8 +4773,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
