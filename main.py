@@ -6262,7 +6262,8 @@ def made_system_load_combobox_etap():
                 my_win.label_104.setText("1-й финал")
                 # my_win.comboBox_etap.addItems(stages3)
             elif last_etap == "1-й финал":
-                my_win.label_104.setText("2-й финал") 
+                my_win.label_104.setText("2-й финал")
+            print("OK") 
             # my_win.comboBox_etap.addItems(stages3)        
             # my_win.comboBox_etap.clear() 
             # my_win.label_10.setText("4-й этап")
