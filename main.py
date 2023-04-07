@@ -842,7 +842,7 @@ mylist = ('мальчиков и девочек', 'юношей и девуше�
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р",
        "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
 res = ("все игры", "завершенные", "не сыгранные")
-stages = ["-выбор этапа-", "Одна таблица", "Предварительный",
+stages_all = ["-выбор этапа-", "Одна таблица", "Предварительный",
            "Полуфиналы", "Финальный", "Суперфинал"]
 stages1 = ("-выбор этапа-", "Одна таблица", "Предварительный")
 stages2 = ("-выбор этапа-", "Полуфиналы", "Финальный")
@@ -6256,24 +6256,30 @@ def made_system_load_combobox_etap():
                 my_win.comboBox_etap.addItems(stages)
         elif  label_text == "2-й этап":  
             # ==== поиск всех занчений комбобокса
+            if ct == "Полуфиналы":
+                delete_set= {"Одна таблица", "Предварительный", "Суперфинал"}
+                # my_win.comboBox_etap.clear()
+            elif ct == "Финалы": 
+                delete_set = {"Одна таблица", "Предварительный", "Полуфинал"}
+
             list_item = []
             count_items = my_win.comboBox_etap.count()
             for i in range(0, count_items):
-                cur_item = my_win.comboBox_etap.currentIndex(i)
-                list_item.append(cur_item)
+                cur_item = my_win.comboBox_etap.itemText(i)
+                list_item.append(cur_item) # значение которые есть в комбобокс
             # set_item = set(list_item)
-            new_items.intersection_update(list_item)
+            delete_set.intersection_update(list_item)
 
-            if ct == "Полуфиналы":
-                delete_list = ["Одна таблица", "Предварительный", "Суперфинал"]
-                # my_win.comboBox_etap.clear()
-            elif ct == "Финалы": 
-                delete_list = ["Одна таблица", "Предварительный", "Полуфинал"]
-                # my_win.comboBox_etap.clear()
-            # else:
-            for k in delete_list:
-                if k in stages:
-                    stages.remove(k)
+            # if ct == "Полуфиналы":
+            #     delete_list = ["Одна таблица", "Предварительный", "Суперфинал"]
+            #     # my_win.comboBox_etap.clear()
+            # elif ct == "Финалы": 
+            #     delete_list = ["Одна таблица", "Предварительный", "Полуфинал"]
+            #     # my_win.comboBox_etap.clear()
+            # # else:
+            # for k in delete_list:
+            #     if k in stages:
+            #         stages.remove(k)
             my_win.comboBox_etap.addItems(stages)
             
             my_win.label_10.setText("3-й этап")
