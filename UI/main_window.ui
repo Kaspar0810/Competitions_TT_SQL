@@ -955,7 +955,7 @@
         <string>Этапы соревнования - </string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_table_1">
+      <widget class="QComboBox" name="comboBox_table_2">
        <property name="geometry">
         <rect>
          <x>149</x>
@@ -1022,7 +1022,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_table_2">
+      <widget class="QComboBox" name="comboBox_table_3">
        <property name="geometry">
         <rect>
          <x>149</x>
@@ -1142,7 +1142,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_table">
+      <widget class="QComboBox" name="comboBox_table_1">
        <property name="geometry">
         <rect>
          <x>150</x>
@@ -1230,7 +1230,7 @@
         <string>Этапы соревнования - </string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_table_3">
+      <widget class="QComboBox" name="comboBox_table_4">
        <property name="geometry">
         <rect>
          <x>150</x>
@@ -1280,7 +1280,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_table_4">
+      <widget class="QComboBox" name="comboBox_table_5">
        <property name="geometry">
         <rect>
          <x>150</x>
@@ -1446,7 +1446,7 @@
         <string>Этапы соревнования - </string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_table_6">
+      <widget class="QComboBox" name="comboBox_table_7">
        <property name="geometry">
         <rect>
          <x>150</x>
@@ -1532,7 +1532,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="comboBox_table_5">
+      <widget class="QComboBox" name="comboBox_table_6">
        <property name="geometry">
         <rect>
          <x>150</x>
