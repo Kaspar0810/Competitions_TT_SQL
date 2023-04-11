@@ -6234,7 +6234,7 @@ def made_system_load_combobox_etap():
             combobox_etap_compare(real_list)
             my_win.label_10.setText("3-й этап")
         elif  label_text == "3-й этап": # текущий этап
-            my_win.comboBox_table_3.show()
+            # my_win.comboBox_table_3.show()
             real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
             combobox_etap_compare(real_list)
             my_win.label_104.show()
@@ -6274,16 +6274,19 @@ def made_system_load_combobox_etap():
             if label_text == "2-й этап":
                 my_win.label_102.show()
                 my_win.label_102.setText("1-й финал")
+                my_win.comboBox_table_2.show()
             elif label_text == "3-й этап":
                 last_etap = my_win.label_102.text() 
                 my_win.label_103.show()
                 if last_etap == "1-й полуфинал":
-                    my_win.label_103.setText("1-й финал")               
+                    my_win.label_103.setText("1-й финал")
+                    my_win.comboBox_table_3.show()               
             elif label_text == "4-й этап":
                 last_etap = my_win.label_103.text() 
                 if last_etap == "2-й полуфинал":
                     my_win.label_104.setText("1-й финал")
-                    # === view combo
+                    my_win.comboBox_table_4.show()
+                    # kol_player_in_final()
                 else: 
                     txt = my_win.label_103.text()
                     znak = txt.find("-") 
@@ -6293,7 +6296,7 @@ def made_system_load_combobox_etap():
                     # my_win.label_10.setText("5-й этап")
                     # my_win.label_105.show()
                     # my_win.label_104.setText("3-й финал")
-            kol_player_in_final()
+                    # kol_player_in_final()
     # else:
     #     my_win.spinBox_kol_group.hide()
     #     my_win.comboBox_etap.setEnabled(True)
@@ -10435,11 +10438,14 @@ my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 
 fir_window.comboBox.currentTextChanged.connect(change_sroki)
-my_win.comboBox_table_1.currentTextChanged.connect(kol_player_in_final)
+
 my_win.comboBox_table_1.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_2.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_3.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_4.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_5.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_6.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_7.currentTextChanged.connect(kol_player_in_final)
 # my_win.comboBox_etap.currentTextChanged.connect(system_competition)
 
 my_win.comboBox_etap.currentTextChanged.connect(made_system_load_combobox_etap)
