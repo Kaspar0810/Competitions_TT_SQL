@@ -6684,7 +6684,7 @@ def kol_player_in_final():
         elif label_text == "3-й этап":
             fin = "2-й полуфинал"
         exit_stage = "группы"  
-    elif my_win.comboBox_etap.currentText() == "Финалы":
+    elif my_win.comboBox_etap.currentText() == "Финальный":
         if label_text == "2-й этап":
             my_win.label_102.setText("1-й финал")
             fin = "1-й финал"
@@ -6696,9 +6696,9 @@ def kol_player_in_final():
                 my_win.label_103.setText("2-й финал")
                 fin = "2-й финал"
         elif label_text == "4-й этап":
-            my_win.label_104.setText("1-й финал")
-            fin = "2-й финал"
-
+            my_win.label_104.setText("1-й финал") # уже установлен
+            fin = "1-й финал"
+            exit_stage = "1-й полуфинал" # уточнить откуда выходят в финал
 
     elif sender == my_win.comboBox_table_3:
         cur_index = my_win.comboBox_table_3.currentIndex()
