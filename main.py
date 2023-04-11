@@ -6191,17 +6191,11 @@ def combobox_etap_compare(real_list):
     for i in range(0, count_items):
         cur_item = my_win.comboBox_etap.itemText(i)
         item_list.append(cur_item) # значение которые есть в комбобокс после добавления отсутствующих
-    # res = [x for x in real_list + item_list if x not in real_list or x not in item_list] # список, который надо убрать из комбобокса
+    res = [x for x in real_list + item_list if x not in real_list or x not in item_list] # список, который надо убрать из комбобокса
 
-    # if len(res) > 1 or (len(res) == 1 and res[0] != "-выбор этапа-"):
-    # for i in range(1, count_items):
-    #     my_win.comboBox_etap.removeItem(1)
-        # count_items_new = my_win.comboBox_etap.count()
-    my_win.comboBox_etap.clear()
-    my_win.comboBox_etap.addItems(real_list)
-    #     if count_items_new == 1:
-    #         for k in real_list:
-    #             my_win.comboBox_etap.addItems(k)
+    if len(res) != 0:
+        my_win.comboBox_etap.clear()
+        my_win.comboBox_etap.addItems(real_list)
     count_new = my_win.comboBox_etap.count()
     for i in range(0, count_new):
         cur_new = my_win.comboBox_etap.itemText(i)
@@ -6241,13 +6235,8 @@ def made_system_load_combobox_etap():
             combobox_etap_compare(real_list)
             my_win.label_10.setText("3-й этап")
         elif  label_text == "3-й этап": # текущий этап
-            last_etap = my_win.label_103.text() # система этап
-            if last_etap == "2-й полуфинал":
-                # my_win.label_104.setText("1-й финал")
-                real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
-            elif last_etap == "1-й финал":
-                # my_win.label_104.setText("2-й финал")
-                real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
+            my_win.comboBox_table_3.show()
+            real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
             combobox_etap_compare(real_list)
             my_win.label_104.show()
             my_win.label_10.setText("4-й этап")
@@ -6261,8 +6250,7 @@ def made_system_load_combobox_etap():
             my_win.label_105.show()
             kol_player_in_final() 
         my_win.comboBox_etap.setCurrentText("-выбор этапа-")     
-    # elif sender == my_win.comboBox_etap: # выбор значения из комбобокса создания этапов
-    elif ct != "-выбор этапа-":  # выбор значения из комбобокса создания этапов
+    else:   # выбор значения из комбобокса создания этапов
         if ct == "Одна таблица":
             my_win.comboBox_table.show()
             my_win.spinBox_kol_group.hide()
@@ -6306,11 +6294,11 @@ def made_system_load_combobox_etap():
                     # my_win.label_105.show()
                     # my_win.label_104.setText("3-й финал")
             kol_player_in_final()
-    else:
-        my_win.spinBox_kol_group.hide()
-        my_win.comboBox_etap.setEnabled(True)
-        my_win.comboBox_etap.show()
-        my_win.label_10.show()
+    # else:
+    #     my_win.spinBox_kol_group.hide()
+    #     my_win.comboBox_etap.setEnabled(True)
+    #     my_win.comboBox_etap.show()
+    #     my_win.label_10.show()
 
 
 
