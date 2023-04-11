@@ -855,22 +855,21 @@ vid_setki_one_table = ("-выбор типа таблицы-", "Сетка (-2)"
 
 
 my_win.comboBox_page_vid.addItems(page_orient)
-# my_win.comboBox_etap_1.addItems(stages1)
-# my_win.comboBox_etap_2.addItems(stages2)
-# my_win.comboBox_etap_3.addItems(stages3)
-# my_win.comboBox_etap_4.addItems(stages3)
-# my_win.comboBox_etap_5.addItems(stages3)
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
 my_win.comboBox_kategor_sek.addItems(kategoria_list)
 my_win.comboBox_sredi.addItems(mylist)
 my_win.comboBox_razryad.addItems(raz)
 my_win.comboBox_filter_played.addItems(res)
 my_win.comboBox_filter_played_fin.addItems(res)
-# my_win.comboBox_table.addItems(vid_setki)
-# my_win.comboBox_table_2.addItems(vid_setki)
-# my_win.comboBox_table_3.addItems(vid_setki)
-# my_win.comboBox_table_4.addItems(vid_setki)
-# my_win.comboBox_one_table.addItems(vid_setki)
+
+my_win.comboBox_table_1.addItems(vid_setki_one_table)
+my_win.comboBox_table_2.addItems(vid_setki_one_table)
+my_win.comboBox_table_3.addItems(vid_setki_one_table)
+my_win.comboBox_table_4.addItems(vid_setki_one_table)
+my_win.comboBox_table_5.addItems(vid_setki_one_table)
+my_win.comboBox_table_6.addItems(vid_setki_one_table)
+my_win.comboBox_table_7.addItems(vid_setki_one_table)
+# my_win.comboBox_one_table.addItems(vid_setki_one_table)
 
 # def clear_add_combobox():
 #     """"""
@@ -2021,13 +2020,13 @@ def page():
         my_win.label_84.hide()
         my_win.label_85.hide()
         my_win.comboBox_etap.hide()
-        my_win.comboBox_table.hide()
         my_win.comboBox_table_1.hide()
         my_win.comboBox_table_2.hide()
         my_win.comboBox_table_3.hide()
         my_win.comboBox_table_4.hide()
         my_win.comboBox_table_5.hide()
         my_win.comboBox_table_6.hide()
+        my_win.comboBox_table_7.hide()
         my_win.spinBox_kol_group.hide()
 
 
@@ -2446,7 +2445,7 @@ def system_competition():
             my_win.comboBox_etap.clear()
             my_win.comboBox_etap.addItems(stages1)
             my_win.comboBox_etap.show()
-            my_win.comboBox_table.hide()
+            my_win.comboBox_table_1.hide()
             my_win.label_10.show()
             my_win.label_10.setText("1-й этап")
             my_win.Button_etap_made.setEnabled(True)
@@ -6214,13 +6213,13 @@ def made_system_load_combobox_etap():
             return   
         if label_text == "1-й этап":
             if ct == "Одна таблица":
-                my_win.comboBox_table.show()
+                my_win.comboBox_table_1.show()
                 my_win.spinBox_kol_group.hide()
                 my_win.label_11.hide()
                 my_win.label_101.hide()
             elif ct == "Предварительный":
                 my_win.spinBox_kol_group.hide()
-                my_win.comboBox_table.hide()
+                my_win.comboBox_table_1.hide()
                 my_win.label_11.hide()
                 my_win.label_12.show()
                 real_list = ["-выбор этапа-", "Полуфиналы", "Финальный"] # который нужен в комбобокс
@@ -6231,7 +6230,7 @@ def made_system_load_combobox_etap():
             if ct == "Полуфиналы":
                 real_list = ["-выбор этапа-", "Полуфиналы", "Финальный"] # который нужен в комбобокс
             elif ct == "Финалы": 
-                real_list = ["Финальный", "Суперфинал"] 
+                real_list = ["-выбор этапа-", "Финальный", "Суперфинал"] 
             combobox_etap_compare(real_list)
             my_win.label_10.setText("3-й этап")
         elif  label_text == "3-й этап": # текущий этап
@@ -6252,13 +6251,13 @@ def made_system_load_combobox_etap():
         my_win.comboBox_etap.setCurrentText("-выбор этапа-")     
     else:   # выбор значения из комбобокса создания этапов
         if ct == "Одна таблица":
-            my_win.comboBox_table.show()
+            my_win.comboBox_table_1.show()
             my_win.spinBox_kol_group.hide()
             my_win.label_11.hide()
             my_win.label_101.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
-            my_win.comboBox_table.hide()
+            my_win.comboBox_table_1.hide()
             my_win.label_101.show()
             my_win.label_101.setText("Предварительный этап")
             my_win.label_11.show()
@@ -6284,6 +6283,7 @@ def made_system_load_combobox_etap():
                 last_etap = my_win.label_103.text() 
                 if last_etap == "2-й полуфинал":
                     my_win.label_104.setText("1-й финал")
+                    # === view combo
                 else: 
                     txt = my_win.label_103.text()
                     znak = txt.find("-") 
@@ -6649,8 +6649,8 @@ def kol_player_in_final():
     fin = ""
     exit_stage = ""
     label_text = my_win.label_10.text()
-    if sender == my_win.comboBox_table:
-        if my_win.comboBox_table.currentText() == "Круговая система":
+    if sender == my_win.comboBox_table_1:
+        if my_win.comboBox_table_1.currentText() == "Круговая система":
             kol_game = count * (count - 1) // 2
             my_win.label_50.show()
             my_win.label_19.show()
@@ -6660,11 +6660,11 @@ def kol_player_in_final():
             my_win.label_33.setText(f"Всего: {kol_game} игр.")
             my_win.label_50.setText(f"{count} человек по круговой системе.")
             my_win.comboBox_etap.hide()
-            my_win.comboBox_table.hide()
+            my_win.comboBox_table_1.hide()
             my_win.comboBox_page_vid.setCurrentText("альбомная")
         else: # система из одной таблицы по олимпийской системе
             my_win.comboBox_page_vid.setCurrentText("книжная")
-            cur_index = my_win.comboBox_table.currentIndex()
+            cur_index = my_win.comboBox_table_1.currentIndex()
             total_game = 0
             if cur_index != 0:
                 player_in_final = count
@@ -6674,18 +6674,29 @@ def kol_player_in_final():
             my_win.label_19.setText(f"{total_game} игр.")
             my_win.label_33.setText(f"Всего: {total_game} игр.")
             my_win.label_50.setText(f"{count} человек в сетке.")
-            my_win.comboBox_table.hide()
-    elif my_win.comboBox_etap.currentText() == "Полуфиналы" and label_text == "2-й этап":
-            # my_win.label_102.setText("1-й полуфинал")
+            my_win.comboBox_table_1.hide()
+    elif my_win.comboBox_etap.currentText() == "Полуфиналы":
+        if label_text == "2-й этап":
             fin = "1-й полуфинал"
-            exit_stage = "группы"
-    elif my_win.comboBox_etap.currentText() == "Полуфиналы" and label_text == "3-й этап":
-            # my_win.label_103.setText("2-й полуфинал")
+        elif label_text == "3-й этап":
             fin = "2-й полуфинал"
-            exit_stage = "группы"
-    elif my_win.comboBox_etap.currentText() == "Финалы" and label_text == "2-й этап":
+        exit_stage = "группы"  
+    elif my_win.comboBox_etap.currentText() == "Финалы":
+        if label_text == "2-й этап":
             my_win.label_102.setText("1-й финал")
             fin = "1-й финал"
+        elif label_text == "3-й этап":
+            if last_stage == "2-й полуфинал":
+                my_win.label_103.setText("1-й финал")
+                fin = "1-й финал"
+            elif last_stage == "1-й финал":
+                my_win.label_103.setText("2-й финал")
+                fin = "2-й финал"
+        elif label_text == "4-й этап":
+            my_win.label_104.setText("1-й финал")
+            fin = "2-й финал"
+
+
     elif sender == my_win.comboBox_table_3:
         cur_index = my_win.comboBox_table_3.currentIndex()
         ct = my_win.comboBox_etap.currentText()
@@ -6710,7 +6721,7 @@ def kol_player_in_final():
         # возвращает из функции несколько значения в списке
     list_pl_final = total_game_table(kpt, fin, pv, cur_index=0)
     if ok: # заполняет этапы значениями (label)
-        if sender == my_win.comboBox_table or fin == "1-й полуфинал":
+        if sender == my_win.comboBox_table_1 or fin == "1-й полуфинал":
             my_win.label_27.show()
                 # пишет кол-во игр 2-ого этапа
             my_win.label_27.setText(list_pl_final[3])
@@ -6722,7 +6733,7 @@ def kol_player_in_final():
             # my_win.comboBox_etap.clear()
             # my_win.comboBox_etap.addItems(stages2)
             # my_win.label_10.setText("3-й этап")
-        elif sender == my_win.comboBox_table_1 or fin == "2-й полуфинал":
+        elif sender == my_win.comboBox_table_2 or fin == "2-й полуфинал":
             my_win.label_30.setText(list_pl_final[3])
             my_win.label_30.show()
             my_win.label_31.setText(list_pl_final[0])
@@ -6733,7 +6744,7 @@ def kol_player_in_final():
             # my_win.comboBox_etap.clear()
             # my_win.comboBox_etap.addItems(stages3)
             # my_win.label_10.setText("4-й этап")
-        elif sender == my_win.comboBox_table_2:
+        elif sender == my_win.comboBox_table_3:
             my_win.label_53.setText(list_pl_final[3])
             my_win.label_53.show()
             my_win.label_61.setText(list_pl_final[0])
@@ -6741,8 +6752,8 @@ def kol_player_in_final():
             if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
                 my_win.statusbar.showMessage("Система создана.", 10000)
             else:
-                my_win.comboBox_table_2.hide()
-        elif sender == my_win.comboBox_table_3:
+                my_win.comboBox_table_3.hide()
+        elif sender == my_win.comboBox_table_4:
             my_win.label_58.setText(list_pl_final[3])
             my_win.label_58.show()
             my_win.label_62.setText(list_pl_final[0])
@@ -10424,7 +10435,7 @@ my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 
 fir_window.comboBox.currentTextChanged.connect(change_sroki)
-my_win.comboBox_table.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_1.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_1.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_2.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_3.currentTextChanged.connect(kol_player_in_final)
