@@ -6035,7 +6035,6 @@ def etap_made():
         return
     if etap == "Предварительный":
         kol_player_in_group() # кол-во участников в группах
-    # elif etap == "Полуфиналы" or etap == "Финальный":
     elif etap == "Финальный":
         total_game_table(kpt=0, fin="", pv="", cur_index=0) # сколько игр в финале или пф       
         # суммирует все игры этапов    
@@ -6055,6 +6054,7 @@ def etap_made():
 
 def total_game_table(kpt, fin, pv, cur_index):
     """количество участников и кол-во игр"""
+    sender = my_win.sender()
     sum_player = [0]
     etap_text = my_win.comboBox_etap.currentText()
     flag_visible = my_win.checkBox_visible_game.isChecked()
@@ -6063,6 +6063,8 @@ def total_game_table(kpt, fin, pv, cur_index):
         if sys.stage == "Предварительный":
             total_player = sys.total_athletes
             total_gr = sys.total_group
+        elif sys.stage == "1-й полуфинал" or sys.stage == "2-й полуфинал":
+            pass
         else: # вставить подсчет только финалов
             fin_player = sys.max_player
             sum_player.append(fin_player)
@@ -6072,6 +6074,20 @@ def total_game_table(kpt, fin, pv, cur_index):
             vt = "группы"
             type_table = "группы"
         elif etap_text == "Финальный" or etap_text == "Суперфинал":
+           # определить правильный индекс комбококса
+            if sender == my_win.combobBox_etap_2():
+                cur_index = my_win.comboBox_etap_2.currentIndex()
+            elif sender == my_win.combobBox_etap_3():
+                cur_index = my_win.comboBox_etap_3.currentIndex()
+            elif sender == my_win.combobBox_etap_4():
+                cur_index = my_win.comboBox_etap_4.currentIndex()
+            elif sender == my_win.combobBox_etap_5():
+                cur_index = my_win.comboBox_etap_5.currentIndex()
+            elif sender == my_win.combobBox_etap_6():
+                cur_index = my_win.comboBox_etap_6.currentIndex()
+            elif sender == my_win.combobBox_etap_7():
+                cur_index = my_win.comboBox_etap_7.currentIndex()
+
             if cur_index == 0:
                 vt = "Сетка (-2) на"
                 my_win.comboBox_page_vid.setCurrentText("книжная")
@@ -6652,7 +6668,8 @@ def kol_player_in_final():
     fin = ""
     exit_stage = ""
     label_text = my_win.label_10.text()
-    if sender == my_win.comboBox_table_1:
+    # if sender == my_win.comboBox_table_1:
+    if my_win.comboBox_etap.currentText() == "Одна таблица":
         if my_win.comboBox_table_1.currentText() == "Круговая система":
             kol_game = count * (count - 1) // 2
             my_win.label_50.show()
@@ -6686,6 +6703,7 @@ def kol_player_in_final():
         exit_stage = "группы"  
     elif my_win.comboBox_etap.currentText() == "Финальный":
         if label_text == "2-й этап":
+            cur_index = my_win.comboBox_table_2.currentIndex()
             my_win.label_102.setText("1-й финал")
             fin = "1-й финал"
         elif label_text == "3-й этап":
@@ -6695,10 +6713,27 @@ def kol_player_in_final():
             elif last_stage == "1-й финал":
                 my_win.label_103.setText("2-й финал")
                 fin = "2-й финал"
+            cur_index = my_win.comboBox_table_3.currentIndex()    
         elif label_text == "4-й этап":
+            cur_index = my_win.comboBox_table_4.currentIndex()
             my_win.label_104.setText("1-й финал") # уже установлен
             fin = "1-й финал"
             exit_stage = "1-й полуфинал" # уточнить откуда выходят в финал
+        elif label_text == "5-й этап":
+            cur_index = my_win.comboBox_table_5.currentIndex()
+            # txt = my_win.label_104.text() 
+            znak = last_stage.find("-") 
+            fin = int(last_stage[:znak])
+            final = f"{fin + 1}-й финал"    
+            my_win.label_105.setText(final)
+            my_win.label_10.setText("5-й этап")
+            my_win.label_105.show()
+            kol_player_in_final() 
+            my_win.label_105.setText(final) # уже установлен
+            fin = final
+            exit_stage = "1-й полуфинал" # уточнить откуда выходят в финал
+
+
 
     elif sender == my_win.comboBox_table_3:
         cur_index = my_win.comboBox_table_3.currentIndex()
