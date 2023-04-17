@@ -6090,12 +6090,14 @@ def total_game_table(exit_stage, kpt, fin, pv, cur_index):
         if fin_type == "круг" or fin_type == "сетка":
             fin_player = sys.max_player
             sum_player.append(fin_player)
+
         sum_pl = sum(sum_player)
     if kpt != 0:  # подсчет кол-во игр из выбора кол-ва игроков вышедших из группы и системы финала
         if etap_text == "Полуфиналы":
             vt = "группы"
             type_table = "группы"
-            player_in_final = total_gr // 2 * kpt * 2 # колво участников в полуфинале
+            gr_pf = total_gr // 2
+            player_in_final = gr_pf * kpt * 2 # колво участников в полуфинале
         elif etap_text == "Финальный" or etap_text == "Суперфинал":
             cur_index = current_index_combobox_table(sender)
             if cur_index == 1:
@@ -6120,6 +6122,8 @@ def total_game_table(exit_stage, kpt, fin, pv, cur_index):
 
             player_in_final = total_gr * kpt # колво участников в конкретном финале    
             all_player_in_final = player_in_final + sum_pl # общее кол-во спортсменов во всех финалах
+            # str_setka = f"{vt} {player_in_final} участников"
+            # total_gr = 0
 
             if all_player_in_final > player_in_final:
                 balance = player_in_final - sum_pl
@@ -6266,25 +6270,13 @@ def made_system_load_combobox_etap():
         elif  label_text == "4-й этап": 
             real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
             combobox_etap_compare(real_list)
-            # txt = my_win.label_104.text() 
-            # znak = txt.find("-") 
-            # fin = int(txt[:znak])
-            # final = f"{fin + 1}-й финал"    
-            # my_win.label_105.setText(final)
             my_win.label_105.show()
             my_win.label_10.setText("5-й этап")
-            # kol_player_in_final() 
         elif  label_text == "5-й этап": 
             real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
             combobox_etap_compare(real_list)
-            # txt = my_win.label_104.text() 
-            # znak = txt.find("-") 
-            # fin = int(txt[:znak])
-            # final = f"{fin + 1}-й финал"    
-            # my_win.label_106.setText(final)
             my_win.label_106.show()
             my_win.label_10.setText("6-й этап")
-            # kol_player_in_final()
         my_win.comboBox_etap.setCurrentText("-выбор этапа-")     
     else:   # выбор значения из комбобокса создания этапов
         if ct == "Одна таблица":
