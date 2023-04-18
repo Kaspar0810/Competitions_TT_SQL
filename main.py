@@ -6124,10 +6124,10 @@ def total_game_table(exit_stage, kpt, fin, pv, cur_index):
             all_player_in_final = player_in_final + sum_pl # общее кол-во спортсменов во всех финалах
             # str_setka = f"{vt} {player_in_final} участников"
             # total_gr = 0
-
-            if all_player_in_final > player_in_final:
-                balance = player_in_final - sum_pl
-                player_in_final = balance
+        # ==== не понятно =============
+            # if all_player_in_final > player_in_final:
+            #     balance = player_in_final - sum_pl
+            #     player_in_final = balance
         # == уточнить если в группах не равное кол-во участников то и в финале не будет выход из группы умножить на колво групп
 
         total_games = numbers_of_games(cur_index, player_in_final, kpt) # подсчет кол-во игр
@@ -6757,13 +6757,23 @@ def kol_player_in_final():
             fin = "1-й финал"
             my_win.label_104.setText(fin) # уже установлен
         elif label_text == "5-й этап":
-            exit_stage = "1-й полуфинал" # уточнить откуда выходят в финал
+            exit_stage = "2-й полуфинал" # уточнить откуда выходят в финал
             max_exit_group = max_exit_player_out_in_group(exit_stage)
             cur_index = my_win.comboBox_table_5.currentIndex()
             znak = last_stage.find("-") 
             fin = int(last_stage[:znak])
-            final = f"{fin + 1}-й финал"    
-            my_win.label_105.setText(final)
+            final = f"{fin + 1}-й финал" 
+            fin = final   
+            my_win.label_105.setText(fin)
+        elif label_text == "6-й этап":
+            exit_stage = "2-й полуфинал" # уточнить откуда выходят в финал
+            max_exit_group = max_exit_player_out_in_group(exit_stage)
+            cur_index = my_win.comboBox_table_6.currentIndex()
+            znak = last_stage.find("-") 
+            fin = int(last_stage[:znak])
+            final = f"{fin + 1}-й финал" 
+            fin = final   
+            my_win.label_106.setText(fin)
     
 
 
