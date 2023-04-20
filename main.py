@@ -6694,7 +6694,7 @@ def max_player_and_exit_stage(etap):
     etap_dict = {}
     system = System.select().where(System.title_id == title_id())
     i = 0
-    for k in system: # получение словаря этапаов
+    for k in system: # получение словаря этапов
         i += 1
         etap_system = k.stage
         etap_dict[i] = etap_system
@@ -6712,14 +6712,15 @@ def max_player_and_exit_stage(etap):
     if number_etap == 2:
         if etap == "Полуфиналы":
             fin = "1-й полуфинал"
-            max_pl = system_last.max_player
+            max_pl = system_last.max_player # максимальное допустимое число игроков при выборе в комбобоксе
         elif etap == "Финальный":
             fin = "1-й финал"
-        exit_stage = "группы"
+        exit_stage = "группы" # откудоа попдают в полуфинал игроки
     elif number_etap == 3:
         if etap == "Полуфиналы":
             fin = "2-й полуфинал"
-            max_pl = max_player_in_group - (player // group // 2) # максимальное число игроков в комбобоксе
+            # max_pl = max_player_in_group - (player // group // 2) # максимальное число игроков в комбобоксе
+            max_pl = max_player_in_group - mesta_exit # максимальное число игроков в комбобоксе минус игроки из 1-ого пф
         elif etap == "Финальный":
             fin = "1-й финал"
         exit_stage = "группы"
@@ -6810,14 +6811,14 @@ def kol_player_in_final():
             my_win.label_50.setText(f"{count} человек в сетке.")
             my_win.comboBox_table_1.hide()
     elif my_win.comboBox_etap.currentText() == "Полуфиналы":
-        stage = "Предварительный"
+        # stage = "Предварительный"
         etap = my_win.comboBox_etap.currentText()
         exit_player_stage = max_player_and_exit_stage(etap)
         max_exit_group = exit_player_stage[0]
         exit_stage = exit_player_stage[1]
         fin = exit_player_stage[2]
     elif my_win.comboBox_etap.currentText() == "Финальный":
-        stage = "Полуфиналы"
+        # stage = "Полуфиналы"
         etap = my_win.comboBox_etap.currentText()
         exit_player_stage = max_player_and_exit_stage(etap)
         max_exit_group = exit_player_stage[0]
@@ -6837,7 +6838,7 @@ def kol_player_in_final():
                 fin = "2-й финал"
             cur_index = my_win.comboBox_table_3.currentIndex()    
         elif label_text == "4-й этап":
-            stage = my_win.comboBox_etap.currentText()
+            # stage = my_win.comboBox_etap.currentText()
             exit_player_stage = max_player_and_exit_stage(etap)
             max_exit_group = exit_player_stage[0]
             exit_stage = exit_player_stage[1]
