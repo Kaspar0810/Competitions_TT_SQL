@@ -6715,11 +6715,10 @@ def max_player_and_exit_stage(etap):
             max_pl = system_last.max_player # максимальное допустимое число игроков при выборе в комбобоксе
         elif etap == "Финальный":
             fin = "1-й финал"
-        exit_stage = "группы" # откудоа попдают в полуфинал игроки
+        exit_stage = "группы" # откуда попадают в полуфинал игроки
     elif number_etap == 3:
         if etap == "Полуфиналы":
             fin = "2-й полуфинал"
-            # max_pl = max_player_in_group - (player // group // 2) # максимальное число игроков в комбобоксе
             max_pl = max_player_in_group - mesta_exit # максимальное число игроков в комбобоксе минус игроки из 1-ого пф
         elif etap == "Финальный":
             fin = "1-й финал"
@@ -6734,31 +6733,41 @@ def max_player_and_exit_stage(etap):
             exit_stage = "группы"
             max_pl = system_last.max_player 
     elif number_etap == 5:
-        if last_etap == "1-й финал":
-            system_exit = system.select().where(System.stage == stage_exit).get()
-            total_group = system_exit.total_group # колво групп полуфиналов
-            player_in_pf = player // total_group # сколько игроков в полуфинале
-            ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
-            fin = "2-й финал"
-            if ostatok == 0:
-                exit_stage = "2-й полуфинал"
-                max_pl = system_last.max_player 
-            else:
-                exit_stage = "1-й полуфинал"
-                max_pl = ostatok 
+        fin = number_final(last_etap)
+        system_exit = system.select().where(System.stage == stage_exit).get()
+        total_group = system_exit.total_group # колво групп полуфиналов
+        player_in_pf = player // total_group # сколько игроков в полуфинале
+        ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
+        if ostatok == 0:
+            exit_stage = "2-й полуфинал"
+            max_pl = system_last.max_player 
+        else:
+            exit_stage = "1-й полуфинал"
+            max_pl = ostatok 
     elif number_etap == 6:
-        if last_etap == "2-й финал":
-            system_exit = system.select().where(System.stage == stage_exit).get()
-            total_group = system_exit.total_group # колво групп полуфиналов
-            player_in_pf = player // total_group # сколько игроков в полуфинале
-            ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
-            fin = "3-й финал"
-            if ostatok == 0:
-                exit_stage = "группы"
-                max_pl = system_last.max_player 
-            else:
-                exit_stage = "2-й полуфинал"
-                max_pl = ostatok 
+        fin = number_final(last_etap)
+        system_exit = system.select().where(System.stage == stage_exit).get()
+        total_group = system_exit.total_group # колво групп полуфиналов
+        player_in_pf = player // total_group # сколько игроков в полуфинале
+        ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
+        if ostatok == 0:
+            exit_stage = "группы"
+            max_pl = system_last.max_player 
+        else:
+            exit_stage = "2-й полуфинал"
+            max_pl = ostatok 
+    elif number_etap == 7:
+        fin = number_final(last_etap)
+        system_exit = system.select().where(System.stage == stage_exit).get()
+        total_group = system_exit.total_group # колво групп полуфиналов
+        player_in_pf = player // total_group # сколько игроков в полуфинале
+        ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
+        if ostatok == 0:
+            exit_stage = "группы"
+            max_pl = system_last.max_player 
+        else:
+            exit_stage = "2-й полуфинал"
+            max_pl = ostatok 
 
     exit_player_stage.append(max_pl)
     exit_player_stage.append(exit_stage)
@@ -6767,9 +6776,24 @@ def max_player_and_exit_stage(etap):
     return exit_player_stage
 
 
-def exit_stage_and_number_in_group():
+def number_final(last_etap):
     """находит этап откуда выходит в финал"""
-    pass
+    znak = last_etap.find("-") 
+    fin_num = int(last_etap[:znak])
+    fin = f"{fin_num + 1}-й финал"
+    return fin
+    # system_exit = system.select().where(System.stage == stage_exit).get()
+    # total_group = system_exit.total_group # колво групп полуфиналов
+    # player_in_pf = player // total_group # сколько игроков в полуфинале
+    # ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
+    #         fin = "2-й финал"
+    # if ostatok == 0:
+    #     exit_stage = "2-й полуфинал"
+    #     max_pl = system_last.max_player 
+    # else:
+    #     exit_stage = "1-й полуфинал"
+    #     max_pl = ostatok 
+    
 
 
 def kol_player_in_final():
