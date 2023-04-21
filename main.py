@@ -6691,16 +6691,21 @@ def max_player_and_exit_stage(etap):
     """определяет максимальное число спортсменов в комбобоксе и стадию откуда выход в финал
     etap - текущий этап, stage - предыдущий этап, label_text - номер этапа"""
     exit_player_stage = []
+    etap_list = []
     etap_dict = {}
     system = System.select().where(System.title_id == title_id())
     i = 0
     for k in system: # получение словаря этапов
         i += 1
         etap_system = k.stage
-        etap_dict[i] = etap_system
+        mesta_exit = k.mesta_exit
+        etap_list.append(etap_system)
+        etap_list.append(mesta_exit)
+        etap_dict[i] = etap_list
     number_etap = i + 1
 
-    last_etap = etap_dict[i]
+    listing_etap = etap_dict[i] # список этапа (название, выход)
+    last_etap = listing_etap[0] 
     system_last = system.select().where(System.stage == last_etap).get()
     systems = system.select().where(System.stage == "Предварительный").get()
     max_player_in_group = systems.max_player
@@ -6749,10 +6754,10 @@ def max_player_and_exit_stage(etap):
         system_exit = system.select().where(System.stage == stage_exit).get()
         total_group = system_exit.total_group # колво групп полуфиналов
         player_in_pf = player // total_group # сколько игроков в полуфинале
-        ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
-        if ostatok == 0:
+        ostatok = player_in_pf - mesta_exit # сколько игроков из пф осталось и не вышили в финал
+        if ostatok == 0: # значит все игроки из полуФИНАЛОВ вышли и в финал будут сеяться игроки из групп
             exit_stage = "группы"
-            max_pl = system_last.max_player 
+            max_pl = max_player_in_group - system_last.max_player 
         else:
             exit_stage = "2-й полуфинал"
             max_pl = ostatok 
