@@ -3603,77 +3603,77 @@ def focus():
     if tab == 3:
         sys = system.select().where(System.stage == "Предварительный").get()
         sf = sys.score_flag  # флаг из скольки партий играется матч
-        if sender == my_win.lineEdit_pl1_s1:
-            if my_win.lineEdit_pl1_s1.text() == "":
+        if sender == my_win.lineEdit_pl1_s1_gr:
+            if my_win.lineEdit_pl1_s1_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl1_s1.setFocus()
+                my_win.lineEdit_pl1_s1_gr.setFocus()
             else:
-                my_win.lineEdit_pl2_s1.setFocus()
-        elif sender == my_win.lineEdit_pl2_s1:
-            if my_win.lineEdit_pl2_s1.text() == "":
+                my_win.lineEdit_pl2_s1_gr.setFocus()
+        elif sender == my_win.lineEdit_pl2_s1_gr:
+            if my_win.lineEdit_pl2_s1_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl2_s1.setFocus()
+                my_win.lineEdit_pl2_s1_gr.setFocus()
             else:
                 sum_total_game = score_in_game()  # подсчет очков в партии
-                my_win.lineEdit_pl1_s2.setFocus()
-        elif sender == my_win.lineEdit_pl1_s2:
-            if my_win.lineEdit_pl1_s2.text() == "":
+                my_win.lineEdit_pl1_s2_gr.setFocus()
+        elif sender == my_win.lineEdit_pl1_s2_gr:
+            if my_win.lineEdit_pl1_s2_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl1_s2.setFocus()
+                my_win.lineEdit_pl1_s2_gr.setFocus()
             else:
-                my_win.lineEdit_pl2_s2.setFocus()
-        elif sender == my_win.lineEdit_pl2_s2:  # нажал ентер на счете 2-ого игрока 2-й партии
-            if my_win.lineEdit_pl2_s2.text() == "":
+                my_win.lineEdit_pl2_s2_gr.setFocus()
+        elif sender == my_win.lineEdit_pl2_s2_gr:  # нажал ентер на счете 2-ого игрока 2-й партии
+            if my_win.lineEdit_pl2_s2_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl2_s2.setFocus()
+                my_win.lineEdit_pl2_s2_gr.setFocus()
             else:
                 sum_total_game = score_in_game()
                 if sum_total_game[0] != sum_total_game[1]:
                     my_win.lineEdit_pl1_s3.setFocus()
                 else:
                     my_win.Button_Ok_gr.setFocus()
-        elif sender == my_win.lineEdit_pl1_s3:
-            if my_win.lineEdit_pl1_s3.text() == "":
+        elif sender == my_win.lineEdit_pl1_s3_gr:
+            if my_win.lineEdit_pl1_s3_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl1_s3.setFocus()
+                my_win.lineEdit_pl1_s3_gr.setFocus()
             else:
-                my_win.lineEdit_pl2_s3.setFocus()
-        elif sender == my_win.lineEdit_pl2_s3:  # нажал ентер на счете 2-ого игрока 3-й партии
-            if my_win.lineEdit_pl2_s3.text() == "":
+                my_win.lineEdit_pl2_s3_gr.setFocus()
+        elif sender == my_win.lineEdit_pl2_s3_gr:  # нажал ентер на счете 2-ого игрока 3-й партии
+            if my_win.lineEdit_pl2_s3_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl2_s3.setFocus()
+                my_win.lineEdit_pl2_s3_gr.setFocus()
             else:
                 sum_total_game = score_in_game()
                 if sum_total_game[0] != sum_total_game[1]:
-                    my_win.lineEdit_pl1_s4.setFocus()
+                    my_win.lineEdit_pl1_s4_gr.setFocus()
                 else:
                     my_win.Button_Ok_gr.setFocus()
-        elif sender == my_win.lineEdit_pl1_s4:
-            if my_win.lineEdit_pl1_s4.text() == "":
+        elif sender == my_win.lineEdit_pl1_s4_gr:
+            if my_win.lineEdit_pl1_s4_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl1_s4.setFocus()
+                my_win.lineEdit_pl1_s4_gr.setFocus()
             else:
-                my_win.lineEdit_pl2_s4.setFocus()
-        elif sender == my_win.lineEdit_pl2_s4:  # нажал ентер на счете 2-ого игрока 4-й партии
+                my_win.lineEdit_pl2_s4_gr.setFocus()
+        elif sender == my_win.lineEdit_pl2_s4_gr:  # нажал ентер на счете 2-ого игрока 4-й партии
             if my_win.lineEdit_pl2_s4.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl2_s4.setFocus()
+                my_win.lineEdit_pl2_s4_gr.setFocus()
             else:
                 sum_total_game = score_in_game()
                 if sum_total_game[0] != sum_total_game[1]:
-                    my_win.lineEdit_pl1_s5.setFocus()
+                    my_win.lineEdit_pl1_s5_gr.setFocus()
                 else:
                     my_win.Button_Ok_gr.setFocus()
-        elif sender == my_win.lineEdit_pl1_s5:
-            if my_win.lineEdit_pl1_s5.text() == "":
+        elif sender == my_win.lineEdit_pl1_s5_gr:
+            if my_win.lineEdit_pl1_s5_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl1_s5.setFocus()
+                my_win.lineEdit_pl1_s5_gr.setFocus()
             else:
-                my_win.lineEdit_pl2_s5.setFocus()
-        elif sender == my_win.lineEdit_pl2_s5:  # нажал ентер на счете 2-ого игрока 5-й партии
-            if my_win.lineEdit_pl2_s5.text() == "":
+                my_win.lineEdit_pl2_s5_gr.setFocus()
+        elif sender == my_win.lineEdit_pl2_s5_gr:  # нажал ентер на счете 2-ого игрока 5-й партии
+            if my_win.lineEdit_pl2_s5_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
-                my_win.lineEdit_pl2_s5.setFocus()
+                my_win.lineEdit_pl2_s5_gr.setFocus()
             else:
                 sum_total_game = score_in_game()
                 if sum_total_game[0] != sum_total_game[1]:
@@ -3808,20 +3808,20 @@ def score_in_game():
         sys = system.select().where(System.stage == "Предварительный").get()
         sf = sys.score_flag  # флаг из скольки партий играется матч
         # ==========
-        s11 = my_win.lineEdit_pl1_s1.text()
-        s21 = my_win.lineEdit_pl2_s1.text()
-        s12 = my_win.lineEdit_pl1_s2.text()
-        s22 = my_win.lineEdit_pl2_s2.text()
-        s13 = my_win.lineEdit_pl1_s3.text()
-        s23 = my_win.lineEdit_pl2_s3.text()
-        s14 = my_win.lineEdit_pl1_s4.text()
-        s24 = my_win.lineEdit_pl2_s4.text()
-        s15 = my_win.lineEdit_pl1_s5.text()
-        s25 = my_win.lineEdit_pl2_s5.text()
-        s16 = my_win.lineEdit_pl1_s6.text()
-        s26 = my_win.lineEdit_pl2_s6.text()
-        s17 = my_win.lineEdit_pl1_s7.text()
-        s27 = my_win.lineEdit_pl2_s7.text()
+        s11 = my_win.lineEdit_pl1_s1_gr.text()
+        s21 = my_win.lineEdit_pl2_s1_gr.text()
+        s12 = my_win.lineEdit_pl1_s2_gr.text()
+        s22 = my_win.lineEdit_pl2_s2_gr.text()
+        s13 = my_win.lineEdit_pl1_s3_gr.text()
+        s23 = my_win.lineEdit_pl2_s3_gr.text()
+        s14 = my_win.lineEdit_pl1_s4_gr.text()
+        s24 = my_win.lineEdit_pl2_s4_gr.text()
+        s15 = my_win.lineEdit_pl1_s5_gr.text()
+        s25 = my_win.lineEdit_pl2_s5_gr.text()
+        s16 = my_win.lineEdit_pl1_s6_gr.text()
+        s26 = my_win.lineEdit_pl2_s6_gr.text()
+        s17 = my_win.lineEdit_pl1_s7_gr.text()
+        s27 = my_win.lineEdit_pl2_s7_gr.text()
     elif tab == 4:
         pass
     elif tab == 5:
