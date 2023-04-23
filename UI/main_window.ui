@@ -868,7 +868,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1015,7 +1015,7 @@
        <property name="font">
         <font>
          <family>Times New Roman</family>
-         <pointsize>14</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
@@ -1387,25 +1387,6 @@
         <string>Этапы соревнования - </string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_77">
-       <property name="geometry">
-        <rect>
-         <x>247</x>
-         <y>135</y>
-         <width>315</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_78">
        <property name="geometry">
         <rect>
@@ -1500,25 +1481,6 @@
          <x>571</x>
          <y>135</y>
          <width>70</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_83">
-       <property name="geometry">
-        <rect>
-         <x>247</x>
-         <y>113</y>
-         <width>315</width>
          <height>20</height>
         </rect>
        </property>
