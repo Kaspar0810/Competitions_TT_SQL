@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -1825,7 +1825,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
       </widget>
@@ -1840,7 +1840,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
       </widget>
@@ -2450,7 +2450,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
       </widget>
@@ -2465,7 +2465,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <pointsize>14</pointsize>
         </font>
        </property>
       </widget>
