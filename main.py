@@ -3629,7 +3629,7 @@ def focus():
             else:
                 sum_total_game = score_in_game()
                 if sum_total_game[0] != sum_total_game[1]:
-                    my_win.lineEdit_pl1_s3.setFocus()
+                    my_win.lineEdit_pl1_s3_gr.setFocus()
                 else:
                     my_win.Button_Ok_gr.setFocus()
         elif sender == my_win.lineEdit_pl1_s3_gr:
@@ -3655,7 +3655,7 @@ def focus():
             else:
                 my_win.lineEdit_pl2_s4_gr.setFocus()
         elif sender == my_win.lineEdit_pl2_s4_gr:  # нажал ентер на счете 2-ого игрока 4-й партии
-            if my_win.lineEdit_pl2_s4.text() == "":
+            if my_win.lineEdit_pl2_s4_gr.text() == "":
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!")
                 my_win.lineEdit_pl2_s4_gr.setFocus()
             else:
@@ -3906,8 +3906,8 @@ def score_in_game():
                 st2 = sum(ts2)
                 # ==============
                 if tab == 3:
-                    my_win.lineEdit_pl1_score_total.setText(str(st1))
-                    my_win.lineEdit_pl2_score_total.setText(str(st2))
+                    my_win.lineEdit_pl1_score_total_gr.setText(str(st1))
+                    my_win.lineEdit_pl2_score_total_gr.setText(str(st2))
                     if st1 == max_game or st2 == max_game:  # сравнивает максимальное число очков и набранные очки одним из игроков
                         # если игрок набрал макс очки активиоует кнопку ОК и переводит на нее фокус
                         my_win.Button_Ok_gr.setEnabled(True)
@@ -4035,8 +4035,8 @@ def enter_score(none_player=0):
     if my_win.lineEdit_player1_fin.text() != "X" and my_win.lineEdit_player2_fin.text() != "X":
         if st1 > st2 or none_player == 2:  # выиграл 1-й участник
             if tab == 3:
-                winner = my_win.lineEdit_player1.text()
-                loser = my_win.lineEdit_player2.text()
+                winner = my_win.lineEdit_player1_gr.text()
+                loser = my_win.lineEdit_player2_gr.text()
             elif tab == 4:
                 pass
             elif tab == 5:
@@ -4046,8 +4046,8 @@ def enter_score(none_player=0):
             ts_loser = f"{st2} : {st1}"
         else:  # выиграл 2-й участник
             if tab == 3:  # игры в подгруппах
-                winner = my_win.lineEdit_player2.text()
-                loser = my_win.lineEdit_player1.text()
+                winner = my_win.lineEdit_player2_gr.text()
+                loser = my_win.lineEdit_player1_gr.text()
             elif tab == 4:
                 pass
             elif tab == 5:  # игры в финалах
@@ -4130,20 +4130,20 @@ def enter_score(none_player=0):
     fill_table_results()
 
     if tab == 3:
-        my_win.lineEdit_pl1_s1.setText("")  # очищает поля ввода счета в партии
-        my_win.lineEdit_pl2_s1.setText("")
-        my_win.lineEdit_pl1_s2.setText("")
-        my_win.lineEdit_pl2_s2.setText("")
-        my_win.lineEdit_pl1_s3.setText("")
-        my_win.lineEdit_pl2_s3.setText("")
-        my_win.lineEdit_pl1_s4.setText("")
-        my_win.lineEdit_pl2_s4.setText("")
-        my_win.lineEdit_pl1_s5.setText("")
-        my_win.lineEdit_pl2_s5.clear()
-        my_win.lineEdit_pl1_score_total.clear()  # очищает поля общего счета
-        my_win.lineEdit_pl2_score_total.clear()
-        my_win.lineEdit_player1.clear()  # очищает поля фамилии игроков
-        my_win.lineEdit_player2.clear()
+        my_win.lineEdit_pl1_s1_gr.clear()  # очищает поля ввода счета в партии
+        my_win.lineEdit_pl2_s1_gr.clear()
+        my_win.lineEdit_pl1_s2_gr.clear()
+        my_win.lineEdit_pl2_s2_gr.clear()
+        my_win.lineEdit_pl1_s3_gr.clear()
+        my_win.lineEdit_pl2_s3_gr.clear()
+        my_win.lineEdit_pl1_s4_gr.clear()
+        my_win.lineEdit_pl2_s4_gr.clear()
+        my_win.lineEdit_pl1_s5_gr.clear()
+        my_win.lineEdit_pl2_s5_gr.clear()
+        my_win.lineEdit_pl1_score_total_gr.clear()  # очищает поля общего счета
+        my_win.lineEdit_pl2_score_total_gr.clear()
+        my_win.lineEdit_player1_gr.clear()  # очищает поля фамилии игроков
+        my_win.lineEdit_player2_gr.clear()
         fin = my_win.tableWidget.item(r, 1).text()
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
@@ -4242,8 +4242,8 @@ def circle_type(none_player, stage):
     l = ""
     if stage == "Предварительный":
         if none_player == 0:
-            st1 = int(my_win.lineEdit_pl1_score_total.text())
-            st2 = int(my_win.lineEdit_pl2_score_total.text())
+            st1 = int(my_win.lineEdit_pl1_score_total_gr.text())
+            st2 = int(my_win.lineEdit_pl2_score_total_gr.text())
             w = 2
             l = 1
         else:
@@ -4255,8 +4255,8 @@ def circle_type(none_player, stage):
                 st2 = "П"
             w = 2
             l = 0
-            my_win.lineEdit_pl1_score_total.setText(st1)
-            my_win.lineEdit_pl2_score_total.setText(st2)
+            my_win.lineEdit_pl1_score_total_gr.setText(st1)
+            my_win.lineEdit_pl2_score_total_gr.setText(st2)
     # elif stage == "Финальный" or stage == "Одна таблица":
     else:
         if none_player == 0:
@@ -4303,18 +4303,18 @@ def string_score_game():
                 break
     if tab == 3:
         # поля ввода счета в партии
-        st1 = int(my_win.lineEdit_pl1_score_total.text())
-        st2 = int(my_win.lineEdit_pl2_score_total.text())
-        s11 = my_win.lineEdit_pl1_s1.text()
-        s21 = my_win.lineEdit_pl2_s1.text()
-        s12 = my_win.lineEdit_pl1_s2.text()
-        s22 = my_win.lineEdit_pl2_s2.text()
-        s13 = my_win.lineEdit_pl1_s3.text()
-        s23 = my_win.lineEdit_pl2_s3.text()
-        s14 = my_win.lineEdit_pl1_s4.text()
-        s24 = my_win.lineEdit_pl2_s4.text()
-        s15 = my_win.lineEdit_pl1_s5.text()
-        s25 = my_win.lineEdit_pl2_s5.text()
+        st1 = int(my_win.lineEdit_pl1_score_total_gr.text())
+        st2 = int(my_win.lineEdit_pl2_score_total_gr.text())
+        s11 = my_win.lineEdit_pl1_s1_gr.text()
+        s21 = my_win.lineEdit_pl2_s1_gr.text()
+        s12 = my_win.lineEdit_pl1_s2_gr.text()
+        s22 = my_win.lineEdit_pl2_s2_gr.text()
+        s13 = my_win.lineEdit_pl1_s3_gr.text()
+        s23 = my_win.lineEdit_pl2_s3_gr.text()
+        s14 = my_win.lineEdit_pl1_s4_gr.text()
+        s24 = my_win.lineEdit_pl2_s4_gr.text()
+        s15 = my_win.lineEdit_pl1_s5_gr.text()
+        s25 = my_win.lineEdit_pl2_s5_gr.text()
     elif tab == 4:
         pass
     elif tab == 5:
@@ -6309,13 +6309,13 @@ def made_system_load_combobox_etap():
                 last_etap = my_win.label_103.text() 
                 if last_etap == "2-й полуфинал":
                     my_win.label_104.setText("1-й финал")
-                    my_win.comboBox_table_4.show()
                 else: 
                     txt = my_win.label_103.text()
                     znak = txt.find("-") 
                     fin = int(txt[:znak])
                     final = f"{fin + 1}-й финал"    
                     my_win.label_104.setText(final)
+                my_win.comboBox_table_4.show()
             elif label_text == "5-й этап":
                     txt = my_win.label_104.text()
                     znak = txt.find("-") 
@@ -6684,12 +6684,14 @@ def clear_del_player():
 
 def max_player_and_exit_stage(etap):
     """определяет максимальное число спортсменов в комбобоксе и стадию откуда выход в финал
-    etap - текущий этап, stage - предыдущий этап, label_text - номер этапа, mx_pl - максимальное число в комбобоксе"""
+    etap - текущий этап, stage - предыдущий этап, label_text - номер этапа, mx_pl - максимальное число в комбобоксе
+    # etap_list список [этап, кол-во игроков, из какого этапа вышли"""
     exit_player_stage = []
     etap_list = []
     etap_list_tmp = []
     total_stage = []
     etap_dict = {}
+    ostatok_etap = {}
     system = System.select().where(System.title_id == title_id())
     i = 0
     for k in system: # получение словаря этапов
@@ -6704,6 +6706,7 @@ def max_player_and_exit_stage(etap):
         etap_list = etap_list_tmp.copy()
         etap_list_tmp.clear()
         etap_dict[i] = etap_list
+        ostatok_etap[etap_system] = 0
     number_etap = i + 1
 
     listing_etap = etap_dict[i] # список этапа (название, выход)
@@ -6715,6 +6718,11 @@ def max_player_and_exit_stage(etap):
     player = system_last.max_player
     mesta_exit = listing_etap[1]
     stage_exit = listing_etap[2]
+    
+    for p in system:
+        etap_system = p.stage
+        max_player_in_group = p.max_player 
+    ostatok_etap[etap_system] = max_player_in_group
 
     if number_etap == 2:
         if etap == "Полуфиналы":
@@ -6727,13 +6735,32 @@ def max_player_and_exit_stage(etap):
         if etap == "Полуфиналы":
             fin = "2-й полуфинал"
             max_pl = max_player_in_group - mesta_exit # максимальное число игроков в комбобоксе минус игроки из 1-ого пф
+            exit_stage = "Предварительный"
         elif etap == "Финальный":
-            fin = "1-й финал"
-        exit_stage = "Предварительный"
+            fin = "1-й финал" if "1-й полуфинал" in total_stage else "2-й финал"
+            exit_stage = "1-й полуфинал" if "1-й полуфинал" in total_stage else "Предварительный"
+            max_pl = player // group if "1-й полуфинал" in total_stage else system_last.max_player
     elif number_etap == 4:
-        fin = "1-й финал" if "2-й полуфинал" in total_stage else "2-й финал"
-        exit_stage = "1-й полуфинал" if "2-й полуфинал" in total_stage else "Предварительный"
-        max_pl = player // group if "2-й полуфинал" in total_stage else system_last.max_player
+        fin = number_final(last_etap) # текущий этап
+        system_exit = system.select().where(System.stage == stage_exit).get()
+        total_group = system_exit.total_group # колво групп полуфиналов
+        player_in_pf = player // total_group # сколько игроков в полуфинале
+        ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
+        if "2-й полуфинал" in total_stage and ostatok == 0:
+            exit_stage = "2-й полуфинал"
+            max_pl = system_last.max_player
+        elif "2-й полуфинал" in total_stage and ostatok != 0:
+            exit_stage = "1-й полуфинал"
+            max_pl = ostatok
+        elif "1-й полуфинал" in total_stage and ostatok == 0:
+            exit_stage = "Предварительный"
+            max_pl = max_player_in_group
+        elif "1-й полуфинал" in total_stage and ostatok != 0:
+            exit_stage = "1-й полуфинал"
+            max_pl = ostatok
+        # fin = "1-й финал" if "2-й полуфинал" in total_stage else "2-й финал"
+        # exit_stage = "1-й полуфинал" if "2-й полуфинал" in total_stage else "Предварительный"
+        # max_pl = player // group if "2-й полуфинал" in total_stage else system_last.max_player
     elif number_etap == 5:
         fin = number_final(last_etap) # текущий этап
         system_exit = system.select().where(System.stage == stage_exit).get()
@@ -6831,9 +6858,15 @@ def kol_player_in_final():
             my_win.label_102.setText("1-й финал")
             fin = "1-й финал"
         elif label_text == "3-й этап":
-            if last_stage == "2-й полуфинал":
-                my_win.label_103.setText("1-й финал")
-                fin = "1-й финал"
+            if last_stage == "1-й полуфинал":
+                etap = my_win.comboBox_etap.currentText()
+                exit_player_stage = max_player_and_exit_stage(etap)
+                max_exit_group = exit_player_stage[0]
+                exit_stage = exit_player_stage[1]
+                fin = exit_player_stage[2]
+                my_win.label_103.setText(fin) # уже установлен
+                # my_win.label_103.setText("1-й финал")
+                # fin = "1-й финал"
             elif last_stage == "1-й финал":
                 my_win.label_103.setText("2-й финал")
                 fin = "2-й финал"   
