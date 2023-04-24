@@ -3588,10 +3588,6 @@ def check_input_total_score(mark):
         return
                  
 
-
-
-
-
 def focus():
     """переводит фокус на следующую позицию
     sum_total_game список (1-й колво очков которые надо набрать, 2-й сколько уже набрали)"""
@@ -6682,6 +6678,23 @@ def clear_del_player():
         return
 
 
+def remains_in_group(etap_system, etap_dict):
+    """подсчет игроков в группе и полуфиналов после создания финалов"""
+    stage_dict = {}
+    number_player = 0
+    system = System.select().where(System.title_id == title_id())
+    for k  in system:
+        etap_system = k.stage
+        if etap_system == "Предварительный":
+            number_player = k.max_player
+        elif etap_system == "1-й полуфинал":
+            number_player = k.max_player // k.total_group
+        elif etap_system == "2-й полуфинал":
+            number_player = k.max_player // k.total_group
+        stage_dict[etap_system] = number_player
+    return stage_dict
+
+
 def max_player_and_exit_stage(etap):
     """определяет максимальное число спортсменов в комбобоксе и стадию откуда выход в финал
     etap - текущий этап, stage - предыдущий этап, label_text - номер этапа, mx_pl - максимальное число в комбобоксе
@@ -6708,6 +6721,7 @@ def max_player_and_exit_stage(etap):
         etap_dict[i] = etap_list
         ostatok_etap[etap_system] = 0
     number_etap = i + 1
+    dict_etap = remains_in_group(etap_system, etap_dict)
 
     listing_etap = etap_dict[i] # список этапа (название, выход)
     last_etap = listing_etap[0] 
@@ -6721,6 +6735,7 @@ def max_player_and_exit_stage(etap):
     
     for p in system:
         etap_system = p.stage
+    
         max_player_in_group = p.max_player 
     ostatok_etap[etap_system] = max_player_in_group
 
