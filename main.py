@@ -6686,14 +6686,14 @@ def remains_in_group(etap_system, etap_system_dict):
     number_player_pf2 = 0
     out_pf1 = 0
     out_pf2 = 0
+    out_f1 = 0
+    out_f2 = 0
     system = System.select().where(System.title_id == title_id())
-    count = len(system)
     for m in range(0, 2):
         for k  in system:
             etap_system = k.stage
             if etap_system == "Предварительный":
                 number_player_gr = k.max_player
-                # stage_dict[etap_system] = number_player_gr # кол-во игроков в группе
                 stage_dict[etap_system] = number_player_gr if m == 0 else number_player_gr - out_pf1 - out_pf2
             elif etap_system == "1-й полуфинал":
                 number_player_pf1 = k.max_player // k.total_group # кол-во игрок в 1-ом пф
@@ -6704,9 +6704,24 @@ def remains_in_group(etap_system, etap_system_dict):
                 out_pf2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
                 stage_dict[etap_system] = number_player_pf2
             elif etap_system == "1-й финал":
-                number_player_f1 = k.max_player // k.total_group
-                out_pf2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
-                stage_dict[etap_system] = number_player_f1
+                systems = system.select().where(System.stage == etap_system).get()
+                exit_stage = systems.stage_exit # откуда выходят в финал
+                out_f1 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+
+                if m == 1:
+                    stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f1  # сколько вышло из 1-й пф в 1-й финал
+
+                # if exit_stage == "Предварительный":
+                #     pass
+                # elif exit_stage == "1-й полуфинал":
+                #     stage_dict[exit_stage ] = stage_dict[exit_stage ] - out_f1  # сколько вышло из 1-й пф в 1-й финал
+                # elif exit_stage == "2-й полуфинал":
+                #     pass
+                # stage_dict[etap_system] = number_player_pf1 if m == 0 else number_player_pf1 - out_f1 - out_f2
+            elif etap_system == "2-й финал":
+                number_player_f2 = k.max_player
+                out_f2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+                stage_dict[etap_system] = number_player_f2
 
     # number_player_gr = number_player_gr - out_pf1 - out_pf2
     # for k in system:
@@ -6780,10 +6795,10 @@ def max_player_and_exit_stage(etap):
             max_pl = player // group if "1-й полуфинал" in total_stage else system_last.max_player
     elif number_etap == 4:
         # fin = number_final(last_etap) # текущий этап
-        system_exit = system.select().where(System.stage == stage_exit).get()
-        total_group = system_exit.total_group # колво групп полуфиналов
-        player_in_pf = player // total_group # сколько игроков в полуфинале
-        ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
+        # system_exit = system.select().where(System.stage == stage_exit).get()
+        # total_group = system_exit.total_group # колво групп полуфиналов
+        # player_in_pf = player // total_group # сколько игроков в полуфинале
+        # ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
         # if "2-й полуфинал" in total_stage and ostatok == 0:
         #     exit_stage = "2-й полуфинал"
         #     max_pl = system_last.max_player
@@ -6798,7 +6813,8 @@ def max_player_and_exit_stage(etap):
         #     max_pl = ostatok
         fin = "1-й финал" if "2-й полуфинал" in total_stage else "2-й финал"
         exit_stage = "1-й полуфинал" if "2-й полуфинал" in total_stage else "Предварительный"
-        max_pl = player // group if "2-й полуфинал" in total_stage else system_last.max_player
+        # max_pl = player // group if "2-й полуфинал" in total_stage else system_last.max_player
+        max_pl = dict_etap[exit_stage] if "2-й полуфинал" in total_stage else dict_etap[exit_stage]
     elif number_etap == 5:
         fin = number_final(last_etap) # текущий этап
         system_exit = system.select().where(System.stage == stage_exit).get()
