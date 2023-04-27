@@ -2470,7 +2470,7 @@ def system_competition():
             my_win.comboBox_table_1.hide()
             my_win.label_10.show()
             my_win.label_10.setText("1-й этап")
-            my_win.Button_etap_made.setEnabled(True)
+            my_win.Button_etap_made.setEnabled(False)
             my_win.comboBox_page_vid.setEnabled(True)
 # =======
             # made_system_load_combobox_etap()
@@ -6688,6 +6688,7 @@ def remains_in_group(etap_system, etap_system_dict):
     out_pf2 = 0
     out_f1 = 0
     out_f2 = 0
+    out_f3 = 0
     system = System.select().where(System.title_id == title_id())
     for m in range(0, 2):
         for k  in system:
@@ -6704,24 +6705,29 @@ def remains_in_group(etap_system, etap_system_dict):
                 out_pf2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
                 stage_dict[etap_system] = number_player_pf2
             elif etap_system == "1-й финал":
-                systems = system.select().where(System.stage == etap_system).get()
-                exit_stage = systems.stage_exit # откуда выходят в финал
-                out_f1 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
-
                 if m == 1:
+                    systems = system.select().where(System.stage == etap_system).get()
+                    exit_stage = systems.stage_exit # откуда выходят в финал
+                    out_f1 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
                     stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f1  # сколько вышло из 1-й пф в 1-й финал
-
-                # if exit_stage == "Предварительный":
-                #     pass
-                # elif exit_stage == "1-й полуфинал":
-                #     stage_dict[exit_stage ] = stage_dict[exit_stage ] - out_f1  # сколько вышло из 1-й пф в 1-й финал
-                # elif exit_stage == "2-й полуфинал":
-                #     pass
-                # stage_dict[etap_system] = number_player_pf1 if m == 0 else number_player_pf1 - out_f1 - out_f2
             elif etap_system == "2-й финал":
-                number_player_f2 = k.max_player
-                out_f2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
-                stage_dict[etap_system] = number_player_f2
+                if m == 1:
+                    systems = system.select().where(System.stage == etap_system).get()
+                    exit_stage = systems.stage_exit # откуда выходят в финал
+                    out_f2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+                    stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f2  # сколько вышло из 1-й пф в 2-й финал
+                # number_player_f2 = k.max_player
+                # out_f2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+                # stage_dict[etap_system] = number_player_f2
+            elif etap_system == "3-й финал":
+                if m == 1:
+                    systems = system.select().where(System.stage == etap_system).get()
+                    exit_stage = systems.stage_exit # откуда выходят в финал
+                    out_f3 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+                    stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f3  # сколько вышло из 1-й пф в 1-й финал
+                # number_player_f2 = k.max_player
+                # out_f2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+                # stage_dict[etap_system] = number_player_f2
 
     # number_player_gr = number_player_gr - out_pf1 - out_pf2
     # for k in system:
@@ -6794,48 +6800,29 @@ def max_player_and_exit_stage(etap):
             exit_stage = "1-й полуфинал" if "1-й полуфинал" in total_stage else "Предварительный"
             max_pl = player // group if "1-й полуфинал" in total_stage else system_last.max_player
     elif number_etap == 4:
-        # fin = number_final(last_etap) # текущий этап
-        # system_exit = system.select().where(System.stage == stage_exit).get()
-        # total_group = system_exit.total_group # колво групп полуфиналов
-        # player_in_pf = player // total_group # сколько игроков в полуфинале
-        # ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
-        # if "2-й полуфинал" in total_stage and ostatok == 0:
-        #     exit_stage = "2-й полуфинал"
-        #     max_pl = system_last.max_player
-        # elif "2-й полуфинал" in total_stage and ostatok != 0:
-        #     exit_stage = "1-й полуфинал"
-        #     max_pl = ostatok
-        # elif "1-й полуфинал" in total_stage and ostatok == 0:
-        #     exit_stage = "Предварительный"
-        #     max_pl = max_player_in_group
-        # elif "1-й полуфинал" in total_stage and ostatok != 0:
-        #     exit_stage = "1-й полуфинал"
-        #     max_pl = ostatok
-        fin = "1-й финал" if "2-й полуфинал" in total_stage else "2-й финал"
-        exit_stage = "1-й полуфинал" if "2-й полуфинал" in total_stage else "Предварительный"
-        # max_pl = player // group if "2-й полуфинал" in total_stage else system_last.max_player
-        max_pl = dict_etap[exit_stage] if "2-й полуфинал" in total_stage else dict_etap[exit_stage]
+        if last_etap == "2-й полуфинал":
+            fin = "1-й финал"
+            exit_stage = "1-й полуфинал"
+            max_pl = dict_etap[exit_stage]
+        elif last_etap == "1-й финал":
+            fin = "2-й финал"
+        elif last_etap == "2-й финал": 
+            fin = "3-й финал"   
     elif number_etap == 5:
         fin = number_final(last_etap) # текущий этап
-        system_exit = system.select().where(System.stage == stage_exit).get()
-        total_group = system_exit.total_group # колво групп полуфиналов
-        player_in_pf = player // total_group # сколько игроков в полуфинале
-        ostatok = player_in_pf - mesta_exit # разница сколько игроков в пф и сколько вышло в финал
-
-        exit_stage = "2-й полуфинал" if "2-й полуфинал" in total_stage else "Предварительный"
-        max_pl = ostatok if ostatok != 0 else player_in_pf
-
+        if "2-й полуфинал" in total_stage and dict_etap["1-й полуфинал"] == 0:
+            exit_stage = "2-й полуфинал"
+        elif "2-й полуфинал" in total_stage and dict_etap["1-й полуфинал"] != 0:
+            exit_stage = "1-й полуфинал"
+        elif "1-й полуфинал" in total_stage or "Предварительный" in total_stage:
+            exit_stage = "Предварительный"
+        max_pl = dict_etap[exit_stage]
     elif number_etap == 6:
         fin = number_final(last_etap)
-
-        system_exit = system.select().where(System.stage == stage_exit).get()
-        total_group = system_exit.total_group # колво групп полуфиналов
-        player_in_pf = player // total_group # сколько игроков в полуфинале
-        ostatok = player_in_pf - mesta_exit # сколько игроков из пф осталось и не вышили в финал
-
-        exit_stage = "Предварительный" if ostatok == 0 else "2-й полуфинал"
-        max_pl = ostatok if ostatok != 0 else max_player_in_group - player_in_pf
- 
+        for exit_stage in dict_etap.keys():
+            if dict_etap[exit_stage] > 0:
+                max_pl = dict_etap[exit_stage]
+                break 
     elif number_etap == 7:
         fin = number_final(last_etap)
         system_exit = system.select().where(System.stage == stage_exit).get()
@@ -6919,8 +6906,6 @@ def kol_player_in_final():
                 exit_stage = exit_player_stage[1]
                 fin = exit_player_stage[2]
                 my_win.label_103.setText(fin) # уже установлен
-                # my_win.label_103.setText("1-й финал")
-                # fin = "1-й финал"
             elif last_stage == "1-й финал":
                 my_win.label_103.setText("2-й финал")
                 fin = "2-й финал"   
@@ -6976,32 +6961,24 @@ def kol_player_in_final():
             my_win.label_60.setText(list_pl_final[0])
             my_win.label_60.show()
             my_win.comboBox_table_3.hide()
-            # if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-            #     my_win.statusbar.showMessage("Система создана.", 10000)
         elif sender == my_win.comboBox_table_4:
             my_win.label_53.setText(list_pl_final[3])
             my_win.label_53.show()
             my_win.label_61.setText(list_pl_final[0])
             my_win.label_61.show()
             my_win.comboBox_table_4.hide()
-            # if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-            #     my_win.statusbar.showMessage("Система создана.", 10000)
         elif sender == my_win.comboBox_table_5:
             my_win.label_58.setText(list_pl_final[3])
             my_win.label_58.show()
             my_win.label_62.setText(list_pl_final[0])
             my_win.label_62.show()
             my_win.comboBox_table_5.hide()
-            # if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-            #     my_win.statusbar.showMessage("Система создана.", 10000)
         elif sender == my_win.comboBox_table_6:
             my_win.label_81.setText(list_pl_final[3])
             my_win.label_81.show()
             my_win.label_84.setText(list_pl_final[0])
             my_win.label_84.show()
             my_win.comboBox_table_6.hide()
-            # if list_pl_final[2] - list_pl_final[1] == 0:  # подсчитывает все ли игроки распределены по финалам
-            #     my_win.statusbar.showMessage("Система создана.", 10000)
         my_win.Button_etap_made.setEnabled(True)
         my_win.comboBox_page_vid.setEnabled(True)
         my_win.Button_etap_made.setFocus(True)
