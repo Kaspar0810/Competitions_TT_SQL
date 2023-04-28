@@ -175,6 +175,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         v_Menu.addAction(self.view_fin2_Action)
         v_Menu.addAction(self.view_fin3_Action)
         v_Menu.addAction(self.view_fin4_Action)
+        v_Menu.addAction(self.view_fin5_Action)
+        v_Menu.addAction(self.view_fin6_Action)
+        v_Menu.addAction(self.view_fin7_Action)
+        v_Menu.addAction(self.view_fin8_Action)
 
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
@@ -226,6 +230,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin2_Action = QAction("2-финал")
         self.view_fin3_Action = QAction("3-финал")
         self.view_fin4_Action = QAction("4-финал")
+        self.view_fin5_Action = QAction("5-финал")
+        self.view_fin6_Action = QAction("6-финал")
+        self.view_fin7_Action = QAction("7-финал")
+        self.view_fin8_Action = QAction("8-финал")
         # выключает пункты меню пока не создана система
         self.choice_one_table_Action.setEnabled(False)
         self.choice_gr_Action.setEnabled(False)
@@ -240,6 +248,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin2_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin3_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin4_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.view_fin5_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.view_fin6_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.view_fin7_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.view_fin8_Action.setEnabled(False)  # делает пункт меню не видимым
         # пункты меню редактирование жеребьевки
         self.ed_one_table_Action.setEnabled(False)  # делает пункт меню не видимым
         self.ed_gr_Action.setEnabled(False)  # делает пункт меню не видимым
@@ -264,6 +276,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin2_Action.triggered.connect(self.view)
         self.view_fin3_Action.triggered.connect(self.view)
         self.view_fin4_Action.triggered.connect(self.view)
+        self.view_fin5_Action.triggered.connect(self.view)
+        self.view_fin6_Action.triggered.connect(self.view)
+        self.view_fin7_Action.triggered.connect(self.view)
+        self.view_fin8_Action.triggered.connect(self.view)
         self.clear_s16_Action.triggered.connect(self.print_clear)
         self.clear_s16_2_Action.triggered.connect(self.print_clear)
         self.clear_s32_full_Action.triggered.connect(self.print_clear)
@@ -842,17 +858,8 @@ mylist = ('мальчиков и девочек', 'юношей и девуше�
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р",
        "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
 res = ("все игры", "завершенные", "не сыгранные")
-stages_all = ("-выбор этапа-", "Одна таблица", "Предварительный",
-           "Полуфиналы", "Финальный", "Суперфинал")
-stages1 = ("-выбор этапа-", "Одна таблица", "Предварительный")
-stages2 = ("-выбор этапа-", "Полуфиналы", "Финальный")
-stages3 = ("-выбор этапа-", "Финальный", "Суперфинал")
-# stages3 = ("-выбор этапа-", "Финальный", "Суперфинал")
 vid_setki_one_table = ("-выбор типа таблицы-", "Сетка (-2)", "Сетка (с розыгрышем всех мест)",
              "Сетка (за 1-3 место)", "Круговая система")
-# vid_setki_pf = ("Группы полуфинала")
-
-
 
 my_win.comboBox_page_vid.addItems(page_orient)
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
@@ -869,31 +876,9 @@ my_win.comboBox_table_4.addItems(vid_setki_one_table)
 my_win.comboBox_table_5.addItems(vid_setki_one_table)
 my_win.comboBox_table_6.addItems(vid_setki_one_table)
 my_win.comboBox_table_7.addItems(vid_setki_one_table)
+my_win.comboBox_table_8.addItems(vid_setki_one_table)
+# my_win.comboBox_table_9.addItems(vid_setki_one_table)
 # my_win.comboBox_one_table.addItems(vid_setki_one_table)
-
-# def clear_add_combobox():
-#     """"""
-#     my_win.comboBox_etap.clear()
-#     # my_win.comboBox_etap_2.clear()
-#     # my_win.comboBox_etap_3.clear()
-#     # my_win.comboBox_etap_4.clear()
-#     # my_win.comboBox_etap_5.clear()
-#     my_win.comboBox_etap.addItems(stages1)
-#     # my_win.comboBox_etap_2.addItems(stages2)
-#     # my_win.comboBox_etap_3.addItems(stages3)
-#     # my_win.comboBox_etap_4.addItems(stages4)
-#     # my_win.comboBox_etap_5.addItems(stages4)
-#     my_win.comboBox_table.clear()
-#     my_win.comboBox_table_2.clear()
-#     my_win.comboBox_table_3.clear()
-#     my_win.comboBox_table_4.clear()
-#     my_win.comboBox_one_table.clear()
-#     my_win.comboBox_table.addItems(vid_setki)
-#     my_win.comboBox_table_2.addItems(vid_setki)
-#     my_win.comboBox_table_3.addItems(vid_setki)
-#     my_win.comboBox_table_4.addItems(vid_setki)
-#     my_win.comboBox_one_table.addItems(vid_setki) 
-
 
 # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_start.setDate(date.today())
@@ -2015,6 +2000,7 @@ def page():
         my_win.label_62.hide()
         my_win.label_106.hide()
         my_win.label_107.hide()
+        my_win.label_108.hide()
         my_win.label_78.hide()
         my_win.label_80.hide()
         my_win.label_84.hide()
@@ -2027,6 +2013,8 @@ def page():
         my_win.comboBox_table_5.hide()
         my_win.comboBox_table_6.hide()
         my_win.comboBox_table_7.hide()
+        my_win.comboBox_table_8.hide()
+
         my_win.spinBox_kol_group.hide()
 
 
@@ -2442,12 +2430,18 @@ def system_competition():
         my_win.label_58.hide() 
         my_win.label_81.hide()
         my_win.label_82.hide()
+        my_win.label_83.hide()
         my_win.label_84.hide()
-        my_win.label_85.hide()      
-        my_win.comboBox_table_1.hide()
-        my_win.comboBox_table_2.hide()
-        my_win.comboBox_table_3.hide()
-        my_win.comboBox_table_4.hide()
+        my_win.label_85.hide()
+        my_win.label_86.hide()      
+        # my_win.comboBox_table_1.hide()
+        # my_win.comboBox_table_2.hide()
+        # my_win.comboBox_table_3.hide()
+        # my_win.comboBox_table_4.hide()
+        # my_win.comboBox_table_5.hide()
+        # my_win.comboBox_table_6.hide()
+        # my_win.comboBox_table_7.hide()
+        # my_win.comboBox_table_8.hide()
         my_win.tabWidget.setTabEnabled(2, True)
 
         if flag_system is True:
@@ -6152,7 +6146,9 @@ def current_index_combobox_table(sender):
     elif sender == my_win.comboBox_table_6:
         cur_index = my_win.comboBox_table_6.currentIndex()
     elif sender == my_win.comboBox_table_7:
-        cur_index = my_win.comboBox_table_7.currentIndex()    
+        cur_index = my_win.comboBox_table_7.currentIndex() 
+    elif sender == my_win.comboBox_table_8:
+        cur_index = my_win.comboBox_table_8.currentIndex()       
     return cur_index
 
 
@@ -6696,10 +6692,10 @@ def remains_in_group(etap_system, etap_system_dict):
     number_player_pf2 = 0
     out_pf1 = 0
     out_pf2 = 0
-    out_f1 = 0
-    out_f2 = 0
-    out_f3 = 0
-    out_f4 = 0
+    out_f = 0
+    # out_f2 = 0
+    # out_f3 = 0
+    # out_f4 = 0
     system = System.select().where(System.title_id == title_id())
     for m in range(0, 2):
         for k  in system:
@@ -6715,30 +6711,32 @@ def remains_in_group(etap_system, etap_system_dict):
                 number_player_pf2 = k.max_player // k.total_group
                 out_pf2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
                 stage_dict[etap_system] = number_player_pf2
-            elif etap_system == "1-й финал":
+            elif (etap_system == "1-й финал" or etap_system == "2-й финал" or etap_system == "3-й финал" or
+                etap_system == "4-й финал" or etap_system == "5-й финал" or etap_system == "6-й финал" or
+                etap_system == "7-й финал" or etap_system == "8-й финал" or etap_system == "9-й финал"):
                 if m == 1:
                     systems = system.select().where(System.stage == etap_system).get()
                     exit_stage = systems.stage_exit # откуда выходят в финал
-                    out_f1 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
-                    stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f1  # сколько вышло из 1-й пф в 1-й финал
-            elif etap_system == "2-й финал":
-                if m == 1:
-                    systems = system.select().where(System.stage == etap_system).get()
-                    exit_stage = systems.stage_exit # откуда выходят в финал
-                    out_f2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
-                    stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f2  # сколько вышло из 1-й пф в 2-й финал
-            elif etap_system == "3-й финал":
-                if m == 1:
-                    systems = system.select().where(System.stage == etap_system).get()
-                    exit_stage = systems.stage_exit # откуда выходят в финал
-                    out_f3 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
-                    stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f3  # сколько вышло из 1-й пф в 1-й финал
-            elif etap_system == "4-й финал":
-                if m == 1:
-                    systems = system.select().where(System.stage == etap_system).get()
-                    exit_stage = systems.stage_exit # откуда выходят в финал
-                    out_f4 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
-                    stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f4  # сколько вышло из 1-й пф в 1-й финал
+                    out_f = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+                    stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f  # сколько вышло из 1-й пф в 1-й финал
+            # elif etap_system == "2-й финал":
+            #     if m == 1:
+            #         systems = system.select().where(System.stage == etap_system).get()
+            #         exit_stage = systems.stage_exit # откуда выходят в финал
+            #         out_f2 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+            #         stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f2  # сколько вышло из 1-й пф в 2-й финал
+            # elif etap_system == "3-й финал":
+            #     if m == 1:
+            #         systems = system.select().where(System.stage == etap_system).get()
+            #         exit_stage = systems.stage_exit # откуда выходят в финал
+            #         out_f3 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+            #         stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f3  # сколько вышло из 1-й пф в 1-й финал
+            # elif etap_system == "4-й финал":
+            #     if m == 1:
+            #         systems = system.select().where(System.stage == etap_system).get()
+            #         exit_stage = systems.stage_exit # откуда выходят в финал
+            #         out_f4 = etap_system_dict[etap_system] # сколько вышло из группы 1-й пф
+            #         stage_dict[exit_stage] = stage_dict[exit_stage ] - out_f4  # сколько вышло из 1-й пф в 1-й финал
 
     return stage_dict
 
@@ -6795,17 +6793,36 @@ def max_player_and_exit_stage(etap):
             fin = "1-й финал" if "1-й полуфинал" in total_stage else "2-й финал"
             exit_stage = "1-й полуфинал" if "1-й полуфинал" in total_stage else "Предварительный"
             max_pl = player // group if "1-й полуфинал" in total_stage else system_last.max_player
-    elif number_etap == 4:
-        if last_etap == "2-й полуфинал":
-            fin = "1-й финал"
-            exit_stage = "1-й полуфинал"
-            max_pl = dict_etap[exit_stage]
-        elif last_etap == "1-й финал":
-            fin = "2-й финал"
-        elif last_etap == "2-й финал": 
-            fin = "3-й финал"   
-    elif (number_etap == 5 or number_etap == 6 or number_etap == 7
-        or number_etap == 8 or number_etap == 9 or number_etap == 10):
+    # elif number_etap == 4:
+    #     fin = number_final(last_etap) # текущий этап
+    #     if "2-й полуфинал" in total_stage:
+    #         if dict_etap["1-й полуфинал"] == 0 and dict_etap["2-й полуфинал"] != 0:
+    #             exit_stage = "2-й полуфинал"
+    #         elif dict_etap["1-й полуфинал"] != 0 and dict_etap["2-й полуфинал"] != 0:
+    #             exit_stage = "1-й полуфинал"
+    #         elif dict_etap["1-й полуфинал"] == 0 and dict_etap["2-й полуфинал"] == 0:
+    #             exit_stage = "Предварительный"
+    #     elif "1-й полуфинал" in total_stage:
+    #         if dict_etap["1-й полуфинал"] == 0:
+    #             exit_stage = "Предварительный"
+    #         elif dict_etap["1-й полуфинал"] != 0:
+    #             exit_stage = "1-й полуфинал"
+    #     else:
+    #         exit_stage = "Предварительный"
+    #     max_pl = dict_etap[exit_stage]
+        # if last_etap == "2-й полуфинал":
+        #     fin = "1-й финал"
+        #     exit_stage = "1-й полуфинал"
+        #     max_pl = dict_etap[exit_stage]
+        # else:
+        #     fin = number_final(last_etap) # текущий этап
+
+        # elif last_etap == "1-й финал":
+        #     fin = "2-й финал"
+        # elif last_etap == "2-й финал": 
+        #     fin = "3-й финал"   
+    elif (number_etap == 4 or number_etap == 5 or number_etap == 6 or number_etap == 7
+        or number_etap == 8 or number_etap == 9 or number_etap == 10 or number_etap == 11):
         fin = number_final(last_etap) # текущий этап
         if "2-й полуфинал" in total_stage:
             if dict_etap["1-й полуфинал"] == 0 and dict_etap["2-й полуфинал"] != 0:
@@ -6831,7 +6848,7 @@ def max_player_and_exit_stage(etap):
 
 
 def number_final(last_etap):
-    """находит этап откуда выходит в финал"""
+    """определяет номер финала исходя из предыдущего"""
     znak = last_etap.find("-") 
     fin_num = int(last_etap[:znak])
     fin = f"{fin_num + 1}-й финал"
@@ -6883,8 +6900,13 @@ def kol_player_in_final():
         fin = exit_player_stage[2]
     elif my_win.comboBox_etap.currentText() == "Финальный":
         if label_text == "2-й этап":
-            my_win.label_102.setText("1-й финал")
-            fin = "1-й финал"
+            etap = my_win.comboBox_etap.currentText()
+            exit_player_stage = max_player_and_exit_stage(etap)
+            max_exit_group = exit_player_stage[0]
+            exit_stage = exit_player_stage[1]
+            fin = exit_player_stage[2]
+            my_win.label_102.setText(fin)
+            # fin = "1-й финал"
         elif label_text == "3-й этап":
             if last_stage == "1-й полуфинал":
                 etap = my_win.comboBox_etap.currentText()
@@ -6902,41 +6924,7 @@ def kol_player_in_final():
             max_exit_group = exit_player_stage[0]
             exit_stage = exit_player_stage[1]
             fin = exit_player_stage[2]
-        # elif label_text == "4-й этап":
-        #     etap = my_win.comboBox_etap.currentText()
-        #     exit_player_stage = max_player_and_exit_stage(etap)
-        #     max_exit_group = exit_player_stage[0]
-        #     exit_stage = exit_player_stage[1]
-        #     fin = exit_player_stage[2]
-        #     # my_win.label_104.setText(fin) # уже установлен
-        # elif label_text == "5-й этап":
-        #     etap = my_win.comboBox_etap.currentText()
-        #     exit_player_stage = max_player_and_exit_stage(etap)
-        #     max_exit_group = exit_player_stage[0]
-        #     exit_stage = exit_player_stage[1]
-        #     fin = exit_player_stage[2]
-        #     # my_win.label_105.setText(fin)
-        # elif label_text == "6-й этап":
-        #     etap = my_win.comboBox_etap.currentText()
-        #     exit_player_stage = max_player_and_exit_stage(etap)
-        #     max_exit_group = exit_player_stage[0]
-        #     exit_stage = exit_player_stage[1]
-        #     fin = exit_player_stage[2]
-        #     # my_win.label_106.setText(fin)
-        # elif label_text == "7-й этап":
-        #     etap = my_win.comboBox_etap.currentText()
-        #     exit_player_stage = max_player_and_exit_stage(etap)
-        #     max_exit_group = exit_player_stage[0]
-        #     exit_stage = exit_player_stage[1]
-        #     fin = exit_player_stage[2]
-        #     # my_win.label_107.setText(fin)
-        # elif label_text == "8-й этап":
-        #     etap = my_win.comboBox_etap.currentText()
-        #     exit_player_stage = max_player_and_exit_stage(etap)
-        #     max_exit_group = exit_player_stage[0]
-        #     exit_stage = exit_player_stage[1]
-        #     fin = exit_player_stage[2]
-        #     # my_win.label_108.setText(fin)
+
     # изменение падежа этапов в комбобоксе
     if exit_stage == "Предварительный":
         exit_stroka = "Предварительного этапа"
@@ -6986,6 +6974,18 @@ def kol_player_in_final():
             my_win.label_84.setText(list_pl_final[0])
             my_win.label_84.show()
             my_win.comboBox_table_6.hide()
+        elif sender == my_win.comboBox_table_7:
+            my_win.label_82.setText(list_pl_final[3])
+            my_win.label_82.show()
+            my_win.label_85.setText(list_pl_final[0])
+            my_win.label_85.show()
+            my_win.comboBox_table_7.hide()
+        elif sender == my_win.comboBox_table_8:
+            my_win.label_83.setText(list_pl_final[3])
+            my_win.label_83.show()
+            my_win.label_86.setText(list_pl_final[0])
+            my_win.label_86.show()
+            my_win.comboBox_table_8.hide()
         my_win.Button_etap_made.setEnabled(True)
         my_win.comboBox_page_vid.setEnabled(True)
         my_win.Button_etap_made.setFocus(True)
@@ -10678,14 +10678,10 @@ my_win.comboBox_table_4.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_5.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_6.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_7.currentTextChanged.connect(kol_player_in_final)
-# my_win.comboBox_etap.currentTextChanged.connect(system_competition)
+my_win.comboBox_table_8.currentTextChanged.connect(kol_player_in_final)
 
 my_win.comboBox_etap.currentTextChanged.connect(made_system_load_combobox_etap)
 
-# my_win.comboBox_etap_2.currentTextChanged.connect(system_competition)
-# my_win.comboBox_etap_3.currentTextChanged.connect(system_competition)
-# my_win.comboBox_etap_4.currentTextChanged.connect(system_competition)
-# my_win.comboBox_etap_5.currentTextChanged.connect(system_competition)
 my_win.comboBox_page_vid.currentTextChanged.connect(page_vid)
 my_win.comboBox_filter_choice.currentTextChanged.connect(choice_filter_group)
 my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
