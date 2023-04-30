@@ -1162,11 +1162,12 @@ def load_tableWidget():
         z = 6
         column_label = ["№", "Место", "  Рейтинг",
                         "Фамилия Имя", "Дата рождения", "Город"]
-    elif tb == 3 or tb == 5:
+    elif tb == 3 or tb == 4 or tb == 5:
         z = 15
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
                         "Общий счет",
                         "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
+        # my_win.tableWidget.setColumnWidth(5, 10)
     elif tb == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
         z = 19
         column_label = ["№", "Id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
@@ -2003,8 +2004,17 @@ def page():
         my_win.label_108.hide()
         my_win.label_78.hide()
         my_win.label_80.hide()
+        my_win.label_82.hide()
+        my_win.label_83.hide()
         my_win.label_84.hide()
         my_win.label_85.hide()
+        my_win.label_86.hide()
+        my_win.label_87.hide()
+        my_win.label_47.hide()
+        my_win.label_48.hide()
+        my_win.label_49.hide()
+        my_win.label_57.hide()
+        my_win.label_54.hide()
         my_win.comboBox_etap.hide()
         my_win.comboBox_table_1.hide()
         my_win.comboBox_table_2.hide()
@@ -2069,36 +2079,36 @@ def page():
                     my_win.label_53.show()
                     my_win.label_61.show()
                 elif i == 4:
-                    my_win.label_105.setText(stage[3])
-                    my_win.label_58.setText(game[3])
-                    my_win.label_62.setText(table[3])
+                    my_win.label_105.setText(stage[4])
+                    my_win.label_58.setText(game[4])
+                    my_win.label_62.setText(table[4])
                     my_win.label_105.show()
                     my_win.label_58.show()
                     my_win.label_62.show()
                 elif i == 5:
-                    my_win.label_106.setText(stage[3])
-                    my_win.label_71.setText(game[3])
-                    my_win.label_84.setText(table[3])
+                    my_win.label_106.setText(stage[5])
+                    my_win.label_81.setText(game[5])
+                    my_win.label_84.setText(table[5])
                     my_win.label_106.show()
-                    my_win.label_71.show()
+                    my_win.label_81.show()
                     my_win.label_84.show()
                 elif i == 6:
-                    my_win.label_107.setText(stage[3])
-                    my_win.label_82.setText(game[3])
-                    my_win.label_85.setText(table[3])
+                    my_win.label_107.setText(stage[6])
+                    my_win.label_82.setText(game[6])
+                    my_win.label_85.setText(table[6])
                     my_win.label_107.show()
                     my_win.label_82.show()
                     my_win.label_85.show()
                 elif i == 7:
-                    my_win.label_108.setText(stage[3])
-                    my_win.label_58.setText(game[3])
-                    my_win.label_62.setText(table[3])
+                    my_win.label_108.setText(stage[7])
+                    my_win.label_58.setText(game[7])
+                    my_win.label_62.setText(table[7])
                     my_win.label_108.show()
                     my_win.label_58.show()
                     my_win.label_62.show()
 
             total_game = sum(sum_game)
-            my_win.comboBox_table.hide()
+            my_win.comboBox_table_1.hide()
             my_win.comboBox_page_vid.setEnabled(False)
             my_win.Button_etap_made.setEnabled(False)
             my_win.Button_system_made.setEnabled(False)
@@ -3340,11 +3350,15 @@ def select_player_in_game():
             if tab == 3:
                 my_win.lineEdit_pl1_score_total_gr.setText(sc1)
                 my_win.lineEdit_pl2_score_total_gr.setText(sc2)
-                my_win.lineEdit_player1.setText(pl1)
-                my_win.lineEdit_player2.setText(pl2)
+                my_win.lineEdit_player1_gr.setText(pl1)
+                my_win.lineEdit_player2_gr.setText(pl2)
                 my_win.lineEdit_pl1_s1_gr.setFocus()
             elif tab == 4:
-                pass
+                my_win.lineEdit_pl1_score_total_pf.setText(sc1)
+                my_win.lineEdit_pl2_score_total_pf.setText(sc2)
+                my_win.lineEdit_player1_pf.setText(pl1)
+                my_win.lineEdit_player2_pf.setText(pl2)
+                my_win.lineEdit_pl1_s1_pf.setFocus()
             else:
                 my_win.lineEdit_pl1_score_total_fin.setText(sc1)
                 my_win.lineEdit_pl2_score_total_fin.setText(sc2)
@@ -3932,7 +3946,9 @@ def score_in_game():
 def control_score(sc1, sc2):
     """проверка на правильность ввода счета"""
     msgBox = QMessageBox
-
+    if sc1.isNumeric() == False or sc2.isNumeric() == False:
+        result = msgBox.information(my_win, "", "Вы ввели неправильный счет",
+                                 msgBox.Ok, msgBox.Cancel)
     sc1 = int(sc1)
     sc2 = int(sc2)
     if sc1 > 35 or sc2 > 35:
@@ -3990,7 +4006,7 @@ def enter_score(none_player=0):
     if tab == 3: # группы
         stage = "Предварительный"
     elif tab == 4:# полуфиналы
-        pass
+        stage = "Полуфинал"
     else:  # финальный
         if fin == "1 группа":
             stage = "Одна таблица"
@@ -6032,6 +6048,14 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
+    elif tb == 3:
+        my_win.tableWidget.hideColumn(0)
+        my_win.tableWidget.hideColumn(1)
+        my_win.tableWidget.showColumn(2)
+        my_win.tableWidget.hideColumn(9)
+        my_win.tableWidget.hideColumn(10)
+        my_win.tableWidget.hideColumn(11)
+        my_win.tableWidget.hideColumn(12)    
 
 
 def etap_made():
@@ -6842,18 +6866,24 @@ def kol_player_in_final():
             my_win.label_33.setText(f"Всего: {total_game} игр.")
             my_win.label_50.setText(f"{count} человек в сетке.")
             my_win.comboBox_table_1.hide()
-    elif my_win.comboBox_etap.currentText() == "Полуфиналы":
+    else:
         etap = my_win.comboBox_etap.currentText()
         exit_player_stage = max_player_and_exit_stage(etap)
         max_exit_group = exit_player_stage[0]
         exit_stage = exit_player_stage[1]
         fin = exit_player_stage[2]
-    elif my_win.comboBox_etap.currentText() == "Финальный":
-        etap = my_win.comboBox_etap.currentText()
-        exit_player_stage = max_player_and_exit_stage(etap)
-        max_exit_group = exit_player_stage[0]
-        exit_stage = exit_player_stage[1]
-        fin = exit_player_stage[2]
+    # elif my_win.comboBox_etap.currentText() == "Полуфиналы":
+    #     etap = my_win.comboBox_etap.currentText()
+    #     exit_player_stage = max_player_and_exit_stage(etap)
+    #     max_exit_group = exit_player_stage[0]
+    #     exit_stage = exit_player_stage[1]
+    #     fin = exit_player_stage[2]
+    # elif my_win.comboBox_etap.currentText() == "Финальный":
+    #     etap = my_win.comboBox_etap.currentText()
+    #     exit_player_stage = max_player_and_exit_stage(etap)
+    #     max_exit_group = exit_player_stage[0]
+    #     exit_stage = exit_player_stage[1]
+    #     fin = exit_player_stage[2]
 
     # изменение падежа этапов в комбобоксе
     if exit_stage == "Предварительный":
@@ -10656,8 +10686,9 @@ my_win.checkBox_find_player.stateChanged.connect(find_player)
 # =======  нажатие кнопок =========
 
 
-# my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
-# my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
+my_win.Button_Ok_gr.setAutoDefault(True)  # click on <Enter>
+my_win.Button_Ok_pf.setAutoDefault(True)  # click on <Enter>
+my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
 my_win.Button_pay_R.clicked.connect(save_in_db_pay_R)
 my_win.Button_clear_del.clicked.connect(clear_del_player)
 my_win.Button_reset_filter.clicked.connect(reset_filter)
