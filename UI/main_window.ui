@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -2244,7 +2244,7 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <widget class="QGroupBox" name="groupBox_kolvo_vstrech">
+        <widget class="QGroupBox" name="groupBox_kolvo_vstrech_gr">
          <property name="font">
           <font>
            <weight>75</weight>
@@ -3615,8 +3615,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3628,7 +3628,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
+       <width>196</width>
        <height>534</height>
       </rect>
      </property>
@@ -4288,8 +4288,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4561,8 +4561,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4574,8 +4574,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4823,8 +4823,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>501</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">

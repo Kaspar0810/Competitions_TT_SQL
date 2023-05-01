@@ -3059,14 +3059,14 @@ def change_status_visible_and_score_game():
         state_visible = state_visible_db
         #  ==== изменение состояние =====
         if sender == my_win.checkBox_4:
-            for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            for i in my_win.groupBox_kolvo_vstrech_gr.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
                 if i.isChecked():
                     match_current = int(i.text())
                     break
             state_visible = my_win.checkBox_4.isChecked()
         elif (sender == my_win.radioButton_match_3 or 
             sender == my_win.radioButton_match_5 or sender == my_win.radioButton_match_7):
-            for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            for i in my_win.groupBox_kolvo_vstrech_gr.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
                 if i.isChecked():
                     match_current = int(i.text())
                     break
@@ -3103,7 +3103,7 @@ def change_status_visible_and_score_game():
         match_current = match_db
         #  ==== изменение состояние =====
         if sender == my_win.checkBox_5:
-            for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
                 if i.isChecked():
                     match_current = int(i.text())
                     break
@@ -3138,9 +3138,13 @@ def change_status_visible_and_score_game():
             my_win.frame_gr_five.setVisible(False)
             my_win.frame_gr_seven.setVisible(False)
             my_win.checkBox_4.setChecked(False)
-            my_win.lineEdit_pl1_score_total.setFocus(True)
+            my_win.lineEdit_pl1_score_total_gr.setFocus(True)
         elif tab == 4:
-            pass
+            my_win.frame_pf_three.setVisible(False)
+            my_win.frame_pf_five.setVisible(False)
+            my_win.frame_pf_seven.setVisible(False)
+            my_win.checkBox_14.setChecked(False)
+            my_win.lineEdit_pl1_score_total_pf.setFocus(True)
         else:
             my_win.frame_fin_three.setVisible(False)
             my_win.frame_fin_five.setVisible(False)
@@ -3324,7 +3328,6 @@ def select_player_in_game():
         my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
-        # state_visible = visible_field()
         state_visible = change_status_visible_and_score_game()
         sc = my_win.tableWidget.item(r, 8).text()
         pl1 = my_win.tableWidget.item(r, 4).text()
@@ -3532,12 +3535,19 @@ def enter_total_score():
     tab = my_win.tabWidget.currentIndex()
     mark = 0
     flag = 0
-    if sender == my_win.lineEdit_pl1_score_total:
-        mark = my_win.lineEdit_pl1_score_total.text()
+    mistake = 0
+    if sender == my_win.lineEdit_pl1_score_total_gr:
+        mark = my_win.lineEdit_pl1_score_total_gr.text()
         flag = 0
-    elif sender == my_win.lineEdit_pl2_score_total:
-        mark = my_win.lineEdit_pl2_score_total.text()
+    elif sender == my_win.lineEdit_pl2_score_total_gr:
+        mark = my_win.lineEdit_pl2_score_total_gr.text()
         flag = 1 
+    elif sender == my_win.lineEdit_pl1_score_total_pf:
+        mark = my_win.lineEdit_pl1_score_total_pf.text()
+        flag = 0
+    elif sender == my_win.lineEdit_pl2_score_total_pf:
+        mark = my_win.lineEdit_pl2_score_total_pf.text()
+        flag = 1  
     elif sender == my_win.lineEdit_pl1_score_total_fin:
         mark = my_win.lineEdit_pl1_score_total_fin.text()
         flag = 0
@@ -3546,19 +3556,19 @@ def enter_total_score():
         flag = 1  
     if mark != "":  
         mark = int(mark)
-        check_input_total_score(mark)
+        mistake = check_input_total_score(mark, flag)
         if tab == 3 and flag == 0:
-            my_win.lineEdit_pl2_score_total.setFocus()
+            my_win.lineEdit_pl2_score_total_gr.setFocus() if mistake == 0 else my_win.lineEdit_pl1_score_total_gr.setFocus()
         elif tab == 4 and flag == 0:
-            pass
+            my_win.lineEdit_pl2_score_total_pf.setFocus() if mistake == 0 else my_win.lineEdit_pl1_score_total_pf.setFocus()
         elif tab == 5 and flag == 0:
-            my_win.lineEdit_pl2_score_total_fin.setFocus()
+            my_win.lineEdit_pl2_score_total_fin.setFocus() if mistake == 0 else my_win.lineEdit_pl1_score_total_fin.setFocus()
         elif tab == 3 and flag == 1:
-            enter_score(none_player=0) 
+            enter_score(none_player=0) if mistake == 0 else my_win.lineEdit_pl2_score_total_gr.setFocus()
         elif tab == 4 and flag == 1:
-            pass
+            enter_score(none_player=0) if mistake == 0 else my_win.lineEdit_pl2_score_total_pf.setFocus()
         elif tab == 5 and flag == 1:
-            enter_score(none_player=0)
+            enter_score(none_player=0) if mistake == 0 else my_win.lineEdit_pl2_score_total_fin.setFocus()
     else:
         reply = msgBox.information(my_win, 'Уведомление',
                                                 "Проверьте правильность ввода счета!",
@@ -3566,34 +3576,56 @@ def enter_total_score():
         return
     
 
-def check_input_total_score(mark):
+def check_input_total_score(mark, flag):
     """проверка ввода счета встречи и его правильность"""
     msgBox = QMessageBox
+    score_list = []
     tab = my_win.tabWidget.currentIndex() 
     mark_int = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     if tab == 3:
-        for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+        for i in my_win.groupBox_kolvo_vstrech_gr.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
             if i.isChecked():
                 match_current = int(i.text())
                 break
+        s1 = my_win.lineEdit_pl1_score_total_gr.text()
+        s2 = my_win.lineEdit_pl2_score_total_gr.text()
     elif tab == 4:
-        pass
+        for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            if i.isChecked():
+                match_current = int(i.text())
+                break
+        s1 = my_win.lineEdit_pl1_score_total_pf.text()
+        s2 = my_win.lineEdit_pl2_score_total_pf.text()
     else:
         for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
             if i.isChecked():
                 match_current = int(i.text())
                 break
+        s1 = my_win.lineEdit_pl1_score_total_fin.text()
+        s2 = my_win.lineEdit_pl2_score_total_fin.text()
     if mark in mark_int:
-        if mark >= match_current:
+        if flag == 1:
+            score_list.append(int(s1))
+            score_list.append(int(s2))
+            if match_current // 2 + 1 not in score_list:
+                reply = msgBox.information(my_win, 'Уведомление',
+                                                "Проверьте правильность ввода счета!\nСчет меньше необходимого.",
+                                               msgBox.Ok)
+                return
+        if match_current // 2 + 1 < mark:
             reply = msgBox.information(my_win, 'Уведомление',
-                                                "Проверьте правильность ввода счета!",
-                                                msgBox.Ok)
-            return
+                                                "Проверьте правильность ввода счета!\nЧисло не соответсвует из скольки партий матч.",
+                                               msgBox.Ok)
+            mistake = 1
+        else:
+            mistake = 0
+            return mistake
     else:
-        reply = QMessageBox.information(my_win, 'Уведомление',
-                                                "Проверьте правильность ввода счета!",
+        reply = msgBox.information(my_win, 'Уведомление',
+                                                "Вы ввели не правильно символ!",
                                                 msgBox.Ok)
-        return
+        mistake = 1
+        return mistake
                  
 
 def focus():
@@ -4295,12 +4327,16 @@ def string_score_game():
     visible_flag = True
     if tab == 3:
         visible_flag = my_win.checkBox_4.isChecked()
-        for i in my_win.groupBox_kolvo_vstrech.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+        for i in my_win.groupBox_kolvo_vstrech_gr.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
             if i.isChecked():
                 g = (int(i.text()) + 1) // 2 # число, максимальное кол-во партий для победы
                 break
     elif tab == 4:
-        pass
+        visible_flag = my_win.checkBox_14.isChecked()
+        for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+            if i.isChecked():
+                g = (int(i.text()) + 1) // 2 # число, максимальное кол-во партий для победы
+                break
     else:
         visible_flag = my_win.checkBox_5.isChecked()
         for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
@@ -9207,7 +9243,6 @@ def rank_in_group(total_score, td, num_gr):
     pp = {}  # ключ - игрок, значение его очки
     pg_win = {}
     pg_los = {}
-    key_tmp = []
     tr = []
     player_rank_tmp = []
     player_rank = []
@@ -9236,7 +9271,7 @@ def rank_in_group(total_score, td, num_gr):
     kol_tours_in_group = len(game_max)  # кол-во всего игр в группе
 
     for key, value in total_score.items():
-        rev_dict.setdefault(value, set()).add(key)
+        rev_dict.setdefault(value, set()).add(key) # словарь (число очков, номера групп)
     res = [key for key, values in rev_dict.items() if len(values) > 1]
 
     # отдельно составляет список ключей (номера участников группы)
@@ -9248,7 +9283,6 @@ def rank_in_group(total_score, td, num_gr):
     ds = {index: value for index, value in enumerate(val_list)}  
     # сортирует словарь по убыванию соот
     sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}
-    # mesto_points = {}  # словарь (ключ-очки, а значения места без учета соотношений)
     valuesList = list(sorted_tuple.values())  # список очков по убыванию
     unique_numbers = list(set(valuesList))  # множество уникальных очков
     unique_numbers.sort(reverse=True)  # список уникальных очков по убыванию
@@ -9259,10 +9293,6 @@ def rank_in_group(total_score, td, num_gr):
         for x in num_player:
             tr.append(str(x))  # создает список (встречи игроков)
         m_new = valuesList.count(f)  # подсчитываем сколько раз оно встречается
-
-        for k in range(0, max_per):
-            if val_list[k] == f:
-                key_tmp.append(key_list[k])
 
         if m_new == 1:  # если кол-во очков у одного спортсмена
             p1 = x
@@ -9285,8 +9315,7 @@ def rank_in_group(total_score, td, num_gr):
         elif m_new > 3:
             m_circle = m_new
             men_of_circle = m_new
-            player_rank_tmp = circle(
-                men_of_circle, tr, num_gr, td, max_person, mesto, m_circle)
+            player_rank_tmp = circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle)
         tr.clear()
 
         for i in player_rank_tmp:
@@ -9334,9 +9363,6 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle):
     for key, value in sort_tuple.items():
         rev_dict.setdefault(value, set()).add(key)
 
-    # отдельно составляет список ключей (группы)
-    key_list = list(sort_tuple.keys())
-
     for f in unique_numbers:  # проходим циклом по уник. значениям, очки в крутиловке
         m_new = 0
         num_player = rev_dict.get(f)
@@ -9376,6 +9402,7 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle):
 def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_rank_tmp,
                      tr_all, pp, pg_win, pg_los, x, pps, ps):
     """крутиловка в крутиловке"""
+    num_player = []
     if m_new == 1:
         p1 = x
         td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
@@ -9393,6 +9420,55 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
         points_person = z[0]
         player_rank_tmp = circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, ps,
                                           tr_all, men_of_circle, pg_win, pg_los, pp, pps)
+    elif m_new > 3:
+        dict_ratio = {}
+        for k in range(1, m_new + 1):
+            pg_win[k] = sum(pg_win[k])  # сумма выигранных партий
+            pg_los[k] = sum(pg_los[k])  # сумма проигранных партий
+            x = pg_win[k] / pg_los[k]
+            x = float('{:.3f}'.format(x)) # соотношение выйгранных партий к проигранным
+            dict_ratio[k] = x
+        sorted_ratio = {k: dict_ratio[k] for k in
+                            sorted(dict_ratio, key=dict_ratio.get, reverse=True)}  # сортирует словарь по убыванию соот 
+        k_list = list(sorted_ratio.keys())  # отдельно составляет список ключей (группы)
+        v_list = list(sorted_ratio.values())  # отдельно составляет список значений (соотношение)
+        ratio_person = get_unique_numbers(v_list)  
+        list_uniq = []  # список списков соотношение (выигранный партии к проигравшем) и кол-во игроков их имеющих
+        list_tmp = []
+        u = []
+
+        for p in ratio_person:
+            a = v_list.count(p)
+            list_tmp.append(p)
+            list_tmp.append(a)
+            # список (очки и скольких игроков они встречаются)
+            list_uniq.append(list_tmp.copy())
+            list_tmp.clear()
+
+        for k in list_uniq:
+            point = k[0] # соотношение
+            total_uniq = k[1] # сколько раз встречается
+            index = v_list.index(k[0])
+            p1 = k_list[index]
+            if total_uniq == 1:
+                td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
+                td[p1 * 2 - 2][max_person + 3] = point  # очки во встрече победителя
+                player_rank_tmp.append([p1, mesto])   
+                mesto += 1
+            elif total_uniq == 2:
+                for i in range(len(v_list)):
+                    if v_list[i] == point:
+                        num_pl = k_list[i]
+                        num_player.append(num_pl)
+                tr.clear()
+                for x in num_player:
+                    tr.append(str(x))  # создает список (встречи игроков)
+                    m_new += 1
+                player_rank_temp = circle_2_player(tr, td, max_person, mesto, num_gr)
+                player_rank_tmp = player_rank_tmp + player_rank_temp
+            elif total_uniq == 3:
+                pass
+
     tr_all.clear()
     tr.clear()
     return player_rank_tmp
