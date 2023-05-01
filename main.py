@@ -204,7 +204,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
         self.find_r1_Action = QAction("Поиск в январском рейтинге")
-        # self.savelist_Action = QAction("Список")  # подменю сохранить
         self.choice_one_table_Action = QAction("Одна таблица")
         # подменю жеребьевка -группы-
         self.choice_gr_Action = QAction("Группы")
@@ -374,7 +373,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         my_win.tabWidget.setCurrentIndex(2)
                         choice_gr_automat()
         elif sender == self.choice_pf_Action: # подменю полуфиналы
-            pass
+            semifinal = select_choice_semifinal()
+            if semifinal is None: # если отмена при выборе жеребьевки
+                return
+            my_win.tabWidget.setCurrentIndex(2)
+            all_games_in_group_text = my_win.label_19.text()
+            znak = all_games_in_group_text.find(" ")
+            all_games_in_group = int(all_games_in_group_text[:znak])
+            playing_games_in_group_text = my_win.label_48.text()
+            znak1 = playing_games_in_group_text.find(" ")
+            text = playing_games_in_group_text[znak1 + 1:]
+            znak2 = text.find(" ")
+            text1 = text[:znak2]
+            playing_games_in_group = int(text1)
+            remains = all_games_in_group - playing_games_in_group
+            if remains == 0:
+                pass
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
@@ -495,13 +509,6 @@ app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 
-# def change_menu():
-#     """"""
-#     t = title_id()
-#     MainWindow._createAction()
-#     my_win.view_fin3_Action.setVisible(True)  # делает пункт меню не видимым
-
-
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
     def __init__(self):
@@ -546,7 +553,6 @@ class StartWindow(QMainWindow, Ui_Form):
         self.close()
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {full_name}")
         my_win.show()
-
 
     def new(self):
         """запускает новые соревнования"""
@@ -776,13 +782,10 @@ def load_listR_in_db(fname, table_db):
 
         excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
         data_pandas = pd.DataFrame(excel_data)  # получает Dataframe
-        # print(data_pandas[data_pandas['Рейтинг']. isnull ()])
         # создает список заголовков столбцов
         column = data_pandas.columns.ravel().tolist()
 
         count = len(data_pandas)  # кол-во строк в excel файле
-        # sp = 100 / (count)
-        # sp = round(sp, 3) # округление числа до 3-х знаков
 
         count_column = len(column)
         if count_column == 5:
@@ -804,8 +807,6 @@ def load_listR_in_db(fname, table_db):
                 data_tmp.append(val)  # получает временный список строки
             data.append(data_tmp.copy())  # добавляет в список Data
             data_tmp.clear()  # очищает временный список
-            # step += sp
-            # StartWindow.progress_bar_start_form(step)
         with db.atomic():
             for idx in range(0, len(data), 100):
                 table_db.insert_many(data[idx:idx+100]).execute()
@@ -842,7 +843,6 @@ def change_sroki():
     """изменение текста label формы стартового окна в зависимости от выбора соревнования"""
     t_id = Title.select().order_by(Title.id.desc()).get()
     k = t_id.id - 1
-    tit = Title.get(Title.id == k)
     index = fir_window.comboBox.currentIndex()
     id = k - index
     title = Title.get(Title.id == id)
@@ -966,7 +966,7 @@ def enabled_menu_after_choice():
             elif stage == "Предварительный":
                 my_win.view_gr_Action.setEnabled(True)
                 my_win.ed_gr_Action.setEnabled(True) # включает меню - редакирование жеребьевки групп
-            elif stage == "Полуфиналы":
+            elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
                 my_win.view_pf_Action.setEnabled(True)
             elif stage == "1-й финал":
                 my_win.view_fin1_Action.setEnabled(True)
@@ -982,7 +982,7 @@ def enabled_menu_after_choice():
             my_win.choice_one_table_Action.setEnabled(True)
         elif stage == "Предварительный":
             my_win.choice_gr_Action.setEnabled(True)
-        elif stage == "Полуфиналы":
+        elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
             my_win.choice_pf_Action.setEnabled(True)
         else:
             my_win.choice_fin_Action.setEnabled(True)
@@ -1976,7 +1976,9 @@ def page():
         player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
-        my_win.label_52.setText(f"Сыграно: {count_result} игр.")
+        my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
+        my_win.label_48.setText(f"Сыграно: {count_result} игр.")
+        my_win.label_48.show()
         st_count = len(sf)
         if st_count != 1:
             load_combobox_filter_group()
@@ -2011,7 +2013,7 @@ def page():
         my_win.label_86.hide()
         my_win.label_87.hide()
         my_win.label_47.hide()
-        my_win.label_48.hide()
+        # my_win.label_48.hide()
         my_win.label_49.hide()
         my_win.label_57.hide()
         my_win.label_54.hide()
@@ -2444,14 +2446,7 @@ def system_competition():
         my_win.label_84.hide()
         my_win.label_85.hide()
         my_win.label_86.hide()      
-        # my_win.comboBox_table_1.hide()
-        # my_win.comboBox_table_2.hide()
-        # my_win.comboBox_table_3.hide()
-        # my_win.comboBox_table_4.hide()
-        # my_win.comboBox_table_5.hide()
-        # my_win.comboBox_table_6.hide()
-        # my_win.comboBox_table_7.hide()
-        # my_win.comboBox_table_8.hide()
+ 
         my_win.tabWidget.setTabEnabled(2, True)
 
         if flag_system is True:
@@ -2477,7 +2472,6 @@ def system_competition():
             my_win.Button_etap_made.setEnabled(False)
             my_win.comboBox_page_vid.setEnabled(True)
 # =======
-            # made_system_load_combobox_etap()
             player = Player.select().where(Player.title_id == title_id())
             count = len(player)
             if count != 0:
@@ -2551,6 +2545,16 @@ def one_table(fin, group):
                 k.basic = fin
                 k.save()
             add_open_tab(tab_page="Система")
+            # =====
+            # for m in system:
+            #     etap = m.stage
+            #     if etap == "Предварительный":
+            #         my_win.choice_gr_Action.setEnabled(True)
+            #     elif etap == "1-й полуфинал" or etap == "2-й полуфинал":
+            #         my_win.choice_pf_Action.setEnabled(True)
+            #     else: 
+            #         my_win.choice_fin_Action.setEnabled(True) 
+            # ======
             result = msgBox.question(my_win, "", "Система соревнований создана.\n"
                                                  "Теперь необходимо сделать жеребъевку\n"
                                                  "Хотите ее сделать сейчас?",
@@ -6638,7 +6642,7 @@ def select_choice_final():
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     fin = []
     for sys in system:
-        if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
+        if sys.stage != "Предварительный" and sys.stage != "1-й полуфинал" and sys.stage != "2-й полуфинал":
             fin.append(sys.stage)
     fin, ok = QInputDialog.getItem(my_win, "Выбор финала", "Выберите финал для жеребъевки", fin, 0, False)
     if ok:
@@ -6646,6 +6650,21 @@ def select_choice_final():
     else:
         fin = None
         return fin
+
+
+def select_choice_semifinal():
+    """выбор жеребьевки полуфинала"""
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    semifinal = []
+    for sys in system:
+        if sys.stage == "1-й полуфинал" or sys.stage == "2-й полуфинал":
+            semifinal.append(sys.stage)
+    semifinal, ok = QInputDialog.getItem(my_win, "Выбор полуфинала", "Выберите полуфинал для жеребъевки", semifinal, 0, False)
+    if ok:
+        return semifinal
+    else:
+        semifinal = None
+        return semifinal
 
 
 def manual_choice_setka(fin, count_exit, mesto_first_poseva):

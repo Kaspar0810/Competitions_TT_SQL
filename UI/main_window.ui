@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -1090,7 +1090,7 @@
         <rect>
          <x>648</x>
          <y>28</y>
-         <width>70</width>
+         <width>150</width>
          <height>20</height>
         </rect>
        </property>
@@ -1109,7 +1109,7 @@
         <rect>
          <x>648</x>
          <y>7</y>
-         <width>70</width>
+         <width>161</width>
          <height>20</height>
         </rect>
        </property>
@@ -1128,7 +1128,7 @@
         <rect>
          <x>648</x>
          <y>50</y>
-         <width>70</width>
+         <width>150</width>
          <height>20</height>
         </rect>
        </property>
@@ -1195,7 +1195,7 @@
         <rect>
          <x>649</x>
          <y>72</y>
-         <width>70</width>
+         <width>150</width>
          <height>20</height>
         </rect>
        </property>
@@ -1266,7 +1266,7 @@
         <rect>
          <x>649</x>
          <y>94</y>
-         <width>70</width>
+         <width>150</width>
          <height>20</height>
         </rect>
        </property>
@@ -1392,7 +1392,7 @@
         <rect>
          <x>649</x>
          <y>113</y>
-         <width>70</width>
+         <width>150</width>
          <height>20</height>
         </rect>
        </property>
@@ -1442,7 +1442,7 @@
         <rect>
          <x>649</x>
          <y>135</y>
-         <width>70</width>
+         <width>150</width>
          <height>20</height>
         </rect>
        </property>
@@ -1616,7 +1616,7 @@
         <rect>
          <x>650</x>
          <y>156</y>
-         <width>70</width>
+         <width>150</width>
          <height>20</height>
         </rect>
        </property>
