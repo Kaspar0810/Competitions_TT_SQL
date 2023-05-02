@@ -383,6 +383,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             playing_games = len(result_gameing)
             remains = all_game - playing_games
             if remains == 0:
+                posev_data = player_choice_semifinal(semifinal)
                 choice_semifinal_automat()
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
@@ -4719,10 +4720,12 @@ def reset_filter():
     load_combo()
 
 
-def choice_semifinal_automat():
+def choice_semifinal_automat(stage):
     """жеребьевка полуфиналов"""
     msgBox = QMessageBox()
     system = System.select().where(System.title_id == title_id())
+    choice = Choice.select().where(Choice.title_id == title_id())
+
 
     pl = Player.select()
     pl = len(pl)
@@ -9853,6 +9856,46 @@ def player_choice_one_table(stage):
             'фамилия': posev.family,
             'регион': city,
         })
+    return posev_data
+
+
+def player_choice_semifinal(stage):
+    """список спортсменов полуфиналов"""
+    posev_data = []
+    mesto_first = 0
+
+    players = Player.select().where(Player.title_id == title_id())
+    system = System.select().where(System.title_id == title_id())
+    systems = system.select().where(System.stage == "Предварительный").get()
+    total_group = systems.total_group
+    system_stage = system.select().where(System.stage == stage).get()
+    mesta_exit = system_stage.mesta_exit
+
+    if stage == "1-й полуфинал":
+        mesto_first = 1
+    else:
+        system_stage = system.select().where(System.stage == "1-й полуфинал").get()
+        mesta_exit = system_stage.mesta_exit
+        mesto_first = mesta_exit + 1
+
+    for k in range(1, total_group + 1):
+        choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == f"{k} группа"))
+        p = 0 if k <= total_group // 2 else mesta_exit
+        n = k if k <= total_group // 2 else total_group - k + 1
+        for i in range(mesto_first, mesta_exit + 1):
+            p += 1
+            choice_mesta = choices.select().where(Choice.mesto_group == i).get()
+            with db: # записывает в db номер полуфинала
+                choice_mesta.semi_final = stage
+                choice_mesta.n_group = f"{n} группа" # номера группы полуфинала
+                choice_mesta.posev_sf = p # номер посева
+                choice_mesta.save()
+
+            # pl = players.select().where(Player.id == choice_mesta.player_choice_id).get()
+            # city = pl.city
+            # posev_data.append({
+            #     'фамилия': choice_mesta.family,
+            #     'регион': city})
     return posev_data
 
 
