@@ -376,19 +376,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             semifinal = select_choice_semifinal()
             if semifinal is None: # если отмена при выборе жеребьевки
                 return
-            my_win.tabWidget.setCurrentIndex(2)
-            all_games_in_group_text = my_win.label_19.text()
-            znak = all_games_in_group_text.find(" ")
-            all_games_in_group = int(all_games_in_group_text[:znak])
-            playing_games_in_group_text = my_win.label_48.text()
-            znak1 = playing_games_in_group_text.find(" ")
-            text = playing_games_in_group_text[znak1 + 1:]
-            znak2 = text.find(" ")
-            text1 = text[:znak2]
-            playing_games_in_group = int(text1)
-            remains = all_games_in_group - playing_games_in_group
+                # проверяет все или игры в группе сыграны
+            result_all = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
+            all_game = len(result_all)
+            result_gameing = Result.select().where((Result.title_id == title_id()) & (Result.winner != ""))
+            playing_games = len(result_gameing)
+            remains = all_game - playing_games
             if remains == 0:
-                pass
+                choice_semifinal_automat()
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
@@ -4724,20 +4719,20 @@ def reset_filter():
     load_combo()
 
 
-# def choice_table():
-#     """заполняется таблица жеребьевка из меню -создание системы-"""
-#     msgBox = QMessageBox()
-#     s = System.select().order_by(System.id.desc()).get()
-#     system = System.get(System.id == s)
-#     pl = Player.select()
-#     pl = len(pl)
-#     mp = system.total_athletes
-#     if mp == 0:  # система еще не создана (mp - всего человек в списке)
-#         result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
-#                                     msgBox.Ok, msgBox.Cancel)
-#         if result == msgBox.Ok:
-#             choice_tbl_made()  # заполняет db жеребьевка
-#             system_competition()  # создает систему соревнований
+def choice_semifinal_automat():
+    """жеребьевка полуфиналов"""
+    msgBox = QMessageBox()
+    system = System.select().where(System.title_id == title_id())
+
+    pl = Player.select()
+    pl = len(pl)
+    mp = system.total_athletes
+    if mp == 0:  # система еще не создана (mp - всего человек в списке)
+        result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
+                                    msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
+            choice_tbl_made()  # заполняет db жеребьевка
+            system_competition()  # создает систему соревнований
 
 
 def choice_gr_automat():
@@ -7457,6 +7452,8 @@ def table_made(pv, stage):
             break
     if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
         kg = 1
+    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+        kg = s_id.total_group  # кол-во групп
     else:  # групповые игры
         kg = s_id.total_group  # кол-во групп
         
@@ -7618,6 +7615,10 @@ def table_made(pv, stage):
         name_table = f"{short_name}_one_table.pdf"
     elif stage == "Предварительный":
         name_table = f"{short_name}_table_group.pdf"
+    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+        txt = stage.rfind("-")
+        number_fin = stage[:txt]
+        name_table = f"{short_name}_{number_fin}_semifinal.pdf"
     else:
         txt = stage.rfind("-")
         number_fin = stage[:txt]
