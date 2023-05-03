@@ -373,8 +373,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         my_win.tabWidget.setCurrentIndex(2)
                         choice_gr_automat()
         elif sender == self.choice_pf_Action: # подменю полуфиналы
-            semifinal = select_choice_semifinal()
-            if semifinal is None: # если отмена при выборе жеребьевки
+            stage = select_choice_semifinal()
+            if stage is None: # если отмена при выборе жеребьевки
                 return
                 # проверяет все или игры в группе сыграны
             result_all = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
@@ -383,8 +383,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             playing_games = len(result_gameing)
             remains = all_game - playing_games
             if remains == 0:
-                posev_data = player_choice_semifinal(semifinal)
-                choice_semifinal_automat()
+                # posev_data = player_choice_semifinal(semifinal)
+                choice_semifinal_automat(stage)
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
@@ -2940,19 +2940,24 @@ def player_fin_on_circle(fin):
     table_made(pv, stage)
 
 
-def player_in_table_group_and_write_Game_list_Result():
+def player_in_table_group_and_write_Game_list_Result(stage):
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
     встречи по турам в таблицу -Result- """
     sys = System.select().where(System.title_id == title_id())  # находит system id последнего
-    system = sys.select().where(System.stage == "Предварительный").get()
+    # system = sys.select().where(System.stage == "Предварительный").get()
+    system = sys.select().where(System.stage == stage).get()
     # удаление старых записей в game_list после редактирования жеребьевки групп
-    gamelist = Game_list.delete().where(Game_list.title_id == title_id())
+    if stage == "Предварительный":
+        gamelist = Game_list.delete().where(Game_list.title_id == title_id())
+        query = Result.delete().where(Result.title_id == title_id())
+    else:
+        gamelist = Game_list.delete().where((Game_list.title_id == title_id()) & (Game_list.number_group == stage))
+        query = Result.delete().where((Result.title_id == title_id()) & (Result.number_group == stage))
     gamelist.execute()
-    query = Result.delete().where(Result.title_id == title_id()) # 
     query.execute()
     #==========
     kg = system.total_group
-    stage = system.stage
+    # stage = system.stage
     pv = system.page_vid
     # создание таблиц групп со спортсменами согласно жеребьевки в PDF
     table_made(pv, stage)
@@ -4722,20 +4727,40 @@ def reset_filter():
 
 def choice_semifinal_automat(stage):
     """жеребьевка полуфиналов"""
-    msgBox = QMessageBox()
+    mesto_first = 0
+
+    players = Player.select().where(Player.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
-    choice = Choice.select().where(Choice.title_id == title_id())
+    systems = system.select().where(System.stage == "Предварительный").get()
+    total_group = systems.total_group
+    system_stage = system.select().where(System.stage == stage).get()
+    sys_id = system_stage.id
+    mesta_exit = system_stage.mesta_exit
 
+    if stage == "1-й полуфинал":
+        mesto_first = 1
+    else:
+        system_stage = system.select().where(System.stage == "1-й полуфинал").get()
+        mesta_exit = system_stage.mesta_exit
+        mesto_first = mesta_exit + 1
 
-    pl = Player.select()
-    pl = len(pl)
-    mp = system.total_athletes
-    if mp == 0:  # система еще не создана (mp - всего человек в списке)
-        result = msgBox.information(my_win, "", "Хотите создать систему соревнований?",
-                                    msgBox.Ok, msgBox.Cancel)
-        if result == msgBox.Ok:
-            choice_tbl_made()  # заполняет db жеребьевка
-            system_competition()  # создает систему соревнований
+    for k in range(1, total_group + 1):
+        choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == f"{k} группа"))
+        p = 0 if k <= total_group // 2 else mesta_exit
+        n = k if k <= total_group // 2 else total_group - k + 1
+        for i in range(mesto_first, mesta_exit + 1):
+            p += 1
+            choice_mesta = choices.select().where(Choice.mesto_group == i).get()
+            with db: # записывает в db номер полуфинала
+                choice_mesta.semi_final = stage
+                choice_mesta.n_group = f"{n} группа" # номера группы полуфинала
+                choice_mesta.posev_sf = p # номер посева
+                choice_mesta.save()
+    with db:  # записывает в систему, что произведена жеребъевка
+        system = System.get(System.id == sys_id)
+        system.choice_flag = True
+        system.save()
+    player_in_table_group_and_write_Game_list_Result(stage)
 
 
 def choice_gr_automat():
@@ -4754,9 +4779,9 @@ def choice_gr_automat():
     start = 0
     end = 1
     step = 0
-
+    stage = "Предварительный"
     sys = System.select().where(System.title_id == title_id())
-    sys_id = sys.select().where(System.stage == "Предварительный").get()
+    sys_id = sys.select().where(System.stage == stage).get()
     group = sys_id.total_group
     max_player = sys_id.max_player  # максимальное число игроков в группе, оно же число посевов
     total_player = sys_id.total_athletes
@@ -4850,7 +4875,7 @@ def choice_gr_automat():
                 system = System.get(System.id == sys_id)
                 system.choice_flag = True
                 system.save()
-            player_in_table_group_and_write_Game_list_Result()
+            player_in_table_group_and_write_Game_list_Result(stage)
         group_list.clear()
 
 
@@ -7455,8 +7480,8 @@ def table_made(pv, stage):
             break
     if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
         kg = 1
-    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-        kg = s_id.total_group  # кол-во групп
+    # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+    #     kg = s_id.total_group  # кол-во групп
     else:  # групповые игры
         kg = s_id.total_group  # кол-во групп
         
@@ -8816,10 +8841,14 @@ def  table_data(stage, kg):
         tdt_all.append(tdt_color)
     else:
         max_gamer = kol_player()
-        tr = len(result)  # общее кол-во игр в группах
+        result_stage = result.select().where(Result.number_group == stage)
+        tr = len(result_stage)  # общее кол-во игр в группах
         for p in range(0, kg):
             num_gr = f"{p + 1} группа"
-            posev_data = player_choice_in_group(num_gr) # словарь фамилия:игрок/id регион: область
+            if stage == "Предварительный":
+                posev_data = player_choice_in_group(num_gr) # словарь фамилия:игрок/id регион: область
+            else:
+                posev_data = player_choice_semifinal(stage, num_gr)
             count_player_group = len(posev_data)
             tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
             tdt_new.append(tdt_tmp[0])
@@ -9859,44 +9888,59 @@ def player_choice_one_table(stage):
     return posev_data
 
 
-def player_choice_semifinal(stage):
+def player_choice_semifinal(stage, num_gr):
     """список спортсменов полуфиналов"""
     posev_data = []
-    mesto_first = 0
-
+    choice = Choice.select().where(Choice.title_id == title_id())
+    choice_group_pf = choice.select().where((Choice.semi_final == stage) & (Choice.n_group == num_gr))
     players = Player.select().where(Player.title_id == title_id())
-    system = System.select().where(System.title_id == title_id())
-    systems = system.select().where(System.stage == "Предварительный").get()
-    total_group = systems.total_group
-    system_stage = system.select().where(System.stage == stage).get()
-    mesta_exit = system_stage.mesta_exit
-
-    if stage == "1-й полуфинал":
-        mesto_first = 1
-    else:
-        system_stage = system.select().where(System.stage == "1-й полуфинал").get()
-        mesta_exit = system_stage.mesta_exit
-        mesto_first = mesta_exit + 1
-
-    for k in range(1, total_group + 1):
-        choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == f"{k} группа"))
-        p = 0 if k <= total_group // 2 else mesta_exit
-        n = k if k <= total_group // 2 else total_group - k + 1
-        for i in range(mesto_first, mesta_exit + 1):
-            p += 1
-            choice_mesta = choices.select().where(Choice.mesto_group == i).get()
-            with db: # записывает в db номер полуфинала
-                choice_mesta.semi_final = stage
-                choice_mesta.n_group = f"{n} группа" # номера группы полуфинала
-                choice_mesta.posev_sf = p # номер посева
-                choice_mesta.save()
-
-            # pl = players.select().where(Player.id == choice_mesta.player_choice_id).get()
-            # city = pl.city
-            # posev_data.append({
-            #     'фамилия': choice_mesta.family,
-            #     'регион': city})
+    for posev in choice_group_pf:
+        pl = players.select().where(Player.id == posev.player_choice_id).get()
+        city = pl.city
+        id_pl = posev.player_choice_id
+        posev_data.append({
+            'фамилия': f"{posev.family}/{id_pl}",
+            'регион': city,
+        })
     return posev_data
+
+
+    # posev_data = []
+    # mesto_first = 0
+
+    # players = Player.select().where(Player.title_id == title_id())
+    # system = System.select().where(System.title_id == title_id())
+    # systems = system.select().where(System.stage == "Предварительный").get()
+    # total_group = systems.total_group
+    # system_stage = system.select().where(System.stage == stage).get()
+    # mesta_exit = system_stage.mesta_exit
+
+    # if stage == "1-й полуфинал":
+    #     mesto_first = 1
+    # else:
+    #     system_stage = system.select().where(System.stage == "1-й полуфинал").get()
+    #     mesta_exit = system_stage.mesta_exit
+    #     mesto_first = mesta_exit + 1
+
+    # for k in range(1, total_group + 1):
+    #     choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == f"{k} группа"))
+    #     p = 0 if k <= total_group // 2 else mesta_exit
+    #     n = k if k <= total_group // 2 else total_group - k + 1
+    #     for i in range(mesto_first, mesta_exit + 1):
+    #         p += 1
+    #         choice_mesta = choices.select().where(Choice.mesto_group == i).get()
+    #         with db: # записывает в db номер полуфинала
+    #             choice_mesta.semi_final = stage
+    #             choice_mesta.n_group = f"{n} группа" # номера группы полуфинала
+    #             choice_mesta.posev_sf = p # номер посева
+    #             choice_mesta.save()
+
+    #         pl = players.select().where(Player.id == choice_mesta.player_choice_id).get()
+    #         city = pl.city
+    #         posev_data.append({
+    #             'фамилия': choice_mesta.family,
+    #             'регион': city})
+    # return posev_data
 
 
 def player_choice_in_setka(fin):
