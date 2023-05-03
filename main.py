@@ -271,6 +271,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_list_Action.triggered.connect(self.view)
         self.view_one_table_Action.triggered.connect(self.view)
         self.view_gr_Action.triggered.connect(self.view)
+        self.view_pf_Action.triggered.connect(self.view)
         self.view_fin1_Action.triggered.connect(self.view)
         self.view_fin2_Action.triggered.connect(self.view)
         self.view_fin3_Action.triggered.connect(self.view)
@@ -2663,15 +2664,17 @@ def view():
     elif sender == my_win.view_gr_Action:  # вкладка группы
         view_file = f"{short_name}_table_group.pdf"
     elif sender == my_win.view_fin1_Action:
-        view_file = f"{short_name}_1-финал.pdf"
+        view_file = f"{short_name}_1-final.pdf"
     elif sender == my_win.view_fin2_Action:
-        view_file = f"{short_name}_2-финал.pdf"
+        view_file = f"{short_name}_2-final.pdf"
     elif sender == my_win.view_fin3_Action:
-        view_file = f"{short_name}_3-финал.pdf"
+        view_file = f"{short_name}_3-final.pdf"
     elif sender == my_win.view_fin4_Action:
-        view_file = f"{short_name}_4-финал.pdf"
+        view_file = f"{short_name}_4-final.pdf"
     elif sender == my_win.view_one_table_Action:
         view_file = f"{short_name}_one_table.pdf"
+    elif sender == my_win.view_pf_Action:
+        view_file = f"{short_name}-semifinal.pdf"
     elif sender == my_win.clear_s32_Action:
         view_file = "чист_32_сетка.pdf"
     elif sender == my_win.clear_s16_Action:
@@ -7472,18 +7475,17 @@ def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
     from reportlab.platypus import Table
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    for s_id in system:
-        if s_id.stage == stage:
-            max_pl = s_id.max_player
-            type_tbl = s_id.type_table
-            break
-    if stage == "Одна таблица" or (stage != "Одна таблица" and type_tbl == "круг"):
+    system = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()  # находит system id последнего
+    type_tbl = system.type_table
+ 
+    if (stage == "Одна таблица" and type_tbl == "круг") or (stage != "Одна таблица" and type_tbl == "круг"):
         kg = 1
-    # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-    #     kg = s_id.total_group  # кол-во групп
+    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+        kg = system.total_group  # кол-во групп
+        max_pl = system.max_player // kg
     else:  # групповые игры
-        kg = s_id.total_group  # кол-во групп
+        kg = system.total_group  # кол-во групп
+        max_pl = system.max_player
         
     family_col = 3.2
     if pv == "альбомная":  # альбомная ориентация стр
@@ -7646,11 +7648,11 @@ def table_made(pv, stage):
     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
         txt = stage.rfind("-")
         number_fin = stage[:txt]
-        name_table = f"{short_name}_{number_fin}_semifinal.pdf"
+        name_table = f"{short_name}_{number_fin}-semifinal.pdf"
     else:
         txt = stage.rfind("-")
         number_fin = stage[:txt]
-        name_table = f"{short_name}_{number_fin}-финал.pdf"
+        name_table = f"{short_name}_{number_fin}-final.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     change_dir()
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -7812,7 +7814,7 @@ def setka_16_2_made(fin):
         if fin == "Одна таблица":
             name_table_final = f"{short_name}_one_table.pdf"
         else:
-            name_table_final = f"{short_name}_{f}-финал.pdf"
+            name_table_final = f"{short_name}_{f}-final.pdf"
     else:
         short_name = "чист_16_2_сетка"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
@@ -8802,18 +8804,21 @@ def setka_data_clear(fin, table):
     return all_list
     
 
-def kol_player():
+def kol_player(stage):
     """выводит максимальное количество человек в группе t если все группы равны, а g2 если разное количество"""
-    system = System.get(System.title_id == title_id())
-    all_players = system.total_athletes
-    all_group = system.total_group
-    flat = all_players % all_group  # если количество участников равно делится на группы
+    system = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()
+    if stage == "Предварительный":
+        all_players = system.total_athletes
+        all_group = system.total_group
+        flat = all_players % all_group  # если количество участников равно делится на группы
     # если количество участников не равно делится на группы, g2 наибольшое кол-во человек в группе
-    player_flat = all_players // all_group
-    if flat == 0:
-        max_gamer = player_flat
+        player_flat = all_players // all_group
+        if flat == 0:
+            max_gamer = player_flat
+        else:
+            max_gamer = player_flat + 1
     else:
-        max_gamer = player_flat + 1
+        max_gamer = system.max_player // system.total_group
     return max_gamer
 
 
@@ -8840,7 +8845,7 @@ def  table_data(stage, kg):
         tdt_all.append(tdt_new)
         tdt_all.append(tdt_color)
     else:
-        max_gamer = kol_player()
+        max_gamer = kol_player(stage)
         result_stage = result.select().where(Result.number_group == stage)
         tr = len(result_stage)  # общее кол-во игр в группах
         for p in range(0, kg):
@@ -9903,44 +9908,6 @@ def player_choice_semifinal(stage, num_gr):
             'регион': city,
         })
     return posev_data
-
-
-    # posev_data = []
-    # mesto_first = 0
-
-    # players = Player.select().where(Player.title_id == title_id())
-    # system = System.select().where(System.title_id == title_id())
-    # systems = system.select().where(System.stage == "Предварительный").get()
-    # total_group = systems.total_group
-    # system_stage = system.select().where(System.stage == stage).get()
-    # mesta_exit = system_stage.mesta_exit
-
-    # if stage == "1-й полуфинал":
-    #     mesto_first = 1
-    # else:
-    #     system_stage = system.select().where(System.stage == "1-й полуфинал").get()
-    #     mesta_exit = system_stage.mesta_exit
-    #     mesto_first = mesta_exit + 1
-
-    # for k in range(1, total_group + 1):
-    #     choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == f"{k} группа"))
-    #     p = 0 if k <= total_group // 2 else mesta_exit
-    #     n = k if k <= total_group // 2 else total_group - k + 1
-    #     for i in range(mesto_first, mesta_exit + 1):
-    #         p += 1
-    #         choice_mesta = choices.select().where(Choice.mesto_group == i).get()
-    #         with db: # записывает в db номер полуфинала
-    #             choice_mesta.semi_final = stage
-    #             choice_mesta.n_group = f"{n} группа" # номера группы полуфинала
-    #             choice_mesta.posev_sf = p # номер посева
-    #             choice_mesta.save()
-
-    #         pl = players.select().where(Player.id == choice_mesta.player_choice_id).get()
-    #         city = pl.city
-    #         posev_data.append({
-    #             'фамилия': choice_mesta.family,
-    #             'регион': city})
-    # return posev_data
 
 
 def player_choice_in_setka(fin):
