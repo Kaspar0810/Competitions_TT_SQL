@@ -361,7 +361,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                         if reply == msg.Ok:
                             my_win.tabWidget.setCurrentIndex(2)
-                            clear_db_before_choice()
+                            clear_db_before_choice(stage)
                             # === вставить ручной вид жеребьевки
                             choice_gr_automat()
                             add_open_tab(tab_page="Группы")
@@ -377,15 +377,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             stage = select_choice_semifinal()
             if stage is None: # если отмена при выборе жеребьевки
                 return
-                # проверяет все или игры в группе сыграны
-            result_all = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
-            all_game = len(result_all)
-            result_gameing = Result.select().where((Result.title_id == title_id()) & (Result.winner != ""))
-            playing_games = len(result_gameing)
-            remains = all_game - playing_games
-            if remains == 0:
-                # posev_data = player_choice_semifinal(semifinal)
-                choice_semifinal_automat(stage)
+            systems = system.select().where(System.stage == stage).get()
+            if systems.choice_flag == True:
+                reply = msg.information(my_win, 'Уведомление',
+                                                "Жеребъевка была произведена,\nесли хотите сделать "
+                                                "повторно\nнажмите -ОК-, если нет то - Cancel-",
+                                                msg.Ok, msg.Cancel)
+                if reply == msg.Ok:
+                    my_win.tabWidget.setCurrentIndex(3)
+                    clear_db_before_choice(stage)
+                    choice_semifinal_automat(stage)
+                    add_open_tab(tab_page="Полуфиналы")
+                    my_win.tabWidget.setCurrentIndex(4)
+                    my_win.ed_pf_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                    return
+                else:
+                    return
+            else:
+                    # проверяет все или игры в группе сыграны
+                result_all = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
+                all_game = len(result_all)
+                result_gameing = Result.select().where((Result.title_id == title_id()) & (Result.winner != ""))
+                playing_games = len(result_gameing)
+                remains = all_game - playing_games
+                if remains == 0:
+                    choice_semifinal_automat(stage)
+                    add_open_tab(tab_page="Полуфиналы")
+                    my_win.tabWidget.setCurrentIndex(4)
+                    my_win.ed_pf_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
@@ -2143,7 +2162,7 @@ def page():
             visible_field()
             my_win.label_16.hide()
     elif tb == 4:  # вкладка -полуфиналы-
-        system_stage = sf.select().where(System.stage == "Полуфиналы").get()
+        system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
         my_win.checkBox_7.setEnabled(False)
@@ -3097,7 +3116,42 @@ def change_status_visible_and_score_game():
             my_win.frame_gr_seven.setVisible(True)
         my_win.label_22.setVisible(True)
     elif tab == 4:
-        pass
+        system_stage = system.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
+        match_db = system_stage.score_flag
+        state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
+        match_current = match_db
+        state_visible = state_visible_db
+        #  ==== изменение состояние =====
+        if sender == my_win.checkBox_14:
+            for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                if i.isChecked():
+                    match_current = int(i.text())
+                    break
+            state_visible = my_win.checkBox_14.isChecked()
+        elif (sender == my_win.radioButton_match_3 or 
+            sender == my_win.radioButton_match_5 or sender == my_win.radioButton_match_7):
+            for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                if i.isChecked():
+                    match_current = int(i.text())
+                    break
+            state_visible = state_visible_db
+
+        if match_current == 3:
+            my_win.radioButton_match_9.setChecked(True)
+            my_win.frame_pf_three.setVisible(True)
+            my_win.frame_pf_five.setVisible(False)
+            my_win.frame_pf_seven.setVisible(False)
+        elif match_current == 5:
+            my_win.radioButton_match_10.setChecked(True)
+            my_win.frame_pf_three.setVisible(True)
+            my_win.frame_pf_five.setVisible(True)
+            my_win.frame_pf_seven.setVisible(False)
+        elif match_current == 7:
+            my_win.radioButton_match_11.setChecked(True)
+            my_win.frame_pf_three.setVisible(True)
+            my_win.frame_pf_five.setVisible(True)
+            my_win.frame_pf_seven.setVisible(True)
+        my_win.label_71.setVisible(True)
     else:
         r = my_win.tableWidget.currentRow()
         if r == -1:
@@ -4732,7 +4786,7 @@ def choice_semifinal_automat(stage):
     """жеребьевка полуфиналов"""
     mesto_first = 0
 
-    players = Player.select().where(Player.title_id == title_id())
+    # players = Player.select().where(Player.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     systems = system.select().where(System.stage == "Предварительный").get()
     total_group = systems.total_group
@@ -6535,7 +6589,7 @@ def clear_db_before_edit():
         r_d.delete_instance()
 
 
-def clear_db_before_choice():
+def clear_db_before_choice(stage):
     """очищает систему перед повторной жеребьевкой и изменяет кол-во участников если они изменились"""
     msgBox = QMessageBox
     sys = System.select().where(System.title_id == title_id())
@@ -6546,7 +6600,7 @@ def clear_db_before_choice():
     total_player = system.total_athletes
     max_pl = system.max_player
     new_total_player = len(player)
-    free_group = 0
+    # free_group = 0
     if total_player != new_total_player: #  если изменилось число участников
         result = msgBox.question(my_win, "Список участников", "Был изменено число участников.\n"
         "вы хотите изменить систему соревнований?",
@@ -6581,18 +6635,22 @@ def clear_db_before_choice():
                 x.save()
     # else:  # если число спортсменов не изменилось (просто смена участников)
     gl = Game_list.select().where(Game_list.title_id == title_id())
-    for i in gl:
+    system_id = sys.select().where(System.stage == stage).get()
+    gamelists = gl.select().where(Game_list.system_id == system_id)
+    for i in gamelists:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
-    chc = Choice.select().where(Choice.title_id == title_id())
-    for i in chc:
-        ch_d = Choice.get(Choice.id == i)
-        ch_d.delete_instance()
-    rs = Result.select().where(Result.title_id == title_id())
-    for i in rs:
+    choices = Choice.select().where(Choice.title_id == title_id())
+    if stage == "Предварительный":
+        for i in choices:
+            ch_d = Choice.get(Choice.id == i)
+            ch_d.delete_instance()
+    results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+    for i in results:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
-    choice_tbl_made()
+    if stage == "Предварительный":
+        choice_tbl_made()
 
 
 def clear_db_before_choice_final(fin):
@@ -8846,7 +8904,8 @@ def  table_data(stage, kg):
         tdt_all.append(tdt_color)
     else:
         max_gamer = kol_player(stage)
-        result_stage = result.select().where(Result.number_group == stage)
+        # result_stage = result.select().where(Result.number_group == stage)
+        result_stage = result.select().where(Result.system_stage == stage)
         tr = len(result_stage)  # общее кол-во игр в группах
         for p in range(0, kg):
             num_gr = f"{p + 1} группа"
@@ -9055,7 +9114,7 @@ def score_in_table(td, num_gr):
     if tab == 3:
         ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
     elif tab == 4:
-        ta = system.select().where(System.stage == "Полуфиналы").get()  # находит system id последнего
+        ta = system.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()  # находит system id последнего
     else:
         ta = system.select().where(System.stage == num_gr).get()  # находит system id последнего
     mp = ta.max_player
