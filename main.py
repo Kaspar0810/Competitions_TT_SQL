@@ -168,7 +168,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         view_Menu.addAction(self.view_title_Action)
         view_Menu.addAction(self.view_list_Action)
         view_Menu.addAction(self.view_gr_Action)
-        view_Menu.addAction(self.view_pf_Action)
+        pf_view_Menu = view_Menu.addMenu("Полуфиналы")
+        pf_view_Menu.addAction(self.view_pf1_Action)
+        pf_view_Menu.addAction(self.view_pf2_Action)
         view_Menu.addAction(self.view_one_table_Action)
         v_Menu = view_Menu.addMenu("Финалы")
         v_Menu.addAction(self.view_fin1_Action)
@@ -214,7 +216,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_title_Action = QAction("Титульный лист")
         self.view_list_Action = QAction("Список участников")
         self.view_gr_Action = QAction("Группы")
-        self.view_pf_Action = QAction("Полуфиналы")
+        self.view_pf1_Action = QAction("1-й полуфинал")
+        self.view_pf2_Action = QAction("2-й полуфинал")
 
         self.view_one_table_Action = QAction("Одна таблица")
         self.go_to_Action = QAction("пусто")
@@ -241,7 +244,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.view_one_table_Action.setEnabled(False)
         self.view_gr_Action.setEnabled(False)
-        self.view_pf_Action.setEnabled(False)
+        self.view_pf1_Action.setEnabled(False)
+        self.view_pf2_Action.setEnabled(False)
         # self.v_menu
         self.view_fin1_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin2_Action.setEnabled(False)  # делает пункт меню не видимым
@@ -271,7 +275,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_list_Action.triggered.connect(self.view)
         self.view_one_table_Action.triggered.connect(self.view)
         self.view_gr_Action.triggered.connect(self.view)
-        self.view_pf_Action.triggered.connect(self.view)
+        self.view_pf1_Action.triggered.connect(self.view)
+        self.view_pf2_Action.triggered.connect(self.view)
         self.view_fin1_Action.triggered.connect(self.view)
         self.view_fin2_Action.triggered.connect(self.view)
         self.view_fin3_Action.triggered.connect(self.view)
@@ -384,8 +389,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             playing_games = len(result_gameing)
             remains = all_game - playing_games
             if remains == 0:
-                # posev_data = player_choice_semifinal(semifinal)
                 choice_semifinal_automat(stage)
+                add_open_tab(tab_page="Полуфинал")
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
@@ -963,8 +968,10 @@ def enabled_menu_after_choice():
             elif stage == "Предварительный":
                 my_win.view_gr_Action.setEnabled(True)
                 my_win.ed_gr_Action.setEnabled(True) # включает меню - редакирование жеребьевки групп
-            elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-                my_win.view_pf_Action.setEnabled(True)
+            elif stage == "1-й полуфинал":
+                my_win.view_pf1_Action.setEnabled(True)
+            elif stage == "2-й полуфинал":
+                my_win.view_pf2_Action.setEnabled(True)
             elif stage == "1-й финал":
                 my_win.view_fin1_Action.setEnabled(True)
             elif stage == "2-й финал":
@@ -2673,8 +2680,10 @@ def view():
         view_file = f"{short_name}_4-final.pdf"
     elif sender == my_win.view_one_table_Action:
         view_file = f"{short_name}_one_table.pdf"
-    elif sender == my_win.view_pf_Action:
-        view_file = f"{short_name}-semifinal.pdf"
+    elif sender == my_win.view_pf1_Action:
+        view_file = f"{short_name}_1-semifinal.pdf"
+    elif sender == my_win.view_pf2_Action:
+        view_file = f"{short_name}_2-semifinal.pdf"
     elif sender == my_win.clear_s32_Action:
         view_file = "чист_32_сетка.pdf"
     elif sender == my_win.clear_s16_Action:
