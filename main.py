@@ -378,19 +378,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     else:
                         my_win.tabWidget.setCurrentIndex(2)
                         choice_gr_automat()
-        elif sender == self.choice_pf_Action: # подменю полуфиналы
+        elif sender == self.choice_pf_Action: # подменю полуфиналы            
             stage = select_choice_semifinal()
+            system_stage = system.select().where(System.stage == stage).get()
+            choice_flag = system_stage.choice_flag
             if stage is None: # если отмена при выборе жеребьевки
                 return
+            if choice_flag is True:
+                reply = msg.information(my_win, 'Уведомление',
+                                                "Жеребъевка была произведена,\nесли хотите сделать "
+                                                "повторно\nнажмите -ОК-, если нет то - Cancel-",
+                                                msg.Ok, msg.Cancel)
+
+                if reply == msg.Ok:
+                    # my_win.tabWidget.setCurrentIndex(3)
+                    clear_db_before_choice_semifinal(stage)
+                    # === вставить ручной вид жеребьевки
+                    choice_semifinal_automat(stage)
+                    add_open_tab(tab_page="Полуфиналы")
+                    my_win.tabWidget.setCurrentIndex(4)
+                    my_win.ed_pf_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                    return
+                else:
+                    return
+            else:
                 # проверяет все или игры в группе сыграны
-            result_all = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
-            all_game = len(result_all)
-            result_gameing = Result.select().where((Result.title_id == title_id()) & (Result.winner != ""))
-            playing_games = len(result_gameing)
-            remains = all_game - playing_games
-            if remains == 0:
-                # posev_data = player_choice_semifinal(semifinal)
-                choice_semifinal_automat(stage)
+                result_all = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
+                all_game = len(result_all)
+                result_gameing = Result.select().where((Result.title_id == title_id()) & (Result.winner != ""))
+                playing_games = len(result_gameing)
+                remains = all_game - playing_games
+                if remains == 0:
+                    choice_semifinal_automat(stage)
+                    my_win.tabWidget.setCurrentIndex(4)
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
@@ -6655,7 +6675,23 @@ def clear_db_before_choice_final(fin):
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
-    
+
+
+def clear_db_before_choice_semifinal(stage):
+    """очищает базу данных -Game_list- и -Result- перед повторной жеребьевкой полуфиналов"""
+    system = System.select().where(System.title_id == title_id()) 
+    system_id = system.select().where(System.stage == stage).get()
+    gamelist = Game_list.select().where(Game_list.title_id == title_id())
+    gl = gamelist.select().where(Game_list.system_id == system_id)
+    for i in gl:
+        gl_d = Game_list.get(Game_list.id == i)
+        gl_d.delete_instance()
+    results = Result.select().where(Result.title_id == title_id())
+    rs = results.select().where(Result.system_stage == stage)
+    for i in rs:
+        r_d = Result.get(Result.id == i)
+        r_d.delete_instance()
+
 
 def ready_system():
     """проверка на готовность системы"""
@@ -9946,7 +9982,8 @@ def player_choice_semifinal(stage, num_gr):
     """список спортсменов полуфиналов"""
     posev_data = []
     choice = Choice.select().where(Choice.title_id == title_id())
-    choice_group_pf = choice.select().where((Choice.semi_final == stage) & (Choice.n_group == num_gr))
+    choice_pf = choice.select().where(Choice.semi_final == stage)
+    choice_group_pf = choice_pf.select().order_by(Choice.posev_sf).where(Choice.n_group == num_gr)
     players = Player.select().where(Player.title_id == title_id())
     for posev in choice_group_pf:
         pl = players.select().where(Player.id == posev.player_choice_id).get()
