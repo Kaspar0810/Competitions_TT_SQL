@@ -3608,7 +3608,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -3616,7 +3616,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3628,8 +3628,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>225</width>
-       <height>565</height>
+       <width>237</width>
+       <height>534</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4002,7 +4002,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4289,7 +4289,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4562,12 +4562,178 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
       <string>Полуфиналы</string>
      </attribute>
+     <widget class="QGroupBox" name="groupBox_filter_group_semifinal">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>221</width>
+        <height>227</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="title">
+       <string>Фильтр</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>6</x>
+         <y>27</y>
+         <width>211</width>
+         <height>191</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <property name="spacing">
+         <number>1</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_14">
+          <property name="spacing">
+           <number>1</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_34">
+            <property name="font">
+             <font>
+              <family>Courier New</family>
+              <pointsize>14</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>по полуфиналам</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_filter_semifinal"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_15">
+            <property name="font">
+             <font>
+              <family>Courier New</family>
+              <pointsize>14</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>по группам</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_filter_group_sf">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_29">
+            <property name="font">
+             <font>
+              <family>Courier New</family>
+              <pointsize>14</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>по результатам</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_filter_played_sf"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_32">
+            <property name="font">
+             <font>
+              <family>Courier New</family>
+              <pointsize>14</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>по игроку</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_find_name_sf">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <property name="spacing">
+           <number>1</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="Button_filter_sf">
+            <property name="text">
+             <string>Фильтр</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="Button_reset_filter_sf">
+            <property name="text">
+             <string>Сброс</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>211</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>14</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_4">
      <property name="geometry">
@@ -4575,7 +4741,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4824,7 +4990,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>494</height>
+       <height>501</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5265,6 +5431,26 @@
     </property>
     <property name="text">
      <string>Создать</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_23">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>750</y>
+      <width>203</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+      <pointsize>14</pointsize>
+      <italic>true</italic>
+     </font>
+    </property>
+    <property name="text">
+     <string>по группам</string>
     </property>
    </widget>
   </widget>
