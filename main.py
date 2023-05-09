@@ -1,5 +1,5 @@
 
-import typing
+# import typing
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -31,7 +31,7 @@ import pathlib
 from pathlib import Path
 import random
 # import collections
-# from playhouse.migrate import *
+from playhouse.migrate import *
 
 if not os.path.isdir("table_pdf"):  # создает папку 
     os.mkdir("table_pdf")
@@ -3308,7 +3308,9 @@ def visible_field():
             flag = 1
             my_win.checkBox_4.setChecked(state_visible)
         elif tab == 4:
-            pass
+            state_visible = change_status_visible_and_score_game()
+            flag = 1
+            my_win.checkBox_14.setChecked(state_visible)
         else:
             # устанавливает начальное значение - со счетом ищ 5-ти партий
             stage = "все финалы"
@@ -3336,7 +3338,7 @@ def visible_field():
                 system_stage.save()
 
         state_visible = state_visible_db
-    if sender == my_win.checkBox_4 or sender == my_win.checkBox_5: # изменяет состояние чекбокса игра со счетом или нет
+    if sender == my_win.checkBox_4 or sender == my_win.checkBox_5 or sender == my_win.checkBox_14: # изменяет состояние чекбокса игра со счетом или нет
         if tab == 3:
             state_visible = my_win.checkBox_4.isChecked()
             if state_visible is True:
@@ -3344,7 +3346,11 @@ def visible_field():
             else:
                 my_win.lineEdit_pl1_gr_score_total.setFocus()
         elif tab == 4:
-            pass
+            state_visible = my_win.checkBox_14.isChecked()
+            if state_visible is True:
+                my_win.lineEdit_pl1_s1_pf.setFocus()
+            else:
+                my_win.lineEdit_pl1_pf_score_total.setFocus()
         else:
             state_visible = my_win.checkBox_5.isChecked()
             if state_visible is True:
@@ -5051,6 +5057,8 @@ def choice_semifinal_automat(stage):
                 choice_mesta.n_group = f"{n} группа" # номера группы полуфинала
                 choice_mesta.posev_sf = p # номер посева
                 choice_mesta.save()
+    # ===== вставить функцию добавления сыгранных игр
+    load_playing_game_in_table_for_semifinal(fin=stage)
     with db:  # записывает в систему, что произведена жеребъевка
         system = System.get(System.id == sys_id)
         system.choice_flag = True
@@ -10873,6 +10881,108 @@ def tours_list(cp):
     return tour_list
 
 
+def load_playing_game_in_table_for_semifinal(fin):
+    """растановка в финале игроков со встречей сыгранной в группе"""
+    id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы в порядке занятых место по возрастанию
+    posev_player_exit_out_gr = []
+    player_exit = []
+    mesto_rank = 1 # начальное место с которого вышли в финал
+    system = System.select().where(System.title_id == title_id())
+    choice = Choice.select().where(Choice.title_id == title_id())
+    results = Result.select().where(Result.title_id == title_id())
+    sys = system.select().where(System.stage == "Предварительный").get()
+    sys_fin = system.select().where(System.stage == fin).get()
+    sys_fin_id = sys_fin.id
+    kol_gr = sys.total_group
+    if fin == "1-й финал":
+        mesto_rank = 1
+    elif fin == "1-й полуфинал":  
+        mesta_rank = 1          
+        choice = choice.select().where(Choice.semi_final == fin)
+        choice_group = choice.select().where(Choice.sf_group == f"{i} группа") 
+    elif fin == "2-й полуфинал": 
+        pass
+    else:
+        sys_fin_last = system.select().where(System.id == sys_fin_id - 1).get()
+        mesto_rank = sys_fin_last.mesta_exit + 1 # место, попадающих в финал из группы начало
+    how_many_mest_exit = sys_fin.mesta_exit # количество мест попадающих из предварительного этапа
+#  ================
+    for i in range(1, kol_gr + 1): # цикл по группам
+        posev_player_exit_out_gr.clear()
+        id_player_exit_out_gr.clear()
+        choice_group = choice.select().where(Choice.group == f"{i} группа") 
+        kol_player = len(choice_group) # число участников в группе
+        if mesto_rank + how_many_mest_exit <= kol_player:
+            mesto_rank_end = mesto_rank + how_many_mest_exit
+        else:
+            mesto_rank_end = kol_player + 1
+        n = 0
+        for k in range(mesto_rank, mesto_rank_end): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
+            ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
+            pl_id = ch_mesto_exit.player_choice_id # id игрока, занявшего данное место
+            pl_posev = ch_mesto_exit.posev_group
+            id_player_exit_out_gr.append(pl_id)
+            posev_player_exit_out_gr.append(pl_posev) # номера игроков в группе вышедших в финал
+            n += 1
+
+        posev_pl = []
+        temp = []
+        posev_id_pl = []
+        all_posev_id_pl = []
+        if n > 1:
+            # получаем все варианты встреч, сыгранных в группе игроков которые попали в финал
+            for i in combinations(posev_player_exit_out_gr, 2):
+                posev_player_exit = list(i)
+                for v in posev_player_exit:
+                    ind = posev_player_exit_out_gr.index(v)
+                    id_player = id_player_exit_out_gr[ind]
+                    temp.append(id_player)
+                    posev_id_pl = temp.copy()
+                temp.clear()
+                posev_pl.append(posev_player_exit)
+                all_posev_id_pl.append(posev_id_pl)
+
+            result_pre = results.select().where(Result.system_stage == "Предварительный") # изменить откуда выходят из группы или пф
+            for d in range(0, len(posev_pl)):
+                posev_exit = posev_pl[d]
+                id_player_exit = all_posev_id_pl[d]
+                if posev_exit[0] > posev_exit[1]: # если спортсмены заняли места не по расстановки в табл меняем на номера встречи в правильном порядке по возр
+                    id_player_exit.reverse()
+                    
+                player_exit.clear()
+                posev_exit.clear()
+                for l in id_player_exit:
+                    players = Player.select().where(Player.id == l).get()
+                    family_city = players.full_name
+                    player_exit.append(family_city)  
+                    # номер ид в таблице -Result- встречи игроков, попавших в финал идущих по расстоновке в таблице   
+                result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
+
+                result_pre_fin = results.select().where(Result.number_group == fin)
+
+                result_fin_1 = result_pre_fin.select().where((Result.player1 == player_exit[0]))
+                result_fin = result_fin_1.select().where(Result.player2 == player_exit[1])
+                count = len(result_fin)
+
+                if count != 1:
+                    result_fin = result_pre_fin.select().where((Result.player1 == player_exit[1]) & (Result.player2 == player_exit[0])).get()
+                else:
+                    result_fin = result_pre_fin.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get()
+
+                with db:
+                    result_fin.winner = result_gr.winner
+                    result_fin.points_win = result_gr.points_win
+                    result_fin.score_in_game = result_gr.score_in_game
+                    result_fin.score_win = result_gr.score_win
+                    result_fin.loser = result_gr.loser
+                    result_fin.points_loser = result_gr.points_loser
+                    result_fin.score_loser = result_gr.score_loser
+                    result_fin.save()
+    stage = fin
+    pv = sys_fin.page_vid
+    table_made(pv, stage)
+
+
 def load_playing_game_in_table_for_final(fin):
     """растановка в финале игроков со встречей сыгранной в группе"""
     id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы в порядке занятых место по возрастанию
@@ -10968,7 +11078,6 @@ def load_playing_game_in_table_for_final(fin):
     table_made(pv, stage)
 
 
-
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
 #     # filename = input("Введите любое существующее имя файла:\n")
@@ -11020,7 +11129,7 @@ def load_playing_game_in_table_for_final(fin):
 #     with db:
 # # #         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
 # # #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         migrate(migrator.rename_column('r1_lists_m', 'r_region', 'r1_region')) # Переименование столбца (таблица, старое название, новое название столбца)
+#         migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
         # migrate(migrator.add_column('r1_lists_m', 'r1_district', r1_district)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
     # ========================= создание таблицы
