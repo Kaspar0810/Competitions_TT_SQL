@@ -1,5 +1,5 @@
 
-# import typing
+import typing
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -31,7 +31,7 @@ import pathlib
 from pathlib import Path
 import random
 # import collections
-from playhouse.migrate import *
+# from playhouse.migrate import *
 
 if not os.path.isdir("table_pdf"):  # создает папку 
     os.mkdir("table_pdf")
@@ -393,11 +393,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                                 msg.Ok, msg.Cancel)
 
                 if reply == msg.Ok:
-                    # my_win.tabWidget.setCurrentIndex(3)
                     clear_db_before_choice_semifinal(stage)
                     # === вставить ручной вид жеребьевки
                     choice_semifinal_automat(stage)
+# ======= заполнение сыграныыми играми в группах
+                    reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить {stage} результатами "
+                                                                            f"встреч, сыгранных в группах.",
+                                                                            
+                                            msg.Ok,
+                                            msg.Cancel)
+                    if reply == msg.Ok:
+                        load_playing_game_in_table_for_semifinal(stage)
+                    else:
+                        return
                     add_open_tab(tab_page="Полуфиналы")
+
                     my_win.tabWidget.setCurrentIndex(4)
                     my_win.ed_pf_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
                     return
@@ -3338,7 +3348,7 @@ def visible_field():
                 system_stage.save()
 
         state_visible = state_visible_db
-    if sender == my_win.checkBox_4 or sender == my_win.checkBox_5 or sender == my_win.checkBox_14: # изменяет состояние чекбокса игра со счетом или нет
+    if sender == my_win.checkBox_4 or sender == my_win.checkBox_14 or sender == my_win.checkBox_5: # изменяет состояние чекбокса игра со счетом или нет
         if tab == 3:
             state_visible = my_win.checkBox_4.isChecked()
             if state_visible is True:
@@ -5057,8 +5067,6 @@ def choice_semifinal_automat(stage):
                 choice_mesta.n_group = f"{n} группа" # номера группы полуфинала
                 choice_mesta.posev_sf = p # номер посева
                 choice_mesta.save()
-    # ===== вставить функцию добавления сыгранных игр
-    load_playing_game_in_table_for_semifinal(fin=stage)
     with db:  # записывает в систему, что произведена жеребъевка
         system = System.get(System.id == sys_id)
         system.choice_flag = True
@@ -10881,32 +10889,24 @@ def tours_list(cp):
     return tour_list
 
 
-def load_playing_game_in_table_for_semifinal(fin):
-    """растановка в финале игроков со встречей сыгранной в группе"""
+def load_playing_game_in_table_for_semifinal(stage):
+    """растановка в полуфинале игроков со встречей сыгранной в группе"""
     id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы в порядке занятых место по возрастанию
     posev_player_exit_out_gr = []
-    player_exit = []
+    player_exit = []    
     mesto_rank = 1 # начальное место с которого вышли в финал
     system = System.select().where(System.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     results = Result.select().where(Result.title_id == title_id())
     sys = system.select().where(System.stage == "Предварительный").get()
-    sys_fin = system.select().where(System.stage == fin).get()
-    sys_fin_id = sys_fin.id
+    sys_semifin = system.select().where(System.stage == stage).get()
     kol_gr = sys.total_group
-    if fin == "1-й финал":
+    if stage == "1-й полуфинал":
         mesto_rank = 1
-    elif fin == "1-й полуфинал":  
-        mesta_rank = 1          
-        choice = choice.select().where(Choice.semi_final == fin)
-        choice_group = choice.select().where(Choice.sf_group == f"{i} группа") 
-    elif fin == "2-й полуфинал": 
-        pass
     else:
-        sys_fin_last = system.select().where(System.id == sys_fin_id - 1).get()
+        sys_fin_last = system.select().where(System.stage == stage).get()
         mesto_rank = sys_fin_last.mesta_exit + 1 # место, попадающих в финал из группы начало
-    how_many_mest_exit = sys_fin.mesta_exit # количество мест попадающих из предварительного этапа
-#  ================
+    how_many_mest_exit = sys_semifin.mesta_exit # количество мест попадающих из предварительного этапа
     for i in range(1, kol_gr + 1): # цикл по группам
         posev_player_exit_out_gr.clear()
         id_player_exit_out_gr.clear()
@@ -10955,31 +10955,24 @@ def load_playing_game_in_table_for_semifinal(fin):
                     players = Player.select().where(Player.id == l).get()
                     family_city = players.full_name
                     player_exit.append(family_city)  
-                    # номер ид в таблице -Result- встречи игроков, попавших в финал идущих по расстоновке в таблице   
+                    # номер ид в таблице -Result- встречи игроков, попавших в полуфинал идущих по расстоновке в таблице   
                 result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
 
-                result_pre_fin = results.select().where(Result.number_group == fin)
-
-                result_fin_1 = result_pre_fin.select().where((Result.player1 == player_exit[0]))
-                result_fin = result_fin_1.select().where(Result.player2 == player_exit[1])
-                count = len(result_fin)
-
-                if count != 1:
-                    result_fin = result_pre_fin.select().where((Result.player1 == player_exit[1]) & (Result.player2 == player_exit[0])).get()
-                else:
-                    result_fin = result_pre_fin.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get()
+                result_pre_fin = results.select().where(Result.system_stage == stage)
+                result_semifin_player1 = result_pre_fin.select().where(Result.player1.in_(player_exit))
+                result_semifin = result_semifin_player1.select().where(Result.player2.in_(player_exit)).get()
 
                 with db:
-                    result_fin.winner = result_gr.winner
-                    result_fin.points_win = result_gr.points_win
-                    result_fin.score_in_game = result_gr.score_in_game
-                    result_fin.score_win = result_gr.score_win
-                    result_fin.loser = result_gr.loser
-                    result_fin.points_loser = result_gr.points_loser
-                    result_fin.score_loser = result_gr.score_loser
-                    result_fin.save()
-    stage = fin
-    pv = sys_fin.page_vid
+                    result_semifin.winner = result_gr.winner
+                    result_semifin.points_win = result_gr.points_win
+                    result_semifin.score_in_game = result_gr.score_in_game
+                    result_semifin.score_win = result_gr.score_win
+                    result_semifin.loser = result_gr.loser
+                    result_semifin.points_loser = result_gr.points_loser
+                    result_semifin.score_loser = result_gr.score_loser
+                    result_semifin.save()
+    pv = sys_semifin.page_vid
+    my_win.tabWidget.setCurrentIndex(4)
     table_made(pv, stage)
 
 
@@ -11078,6 +11071,7 @@ def load_playing_game_in_table_for_final(fin):
     table_made(pv, stage)
 
 
+
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
 #     # filename = input("Введите любое существующее имя файла:\n")
@@ -11129,7 +11123,7 @@ def load_playing_game_in_table_for_final(fin):
 #     with db:
 # # #         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
 # # #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
+#         migrate(migrator.rename_column('r1_lists_m', 'r_region', 'r1_region')) # Переименование столбца (таблица, старое название, новое название столбца)
         # migrate(migrator.add_column('r1_lists_m', 'r1_district', r1_district)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
     # ========================= создание таблицы
