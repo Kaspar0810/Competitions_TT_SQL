@@ -1,5 +1,5 @@
 
-import typing
+# import typing
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
