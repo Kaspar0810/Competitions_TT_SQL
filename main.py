@@ -924,6 +924,7 @@ my_win.comboBox_kategor_sek.addItems(kategoria_list)
 my_win.comboBox_sredi.addItems(mylist)
 my_win.comboBox_razryad.addItems(raz)
 my_win.comboBox_filter_played.addItems(res)
+my_win.comboBox_filter_played_sf.addItems(res)
 my_win.comboBox_filter_played_fin.addItems(res)
 
 my_win.comboBox_table_1.addItems(vid_setki_one_table)
@@ -2117,7 +2118,6 @@ def page():
         my_win.comboBox_table_8.hide()
 
         my_win.spinBox_kol_group.hide()
-
 
         flag = ready_system()
 
@@ -4944,6 +4944,58 @@ def filter_fin(pl=False):
         my_win.comboBox_find_name_fin.clear()
 
 
+def filter_sf():
+    """фильтрует таблицу -результаты- на вкладке полуфиналы"""
+    find_player = []
+    sf = ['1-й полуфинал', '2-й полуфинал']
+    semifinal = my_win.comboBox_filter_semifinal.currentText()
+    group = my_win.comboBox_filter_group_sf.currentText()
+    name = my_win.comboBox_find_name_sf.currentText()
+    played = my_win.comboBox_filter_played_sf.currentText()
+    find_player.append(name)
+    fltr_id = Result.select().where(Result.title_id == title_id())
+    if group == "все группы" and my_win.comboBox_find_name_sf.currentText() != "":
+        pl1_query = fltr_id.select().where(Result.player1 == name)
+        pl2_query = fltr_id.select().where(Result.player2 == name)
+        fltr = pl1_query | pl2_query # объдиняет два запроса в один
+    elif group == "все группы" and played == "все игры":
+        fltr = fltr_id.select().where(Result.system_stage.in_(sf))
+    elif group == "все группы" and played == "завершенные":
+        fltr = fltr_id.select().where(Result.points_win == 2)
+    elif group != "все группы" and played == "завершенные":
+        fl = fltr_id.select().where(Result.number_group == group)
+        fltr = fl.select().where(Result.points_win == 2)
+    elif group != "все группы" and played == "не сыгранные":
+        fl = fltr_id.select().where(Result.number_group == group)
+        fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
+    elif group == "все группы" and played == "не сыгранные":
+        fltr = fltr_id.select().where(Result.points_win != 2 and Result.points_win == None)
+    elif group != "все группы" and played == "все игры":
+        if semifinal == "-все полуфиналы-":
+            fltr = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.number_group == group))
+        else:
+            fltr = fltr_id.select().where((Result.system_stage == semifinal) & (Result.number_group == group))
+
+    result_list = fltr.dicts().execute()
+    row_count = len(result_list)  # кол-во строк в таблице
+    if played == "завершенные":
+        my_win.label_17.setText(f"сыграно {row_count} встреч")
+    elif played == "не сыгранные":
+        my_win.label_17.setText(f"не сыграно еще {row_count} встреч(а)")
+    else:
+        my_win.label_17.setText(f"всего {row_count} встреч(а)")
+    my_win.label_17.show()
+    column_count = 13  # кол-во столбцов в таблице
+    # вставляет в таблицу необходимое кол-во строк
+    my_win.tableWidget.setRowCount(row_count)
+
+    for row in range(row_count):  # добавляет данные из базы в TableWidget
+        for column in range(column_count):
+            item = str(list(result_list[row].values())[column])
+            my_win.tableWidget.setItem(
+                row, column, QTableWidgetItem(str(item)))
+
+
 def filter_gr():
     """фильтрует таблицу -результаты- на вкладке группы"""
     find_player = []
@@ -5020,11 +5072,16 @@ def load_combo_etap_begunki():
 def reset_filter():
     """сбрасывает критерии фильтрации"""
     sender = my_win.sender()
-    if sender == my_win.Button_reset_filter:
+    if sender == my_win.Button_reset_filter_gr:
         my_win.comboBox_find_name.setCurrentText("")
         my_win.comboBox_filter_played.setCurrentText("все игры")
         my_win.comboBox_filter_group.setCurrentText("все группы")
         filter_gr()
+    elif sender == my_win.Button_reset_filter_sf:
+        my_win.comboBox_find_name_sf.setCurrentText("")
+        my_win.comboBox_filter_played_sf.setCurrentText("все игры")
+        my_win.comboBox_filter_group_sf.setCurrentText("все группы")
+        filter_sf()
     elif sender == my_win.Button_reset_filter_fin:
         my_win.comboBox_find_name_fin.setCurrentText("")
         my_win.comboBox_filter_played_fin.setCurrentText("все игры")
@@ -7283,19 +7340,6 @@ def kol_player_in_final():
         max_exit_group = exit_player_stage[0]
         exit_stage = exit_player_stage[1]
         fin = exit_player_stage[2]
-    # elif my_win.comboBox_etap.currentText() == "Полуфиналы":
-    #     etap = my_win.comboBox_etap.currentText()
-    #     exit_player_stage = max_player_and_exit_stage(etap)
-    #     max_exit_group = exit_player_stage[0]
-    #     exit_stage = exit_player_stage[1]
-    #     fin = exit_player_stage[2]
-    # elif my_win.comboBox_etap.currentText() == "Финальный":
-    #     etap = my_win.comboBox_etap.currentText()
-    #     exit_player_stage = max_player_and_exit_stage(etap)
-    #     max_exit_group = exit_player_stage[0]
-    #     exit_stage = exit_player_stage[1]
-    #     fin = exit_player_stage[2]
-
     # изменение падежа этапов в комбобоксе
     if exit_stage == "Предварительный":
         exit_stroka = "Предварительного этапа"
@@ -7521,16 +7565,12 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     from reportlab.platypus import Table
     systems = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
-    # result_group = result.select().where(Result.number_group == number_group)
     if stage != "Финальный":
         system = systems.select().where(System.stage == stage).get()
         total_group = system.total_group
-
     else:
         system = systems.select().where(System.stage == number_group).get()
         final_type = system.type_table
-
-    # result_group = result.select().where(Result.system_stage == stage)
      # # кол-во столбцов в таблице и их ширина
     cW = (1.6 * cm)
     rH = (0.6 * cm, 0.9 * cm, 1 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm,
@@ -7652,7 +7692,6 @@ def begunki_made():
                         ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
                         ('ALIGN',(0, 0), (0, 0),'CENTER')])
     #  ========= формирование диапазона печати бегунков ==========
-    # sys = system.select().where(System.stage == number_group).get()
     sys = system.select().where(System.stage == stage).get()
     final_type = sys.type_table
     list_tours = []
@@ -7738,8 +7777,6 @@ def begunki_made():
         os.system(f"open {view_file}")
     elif platform == "win32":  # Windows...
         os.system(f"{view_file}")
-
-    # os.system(f"open {view_file}")
 
 
 def select_stage_for_begunki():
@@ -8301,7 +8338,6 @@ def setka_16_full_made(fin):
             name_table_final = f"{short_name}_one_table.pdf"
         else:
             name_table_final = f"{short_name}_{f}-финал.pdf"
-        # name_table_final = f"{short_name}_{f}-финал.pdf"
     else:
         short_name = "чист_16_full_сетка"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
@@ -9159,8 +9195,6 @@ def  table_data(stage, kg):
     tdt_new = []
     result = Result.select().where(Result.title_id == title_id())  # находит system id последнего
 
-    # проверяет заполнена ли таблица (если строк 0, то еще нет записей)
-
     if kg == 1:  # система одна таблица круг или финалу по кругу
         # список словарей участник и его регион
         result_fin = result.select().where(Result.number_group == stage)
@@ -9198,7 +9232,6 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     tdt_tmp = []
     tbl_tmp = []  # временный список группы tbl
     # цикл нумерации строк (по 2-е строки на каждого участника)
-    # tab = my_win.tabWidget.currentIndex()
     for k in range(1, max_gamer * 2 + 1):
         st = ['']
         # получаем пустой список (номер, фамилия и регион, клетки (кол-во уч), оч, соот, место)
@@ -9296,50 +9329,6 @@ def setka_data(fin, posev_data):
     return all_list
 
 
-# def setka_data_32(fin):
-#     """данные сетки на 32"""
-#     id_ful_name = {}
-#     id_name = {}
-#     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-#     for sys in system:  # проходит циклом по всем отобранным записям
-#         if sys.stage == fin:
-#             mp = sys.max_player
-#             flag = sys.choice_flag
-#     tds = []
-#     all_list = []
-#     if flag == True:
-#         posev_data = setka_player_after_choice(fin) # получаем списки участников сетки после жеребьевки
-#     else:
-#         posev_data = player_choice_in_setka(fin)  # получаем списки участников сетки новой или повторной жеребьевки
-
-
-#     for i in range(1, mp * 2 + 1, 2):
-#         posev = posev_data[((i + 1) // 2) - 1]
-#         family = posev['фамилия']
-#         if family != "X":
-#             id_f_name = full_player_id(family)
-#             id_f_n = id_f_name[0]
-#             id_s_n = id_f_name[1]
-#             # словарь ключ - полное имя/ город, значение - id
-#             id_ful_name[id_f_n["name"]] = id_f_n["id"]
-#             id_name[id_s_n["name"]] = id_s_n["id"]
-#             # =================
-#             # находит пробел отделяющий имя от фамилии
-#             space = family.find(" ")
-#             line = family.find("/")  # находит черту отделяющий имя от города
-#             city_slice = family[line:]  # получает отдельно город
-#             # получает отдельно фамилия и первую букву имени
-#             family_slice = family[:space + 2]
-#             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
-#             tds.append(family_city)
-#         else:
-#             tds.append(family)
-#     all_list.append(tds)
-#     all_list.append(id_ful_name)
-#     all_list.append(id_name)
-#     return all_list
-
-
 def full_player_id(family):
     """получает словарь -фамилия игрока и его город и соответствующий ему id в таблице Players"""
     full_name = {}
@@ -9356,7 +9345,6 @@ def full_player_id(family):
         name = plr.player
         # ====  вариант фамилия и имя
         space = name.find(" ")  # находит пробел отделяющий имя от фамилии
-        # family_slice = name[:space + 2]
         full_name["name"] = f"{name}/{city}"
         full_name["id"] = id_player
         short_name["name"] = f"{name}"
@@ -9644,7 +9632,6 @@ def rank_in_group(total_score, td, num_gr, stage):
     result = Result.select().where(Result.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
 
-    # f = num_gr.find("группа")
     if stage == "Предварительный":
         system = sys.select().where(System.stage == stage).get()
         max_person = system.max_player
@@ -10028,7 +10015,6 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
                 w = key_l[val_l.index(i)]
                 # получает номер участника, соответствующий
                 # новый вариант получения номера участника
-                # wq = key_l[q] # получает номер группы, соответствующий
                 wq = int(d.setdefault(w))
                 # записывает соотношения игроку
                 td[wq * 2 - 2][max_person + 3] = str(i)
@@ -10339,8 +10325,7 @@ def player_choice_in_setka(fin):
 
     posev_data = []
     for key in posev.keys():
-        posev_data.append({'посев': key, 'фамилия': posev[key]})
-   
+        posev_data.append({'посев': key, 'фамилия': posev[key]})  
     # сортировка (списка словарей) по ключу словаря -посев-
     posev_data = sorted(posev_data, key=lambda i: i['посев'])
     sys_tem = system.select().where(System.stage == fin).get()
@@ -10511,7 +10496,6 @@ def draw_setka_2(col, row, num, style):
     elif num == 4:
         cf = 2
     elif num == 8:
-        # cf = 3
         cf = 4
     elif num == 16:
         cf = 5
@@ -11273,10 +11257,12 @@ my_win.Button_Ok_pf.setAutoDefault(True)  # click on <Enter>
 my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
 my_win.Button_pay_R.clicked.connect(save_in_db_pay_R)
 my_win.Button_clear_del.clicked.connect(clear_del_player)
-my_win.Button_reset_filter.clicked.connect(reset_filter)
+my_win.Button_reset_filter_gr.clicked.connect(reset_filter)
 my_win.Button_reset_filter_fin.clicked.connect(reset_filter)
+my_win.Button_reset_filter_sf.clicked.connect(reset_filter)
 my_win.Button_filter_fin.clicked.connect(filter_fin)
-my_win.Button_filter.clicked.connect(filter_gr)
+my_win.Button_filter_sf.clicked.connect(filter_sf)
+my_win.Button_filter_gr.clicked.connect(filter_gr)
 # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_etap_made.clicked.connect(etap_made)
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу

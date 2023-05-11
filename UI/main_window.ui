@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>3</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3608,7 +3608,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4407,14 +4407,14 @@
           <number>1</number>
          </property>
          <item>
-          <widget class="QPushButton" name="Button_filter">
+          <widget class="QPushButton" name="Button_filter_gr">
            <property name="text">
             <string>Фильтр</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="Button_reset_filter">
+          <widget class="QPushButton" name="Button_reset_filter_gr">
            <property name="text">
             <string>Сброс</string>
            </property>
@@ -4587,13 +4587,13 @@
       <property name="title">
        <string>Фильтр</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>6</x>
          <y>27</y>
          <width>211</width>
-         <height>191</height>
+         <height>199</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_13">
