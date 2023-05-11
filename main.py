@@ -3331,7 +3331,8 @@ def visible_field():
             my_win.checkBox_4.setEnabled(True)
             stage = "Предварительный" # из какого финала играют встречу
         elif tab == 4:
-            pass
+            my_win.checkBox_14.setEnabled(True)
+            
         else:
             state_visible = my_win.checkBox_5.isChecked()
             stage = my_win.tableWidget.item(r, 2).text() # из какого финала играют встречу
@@ -4356,7 +4357,8 @@ def enter_score(none_player=0):
                 winner = my_win.lineEdit_player2_gr.text()
                 loser = my_win.lineEdit_player1_gr.text()
             elif tab == 4:
-                pass
+                winner = my_win.lineEdit_player2_pf.text()
+                loser = my_win.lineEdit_player1_pf.text()
             elif tab == 5:  # игры в финалах
                 winner = my_win.lineEdit_player2_fin.text()
                 loser = my_win.lineEdit_player1_fin.text()
@@ -5064,7 +5066,7 @@ def choice_semifinal_automat(stage):
             choice_mesta = choices.select().where(Choice.mesto_group == i).get()
             with db: # записывает в db номер полуфинала
                 choice_mesta.semi_final = stage
-                choice_mesta.n_group = f"{n} группа" # номера группы полуфинала
+                choice_mesta.sf_group = f"{n} группа" # номера группы полуфинала
                 choice_mesta.posev_sf = p # номер посева
                 choice_mesta.save()
     with db:  # записывает в систему, что произведена жеребъевка
@@ -9394,7 +9396,7 @@ def score_in_table(td, num_gr):
         stage = ta.stage
         mp = len(gamelist.select().where((Game_list.system_id == ta) & (Game_list.number_group == num_gr)))
         r = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
-        ch = choice.select().where((Choice.semi_final == stage) & (Choice.n_group == num_gr))  # фильтрует по группе
+        ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
     else:
         ta = system.select().where(System.stage == num_gr).get()  # находит system id последнего
         stage = ta.stage
@@ -9482,6 +9484,8 @@ def score_in_table(td, num_gr):
     count_game = (count_player * (count_player - 1)) // 2
     if num_gr == "Одна таблица":
         results = result.select().where(Result.system_stage == num_gr)
+    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+        results = r.select().where(Result.number_group == num_gr)
     else:
         results = result.select().where(Result.number_group == num_gr)
 
@@ -9489,7 +9493,7 @@ def score_in_table(td, num_gr):
     a = len(results_playing) # кол-во сыгранных игр
 
     if a == count_game:
-        rank_in_group(total_score, td, num_gr)  # определяет места в группе
+        rank_in_group(total_score, td, num_gr, stage)  # определяет места в группе
 
     return td_color
 
@@ -9581,7 +9585,7 @@ def score_in_setka(fin):
     return dict_setka
 
 
-def result_rank_group_in_choice(num_gr, player_rank_group):
+def result_rank_group_in_choice(num_gr, player_rank_group, stage):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
     tab = my_win.tabWidget.currentIndex()
@@ -9590,7 +9594,7 @@ def result_rank_group_in_choice(num_gr, player_rank_group):
         if tab == 3:
             choice = chc.select().where(Choice.group == num_gr)
         elif tab == 4:
-            pass
+            choice = chc.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))
         else:
             if num_gr == "Одна таблица":
                 choice = chc.select().where(Choice.basic == "Одна таблица")
@@ -9620,7 +9624,7 @@ def result_rank_group_in_choice(num_gr, player_rank_group):
                 n += 1
 
 
-def rank_in_group(total_score, td, num_gr):
+def rank_in_group(total_score, td, num_gr, stage):
     """выставляет места в группах соответственно очкам -men_of_circle - кол-во человек в крутиловке
     player_rank_group - список списков номер игрока - место -num_player -player_rank - список списков участник - место
     player_group - кол-во участников в группе"""
@@ -9635,23 +9639,32 @@ def rank_in_group(total_score, td, num_gr):
     player_rank_tmp = []
     player_rank = []
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
-    player_rank_group = []
+    player_rank_group = []    
     sys = System.select().where(System.title_id == title_id())
-    f = num_gr.find("группа")
-    if f != -1:
-        system = sys.select().where(System.stage == "Предварительный").get()
-    else:
-        system = sys.select().where(System.stage == num_gr).get()
     result = Result.select().where(Result.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
-    game_list_group = game_list.select().where(Game_list.number_group == num_gr)
-    max_person = system.max_player
-    max_per = len(game_list_group)
-   
-    if num_gr == "Одна таблица":
+
+    # f = num_gr.find("группа")
+    if stage == "Предварительный":
+        system = sys.select().where(System.stage == stage).get()
+        max_person = system.max_player
+    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+        system = sys.select().where(System.stage == stage).get()
+        system_id = system.id
+        game_list_group = game_list.select().where((Game_list.system_id == system_id) & (Game_list.number_group == num_gr))
+        game_max = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))  # сколько всего игр в группе
+        max_person = len(game_list_group)
+    elif num_gr == "Одна таблица":
+        system = sys.select().where(System.stage == num_gr).get()
         game_max = result.select().where(Result.system_stage == num_gr)  # сколько всего игр в группе
-    else:
-        game_max = result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
+    # game_list_group = game_list.select().where(Game_list.number_group == num_gr)
+    # # max_person = system.max_player
+    # max_per = len(game_list_group)
+   
+    # if num_gr == "Одна таблица":
+    #     game_max = result.select().where(Result.system_stage == num_gr)  # сколько всего игр в группе
+    # else:
+    #     game_max = result.select().where(Result.number_group == num_gr)  # сколько всего игр в группе
     # 1-й запрос на выборку с группой
     game_played = game_max.select().where(Result.winner is None or Result.winner != "")  # 2-й запрос на выборку
     # с победителями из 1-ого запроса
@@ -9715,7 +9728,7 @@ def rank_in_group(total_score, td, num_gr):
         player_rank_tmp.clear()
     if kol_tours_played == kol_tours_in_group:  # когда все встречи сыграны
         # функция простановки мест из группы в -Choice-
-        result_rank_group_in_choice(num_gr, player_rank_group)
+        result_rank_group_in_choice(num_gr, player_rank_group,stage)
 
 
 def get_unique_numbers(pp_all):
@@ -10229,7 +10242,7 @@ def player_choice_semifinal(stage, num_gr):
     posev_data = []
     choice = Choice.select().where(Choice.title_id == title_id())
     choice_pf = choice.select().where(Choice.semi_final == stage)
-    choice_group_pf = choice_pf.select().order_by(Choice.posev_sf).where(Choice.n_group == num_gr)
+    choice_group_pf = choice_pf.select().order_by(Choice.posev_sf).where(Choice.sf_group == num_gr)
     players = Player.select().where(Player.title_id == title_id())
     for posev in choice_group_pf:
         pl = players.select().where(Player.id == posev.player_choice_id).get()
@@ -11123,8 +11136,8 @@ def load_playing_game_in_table_for_final(fin):
 #     with db:
 # # #         # migrate(migrator.drop_not_null('system', 'mesta_exit'))
 # # #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         migrate(migrator.rename_column('r1_lists_m', 'r_region', 'r1_region')) # Переименование столбца (таблица, старое название, новое название столбца)
-        # migrate(migrator.add_column('r1_lists_m', 'r1_district', r1_district)) # Добавление столбца (таблица, столбец, повтор название столбца)
+#         migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
+#         # migrate(migrator.add_column('r1_lists_m', 'r1_district', r1_district)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
     # ========================= создание таблицы
     # with db:

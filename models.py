@@ -193,7 +193,7 @@ class Choice(BaseModel):
     posev_group = IntegerField(null=True)
     mesto_group = IntegerField(null=True)
     semi_final = IntegerField(null=True)
-    n_group = CharField(null=True)
+    sf_group = CharField(null=True)
     posev_sf = IntegerField(null=True)
     mesto_semi_final = IntegerField(null=True)
     final = CharField(null=True)
