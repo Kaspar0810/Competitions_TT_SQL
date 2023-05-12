@@ -4955,13 +4955,20 @@ def filter_sf():
     find_player.append(name)
     fltr_id = Result.select().where(Result.title_id == title_id())
     if group == "все группы" and my_win.comboBox_find_name_sf.currentText() != "":
-        pl1_query = fltr_id.select().where(Result.player1 == name)
-        pl2_query = fltr_id.select().where(Result.player2 == name)
+        if semifinal == "-все полуфиналы-":
+            pl1_query = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.player1 == name))
+            pl2_query = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.player2 == name))            
+        else:
+            pl1_query = fltr_id.select().where((Result.system_stage == semifinal) & (Result.player1 == name))
+            pl2_query = fltr_id.select().where((Result.system_stage == semifinal) & (Result.player2 == name)) 
         fltr = pl1_query | pl2_query # объдиняет два запроса в один
     elif group == "все группы" and played == "все игры":
         fltr = fltr_id.select().where(Result.system_stage.in_(sf))
     elif group == "все группы" and played == "завершенные":
-        fltr = fltr_id.select().where(Result.points_win == 2)
+        if semifinal == "-все полуфиналы-":
+            fltr = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.points_win == 2))
+        else:
+            fltr = fltr_id.select().where((Result.system_stage == semifinal) & (Result.points_win == 2))
     elif group != "все группы" and played == "завершенные":
         fl = fltr_id.select().where(Result.number_group == group)
         fltr = fl.select().where(Result.points_win == 2)
@@ -5052,8 +5059,10 @@ def load_combo():
         city = i.city
         text.append(f"{family}/{city}")
     my_win.comboBox_find_name.addItems(text)
+    my_win.comboBox_find_name_sf.addItems(text)
     my_win.comboBox_find_name_fin.addItems(text)
     my_win.comboBox_find_name.setCurrentText("")
+    my_win.comboBox_find_name_sf.setCurrentText("")
     my_win.comboBox_find_name_fin.setCurrentText("")
 
 
