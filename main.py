@@ -433,57 +433,61 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             etap_exit = sys.stage_exit
             if etap_exit == "Предварительный":
                 etap_replacing = etap_exit.replace("ый", "ом")
-            elif etap_exit == "Полуфинал":
+            elif etap_exit == "1-й полуфинал" or etap_exit == "2-й полуфинал":
                 etap_replacing = etap_exit + "е"
             fin_replacing = fin.replace("й", "ого") + "а"
             if fin is not None:
+                checking_flag = checking_possibility_choice(fin) # флаг жеребьевки этапа, если True значит все игры предварительного или полуфиналов сыграны
+                if checking_flag is False:
+                    return
                 check_flag = check_choice(fin)
                 if check_flag is True:
-                    if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
-                        reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
-                                                                            f"\nесли хотите сделать "
-                                                                            "повторно\nнажмите-ОК-, "
-                                                                            "если нет то - Cancel-",
-                                                        msg.Ok,
-                                                        msg.Cancel)
-                        if reply == msg.Ok:
-                            if type == "круг":
-                                clear_db_before_choice_final(fin)
-                                player_fin_on_circle(fin)
-                                if kol_player_exit > 1:
-                                    reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить игры {fin_replacing} результатами "
-                                                                            f"встреч, сыгранных в {etap_replacing} этапе.",
-                                                                            
-                                                        msg.Ok,
-                                                        msg.Cancel)
-                                    if reply == msg.Ok:
-                                        load_playing_game_in_table_for_final(fin)
-                                    else:
-                                        return
-                                add_open_tab(tab_page="Финалы")
-                            else:
-                                choice_setka(fin)
-                        else:
-                            return
-                    else:
+                    # if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
+                    reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
+                                                                        f"\nесли хотите сделать "
+                                                                        "повторно\nнажмите-ОК-, "
+                                                                        "если нет то - Cancel-",
+                                                    msg.Ok,
+                                                    msg.Cancel)
+                    if reply == msg.Ok:
                         if type == "круг":
-                            s = system.select().where(System.stage == "Предварительный").get()
-                            group = s.total_group
+                            clear_db_before_choice_final(fin)
                             player_fin_on_circle(fin)
                             if kol_player_exit > 1:
                                 reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить игры {fin_replacing} результатами "
-                                                                            f"встреч, сыгранных в {etap_replacing} этапе.",
+                                                                        f"встреч, сыгранных в {etap_replacing} этапе.",
                                                                             
-                                                        msg.Ok,
-                                                        msg.Cancel)
+                                                    msg.Ok,
+                                                    msg.Cancel)
                                 if reply == msg.Ok:
                                     load_playing_game_in_table_for_final(fin)
                                 else:
                                     return
+                            add_open_tab(tab_page="Финалы")
                         else:
                             choice_setka(fin)
+                    else:
+                        return
                 else:
-                    return
+                    if type == "круг":
+                        s = system.select().where(System.stage == "Предварительный").get()
+                        group = s.total_group
+                        player_fin_on_circle(fin)
+                        if kol_player_exit > 1:
+                            reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить игры {fin_replacing} результатами "
+                                                                        f"встреч, сыгранных в {etap_replacing} этапе.",
+                                                                            
+                                                    msg.Ok,
+                                                    msg.Cancel)
+                            if reply == msg.Ok:
+                                load_playing_game_in_table_for_final(fin)
+                            else:
+                                return
+                    else:
+                        player_choice_in_setka(fin)
+                        choice_setka(fin)
+                    # else:
+                    # return
             else:
                 return
         enabled_menu_after_choice()
@@ -5613,10 +5617,9 @@ def setka_choice_number(fin, count_exit):
     posev_3 = []
     posev_4 = []
 
-    system = System.select().where(System.title_id == title_id())
-    sys = system.select().where(System.stage == fin).get()
-
-    type_setka = sys.label_string
+    system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()
+ 
+    type_setka = system.label_string
     if count_exit == 1:
         if type_setka == "Сетка (с розыгрышем всех мест) на 16 участников":
             posev_1 = [[1, 16], [8, 9], [4, 5, 12, 13], [2, 3, 6, 7, 10, 11, 14, 15]]
@@ -5903,8 +5906,8 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
             number_posev = [i for i in sev if i <= player_net // 2] # номера от 1 до 16 
     elif n > 1: 
         if n == 2: # уводит 3-е место от 2-ого в другую четверть
-            group_last = group_last[8:]
-            number_last = number_last[8:] # список номеров 2-ого посева
+            group_last = group_last[:8]
+            number_last = number_last[:8] # список номеров 2-ого посева
         elif n == 3: # уводит 4-е место от 1-ого в другую четверть
             group_last = group_last[:8] 
             number_last = number_last[:8]
@@ -6118,17 +6121,16 @@ def posev_test(posev, group, m):
 
 def choice_setka(fin):
     """жеребьевки сетки"""
-    sys = System.select().where(System.title_id == title_id())  # находит system id последнего
-    system = sys.select().where(System.stage == fin).get()
+    system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()# находит system id последнего
+    # system = sys.select().where(System.stage == fin).get()
 
     flag = system.choice_flag
     if flag is True:  # перед повторной жеребьевкой
-        del_choice = Game_list.select().where(Game_list.title_id == title_id()
-                                              and Game_list.number_group == fin)
+        del_choice = Game_list.select().where((Game_list.title_id == title_id()) & (Game_list.number_group == fin))
         for i in del_choice:
             i.delete_instance()  # удаляет строки финала (fin) из таблицы -Game_list
         
-        del_result = Result.select().where(Result.title_id == title_id() and Result.number_group == fin)
+        del_result = Result.select().where((Result.title_id == title_id()) & (Result.number_group == fin))
         for i in del_result:
             i.delete_instance()  # удаляет строки финала (fin) из таблицы -Result-
 
@@ -7119,7 +7121,16 @@ def manual_choice_setka(fin, count_exit, mesto_first_poseva):
 
 
 def check_choice(fin):
-    """Проверяет перед жеребьевкой финалов, сыграны ли все партиии в группах"""
+    """Проверяет перед жеребьевкой финалов, была ли она произведена ранее или еще нет"""
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    system_final = system.select().where(System.stage == fin).get() # получаем запись конкретного финала
+    check_flag = system_final.choice_flag
+ 
+    return check_flag
+
+
+def checking_possibility_choice(fin):
+    """Проверяет перед жеребьевкой финалов, сыграны ли все партиии в группах или полуфиналах"""
     msg = QMessageBox
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     system_final = system.select().where(System.stage == fin).get() # получаем запись конкретного финала
@@ -7127,13 +7138,17 @@ def check_choice(fin):
         check_flag = system_final.choice_flag
     else:    
         exit = system_final.stage_exit  # запись откуда идет выход в финал
-        res = Result.select().where(Result.title_id == title_id())  # отбираем записи с выходом в финал
-        gr = res.select().where(Result.system_stage == exit)
+        if exit == "1-й полуфинал" or exit == "2-й полуфинал":
+            exit_str = f"{exit}е"
+        else:
+            exit_str = "предварительном этапе"
+        gr = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == exit)) # отбираем записи с выходом в финал
+
         for i in gr:
             game = i.points_win 
             check_flag = True      
             if game is None:
-                result = msg.information(my_win, "Предварительный этап", "Еще не все встречи сыграны в предварительном этапе.",
+                result = msg.information(my_win, "Предварительный этап", "Еще не все встречи сыграны в" f"{exit_str}.",
                                         msg.Ok)
                 check_flag = False
                 break                        
@@ -10263,67 +10278,65 @@ def player_choice_in_setka(fin):
 
     flag = check_choice(fin)
     if flag is False: # если жеребьевка еще не сделана
-        for t in system:
-            if t.stage == "Предварительный":
-                p_stage.append(t.stage)               
-            elif t.stage == "Полуфиналы":
-                p_stage.append(t.stage)
-        count = len(p_stage)
+        system_id = system.select().where(System.stage == fin).get()
+        stage_exit = system_id.stage_exit # откуда выходят в финал
+        count_exit = system_id.mesta_exit # сколько игроков выходят в финал
+    
         if fin == "Одна таблица":
             mesto_first_poseva = 1
             count_exit = 1
-        elif count == 2:  # играются еще и полуфиналы
-            pre_stage, ok = QInputDialog.getItem(my_win, "Число участников", "Выберите предварительный этап,\n откуда "
-                                                 "спортсмены выходят" f"{p_stage} в {fin}")
-            if ok:
-                pass
-        else:  # выходят в финал только из  группового этапа
-            mp = t.max_player
-            kpt, ok = QInputDialog.getInt(my_win, "Места в группе", "Введите место, которoе выходит\n"
-                                          f"из группы в {fin}", value=1, min=1, max=mp)
-            if ok:
-                sys_tem = system.select().where(System.stage == fin).get()
-                sys = system.select().where(System.stage == "Предварительный").get()
-                count_exit = sys_tem.max_player // sys.total_group
-                if count_exit == 1:  # если выходит один человек
-                    reply = QMessageBox.information(my_win, 'Уведомление',
-                                                    "Из группы выходят в " f"{fin} спортсмены,\n"
-                                                    "занявшие " f"{kpt} место, все верно?",
-                                                    QMessageBox.Yes,
-                                                    QMessageBox.Cancel)
-                elif count_exit == 2: # если выходит два человека
-                    reply = QMessageBox.information(my_win, 'Уведомление',
-                                                    "Из группы выходят в " f"{fin} спортсмены,\n"
-                                                    "занявшие " f"{kpt} и {kpt + 1} места, все верно?",
-                                                    QMessageBox.Yes,
-                                                    QMessageBox.Cancel)
-                elif count_exit == 3:  # если выходит 4 человека
-                    reply = QMessageBox.information(my_win, 'Уведомление',
-                                                    "Из группы выходят в " f"{fin} спортсмены,\n"
-                                                    "занявшие " f"{kpt}, {kpt + 1} и {kpt + 2} места, все верно?",
-                                                    QMessageBox.Yes,
-                                                    QMessageBox.Cancel)
-                elif count_exit == 4:  # если выходит 4 человека
-                    reply = QMessageBox.information(my_win, 'Уведомление',
-                                                    "Из группы выходят в " f"{fin} спортсмены,\n"
-                                                    "занявшие " f"{kpt}, {kpt + 1}, {kpt + 2} и {kpt + 3} места, все верно?",
-                                                    QMessageBox.Yes,
-                                                    QMessageBox.Cancel)   
-
-                if reply == QMessageBox.Yes:
-                    with db:
-                        sys_tem.stage_exit = "Предварительный"
-                        sys_tem.mesta_exit = kpt
-                        sys_tem.save()
-                else:
-                    return
+        elif stage_exit == "Предварительный":
+            pass
+        elif stage_exit == "1-й полуфинал" or  stage_exit == "2-й полуфинал":
+            if stage_exit == "1-й полуфинал":
+                stage_str = "1-ого полуфинала"
             else:
-                player_choice_in_setka(fin)
-                sys_tem = system.select().where(System.stage == fin).get()
-                if sys_tem.choice_flag == True:
-                    exit()
-            mesto_first_poseva = kpt
+                stage_str = "2-ого полуфинала"
 
+        if count_exit == 1: 
+            number_exit_str = "1-е место"
+        elif count_exit == 2:
+            number_exit_str = "1-е и 2-е место"
+        elif count_exit == 3:
+            number_exit_str = "1-е, 2-е и 3-е место"
+        elif count_exit == 4:
+            number_exit_str = "1-е, 2-е, 3-е и 4-е место"
+
+        # elif count == 2:  # играются еще и полуфиналы
+        #     pre_stage, ok = QInputDialog.getItem(my_win, "Число участников", "Выберите предварительный этап,\n откуда "
+        #                                          "спортсмены выходят" f"{p_stage} в {fin}")
+        #     if ok:
+        #         pass
+        # else:  # выходят в финал только из группового этапа
+        #     mp = t.max_player
+        #     kpt, ok = QInputDialog.getInt(my_win, "Места в группе", "Введите место, которoе выходит\n"
+        #                                   f"из группы в {fin}", value=1, min=1, max=mp)
+        #     if ok:
+        #         sys_tem = system.select().where(System.stage == fin).get()
+        #         sys = system.select().where(System.stage == "Предварительный").get()
+        #         count_exit = sys_tem.max_player // sys.total_group
+            # if number_exit == 1:  # если выходит один человек
+        reply = QMessageBox.information(my_win, 'Уведомление',
+                                        "Из " f"{stage_str} выходят в " f"{fin} спортсмены,\n"
+                                        "занявшие " f"{number_exit_str}, все верно?",
+                                        QMessageBox.Yes,
+                                        QMessageBox.Cancel)
+
+        if reply == QMessageBox.Cancel:
+            return
+        #         with db:
+        #                 sys_tem.stage_exit = "Предварительный"
+        #                 sys_tem.mesta_exit = kpt
+        #                 sys_tem.save()
+        # else:
+        #     return
+        # else:
+        #     player_choice_in_setka(fin)
+        #     sys_tem = system.select().where(System.stage == fin).get()
+        #     if sys_tem.choice_flag == True:
+        #         exit()
+        # mesto_first_poseva = number_exit
+        mesto_first_poseva = 1
     else:  # если была произведена жеребьевка
         if fin == "Одна таблица":
             mesto_first_poseva = 1
@@ -10335,7 +10348,7 @@ def player_choice_in_setka(fin):
             count_exit = sys.max_player // syst.total_group
             mesto_first_poseva = sys.mesta_exit
 
-    flag = selection_of_the_draw_mode()
+    flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
     posev = choice_setka_automat(fin, flag, count_exit, mesto_first_poseva)
 
     posev_data = []
