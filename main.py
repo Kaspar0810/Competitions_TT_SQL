@@ -5306,12 +5306,12 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
     posev_data = {} # окончательные посев номер в сетке - игрок/ город
     num_id_player = {} # словарь номер сетки - id игрока
     #===================================
-    system = System.select().where(System.title_id == title_id())
-    sys = system.select().where(System.stage == fin).get()
+    system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()
+#    ? sys = system.select().where(System.stage == fin).get()
     choice = Choice.select().where(Choice.title_id == title_id())
-    max_player = sys.total_athletes
+    max_player = system.total_athletes
   
-    posevs = setka_choice_number(fin, count_exit)
+    posevs = setka_choice_number(fin, count_exit) # выбор номеров сетки для посева
     player_net = posevs[0]
     posev_1 = posevs[1]
     z = len(posevs)
@@ -5333,15 +5333,22 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
     free_num = []
     all_player = []
     for d in range(0, count_exit):
-        if sys.stage == "Одна таблица":
+        if system.stage == "Одна таблица":
             all_player.append(len(choice.select().where(Choice.basic == fin)))
-        else:
-            all_player.append(len(choice.select().where(Choice.mesto_group == mesto_first_poseva + d)))
+        # else:
+        #     all_player.append(len(choice.select().where(Choice.mesto_group == mesto_first_poseva + d)))
     all_player = sum(all_player) # реальное число игроков в сетке
 
     for n in range (0, count_exit): # начало основного посева
         if fin == "1-й финал":
-            choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
+            stage_exit = system.stage_exit # этап откуда выходят в финал
+            mesta_exit = system.mesta_exit
+            nums = [i for i in range(1, mesta_exit + 1)] # получает список мест 
+            if stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал":
+                choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_group.in_(nums)))
+                all_player = len(choice_posev)
+            else: # выходят из предварительного
+                pass
         elif fin == "Одна таблица":
             choice_posev = choice.select().order_by(Choice.rank.desc()).where(Choice.basic == fin)
         else:
@@ -5604,7 +5611,7 @@ def wiev_table_choice():
 #     te.setGeometry(30, 30, 50, 50)
 #     te.setFocus()
 #     te.setTextColor(QColor(255, 0, 0))
-#     te.setFontPointSize(20)
+#     te.setFontPointSize(20)а
 #     dialog.setModal(True)
 #     dialog.show()
 
