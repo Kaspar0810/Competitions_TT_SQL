@@ -5332,28 +5332,48 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
     del_num = 0
     free_num = []
     all_player = []
-    for d in range(0, count_exit):
-        if system.stage == "Одна таблица":
-            all_player.append(len(choice.select().where(Choice.basic == fin)))
+    # for d in range(0, count_exit):
+    if system.stage == "Одна таблица":
+        all_player.append(len(choice.select().where(Choice.basic == fin)))
+    elif fin == "1-й финал":
+        stage_exit = system.stage_exit # этап откуда выходят в финал
+        mesta_exit = system.mesta_exit
+        max_player = system.max_player
+        nums = [i for i in range(1, mesta_exit + 1)] # получает список мест 
+        if stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
+            choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final.in_(nums)))
+        all_player = len(choice_posev) # реальное число игроков в сетке
+
+
         # else:
         #     all_player.append(len(choice.select().where(Choice.mesto_group == mesto_first_poseva + d)))
-    all_player = sum(all_player) # реальное число игроков в сетке
+    # all_player = sum(all_player) # реальное число игроков в сетке
 
     for n in range (0, count_exit): # начало основного посева
-        if fin == "1-й финал":
-            stage_exit = system.stage_exit # этап откуда выходят в финал
-            mesta_exit = system.mesta_exit
-            nums = [i for i in range(1, mesta_exit + 1)] # получает список мест 
-            if stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал":
-                choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_group.in_(nums)))
-                all_player = len(choice_posev)
-            else: # выходят из предварительного
-                pass
-        elif fin == "Одна таблица":
+        if fin == "Одна таблица":
             choice_posev = choice.select().order_by(Choice.rank.desc()).where(Choice.basic == fin)
-        else:
-            choice_posev = choice.select().order_by(Choice.rank.desc()).where(Choice.mesto_group == mesto_first_poseva + n)
+        elif fin == "1-й финал":
+            stage_exit = system.stage_exit # этап откуда выходят в финал
+            # mesta_exit = system.mesta_exit
+            max_player = system.max_player
+            mesto_first_poseva = 1
+            # nums = [i for i in range(1, mesta_exit + 1)] # получает список мест 
+            if stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
+                choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final == mesto_first_poseva + n))
+                # all_player = len(choice_posev)
+        #     else: # выходят из предварительного
+        #         pass
+        # elif fin == "Одна таблица":
+        #     choice_posev = choice.select().order_by(Choice.rank.desc()).where(Choice.basic == fin)
+        # else:
+        #     choice_posev = choice.select().order_by(Choice.rank.desc()).where(Choice.mesto_group == mesto_first_poseva + n)
         count_player_in_final = len(choice_posev)
+
+        # if max_player != count_player_in_final and count_exit == 1:
+        #     free_num = free_place_in_setka(max_player, count_player_in_final)
+        #     del_num = 1 # флаг, что есть свободные номера 
+        # elif max_player != count_player_in_final and count_exit > 1:
+        #     del_num = 1
 
         if count_player_in_final != max_player // count_exit and count_exit == 1: # вычеркиваем определенные номера только если одно место выходит из группы
             free_num = free_place_in_setka(max_player, count_player_in_final)
@@ -5366,7 +5386,10 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
         
             family = posev.family
             if fin != "Одна таблица":
-                group = posev.group
+                if stage_exit == "Предварительный":
+                    group = posev.group
+                else:
+                    group = posev.sf_group
                 ind = group.find(' ')
                 group_number = int(group[:ind])
             else:
