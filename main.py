@@ -5810,7 +5810,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                 possible_number[reg] = sev
         else: # 2-й посев и последующие 
             number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы
-            number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n)
+            number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
             reg_tmp.clear()
             for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
                 d = number_last.index(k)
@@ -5956,23 +5956,23 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
     return number_posev
 
 
-def number_setka_posev_last(cur_gr, group_last, number_last, n):
+def number_setka_posev_last(cur_gr, group_last, number_last, n, player_net):
     """промежуточные номера для посева в сетке""" 
     if n == 0:
         if cur_gr in group_last:
             index = group_last.index(cur_gr)
             set_number = number_last[index] # номер где уже посеянна такая же область 
-            if set_number <= 32 // 2: # если номер в сетке вверху, то надо сеять вниз
-                number_posev_old  = [i for i in number_last if i > 32 // 2] # отсеивает в списке номера больше 16
+            if set_number <= player_net // 2: # если номер в сетке вверху, то надо сеять вниз
+                number_posev_old  = [i for i in number_last if i > player_net // 2] # отсеивает в списке номера больше 16
             else: 
-                number_posev_old  = [i for i in number_last if i <= 32 // 2] # отсеивает в списке номера больше 16 
+                number_posev_old  = [i for i in number_last if i <= player_net // 2] # отсеивает в списке номера больше 16 
     elif n == 1: # уводит 2-е место от 1-ого в другую половину
         index = group_last.index(cur_gr)
         set_number = number_last[index] # номер где посеянна группа, от которой надо увести 
-        if set_number <= 32 // 2: # если номер в сетке вверху, то наде сеять вниз
-            number_posev_old  = [i for i in number_last if i > 32 // 2] # номера от 17 до 32
+        if set_number <= player_net // 2: # если номер в сетке вверху, то наде сеять вниз
+            number_posev_old  = [i for i in number_last if i > player_net // 2] # номера от 17 до 32
         else: 
-            number_posev_old  = [i for i in number_last if i <= 32 // 2] # номера от 1 до 16 
+            number_posev_old  = [i for i in number_last if i <= player_net // 2] # номера от 1 до 16 
     elif n > 1: 
         if n == 2: # уводит 3-е место от 2-ого в другую четверть
             group_last = group_last[8:] 
