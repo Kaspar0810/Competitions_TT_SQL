@@ -484,8 +484,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             else:
                                 return
                     else:
-                        player_choice_in_setka(fin)
-                        choice_setka(fin)
+                        posev_data = player_choice_in_setka(fin)
+                        player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
+                        load_combobox_filter_final()
+                        add_open_tab(tab_page="Финалы")
                     # else:
                     # return
             else:
@@ -2717,7 +2719,6 @@ def kol_player_in_group():
         system.kol_game_string = stroka_kol_game
         system.visible_game = flag_visible
         system.save()
-    # made_system_load_combobox_etap
     load_combobox_filter_group()
 
 
@@ -2787,16 +2788,15 @@ def view():
 def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     """заполняет таблицу Game_list данными спортсменами из сетки tds - список списков данных из сетки, а затем
     заполняет таблицу -Result-"""
-    s = System.select().where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()  # находит system id последнего
     st = "Финальный"
     game = 0
     if fin == "Одна таблица":
         st = "Одна таблица"
+    id_system = system.id
+    system_table = system.label_string
+    mp = system.max_player
 
-    for i in s:  # перебирает в цикле строки в табл System где последний titul_id
-        if i.stage == fin:
-            mp = i.total_athletes
-            system_table = i.label_string
     if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
         game = 12
     elif system_table == "Сетка (-2) на 8 участников":
@@ -2828,7 +2828,7 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     # записывает в Game_List спортсменов участников сетки и присваивает встречи 1-ого тура и записывает в тбл Results
         with db:
             game_list = Game_list(number_group=fin, rank_num_player=k, player_group=family_id,
-                                  system_id=s, title_id=title_id()).save()
+                                  system_id=id_system, title_id=title_id()).save()
 
     for i in range(1, mp // 2 + 1):  # присваивает встречи 1-ого тура и записывает в тбл Results
         num_game = i
@@ -5293,6 +5293,14 @@ def progress_bar(step):
 #             print('Введите число от 1 до 10')
 
 
+def check_one_region_in_choice(fin):
+    """Проверка на спортсменов одного регионоа в жеребьевке"""
+    system = System.select().where(System.title_id == title_id())
+    stage_exit = system.stage_exit
+    mesta_exit = system.mesta_exit
+    choice = Choice.select().where(Choice.stage)
+
+
 def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
     """автоматическая жеребьевка сетки, fin - финал, count_exit - сколько выходят в финал
     mesto_first_poseva - номер 1-ого места, flag - флаг вида жеребьевки ручная или автомат""" 
@@ -5305,9 +5313,16 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
     current_region_posev = {} # в текущем посеве список регионов по порядку
     posev_data = {} # окончательные посев номер в сетке - игрок/ город
     num_id_player = {} # словарь номер сетки - id игрока
+    possible_number = {}
     #===================================
+    one_region = 0
+    result = msgBox.question(my_win, "", "У Вас в посеве участвуют спортсмены одного региона?",
+                                 msgBox.Ok, msgBox.Cancel)
+    if result == msgBox.Ok:
+        one_region = 1
+
+
     system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()
-#    ? sys = system.select().where(System.stage == fin).get()
     choice = Choice.select().where(Choice.title_id == title_id())
     max_player = system.total_athletes
   
@@ -5474,7 +5489,11 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
                             group_last.append(v[2]) # список номеров групп уже посеянных
                         if n != 0 or (n == 0 and l > 1):
                 # =========== определения кол-во возможный вариантов посева у каждого региона
-                            possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)
+                            if one_region == 0:
+                                possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)
+                            else:
+                                for l in current_region_posev.keys():
+                                    possible_number[l] = sev
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                                 num_posev = list(possible_number.keys())   
@@ -5729,8 +5748,8 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
     current_region = list(current_region_posev.values())
     y = 0
     for reg in current_region_posev.keys():
-        cur_reg = current_region[y][0]
-        cur_gr = current_region[y][1]
+        cur_reg = current_region[y][0] # текущий регион посева
+        cur_gr = current_region[y][1] # номер группы, которая сеятся
         if n == 0:
             if cur_reg in reg_last:
                 reg_tuple = tuple(reg_last)
@@ -5957,7 +5976,8 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
 
 
 def number_setka_posev_last(cur_gr, group_last, number_last, n, player_net):
-    """промежуточные номера для посева в сетке""" 
+    """промежуточные номера для посева в сетке
+     -number_last- посеянные номера""" 
     if n == 0:
         if cur_gr in group_last:
             index = group_last.index(cur_gr)
@@ -9351,11 +9371,11 @@ def setka_data(fin, posev_data):
     fam_name_city = []
     all_list = []
 
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    for sys in system:  # проходит циклом по всем отобранным записям
-        if sys.stage == fin:
-            mp = sys.total_athletes
-  
+    system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()  # находит system id последнего
+    # for sys in system:  # проходит циклом по всем отобранным записям
+    #     if sys.stage == fin:
+    #         mp = sys.total_athletes
+    mp = system.max_player
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия'] # фамилия имя / город
