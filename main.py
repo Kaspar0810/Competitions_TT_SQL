@@ -442,7 +442,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     return
                 check_flag = check_choice(fin)
                 if check_flag is True:
-                    # if sys.choice_flag == True:  # проверка флаг на жеребьевку финала
                     reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
                                                                         f"\nесли хотите сделать "
                                                                         "повторно\nнажмите-ОК-, "
@@ -455,8 +454,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             player_fin_on_circle(fin)
                             if kol_player_exit > 1:
                                 reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить игры {fin_replacing} результатами "
-                                                                        f"встреч, сыгранных в {etap_replacing} этапе.",
-                                                                            
+                                                                        f"встреч, сыгранных в {etap_replacing} этапе.",                                                                            
                                                     msg.Ok,
                                                     msg.Cancel)
                                 if reply == msg.Ok:
@@ -8415,7 +8413,7 @@ def setka_16_full_made(fin):
         if fin == "Одна таблица":
             name_table_final = f"{short_name}_one_table.pdf"
         else:
-            name_table_final = f"{short_name}_{f}-финал.pdf"
+            name_table_final = f"{short_name}_{f}-final.pdf"
     else:
         short_name = "чист_16_full_сетка"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
@@ -8533,7 +8531,7 @@ def setka_32_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{short_name}_{f}-финал.pdf"
+        name_table_final = f"{short_name}_{f}-final.pdf"
     else:
         short_name = "чист_32_сетка"
         name_table_final = f"{short_name}.pdf"
@@ -8746,7 +8744,7 @@ def setka_32_full_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{short_name}_{f}-финал.pdf"
+        name_table_final = f"{short_name}_{f}-final.pdf"
     else:
         short_name = "чист_32_full_сетка"
         name_table_final = f"{short_name}.pdf"
@@ -8980,7 +8978,7 @@ def setka_32_2_made(fin):
     t_id = Title.get(Title.id == title_id())
     if tds is not None:
         short_name = t_id.short_name_comp
-        name_table_final = f"{short_name}_{f}-финал.pdf"
+        name_table_final = f"{short_name}_{f}-final.pdf"
     else:
         short_name = "чист_32_2_сетка"
         name_table_final = f"{short_name}.pdf"
@@ -8995,29 +8993,42 @@ def mesto_in_final(fin):
     """с какого номера расставляются места в финале, в зависимости от его номера и кол-во участников fin - финал"""
     final = []
     mesto = {}
-    tmp = []
+    # tmp = []
 
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
-
-    first = 1
+    system = System.select().where(System.title_id == title_id()) # находит system id последнего
+    system_id = system.select().where(System.stage == "1-й финал").get()
+    count = len(system)
+    # first = 1
     k = 0
-    for sys in system:
-        f = sys.stage
-        if f == "Одна таблица":
-            mesto[fin] = 1
-        elif f != "Предварительный":
-            if f != "Полуфиналы":
-                tmp.append(f)
-                if k >= 1:
-                    tmp.append(first + final[k - 1][2])
-                else:
-                    tmp.append(first)
-                tmp.append(sys.max_player)
-                k += 1
-            final.append(tmp.copy())
-            tmp.clear()
-            mesto[f] = final[k - 1][1]
-    first_mesto = mesto[fin] # место с которго начинается место в сетке
+    if fin == "Одна таблица" or fin == "1-й финал":
+       mesto[fin] = 1 
+    else:
+        for k in range(system_id, system_id + count):
+            sys = system.select().where(System.id == k).get()
+            max_player = sys.max_player
+            stage = sys.stage
+            final.append(max_player)
+            if stage == fin:
+                break
+        mesto[fin] = sum(final) + 1
+    first_mesto = mesto[fin]
+    # # for sys in system:
+    # #     f = sys.stage
+    # #     if f == "Одна таблица":
+    # #         mesto[fin] = 1
+    # #     elif f != "Предварительный":
+    # #         if f != "Полуфиналы":
+    # #             tmp.append(f)
+    # #             if k >= 1:
+    # #                 tmp.append(first + final[k - 1][2])
+    # #             else:
+    # #                 tmp.append(first)
+    # #             tmp.append(sys.max_player)
+    # #             k += 1
+    # #         final.append(tmp.copy())
+    # #         tmp.clear()
+    #         mesto[f] = final[k - 1][1]
+    # first_mesto = mesto[fin] # место с которго начинается место в сетке
     return first_mesto
 
 
