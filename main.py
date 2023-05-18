@@ -1955,9 +1955,13 @@ def load_combobox_filter_final():
             fin = []
             if sys.choice_flag is True:
                 fin.append(sys.stage)
-        elif sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
-            if sys.choice_flag is True:
-                fin.append(sys.stage)
+                break
+        else:
+            stage = system.select().where(System.stage ** '%-й финал')
+            for k in stage:
+                if k.choice_flag is True:
+                    fin.append(k.stage)
+            break
     my_win.comboBox_filter_final.addItems(fin)
 
 
