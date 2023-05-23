@@ -2749,7 +2749,7 @@ def view():
     short_name = t_id.short_name_comp
     change_dir()
     dir_path = pathlib.Path.cwd()
-    p = str(dir_path)
+    p = str(dir_path) # показывает текущий каталог
     if sender == my_win.all_comp_Action:
         pass
     elif sender == my_win.view_title_Action:
@@ -7540,9 +7540,13 @@ def title_id():
     if name != "":       
         data = my_win.dateEdit_start.text()
         gamer = my_win.lineEdit_title_gamer.text()
-        t = Title.select().where(Title.name == name and Title.data_start == data)  # получает эту строку в db
-        title = t.select().where(Title.gamer == gamer).get()
-        title_id = title.id  # получает его id
+        titles = Title.select().where((Title.name == name) & (Title.data_start == data))  # получает эту строку в db
+        for k in titles:
+            player_gamer = k.gamer
+            if player_gamer == gamer:
+                titles_id = k.select().where(Title.gamer == gamer).get()
+                title_id = titles_id.id
+                break
     else:
         # получение последней записи в таблице
         t_id = Title.select().order_by(Title.id.desc()).get()
@@ -9456,6 +9460,8 @@ def score_in_table(td, num_gr):
     choice = Choice.select().where(Choice.title_id == title_id())
     gamelist = Game_list.select().where(Game_list.title_id == title_id())
 
+
+
     if tab == 3:
         ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
         r = result.select().where((Result.system_stage == "Предварительный") & (Result.number_group == num_gr))
@@ -9474,6 +9480,10 @@ def score_in_table(td, num_gr):
         if stage == "Одна таблица":
             r = result.select().where(Result.number_group == "Одна таблица")
             ch = choice.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
+        else:
+            r = result.select().where(Result.number_group == num_gr) 
+            ch = choice.select().where(Choice.final == num_gr)
+        mp = len(gamelist.select().where((Game_list.system_id == ta) & (Game_list.number_group == num_gr)))
 
     count = len(r)  # сколько игр в группе
     count_player = len(ch)  # определяет сколько игроков в группе
@@ -10486,7 +10496,7 @@ def change_dir():
     p = str(dir_path)
     f = p.rfind("table_pdf")
     if f == -1:
-        os.chdir("table_pdf")
+        os.chdir("table_pdf") # переходит в каталог pdf
     else:
         os.chdir(dir_path.parent)
 
