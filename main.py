@@ -1225,9 +1225,8 @@ def system_made():
 
 def load_tableWidget():
     """Заполняет таблицу списком или рейтингом в зависимости от выбора"""
-    gamer = my_win.lineEdit_title_gamer.text()
     tb = my_win.tabWidget.currentIndex()
-    system = System.select().where(System.title_id == title_id())  # должен получить первый номер id 
+    # system = System.select().where(System.title_id == title_id())  # должен получить первый номер id 
     # сигнал указывающий какой пункт меню нажат
     sender = my_win.menuWidget().sender()
     # нажат пункт меню -текущий рейтинг- или -рейтинг январский
@@ -1246,7 +1245,7 @@ def load_tableWidget():
         column_label = ["№", "Id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
-    elif my_win.checkBox_6.isChecked():
+    elif my_win.checkBox_6.isChecked(): # если отмечен чекбокс -удаленные-
         z = 14
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
@@ -1277,7 +1276,7 @@ def load_tableWidget():
             stage = "Предварительный"
             fill_table_results()
         else:
-            # system = System.select().where(System.title_id == title_id())  # должен получить первый номер id 
+            system = System.select().where(System.title_id == title_id())  # должен получить первый номер id 
             choice_flag = {} # словарь финал - жеребьевка
             stg = []
             for i in system:
@@ -2435,20 +2434,19 @@ def list_player_pdf(player_list):
     gamer = tit.gamer
     count = len(player_list)  # количество записей в базе
     kp = count + 1
-    my_win.tableWidget.setRowCount(count)
-    for k in range(0, count):  # цикл по списку по строкам (k, 1) - пропущен столбец id
-        n = my_win.tableWidget.item(k, 0).text()
-        p = my_win.tableWidget.item(k, 2).text()
-        b = my_win.tableWidget.item(k, 3).text()
-        c = my_win.tableWidget.item(k, 4).text()
-        g = my_win.tableWidget.item(k, 5).text()
-        z = my_win.tableWidget.item(k, 6).text()
-        t = my_win.tableWidget.item(k, 7).text()
-        q = my_win.tableWidget.item(k, 8).text()
-        m = my_win.tableWidget.item(k, 9).text()
-        g = chop_line_city(g)
-        q = chop_line(q)
-        data = [n, p, b, c, g, z, t, q, m]
+    n = 0
+    for l in player_list:
+        n += 1
+        p = l.player
+        b = l.bday
+        r = l.rank
+        c = l.city
+        g = l.region
+        z = l.razryad
+        coach_id = l.coach_id
+        t = coach_id.coach
+        m = l.mesto
+        data = [n, p, b, r, c, g, z, t, m]
 
         elements.append(data)
     elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
@@ -2746,19 +2744,29 @@ def view():
     from sys import platform
     sender = my_win.sender()
     t_id = Title.get(Title.id == title_id())
+    tab = my_win.tabWidget.currentIndex()
     short_name = t_id.short_name_comp
+    if sender == my_win.view_list_Action:
+        view_sort = ["По алфавиту", "По рейтингу", "По месту"]
+        if tab != 1:
+            view_sort, ok = QInputDialog.getItem(
+                        my_win, "Сортировка", "Выберите вид сортировки,\n просмотра списка участников.", view_sort, 0, False)
+            if view_sort == "По рейтингу":
+                player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
+            elif view_sort == "По алфавиту": 
+                player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player) # сортировка по алфавиту
+            elif view_sort == "По месту":
+                player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
+            list_player_pdf(player_list) 
     change_dir()
     dir_path = pathlib.Path.cwd()
     p = str(dir_path) # показывает текущий каталог
+    view_file = f"{short_name}_player_list.pdf"
+    
     if sender == my_win.all_comp_Action:
         pass
     elif sender == my_win.view_title_Action:
         view_file = f"{short_name}_title.pdf"
-    elif sender == my_win.view_list_Action:
-        my_win.tabWidget.setCurrentIndex(1)
-        player_list = Player.select().where(Player.title_id == title_id())  # сортировка по алфавиту
-        list_player_pdf(player_list)
-        view_file = f"{short_name}_player_list.pdf"
     elif sender == my_win.view_gr_Action:  # вкладка группы
         view_file = f"{short_name}_table_group.pdf"
     elif sender == my_win.view_fin1_Action:
@@ -4469,7 +4477,6 @@ def enter_score(none_player=0):
     if stage == "Одна таблица":
         system = System.select().order_by(System.id).where(System.title_id == title_id()).get()
     else:
-        # sys = System.select().order_by(System.id).where(System.title_id == title_id())
         system = sys.select().where(System.stage == fin).get()
     if system.stage == "Предварительный":
         pv = system.page_vid
@@ -7540,13 +7547,15 @@ def title_id():
     if name != "":       
         data = my_win.dateEdit_start.text()
         gamer = my_win.lineEdit_title_gamer.text()
-        titles = Title.select().where((Title.name == name) & (Title.data_start == data))  # получает эту строку в db
-        for k in titles:
-            player_gamer = k.gamer
-            if player_gamer == gamer:
-                titles_id = k.select().where(Title.gamer == gamer).get()
-                title_id = titles_id.id
-                break
+        titles_data = Title.select().where(Title.name == name)  # получает эту строку в db
+        titles = titles_data.select().where((Title.gamer == gamer) & (Title.data_start == data)).get()
+        title_id = titles.id
+        # for k in titles:
+            # player_gamer = k.gamer
+            # if player_gamer == gamer:
+            #     titles_id = k.select().where(Title.gamer == gamer).get()
+            #     title_id = titles_id.id
+            #     break
     else:
         # получение последней записи в таблице
         t_id = Title.select().order_by(Title.id.desc()).get()
