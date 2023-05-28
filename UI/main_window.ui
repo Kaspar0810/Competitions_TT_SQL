@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>2</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -1085,7 +1085,7 @@
         <enum>Qt::Vertical</enum>
        </property>
       </widget>
-      <widget class="QLabel" name="label_47">
+      <widget class="QLabel" name="label_playing_etap2">
        <property name="geometry">
         <rect>
          <x>648</x>
@@ -1104,7 +1104,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_48">
+      <widget class="QLabel" name="label__playing_etap1">
        <property name="geometry">
         <rect>
          <x>648</x>
@@ -1123,7 +1123,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_49">
+      <widget class="QLabel" name="label_playing_etap3">
        <property name="geometry">
         <rect>
          <x>648</x>
@@ -1190,7 +1190,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_54">
+      <widget class="QLabel" name="label_playing_etap4">
        <property name="geometry">
         <rect>
          <x>649</x>
@@ -1261,7 +1261,7 @@
         <string>Этапы соревнования - </string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_57">
+      <widget class="QLabel" name="label_playing_etap5">
        <property name="geometry">
         <rect>
          <x>649</x>
@@ -1387,7 +1387,7 @@
         <string>Этапы соревнования - </string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_78">
+      <widget class="QLabel" name="label_playing_etap6">
        <property name="geometry">
         <rect>
          <x>649</x>
@@ -1437,7 +1437,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_80">
+      <widget class="QLabel" name="label_playing_etap7">
        <property name="geometry">
         <rect>
          <x>649</x>
@@ -1611,7 +1611,7 @@
         <string>Этапы соревнования - </string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_87">
+      <widget class="QLabel" name="label_playing_etap8">
        <property name="geometry">
         <rect>
          <x>650</x>
@@ -3615,8 +3615,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4005,8 +4005,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4565,8 +4565,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4744,8 +4744,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4993,8 +4993,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
