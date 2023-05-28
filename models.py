@@ -144,6 +144,7 @@ class Result(BaseModel):
     score_loser = CharField(null=True)
     title_id = ForeignKeyField(Title)
     round = CharField(20)
+    # system_id = ForeignKeyField(System)
 
     class Meta:
         db_table = "results"
