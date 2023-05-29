@@ -1104,7 +1104,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label__playing_etap1">
+      <widget class="QLabel" name="label_playing_etap1">
        <property name="geometry">
         <rect>
          <x>648</x>
@@ -3615,8 +3615,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3628,8 +3628,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>534</height>
+       <width>225</width>
+       <height>565</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4005,8 +4005,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4292,8 +4292,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4565,8 +4565,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4597,7 +4597,7 @@
          <x>6</x>
          <y>27</y>
          <width>211</width>
-         <height>199</height>
+         <height>233</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -4744,8 +4744,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4993,8 +4993,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">

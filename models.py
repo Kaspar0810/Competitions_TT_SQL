@@ -128,29 +128,6 @@ class Player(BaseModel):
         db_table = "players"
         order_by = "rank"
 
-
-class Result(BaseModel):
-    system_stage = CharField()
-    number_group = CharField()
-    tours = CharField()
-    player1 = CharField()
-    player2 = CharField()
-    winner = CharField(null=True)
-    points_win = IntegerField(null=True)
-    score_in_game = CharField(20, null=True)
-    score_win = CharField(null=True)
-    loser = CharField(null=True)
-    points_loser = IntegerField(null=True)
-    score_loser = CharField(null=True)
-    title_id = ForeignKeyField(Title)
-    round = CharField(20)
-    # system_id = ForeignKeyField(System)
-
-    class Meta:
-        db_table = "results"
-        opder_by = "id"
-
-
 class System(BaseModel):
     title_id = ForeignKeyField(Title)
     total_athletes = IntegerField()
@@ -223,6 +200,27 @@ class Delete_player(BaseModel):
 
     class Meta:
         db_table = "delete_players"
+
+class Result(BaseModel):
+    system_stage = CharField()
+    number_group = CharField()
+    tours = CharField()
+    player1 = CharField()
+    player2 = CharField()
+    winner = CharField(null=True)
+    points_win = IntegerField(null=True)
+    score_in_game = CharField(20, null=True)
+    score_win = CharField(null=True)
+    loser = CharField(null=True)
+    points_loser = IntegerField(null=True)
+    score_loser = CharField(null=True)
+    title_id = ForeignKeyField(Title)
+    round = CharField(20)
+    system_id = ForeignKeyField(System)
+
+    class Meta:
+        db_table = "results"
+        opder_by = "id"
 
 
 

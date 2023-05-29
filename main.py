@@ -31,7 +31,7 @@ import pathlib
 from pathlib import Path
 import random
 # import collections
-from playhouse.migrate import *
+# from playhouse.migrate import *
 
 if not os.path.isdir("table_pdf"):  # создает папку 
     os.mkdir("table_pdf")
@@ -2083,8 +2083,8 @@ def page():
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
         my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
-        my_win.label_playing_etap1.setText(f"Сыграно: {count_result} игр.")
-        my_win.label_playing_etap1.show()
+        label_playing_count()
+    
         st_count = len(sf)
         if st_count != 1:
             load_combobox_filter_group()
@@ -2115,14 +2115,6 @@ def page():
         my_win.label_84.hide()
         my_win.label_85.hide()
         my_win.label_86.hide()
-        my_win.label_playing_etap1.hide()
-        my_win.label_playing_etap2.hide()
-        my_win.label_playing_etap3.hide()
-        my_win.label_playing_etap4.hide()
-        my_win.label_playing_etap5.hide()
-        my_win.label_playing_etap6.hide()
-        my_win.label_playing_etap7.hide()
-        my_win.label_playing_etap8.hide()
 
         my_win.comboBox_etap.hide()
         my_win.comboBox_table_1.hide()
@@ -2305,7 +2297,44 @@ def label_playing_count():
     """На вкладке -система- пишет сколько игр сыграно в каждом этапе"""
     result = Result.select().where(Result.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
-    # for k in system:
+    n = 0
+    my_win.label__playing_etap1.hide()
+    my_win.label_playing_etap2.hide()
+    my_win.label_playing_etap3.hide()
+    my_win.label_playing_etap4.hide()
+    my_win.label_playing_etap5.hide()
+    my_win.label_playing_etap6.hide()
+    my_win.label_playing_etap7.hide()
+    my_win.label_playing_etap8.hide()
+    for k in system:
+        n += 1
+        system_id = k.id
+        result_playing = result.select().where((Result.system_id == system_id) & (Result.winner != ""))
+        count_playing = len(result_playing)
+        if n == 1:
+            my_win.label__playing_etap1.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label__playing_etap1.show()
+        elif n == 2:
+            my_win.label_playing_etap2.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap2.show()
+        elif n == 3:
+            my_win.label_playing_etap3.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap3.show()
+        elif n == 4:
+            my_win.label_playing_etap4.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap4.show()
+        elif n == 5:
+            my_win.label_playing_etap5.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap5.show()
+        elif n == 6:
+            my_win.label_playing_etap6.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap6.show()
+        elif n == 7:
+            my_win.label_playing_etap7.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap7.show()
+        elif n == 8:
+            my_win.label_playing_etap8.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap8.show()
 
 
 
@@ -2865,13 +2894,13 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
         if pl1 is not None and pl2 is not None:
             with db:
                 results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
-                                 tours=num_game, title_id=title_id()).save()
+                                 tours=num_game, title_id=title_id(), system_id=id_system).save()
     for i in range(mp // 2 + 1, game + 1):  # дополняет номера будущих встреч
         pl1 = ""
         pl2 = ""
         with db:
             results = Result(number_group=fin, system_stage=st, player1=pl1, player2=pl2,
-                             tours=i, title_id=title_id()).save()
+                             tours=i, title_id=title_id(),system_id=id_system).save()
 
 
 def player_in_one_table(fin):
@@ -3040,7 +3069,7 @@ def player_in_table_group_and_write_Game_list_Result(stage):
     query.execute()
     #==========
     kg = system.total_group
-    # stage = system.stage
+    system_id = system.id
     pv = system.page_vid
     # создание таблиц групп со спортсменами согласно жеребьевки в PDF
     table_made(pv, stage)
@@ -3090,7 +3119,7 @@ def player_in_table_group_and_write_Game_list_Result(stage):
                     full_pl2 = f"{pl2_id}/{cit2}"
                     with db:
                         results = Result(number_group=number_group, system_stage=stage, player1=full_pl1, player2=full_pl2,
-                                         tours=match, title_id=title_id(), round=round).save()
+                                         tours=match, title_id=title_id(), round=round, system_id=system_id).save()
 
 
 def chop_line(q, maxline=31):
@@ -11209,20 +11238,20 @@ def load_playing_game_in_table_for_final(fin):
 # 
 
 
-def proba():
-    """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+# def proba():
+#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
 
-    my_db = SqliteDatabase('comp_db.db')
-    migrator = SqliteMigrator(my_db)
-    # r1_district = CharField(default='', null=True)
-    # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
-    system_id = ForeignKeyField(Result, field=system_id, null=True)
-# # #
-    with db:
-        # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
-        # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-        # migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
-        migrate(migrator.add_column('result', 'system_id', system_id)) # Добавление столбца (таблица, столбец, повтор название столбца)
+#     my_db = SqliteDatabase('comp_db.db')
+#     migrator = SqliteMigrator(my_db)
+#     # r1_district = CharField(default='', null=True)
+#     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
+#     system_id = ForeignKeyField(System, field=System.id, null=True)
+# # # #
+#     with db:
+#         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
+#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+#         # migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
+#         migrate(migrator.add_column('results', 'system_id', system_id)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
     # ========================= создание таблицы
     # with db:
@@ -11376,7 +11405,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
 my_win.Buttom_change_player.clicked.connect(change_player_between_group_after_draw)
