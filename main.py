@@ -2128,84 +2128,84 @@ def page():
 
         my_win.spinBox_kol_group.hide()
 
-        flag = ready_system()
-
-        if flag is False:  # система еще не создана
-            my_win.statusbar.showMessage("Создание системы соревнования", 10000)
-            my_win.label_10.show()
-            my_win.label_10.setText("1-й этап")
-            my_win.comboBox_etap.show()
-        else:
-            stage = []
-            table = []
-            game = []
-            sum_game = []
-            for i in sf:  # цикл по таблице -system-
-                stage.append(i.stage)  # добавляет в список этап
-                table.append(i.label_string)  # добавляет в список система
-                game.append(i.kol_game_string)  # добавляет в список кол-во игр
-            count = len(stage)
-            for i in range(0, count):  # подсчитывает сумму игр
-                txt = game[i]
-                t = txt.find(" ")
-                txt = int(txt[0:t])
-                sum_game.append(txt)
-                if i == 0:  # показывает в зависимости от этапов финал, кол-во игр
-                    my_win.label_101.setText(stage[0])
-                    my_win.label_19.setText(game[0])
-                    my_win.label_12.setText(table[0])
-                    my_win.label_101.show()
-                    my_win.label_12.show()
-                    my_win.label_19.show()
-                elif i == 1:
-                    my_win.label_102.setText(stage[1])
-                    my_win.label_27.setText(game[1])
-                    my_win.label_28.setText(table[1])
-                    my_win.label_102.show()
-                    my_win.label_27.show()
-                    my_win.label_28.show()
-                elif i == 2:
-                    my_win.label_103.setText(stage[2])
-                    my_win.label_30.setText(game[2])
-                    my_win.label_31.setText(table[2])
-                    my_win.label_30.show()
-                    my_win.label_31.show()
-                    my_win.label_103.show()
-                elif i == 3:
-                    my_win.label_104.setText(stage[3])
-                    my_win.label_53.setText(game[3])
-                    my_win.label_61.setText(table[3])
-                    my_win.label_104.show()
-                    my_win.label_53.show()
-                    my_win.label_61.show()
-                elif i == 4:
-                    my_win.label_105.setText(stage[4])
-                    my_win.label_58.setText(game[4])
-                    my_win.label_62.setText(table[4])
-                    my_win.label_105.show()
-                    my_win.label_58.show()
-                    my_win.label_62.show()
-                elif i == 5:
-                    my_win.label_106.setText(stage[5])
-                    my_win.label_81.setText(game[5])
-                    my_win.label_84.setText(table[5])
-                    my_win.label_106.show()
-                    my_win.label_81.show()
-                    my_win.label_84.show()
-                elif i == 6:
-                    my_win.label_107.setText(stage[6])
-                    my_win.label_82.setText(game[6])
-                    my_win.label_85.setText(table[6])
-                    my_win.label_107.show()
-                    my_win.label_82.show()
-                    my_win.label_85.show()
-                elif i == 7:
-                    my_win.label_108.setText(stage[7])
-                    my_win.label_58.setText(game[7])
-                    my_win.label_62.setText(table[7])
-                    my_win.label_108.show()
-                    my_win.label_58.show()
-                    my_win.label_62.show()
+        # flag = ready_system()
+        # flag = True
+        # if flag is False:  # система еще не создана
+        #     my_win.statusbar.showMessage("Создание системы соревнования", 10000)
+        #     my_win.label_10.show()
+        #     my_win.label_10.setText("1-й этап")
+        #     my_win.comboBox_etap.show()
+        # else:
+        stage = []
+        table = []
+        game = []
+        sum_game = []
+        for i in sf:  # цикл по таблице -system-
+            stage.append(i.stage)  # добавляет в список этап
+            table.append(i.label_string)  # добавляет в список система
+            game.append(i.kol_game_string)  # добавляет в список кол-во игр
+        count = len(stage)
+        for i in range(0, count):  # подсчитывает сумму игр
+            txt = game[i]
+            t = txt.find(" ")
+            txt = int(txt[0:t])
+            sum_game.append(txt)
+            if i == 0:  # показывает в зависимости от этапов финал, кол-во игр
+                my_win.label_101.setText(stage[0])
+                my_win.label_19.setText(game[0])
+                my_win.label_12.setText(table[0])
+                my_win.label_101.show()
+                my_win.label_12.show()
+                my_win.label_19.show()
+            elif i == 1:
+                my_win.label_102.setText(stage[1])
+                my_win.label_27.setText(game[1])
+                my_win.label_28.setText(table[1])
+                my_win.label_102.show()
+                my_win.label_27.show()
+                my_win.label_28.show()
+            elif i == 2:
+                my_win.label_103.setText(stage[2])
+                my_win.label_30.setText(game[2])
+                my_win.label_31.setText(table[2])
+                my_win.label_30.show()
+                my_win.label_31.show()
+                my_win.label_103.show()
+            elif i == 3:
+                my_win.label_104.setText(stage[3])
+                my_win.label_53.setText(game[3])
+                my_win.label_61.setText(table[3])
+                my_win.label_104.show()
+                my_win.label_53.show()
+                my_win.label_61.show()
+            elif i == 4:
+                my_win.label_105.setText(stage[4])
+                my_win.label_58.setText(game[4])
+                my_win.label_62.setText(table[4])
+                my_win.label_105.show()
+                my_win.label_58.show()
+                my_win.label_62.show()
+            elif i == 5:
+                my_win.label_106.setText(stage[5])
+                my_win.label_81.setText(game[5])
+                my_win.label_84.setText(table[5])
+                my_win.label_106.show()
+                my_win.label_81.show()
+                my_win.label_84.show()
+            elif i == 6:
+                my_win.label_107.setText(stage[6])
+                my_win.label_82.setText(game[6])
+                my_win.label_85.setText(table[6])
+                my_win.label_107.show()
+                my_win.label_82.show()
+                my_win.label_85.show()
+            elif i == 7:
+                my_win.label_108.setText(stage[7])
+                my_win.label_58.setText(game[7])
+                my_win.label_62.setText(table[7])
+                my_win.label_108.show()
+                my_win.label_58.show()
+                my_win.label_62.show()
 
             total_game = sum(sum_game)
             my_win.comboBox_table_1.hide()
@@ -2298,7 +2298,7 @@ def label_playing_count():
     result = Result.select().where(Result.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     n = 0
-    my_win.label__playing_etap1.hide()
+    my_win.label_playing_etap1.hide()
     my_win.label_playing_etap2.hide()
     my_win.label_playing_etap3.hide()
     my_win.label_playing_etap4.hide()
@@ -2312,8 +2312,8 @@ def label_playing_count():
         result_playing = result.select().where((Result.system_id == system_id) & (Result.winner != ""))
         count_playing = len(result_playing)
         if n == 1:
-            my_win.label__playing_etap1.setText((f"Сыграно: {count_playing} игр."))
-            my_win.label__playing_etap1.show()
+            my_win.label_playing_etap1.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap1.show()
         elif n == 2:
             my_win.label_playing_etap2.setText((f"Сыграно: {count_playing} игр."))
             my_win.label_playing_etap2.show()
@@ -2335,7 +2335,6 @@ def label_playing_count():
         elif n == 8:
             my_win.label_playing_etap8.setText((f"Сыграно: {count_playing} игр."))
             my_win.label_playing_etap8.show()
-
 
 
 def add_city():
@@ -2557,7 +2556,7 @@ def system_competition():
                 clear_db_before_edit()
                 tab_enabled(gamer)  # показывает вкладки по новому
                 choice_tbl_made()  # заполняет db жеребьевка
-                flag_system = False
+                flag_system = False # ставит флаг, что система еще не создана
                 stage = ""
             else:
                 return
@@ -6771,6 +6770,9 @@ def control_all_player_in_final(etap):
                     choice_gr_automat()
                     add_open_tab(tab_page="Группы")
                     tab_enabled(gamer)
+                    with db:
+                        system_stage.choice_flag = True
+                        system_stage.save()
                     flag = True
                 else:
                     return    
@@ -7002,11 +7004,16 @@ def numbers_of_games(cur_index, player_in_final, kpt):
 def clear_db_before_edit():
     """очищает таблицы при повторном создании системы"""
     system = System.select().where(System.title_id == title_id())
+    title = Title.select().where(Title.id == title_id()).get()
     for i in system:  # удаляет все записи
         i.delete_instance()
     sys = System(title_id=title_id(), total_athletes=0, total_group=0, max_player=0, stage="", type_table="", page_vid="",
                  label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True,
                  stage_exit="", mesta_exit="").save()
+    with db:
+        # записывает в таблицу -Title- новые открытые вкладки
+        title.tab_enabled = "Титул Участники"
+        title.save()
 
     gl = Game_list.select().where(Game_list.title_id == title_id())
     for i in gl:
