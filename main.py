@@ -1658,6 +1658,8 @@ def fill_table_results():
     tb = my_win.tabWidget.currentIndex()
     if tb == 3:
         stage = "Предварительный"
+        system = System.select().where(System.title_id == title_id())
+        system_id = system.select().where(System.stage == stage).get()
     else:
         stage = my_win.comboBox_filter_final.currentText()
         if stage == "Одна таблица":
@@ -1667,27 +1669,29 @@ def fill_table_results():
     if tb == 4:
         player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
     else:
-        player_result = result.select().where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result
-    count = len(player_result)  # если 0, то записей нет
-    flag = ready_system()
-    if flag is True and count == 0:
-        message = "Надо сделать жербьевку предварительного этапа.\nХотите ее создать?"
-        reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
-        if reply == msg.Yes:
-            choice_gr_automat()
-        else:
-            return
-    elif flag is False and count == 0:
-        message = "Сначала надо создать систему соревнований\nзатем произвести жербьевку.\n" \
-                  "Хотите начать ее создавать?"
-        reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
-        if reply == msg.Yes:
-            system_competition()
-        else:
-            return
-    else:
-        if count == 0:
-            return
+        player_result = result.select().where(Result.system_id == system_id)  # проверка есть ли записи в таблице -result
+        # player_result_group = result.select().order_by(Result.number_group.desc()).where(Result.system_stage == stage) # проверка есть ли записи в таблице -result
+        # player_result = player_result_group.select().order_by(Result.round.desc())
+    # count = len(player_result)  # если 0, то записей нет
+    # flag = ready_system()
+    # if flag is True and count == 0:
+    #     message = "Надо сделать жербьевку предварительного этапа.\nХотите ее создать?"
+    #     reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
+    #     if reply == msg.Yes:
+    #         choice_gr_automat()
+    #     else:
+    #         return
+    # elif flag is False and count == 0:
+    #     message = "Сначала надо создать систему соревнований\nзатем произвести жербьевку.\n" \
+    #               "Хотите начать ее создавать?"
+    #     reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
+    #     if reply == msg.Yes:
+    #         system_competition()
+    #     else:
+    #         return
+    # else:
+    #     if count == 0:
+    #         return
 
         result_list = player_result.dicts().execute()
         row_count = len(result_list)  # кол-во строк в таблице
@@ -1726,7 +1730,7 @@ def fill_table_results():
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
         my_win.tableWidget.hideColumn(13)
-        my_win.tableWidget.hideColumn(14)
+        my_win.tableWidget.showColumn(14)
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
 
@@ -2128,14 +2132,6 @@ def page():
 
         my_win.spinBox_kol_group.hide()
 
-        # flag = ready_system()
-        # flag = True
-        # if flag is False:  # система еще не создана
-        #     my_win.statusbar.showMessage("Создание системы соревнования", 10000)
-        #     my_win.label_10.show()
-        #     my_win.label_10.setText("1-й этап")
-        #     my_win.comboBox_etap.show()
-        # else:
         stage = []
         table = []
         game = []
@@ -2223,26 +2219,26 @@ def page():
         my_win.checkBox_8.setEnabled(False)
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
-        flag = ready_choice(stage="Предварительный")
-        if flag is False:
-            result = msgBox.information(my_win, "", "Необходимо сделать жеребьевку\nпредварительного этапа.",
-                                        msgBox.Ok, msgBox.Cancel)
-            if result != msgBox.Ok:
-                return
-            else:
-                my_win.tabWidget.setCurrentIndex(2)
-                choice_gr_automat()
-                sf.choice_flag = True
-                sf.save()
-            my_win.tabWidget.setCurrentIndex(3)
-        else:  # жеребьевка сделана
-            my_win.tableWidget.show()
-            my_win.Button_Ok_gr.setEnabled(False)
-            load_combobox_filter_group()
-            load_tableWidget()
-            load_combo()
-            visible_field()
-            my_win.label_16.hide()
+        # flag = ready_choice(stage="Предварительный")
+        # if flag is False:
+        #     result = msgBox.information(my_win, "", "Необходимо сделать жеребьевку\nпредварительного этапа.",
+        #                                 msgBox.Ok, msgBox.Cancel)
+        #     if result != msgBox.Ok:
+        #         return
+        #     else:
+        #         my_win.tabWidget.setCurrentIndex(2)
+        #         choice_gr_automat()
+        #         sf.choice_flag = True
+        #         sf.save()
+        #     my_win.tabWidget.setCurrentIndex(3)
+        # else:  # жеребьевка сделана
+        my_win.tableWidget.show()
+        my_win.Button_Ok_gr.setEnabled(False)
+        load_combobox_filter_group()
+        load_tableWidget()
+        load_combo()
+        visible_field()
+        my_win.label_16.hide()
     elif tb == 4:  # вкладка -полуфиналы-
         system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
         game_visible = system_stage.visible_game
