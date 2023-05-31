@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>5</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -1913,7 +1913,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>14</pointsize>
+         <pointsize>13</pointsize>
         </font>
        </property>
       </widget>
@@ -1928,7 +1928,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>14</pointsize>
+         <pointsize>13</pointsize>
         </font>
        </property>
       </widget>
@@ -2538,7 +2538,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>14</pointsize>
+         <pointsize>13</pointsize>
         </font>
        </property>
       </widget>
@@ -2553,7 +2553,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>14</pointsize>
+         <pointsize>13</pointsize>
         </font>
        </property>
       </widget>
@@ -3159,7 +3159,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>14</pointsize>
+         <pointsize>13</pointsize>
         </font>
        </property>
       </widget>
@@ -3174,7 +3174,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>14</pointsize>
+         <pointsize>13</pointsize>
         </font>
        </property>
       </widget>
@@ -3615,8 +3615,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3628,8 +3628,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>225</width>
-       <height>565</height>
+       <width>237</width>
+       <height>534</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4005,8 +4005,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4292,8 +4292,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4565,8 +4565,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4744,8 +4744,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4993,8 +4993,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">

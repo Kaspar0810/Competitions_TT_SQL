@@ -1235,10 +1235,10 @@ def load_tableWidget():
         column_label = ["№", "Место", "  Рейтинг",
                         "Фамилия Имя", "Дата рождения", "Город"]
     elif tb == 3 or tb == 4 or tb == 5:
-        z = 15
+        z = 16
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
                         "Общий счет",
-                        "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id"]
+                        "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id", "Тур"]
         # my_win.tableWidget.setColumnWidth(5, 10)
     elif tb == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
         z = 19
@@ -1705,7 +1705,7 @@ def fill_table_results():
                 item = str(list(result_list[row].values())[column])
                 if column < 6 or column > 6:
                     row_result.append(item)
-                elif column == 6:
+                elif column == 6: # столбец победителя
                     row_result.append(item)
                     if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
                         if row_result[4] == row_result[6]:
@@ -1731,6 +1731,7 @@ def fill_table_results():
         my_win.tableWidget.hideColumn(12)
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.showColumn(14)
+        my_win.tableWidget.hideColumn(15)
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
 
@@ -2114,6 +2115,7 @@ def page():
         my_win.label_106.hide()
         my_win.label_107.hide()
         my_win.label_108.hide()
+        my_win.label_81.hide()
         my_win.label_82.hide()
         my_win.label_83.hide()
         my_win.label_84.hide()
@@ -6600,7 +6602,7 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(0)
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.hideColumn(9)
+        my_win.tableWidget.showColumn(9)
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)    
@@ -8011,7 +8013,7 @@ def table_made(pv, stage):
             family_col = 4.0
             wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
         else:
-            family_col = 3.2
+            family_col = 3.8
             wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
     col = ((wcells * cm,) * max_pl)
     elements = []
@@ -8024,7 +8026,7 @@ def table_made(pv, stage):
         if max_pl < 5:
             rH = (0.34 * cm)  # высота строки
         else:
-            rH = (0.33 * cm)  # высота строки
+            rH = (0.32 * cm)  # высота строки
     # rH = None  # высота строки
     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
     # num_columns = list(range(max_pl))
@@ -8164,6 +8166,8 @@ def table_made(pv, stage):
         name_table = f"{short_name}_{number_fin}-final.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     change_dir()
+    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     change_dir()
 
