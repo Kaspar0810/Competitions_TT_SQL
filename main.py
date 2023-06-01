@@ -1231,9 +1231,9 @@ def load_tableWidget():
     sender = my_win.menuWidget().sender()
     # нажат пункт меню -текущий рейтинг- или -рейтинг январский
     if sender == my_win.rAction or sender == my_win.r1Action:
-        z = 6
+        z = 7
         column_label = ["№", "Место", "  Рейтинг",
-                        "Фамилия Имя", "Дата рождения", "Город"]
+                        "Фамилия Имя", "Дата рождения", "Город", "Регион"]
     elif tb == 3 or tb == 4 or tb == 5:
         z = 16
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
@@ -1615,7 +1615,12 @@ def fill_table(player_list):
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
-    player_rlist = R_list_m.select().order_by(R_list_m.r_fname)
+    title = Title.select().where(Title.id == title_id()).get()
+    gamer = title.gamer
+    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+        player_rlist = R_list_d.select().order_by(R_list_d.r_fname)
+    else:
+        player_rlist = R_list_m.select().order_by(R_list_m.r_fname)
     player_r = player_rlist.dicts().execute()
     row_count = len(player_r)  # кол-во строк в таблице
     column_count = len(player_r[0])  # кол-во столбцов в таблице
@@ -1634,7 +1639,12 @@ def fill_table_R_list():
 
 def fill_table_R1_list():
     """заполняет таблицу списком из январского рейтинг листа"""
-    player_rlist = R1_list_m.select().order_by(R1_list_m.r1_fname)
+    title = Title.select().where(Title.id == title_id()).get()
+    gamer = title.gamer
+    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+        player_rlist = R1_list_d.select().order_by(R1_list_d.r_fname)
+    else:
+        player_rlist = R1_list_m.select().order_by(R1_list_m.r_fname)
     player_r1 = player_rlist.dicts().execute()
     row_count = len(player_r1)  # кол-во строк в таблице
     column_count = len(player_r1[0])  # кол-во столбцов в таблице
