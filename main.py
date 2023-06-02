@@ -1224,14 +1224,14 @@ def system_made():
 
 
 def load_tableWidget():
-    """Заполняет таблицу списком или рейтингом в зависимости от выбора"""
+    """Заполняет таблицу списком или рейтингом в зависимости от выбора 
+    z должно совпадать с кол-вом столбцо базы данных той таблицы"""
     tb = my_win.tabWidget.currentIndex()
-    # system = System.select().where(System.title_id == title_id())  # должен получить первый номер id 
     # сигнал указывающий какой пункт меню нажат
     sender = my_win.menuWidget().sender()
     # нажат пункт меню -текущий рейтинг- или -рейтинг январский
     if sender == my_win.rAction or sender == my_win.r1Action:
-        z = 7
+        z = 8
         column_label = ["№", "Место", "  Рейтинг",
                         "Фамилия Имя", "Дата рождения", "Город", "Регион"]
     elif tb == 3 or tb == 4 or tb == 5:
@@ -2231,19 +2231,7 @@ def page():
         my_win.checkBox_8.setEnabled(False)
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
-        # flag = ready_choice(stage="Предварительный")
-        # if flag is False:
-        #     result = msgBox.information(my_win, "", "Необходимо сделать жеребьевку\nпредварительного этапа.",
-        #                                 msgBox.Ok, msgBox.Cancel)
-        #     if result != msgBox.Ok:
-        #         return
-        #     else:
-        #         my_win.tabWidget.setCurrentIndex(2)
-        #         choice_gr_automat()
-        #         sf.choice_flag = True
-        #         sf.save()
-        #     my_win.tabWidget.setCurrentIndex(3)
-        # else:  # жеребьевка сделана
+
         my_win.tableWidget.show()
         my_win.Button_Ok_gr.setEnabled(False)
         load_combobox_filter_group()
@@ -2294,9 +2282,11 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 6:
-        my_win.Button_print_begunki.setEnabled(False)
-        my_win.lineEdit_range_tours.hide()
-        load_combo_etap_begunki()
+        pass
+        # my_win.Button_print_begunki.setEnabled(False)
+        # my_win.lineEdit_range_tours.hide()
+        # load_combo_etap_begunki()
+   
 
     hide_show_columns(tb)
 
