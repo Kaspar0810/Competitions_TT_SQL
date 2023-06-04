@@ -1225,15 +1225,15 @@ def system_made():
 
 def load_tableWidget():
     """Заполняет таблицу списком или рейтингом в зависимости от выбора 
-    z должно совпадать с кол-вом столбцо базы данных той таблицы"""
+    z должно совпадать с кол-вом столбцов базы данных той таблицы"""
     tb = my_win.tabWidget.currentIndex()
     # сигнал указывающий какой пункт меню нажат
     sender = my_win.menuWidget().sender()
     # нажат пункт меню -текущий рейтинг- или -рейтинг январский
-    if sender == my_win.rAction or sender == my_win.r1Action:
+    if sender == my_win.rAction or sender == my_win.r1Action or tb == 6:
         z = 8
         column_label = ["№", "Место", "  Рейтинг",
-                        "Фамилия Имя", "Дата рождения", "Город", "Регион"]
+                        "Фамилия Имя", "Дата рождения", "Город", "Регион", "Округ"]
     elif tb == 3 or tb == 4 or tb == 5:
         z = 16
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
@@ -1261,7 +1261,7 @@ def load_tableWidget():
         item = QtWidgets.QTableWidgetItem()
         item.setBackground(QtGui.QColor(0, 255, 150))
         my_win.tableWidget.setHorizontalHeaderItem(i, item)
-    my_win.tableWidget.setHorizontalHeaderLabels(column_label)
+    my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
     my_win.tableWidget.isSortingEnabled()
     my_win.tableWidget.show()
     if sender == my_win.rAction:  # нажат пункт меню -текущий рейтинг- и загружает таблицу с рейтингом
@@ -1300,12 +1300,28 @@ def load_tableWidget():
         else:
             fill_table_choice()
             hide_show_columns(tb)
+    elif  tb == 6:
+        r_combo_index = my_win.comboBox_choice_R.currentIndex()  
+        if r_combo_index == 0:
+            fill_table_R_list() 
+        else:
+            fill_table_R1_list()  
     else:  # загружает таблицу со списком
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())
         count = len(player_list)
         if count != 0:
             fill_table(player_list)
             hide_show_columns(tb)
+
+
+def r_list_load_tablewidget():
+    my_win.lineEdit_find_player_in_R.clear()
+    r_combo_index = my_win.comboBox_choice_R.currentIndex()  
+    if r_combo_index == 0:
+        fill_table_R_list() 
+    else:
+        fill_table_R1_list() 
+
 
 
 def title_string():
@@ -1472,8 +1488,15 @@ def title_update():
     title_pdf()
 
 
+def clear_filter_rejting_list():
+    """сбрасывает данные фильтра на вкладкк -рейтинг-"""
+    my_win.lineEdit_find_player_in_R.clear()
+    
+
+
 def find_in_rlist():
     """при создании списка участников ищет спортсмена в текущем R-листе"""
+    tb = my_win.tabWidget.currentIndex()
     if my_win.checkBox_find_player.isChecked():
         find_in_player_list()
     else:
@@ -1482,8 +1505,13 @@ def find_in_rlist():
         t_id = Title.get(Title.id == title_id())
         gamer = t_id.gamer
         my_win.listWidget.clear()
-        my_win.textEdit.clear()
-        txt = my_win.lineEdit_Family_name.text()
+        if tb == 6:
+            # my_win.textE.clear()
+            cur_index = my_win.comboBox_choice_R.currentIndex()
+            txt = my_win.lineEdit_find_player_in_R.text()
+        else:
+            my_win.textEdit.clear()
+            txt = my_win.lineEdit_Family_name.text()
 
         zn = txt.find(" ")
         if zn != -1:
@@ -1495,37 +1523,53 @@ def find_in_rlist():
                 txt = f"{family} {name}"
         else:
             txt = txt.capitalize()  # Переводит первую букву в заглавную
-        fp = txt
         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-            r_data = r_data_w
+            if tb == 6 and cur_index == 0:
+                r_data = r_data_w[0]
+            elif tb == 6 and cur_index == 1:
+                r_data = r_data_w[1]
+            else:
+                r_data = r_data_w
         else:
-            r_data = r_data_m
+            if tb == 6 and cur_index == 0:
+                r_data = r_data_m[0]
+            elif tb == 6 and cur_index == 1:
+                r_data = r_data_m[1]
+            else:
+                r_data = r_data_m
         
         r = 0
-        for r_list in r_data:
-            p = r_list.select()
-            if r == 0:
-                my_win.label_63.setText("Поиск в текущем рейтинг листе.")
-                p = p.where(r_list.r_fname ** f'{fp}%')  # like поиск в текущем рейтинге
-                if r == 0  and len(p) != 0:
-                    for pl in p:
-                        full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+        if tb == 6:
+            if cur_index == 0:
+                player_list = r_data.select().where(r_data.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+            else:
+                player_list = r_data.select().where(r_data.r1_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+            fill_table(player_list)
+        else:
+            for r_list in r_data:
+                p = r_list.select()
+                if r == 0:
+                    my_win.label_63.setText("Поиск в текущем рейтинг листе.")
+                    p = p.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+                    if r == 0  and len(p) != 0:
+                        for pl in p:
+                            full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
+                            my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+                        return
+                    elif r == 0:
+                        r = 1
+                        continue
+                else:
+                    my_win.label_63.setText("Поиск в январском рейтинге.")
+                    p = p.where(r_list.r1_fname ** f'{txt}%')  # like поиск в январском рейтинге
+                    if len(p) > 0:
+                        for pl in p:
+                            full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
+                            my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+                    else:
+                        full_stroka = ""
                         my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
                     return
-                elif r == 0:
-                    r = 1
-                    continue
-            else:
-                my_win.label_63.setText("Поиск в январском рейтинге.")
-                p = p.where(r_list.r1_fname ** f'{fp}%')  # like поиск в январском рейтинге
-                if len(p) > 0:
-                    for pl in p:
-                        full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
-                        my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-                else:
-                    full_stroka = ""
-                    my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-                return
       
 
 def input_player():
@@ -1587,15 +1631,21 @@ def find_city():
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
+    tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
+    if tb == 6:
+        if row_count > 0:
+            my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
+        else:
+            my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
     if row_count != 0:  # список удаленных игроков пуст если R = 0
-        column_count = len(player_selected[0])  # кол-во столбцов в таблице
+        column_count = len(player_selected[0]) # кол-во столбцов в таблице
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(1, column_count + 1):
-                if column == 8:  # преобразует id тренера в фамилию
+                if column == 8 and tb != 6:  # преобразует id тренера в фамилию
                     coach_id = str(list(player_selected[row].values())[column - 1])
                     coach = Coach.get(Coach.id == coach_id)
                     item = coach.coach
@@ -1626,13 +1676,12 @@ def fill_table_R_list():
     column_count = len(player_r[0])  # кол-во столбцов в таблице
     # вставляет в таблицу необходимое кол-во строк
     my_win.tableWidget.setRowCount(row_count)
-
+    my_win.label_78.setText(f"Всего {row_count} записей.")
     for row in range(row_count):  # добвляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(player_r[row].values())[column])
             my_win.tableWidget.setItem(
                 row, column, QTableWidgetItem(str(item)))
-
     # ставит размер столбцов согласно записям
     my_win.tableWidget.resizeColumnsToContents()
 
@@ -1642,15 +1691,15 @@ def fill_table_R1_list():
     title = Title.select().where(Title.id == title_id()).get()
     gamer = title.gamer
     if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-        player_rlist = R1_list_d.select().order_by(R1_list_d.r_fname)
+        player_rlist = R1_list_d.select().order_by(R1_list_d.r1_fname)
     else:
-        player_rlist = R1_list_m.select().order_by(R1_list_m.r_fname)
+        player_rlist = R1_list_m.select().order_by(R1_list_m.r1_fname)
     player_r1 = player_rlist.dicts().execute()
     row_count = len(player_r1)  # кол-во строк в таблице
     column_count = len(player_r1[0])  # кол-во столбцов в таблице
     # вставляет в таблицу необходимое кол-во строк
     my_win.tableWidget.setRowCount(row_count)
-
+    my_win.label_78.setText(f"Всего {row_count} записей.")
     for row in range(row_count):  # добавляет данные из базы в TableWidget
         for column in range(column_count):
             item = str(list(player_r1[row].values())[column])
@@ -2282,7 +2331,12 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 6:
-        pass
+        my_win.comboBox_choice_R.clear()
+        rejting_month = ["За текуший месяц", "За январь месяц"]
+        my_win.comboBox_choice_R.addItems(rejting_month)
+        load_tableWidget()
+
+ 
         # my_win.Button_print_begunki.setEnabled(False)
         # my_win.lineEdit_range_tours.hide()
         # load_combo_etap_begunki()
@@ -2386,7 +2440,6 @@ def add_coach(ch, num):
     for c in coach:
         coa = Coach.select().where(Coach.coach == ch)
         if bool(coa):
-            # my_win.textEdit.setText("Такой тренер(ы) существует")
             return
         else:
             cch = Coach(coach=ch, player_id=num).save()
@@ -3692,12 +3745,32 @@ def find_in_player_list():
     if txt == "":
         my_win.textEdit.clear()
     txt = txt.upper()
-    player_list = player.where(Player.player ** f'{txt}%')  # like
+    player_list = player.select().where(Player.player ** f'{txt}%')  # like
     if len(player_list) > 0:
         fill_table(player_list)
     else:
         my_win.textEdit.setText("Такого спортсмена нет!")
 
+
+def find_in_player_rejting_list():
+    """поиск спортсмена в рейтинг листе"""
+    id_title = Title.select().where(Title.id == title_id()).get()
+    gamer = id_title.gamer
+    # tb = my_win.tabWidget.currentIndex()
+    cur_index = my_win.comboBox_choice_R.currentIndex()
+    if cur_index == 0:
+        r_list_player = (R_list_m or R_list_d)
+        txt_r = my_win.lineEdit_find_player_in_R.text()
+        # txt_r.capitalize
+    elif cur_index == 1:
+        pass
+    # player_list = r_list_player.select().where(r_list_player.r_fname ** f'{txt_r}%')
+    player_list = R_list_d.select().where(R_list_d.r_fname ** f'{txt_r}%')
+    if len(player_list) > 0:
+        fill_table(player_list)
+    else:
+        pass
+        # my_win.textEdit.setText("Такого спортсмена нет!")
 
 def enter_total_score():
     """ввод счета во встречи без счета в партиях"""
@@ -6605,7 +6678,15 @@ def hide_show_columns(tb):
         my_win.tableWidget.showColumn(9)
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)    
+        my_win.tableWidget.hideColumn(12) 
+    elif tb == 6:
+        my_win.tableWidget.hideColumn(0)
+        my_win.tableWidget.showColumn(1)
+        my_win.tableWidget.showColumn(2)
+        my_win.tableWidget.showColumn(9)
+        my_win.tableWidget.hideColumn(10)
+        my_win.tableWidget.hideColumn(11)
+        my_win.tableWidget.hideColumn(12)   
 
 
 def etap_made():
@@ -11317,6 +11398,7 @@ my_win.lineEdit_city_list.returnPressed.connect(add_city)
 # ====== отслеживание изменения текста в полях ============
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
+my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_rlist)
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
 my_win.comboBox_region.currentTextChanged.connect(find_city)
@@ -11354,6 +11436,7 @@ my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)
 my_win.comboBox_first_group.currentTextChanged.connect(add_item_listwidget)
 my_win.comboBox_second_group.currentTextChanged.connect(add_item_listwidget)
 
+my_win.comboBox_choice_R.currentTextChanged.connect(r_list_load_tablewidget)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
@@ -11422,5 +11505,6 @@ my_win.Button_sort_R.clicked.connect(sort)
 my_win.Button_sort_Name.clicked.connect(sort)
 my_win.Button_fltr_list.clicked.connect(filter_player_list)
 my_win.Button_reset_fltr_list.clicked.connect(filter_player_list)
+my_win.Button_reset_fltr_in_R.clicked.connect(clear_filter_rejting_list)
 
 sys.exit(app.exec())
