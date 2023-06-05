@@ -1304,11 +1304,12 @@ def load_tableWidget():
             fill_table_choice()
             hide_show_columns(tb)
     elif  tb == 6:
-        r_combo_index = my_win.comboBox_choice_R.currentIndex()  
-        if r_combo_index == 0:
-            fill_table_R_list() 
-        else:
-            fill_table_R1_list()  
+        r_list_load_tablewidget()
+        # r_combo_index = my_win.comboBox_choice_R.currentIndex()  
+        # if r_combo_index == 0:
+        #     fill_table_R_list() 
+        # else:
+        #     fill_table_R1_list()  
     else:  # загружает таблицу со списком
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())
         count = len(player_list)
@@ -1637,19 +1638,18 @@ def fill_table(player_list):
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
-    # number_column = 0
+    number_column = 1
     if tb == 6:
         if row_count > 0:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
         else:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
-        # number_column = 1
+        number_column = 0
     if row_count != 0:  # список удаленных игроков пуст если R = 0
         column_count = len(player_selected[0]) # кол-во столбцов в таблице
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
-            my_win.tableWidget.setItem(row, 0, QTableWidgetItem(str(row + 1)))
             for column in range(0, column_count):
                 if column == 7 and tb != 6:  # преобразует id тренера в фамилию
                     coach_id = str(list(player_selected[row].values())[column])
@@ -1657,15 +1657,11 @@ def fill_table(player_list):
                     item = coach.coach
                 else:
                     item = str(list(player_selected[row].values())[column])
-                my_win.tableWidget.setItem(row, column + 1, QTableWidgetItem(str(item)))
+                my_win.tableWidget.setItem(row, column + number_column, QTableWidgetItem(str(item)))
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
-        # for i in range(0, column_count):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
-        #     item = QtWidgets.QTableWidgetItem()
-        #     item.setBackground(QtGui.QColor(0, 255, 150))
-        #     my_win.tableWidget.setHorizontalHeaderItem(i, item)
-        # for i in range(0, row_count):  # отсортировывает номера строк по порядку
-        #    my_win.tableWidget.setItem(i, number_column, QTableWidgetItem(str(i + 1)))
+        for i in range(0, row_count):  # отсортировывает номера строк по порядку
+           my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
@@ -2464,9 +2460,9 @@ def find_player():
 
 
 
-def find_player_in_R():
-    """если есть необходимость в поиске игрок в рейтинг листах январском или текущем"""
-    pass
+# def find_player_in_R():
+#     """если есть необходимость в поиске игрок в рейтинг листах январском или текущем"""
+#     pass
 
 
 def sort():
@@ -3764,23 +3760,33 @@ def find_in_player_list():
 
 def find_in_player_rejting_list():
     """поиск спортсмена в рейтинг листе"""
+    r_data_m = [R_list_m, R1_list_m]
+    r_data_w = [R_list_d, R1_list_d]
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
-    # tb = my_win.tabWidget.currentIndex()
+    txt_r = ""
     cur_index = my_win.comboBox_choice_R.currentIndex()
+    txt_r = my_win.lineEdit_find_player_in_R.text()
+    txt_r = txt_r.capitalize()
     if cur_index == 0:
-        r_list_player = (R_list_m or R_list_d)
-        txt_r = my_win.lineEdit_find_player_in_R.text()
-        txt_r = txt_r.capitalize()
+        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+            r_data = r_data_w[0]
+        else:
+            r_data = r_data_m[0]
+        player_list = r_data.select().where(r_data.r_fname ** f'{txt_r}%')   
     elif cur_index == 1:
-        pass
-    # player_list = r_list_player.select().where(r_list_player.r_fname ** f'{txt_r}%')
-    player_list = R_list_d.select().where(R_list_d.r_fname ** f'{txt_r}%')
+        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+            r_data = r_data_w[1]
+        else:
+           r_data = r_data_m[1]
+        player_list = r_data.select().where(r_data.r1_fname ** f'{txt_r}%')
+ 
     if len(player_list) > 0:
         fill_table(player_list)
     else:
         pass
         # my_win.textEdit.setText("Такого спортсмена нет!")
+
 
 def enter_total_score():
     """ввод счета во встречи без счета в партиях"""
