@@ -17,7 +17,7 @@ from start_form import Ui_Form
 from datetime import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtGui, QtWidgets, QtPrintSupport
+from PyQt5 import QtGui, QtWidgets, QtPrintSupport, QtCore
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from models import *
 from collections import Counter
@@ -1225,13 +1225,13 @@ def system_made():
 
 def load_tableWidget():
     """Заполняет таблицу списком или рейтингом в зависимости от выбора 
-    z должно совпадать с кол-вом столбцов базы данных той таблицы"""
+    z должно совпадать с кол-вом столбцов базы данных той таблицы + 1"""
     tb = my_win.tabWidget.currentIndex()
     # сигнал указывающий какой пункт меню нажат
     sender = my_win.menuWidget().sender()
     # нажат пункт меню -текущий рейтинг- или -рейтинг январский
     if sender == my_win.rAction or sender == my_win.r1Action or tb == 6:
-        z = 8
+        z = 9
         column_label = ["№", "Место", "  Рейтинг",
                         "Фамилия Имя", "Дата рождения", "Город", "Регион", "Округ"]
     elif tb == 3 or tb == 4 or tb == 5:
@@ -1254,12 +1254,15 @@ def load_tableWidget():
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
-    my_win.tableWidget.setColumnCount(z)
+    my_win.tableWidget.setColumnCount(z) # устанавливает колво столбцов
     my_win.tableWidget.setRowCount(1)
     my_win.tableWidget.verticalHeader().hide()
     for i in range(0, z):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
         item = QtWidgets.QTableWidgetItem()
-        item.setBackground(QtGui.QColor(0, 255, 150))
+        brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        item.setForeground(brush)
+        # item.setBackground(QtGui.QColor(0, 255, 150))
         my_win.tableWidget.setHorizontalHeaderItem(i, item)
     my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
     my_win.tableWidget.isSortingEnabled()
@@ -1634,28 +1637,35 @@ def fill_table(player_list):
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
+    # number_column = 0
     if tb == 6:
         if row_count > 0:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
         else:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
+        # number_column = 1
     if row_count != 0:  # список удаленных игроков пуст если R = 0
         column_count = len(player_selected[0]) # кол-во столбцов в таблице
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
-            for column in range(1, column_count + 1):
-                if column == 8 and tb != 6:  # преобразует id тренера в фамилию
-                    coach_id = str(list(player_selected[row].values())[column - 1])
+            my_win.tableWidget.setItem(row, 0, QTableWidgetItem(str(row + 1)))
+            for column in range(0, column_count):
+                if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+                    coach_id = str(list(player_selected[row].values())[column])
                     coach = Coach.get(Coach.id == coach_id)
                     item = coach.coach
                 else:
-                    item = str(list(player_selected[row].values())[column - 1])
-                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                    item = str(list(player_selected[row].values())[column])
+                my_win.tableWidget.setItem(row, column + 1, QTableWidgetItem(str(item)))
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
-        for i in range(0, row_count):  # отсортировывает номера строк по порядку
-            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+        # for i in range(0, column_count):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+        #     item = QtWidgets.QTableWidgetItem()
+        #     item.setBackground(QtGui.QColor(0, 255, 150))
+        #     my_win.tableWidget.setHorizontalHeaderItem(i, item)
+        # for i in range(0, row_count):  # отсортировывает номера строк по порядку
+        #    my_win.tableWidget.setItem(i, number_column, QTableWidgetItem(str(i + 1)))
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
@@ -2122,8 +2132,8 @@ def page():
         db_select_title()
         load_tableWidget()
         my_win.tableWidget.show()
-        player_list = Player.select().where(Player.title_id == title_id())
-        fill_table(player_list)  # заполняет TableWidget списком игроков
+        # player_list = Player.select().where(Player.title_id == title_id())
+        # fill_table(player_list)  # заполняет TableWidget списком игроков
     elif tb == 1:  # -список участников-
         load_comboBox_filter()
         region()
@@ -3761,7 +3771,7 @@ def find_in_player_rejting_list():
     if cur_index == 0:
         r_list_player = (R_list_m or R_list_d)
         txt_r = my_win.lineEdit_find_player_in_R.text()
-        # txt_r.capitalize
+        txt_r = txt_r.capitalize()
     elif cur_index == 1:
         pass
     # player_list = r_list_player.select().where(r_list_player.r_fname ** f'{txt_r}%')
@@ -6664,13 +6674,14 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
     elif tb == 0:
-        my_win.tableWidget.showColumn(0)
+        # my_win.tableWidget.showColumn(0)
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
         my_win.tableWidget.hideColumn(9)
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
+        my_win.tableWidget.hideColumn(13)
     elif tb == 3:
         my_win.tableWidget.hideColumn(0)
         my_win.tableWidget.hideColumn(1)
@@ -6680,7 +6691,7 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12) 
     elif tb == 6:
-        my_win.tableWidget.hideColumn(0)
+        my_win.tableWidget.showColumn(0)
         my_win.tableWidget.showColumn(1)
         my_win.tableWidget.showColumn(2)
         my_win.tableWidget.showColumn(9)
@@ -11398,7 +11409,7 @@ my_win.lineEdit_city_list.returnPressed.connect(add_city)
 # ====== отслеживание изменения текста в полях ============
 
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
-my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_rlist)
+my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_player_rejting_list)
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
 my_win.comboBox_region.currentTextChanged.connect(find_city)
