@@ -1491,6 +1491,7 @@ def clear_filter_rejting_list():
     """сбрасывает данные фильтра на вкладкк -рейтинг-"""
     my_win.lineEdit_find_player_in_R.clear()
     my_win.comboBox_filter_region_in_R.setCurrentIndex(0)
+    my_win.comboBox_filter_city_in_R.setCurrentIndex(0)
 
 
 def find_in_rlist():
@@ -3790,7 +3791,6 @@ def find_in_player_list():
 
 def find_in_player_rejting_list():
     """поиск спортсмена в рейтинг листе"""
-    sender = my_win.sender()
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
     gamer_w = ["Девочки", "Девушки", "Женщины"]
@@ -3805,14 +3805,7 @@ def find_in_player_rejting_list():
             r_data = r_data_w[0]
         else:
             r_data = r_data_m[0]
-        if sender == my_win.comboBox_filter_region_in_R:
-            region_txt = my_win.comboBox_filter_region_in_R.currentText()
-            player_list = r_data.select().where(r_data.r_region == region_txt)
-        elif sender == my_win.comboBox_filter_city_in_R:
-            city_txt = my_win.comboBox_filter_city_in_R.currentText()
-            player_list = r_data.select().where(r_data.r_city == city_txt)
-        else:
-            player_list = r_data.select().where(r_data.r_fname ** f'{txt_r}%')   
+        player_list = r_data.select().where(r_data.r_fname ** f'{txt_r}%')   
     elif cur_index == 1: # если рейтинг за январь
         if gamer in gamer_w:
             r_data = r_data_w[1]
@@ -3821,7 +3814,54 @@ def find_in_player_rejting_list():
         player_list = r_data.select().where(r_data.r1_fname ** f'{txt_r}%')
  
     fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
-  
+
+
+def filter_rejting_list():
+    """Фильтрует вкладку -рейтинг-"""
+    sender = my_win.sender()
+    r_data_m = [R_list_m, R1_list_m]
+    r_data_w = [R_list_d, R1_list_d]
+
+    gamer_w = ["Девочки", "Девушки", "Женщины"]
+    id_title = Title.select().where(Title.id == title_id()).get()
+    gamer = id_title.gamer
+    cur_index = my_win.comboBox_choice_R.currentIndex()
+    region_txt = my_win.comboBox_filter_region_in_R.currentText()
+    city_txt = my_win.comboBox_filter_city_in_R.currentText()
+
+    if cur_index == 0:
+        r_data = r_data_w[0] if gamer in gamer_w else r_data_m[0] # текущий рейтинг
+        rejting_name = r_data.r_fname
+        rejting_list = r_data.r_list
+    else:
+        r_data = r_data_w[1] if gamer in gamer_w else r_data_m[1] # январский рейтинг 
+        rejting_name = r_data.r1_fname
+        rejting_list = r_data.r1_list
+
+    if sender == my_win.Button_sort_rejting_in_R:        
+        if region_txt == "" and city_txt == "":
+            player_list = r_data.select().order_by(rejting_list.desc())
+        elif region_txt != "" and city_txt == "":
+            player_list = r_data.select().where((r_data.r_region == region_txt) & (rejting_list.desc()))
+        elif region_txt == "" and city_txt != "":
+            player_list = r_data.select().order_by(rejting_list.desc()).where(r_data.r_city == city_txt)
+    elif sender == my_win.Button_sort_alf_R: 
+        if region_txt == "" and city_txt == "":
+            player_list = r_data.select().order_by(rejting_name)
+        elif region_txt != "" and city_txt == "":
+            player_list = r_data.select().where((r_data.r_region == region_txt) & (rejting_name))
+        elif region_txt == "" and city_txt != "":
+            player_list = r_data.select().where((r_data.r_city == city_txt) & (rejting_name))
+    else:
+        if region_txt == "" and city_txt == "":
+            player_list = r_data.select()
+        elif region_txt != "" and city_txt == "":
+            player_list = r_data.select().where(r_data.r_region == region_txt)
+        elif region_txt == "" and city_txt != "":
+            player_list = r_data.select().where(r_data.r_city == city_txt)
+
+    fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
+
 
 def enter_total_score():
     """ввод счета во встречи без счета в партиях"""
@@ -11492,8 +11532,8 @@ my_win.comboBox_first_group.currentTextChanged.connect(add_item_listwidget)
 my_win.comboBox_second_group.currentTextChanged.connect(add_item_listwidget)
 
 my_win.comboBox_choice_R.currentTextChanged.connect(r_list_load_tablewidget)
-my_win.comboBox_filter_region_in_R.currentTextChanged.connect(find_in_player_rejting_list)
-my_win.comboBox_filter_city_in_R.currentTextChanged.connect(find_in_player_rejting_list)
+my_win.comboBox_filter_region_in_R.currentTextChanged.connect(filter_rejting_list)
+my_win.comboBox_filter_city_in_R.currentTextChanged.connect(filter_rejting_list)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
@@ -11560,7 +11600,7 @@ my_win.Button_sort_Name.clicked.connect(sort)
 my_win.Button_fltr_list.clicked.connect(filter_player_list)
 my_win.Button_reset_fltr_list.clicked.connect(filter_player_list)
 my_win.Button_reset_fltr_in_R.clicked.connect(clear_filter_rejting_list)
-my_win.Button_sort_alf_R.clicked.connect(sort)
-my_win.Button_sort_rejting_in_R.clicked.connect(sort)
+my_win.Button_sort_alf_R.clicked.connect(filter_rejting_list)
+my_win.Button_sort_rejting_in_R.clicked.connect(filter_rejting_list)
 
 sys.exit(app.exec())
