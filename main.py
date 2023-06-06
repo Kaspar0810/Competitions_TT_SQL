@@ -1305,11 +1305,6 @@ def load_tableWidget():
             hide_show_columns(tb)
     elif  tb == 6:
         r_list_load_tablewidget()
-        # r_combo_index = my_win.comboBox_choice_R.currentIndex()  
-        # if r_combo_index == 0:
-        #     fill_table_R_list() 
-        # else:
-        #     fill_table_R1_list()  
     else:  # загружает таблицу со списком
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())
         count = len(player_list)
@@ -1495,7 +1490,7 @@ def title_update():
 def clear_filter_rejting_list():
     """сбрасывает данные фильтра на вкладкк -рейтинг-"""
     my_win.lineEdit_find_player_in_R.clear()
-    
+    my_win.comboBox_filter_region_in_R.setCurrentIndex(0)
 
 
 def find_in_rlist():
@@ -1510,7 +1505,6 @@ def find_in_rlist():
         gamer = t_id.gamer
         my_win.listWidget.clear()
         if tb == 6:
-            # my_win.textE.clear()
             cur_index = my_win.comboBox_choice_R.currentIndex()
             txt = my_win.lineEdit_find_player_in_R.text()
         else:
@@ -1735,28 +1729,6 @@ def fill_table_results():
         player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
     else:
         player_result = result.select().where(Result.system_id == system_id)  # проверка есть ли записи в таблице -result
-        # player_result_group = result.select().order_by(Result.number_group.desc()).where(Result.system_stage == stage) # проверка есть ли записи в таблице -result
-        # player_result = player_result_group.select().order_by(Result.round.desc())
-    # count = len(player_result)  # если 0, то записей нет
-    # flag = ready_system()
-    # if flag is True and count == 0:
-    #     message = "Надо сделать жербьевку предварительного этапа.\nХотите ее создать?"
-    #     reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
-    #     if reply == msg.Yes:
-    #         choice_gr_automat()
-    #     else:
-    #         return
-    # elif flag is False and count == 0:
-    #     message = "Сначала надо создать систему соревнований\nзатем произвести жербьевку.\n" \
-    #               "Хотите начать ее создавать?"
-    #     reply = msg.question(my_win, 'Уведомление', message, msg.Yes, msg.No)
-    #     if reply == msg.Yes:
-    #         system_competition()
-    #     else:
-    #         return
-    # else:
-    #     if count == 0:
-    #         return
 
         result_list = player_result.dicts().execute()
         row_count = len(result_list)  # кол-во строк в таблице
@@ -2106,6 +2078,40 @@ def load_combobox_filter_group_semifinal():
     my_win.comboBox_filter_group_sf.addItems(gr_txt)
 
 
+def load_comboBox_filter_rejting():
+    """Загружает комбобоксы вкладки рейтинг"""
+    region_rejting = [""]
+    city_rejting = [""]
+    r_data_m = [R_list_m, R1_list_m]
+    r_data_w = [R_list_d, R1_list_d]
+    id_title = Title.select().where(Title.id == title_id()).get()
+    gamer = id_title.gamer
+    cur_index = my_win.comboBox_choice_R.currentIndex()
+
+    if cur_index == 0: # если выбран текущий рейтинг
+        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+            r_data = r_data_w[0]
+        else:
+            r_data = r_data_m[0] 
+    elif cur_index == 1: # если рейтинг за январь
+        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+            r_data = r_data_w[1]
+        else:
+           r_data = r_data_m[1]
+    player_list = r_data.select()
+    for k in player_list:
+        region = k.r_region
+        city = k.r_city
+        if region not in region_rejting:
+            region_rejting.append(region)
+            region_rejting.sort()
+        if city not in city_rejting:
+            city_rejting.append(city)
+            city_rejting.sort()
+    my_win.comboBox_filter_region_in_R.addItems(region_rejting)
+    my_win.comboBox_filter_city_in_R.addItems(city_rejting)
+
+
 def tab():
     """Изменяет вкладку tabWidget в зависимости от вкладки toolBox"""
     tw = my_win.tabWidget.currentIndex()
@@ -2128,8 +2134,6 @@ def page():
         db_select_title()
         load_tableWidget()
         my_win.tableWidget.show()
-        # player_list = Player.select().where(Player.title_id == title_id())
-        # fill_table(player_list)  # заполняет TableWidget списком игроков
     elif tb == 1:  # -список участников-
         load_comboBox_filter()
         region()
@@ -2340,6 +2344,7 @@ def page():
         my_win.comboBox_choice_R.clear()
         rejting_month = ["За текуший месяц", "За январь месяц"]
         my_win.comboBox_choice_R.addItems(rejting_month)
+        load_comboBox_filter_rejting()
         load_tableWidget()
 
  
@@ -2468,16 +2473,41 @@ def find_player():
 def sort():
     """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
-
+    r_data_m = [R_list_m, R1_list_m]
+    r_data_w = [R_list_d, R1_list_d]
+    signal_button_list = [my_win.Button_sort_R, my_win.Button_sort_Name, my_win.Button_sort_mesto]
+    id_title = Title.select().where(Title.id == title_id()).get()
+    gamer = id_title.gamer
+    cur_index = my_win.comboBox_choice_R.currentIndex()
+    if cur_index == 0: # если выбран текущий рейтинг
+            if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+                r_data = r_data_w[0]
+            else:
+                r_data = r_data_m[0]
+            rejting_name = r_data.r_fname
+            rejting_list = r_data.r_list
+    elif cur_index == 1: # если рейтинг за январь
+            if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+                r_data = r_data_w[1]
+            else:
+                r_data = r_data_m[1] 
+            rejting_name = r_data.r1_fname
+            rejting_list = r_data.r1_list
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
     elif sender == my_win.Button_sort_Name:
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алфавиту
     elif sender == my_win.Button_sort_mesto:
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
+    elif sender == my_win.Button_sort_alf_R:
+        player_list = r_data.select().order_by(rejting_name)
+    elif sender == my_win.Button_sort_rejting_in_R:
+        player_list = r_data.select().order_by(rejting_list.desc())
 
     fill_table(player_list)
-    list_player_pdf(player_list)
+    # if sender == my_win.Button_sort_R or sender == my_win.Button_sort_Name or sender == my_win.Button_sort_mesto:
+    if sender in signal_button_list:
+        list_player_pdf(player_list)
 
 
 # def button_etap_made_enabled(state):
@@ -3760,33 +3790,38 @@ def find_in_player_list():
 
 def find_in_player_rejting_list():
     """поиск спортсмена в рейтинг листе"""
+    sender = my_win.sender()
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
+    gamer_w = ["Девочки", "Девушки", "Женщины"]
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
     txt_r = ""
     cur_index = my_win.comboBox_choice_R.currentIndex()
     txt_r = my_win.lineEdit_find_player_in_R.text()
     txt_r = txt_r.capitalize()
-    if cur_index == 0:
-        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+    if cur_index == 0: # если выбран текущий рейтинг
+        if gamer in gamer_w:
             r_data = r_data_w[0]
         else:
             r_data = r_data_m[0]
-        player_list = r_data.select().where(r_data.r_fname ** f'{txt_r}%')   
-    elif cur_index == 1:
-        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+        if sender == my_win.comboBox_filter_region_in_R:
+            region_txt = my_win.comboBox_filter_region_in_R.currentText()
+            player_list = r_data.select().where(r_data.r_region == region_txt)
+        elif sender == my_win.comboBox_filter_city_in_R:
+            city_txt = my_win.comboBox_filter_city_in_R.currentText()
+            player_list = r_data.select().where(r_data.r_city == city_txt)
+        else:
+            player_list = r_data.select().where(r_data.r_fname ** f'{txt_r}%')   
+    elif cur_index == 1: # если рейтинг за январь
+        if gamer in gamer_w:
             r_data = r_data_w[1]
         else:
            r_data = r_data_m[1]
         player_list = r_data.select().where(r_data.r1_fname ** f'{txt_r}%')
  
-    if len(player_list) > 0:
-        fill_table(player_list)
-    else:
-        pass
-        # my_win.textEdit.setText("Такого спортсмена нет!")
-
+    fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
+  
 
 def enter_total_score():
     """ввод счета во встречи без счета в партиях"""
@@ -6700,10 +6735,13 @@ def hide_show_columns(tb):
         my_win.tableWidget.showColumn(0)
         my_win.tableWidget.showColumn(1)
         my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.showColumn(9)
+        my_win.tableWidget.hideColumn(8)
+        my_win.tableWidget.hideColumn(9)
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)   
+        my_win.tableWidget.hideColumn(12)
+ 
+        
 
 
 def etap_made():
@@ -11454,6 +11492,8 @@ my_win.comboBox_first_group.currentTextChanged.connect(add_item_listwidget)
 my_win.comboBox_second_group.currentTextChanged.connect(add_item_listwidget)
 
 my_win.comboBox_choice_R.currentTextChanged.connect(r_list_load_tablewidget)
+my_win.comboBox_filter_region_in_R.currentTextChanged.connect(find_in_player_rejting_list)
+my_win.comboBox_filter_city_in_R.currentTextChanged.connect(find_in_player_rejting_list)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
@@ -11469,14 +11509,11 @@ my_win.radioButton_4.toggled.connect(change_choice_group)
 
 # при изменении чекбокса активирует кнопку создать
 my_win.checkBox.stateChanged.connect(button_title_made_enable)
-# my_win.checkBox_2.stateChanged.connect(button_etap_made_enabled)  # при изменении чекбокса активирует кнопку создать
 # при изменении чекбокса активирует кнопку создать
 my_win.checkBox_3.stateChanged.connect(button_system_made_enable)
 # при изменении чекбокса показывает поля для ввода счета
-# my_win.checkBox_4.stateChanged.connect(game_in_visible)
 my_win.checkBox_4.stateChanged.connect(change_status_visible_and_score_game)
-# при изменении чекбокса показывает поля для ввода счета финала
-# my_win.checkBox_5.stateChanged.connect(game_in_visible)
+# при изменении чекбокса показывает поля для ввода счета финала)
 my_win.checkBox_5.stateChanged.connect(change_status_visible_and_score_game)
 # при изменении чекбокса показывает список удаленных игроков
 my_win.checkBox_6.stateChanged.connect(del_player_table)
@@ -11523,5 +11560,7 @@ my_win.Button_sort_Name.clicked.connect(sort)
 my_win.Button_fltr_list.clicked.connect(filter_player_list)
 my_win.Button_reset_fltr_list.clicked.connect(filter_player_list)
 my_win.Button_reset_fltr_in_R.clicked.connect(clear_filter_rejting_list)
+my_win.Button_sort_alf_R.clicked.connect(sort)
+my_win.Button_sort_rejting_in_R.clicked.connect(sort)
 
 sys.exit(app.exec())
