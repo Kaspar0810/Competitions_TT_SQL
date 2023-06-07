@@ -1492,6 +1492,7 @@ def clear_filter_rejting_list():
     my_win.lineEdit_find_player_in_R.clear()
     my_win.comboBox_filter_region_in_R.setCurrentIndex(0)
     my_win.comboBox_filter_city_in_R.setCurrentIndex(0)
+    my_win.comboBox_filter_date_in_R.setCurrentIndex(0)
 
 
 def find_in_rlist():
@@ -2083,6 +2084,7 @@ def load_comboBox_filter_rejting():
     """Загружает комбобоксы вкладки рейтинг"""
     region_rejting = [""]
     city_rejting = [""]
+    b_day = ["", "до 12 лет", "до 13 лет", "до 14 лет", "до 16 лет", "до 20 лет", "до 22 лет"]
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
     id_title = Title.select().where(Title.id == title_id()).get()
@@ -2111,6 +2113,7 @@ def load_comboBox_filter_rejting():
             city_rejting.sort()
     my_win.comboBox_filter_region_in_R.addItems(region_rejting)
     my_win.comboBox_filter_city_in_R.addItems(city_rejting)
+    my_win.comboBox_filter_date_in_R.addItems(b_day)
 
 
 def tab():
@@ -2347,12 +2350,6 @@ def page():
         my_win.comboBox_choice_R.addItems(rejting_month)
         load_comboBox_filter_rejting()
         load_tableWidget()
-
- 
-        # my_win.Button_print_begunki.setEnabled(False)
-        # my_win.lineEdit_range_tours.hide()
-        # load_combo_etap_begunki()
-   
 
     hide_show_columns(tb)
 
@@ -3828,37 +3825,49 @@ def filter_rejting_list():
     cur_index = my_win.comboBox_choice_R.currentIndex()
     region_txt = my_win.comboBox_filter_region_in_R.currentText()
     city_txt = my_win.comboBox_filter_city_in_R.currentText()
+    date_txt = my_win.comboBox_filter_date_in_R.currentText()
+    if date_txt != "":
+        znak = date_txt.find(" ")
+        year_fltr = int(date_txt[znak: znak + 3])
+        year_current = int(datetime.today().strftime("%Y")) # текущий год
+    # if date_cur_index == 1:
+        raz = year_current - year_fltr + 1
 
     if cur_index == 0:
         r_data = r_data_w[0] if gamer in gamer_w else r_data_m[0] # текущий рейтинг
         rejting_name = r_data.r_fname
         rejting_list = r_data.r_list
+        rejting_region = r_data.r_region
+        rejting_city = r_data.r_city
     else:
         r_data = r_data_w[1] if gamer in gamer_w else r_data_m[1] # январский рейтинг 
         rejting_name = r_data.r1_fname
         rejting_list = r_data.r1_list
-
+        rejting_region = r_data.r1_region
+        rejting_city = r_data.r1_city
     if sender == my_win.Button_sort_rejting_in_R:        
         if region_txt == "" and city_txt == "":
             player_list = r_data.select().order_by(rejting_list.desc())
         elif region_txt != "" and city_txt == "":
-            player_list = r_data.select().where((r_data.r_region == region_txt) & (rejting_list.desc()))
+            player_list = r_data.select().where((rejting_region == region_txt) & (rejting_list.desc()))
         elif region_txt == "" and city_txt != "":
-            player_list = r_data.select().order_by(rejting_list.desc()).where(r_data.r_city == city_txt)
+            player_list = r_data.select().order_by(rejting_list.desc()).where(rejting_city == city_txt)
     elif sender == my_win.Button_sort_alf_R: 
         if region_txt == "" and city_txt == "":
             player_list = r_data.select().order_by(rejting_name)
         elif region_txt != "" and city_txt == "":
-            player_list = r_data.select().where((r_data.r_region == region_txt) & (rejting_name))
+            player_list = r_data.select().where((rejting_region == region_txt) & (rejting_name))
         elif region_txt == "" and city_txt != "":
-            player_list = r_data.select().where((r_data.r_city == city_txt) & (rejting_name))
+            player_list = r_data.select().where((rejting_city == city_txt) & (rejting_name))
+    # elif date_txt != "":
+    #     pass 
     else:
         if region_txt == "" and city_txt == "":
             player_list = r_data.select()
         elif region_txt != "" and city_txt == "":
-            player_list = r_data.select().where(r_data.r_region == region_txt)
+            player_list = r_data.select().where(rejting_region == region_txt)
         elif region_txt == "" and city_txt != "":
-            player_list = r_data.select().where(r_data.r_city == city_txt)
+            player_list = r_data.select().where(rejting_city == city_txt)
 
     fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
 
@@ -11534,6 +11543,7 @@ my_win.comboBox_second_group.currentTextChanged.connect(add_item_listwidget)
 my_win.comboBox_choice_R.currentTextChanged.connect(r_list_load_tablewidget)
 my_win.comboBox_filter_region_in_R.currentTextChanged.connect(filter_rejting_list)
 my_win.comboBox_filter_city_in_R.currentTextChanged.connect(filter_rejting_list)
+my_win.comboBox_filter_date_in_R.currentTextChanged.connect(filter_rejting_list)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
