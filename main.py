@@ -3830,8 +3830,8 @@ def filter_rejting_list():
         znak = date_txt.find(" ")
         year_fltr = int(date_txt[znak: znak + 3])
         year_current = int(datetime.today().strftime("%Y")) # текущий год
-    # if date_cur_index == 1:
-        raz = year_current - year_fltr
+        year_bday = year_current - year_fltr + 1
+        # raz_date = date(2011, 1, 1)
 
     if cur_index == 0:
         r_data = r_data_w[0] if gamer in gamer_w else r_data_m[0] # текущий рейтинг
@@ -3847,7 +3847,7 @@ def filter_rejting_list():
         rejting_region = r_data.r1_region
         rejting_city = r_data.r1_city
         rejting_date = r_data.r1_bithday
-    year_bday = rejting_date.strftime("%Y") # текущий год    
+    # year_bday = rejting_date.strftime("%Y") # текущий год    
     if sender == my_win.Button_sort_rejting_in_R:        
         if region_txt == "" and city_txt == "":
             player_list = r_data.select().order_by(rejting_list.desc())
@@ -3863,7 +3863,12 @@ def filter_rejting_list():
         elif region_txt == "" and city_txt != "":
             player_list = r_data.select().where((rejting_city == city_txt) & (rejting_name))
     elif date_txt != "":
-        player_list = r_data.select().where(year_bday < raz)
+        # rejting_date =
+        player_list = r_data.select().where(rejting_name == "Абаимова Елена").get()
+        bd = player_list.r_bithday
+        # date_time_obj = datetime.strptime(rejting_date, '%d.%m.%Y')
+        # r_bday = date_time_obj.date()
+        # player_list = r_data.select().where(r_bday < raz_date)
     else:
         if region_txt == "" and city_txt == "":
             player_list = r_data.select()
