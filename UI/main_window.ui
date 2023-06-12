@@ -3906,20 +3906,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_14">
          <item>
-          <spacer name="horizontalSpacer_6">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="Button_fltr_ok_R">
+          <widget class="QPushButton" name="Button_print_R">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -3934,9 +3921,22 @@
             </font>
            </property>
            <property name="text">
-            <string>Применить</string>
+            <string>Печать рейтинга листа</string>
            </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
           <widget class="QPushButton" name="Button_reset_fltr_in_R">
@@ -3954,7 +3954,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Сбросить</string>
+            <string>Сбросить фильтр</string>
            </property>
           </widget>
          </item>
@@ -4024,15 +4024,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4421,8 +4421,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4708,8 +4708,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4981,8 +4981,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5160,8 +5160,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5409,8 +5409,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>511</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5420,8 +5420,8 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>213</width>
+        <y>2</y>
+        <width>216</width>
         <height>241</height>
        </rect>
       </property>
@@ -5434,164 +5434,161 @@
       <property name="title">
        <string>Бегунки</string>
       </property>
-      <widget class="QPushButton" name="Button_print_begunki">
-       <property name="geometry">
-        <rect>
-         <x>3</x>
-         <y>200</y>
-         <width>92</width>
-         <height>32</height>
-        </rect>
+      <layout class="QVBoxLayout" name="verticalLayout_26">
+       <property name="spacing">
+        <number>1</number>
        </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string>Печать</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_68">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>80</y>
-         <width>201</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string>Номер группы, финала</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_69">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>27</y>
-         <width>161</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string>Выбор этапа</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="Button_view_begunki">
-       <property name="geometry">
-        <rect>
-         <x>114</x>
-         <y>200</y>
-         <width>85</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>10</pointsize>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string>Просмотр</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_select_group_begunki">
-       <property name="geometry">
-        <rect>
-         <x>6</x>
-         <y>100</y>
-         <width>196</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-       <property name="insertPolicy">
-        <enum>QComboBox::InsertAlphabetically</enum>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_select_stage_begunki">
-       <property name="geometry">
-        <rect>
-         <x>6</x>
-         <y>50</y>
-         <width>197</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_select_tours">
-       <property name="geometry">
-        <rect>
-         <x>6</x>
-         <y>160</y>
-         <width>103</width>
-         <height>26</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_range_tours">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>160</y>
-         <width>80</width>
-         <height>23</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_70">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>137</y>
-         <width>201</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string>Диапазон печати</string>
-       </property>
-      </widget>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_23">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_69">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Выбор этапа</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_select_stage_begunki">
+           <property name="editable">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_24">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_68">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Номер группы, финала</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_select_group_begunki">
+           <property name="editable">
+            <bool>false</bool>
+           </property>
+           <property name="insertPolicy">
+            <enum>QComboBox::InsertAlphabetically</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_25">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_70">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Диапазон печати</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
+           <property name="spacing">
+            <number>1</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="comboBox_select_tours"/>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_range_tours"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_16">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="Button_print_begunki">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>10</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Печать</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_view_begunki">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>10</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Просмотр</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="Line" name="line_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>250</y>
+        <width>211</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
      </widget>
     </widget>
    </widget>
