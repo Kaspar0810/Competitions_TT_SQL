@@ -187,6 +187,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
+        help_Menu.addAction(self.copy_db_Action)
     #  создание действий меню
 
     def _createAction(self):
@@ -264,6 +265,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_pf_Action.setEnabled(False)  # делает пункт меню не видимым
         self.ed_fin_Action.setEnabled(False)  # делает пункт меню не видимым
 
+        self.copy_db_Action = QAction("Импорт из базы данных")
+
     def _connectActions(self):
         # Connect File actions
         self.system_made_Action.triggered.connect(self.system_made)
@@ -307,6 +310,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
 
+        self.copy_db_Action.triggered.connect(self.import_db)
+
     def newFile(self):
         # Logic for creating a new file goes here...
         my_win.textEdit.setText("Нажата кнопка меню соревнования")
@@ -327,6 +332,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.tabWidget.setCurrentIndex(6)
         my_win.comboBox_choice_R.setCurrentIndex(1)
         my_win.lineEdit_find_player_in_R.setFocus()
+
+    def import_db(self):
+        # filename, extension = QFileDialog.getSaveFileName(
+        #     self, 'Save file', 'backup_x', filter=self.tr(".bak"))
+        # try:
+        #     with open("text.txt", 'r') as inst, open(filename + extension, "w") as backup:
+        #         for line in inst:
+        #             backup.writelines(line)
+        # except IOError:
+        #     pass
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл архива базы данных", "", "comp_db_backup.db")
+        filepatch = str(fname[1])
+        filename, extension = QFileDialog.getSaveFileName(self,"Сохранить файл",f'{filepatch}',"DB Files(.db)")
+        # filename, extension = QFileDialog.getSaveFileName(self, 'Save file', 'backup_x', filter=self.tr(".bak"))
 
     def exit(self):
         exit_comp()
