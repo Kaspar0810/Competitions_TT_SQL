@@ -1729,53 +1729,53 @@ def fill_table_R1_list():
 
 def fill_table_results():
     """заполняет таблицу результатов QtableWidget из db result"""
-    msg = QMessageBox
     result = Result.select().where(Result.title_id == title_id())
+    system = System.select().where(System.title_id == title_id())
     tb = my_win.tabWidget.currentIndex()
     if tb == 3:
         stage = "Предварительный"
-        system = System.select().where(System.title_id == title_id())
         system_id = system.select().where(System.stage == stage).get()
-    else:
+        id_system = system_id.id
+        player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result
+    elif tb == 5:
         stage = my_win.comboBox_filter_final.currentText()
         if stage == "Одна таблица":
             stage = "Одна таблица"
         else:
             stage = "Финальный"
+        player_result = result.select().where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result
     if tb == 4:
         player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
-    else:
-        player_result = result.select().where(Result.system_id == system_id)  # проверка есть ли записи в таблице -result
 
-        result_list = player_result.dicts().execute()
-        row_count = len(result_list)  # кол-во строк в таблице
-        column_count = len(result_list[0])  # кол-во столбцов в таблице
+    result_list = player_result.dicts().execute()
+    row_count = len(result_list)  # кол-во строк в таблице
+    column_count = len(result_list[0])  # кол-во столбцов в таблице
         # вставляет в таблицу необходимое кол-во строк
-        my_win.tableWidget.setRowCount(row_count)
-        row_result = []
-        for row in range(row_count):  # добавляет данные из базы в TableWidget
-            row_result.clear()
-            for column in range(column_count):
-                item = str(list(result_list[row].values())[column])
-                if column < 6 or column > 6:
-                    row_result.append(item)
-                elif column == 6: # столбец победителя
-                    row_result.append(item)
-                    if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
-                        if row_result[4] == row_result[6]:
-                            my_win.tableWidget.item(row, 4).setForeground(
-                                QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                            # в красный цвет 1-ого игрока
-                        else:
-                            my_win.tableWidget.item(row, 5).setForeground(
-                                QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                            # в красный цвет 2-ого игрока
-                    else:
+    my_win.tableWidget.setRowCount(row_count)
+    row_result = []
+    for row in range(row_count):  # добавляет данные из базы в TableWidget
+        row_result.clear()
+        for column in range(column_count):
+            item = str(list(result_list[row].values())[column])
+            if column < 6 or column > 6:
+                row_result.append(item)
+            elif column == 6: # столбец победителя
+                row_result.append(item)
+                if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
+                    if row_result[4] == row_result[6]:
                         my_win.tableWidget.item(row, 4).setForeground(
-                            QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
+                            QBrush(QColor(255, 0, 0)))  # окрашивает текст
+                            # в красный цвет 1-ого игрока
+                    else:
                         my_win.tableWidget.item(row, 5).setForeground(
-                            QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
-                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+                            QBrush(QColor(255, 0, 0)))  # окрашивает текст
+                            # в красный цвет 2-ого игрока
+                else:
+                    my_win.tableWidget.item(row, 4).setForeground(
+                        QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
+                    my_win.tableWidget.item(row, 5).setForeground(
+                        QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
 
         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
         my_win.tableWidget.showColumn(9) # столбец счет в партиях
@@ -3058,6 +3058,7 @@ def player_fin_on_circle(fin):
     choice = Choice.select().order_by(Choice.group).where(Choice.title_id == title_id())
 
     system_id = system.select().where(System.stage == fin).get()
+    id_system = system_id.id
     stage_exit = system_id.stage_exit
     # sys = system.select().where(System.stage == stage_exit).get()
     st = "Финальный"
@@ -3152,7 +3153,7 @@ def player_fin_on_circle(fin):
             full_pl2 = f"{pl2_fam}/{cit2}"
             with db:
                 results = Result(number_group=fin, system_stage=st, player1=full_pl1, player2=full_pl2,
-                                tours=match, title_id=title_id(), round=round).save()
+                                tours=match, title_id=title_id(), round=round, system_id=id_system).save()
     with db:
         system_id.choice_flag = True
         system_id.save()    
