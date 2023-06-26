@@ -4345,7 +4345,7 @@ def enter_score(none_player=0):
     l = sc_total[3]  # очки проигравшего
 
     if my_win.lineEdit_player1_fin.text() != "X" and my_win.lineEdit_player2_fin.text() != "X":
-        if st1 > st2 or none_player == 2:  # выиграл 1-й участник
+        if st1 > st2 or none_player == 2:  # выиграл 1-й участник или 2-й не явился на встречу
             if tab == 3:
                 winner = my_win.lineEdit_player1_gr.text()
                 loser = my_win.lineEdit_player2_gr.text()
@@ -4357,7 +4357,7 @@ def enter_score(none_player=0):
                 loser = my_win.lineEdit_player2_fin.text()
             ts_winner = f"{st1} : {st2}"
             ts_loser = f"{st2} : {st1}"
-        else:  # выиграл 2-й участник
+        else:  # выиграл 2-й участник или 1-й не явился на встречу
             if tab == 3:  # игры в подгруппах
                 winner = my_win.lineEdit_player2_gr.text()
                 loser = my_win.lineEdit_player1_gr.text()
@@ -4375,6 +4375,8 @@ def enter_score(none_player=0):
         else:
             if type == "сетка":
                 winner_string = ""
+            # elif type == "круг":
+            #     winner_string = ""
     else: # если нет одного игрока -X-
         if my_win.lineEdit_player1_fin.text() == "X":
             winner = my_win.lineEdit_player2_fin.text()
