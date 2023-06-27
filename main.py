@@ -4345,7 +4345,6 @@ def enter_score(none_player=0):
     l = sc_total[3]  # очки проигравшего
 
     if my_win.lineEdit_player1_fin.text() != "X" and my_win.lineEdit_player2_fin.text() != "X":
-<<<<<<< HEAD
         if tab == 3:
             pl1 = my_win.lineEdit_player1_gr.text()
             pl2 = my_win.lineEdit_player2_gr.text()
@@ -4367,7 +4366,6 @@ def enter_score(none_player=0):
             ts_winner = f"{st2} : {st1}"
             ts_loser = f"{st2} : {st1}"
         loser_fam_name = loser 
-=======
         if none_player == 0:
             if st1 > st2 or none_player == 2:  # выиграл 1-й участник или 2-й не явился на встречу
                 if tab == 3:
@@ -4394,7 +4392,6 @@ def enter_score(none_player=0):
                 ts_winner = f"{st2} : {st1}"
                 ts_loser = f"{st1} : {st2}"
             loser_fam_name = loser 
->>>>>>> 10c75fcbe02c3334bff692032dcacc7c10c515d9
         if none_player == 0:
             winner_string = string_score_game()  # пишет счет в партии
         else:
