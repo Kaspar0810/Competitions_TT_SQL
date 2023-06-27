@@ -4345,38 +4345,34 @@ def enter_score(none_player=0):
     l = sc_total[3]  # очки проигравшего
 
     if my_win.lineEdit_player1_fin.text() != "X" and my_win.lineEdit_player2_fin.text() != "X":
-        if st1 > st2 or none_player == 2:  # выиграл 1-й участник или 2-й не явился на встречу
-            if tab == 3:
-                winner = my_win.lineEdit_player1_gr.text()
-                loser = my_win.lineEdit_player2_gr.text()
-            elif tab == 4:
-                winner = my_win.lineEdit_player1_pf.text()
-                loser = my_win.lineEdit_player2_pf.text()
-            elif tab == 5:
-                winner = my_win.lineEdit_player1_fin.text()
-                loser = my_win.lineEdit_player2_fin.text()
+        if tab == 3:
+            pl1 = my_win.lineEdit_player1_gr.text()
+            pl2 = my_win.lineEdit_player2_gr.text()
+        elif tab == 4:
+            pl1 = my_win.lineEdit_player1_pf.text()
+            pl2 = my_win.lineEdit_player2_pf.text()
+        elif tab == 5:
+            pl1 = my_win.lineEdit_player1_fin.text()
+            pl2 = my_win.lineEdit_player2_fin.text()
+        if none_player == 1 or st1 > st2:
+# выиграл 1-й участник или 2-й не явился на встречу
+            winner = pl1
+            loser = pl2
             ts_winner = f"{st1} : {st2}"
-            ts_loser = f"{st2} : {st1}"
-        else:  # выиграл 2-й участник или 1-й не явился на встречу
-            if tab == 3:  # игры в подгруппах
-                winner = my_win.lineEdit_player2_gr.text()
-                loser = my_win.lineEdit_player1_gr.text()
-            elif tab == 4:
-                winner = my_win.lineEdit_player2_pf.text()
-                loser = my_win.lineEdit_player1_pf.text()
-            elif tab == 5:  # игры в финалах
-                winner = my_win.lineEdit_player2_fin.text()
-                loser = my_win.lineEdit_player1_fin.text()
-            ts_winner = f"{st2} : {st1}"
             ts_loser = f"{st1} : {st2}"
+        elif none_player == 2 or st1 < st2:
+            winner = pl2
+            loser = pl1
+            ts_winner = f"{st2} : {st1}"
+            ts_loser = f"{st2} : {st1}"
         loser_fam_name = loser 
         if none_player == 0:
             winner_string = string_score_game()  # пишет счет в партии
         else:
             if type == "сетка":
                 winner_string = ""
-            # elif type == "круг":
-            #     winner_string = ""
+            elif type == "круг":
+                winner_string = "В : П"
     else: # если нет одного игрока -X-
         if my_win.lineEdit_player1_fin.text() == "X":
             winner = my_win.lineEdit_player2_fin.text()
@@ -4835,7 +4831,8 @@ def filter_fin(pl=False):
         # один из финалов встречи которые не сыгранные
         elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "":
             fl = filter.select().where(Result.number_group == final)
-            fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
+            # fltr = fl.select().where((Result.points_win != 2) & (Result.points_win == None))
+            fltr = fl.select().where(Result.points_win == None)
             count = len(fltr)
             my_win.label_38.setText(
                 f'Всего в {final} не сыгранно {count} игры')
