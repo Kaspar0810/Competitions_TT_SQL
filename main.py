@@ -9507,8 +9507,6 @@ def score_in_table(td, num_gr):
     choice = Choice.select().where(Choice.title_id == title_id())
     gamelist = Game_list.select().where(Game_list.title_id == title_id())
 
-
-
     if tab == 3:
         ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
         r = result.select().where((Result.system_stage == "Предварительный") & (Result.number_group == num_gr))
@@ -9522,15 +9520,16 @@ def score_in_table(td, num_gr):
         r = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
     else:
-        ta = system.select().where(System.stage == num_gr).get()  # находит system id последнего
-        stage = ta.stage
+        ta = result.select().where(Result.number_group == num_gr).get()  # находит system id последнего
+        stage = ta.system_stage
+        system_id = ta.system_id
         if stage == "Одна таблица":
             r = result.select().where(Result.number_group == "Одна таблица")
             ch = choice.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
         else:
-            r = result.select().where(Result.number_group == num_gr) 
+            r = result.select().where(Result.system_id == system_id) 
             ch = choice.select().where(Choice.final == num_gr)
-        mp = len(gamelist.select().where((Game_list.system_id == ta) & (Game_list.number_group == num_gr)))
+        mp = len(gamelist.select().where(Game_list.system_id == system_id))
 
     count = len(r)  # сколько игр в группе
     count_player = len(ch)  # определяет сколько игроков в группе
@@ -9790,8 +9789,14 @@ def rank_in_group(total_score, td, num_gr, stage):
         game_max = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))  # сколько всего игр в группе
         max_person = len(game_list_group)
     elif num_gr == "Одна таблица":
-        system = sys.select().where(System.stage == num_gr).get()
+        # system = sys.select().where(System.stage == num_gr).get()
         game_max = result.select().where(Result.system_stage == num_gr)  # сколько всего игр в группе
+    else:
+        system = sys.select().where(System.stage == num_gr).get()
+        system_id = system.id
+        game_list_group = game_list.select().where(Game_list.system_id == system_id)
+        game_max = result.select().where(Result.system_id == system_id)  # сколько всего игр в финале по кругу
+        max_person = len(game_list_group)
 
     # 1-й запрос на выборку с группой
     game_played = game_max.select().where((Result.winner is None) | (Result.winner != ""))  # 2-й запрос на выборку
