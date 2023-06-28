@@ -4024,15 +4024,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4044,7 +4044,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
+       <width>196</width>
        <height>534</height>
       </rect>
      </property>
@@ -4421,8 +4421,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4708,8 +4708,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4981,8 +4981,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>237</width>
-       <height>511</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5386,7 +5386,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>161</width>
+        <width>211</width>
         <height>20</height>
        </rect>
       </property>
@@ -5771,7 +5771,7 @@
     <property name="font">
      <font>
       <family>Times New Roman</family>
-      <pointsize>12</pointsize>
+      <pointsize>10</pointsize>
       <italic>true</italic>
      </font>
     </property>

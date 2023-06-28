@@ -4806,6 +4806,9 @@ def filter_fin(pl=False):
     played = my_win.comboBox_filter_played_fin.currentText()
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     filter = Result.select().where(Result.title_id == title_id())
+    if final != "все финалы":
+        systems = system.select().where(System.stage == final).get()
+        id_system = systems.id # получаем ид системы финала
     fin = []
     if final == "Одна таблица":
         if my_win.comboBox_find_name_fin.currentText() != "":
@@ -4838,7 +4841,7 @@ def filter_fin(pl=False):
                 fl = filter.select().where(Result.system_stage == "Одна таблица")
                 fltr = fl.select().where(Result.tours == num_game_fin)
     else:
-        if final == "все финалы" and played == "все игры" and num_game_fin == "":
+        if final == "все финалы" and played == "все игры" and num_game_fin == "" and round == "":
             fltr = filter.select().where(Result.system_stage == "Финальный")
             if name == "":
                 count = len(fltr)
@@ -4855,45 +4858,51 @@ def filter_fin(pl=False):
                 else:
                     my_win.tableWidget.hideRow(row - 1)
         # один из финалов встречи которые не сыгранные
-        elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "":
-            fl = filter.select().where(Result.number_group == final)
-            # fltr = fl.select().where((Result.points_win != 2) & (Result.points_win == None))
+        elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "" and round == "":
+            fl = filter.select().where(Result.system_id == id_system)
             fltr = fl.select().where(Result.points_win == None)
             count = len(fltr)
             my_win.label_38.setText(
                 f'Всего в {final} не сыгранно {count} игры')
-        elif final != "все финалы" and played == "завершенные" and num_game_fin == "":
-            fltr_played = []
-            fltr = filter.select().where(Result.number_group == final)
-            for fl in fltr:
-                if fl.winner is not None:
-                    win = fl.winner
-                    fltr_played.append(win)
-            count_pl = len(fltr_played)
+        elif final != "все финалы" and played == "завершенные" and num_game_fin == "" and round == "":
+            # fltr_played = []
+            fltr = filter.select().where((Result.system_id == id_system) & (Result.points_win == 2))
+            # for fl in fltr:
+            #     if fl.winner is not None:
+            #         win = fl.winner
+            #         fltr_played.append(win)
+            count_pl = len(fltr)
             my_win.label_38.setText(f'Завершено в {final} {count_pl} игры')
-        elif final != "все финалы" and played == "все игры" and num_game_fin == "":
-            fltr = filter.select().where(Result.number_group == final)
+        elif final != "все финалы" and played == "все игры" and num_game_fin == "" and round == "":
+            fltr = filter.select().where(Result.system_id == id_system)
             count = len(fltr)
             my_win.label_38.setText(f'Всего в {final} {count} игры')
+        elif final != "все финалы" and played == "все игры" and num_game_fin == "" and round != "":
+            fltr = filter.select().where((Result.system_id == id_system) & (Result.round == int(round)))
+            count = len(fltr)
+            my_win.label_38.setText(f'Всего в {final} {count} игры')  
+        elif final != "все финалы" and played == "завершенные" and num_game_fin == "" and round != "":
+            fltr_fin = filter.select().where(Result.system_id == id_system)
+            fltr = fltr_fin.select().where((Result.round == int(round)) & (Result.points_win == 2))
+            count = len(fltr)
+            my_win.label_38.setText(f'Всего в {final} {count} игры')   
         elif final == "все финалы" and played == "завершенные" and num_game_fin == "":
-            fltr_played = []
-            fltr = filter.select().where(Result.system_stage == "Финальный")
-            for fl in fltr:
-                if fl.winner is not None:
-                    win = fl.winner
-                    fltr_played.append(win)
-            count_pl = len(fltr_played)
-            my_win.label_38.setText(
-                f' Всего сыграно во всех финалах {count_pl} игры')
+            # fltr_played = []
+            fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.points_win == 2))
+            # for fl in fltr:
+            #     if fl.winner is not None:
+            #         win = fl.winner
+            #         fltr_played.append(win)
+            count_pl = len(fltr)
+            my_win.label_38.setText(f' Всего сыграно во всех финалах {count_pl} игры')
         elif final == "все финалы" and played == "не сыгранные" and num_game_fin == "":
-            fl = filter.select().where(Result.system_stage == "Финальный")
-            fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
+            fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.points_win == None))
             count = len(fltr)
             my_win.label_38.setText(
                 f'Всего в {final} не сыгранно {count} игры')
         else:
-            if final != "все финалы" and num_game_fin != "":
-                fltr = filter.select().where(Result.number_group == final)
+            if final != "все финалы" and num_game_fin != "" and round != "":
+                fltr = filter.select().where((Result.number_group == final) & (Result.round == round))
             else:
                 for sys in system:  # отбирает финалы с сеткой
                     if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
