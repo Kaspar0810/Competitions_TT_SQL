@@ -4877,6 +4877,14 @@ def filter_fin(pl=False):
             fltr = filter.select().where(Result.system_id == id_system)
             count = len(fltr)
             my_win.label_38.setText(f'Всего в {final} {count} игры')
+        elif final != "все финалы" and played == "все игры" and num_game_fin != "":
+            fltr = filter.select().where((Result.system_id == id_system) & (Result.tours == num_game_fin))
+            count = len(fltr)
+            my_win.label_38.setText(f'Всего в {final} {count} игры')
+        elif final == "все финалы" and played == "все игры" and num_game_fin != "":
+            fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.tours == num_game_fin))
+            count = len(fltr)
+            my_win.label_38.setText(f'Всего в {final} {count} игры')
         elif final != "все финалы" and played == "все игры" and num_game_fin == "" and round != "":
             fltr = filter.select().where((Result.system_id == id_system) & (Result.round == int(round)))
             count = len(fltr)
@@ -4887,12 +4895,7 @@ def filter_fin(pl=False):
             count = len(fltr)
             my_win.label_38.setText(f'Всего в {final} {count} игры')   
         elif final == "все финалы" and played == "завершенные" and num_game_fin == "":
-            # fltr_played = []
             fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.points_win == 2))
-            # for fl in fltr:
-            #     if fl.winner is not None:
-            #         win = fl.winner
-            #         fltr_played.append(win)
             count_pl = len(fltr)
             my_win.label_38.setText(f' Всего сыграно во всех финалах {count_pl} игры')
         elif final == "все финалы" and played == "не сыгранные" and num_game_fin == "":
@@ -4902,7 +4905,7 @@ def filter_fin(pl=False):
                 f'Всего в {final} не сыгранно {count} игры')
         else:
             if final != "все финалы" and num_game_fin != "" and round != "":
-                fltr = filter.select().where((Result.number_group == final) & (Result.round == round))
+                fltr = filter.select().where((Result.system_id == id_system) & (Result.round == round))
             else:
                 for sys in system:  # отбирает финалы с сеткой
                     if sys.stage != "Предварительный" and sys.stage != "Полуфиналы":
