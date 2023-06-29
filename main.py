@@ -4297,6 +4297,11 @@ def control_score(sc1, sc2):
     return flag
 
 
+def control_winner_player():
+    """ Проверка условия победителя матча, различие рейтинга"""
+    pass
+
+
 def enter_score(none_player=0):
     """заносит в таблицу -результаты- победителя, счет и т.п. sc_total [партии выигранные, проигранные, очки победителя
      очки проигравшего"""
@@ -4850,13 +4855,8 @@ def filter_fin(pl=False):
                     my_win.tableWidget.showRow(i)
             else:  # выбор по фамилии спортсмена
                 row = 0
-                fltr = filter.select().where(Result.system_stage == "Финальный")
-                for result_name in fltr:
-                    row += 1
-                if result_name.player1 == name or result_name.player2 == name:
-                    pass
-                else:
-                    my_win.tableWidget.hideRow(row - 1)
+                fl = filter.select().where(Result.system_stage == "Финальный")
+                fltr = fl.select().where((Result.player1 == name)| (Result.player2 == name)) # объединение запросов (отбор по 2-ум столбцам)
         # один из финалов встречи которые не сыгранные
         elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "" and round == "":
             fl = filter.select().where(Result.system_id == id_system)
@@ -4941,19 +4941,6 @@ def filter_fin(pl=False):
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(
                 row, column, QTableWidgetItem(str(item)))
-            # =====================
-    if my_win.comboBox_find_name_fin.currentText() != "" and pl == False:
-        result = msgBox.question(my_win, "", "Продолжить поиск игр с участием\n"
-                                             f"{name} ?",
-                                 msgBox.Ok, msgBox.Cancel)
-        if result == msgBox.Ok:
-            pl = True
-            filter_fin(pl)
-        elif result == msgBox.Cancel:
-            my_win.comboBox_find_name_fin.clear()
-            return
-    else:
-        my_win.comboBox_find_name_fin.clear()
 
 
 def filter_sf():
@@ -7633,7 +7620,6 @@ def func_zagolovok(canvas, doc):
     canvas.setFont("DejaVuSerif-Italic", 14)
     # центральный текст титула
     canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)
-    # canvas.drawCentredString(width / 2.0, height - 1.3 * cm, final)  # центральный текст номер финала
     canvas.setFont("DejaVuSerif-Italic", 11)
     # текста титула по основным
     canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
@@ -7643,14 +7629,14 @@ def func_zagolovok(canvas, doc):
     canvas.setFont("DejaVuSerif-Italic", 11)
     canvas.setFillColor(blue)  # меняет цвет шрифта списка судейской коллеги
     if pv == landscape(A4):
-        main_referee_collegia = f"Гл. судья: {title.referee} судья {title.kat_ref}______________  " \
-                                f"Гл. секретарь: {title.secretary} судья {title.kat_sek} ______________"
+        main_referee_collegia = f"Гл. судья: судья {title.kat_ref}______________ {title.referee}   " \
+                                f"Гл. секретарь: судья {title.kat_sek} ______________{title.secretary}"
         # текста титула по основным
         canvas.drawCentredString(
             width / 2.0, height - 20 * cm, main_referee_collegia)
     else:
-        main_referee = f"Гл. судья: {title.referee} судья {title.kat_ref} ______________"
-        main_secretary = f"Гл. секретарь: {title.secretary} судья {title.kat_sek} ______________"
+        main_referee = f"Гл. судья: судья {title.kat_ref} ______________{title.referee}"
+        main_secretary = f"Гл. секретарь: судья {title.kat_sek} ______________{title.secretary} "
         # подпись главного судьи
         canvas.drawString(2 * cm, 2 * cm, main_referee)
         # подпись главного секретаря
@@ -7838,7 +7824,11 @@ def begunki_made():
                         ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
                         ('ALIGN',(0, 0), (0, 0),'CENTER')])
     #  ========= формирование диапазона печати бегунков ==========
-    sys = system.select().where(System.stage == stage).get()
+    if stage == "Финальный":
+        sys = system.select().where(System.stage == number_group).get()
+    elif stage == "Предварительный":
+        sys = system.select().where(System.stage == stage).get()
+
     final_type = sys.type_table
     list_tours = []
     if final_type == "сетка":
@@ -8100,6 +8090,8 @@ def table_made(pv, stage):
     if kg == 1:  # одна таблицу
         data = [[dict_table[0]]]
         shell_table = Table(data, colWidths=["*"])
+        text = stage
+        elements.append(Paragraph(text, h2))
         elements.append(shell_table)
     else:
         data_tmp = []
@@ -8125,7 +8117,7 @@ def table_made(pv, stage):
                 tmp_copy = s_tmp.copy()
                 shell_table.append(tmp_copy)
                 s_tmp.clear()
-                text = f'группа {l * 2 + 1} группа {l * 2 + 2}'
+                text = f'группа {l * 2 + 1} {"" * 5} группа {l * 2 + 2}'
                 elements.append(Paragraph(text, h2))
                 elements.append(shell_table[l][0])
         else:  # страница книжная, то таблицы размещаются обе в столбец
