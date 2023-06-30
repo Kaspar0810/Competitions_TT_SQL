@@ -123,6 +123,9 @@ class Player(BaseModel):
     title_id = ForeignKeyField(Title)
     pay_rejting = CharField(50)
     comment = CharField()
+    coefficient_victories = FloatField()
+    total_game_player = IntegerField()
+    total_win_game = IntegerField()
 
     class Meta:
         db_table = "players"

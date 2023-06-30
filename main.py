@@ -4297,9 +4297,51 @@ def control_score(sc1, sc2):
     return flag
 
 
-def control_winner_player():
+def control_winner_player(winner, loser):
     """ Проверка условия победителя матча, различие рейтинга"""
-    pass
+    msgBox = QMessageBox
+    player = Player.select().where(Player.title_id == title_id())
+    result = Result.select().where(Result.title_id == title_id())
+    player_win_id = player.select().where(Player.full_name == winner).get()
+    player_los_id = player.select().where(Player.full_name == loser).get()
+    win_id = player_win_id.id
+    r_win = player_win_id.rank
+    coefficient_win = player_win_id.coefficient_victories
+    total_game_win = player_win_id.total_game_player
+    # all_game_win = resul
+    los_id = player_los_id.id
+    r_los = player_los_id.rank
+    coefficient_los = player_los_id.coefficient_victories
+    total_game_los = player_los_id.total_game_player
+    if total_game_win < 5 or total_game_los < 5: # если еще сыграно мало игр и определяем по разности рейтинга
+        if abs(r_win - r_los) > 20:
+            result = msgBox.information(my_win, "", f"Вы уверенны в победе {winner}!",
+                                    msgBox.Yes, msgBox.No)
+            if  result == msgBox.No:
+                return                     
+    else:
+        if coefficient_win - coefficient_los <= 0.5:
+            result = msgBox.information(my_win, "", f"Вы уверенны в победе {winner}!",
+                                    msgBox.Yes, msgBox.No)
+            if  result == msgBox.No:
+                return
+    sum_win = player_win_id.total_win_game + 1
+    all_game_win = total_game_win + 1
+    sum_los = player_los_id.total_los_game + 1
+    all_game_los = total_game_los + 1   # else:
+        #     result = msgBox.information(my_win, "", f"Вы уверенны в победе {winner}!",
+        #                             msgBox.Yes, msgBox.No)
+        #     if  result == msgBox.No:
+        #         return
+    with db:
+        player_win_id.total_game_player = sum_win
+        player_win_id.total_win_game = all_game_win
+        player_win_id.coefficient_victories = (sum_win / all_game_win)
+        player_win_id.save()
+        player_los_id.total_game_player = sum_win
+        player_los_id.total_los_game = all_game_los
+        player_los_id.coefficient_victories = (sum_los / all_game_los)
+        player_los_id.save()
 
 
 def enter_score(none_player=0):
@@ -4425,6 +4467,8 @@ def enter_score(none_player=0):
         znak_win = winner.find("/")
         if znak_win != -1:
             winner = winner[:znak_win]
+
+    control_winner_player(winner, loser) # проверка реальности победы игрока (маленький рейтинг над большим)
 
     with db:  # записывает в таблицу -Result- сыгранный матч в группах или финал по кругу
         result = Result.get(Result.id == id)
@@ -4865,12 +4909,7 @@ def filter_fin(pl=False):
             my_win.label_38.setText(
                 f'Всего в {final} не сыгранно {count} игры')
         elif final != "все финалы" and played == "завершенные" and num_game_fin == "" and round == "":
-            # fltr_played = []
             fltr = filter.select().where((Result.system_id == id_system) & (Result.points_win == 2))
-            # for fl in fltr:
-            #     if fl.winner is not None:
-            #         win = fl.winner
-            #         fltr_played.append(win)
             count_pl = len(fltr)
             my_win.label_38.setText(f'Завершено в {final} {count_pl} игры')
         elif final != "все финалы" and played == "все игры" and num_game_fin == "" and round == "":
@@ -11263,15 +11302,15 @@ def load_playing_game_in_table_for_final(fin):
 
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
-#     # r1_district = CharField(default='', null=True)
+#     total_win_game = IntegerField(default=0, null=True)
 #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
-#     system_id = ForeignKeyField(System, field=System.id, null=True)
+#     # system_id = ForeignKeyField(System, field=System.id, null=True)
 # # # #
 #     with db:
 #         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
 #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
 #         # migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
-#         migrate(migrator.add_column('results', 'system_id', system_id)) # Добавление столбца (таблица, столбец, повтор название столбца)
+#         migrate(migrator.add_column('players', 'total_win_game', total_win_game)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
     # ========================= создание таблицы
     # with db:
@@ -11438,6 +11477,7 @@ my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
 # my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
 my_win.Buttom_change_player.clicked.connect(change_player_between_group_after_draw)
