@@ -109,7 +109,6 @@ class Title(BaseModel):
     class Meta:
         db_table = "titles"
 
-
 class Player(BaseModel):
     player = CharField(50)
     bday = DateField()
@@ -150,7 +149,6 @@ class System(BaseModel):
     class Meta:
         db_table = "system"
 
-
 class Game_list(BaseModel):
     number_group = CharField()
     rank_num_player = IntegerField()
@@ -162,8 +160,8 @@ class Game_list(BaseModel):
         db_table = "game_lists"
         order_by = "number_group"
 
-
 class Choice(BaseModel):
+
     player_choice = ForeignKeyField(Player)
     family = CharField()
     region = CharField()
@@ -185,7 +183,6 @@ class Choice(BaseModel):
 
     class Meta:
         db_table = "choices"
-
 
 class Delete_player(BaseModel):
     player = CharField()
