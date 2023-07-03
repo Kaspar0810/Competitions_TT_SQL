@@ -1737,6 +1737,8 @@ def fill_table_R1_list():
 
 def fill_table_results():
     """заполняет таблицу результатов QtableWidget из db result"""
+    system_id_list = []
+    system_stage_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
     result = Result.select().where(Result.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     tb = my_win.tabWidget.currentIndex()
@@ -1751,7 +1753,12 @@ def fill_table_results():
             stage = "Одна таблица"
         else:
             stage = "Финальный"
-        player_result = result.select().where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result
+            for k in system: # заполняе список ид системы финальных этапов
+                id_system = k.id
+                if k.stage not in system_stage_list:
+                    system_id_list.append(id_system)
+        player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result            
+        # player_result = result.select().where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result
     if tb == 4:
         player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
 
@@ -5390,9 +5397,9 @@ def rank_mesto_out_in_group_or_semifinal_to_final(fin):
     return nums
 
 
-def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
+def choice_setka_automat(fin, flag, count_exit):
     """автоматическая жеребьевка сетки, fin - финал, count_exit - сколько выходят в финал
-    mesto_first_poseva - номер 1-ого места, flag - флаг вида жеребьевки ручная или автомат""" 
+    flag - флаг вида жеребьевки ручная или автомат""" 
     msgBox = QMessageBox 
     full_posev = []  # список полного списка участников 1-ого посева
     group_last = []
@@ -5445,9 +5452,12 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
         elif fin == "1-й финал":
             if stage_exit == "Предварительный":
                 # == реальное число игроков в финале
-                real_all_player_in_final = len(choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final.in_(nums))))
+                real_all_player_in_final = len(choice.select().where(Choice.mesto_group.in_(nums)))
                 # == число игроков в конкретном посеве финала
-                choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final == nums[n]))               
+                if n == 0:
+                    choice_posev = choice.select().where(Choice.mesto_group == nums[n]).order_by(Choice.group) # если 1-й финал и 1-й посев тос ортирует по группам 
+                else:
+                    choice_posev = choice.select().where(Choice.mesto_group == nums[n])          
             elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
                 real_all_player_in_final = len(choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final.in_(nums))))
                 # == число игроков в конкретном посеве финала
@@ -5543,7 +5553,7 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
                 l = number_posev[0] # общий список всего посева
                 if i == 0 and n == 0: #  ===== 1-й посев
                     sev = posev[i]  # список номеров посева
-                    num_set = sev[w]
+                    num_set = sev[w] # номер в сетке на который идет сев
                     count_sev = len(sev) # количество номеров в посеве
                 else:
                     num_set = sev[0] # проверить
@@ -5568,7 +5578,7 @@ def choice_setka_automat(fin, flag, count_exit, mesto_first_poseva):
                             reg_last.append(v[1]) # список уже посеянных регионов
                             group_last.append(v[2]) # список номеров групп уже посеянных
                         if n != 0 or (n == 0 and l > 1):
-                # =========== определения кол-во возможный вариантов посева у каждого региона
+                # =========== определения кол-во возможны вариантов посева у каждого региона
                             if one_region == 0:
                                 possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)
                             else:
@@ -10711,7 +10721,7 @@ def player_choice_in_setka(fin):
     mesto_first_poseva = 1
 
     flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
-    posev = choice_setka_automat(fin, flag, count_exit, mesto_first_poseva)
+    posev = choice_setka_automat(fin, flag, count_exit)
 
     posev_data = []
     for key in posev.keys():
