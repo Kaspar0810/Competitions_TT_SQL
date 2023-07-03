@@ -4363,15 +4363,19 @@ def control_winner_player(winner, loser):
     all_game_win = total_game_win + 1
     sum_los = player_los_id.total_win_game
     all_game_los = total_game_los + 1  
+    koef_win = sum_win / all_game_win
+    koef_los = sum_los / all_game_los
+    koef_win = float('{:.3f}'.format(koef_win)) # соотношение выйгранных партий ко всем играм
+    koef_los = float('{:.3f}'.format(koef_los)) # соотношение выйгранных партий ко всем играм
  
     with db:
         player_win_id.total_game_player = all_game_win # все игр сыгранных игроком
         player_win_id.total_win_game = sum_win # сколько побед он одержал
-        player_win_id.coefficient_victories = (sum_win / all_game_win)
+        player_win_id.coefficient_victories = koef_win
         player_win_id.save()
         player_los_id.total_game_player = all_game_los
         player_los_id.total_win_game = sum_los
-        player_los_id.coefficient_victories = (sum_los / all_game_los)
+        player_los_id.coefficient_victories = koef_los
         player_los_id.save()
 
 
@@ -5925,6 +5929,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                 possible_number[reg] = sev
         else: # 2-й посев и последующие 
             number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы
+
             number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
             reg_tmp.clear()
             for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
