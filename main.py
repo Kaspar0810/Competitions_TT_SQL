@@ -4359,7 +4359,8 @@ def control_winner_player(winner, loser):
         result = msgBox.information(my_win, "", f"Вы уверенны в победе\n {winner} рейтинг{r_win}!\n над {loser} рейтинг {r_los}",
                                     msgBox.Yes, msgBox.No)
         if  result == msgBox.No:
-            return
+            flag = False
+            return flag
     sum_win = player_win_id.total_win_game + 1
     all_game_win = total_game_win + 1
     sum_los = player_los_id.total_win_game
@@ -4494,7 +4495,9 @@ def enter_score(none_player=0):
         ts_winner = ""
         ts_loser = ""
 
-    control_winner_player(winner, loser) # проверка реальности победы игрока (маленький рейтинг над большим)
+    flag = control_winner_player(winner, loser) # проверка реальности победы игрока (маленький рейтинг над большим)
+    if flag is False:
+        return
 
     with db:  # записывает в таблицу -Result- сыгранный матч в группах или финал по кругу
         result = Result.get(Result.id == id)
@@ -9817,6 +9820,7 @@ def score_in_table(td, num_gr):
             stage = "Одна таблица"
             ch = choice.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
         else:
+            stage = "Финальный"
             ch = choice.select().where(Choice.final == num_gr)
         mp = len(gamelist.select().where(Game_list.system_id == id_system))
 
@@ -10091,7 +10095,7 @@ def rank_in_group(total_score, td, num_gr, stage):
         game_max = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))  # сколько всего игр в группе
         max_person = len(game_list_group)
     else:
-        system = sys.select().where(System.stage == stage).get()
+        system = sys.select().where(System.stage == num_gr).get()
         id_system = system.id
         game_max = result.select().where(Result.system_id == id_system)  # сколько всего игр в группе
         game_list_group = game_list.select().where(Game_list.system_id == id_system)
