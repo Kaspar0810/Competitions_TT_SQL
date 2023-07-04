@@ -1747,10 +1747,14 @@ def fill_table_results():
         system_id = system.select().where(System.stage == stage).get()
         id_system = system_id.id
         player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result
+    elif tb == 4:
+        player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
     elif tb == 5:
         stage = my_win.comboBox_filter_final.currentText()
         if stage == "Одна таблица":
             stage = "Одна таблица"
+            system_id = system.select().where(System.stage == stage).get()
+            id_system = system_id.id
         else:
             stage = "Финальный"
             for k in system: # заполняе список ид системы финальных этапов
@@ -1758,10 +1762,7 @@ def fill_table_results():
                 if k.stage not in system_stage_list:
                     system_id_list.append(id_system)
         player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result            
-        # player_result = result.select().where(Result.system_stage == stage)  # проверка есть ли записи в таблице -result
-    if tb == 4:
-        player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
-
+ 
     result_list = player_result.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = len(result_list[0])  # кол-во столбцов в таблице
