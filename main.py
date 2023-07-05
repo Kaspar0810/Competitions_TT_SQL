@@ -9613,10 +9613,6 @@ def  table_data(stage, kg):
     id_system = system_id.id
     if kg == 1:  # система одна таблица круг или финалу по кругу
         # список словарей участник и его регион
-        # if stage == "Одна таблица":
-        #     result_fin = result.select().where(Result.system_stage == stage)
-        # else:
-        #     result_fin = result.select().where(Result.number_group == stage)
         result_fin = result.select().where(Result.system_id == id_system)
         tr = len(result_fin)  # общее кол-во игр в финалах или одной таблице
         posev_data = player_choice_one_table(stage) # posev_data (фамилия/ id)
@@ -9630,8 +9626,6 @@ def  table_data(stage, kg):
         tdt_all.append(tdt_color)
     else:
         max_gamer = kol_player(stage)
-        # result_stage = result.select().where(Result.number_group == stage)
-        # result_stage = result.select().where(Result.system_stage == stage)
         result_stage = result.select().where(Result.system_id == id_system)
         tr = len(result_stage)  # общее кол-во игр в группах
         for p in range(0, kg):
