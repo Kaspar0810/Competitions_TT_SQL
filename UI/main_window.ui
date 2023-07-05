@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>5</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3659,7 +3659,7 @@
        <rect>
         <x>10</x>
         <y>20</y>
-        <width>191</width>
+        <width>220</width>
         <height>121</height>
        </rect>
       </property>
@@ -4031,8 +4031,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>504</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4044,8 +4044,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>196</width>
-       <height>534</height>
+       <width>225</width>
+       <height>565</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4421,8 +4421,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>504</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4708,8 +4708,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>504</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4981,8 +4981,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>504</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5161,7 +5161,7 @@
        <x>0</x>
        <y>0</y>
        <width>237</width>
-       <height>511</height>
+       <height>504</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5441,8 +5441,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>237</width>
+       <height>504</height>
       </rect>
      </property>
      <attribute name="label">
