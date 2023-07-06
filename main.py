@@ -31,7 +31,7 @@ import pathlib
 from pathlib import Path
 import random
 # import collections
-# from playhouse.migrate import *
+from playhouse.migrate import *
 
 if not os.path.isdir("table_pdf"):  # создает папку 
     os.mkdir("table_pdf")
@@ -1253,9 +1253,9 @@ def load_tableWidget():
     sender = my_win.menuWidget().sender()
     # нажат пункт меню -текущий рейтинг- или -рейтинг январский
     if sender == my_win.rAction or sender == my_win.r1Action or tb == 6:
-        z = 9
-        column_label = ["№", "Место", "  Рейтинг",
-                        "Фамилия Имя", "Дата рождения", "Город", "Регион", "Округ"]
+        z = 10
+        column_label = ["№", "Место", "Рейтинг",
+                        "Фамилия Имя", "Дата рождения", "Город", "Регион", "Округ", "Заявка"]
     elif tb == 3 or tb == 4 or tb == 5:
         z = 16
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
@@ -1273,7 +1273,7 @@ def load_tableWidget():
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
-        z = 17  # кол-во столбцов должно быть равно (fill_table -column_count-) плюс 1 нумерация списка
+        z = 18  # кол-во столбцов должно быть равно (fill_table -column_count-) плюс 1 нумерация списка
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
@@ -1285,7 +1285,6 @@ def load_tableWidget():
         brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         item.setForeground(brush)
-        # item.setBackground(QtGui.QColor(0, 255, 150))
         my_win.tableWidget.setHorizontalHeaderItem(i, item)
     my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
     my_win.tableWidget.isSortingEnabled()
@@ -1343,7 +1342,6 @@ def r_list_load_tablewidget():
         fill_table_R_list() 
     else:
         fill_table_R1_list() 
-
 
 
 def title_string():
@@ -1907,6 +1905,12 @@ def add_player():
     txt_edit = my_win.textEdit.toPlainText()
     ms = "" # записвыает место в базу как пустое
     idc = Coach.get(Coach.coach == ch)
+    # ==== определяет завявка предварительная или нет
+    titul = title_id()
+    data_start = titul.data_start
+    date_current = datetime.today()
+    if  date_current < data_start:
+        zayavka = "предварительная"
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
@@ -1918,7 +1922,7 @@ def add_player():
             player_del.delete_instance()
             plr = Player(player_id=player_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
-                         comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0).save()
+                         comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
         if txt == "Редактировать":
@@ -1939,7 +1943,7 @@ def add_player():
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting="", comment="", 
-                                coefficient_victories=0, total_game_player=0, total_win_game=0).save()
+                                coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
         pl_id = Player.select().order_by(Player.id.desc()).get() # id нового игрока
         player_id = pl_id.id
         # ========
@@ -11537,20 +11541,20 @@ def load_playing_game_in_table_for_final(fin):
 # 
 
 
-# def proba():
-#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+def proba():
+    """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
 
-#     my_db = SqliteDatabase('comp_db.db')
-#     migrator = SqliteMigrator(my_db)
-#     total_win_game = IntegerField(default=0, null=True)
+    my_db = SqliteDatabase('comp_db.db')
+    migrator = SqliteMigrator(my_db)
+    application = CharField(null=True)
 #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
 #     # system_id = ForeignKeyField(System, field=System.id, null=True)
 # # # #
-#     with db:
+    with db:
 #         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
 #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
 #         # migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
-#         migrate(migrator.add_column('players', 'total_win_game', total_win_game)) # Добавление столбца (таблица, столбец, повтор название столбца)
+        migrate(migrator.add_column('players', 'application', application)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
     # ========================= создание таблицы
     # with db:
@@ -11716,7 +11720,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
