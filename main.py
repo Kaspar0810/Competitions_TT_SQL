@@ -1260,7 +1260,7 @@ def load_tableWidget():
         z = 16
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
                         "Общий счет",
-                        "Счет в партии", "Проигравший", "Очки", "Счет в партии", " title_id", "Тур"]
+                        "Счет в партии", "Проигравший", "Очки", "Счет в партии", "Тур"]
         # my_win.tableWidget.setColumnWidth(5, 10)
     elif tb == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
         z = 19
@@ -1273,7 +1273,7 @@ def load_tableWidget():
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
-        z = 18  # кол-во столбцов должно быть равно (fill_table -column_count-) плюс 1 нумерация списка
+        z = 17  # кол-во столбцов должно быть равно (fill_table -column_count-) плюс 1 нумерация списка
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
@@ -1328,6 +1328,7 @@ def load_tableWidget():
     elif  tb == 6:
         r_list_load_tablewidget()
     else:  # загружает таблицу со списком
+        t_id = title_id()
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())
         count = len(player_list)
         if count != 0:
@@ -1906,11 +1907,11 @@ def add_player():
     ms = "" # записвыает место в базу как пустое
     idc = Coach.get(Coach.coach == ch)
     # ==== определяет завявка предварительная или нет
-    titul = title_id()
-    data_start = titul.data_start
-    date_current = datetime.today()
-    if  date_current < data_start:
-        zayavka = "предварительная"
+    # titul = title_id()
+    # data_start = titul.data_start
+    # date_current = datetime.today()
+    # if  date_current < data_start:
+    #     zayavka = "предварительная"
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
@@ -1922,7 +1923,7 @@ def add_player():
             player_del.delete_instance()
             plr = Player(player_id=player_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
-                         comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
+                         comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0).save()
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
         if txt == "Редактировать":
@@ -1943,7 +1944,7 @@ def add_player():
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting="", comment="", 
-                                coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
+                                coefficient_victories=0, total_game_player=0, total_win_game=0).save()
         pl_id = Player.select().order_by(Player.id.desc()).get() # id нового игрока
         player_id = pl_id.id
         # ========
