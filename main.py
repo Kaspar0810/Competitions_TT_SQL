@@ -641,7 +641,7 @@ class StartWindow(QMainWindow, Ui_Form):
 
             title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
                           kat_ref="", secretary="", kat_sek="", gamer=gamer, full_name_comp="", pdf_comp="",
-                          short_name_comp="", tab_enabled="Титул Участники").save()
+                          short_name_comp="", tab_enabled="Титул").save()
             # получение последней записи в таблице
             t_id = Title.select().order_by(Title.id.desc()).get()
             title_id = t_id.id
@@ -1003,6 +1003,7 @@ def tab_enabled(gamer):
             comp = f"{old_comp}.{old_data}.{old_gamer}"
             my_win.go_to_Action.setText(comp)
             last_competition()
+    my_win.tabWidget.setTabEnabled(1, False)        
     my_win.tabWidget.setTabEnabled(2, False)
     my_win.tabWidget.setTabEnabled(3, False)
     my_win.tabWidget.setTabEnabled(4, False)
@@ -1399,7 +1400,7 @@ def title_pdf():
     else:
         filepatch = None
 
-    tit_id = title_id()
+    tit_id = Title.select().where(Title.id == title_id()).get()
     short_name = tit_id.short_name_comp
     canvas = Canvas(f"{short_name}_title.pdf", pagesize=A4)
 
@@ -1440,19 +1441,21 @@ def title_made():
         return
     else:
         db_insert_title(title_str)
+
     title_pdf()
     # после заполнения титула выключает чекбокс
     my_win.checkBox.setChecked(False)
     my_win.Button_title_made.setText("Создать")
     region()
     # получение последней записи в таблице
-    t = Title.select().order_by(Title.id.desc()).get()
+    title = Title.select().order_by(Title.id.desc()).get()
+
     # получение последнего id системы соревнования
     s = System.select().order_by(System.id.desc()).get()
-
+    add_open_tab(tab_page="Участники")
     with db:
         System.create_table()
-        sys = System(id=s, title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="",
+        sys = System(id=s, title_id=title, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="",
                      label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True).save()
 
 
@@ -1907,11 +1910,11 @@ def add_player():
     ms = "" # записвыает место в базу как пустое
     idc = Coach.get(Coach.coach == ch)
     # ==== определяет завявка предварительная или нет
-    # titul = title_id()
-    # data_start = titul.data_start
-    # date_current = datetime.today()
-    # if  date_current < data_start:
-    #     zayavka = "предварительная"
+    titul = title_id()
+    data_start = titul.data_start
+    date_current = datetime.today()
+    if  date_current < data_start:
+        zayavka = "предварительная"
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
@@ -2013,6 +2016,22 @@ def dclick_in_listwidget():
         name = name.capitalize()
         r = text[sz + 2:sz1]
         dr = text[sz1 + 2:sz2]
+        # ==== проверка правильность даты для участия в турнире
+        title = Title.get(Title.id == title_id())
+        vozrast_text = title.vozrast
+        text = vozrast_text[:2]
+        if text == "до":
+            mark = vozrast_text.find(" ")
+            total_old = int(vozrast_text[mark + 1:5])
+            year_current = int(datetime.today().strftime("%Y")) # текущий год
+            year_bday = year_current - total_old + 1
+            after_date = date(year_bday, 1, 1)
+            date_object = datetime.strptime(dr,"%Y-%m-%d")
+            dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
+            current_date = date(dr_year, 1, 1)
+            if after_date > current_date: # сравниваем две даты
+                print("проблема")
+
         # ==== переводит строку с датой из базы даннных в строку к обычному виду
         date_object = datetime.strptime(dr,"%Y-%m-%d")
         dr = date_object.strftime('%d.%m.%Y')
