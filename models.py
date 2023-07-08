@@ -125,8 +125,8 @@ class Player(BaseModel):
     coefficient_victories = FloatField()
     total_game_player = IntegerField()
     total_win_game = IntegerField()
+    application = CharField(30)
    
-
     class Meta:
         db_table = "players"
         order_by = "rank"

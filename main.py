@@ -1269,12 +1269,11 @@ def load_tableWidget():
                         "Посев",
                         "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
     elif my_win.checkBox_6.isChecked(): # если отмечен чекбокс -удаленные-
-        # z = 14
         z = 17
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)"]
     else:
-        z = 17  # кол-во столбцов должно быть равно (fill_table -column_count-) плюс 1 нумерация списка
+        z = 18  # кол-во столбцов должно быть равно (fill_table -column_count-) плюс 1 нумерация списка
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
                         "Тренер(ы)", "Место"]
 
@@ -1910,9 +1909,9 @@ def add_player():
     ms = "" # записвыает место в базу как пустое
     idc = Coach.get(Coach.coach == ch)
     # ==== определяет завявка предварительная или нет
-    titul = title_id()
-    data_start = titul.data_start
-    date_current = datetime.today()
+    title = Title.select().where(Title.id == title_id()).get()
+    data_start = title.data_start
+    date_current = date.today()
     if  date_current < data_start:
         zayavka = "предварительная"
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
@@ -1947,7 +1946,7 @@ def add_player():
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting="", comment="", 
-                                coefficient_victories=0, total_game_player=0, total_win_game=0).save()
+                                coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
         pl_id = Player.select().order_by(Player.id.desc()).get() # id нового игрока
         player_id = pl_id.id
         # ========
@@ -1993,6 +1992,7 @@ def check_rejting_pay(pl, txt_edit):
 
 def dclick_in_listwidget():
     """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""
+    msgBox = QMessageBox
     txt_tmp = my_win.label_63.text()
     text = my_win.listWidget.currentItem().text()
     coach_field = my_win.lineEdit_coach.text()
@@ -2019,19 +2019,26 @@ def dclick_in_listwidget():
         # ==== проверка правильность даты для участия в турнире
         title = Title.get(Title.id == title_id())
         vozrast_text = title.vozrast
-        text = vozrast_text[:2]
-        if text == "до":
+        text_1 = vozrast_text.rfind("моложе")
+        text_date = vozrast_text[:2]
+        if text_1 == -1 and text_date == "до":
             mark = vozrast_text.find(" ")
             total_old = int(vozrast_text[mark + 1:5])
             year_current = int(datetime.today().strftime("%Y")) # текущий год
             year_bday = year_current - total_old + 1
-            after_date = date(year_bday, 1, 1)
-            date_object = datetime.strptime(dr,"%Y-%m-%d")
-            dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
-            current_date = date(dr_year, 1, 1)
-            if after_date > current_date: # сравниваем две даты
-                print("проблема")
-
+        elif text_1 > -1: # если возраст г.р и моложе
+            year_bday = int(vozrast_text[:4])
+            year_current = int(datetime.today().strftime("%Y")) # текущий год
+        after_date = date(year_bday, 1, 1)
+        date_object = datetime.strptime(dr,"%Y-%m-%d")
+        dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
+        current_date = date(dr_year, 1, 1)
+        if after_date > current_date: # сравниваем две даты
+            result = msgBox.information(my_win, "", "Возраст спортсмена не соответсвует\nвозрастной категории соревнования.\n"
+                    "Или возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
+                                        msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
+                return
         # ==== переводит строку с датой из базы даннных в строку к обычному виду
         date_object = datetime.strptime(dr,"%Y-%m-%d")
         dr = date_object.strftime('%d.%m.%Y')
@@ -6683,8 +6690,11 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
+        my_win.tableWidget.hideColumn(13)
+        my_win.tableWidget.hideColumn(14)
+        my_win.tableWidget.hideColumn(15)
+        my_win.tableWidget.hideColumn(16)
     elif tb == 0:
-        # my_win.tableWidget.showColumn(0)
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
         my_win.tableWidget.hideColumn(9)
@@ -6692,6 +6702,9 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
         my_win.tableWidget.hideColumn(13)
+        my_win.tableWidget.hideColumn(14)
+        my_win.tableWidget.hideColumn(15)
+        my_win.tableWidget.hideColumn(16)
     elif tb == 3:
         my_win.tableWidget.hideColumn(0)
         my_win.tableWidget.hideColumn(1)
