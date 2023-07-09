@@ -1,5 +1,4 @@
 
-# import typing
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
@@ -18,7 +17,6 @@ from datetime import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtGui, QtWidgets, QtPrintSupport, QtCore
-# from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from models import *
 from collections import Counter
 from itertools import *
@@ -31,7 +29,7 @@ import pathlib
 from pathlib import Path
 import random
 # import collections
-from playhouse.migrate import *
+# from playhouse.migrate import *
 
 if not os.path.isdir("table_pdf"):  # создает папку 
     os.mkdir("table_pdf")
@@ -88,7 +86,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Button_title_made.setEnabled(False)
         self.Button_system_made.setEnabled(False)
         self.tabWidget.setCurrentIndex(0)  # включает вкладку титул
-        # self.toolBox.setCurrentIndex(0)
         # ++ отключение страниц
         self.tabWidget.setTabEnabled(1, True)
         self.tabWidget.setTabEnabled(2, False)
@@ -206,8 +203,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_fin_Action = QAction("Редактировать финалы")
         self.vid_edit_Action = QAction("Вид страницы этапов")
 
-        # self.find_r_Action = QAction("Поиск в текущем рейтинге")  # подменю поиск
-        # self.find_r1_Action = QAction("Поиск в январском рейтинге")
         self.choice_one_table_Action = QAction("Одна таблица")
         # подменю жеребьевка -группы-
         self.choice_gr_Action = QAction("Группы")
@@ -502,8 +497,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         return
                 else:
                     if type == "круг":
-                        # s = system.select().where(System.stage == fin).get()
-                        # group = s.total_group
                         player_fin_on_circle(fin)
                         if kol_player_exit > 1:
                             reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить игры {fin_replacing} результатами "
@@ -892,14 +885,6 @@ def load_listR_in_db(fname, table_db):
                 table_db.insert_many(data[idx:idx+100]).execute()
 
 
-def column_bithday_to_standart_vid_in_db():
-    """ Преобазование столбца день рождения к стандартному виду базы данных"""
-
-
-
-
-
-
 def region():
     """добавляет из таблицы в комбобокс регионы"""
     count = len(Region.select())
@@ -926,7 +911,6 @@ def change_sroki():
     i = 0
     if count < 6:
         for k in t_id:
-            id_titul = k.id
             data_st = k.data_start
             data_end = k.data_end
             data_comp.append(data_st)
@@ -968,9 +952,6 @@ my_win.comboBox_table_5.addItems(vid_setki_one_table)
 my_win.comboBox_table_6.addItems(vid_setki_one_table)
 my_win.comboBox_table_7.addItems(vid_setki_one_table)
 my_win.comboBox_table_8.addItems(vid_setki_one_table)
-# my_win.comboBox_table_9.addItems(vid_setki_one_table)
-# my_win.comboBox_one_table.addItems(vid_setki_one_table)
-
 # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
@@ -1267,7 +1248,7 @@ def load_tableWidget():
         z = 19
         column_label = ["№", "Id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
                         "Посев",
-                        "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал"]
+                        "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал", "Заявка"]
     elif my_win.checkBox_6.isChecked(): # если отмечен чекбокс -удаленные-
         z = 17
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
@@ -1275,7 +1256,7 @@ def load_tableWidget():
     else:
         z = 18  # кол-во столбцов должно быть равно (fill_table -column_count-) плюс 1 нумерация списка
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
-                        "Тренер(ы)", "Место"]
+                        "Тренер(ы)", "Место", "Заявка"]
 
     my_win.tableWidget.setColumnCount(z) # устанавливает колво столбцов
     my_win.tableWidget.setRowCount(1)
@@ -1320,6 +1301,7 @@ def load_tableWidget():
         stage = "Предварительный"
         fill_table_results()
     elif tb == 2 or sender == my_win.choice_gr_Action:
+
         if sender == my_win.choice_fin_Action:  # таблица жеребьевки
             pass
         else:
@@ -1655,6 +1637,9 @@ def find_city():
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
+
+    my_win.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # выделение несколких строк по клику мышью
+
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
@@ -1914,6 +1899,8 @@ def add_player():
     date_current = date.today()
     if  date_current < data_start:
         zayavka = "предварительная"
+    else:
+        zayavka = "основная"
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         row = my_win.tableWidget.currentRow()
@@ -3852,7 +3839,11 @@ def filter_player_list(sender):
             player_list = player.select().where(Player.city == city)
         elif region != "" and city == "":
             player_list = player.select().where(Player.region == region)
-
+    elif sender == my_win.checkBox_15:
+        if my_win.checkBox_15.isChecked():
+            player_list = player.select().where(Player.application == "предварительная")
+        else:
+            player_list = Player.select().where(Player.title_id == title_id())
     elif sender == my_win.Button_reset_fltr_list:
         player_list = Player.select().where(Player.title_id == title_id())
         my_win.comboBox_fltr_region.setCurrentIndex(0)
@@ -4410,6 +4401,20 @@ def control_winner_player(winner, loser):
         player_los_id.total_win_game = sum_los
         player_los_id.coefficient_victories = koef_los
         player_los_id.save()
+
+
+def check_real_player():
+    """Изменяет спортсменов по предварительной заявке не реальных"""
+    player_list = Player.select().where(Player.title_id == title_id())
+    indices = my_win.tableWidget.selectionModel().selectedRows()
+    for index in indices:
+        row_index = index.row()
+        id_pl = int(my_win.tableWidget.item(row_index, 1).text())
+        app = player_list.select().where(Player.id == id_pl).get()
+        with db:
+            app.application = "основная"
+            app.save()
+ 
 
 
 def enter_score(none_player=0):
@@ -6200,15 +6205,9 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         free_list = list(kol_group_free.values())  # список кол-во свободных групп, куда можно сеять
         reg_list = list(kol_group_free.keys())  # список ключей (регионов)
         last = len(reg_list)  # кол-во остатка посева
-        # for i in kol_group_free:  # получение словаря (регион и кол-во мест (групп) куда можно сеять)
-        #     tmp = current_region_group[i] 
-        #     kol_reg = len(tmp)  # колво регионов (посевов)
-        #     kol_group_free[i] = kol_reg
         region = reg_list[0]  # номер региона, который сейчас сеется
         free_gr = kol_group_free[i]  # кол-во групп куда можно сеять
         # ==== сделать последний посев по наименшему количеству вариантов посева
-
-        # =========================
         if 1 in free_list and last > 1 or last == 1 and free_gr == 1 :  # проверка есть ли группа где осталось только одно места для посева
             # сделать посев 1 регион но много групп
             region = reg_list[free_list.index(1)]  # регион если в списке free list есть значение -1-, т.е. осталась одна группа
@@ -6546,7 +6545,6 @@ def change_player_between_group_after_draw():
     my_win.comboBox_second_group.setCurrentText(gr_pl2)
     
 
-
 def add_player_to_group():
     """добавление игрока в группу при редактировании"""
     player_choice_tmp = []
@@ -6693,7 +6691,7 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.hideColumn(14)
         my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16)
+        # my_win.tableWidget.hideColumn(16)
     elif tb == 0:
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
@@ -6721,9 +6719,7 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(9)
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)
- 
-        
+        my_win.tableWidget.hideColumn(12)       
 
 
 def etap_made():
@@ -9746,9 +9742,7 @@ def setka_data(fin, posev_data):
     all_list = []
 
     system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()  # находит system id последнего
-    # for sys in system:  # проходит циклом по всем отобранным записям
-    #     if sys.stage == fin:
-    #         mp = sys.total_athletes
+
     mp = system.max_player
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
@@ -11574,20 +11568,20 @@ def load_playing_game_in_table_for_final(fin):
 # 
 
 
-def proba():
-    """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+# def proba():
+#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
 
-    my_db = SqliteDatabase('comp_db.db')
-    migrator = SqliteMigrator(my_db)
-    application = CharField(null=True)
+#     my_db = SqliteDatabase('comp_db.db')
+#     migrator = SqliteMigrator(my_db)
+#     application = CharField(null=True)
 #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
 #     # system_id = ForeignKeyField(System, field=System.id, null=True)
 # # # #
-    with db:
+    # with db:
 #         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
 #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
 #         # migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
-        migrate(migrator.add_column('players', 'application', application)) # Добавление столбца (таблица, столбец, повтор название столбца)
+        # migrate(migrator.add_column('players', 'application', application)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
     # ========================= создание таблицы
     # with db:
@@ -11726,6 +11720,7 @@ my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по не�
 my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке
 my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке
 my_win.checkBox_11.stateChanged.connect(debtor_R) # должники рейтинга оплаты
+my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
 # =======  нажатие кнопок =========
 
@@ -11741,6 +11736,7 @@ my_win.Button_reset_filter_sf.clicked.connect(reset_filter)
 my_win.Button_filter_fin.clicked.connect(filter_fin)
 my_win.Button_filter_sf.clicked.connect(filter_sf)
 my_win.Button_filter_gr.clicked.connect(filter_gr)
+my_win.Button_app.clicked.connect(check_real_player)
 # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_etap_made.clicked.connect(etap_made)
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
@@ -11753,7 +11749,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
