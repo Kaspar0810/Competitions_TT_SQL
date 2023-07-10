@@ -381,6 +381,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     load_combobox_filter_final()
             add_open_tab(tab_page="Финалы")
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
+            flag_real = check_real_player()
+            if flag_real is True:
+                reply = msg.information(my_win, 'Уведомление',
+                                                "В списке присутствуют спортсмены,\nиз предварительной заявке"
+                                                "\nне подтвержденые о своем участии!",
+                                        msg.Ok)
+                if reply == msg.Ok:
+                    my_win.tabWidget.setCurrentIndex(2)                                                        
             for stage in system:
                 if stage.stage == "Предварительный":
                     if stage.choice_flag == True:
@@ -752,6 +760,16 @@ def dbase():
                           Result, Game_list, Choice, Delete_player])
 
 
+def check_real_player():
+    """Проверяет все ли игроки по превдварительной заявке подтвердились"""
+    flag_app = False
+    player = Player.select().where((Player.id == title_id()) & (Player.applications == "предварительная"))
+    count = len(player)
+    if count > 0:
+        flag_app = True
+        return flag_app
+
+
 def db_r(gamer):  # table_db присваивает по умолчанию значение R_list
     """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
      а потом загружает список регионов базу данных"""
@@ -791,7 +809,7 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     t = Title.select().order_by(Title.id.desc()).get()
     title = t.id
     if title == 1:
-        wb = op.load_workbook("регионы.xlsx")
+        wb = op.load_workbook("regions.xlsx")
         s = wb.sheetnames[0]
         sheet = wb[s]
         reg = []
@@ -2409,7 +2427,6 @@ def page():
         my_win.Button_print_begunki.setEnabled(False)
         my_win.lineEdit_range_tours.hide()
         load_combo_etap_begunki()
-
     hide_show_columns(tb)
 
 
@@ -2521,12 +2538,6 @@ def find_player():
         pass
 
 
-
-# def find_player_in_R():
-#     """если есть необходимость в поиске игрок в рейтинг листах январском или текущем"""
-#     pass
-
-
 def sort():
     """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
@@ -2565,21 +2576,6 @@ def sort():
     # if sender == my_win.Button_sort_R or sender == my_win.Button_sort_Name or sender == my_win.Button_sort_mesto:
     if sender in signal_button_list:
         list_player_pdf(player_list)
-
-
-# def button_etap_made_enabled(state):
-#     """включает кнопку - создание таблиц - если отмечен чекбокс, защита от случайного нажатия"""
-#     if state == 2:
-#         my_win.tabWidget.setTabEnabled(2, True)
-#         pass
-#         # my_win.Button_etap_made.setEnabled(True)
-#         # my_win.Button_2etap_made.setEnabled(True)
-#         # my_win.spinBox_kol_group.show()
-#     else:
-#         pass
-#         # my_win.Button_1etap_made.setEnabled(False)
-#         # my_win.Button_2etap_made.setEnabled(False)
-#         # my_win.spinBox_kol_group.hide()
 
 
 def button_title_made_enable(state):
@@ -6691,7 +6687,8 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.hideColumn(14)
         my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(17)
+        my_win.tableWidget.hideColumn(16) # коэфициент значимости
+        my_win.tableWidget.hideColumn(17) # заявка
     elif tb == 0:
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
@@ -6702,7 +6699,8 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.hideColumn(14)
         my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16)
+        my_win.tableWidget.hideColumn(16) # коэфициент значимости
+        my_win.tableWidget.hideColumn(17)
     elif tb == 3:
         my_win.tableWidget.hideColumn(0)
         my_win.tableWidget.hideColumn(1)
