@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>7</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3659,7 +3659,7 @@
        <rect>
         <x>10</x>
         <y>20</y>
-        <width>191</width>
+        <width>220</width>
         <height>121</height>
        </rect>
       </property>
@@ -3988,6 +3988,11 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_7">
+     <attribute name="title">
+      <string>Дополнительно</string>
+     </attribute>
+    </widget>
    </widget>
    <widget class="QToolBox" name="toolBox">
     <property name="geometry">
@@ -4027,15 +4032,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>509</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4048,7 +4053,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>509</height>
+       <height>502</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4059,8 +4064,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>231</width>
-        <height>539</height>
+        <width>236</width>
+        <height>548</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4560,8 +4565,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>509</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4847,8 +4852,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>509</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5120,8 +5125,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>509</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5299,8 +5304,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>509</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5575,13 +5580,18 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="page_8">
+     <attribute name="label">
+      <string>Рейтинг</string>
+     </attribute>
+    </widget>
     <widget class="QWidget" name="page_7">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>509</height>
+       <height>467</height>
       </rect>
      </property>
      <attribute name="label">

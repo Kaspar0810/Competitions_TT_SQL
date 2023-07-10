@@ -6691,7 +6691,7 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.hideColumn(14)
         my_win.tableWidget.hideColumn(15)
-        # my_win.tableWidget.hideColumn(16)
+        my_win.tableWidget.hideColumn(17)
     elif tb == 0:
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
