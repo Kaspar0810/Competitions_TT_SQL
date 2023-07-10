@@ -93,6 +93,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setTabEnabled(4, False)
         self.tabWidget.setTabEnabled(5, False)
         self.tabWidget.setTabEnabled(6, False)
+        self.tabWidget.setTabEnabled(7, True)
 
         self.toolBox.setItemEnabled(0, False)
         self.toolBox.setItemEnabled(1, False)
@@ -100,6 +101,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(3, False)
         self.toolBox.setItemEnabled(4, False)
         self.toolBox.setItemEnabled(5, False)
+        self.toolBox.setItemEnabled(6, False)
+        self.toolBox.setItemEnabled(7, True)
+
 
     # ====== создание строки меню ===========
     def _createMenuBar(self):
@@ -760,16 +764,6 @@ def dbase():
                           Result, Game_list, Choice, Delete_player])
 
 
-def check_real_player():
-    """Проверяет все ли игроки по превдварительной заявке подтвердились"""
-    flag_app = False
-    player = Player.select().where((Player.id == title_id()) & (Player.applications == "предварительная"))
-    count = len(player)
-    if count > 0:
-        flag_app = True
-        return flag_app
-
-
 def db_r(gamer):  # table_db присваивает по умолчанию значение R_list
     """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
      а потом загружает список регионов базу данных"""
@@ -809,7 +803,7 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     t = Title.select().order_by(Title.id.desc()).get()
     title = t.id
     if title == 1:
-        wb = op.load_workbook("regions.xlsx")
+        wb = op.load_workbook("регионы.xlsx")
         s = wb.sheetnames[0]
         sheet = wb[s]
         reg = []
@@ -1008,6 +1002,7 @@ def tab_enabled(gamer):
     my_win.tabWidget.setTabEnabled(4, False)
     my_win.tabWidget.setTabEnabled(5, False)
     my_win.tabWidget.setTabEnabled(6, False)
+    my_win.tabWidget.setTabEnabled(7, True)
 # включает вкладки записаные в Титул
     tab_str = titles.tab_enabled
     tab_list = tab_str.split(" ")
@@ -1319,7 +1314,6 @@ def load_tableWidget():
         stage = "Предварительный"
         fill_table_results()
     elif tb == 2 or sender == my_win.choice_gr_Action:
-
         if sender == my_win.choice_fin_Action:  # таблица жеребьевки
             pass
         else:
@@ -2207,10 +2201,14 @@ def page():
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 505))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         db_select_title()
         load_tableWidget()
         my_win.tableWidget.show()
     elif tb == 1:  # -список участников-
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 530))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         load_comboBox_filter()
         region()
         load_tableWidget()
@@ -2226,6 +2224,8 @@ def page():
         my_win.label_46.setText(f"Всего: {count} участников")
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 243, 841, 515))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 240))
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
         count_result = len(result_played)
@@ -2359,6 +2359,8 @@ def page():
             my_win.label_33.show()
         load_tableWidget()
     elif tb == 3:  # вкладка -группы-
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 188, 841, 568))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 181))
         system_stage = sf.select().where(System.stage == "Предварительный").get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -2375,6 +2377,8 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 4:  # вкладка -полуфиналы-
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 188, 841, 568))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 181))
         system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -2403,6 +2407,8 @@ def page():
             visible_field()
             my_win.label_16.hide()
     elif tb == 5: # вкладка -финалы-
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 188, 841, 568))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 181))
         my_win.checkBox_5.setEnabled(False)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
@@ -2416,17 +2422,22 @@ def page():
         load_combo()
         visible_field()
         my_win.label_16.hide()
-    elif tb == 6:
+    elif tb == 6: # вкладка -рейтинг-
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 70, 841, 691))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 70, 841, 691))
+        # my_win.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
         my_win.comboBox_choice_R.clear()
         my_win.comboBox_filter_date_in_R.clear()
         rejting_month = ["За текуший месяц", "За январь месяц"]
         my_win.comboBox_choice_R.addItems(rejting_month)
         load_comboBox_filter_rejting()
         load_tableWidget()
-
         my_win.Button_print_begunki.setEnabled(False)
         my_win.lineEdit_range_tours.hide()
         load_combo_etap_begunki()
+    elif tb == 7:
+        pass
+
     hide_show_columns(tb)
 
 
@@ -3093,14 +3104,10 @@ def player_fin_on_circle(fin):
     system_id = system.select().where(System.stage == fin).get()
     id_system = system_id.id
     stage_exit = system_id.stage_exit
-    # sys = system.select().where(System.stage == stage_exit).get()
     st = "Финальный"
-    # group = sys.total_group
-    # how_many_mest_exit = system_id.mesta_exit
 
     nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
 
-    # if fin != "1-й финал":
     if stage_exit == "Предварительный":
         choices_fin = choice.select().where(Choice.mesto_group.in_(nums))
         nt = 1
@@ -3143,9 +3150,7 @@ def player_fin_on_circle(fin):
         num = int(n[z + 1:])
         number_tours.append(num)
 
-    # sorted_fin_dict = dict(sorted(fin_dict.items()))
     for nt in number_tours:
-    # for nt in sorted_fin_dict.keys():
         fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
         game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=system_id,
                             title_id=title_id())
@@ -4415,7 +4420,7 @@ def check_real_player():
 
 def enter_score(none_player=0):
     """заносит в таблицу -результаты- победителя, счет и т.п. sc_total [партии выигранные, проигранные, очки победителя
-     очки проигравшего"""
+     очки проигравшего]"""
 
     tab = my_win.tabWidget.currentIndex()
     r = my_win.tableWidget.currentRow()
@@ -6687,8 +6692,7 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.hideColumn(14)
         my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16) # коэфициент значимости
-        my_win.tableWidget.hideColumn(17) # заявка
+        # my_win.tableWidget.hideColumn(16)
     elif tb == 0:
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
@@ -6699,8 +6703,7 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.hideColumn(14)
         my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16) # коэфициент значимости
-        my_win.tableWidget.hideColumn(17)
+        my_win.tableWidget.hideColumn(16)
     elif tb == 3:
         my_win.tableWidget.hideColumn(0)
         my_win.tableWidget.hideColumn(1)
