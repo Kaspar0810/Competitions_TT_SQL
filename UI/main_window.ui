@@ -20,7 +20,7 @@
       <x>260</x>
       <y>0</y>
       <width>841</width>
-      <height>251</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>6</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -831,7 +831,7 @@
         <x>1</x>
         <y>26</y>
         <width>821</width>
-        <height>183</height>
+        <height>191</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -5911,9 +5911,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>250</y>
+      <y>75</y>
       <width>841</width>
-      <height>511</height>
+      <height>684</height>
      </rect>
     </property>
     <property name="sizePolicy">

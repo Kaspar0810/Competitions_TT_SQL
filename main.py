@@ -2423,8 +2423,8 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 6: # вкладка -рейтинг-
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 70, 841, 691))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 70, 841, 691))
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 75, 841, 684))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
         # my_win.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
         my_win.comboBox_choice_R.clear()
         my_win.comboBox_filter_date_in_R.clear()
