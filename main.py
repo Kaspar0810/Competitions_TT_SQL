@@ -157,7 +157,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         rank_Menu.addAction(self.r1Action)
         # меню печать
         print_Menu = printMenu.addMenu("Чистые таблицы") 
-        print_Menu.addAction(self.clear_s8_Action)       
+        print_Menu.addAction(self.clear_s8_full_Action)       
         print_Menu.addAction(self.clear_s16_Action)
         print_Menu.addAction(self.clear_s16_2_Action)
         print_Menu.addAction(self.clear_s32_Action)
@@ -223,7 +223,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_one_table_Action = QAction("Одна таблица")
         self.go_to_Action = QAction("пусто")
         # подменю -печать-
-        self.clear_s8_Action = QAction("Сетка 8")
+        self.clear_s8_full_Action = QAction("Сетка 8")
         self.clear_s8_2_Action = QAction("Сетка 8 минус 2")
         self.clear_s16_Action = QAction("Сетка 16")
         self.clear_s16_2_Action = QAction("Сетка 16 минус 2")
@@ -290,7 +290,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin6_Action.triggered.connect(self.view)
         self.view_fin7_Action.triggered.connect(self.view)
         self.view_fin8_Action.triggered.connect(self.view)
-        self.clear_s8_Action.triggered.connect(self.print_clear)
+        self.clear_s8_full_Action.triggered.connect(self.print_clear)
         self.clear_s8_2_Action.triggered.connect(self.print_clear)
         self.clear_s16_Action.triggered.connect(self.print_clear)
         self.clear_s16_2_Action.triggered.connect(self.print_clear)
@@ -565,7 +565,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             setka_16_full_made(fin="1-й финал")
         elif sender == self.clear_s16_2_Action:
             setka_16_2_made(fin="1-й финал")
-        elif sender == self.clear_s8_Action:
+        elif sender == self.clear_s8_full_Action:
             setka_8_full_made(fin="1-й финал")
 
         view()
@@ -2975,17 +2975,17 @@ def view():
     elif sender == my_win.view_pf2_Action:
         view_file = f"{short_name}_2-semifinal.pdf"
     elif sender == my_win.clear_s32_Action:
-        view_file = "чист_32_сетка.pdf"
+        view_file = "clear_32_net.pdf"
     elif sender == my_win.clear_s16_Action:
-        view_file = "чист_16_full_сетка.pdf"
+        view_file = "clear_16_full_net.pdf"
     elif sender == my_win.clear_s32_full_Action:
-        view_file = "чист_32_full_сетка.pdf"
+        view_file = "clear_32_full_net.pdf"
     elif sender == my_win.clear_s32_2_Action:
-        view_file = "чист_32_2_сетка.pdf"
+        view_file = "clear_32_2_net.pdf"
     elif sender == my_win.clear_s16_2_Action:
-        view_file = "чист_16_2_сетка.pdf"
+        view_file = "clear_16_2_net.pdf"
     elif sender == my_win.clear_s8_full_Action:
-        view_file = "чист_8_full_сетка.pdf"
+        view_file = "clear_8_full_net.pdf"
  
     if platform == "linux" or platform == "linux2":  # linux
         pass
@@ -8460,7 +8460,7 @@ def setka_16_2_made(fin):
         else:
             name_table_final = f"{short_name}_{f}-final.pdf"
     else:
-        short_name = "чист_16_2_сетка"  # имя для чистой сетки
+        short_name = "clear_16_2_net"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
@@ -8478,15 +8478,15 @@ def setka_8_full_made(fin):
     data = []
     style = []
     column = ['']
-    column_count = column * 11
+    column_count = column * 9
     # добавить в аргументы функции
     final = fin
-    if sender != my_win.clear_s8_Action:
+    if sender != my_win.clear_s8_full_Action:
         first_mesto = mesto_in_final(fin)
     else:
         first_mesto = 1  # временный финал для чистой сетки
-    for i in range(0, 40):
-        column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
+    for i in range(0, 33):
+        column_count[8] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -8495,7 +8495,7 @@ def setka_8_full_made(fin):
         y += 1
         data[i][0] = str(y)  # рисует начальные номера таблицы 1-16
     # ========= нумерация встреч сетки ==========
-    # draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=4, number_of_game=1, player=16, data=data) # рисует номера встреч 1-32
+    draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=3, number_of_game=1, player=8, data=data) # рисует номера встреч 1-32
     # draw_num(row_n=32, row_step=2, col_n=6, number_of_columns=2, number_of_game=17, player=4, data=data) # рисует номера встреч 1-32
     # draw_num(row_n=41, row_step=2, col_n=4, number_of_columns=3, number_of_game=21, player=8, data=data) # рисует номера встреч 1-32
     # draw_num(row_n=58, row_step=2, col_n=6, number_of_columns=2, number_of_game=29, player=4, data=data) # рисует номера встреч 1-32
@@ -8525,14 +8525,13 @@ def setka_8_full_made(fin):
     # ============= данные игроков и встреч и размещение по сетке =============
     tds = write_in_setka(data, fin, first_mesto, table)
     #===============
-    cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm, 0.4 * cm, 2.6 * cm,
-           0.4 * cm, 4.4 * cm, 1.3 * cm))
+    cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3.0 * cm, 0.4 * cm, 3.0 * cm, 0.4 * cm, 3.0 * cm, 0.4 * cm))
     # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
     color_mesta(data, first_mesto, table) # раскрашивает места участников красным цветом
-    t = Table(data, cw, 40 * [0.9 * cm])
+    t = Table(data, cw, 33 * [0.7 * cm])
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки 
-    # style = draw_setka(1, 1, 16, style) # рисует кусок сетки(номер столбца, номер строки на 16 человека)
+    style = draw_setka(1, 1, 8, style) # рисует кусок сетки(номер столбца, номер строки на 16 человека)
     # style = draw_setka(7, 29, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
     # style = draw_setka(5, 32, 4, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
     # style = draw_setka(7, 39, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
@@ -8571,15 +8570,15 @@ def setka_8_full_made(fin):
         style.append(fn)
 
     for i in range(1, 8, 2):
-        fn = ('TEXTCOLOR', (i, 0), (i, 39), colors.black)  # цвет шрифта игроков
+        fn = ('TEXTCOLOR', (i, 0), (i, 32), colors.black)  # цвет шрифта игроков
         style.append(fn)
-        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 39), colors.green)  # цвет шрифта номеров встреч
+        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 32), colors.green)  # цвет шрифта номеров встреч
         style.append(fn)
         # выравнивание фамилий игроков по левому краю
-        fn = ('ALIGN', (i, 0), (i, 39), 'LEFT') 
+        fn = ('ALIGN', (i, 0), (i, 32), 'LEFT') 
         style.append(fn)
         # центрирование номеров встреч
-        fn = ('ALIGN', (i + 1, 0), (i + 1, 39), 'CENTER')
+        fn = ('ALIGN', (i + 1, 0), (i + 1, 32), 'CENTER')
         style.append(fn)
     fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
     style.append(fn)
@@ -8593,9 +8592,9 @@ def setka_8_full_made(fin):
                            # 10 столбец с 0 по 68 ряд (цвет места)
                            ('TEXTCOLOR', (10, 0), (10, 39), colors.red),
                         #    ('ALIGN', (10, 0), (10, 68), 'RIGHT'),
-                           ('ALIGN', (9, 0), (9, 39), 'LEFT'),
+                           ('ALIGN', (9, 0), (9, 32), 'LEFT'),
                            # цвет шрифта игроков 1 ого тура
-                           ('TEXTCOLOR', (0, 0), (0, 39), colors.blue),
+                           ('TEXTCOLOR', (0, 0), (0, 32), colors.blue),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
                            ] + ts))
 
@@ -8616,7 +8615,7 @@ def setka_8_full_made(fin):
         else:
             name_table_final = f"{short_name}_{f}-final.pdf"
     else:
-        short_name = "чист_8_full_сетка"  # имя для чистой сетки
+        short_name = "clear_8_full_net"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
@@ -8772,7 +8771,7 @@ def setka_16_full_made(fin):
         else:
             name_table_final = f"{short_name}_{f}-final.pdf"
     else:
-        short_name = "чист_16_full_сетка"  # имя для чистой сетки
+        short_name = "clear_16_full_net"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
@@ -8890,7 +8889,7 @@ def setka_32_made(fin):
         short_name = t_id.short_name_comp
         name_table_final = f"{short_name}_{f}-final.pdf"
     else:
-        short_name = "чист_32_сетка"
+        short_name = "clear_32_net"
         name_table_final = f"{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
@@ -9103,7 +9102,7 @@ def setka_32_full_made(fin):
         short_name = t_id.short_name_comp
         name_table_final = f"{short_name}_{f}-final.pdf"
     else:
-        short_name = "чист_32_full_сетка"
+        short_name = "clear_32_full_net"
         name_table_final = f"{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
@@ -9337,7 +9336,7 @@ def setka_32_2_made(fin):
         short_name = t_id.short_name_comp
         name_table_final = f"{short_name}_{f}-final.pdf"
     else:
-        short_name = "чист_32_2_сетка"
+        short_name = "clear_32_2_net"
         name_table_final = f"{short_name}.pdf"
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     change_dir()
@@ -9383,16 +9382,16 @@ def write_in_setka(data, fin, first_mesto, table):
     flag_clear = False
     # уточнить кол-во столбцов
     if table == "setka_8_full":
-        row_last = 40
-        column_last = 11
+        row_last = 33
+        column_last = 8
         row_end = 17
         row_num_win = {9: [1, 5], 10: [9, 13], 11: [17, 21], 12: [25, 29], 13: [3, 11], 14: [19, 27], 25: [41, 45], 26: [49, 53], 
                     15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
                  # ======= list mest
         mesta_dict = {15: 15, 16: 29, 19: 34, 20: 39, 27: 47, 28: 55, 31: 60, 32: 65}
     elif table == "setka_8_2":
-        row_last = 69
-        column_last = 11
+        row_last = 33
+        column_last = 8
         row_end = 17
         row_num_win = {9: [1, 5], 10: [9, 13], 11: [17, 21], 12: [25, 29], 13: [3, 11], 14: [19, 27], 25: [41, 45], 26: [49, 53], 
                     15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
@@ -9460,7 +9459,7 @@ def write_in_setka(data, fin, first_mesto, table):
         col_first = 2
         row_first = 2
         flag_clear = True
-    elif sender == my_win.clear_s8_Action:
+    elif sender == my_win.clear_s8_full_Action:
         all_list = setka_data_clear(fin, table)  # печать чистой сетки
         col_first = 2
         row_first = 2
