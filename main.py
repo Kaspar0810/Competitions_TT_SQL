@@ -1630,25 +1630,26 @@ def find_city():
             second_word = city_field[index + 1:]
             second_word = second_word.capitalize()
             city_field = city_field[:index + 1] + second_word
-        c = City.select()
-        c = c.where(City.city ** f'{city_field}%')  # like
-        if sender != my_win.comboBox_region:
-            if (len(c)) == 0:
-                my_win.textEdit.setText("Нет такого города в базе")
-            else:
-                for pl in c:
-                    full_stroka = f"{pl.city}"
-                    my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-                return
-        else:  # вставляет регион соответсвующий городу
-            if city_field != "":
-                ir = my_win.comboBox_region.currentIndex()
-                ir = ir + 1
-                ct = my_win.lineEdit_city_list.text()
-                with db:
-                    city = City(city=ct, region_id=ir).save()
-    elif txt == "Рейтинг":
-        pass
+    
+    c = City.select()
+    c = c.where(City.city ** f'{city_field}%')  # like
+    if sender != my_win.comboBox_region:
+        if (len(c)) == 0:
+            my_win.textEdit.setText("Нет такого города в базе")
+        else:
+            for pl in c:
+                full_stroka = f"{pl.city}"
+                my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+            return
+    else:  # вставляет регион соответсвующий городу
+        if city_field != "":
+            ir = my_win.comboBox_region.currentIndex()
+            ir = ir + 1
+            ct = my_win.lineEdit_city_list.text()
+            with db:
+                city = City(city=ct, region_id=ir).save()
+    # elif txt == "Поиск в текущем рейтинг листе.":
+        # pass
 
 
 def fill_table(player_list):
@@ -2001,6 +2002,7 @@ def dclick_in_listwidget():
     coach_field = my_win.lineEdit_coach.text()
     if txt_tmp == "Список городов.": # если в listwidget список городов которые есть в базе
         my_win.label_63.setText("")
+    # text_city = my_win.lineEdit_city_list.text()
         my_win.lineEdit_city_list.setText(text)    
         cr = City.get(City.city == text)
         rg = Region.get(Region.id == cr.region_id)
@@ -2046,7 +2048,7 @@ def dclick_in_listwidget():
         date_object = datetime.strptime(dr,"%Y-%m-%d")
         dr = date_object.strftime('%d.%m.%Y')
         #=====
-        ci = text[sz2 + 2:ds]
+        ci = text[sz2 + 2:ds] # город
         my_win.lineEdit_Family_name.setText(f"{fam} {name}")
         my_win.lineEdit_bday.setText(dr)
         my_win.lineEdit_R.setText(r)
