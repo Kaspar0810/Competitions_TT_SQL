@@ -8500,29 +8500,15 @@ def setka_8_full_made(fin):
     draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=3, number_of_game=1, player=8, data=data) # рисует номера встреч 1-32
     draw_num(row_n=16, row_step=2, col_n=6, number_of_columns=2, number_of_game=8, player=2, data=data) # рисует номера встреч 1-32
     draw_num(row_n=20, row_step=2, col_n=4, number_of_columns=2, number_of_game=9, player=4, data=data) # рисует номера встреч 1-32
-    # draw_num(row_n=58, row_step=2, col_n=6, number_of_columns=2, number_of_game=29, player=4, data=data) # рисует номера встреч 1-32
     draw_num_lost(row_n=16, row_step=2, col_n=4, number_of_game=5, player=2, data=data) # номера минус проигравшие встречи -1 -16
     draw_num_lost(row_n=20, row_step=2, col_n=2, number_of_game=1, player=4, data=data) # номера минус проигравшие встречи -1 -16
     draw_num_lost(row_n=28, row_step=2, col_n=4, number_of_game=9, player=2, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=41, row_step=2, col_n=2, number_of_game=1, player=8, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=58, row_step=2, col_n=4, number_of_game=21, player=4, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=55, row_step=2, col_n=6, number_of_game=25, player=2, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=65, row_step=2, col_n=6, number_of_game=29, player=2, data=data) # номера минус проигравшие встречи -1 -16
    
     data[28][6] = str(12)  # создание номеров встреч 15
     data[13][6] = str(-7)
     data[18][6] = str(-8)
     data[25][6] = str(-11)
     data[30][6] = str(-12)
-    # data[41][8] = str(-20)
-    # data[44][8] = str(27)  # создание номеров встреч 27
-    # data[52][8] = str(-27)
-    # data[55][8] = str(28)  # создание номеров встреч 28
-    # data[57][8] = str(-28)
-    # data[63][8] = str(-31)
-    # data[65][8] = str(32)  # создание номеров встреч 32
-    # data[67][8] = str(-32)
-
     # ============= данные игроков и встреч и размещение по сетке =============
     tds = write_in_setka(data, fin, first_mesto, table)
     #===============
@@ -8532,7 +8518,7 @@ def setka_8_full_made(fin):
     t = Table(data, cw, 40 * [0.6 * cm])
     # =========  цикл создания стиля таблицы ================
     # ==== рисует основной столбец сетки 
-    style = draw_setka(1, 1, 8, style) # рисует кусок сетки(номер столбца, номер строки на 16 человека)
+    style = draw_setka(1, 1, 8, style) # рисует кусок сетки(номер столбца, номер строки на 8 человека)
     style = draw_setka(3, 20, 4, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
     style = draw_setka(5, 28, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
     style = draw_setka(5, 16, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
@@ -8548,23 +8534,10 @@ def setka_8_full_made(fin):
         fn = ('LINEABOVE', (7, q + 29), (8, q + 29),
               1, colors.darkblue)  # за 7-8 место
         style.append(fn)
-        # fn = ('LINEABOVE', (9, q + 56), (10, q + 56),
-        #       1, colors.darkblue)  # за 11-12 место
-        # style.append(fn)
-        # fn = ('LINEABOVE', (9, q + 66), (10, q + 66),
-        #       1, colors.darkblue)  # за 15-16 место
-        # style.append(fn)
     for q in range(0, 4, 3):
         fn = ('LINEABOVE', (7, q + 23), (8, q + 23),
               1, colors.darkblue)  # за 5-6 место
         style.append(fn)
-        # fn = ('LINEABOVE', (9, q + 61), (10, q + 61),
-        #       1, colors.darkblue)  # за 13-14 место
-        # style.append(fn)
-    # for q in range(0, 6, 5):
-    #     fn = ('LINEABOVE', (9, q + 48), (10, q + 48),
-    #           1, colors.darkblue)  # за 9-10 место
-    #     style.append(fn)
 
     for i in range(1, 6, 2):
         fn = ('TEXTCOLOR', (i, 0), (i, 39), colors.black)  # цвет шрифта игроков
@@ -8638,7 +8611,7 @@ def setka_8_2_made(fin):
     else:
         first_mesto = 1  # временный финал для чистой сетки
     for i in range(0, 40):
-        column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -8649,32 +8622,19 @@ def setka_8_2_made(fin):
     # ========= нумерация встреч сетки ==========
     draw_num(row_n=1, row_step=2, col_n=2, number_of_columns=3, number_of_game=1, player=8, data=data) # рисует номера встреч 1-32
     draw_num(row_n=17, row_step=4, col_n=6, number_of_columns=2, number_of_game=8, player=2, data=data) # рисует номера встреч 1-32
-    # draw_num(row_n=20, row_step=2, col_n=4, number_of_columns=2, number_of_game=9, player=4, data=data) # рисует номера встреч 1-32
-    # # draw_num(row_n=58, row_step=2, col_n=6, number_of_columns=2, number_of_game=29, player=4, data=data) # рисует номера встреч 1-32
-    # number_of_game = draw_num_2(row_n=74, row_step=2, col_n=2, number_of_columns=2, number_of_game=1, player=4, data=data) # рисует номера встреч 33-47 
-    # draw_num_lost(row_n=16, row_step=2, col_n=4, number_of_game=5, player=2, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=20, row_step=2, col_n=2, number_of_game=1, player=4, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=28, row_step=2, col_n=4, number_of_game=9, player=2, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=41, row_step=2, col_n=2, number_of_game=1, player=8, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=58, row_step=2, col_n=4, number_of_game=21, player=4, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=55, row_step=2, col_n=6, number_of_game=25, player=2, data=data) # номера минус проигравшие встречи -1 -16
-    # draw_num_lost(row_n=65, row_step=2, col_n=6, number_of_game=29, player=2, data=data) # номера минус проигравшие встречи -1 -16
+    number_of_game = draw_num_2(row_n=17, row_step=2, col_n=2, number_of_columns=2, number_of_game=8, player=4, data=data) # рисует номера встреч 33-47 
+    draw_num_lost_2(row_n=15, row_step=2, col_n=2, revers_number=1, number_of_game=5, player=2, data=data) # номера минус проигравшие встречи -17-24
+    draw_num_lost(row_n=17, row_step=2, col_n=0, number_of_game=1, player=4, data=data) # номера минус проигравшие встречи -1 -16
+    draw_num_lost(row_n=25, row_step=2, col_n=4, number_of_game=10, player=2, data=data) # номера минус проигравшие встречи -1 -16
+    draw_num_lost(row_n=31, row_step=2, col_n=4, number_of_game=8, player=2, data=data) # номера минус проигравшие встречи -1 -16
    
-    data[28][6] = str(12)  # создание номеров встреч 15
-    # data[13][6] = str(-7)
-    # data[18][6] = str(-8)
-    # data[25][6] = str(-11)
-    # data[30][6] = str(-12)
-
-    # data[41][8] = str(-20)
-    # data[44][8] = str(27)  # создание номеров встреч 27
-    # data[52][8] = str(-27)
-    # data[55][8] = str(28)  # создание номеров встреч 28
-    # data[57][8] = str(-28)
-    # data[63][8] = str(-31)
-    # data[65][8] = str(32)  # создание номеров встреч 32
-    # data[67][8] = str(-32)
-
+    data[18][6] = str(12)  # создание номеров встреч 15
+    data[25][6] = str(13)
+    data[31][6] = str(14)
+    data[13][6] = str(-7)
+    data[22][6] = str(-8)
+    data[28][6] = str(-13)
+    data[34][6] = str(-14)  # создание номеров встреч 27
     # ============= данные игроков и встреч и размещение по сетке =============
     tds = write_in_setka(data, fin, first_mesto, table)
     #===============
@@ -8686,41 +8646,24 @@ def setka_8_2_made(fin):
     # ==== рисует основной столбец сетки 
     style = draw_setka(1, 1, 8, style) # рисует кусок сетки(номер столбца, номер строки на 16 человека)
     style = draw_setka_2(1, 17, 4, style) # рисует кусок сетки(номер столбца, номер строки на 16 человека)
-    # style = draw_setka(3, 17, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    # style = draw_setka(3, 21, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    # style = draw_setka(1, 18, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    # style = draw_setka(1, 22, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
-    # style = draw_setka(5, 18, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
-    # style = draw_setka(5, 16, 2, style) # рисует кусок сетки(номер столбца, номер строки на 32 человека)
+    style = draw_setka(5, 25, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
+    style = draw_setka(5, 31, 2, style) # рисует кусок сетки(номер столбца, номер строки на 2 человека)
     # ======= встречи за места =====
     for q in range(0, 7, 6):
         fn = ('LINEABOVE', (7, q + 8), (8, q + 8),
               1, colors.darkblue)  # за 1-2 место
         style.append(fn)
-    # for q in range(0, 3, 2):
-    #     fn = ('LINEABOVE', (7, q + 17), (8, q + 17),
-    #           1, colors.darkblue)  # за 3-4 место
-    #     style.append(fn)
-    #     fn = ('LINEABOVE', (7, q + 29), (8, q + 29),
-    #           1, colors.darkblue)  # за 7-8 место
-    #     style.append(fn)
-        # fn = ('LINEABOVE', (9, q + 56), (10, q + 56),
-        #       1, colors.darkblue)  # за 11-12 место
-        # style.append(fn)
-        # fn = ('LINEABOVE', (9, q + 66), (10, q + 66),
-        #       1, colors.darkblue)  # за 15-16 место
-    #     # style.append(fn)
-    # for q in range(0, 4, 3):
-    #     fn = ('LINEABOVE', (7, q + 23), (8, q + 23),
-    #           1, colors.darkblue)  # за 5-6 место
-    #     style.append(fn)
-        # fn = ('LINEABOVE', (9, q + 61), (10, q + 61),
-        #       1, colors.darkblue)  # за 13-14 место
-        # style.append(fn)
-    # for q in range(0, 6, 5):
-    #     fn = ('LINEABOVE', (9, q + 48), (10, q + 48),
-    #           1, colors.darkblue)  # за 9-10 место
-    #     style.append(fn)
+    for q in range(0, 5, 4):
+        fn = ('LINEABOVE', (7, q + 19), (8, q + 19),
+              1, colors.darkblue)  # за 3-4 место
+        style.append(fn)
+    for q in range(0, 4, 3):
+        fn = ('LINEABOVE', (7, q + 26), (8, q + 26),
+              1, colors.darkblue)  # за 5-6 место
+        style.append(fn)
+        fn = ('LINEABOVE', (7, q + 32), (8, q + 32),
+              1, colors.darkblue)  # за 7-8 место
+        style.append(fn)
 
     for i in range(1, 6, 2):
         fn = ('TEXTCOLOR', (i, 0), (i, 39), colors.black)  # цвет шрифта игроков
@@ -8733,8 +8676,8 @@ def setka_8_2_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i + 1, 0), (i + 1, 39), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
@@ -11031,9 +10974,11 @@ def change_page_vid():
 
 def change_dir():
     """смена директории, чтоб все pdf фалы сохранялися в папке table_pdf"""
+
     dir_path = pathlib.Path.cwd()
-    p = str(dir_path)
-    f = p.rfind("table_pdf")
+    parent_dir = str(dir_path)
+   
+    f = parent_dir.rfind("table_pdf")
     if f == -1:
         os.chdir("table_pdf") # переходит в каталог pdf
     else:
@@ -11273,6 +11218,8 @@ def color_mesta(data, first_mesto, table):
         f= 8
     elif table == "setka_8_full":
         f= 4
+    elif table == "setka_8_2":
+        f= 4
 
     for c in range(0, f):
         if c == 0: # 1-2 место
@@ -11284,6 +11231,8 @@ def color_mesta(data, first_mesto, table):
                 ml = [9, 15, 33, 17]
             elif table == "setka_8_full":
                 ml = [8, 7, 14, 6]
+            elif table == "setka_8_2":
+                ml = [8, 7, 14, 6]
             elif table == "setka_32_full":
                 ml = [11, 31, 54, 22] 
         elif c == 1: # 3-4 место
@@ -11294,7 +11243,9 @@ def color_mesta(data, first_mesto, table):
             elif table == "setka_16_2":
                 ml = [9, 48, 56, 7] 
             elif table == "setka_8_full":
-                ml = [8, 16, 19, 2] 
+                ml = [8, 16, 19, 2]
+            elif table == "setka_8_2": 
+                ml = [8, 18, 23, 4]
             else:                
                 ml = [11, 59, 65, 5] 
         elif c == 2: # 5-6 место
@@ -11305,7 +11256,9 @@ def color_mesta(data, first_mesto, table):
             elif table == "setka_16_2":
                 ml = [9, 60, 64, 3] 
             elif table == "setka_8_full":
-                ml = [8, 22, 26, 3] 
+                ml = [8, 22, 26, 3]
+            elif table == "setka_8_2": 
+                ml = [8, 25, 29, 3] 
             else:
                 ml = [11, 72, 92, 5]
         elif c == 3: # 7-8 место
@@ -11317,6 +11270,8 @@ def color_mesta(data, first_mesto, table):
                 ml = [9, 66, 70, 3] 
             elif table == "setka_8_full":
                 ml = [8, 28, 31, 2] 
+            elif table == "setka_8_2": 
+                ml = [8, 31, 35, 3]
             else:
                 ml = [11, 94, 95, 1]
         elif c == 4: # 9-10 место
