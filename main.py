@@ -2241,8 +2241,10 @@ def page():
         my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
         label_playing_count()
     
-        st_count = len(sf)
-        if st_count != 1:
+        # st_count = len(sf)
+        flag_system = ready_system
+        # if st_count != 1:
+        if flag_system is True:
             load_combobox_filter_group()
 
         my_win.label_101.hide()
@@ -2273,7 +2275,7 @@ def page():
         my_win.label_85.hide()
         my_win.label_86.hide()
 
-        my_win.comboBox_etap.hide()
+        # my_win.comboBox_etap.hide()
         my_win.comboBox_table_1.hide()
         my_win.comboBox_table_2.hide()
         my_win.comboBox_table_3.hide()
@@ -2289,7 +2291,11 @@ def page():
         table = []
         game = []
         sum_game = []
+
         for i in sf:  # цикл по таблице -system-
+            total_player = i.total_athletes
+            if total_player == 0: # если система только начала создаваться
+                return
             stage.append(i.stage)  # добавляет в список этап
             table.append(i.label_string)  # добавляет в список система
             game.append(i.kol_game_string)  # добавляет в список кол-во игр
@@ -2775,6 +2781,7 @@ def system_competition():
             if count != 0:
                 my_win.tabWidget.setCurrentIndex(2)
             else:
+            # if count == 0:
                 reply = QMessageBox.information(my_win, 'Уведомление',
                                                 "У Вас нет ни одного спортсмена.\nСначала необходимо создать "
                                                 "список участников соревнований.\n Перейти к созданию списка?",
@@ -7100,7 +7107,9 @@ def numbers_of_games(cur_index, player_in_final, kpt):
         total_games = total_games_in_final_with_group_games(player_in_final, gr_pf, kpt)
     else:
         if cur_index == 1:  # сетка - 2
-            if player_in_final == 16:
+            if player_in_final == 8:
+                total_games = 14
+            elif player_in_final == 16:
                 total_games = 38
             elif player_in_final > 8 and player_in_final < 16:
                 tours = 4
@@ -7803,6 +7812,10 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
                 else:
                     family = fam_id
                 z[1] = family 
+                # === определяет большие фамилии
+                length_of_last_name = Len(z[1])
+                if length_of_last_name > 15:
+
             l += 1
     for k in tdt_new:
         tdt_temp = k.copy()
@@ -7824,6 +7837,8 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
             ts.add('TEXTCOLOR', (col, row + 1), (col, row + 1), colors.red)  # красный цвет очков победителя
         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
     return dict_tbl
+
+
 
 
 def tbl_begunki(ts, stage, number_group, tours, list_tours):
@@ -8159,7 +8174,7 @@ def table_made(pv, stage):
             rH = (0.32 * cm)  # высота строки
     # rH = None  # высота строки
     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
-    # num_columns = list(range(max_pl))
+
     for i in range(max_pl):
         i += 1
         i = str(i)
@@ -8202,7 +8217,8 @@ def table_made(pv, stage):
     # ============= полный стиль таблицы ======================
     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                     ('FONTSIZE', (0, 0), (-1, -1), 7),
+                     ('FONTSIZE', (0, 0), (-1, -1), 6),
+                     # вставить размер шрифта конкретной ячей под длинную фамилию
                      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                      ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
                      ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
@@ -9940,8 +9956,6 @@ def score_in_table(td, num_gr):
     result = Result.select().where(Result.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     gamelist = Game_list.select().where(Game_list.title_id == title_id())
-    system_id = system.select().where(System.stage == num_gr).get()
-    id_system = system_id.id
 
     if tab == 3:
         ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
@@ -9956,6 +9970,8 @@ def score_in_table(td, num_gr):
         r = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
     else:
+        system_id = system.select().where(System.stage == num_gr).get()
+        id_system = system_id.id
         r = result.select().where(Result.system_id == id_system)
         if num_gr == "Одна таблица":
             stage = "Одна таблица"
@@ -10063,7 +10079,24 @@ def numer_game(num_game, vid_setki):
     """определяет куда записывать победителя и проигравшего по сноске в сетке, номера встреч"""
     snoska = []
     num_game = int(num_game)
-    if vid_setki == 'Сетка (с розыгрышем всех мест) на 16 участников':
+    if vid_setki == 'Сетка (с розыгрышем всех мест) на 8 участников':
+        dict_winner = {1: 9, 2: 9, 3: 10, 4: 10, 5: 11, 6: 11, 7: 12, 8: 12, 9: 13, 10: 13, 11: 14, 12: 14, 13: 15, 14: 15,
+                   17: 19, 18: 19, 21: 25, 22: 25, 23: 26, 24: 26, 25: 27, 26: 27, 29: 31, 30: 31}
+        dict_loser = {1: 21, 2: 21, 3: 22, 4: 22, 5: 23, 6: 23, 7: 24, 8: 24, 9: 17, 10: 17, 11: 18, 12: 18, 13: 16, 14: 16,
+                  17: 20, 18: 20, 21: 29, 22: 29, 23: 30, 24: 30, 25: 28, 26: 28, 29: 32, 30: 32}
+        dict_loser_pdf = {1: -1, 2: -2, 3: -3, 4: -4, 5: -5, 6: -6, 7: -7, 8: -8, 9: -9, 10: -10, 11: -11, 12: -12, 13: -13,
+                      14: -14, 17: -17, 18: -18, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 29: -29, 30: -30}
+        dict_mesta = [15, 16, 19, 20, 27, 28, 31, 32]
+    elif vid_setki == 'Сетка (-2) на 8 участников':
+        dict_winner = {1:9, 2:9, 3:10, 4:10, 5:11, 6:11, 7:12, 8:12, 9:13, 10:13, 11:14, 12:14, 13:15, 14:15,
+                   16:20, 17:21, 18:22, 19:23, 20:24, 21:24, 22:25, 23:25, 24:26, 25:27, 26:28, 27:28, 31:33, 32:33, 35:37, 36:37}
+        dict_loser = {1:16, 2:16, 3:17, 4:17, 5:18, 6:18, 7:19, 8:19, 9:23, 10:22, 11:21, 12:20, 13:26, 14:27,
+                  16:35, 17:35, 18:36, 19:36, 20:31, 21:31, 22:32, 23:32, 24:30, 25:30, 26:29, 27:29, 31:34, 32:34, 35:38, 36:38}
+        dict_loser_pdf = {1: -1, 2: -2, 3: -3, 4: -4, 5: -5, 6: -6, 7: -7, 8: -8, 9: -9, 10: -10, 11: -11, 12: -12, 13: -13,
+                      14: -14, 16: -16, 17: -17, 18: -18, 19: -19, 20: -20, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 
+                      27: -27, 31: -31, 32: -32, 35: -35, 36: -36}
+        dict_mesta = [15, 28, 29, 30, 33, 34, 37, 38]
+    elif vid_setki == 'Сетка (с розыгрышем всех мест) на 16 участников':
         dict_winner = {1: 9, 2: 9, 3: 10, 4: 10, 5: 11, 6: 11, 7: 12, 8: 12, 9: 13, 10: 13, 11: 14, 12: 14, 13: 15, 14: 15,
                    17: 19, 18: 19, 21: 25, 22: 25, 23: 26, 24: 26, 25: 27, 26: 27, 29: 31, 30: 31}
         dict_loser = {1: 21, 2: 21, 3: 22, 4: 22, 5: 23, 6: 23, 7: 24, 8: 24, 9: 17, 10: 17, 11: 18, 12: 18, 13: 16, 14: 16,
