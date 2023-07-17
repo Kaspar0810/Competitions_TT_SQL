@@ -14,9 +14,13 @@ from reportlab.pdfgen.canvas import Canvas
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+# from PyQt5.QtWidgets import QApplication, QCompleter, QLineEdit
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtGui, QtWidgets, QtPrintSupport, QtCore
+from PyQt5 import QtGui, QtWidgets, QtCore, QtPrintSupport
+# from QtCore import QtStringListModel, Qt
 from models import *
 from collections import Counter
 from itertools import *
@@ -69,7 +73,6 @@ pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
-
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -1656,12 +1659,16 @@ def find_city():
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
 
-    my_win.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # выделение несколких строк по клику мышью
+    # my_win.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # выделение несколких строк по клику мышью
 
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
     number_column = 1
+    if tb == 1:
+        my_win.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # выделение несколких строк по клику мышью
+    else:
+        my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection)
     if tb == 6:
         if row_count > 0:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
@@ -2250,10 +2257,7 @@ def page():
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
         my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
         label_playing_count()
-    
-        # st_count = len(sf)
         flag_system = ready_system
-        # if st_count != 1:
         if flag_system is True:
             load_combobox_filter_group()
 
@@ -2381,6 +2385,7 @@ def page():
             my_win.label_33.show()
         load_tableWidget()
     elif tb == 3:  # вкладка -группы-
+        stage = "Предварительный"
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 188, 841, 568))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 181))
         system_stage = sf.select().where(System.stage == "Предварительный").get()
@@ -5150,6 +5155,13 @@ def filter_sf():
             my_win.tableWidget.setItem(
                 row, column, QTableWidgetItem(str(item)))
 
+# def searchComboBox(self):
+#         text = my_win.comboBox_filter_group.currentText()
+#         index = my_win.comboBox_filter_group.findText(text)
+#         if index != -1:
+#             my_win.comboBox_filter_group.setCurrentIndex(index)
+#             my_win.comboBox_filter_group.lineEdit().setSelection(len(text), len(my_win.comboBox_filter_group.currentText()))
+
 
 def filter_gr():
     """фильтрует таблицу -результаты- на вкладке группы"""
@@ -5158,7 +5170,26 @@ def filter_gr():
     name = my_win.comboBox_find_name.currentText()
     played = my_win.comboBox_filter_played.currentText()
     find_player.append(name)
+    # ====
+    # edit_text = QLineEdit
+    # my_win.comboBox_filter_group.setLineEdit(edit_text)
+    # my_win.comboBox_filter_group.setEditable(True)
+    # my_win.comboBox_filter_group.lineEdit().returnPressed.connect(searchComboBox)
+ 
+    # model = QStandardItemModel()
+    # for i in range(my_win.comboBox_filter_group.count()):
+    #     item = QStandardItem(my_win.comboBox_filter_group.itemText(i))
+    #     model.appendRow(item)
+ 
+    # completer = QCompleter(model)
+    # completer.setFilterMode(Qt.MatchContains)
+    # completer.setCaseSensitivity(Qt.CaseInsensitive)
+    # my_win.comboBox_filter_group.setCompleter(completer)
+    # ====
     fltr_id = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
+    if group != "все группы":
+        fltr = fltr_id.select().where(Result.number_group == group)
+
     if group == "все группы" and my_win.comboBox_find_name.currentText() != "":
         pl1_query = fltr_id.select().where(Result.player1 == name)
         pl2_query = fltr_id.select().where(Result.player2 == name)
@@ -5175,8 +5206,8 @@ def filter_gr():
         fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
     elif group == "все группы" and played == "не сыгранные":
         fltr = fltr_id.select().where(Result.points_win != 2 and Result.points_win == None)
-    elif group != "все группы" and played == "все игры":
-        fltr = fltr_id.select().where(Result.number_group == group)
+    # elif group != "все группы" and played == "все игры":
+    #     fltr = fltr_id.select().where(Result.number_group == group)
 
     result_list = fltr.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
@@ -9265,7 +9296,7 @@ def setka_32_2_made(fin):
         first_mesto = 1
     strok = 207
     for i in range(0, strok):
-        # column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
@@ -9443,8 +9474,8 @@ def setka_32_2_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    # style.append(fn)
+    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)
@@ -9545,8 +9576,8 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 85
         column_last = 11
         row_end = 33
-        row_num_win = {9: [3, 7], 10: [11, 15], 11: [19, 23], 12: [27, 31], 13: [5, 13], 14: [21, 29], 16: [46, 46], 17: [50, 50], 18: [54, 54], 19: [58, 58],
-                    20: [46, 46], 21: [50, 50], 22: [54, 54], 23: [58, 58], 24: [49, 45], 25: [57, 53], 26: [55, 47], 27: [55, 47], 28: [53, 45], 33: [62, 66],
+        row_num_win = {9: [3, 7], 10: [11, 15], 11: [19, 23], 12: [27, 31], 13: [5, 13], 14: [21, 29], 16: [46], 17: [50], 18: [54], 19: [58],
+                    20: [46], 21: [50], 22: [54], 23: [58], 24: [45, 49], 25: [53, 57], 26: [47, 55], 27: [47, 55], 28: [45, 53], 33: [62, 66],
                     37: [74, 78], 15: [9, 25]} 
                  # ======= list mest
         mesta_dict = {15: 17, 28: 49, 29: 61, 33: 64, 30: 67, 34: 73, 37: 76, 38: 79} # номер встречи - номер строки
@@ -9565,6 +9596,14 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 207
         column_last = 15
         row_end = 65
+        row_num_win = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
+        24: [59, 63], 25: [5, 13], 26: [21, 29], 27: [37, 45], 28: [53, 61], 29: [9, 25], 30:[41, 57], 31: [17, 49], 
+        35: [72, 76], 41: [89, 93], 42: [97, 101], 43: [91, 99], 47: [114, 118],  57: [140, 144], 58: [148, 152], 
+        59: [156, 160], 60: [164, 168], 61: [142, 150], 62: [158, 166], 63: [146, 162], 67: [172, 176], 73: [179, 183],
+        74: [187, 191], 75: [181, 189], 79: [197, 201]}
+                 # ======= dict mest
+        mesta_dict = {31: 33, 32: 61, 35: 74, 36: 84, 43: 95, 44: 106, 47: 116, 48: 126, 63: 154,
+                        64: 168, 67: 174, 68: 182, 75: 185, 76: 194, 79: 199, 80: 201}
     elif table == "setka_32_full":
         row_last = 207
         column_last = 11
@@ -11869,6 +11908,7 @@ my_win.comboBox_select_group_begunki.currentTextChanged.connect(select_tour_for_
 my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)
 my_win.comboBox_first_group.currentTextChanged.connect(add_item_listwidget)
 my_win.comboBox_second_group.currentTextChanged.connect(add_item_listwidget)
+my_win.comboBox_filter_group.currentTextChanged.connect(filter_gr)
 my_win.comboBox_filter_final.currentTextChanged.connect(filter_fin)
 my_win.comboBox_choice_R.currentTextChanged.connect(r_list_load_tablewidget)
 my_win.comboBox_filter_region_in_R.currentTextChanged.connect(filter_rejting_list)
