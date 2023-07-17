@@ -1157,7 +1157,6 @@ def go_to():
     my_win.lineEdit_sekretar.setText(titles.secretary)
     my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
     my_win.lineEdit_title_gamer.setText(titles.gamer)
-    # tab_enabled(gamer)
     my_win.tabWidget.setCurrentIndex(0)  # открывает вкладку титул
     tab_enabled(gamer)
     player_list = Player.select().where(Player.title_id == title_id())
@@ -1658,17 +1657,16 @@ def find_city():
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
-
-    # my_win.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # выделение несколких строк по клику мышью
-
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
     number_column = 1
     if tb == 1:
-        my_win.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # выделение несколких строк по клику мышью
+        my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
+        my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
     else:
-        my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection)
+        my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
+        # my_win.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
     if tb == 6:
         if row_count > 0:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
@@ -5186,6 +5184,8 @@ def filter_gr():
     # completer.setCaseSensitivity(Qt.CaseInsensitive)
     # my_win.comboBox_filter_group.setCompleter(completer)
     # ====
+    if group == "":
+        return
     fltr_id = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
     if group != "все группы":
         fltr = fltr_id.select().where(Result.number_group == group)
@@ -5205,10 +5205,8 @@ def filter_gr():
         fl = fltr_id.select().where(Result.number_group == group)
         fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
     elif group == "все группы" and played == "не сыгранные":
-        fltr = fltr_id.select().where(Result.points_win != 2 and Result.points_win == None)
-    # elif group != "все группы" and played == "все игры":
-    #     fltr = fltr_id.select().where(Result.number_group == group)
-
+        fltr = fltr_id.select().where((Result.points_win != 2) & (Result.points_win == None))
+ 
     result_list = fltr.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = len(result_list[0])  # кол-во столбцов в таблице
