@@ -11,6 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
+from PyPDF2 import PdfFileMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
@@ -37,6 +38,8 @@ import random
 
 if not os.path.isdir("table_pdf"):  # создает папку 
     os.mkdir("table_pdf")
+if not os.path.isdir("competition_pdf"):  # создает папку 
+    os.mkdir("competition_pdf")
 
 
 def print_hi(name):
@@ -2464,8 +2467,9 @@ def page():
         my_win.Button_print_begunki.setEnabled(False)
         my_win.lineEdit_range_tours.hide()
         load_combo_etap_begunki()
-    elif tb == 7:
-        pass
+    elif tb == 7: # вкладка -дополнительно-
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 505))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
 
     hide_show_columns(tb)
 
@@ -8180,6 +8184,13 @@ def enter_print_begunki():
     if sender == my_win.lineEdit_range_tours:
         begunki_made()
 
+
+def merdge_pdf_files():
+    """Слияние все таблиц соревнований в один файл"""
+    report_dir = (
+    Path.home()
+    / "table_pdf"
+    )
 
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
