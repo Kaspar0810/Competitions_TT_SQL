@@ -3053,7 +3053,7 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
         game = 80
     elif system_table == "Сетка (-2) на 32 участников":
-        game = 96
+        game = 94
     elif system_table == "Сетка (1-3 место) на 32 участников":
         game = 32
     # создание сетки со спортсменами согласно жеребьевки
@@ -3759,7 +3759,7 @@ def select_player_in_game():
                 my_win.lineEdit_player2_fin.setText(pl2)
                 if pl1 == "X" or pl2 == "X":
                     my_win.Button_Ok_fin.setEnabled(True)
-                    my_win.Button_Ok_fin.setFocus()                    
+                    my_win.Button_Ok_fin.setFocus()                   
                 else:
                     if state_visible is True:
                         my_win.lineEdit_pl1_s1_fin.setFocus()
@@ -4117,9 +4117,9 @@ def focus():
         sf = sys.score_flag  # флаг из скольки партий играется матч
         mark_index = mark_list_gr.index(sender)
         mark = mark_list_gr[mark_index].text()
-        if mark == "":
-            control_mark_in_score(mark)
-            return
+        # if mark == "":
+        control_mark_in_score(mark)
+            # return
         if mark_index % 2 == 1:
             if mark_index >= sf:
                 sum_total_game = score_in_game()  # подсчет очков в партии
@@ -4143,9 +4143,9 @@ def focus():
         sf = sys.score_flag  # флаг из скольки партий играется матч
         mark_index = mark_list_sf.index(sender)
         mark = mark_list_sf[mark_index].text()
-        if mark == "":
-            control_mark_in_score(mark)
-            return
+        # if mark == "":
+        control_mark_in_score(mark)
+            # return
         if mark_index % 2 == 1:
             if mark_index >= sf:
                 sum_total_game = score_in_game()  # подсчет очков в партии
@@ -4167,9 +4167,7 @@ def focus():
         sf = sys.score_flag  # флаг из скольки партий играется матч
         mark_index = mark_list_fin.index(sender)
         mark = mark_list_fin[mark_index].text()
-        if mark == "":
-            control_mark_in_score(mark)
-            return
+        control_mark_in_score(mark)
         if mark_index % 2 == 1:
             if mark_index >= sf:
                 sum_total_game = score_in_game()  # подсчет очков в партии
@@ -4204,10 +4202,16 @@ def control_mark_in_score(mark):
             msgBox.critical(my_win, "", "Ошибка при вводе счета!\nвведите счет")
             return
         else:
-            mark = mark[:1]
-            if mark not in mark_number:
-                msgBox.critical(my_win, "", "Ошибка при вводе счета!\nпроверьте правильность ввода цыфры")
+            count = len(mark)
+            if count > 2:
+                msgBox.critical(my_win, "", "Ошибка при вводе счета!\nпроверьте правильность ввода")
                 return
+            else:
+                for k in range(0, count):
+                    mark_zn = mark[k]
+                    if mark_zn not in mark_number:
+                        msgBox.critical(my_win, "", "Ошибка при вводе счета!\nпроверьте правильность ввода")
+                        return
 
 
 def score_in_game():
@@ -5048,8 +5052,7 @@ def filter_fin(pl=False):
         elif final == "все финалы" and played == "не сыгранные" and num_game_fin == "":
             fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.points_win == None))
             count = len(fltr)
-            my_win.label_38.setText(
-                f'Всего в {final} не сыгранно {count} игры')
+            my_win.label_38.setText(f'Всего в {final} не сыгранно {count} игры')
         else:
             if final != "все финалы" and num_game_fin != "" and round != "":
                 fltr = filter.select().where((Result.system_id == id_system) & (Result.round == round))
@@ -8656,7 +8659,7 @@ def setka_16_full_made(fin):
     else:
         first_mesto = 1  # временный финал для чистой сетки
     for i in range(0, 69):
-        column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp) # пустая основа сетки
     # ========= места ==========
@@ -8751,8 +8754,8 @@ def setka_16_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i + 1, 0), (i + 1, 68), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
@@ -9308,7 +9311,7 @@ def setka_32_2_made(fin):
         first_mesto = 1
     strok = 207
     for i in range(0, strok):
-        column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[14] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
@@ -9486,8 +9489,8 @@ def setka_32_2_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, 206), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)
@@ -9495,8 +9498,8 @@ def setka_32_2_made(fin):
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
                            ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                            ('FONTSIZE', (0, 0), (-1, -1), 7),
-                           ('FONTNAME', (1, 0), (1, 32), "DejaVuSerif-Bold"),
-                           ('FONTSIZE', (1, 0), (1, 32), 7)] + ts 
+                           ('FONTNAME', (1, 0), (1, 64), "DejaVuSerif-Bold"),
+                           ('FONTSIZE', (1, 0), (1, 64), 7)] + ts 
                            + [
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
@@ -9609,19 +9612,13 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 207
         column_last = 15
         row_end = 65
-        # row_num_win = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
-        # 24: [59, 63], 25: [5, 13], 26: [21, 29], 27: [37, 45], 28: [53, 61], 29: [9, 25], 30:[41, 57], 31: [17, 49],
-        # 40: [74], 41: [78], 42: [82], 43: [86], 44:[90], 45: [94], 46: [98], 47: [102], 48: [77, 73], 49: [85, 81],
-        # 50: [93, 89],  51: [101, 97], 52: [75], 53: [83], 54: [91], 55: [99], 56: [81, 73], 57: [97, 89],
-        # 58: [77], 59: [93], 60: [90, 74], 65: [112, 116], 69: [124, 128], 75: [141, 145], 76: [149, 153], 87: [171, 175], 88: [179, 183],
-        # 77: [143, 151], 67: [172, 176], 73: [179, 183], 74: [187, 191], 78: [181, 189], 79: [197, 201]}
-        row_num_win = {1: [3], 2: [3], 3: [7], 4: [7], 5: [11], 6: [11], 7: [15], 8: [15], 9: [19], 10: [19], 11: [23], 12: [23],
-        13: [27], 14: [27], 15: [31], 16: [31], 
-        24: [59, 63], 25: [5, 13], 26: [21, 29], 27: [37, 45], 28: [53, 61], 29: [9, 25], 30:[41, 57], 31: [17, 49],
-        40: [74], 41: [78], 42: [82], 43: [86], 44:[90], 45: [94], 46: [98], 47: [102], 48: [77, 73], 49: [85, 81],
-        50: [93, 89],  51: [101, 97], 52: [75], 53: [83], 54: [91], 55: [99], 56: [81, 73], 57: [97, 89],
-        58: [77], 59: [93], 60: [90, 74], 65: [112, 116], 69: [124, 128], 75: [141, 145], 76: [149, 153], 87: [171, 175], 88: [179, 183],
-        77: [143, 151], 67: [172, 176], 73: [179, 183], 74: [187, 191], 78: [181, 189], 79: [197, 201]}
+        row_num_win = {1: [3], 2: [7], 3: [11], 4: [15], 5: [19], 6: [23], 7: [27], 8: [31], 9: [35], 10: [39], 11: [43], 12: [47],
+        13: [51], 14: [55], 15: [59], 16: [63], 17: [5], 18: [13], 19: [21], 20: [29], 21: [37], 22: [45], 23: [53], 24: [61],
+        25: [9], 26: [25], 27: [41], 28: [57], 29: [17], 30:[49], 31: [33], 32: [74], 33: [78], 34: [82], 35: [86], 36: [90],
+        37: [94], 38: [98], 39: [102], 40: [73], 41: [77], 42: [81], 43: [85], 44:[89], 45: [93], 46: [97], 47: [101], 
+        48: [75], 49: [83], 50: [91],  51: [99], 52: [73], 53: [81], 54: [89], 55: [97], 56: [77], 57: [93], 58: [74], 59: [90], 
+        60: [81], 63: [112], 64: [116],  67: [124], 68: [128], 71: [141], 72: [145], 73: [149], 74: [153], 75: [143], 76: [151], 
+        79: [160], 80: [164], 83: [171], 84: [175], 85: [179], 86: [183], 87: [173], 88: [181], 91: [192], 92: [196]}
                  # ======= dict mest
         mesta_dict = {31: 33, 60: 82, 61: 102, 62: 110, 65: 114, 66: 120, 69: 126, 70: 128, 77: 147,
                         78: 156, 81: 162, 82: 171, 89: 177, 90: 186, 93: 194, 94: 201}
@@ -9746,25 +9743,16 @@ def write_in_setka(data, fin, first_mesto, table):
                 else:
                     los = "X"
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
-
-            # c_mesto = 1
             # ========== расстановка для сетки на 16
             if c != 0: #  номер встречи в сетке куда попадает победиель (кроме встреч за места)
                 row_win_list = row_num_win[i]  # номера строк данной встречи в сетке
-                # if len(row_win_list) == 1:
-                #     row_win = row_win_list[0]
-                # else:
-                #     if abs(match[3]) % 2 != 0: # выбирает из списка номер строки в зависимости от четности встречи(вверх или низ)
-                #         row_win = row_win_list[0]
-                #     else:
-                #         row_win = row_win_list[1]
+                row_win = row_win_list[0]
                 c1 = []
                 c1_tmp = []
                 c = str(c)
                 win = match[1]
                 los = match[4]
             elif c == 0:  # встречи за места
-                # c_mesto = 0
                 row_win = mesta_dict[i]
                 c = str(i)
            # цикл создания списков номеров встреч по столбцам новый
@@ -9776,7 +9764,7 @@ def write_in_setka(data, fin, first_mesto, table):
                     if d1 != "" and type(d1) == str and int(d1) > 0:
                         c1_tmp.append(d1)
                         c1 = c1_tmp.copy()
-                column_dict[cd] = c1       
+                column_dict[cd] = c1    # ключ -номер столбца, значение - список номеров встреч   
             # =======
             for k in column_dict.keys():
                 num_game_list = column_dict[k]  
@@ -10197,8 +10185,8 @@ def numer_game(num_game, vid_setki):
         dict_loser = {1: 32, 2: 32, 3: 33, 4: 33, 5: 34, 6: 34, 7: 35, 8: 35, 9: 36, 10: 36, 11: 37, 12: 37, 13: 38, 14: 38, 15: 39, 16: 39,
                   17: 47, 18: 46, 19: 45, 20: 44, 21: 43, 22: 42, 23: 41, 24: 40, 25: 53, 26: 52, 27: 55, 28: 54, 29: 59, 30: 58,
                   32: 83, 33: 83, 34: 84, 35: 84, 36: 85, 37: 85, 38: 86, 39: 86, 40: 71, 41: 71, 42: 72, 43: 72, 44: 73, 45: 73, 46: 74, 47: 74, 48: 67, 49: 67, 
-                  50: 68, 51: 68, 52: 63, 53: 63, 54: 64, 55: 64, 56: 62, 57: 62, 58: 61, 59: 61, 63: 65, 64: 65, 67: 69, 68: 69, 71: 79, 72: 79, 73: 80, 74: 80, 
-                  79: 82, 80: 82, 75: 78, 76: 78, 83: 91, 84: 91, 85: 92, 86: 92, 91: 94, 92: 94}
+                  50: 68, 51: 68, 52: 63, 53: 63, 54: 64, 55: 64, 56: 62, 57: 62, 58: 61, 59: 61, 63: 66, 64: 66, 67: 70, 68: 70, 71: 79, 72: 79, 73: 80, 74: 80, 
+                  79: 82, 80: 82, 75: 78, 76: 78, 83: 91, 84: 91, 85: 92, 86: 92, 87: 90, 88: 90, 91: 94, 92: 94}
         
         dict_loser_pdf = {1: -1, 2: -2, 3: -3, 4: -4, 5: -5, 6: -6, 7: -7, 8: -8, 9: -9, 10: -10, 11: -11, 12: -12, 13: -13,
                     14: -14, 15: -15, 16: -16, 17: -17, 18: -18, 19: -19, 20: -20, 21: -21, 22: -22, 23: -23, 24: -24, 25: -25, 26: -26, 
