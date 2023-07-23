@@ -512,6 +512,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
                             load_combobox_filter_final()
                             add_open_tab(tab_page="Финалы")
+                            setka_32_2_made(fin)
                             # =====
                             # choice_setka(fin)
                     else:
@@ -4589,7 +4590,6 @@ def enter_score(none_player=0):
 
     if tab == 5:  # записывает в -Result- сыгранный матч со сносками на соответствующие строки победителя и проигравшего
         if type == "сетка":
-            # game_minus = [] # номера встреч, откуда попадают победители на игроков после первого поражения
             vid_setki = system.label_string  # вид сетки и кол-во участников
             # список 1-й номер победителя 2-й проигравшего
             snoska = numer_game(num_game, vid_setki) # snoska список [номер встречи победителя, номер встречи приогравшего, номер в сетке куда сносится проигравший]
@@ -5819,13 +5819,51 @@ def choice_setka_automat(fin, flag, count_exit):
 
 def wiev_table_choice():
     """показ таблицы жеребьевки"""
-    pass
-    model = QStandardItemModel(3,32)
-    model.setHorizontalHeaderLabels(['Номер', 'Фамилия', 'регион'])
-    tableView = QTableView()
-    tableView.setModel(model)
-    table = Table()
-    table.show()
+    model = QStandardItemModel(4, 4)
+        # Установить текстовое содержимое четырех меток заголовка в горизонтальном направлении
+    my_win.model.setHorizontalHeaderLabels(["Название 1","Название 2","Название 3","Название 4"])
+
+
+        # # Тодо оптимизации 2 добавить данные
+        # self.model.appendRow([
+        #     QStandardItem('row %s,column %s' % (11,11)),
+        #     QStandardItem('row %s,column %s' % (11,11)),
+        #     QStandardItem('row %s,column %s' % (11,11)),
+        #     QStandardItem('row %s,column %s' % (11,11)),
+        # ])
+
+    for row in range(4):
+        for column in range(4):
+            item = QStandardItem('row %s,column %s'%(row,column))
+                # Установить текстовое значение каждой позиции
+            my_win.model.setItem(row, column, item)
+
+        # Создать представление таблицы, установить модель на пользовательскую модель
+    my_win.tableView = QTableView()
+    my_win.tableView.setModel(my_win.model)
+
+
+
+        # #todo Оптимизация 1 Форма заполняет окно
+        # #Горизонтальная метка расширяет остальную часть окна и заполняет форму
+        # self.tableView.horizontalHeader().setStretchLastSection(True)
+        # # Горизонтальное направление, размер таблицы увеличивается до соответствующего размера
+        # self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        #
+        # #TODO Optimization 3 Удалить текущие выбранные данные
+        # indexs=self.tableView.selectionModel().selection().indexes()
+        # print(indexs)
+        # if len(indexs)>0:
+        #     index=indexs[0]
+        #     self.model.removeRows(index.row(),1)
+
+    # pass
+    # model = QStandardItemModel(3,32)
+    # model.setHorizontalHeaderLabels(['Номер', 'Фамилия', 'регион'])
+    # tableView = QTableView()
+    # tableView.setModel(model)
+    # table = Table()
+    # table.show()
 # class DialogWindow(QMainWindow):
 #     def __init__(self):
 #         super(DialogWindow, self).__init__()
@@ -10943,42 +10981,10 @@ def player_choice_semifinal(stage, num_gr):
 
 def player_choice_in_setka(fin):
     """распределяет спортсменов в сетке согласно жеребьевке"""
-    p_stage = []
     system = System.select().where(System.title_id == title_id())
     system_id = system.select().where(System.stage == fin).get()
-    stage_exit = system_id.stage_exit # откуда выходят в финал
     count_exit = system_id.mesta_exit # сколько игроков выходят в финал
-    
-#     if fin == "Одна таблица":
-#         mesto_first_poseva = 1
-#         count_exit = 1
-#     elif stage_exit == "Предварительный":
-#         stage_str = "Предварительного этапа"
-#     elif stage_exit == "1-й полуфинал" or  stage_exit == "2-й полуфинал":
-#         if stage_exit == "1-й полуфинал":
-#             stage_str = "1-ого полуфинала"
-#         else:
-#             stage_str = "2-ого полуфинала"
-# # уточнить выходящие места
-#     if count_exit == 1: 
-#         number_exit_str = "1-е место"
-#     elif count_exit == 2:
-#         number_exit_str = "1-е и 2-е место"
-#     elif count_exit == 3:
-#         number_exit_str = "1-е, 2-е и 3-е место"
-#     elif count_exit == 4:
-#         number_exit_str = "1-е, 2-е, 3-е и 4-е место"
-
-#     reply = QMessageBox.information(my_win, 'Уведомление',
-#                                     "Из " f"{stage_str} выходят в " f"{fin} спортсмены,\n"
-#                                     "занявшие " f"{number_exit_str}, все верно?",
-#                                     QMessageBox.Yes,
-#                                     QMessageBox.Cancel)
-
-#     if reply == QMessageBox.Cancel:
-#         return
-    mesto_first_poseva = 1
-
+ 
     flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
     posev = choice_setka_automat(fin, flag, count_exit)
 
