@@ -5658,7 +5658,7 @@ def choice_setka_automat(fin, flag, count_exit):
                 count = len(posev[i]) - free_seats
                 del_num = 0
             for w in range(0, count): # внутренний цикл посева
-                l = number_posev[0] # общий список всего посева
+                l = number_posev[0] # общий список всего посева (порядковый номер посева)
                 if i == 0 and n == 0: #  ===== 1-й посев
                     sev = posev[i]  # список номеров посева
                     num_set = sev[w] # номер в сетке на который идет сев
@@ -5688,24 +5688,24 @@ def choice_setka_automat(fin, flag, count_exit):
                         if n != 0 or (n == 0 and l > 1):
                 # =========== определения кол-во возможны вариантов посева у каждого региона
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)                           
-                            for l in current_region_posev.keys():
-                                possible_number[l] = sev
+                            # for l in current_region_posev.keys():
+                            #     possible_number[l] = sev
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                                 num_posev = list(possible_number.keys())   
                             l = list(possible_number.keys())[0]
                             num_set = possible_number[l]
                             # === выбор ручная или автомат ====
-                            if flag is True:
+                            if flag is True: # автоматичекая
                                 if len(num_set) == 0:
                                     msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась, повторите снова.")
                                     sorted_tuple = sorted(num_id_player.items(), key=lambda x: x[0])
                                     dict(sorted_tuple)                                    
                                     player_choice_in_setka(fin)
                                     step = 0
-                                elif len(num_set) != 1:
+                                elif len(num_set) != 1: # есть выбор из номеров случайно
                                     num_set = random_generator(num_set)
-                                elif len(num_set) == 1:
+                                elif len(num_set) == 1: # остался только один номер
                                     num_set = num_set[0]
                             else: # manual
                                 # wiev_table_choice() # функция реального просмотра жеребьевки
@@ -6044,9 +6044,10 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
             number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы
             number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
             reg_tmp.clear()
+            # ======
             for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
                 d = number_last.index(k)
-                reg_tmp.append(reg_last[d])     
+                reg_tmp.append(reg_last[d]) # список регионов     
             if cur_reg in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
                 num_tmp = []
                 for d in number_posev_old: # номер в сетке в предыдущем посеве
@@ -6054,33 +6055,36 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                     if cur_reg in posev_tmp:
                         num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
                 count = len(num_tmp)
+
+                net_8 = player_net // 8
  
                 if count == 1 and n == 1:
-                    if num_tmp[0] <= 8: # в первой четверти (1-8)
-                        number_posev = [i for i in number_posev if i > 8 and i <= 16] # номера 8-16
-                    elif num_tmp[0] >= 9 and num_tmp[0] <= 16: # в первой четверти (9-16)
+                    if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
+                        number_posev = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
+                    elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
                         number_posev = [i for i in number_posev if i < 9] # номера 1-8
-                    elif num_tmp[0] >= 17 and num_tmp[0] <= 24: # в первой четверти (16-24)
-                        number_posev = [i for i in number_posev if i > 24] # номера 25-32
-                    elif num_tmp[0] >= 25 and num_tmp[0] <= 32: # в первой четверти (25-32)
-                        number_posev = [i for i in number_posev if i > 16 and i < 25] # номера 17-24
-                elif count == 1 and n == 2:
-                    if num_tmp[0] <= 4: # в первой четверти (1-4)
-                        number_posev = [i for i in number_posev if i > 4 and i <= 8] # номера 8-16
-                    elif num_tmp[0] >= 5 and num_tmp[0] <= 8: # в первой четверти (9-16)
-                        number_posev = [i for i in number_posev if i < 5] # номера 1-8
-                    elif num_tmp[0] >= 9 and num_tmp[0] <= 12: # в первой четверти (16-24)
-                        number_posev = [i for i in number_posev if i > 12 and i <= 16] # номера 8-16
-                    elif num_tmp[0] >= 13 and num_tmp[0] <= 16: # в первой четверти (25-32)
-                        number_posev = [i for i in number_posev if i >= 9 and i <=12] # номера 17-24
-                    elif num_tmp[0] >= 17 and num_tmp[0] <= 20: # в первой четверти (9-16)
-                        number_posev = [i for i in number_posev if i > 20 and i <= 24] # номера 8-16
-                    elif num_tmp[0] >= 17 and num_tmp[0] <= 20: # в первой четверти (9-16)
-                        number_posev = [i for i in number_posev if i > 20 and i <= 24] # номера 8-16
-                    elif num_tmp[0] >= 25 and num_tmp[0] <= 28: # в первой четверти (16-24)
-                        number_posev = [i for i in number_posev if i > 29] # номера 25-32
-                    elif num_tmp[0] >= 29 and num_tmp[0] <= 32: # в первой четверти (25-32)
-                        number_posev = [i for i in number_posev if i >= 25 and i <= 28] # номера 17-24
+                    elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
+                        number_posev = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
+                    elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
+                        number_posev = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
+                elif (count == 1 and n == 2) or (count == 1 and n == 3):
+                    if num_tmp[0] <= player_net // 4: # в первой четверти (1-4)
+                        number_posev = [i for i in number_posev if i > 4 and i <= player_net // 4] # номера 8-16
+                    elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (9-16)
+                        number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-8
+                    elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (16-24)
+                        number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 8-16
+                    elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (25-32)
+                        number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 17-24
+                    elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (9-16)
+                        number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 8-16
+                    elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (9-16)
+                        number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 8-16
+                    elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (16-24)
+                        number_posev = [i for i in number_posev if i > player_net  // 8 * 7+ 1] # номера 25-32
+                    elif num_tmp[0] >= player_net // 8 * 7 + 1 and num_tmp[0] <= player_net: # в первой четверти (25-32)
+                        number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 17-24
+
                 else:            
                     number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
                     number_posev.clear()
@@ -6191,17 +6195,16 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
             group_last = group_last[:8] 
             number_last = number_last[:8]
         index = group_last.index(cur_gr)
-        set_number = number_last[index] # номер где посеянна группа, во 2-ом посеве от которой надо увести
+        set_number = number_last[index] # номер где посеянна группа, во 4-ом посеве от которой надо увести
 
-
-        if set_number <= 8: # если номер в сетке вверху, то наде сеять вниз
-            number_posev = [i for i in sev if i >= 9 and i < 17] # номера от 9 до 17
-        elif set_number > 8 and set_number < 17: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev = [i for i in sev if i <= 8] # номера от 1 до 8 
-        elif set_number > 16 and set_number < 25: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev = [i for i in sev if i >= 25] # номера от 25 до 32   
-        elif set_number >= 25: # если номер в сетке вверху, то наде сеять вниз: 
-            number_posev = [i for i in sev if i >= 17 and i < 25] # номера от 17 до 24
+        if set_number <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз
+            number_posev = [i for i in sev if i >= (player_net // 4 + 1) and i < (player_net // 2 + 1)] # номера от 9 до 17
+        elif set_number > player_net // 4 and set_number < (player_net // 2 + 1): # если номер в сетке вверху, то наде сеять вниз: 
+            number_posev = [i for i in sev if i <= player_net // 4] # номера от 1 до 8 
+        elif set_number > player_net // 2 and set_number < (player_net // 4 * 3 + 1): # если номер в сетке вверху, то наде сеять вниз: 
+            number_posev = [i for i in sev if i >= (player_net // 4 * 3 + 1)] # номера от 25 до 32   
+        elif set_number >= (player_net // 4 * 3 + 1): # если номер в сетке вверху, то наде сеять вниз: 
+            number_posev = [i for i in sev if i >= (player_net // 2 + 1) and i < (player_net // 4 * 3 + 1)] # номера от 17 до 24
 
     return number_posev
 
