@@ -11,7 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
-from PyPDF2 import PdfFileMerger
+# from PyPDF2 import PdfFileMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
@@ -442,8 +442,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     choice_semifinal_automat(stage)
 # ======= заполнение сыграныыми играми в группах
                     reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить {stage} результатами "
-                                                                            f"встреч, сыгранных в группах.",
-                                                                            
+                                                                            f"встреч, сыгранных в группах.",                                                                            
                                             msg.Ok,
                                             msg.Cancel)
                     if reply == msg.Ok:
@@ -512,9 +511,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
                             load_combobox_filter_final()
                             add_open_tab(tab_page="Финалы")
-                            setka_32_2_made(fin)
-                            # =====
-                            # choice_setka(fin)
+                            load_name_net_after_choice_for_wiev(fin)
+                            # my_win.tabWidget.setCurrentIndex(5) 
                     else:
                         return
                 else:
@@ -529,13 +527,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             if reply == msg.Ok:
                                 load_playing_game_in_table_for_final(fin)
                             else:
-                                return
-                    
+                                return                   
                     else:
                         posev_data = player_choice_in_setka(fin)
                         player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
                         load_combobox_filter_final()
                         add_open_tab(tab_page="Финалы")
+                        load_name_net_after_choice_for_wiev(fin)
+                        my_win.tabWidget.setCurrentIndex(5) 
             else:
                 return
         enabled_menu_after_choice()
@@ -4954,6 +4953,7 @@ def filter_fin(pl=False):
     """фильтрует таблицу -Result- на вкладке финалы"""
     msgBox = QMessageBox
     num_game_fin = my_win.lineEdit_num_game_fin.text()
+    final = "все финалы"
     final = my_win.comboBox_filter_final.currentText()
     name = my_win.comboBox_find_name_fin.currentText()
     round = my_win.lineEdit_tour.text()
@@ -5779,7 +5779,7 @@ def choice_setka_automat(fin, flag, count_exit):
 
                 sp = 100 / (real_all_player_in_final)
                 step += sp
-                progress_bar(step)
+                # progress_bar(step)
         if step > 99:    
             for i in num_id_player.keys():
                 tmp_list = list(num_id_player[i])
@@ -6087,48 +6087,51 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                 d = number_last.index(k)
                 reg_tmp.append(reg_last[d]) # список регионов     
             if cur_reg in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
-                num_tmp = []
+                num_tmp = [] # список номеров сетки где есть такой же регион (в той половине или четверти с номером который сеятся)
                 for d in number_posev_old: # номер в сетке в предыдущем посеве
                     posev_tmp = num_id_player[d]
                     if cur_reg in posev_tmp:
                         num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
                 count = len(num_tmp)
-
+                if count == 0:
+                    print("ok")
                 net_8 = player_net // 8
  
                 if count == 1 and n == 1:
                     if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
-                        number_posev = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
+                        number_posev_new = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
                     elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
-                        number_posev = [i for i in number_posev if i < 9] # номера 1-8
+                        number_posev_new = [i for i in number_posev if i < 9] # номера 1-8
                     elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
-                        number_posev = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
+                        number_posev_new = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
                     elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
-                        number_posev = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
+                        number_posev_new = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
                 elif (count == 1 and n == 2) or (count == 1 and n == 3):
-                    if num_tmp[0] <= player_net // 4: # в первой четверти (1-4)
-                        number_posev = [i for i in number_posev if i > 4 and i <= player_net // 4] # номера 8-16
-                    elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (9-16)
-                        number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-8
-                    elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (16-24)
-                        number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 8-16
-                    elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (25-32)
-                        number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 17-24
-                    elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (9-16)
-                        number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 8-16
-                    elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (9-16)
-                        number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 8-16
-                    elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (16-24)
-                        number_posev = [i for i in number_posev if i > player_net  // 8 * 7+ 1] # номера 25-32
-                    elif num_tmp[0] >= player_net // 8 * 7 + 1 and num_tmp[0] <= player_net: # в первой четверти (25-32)
-                        number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 17-24
-
-                else:            
-                    number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
-                    number_posev.clear()
-                    number_posev = number_tmp.copy() 
-            possible_number[reg] = number_posev 
-            proba_possible[cur_gr] = number_posev
+                    if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
+                        number_posev_new = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
+                    elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
+                        number_posev_new = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
+                    elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
+                        number_posev_new = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
+                    elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
+                        number_posev_new = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
+                    elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
+                        number_posev_new = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
+                    elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
+                        number_posev_new = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
+                    elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
+                        number_posev_new = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
+                    elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
+                        number_posev_new = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
+                if len(number_posev) == 0:
+                    print(f"stop {num_tmp[0]}")
+                # else:            
+                #     number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
+                #     number_posev.clear()
+                #     number_posev = number_tmp.copy()
+            number_posev_new = number_posev 
+            possible_number[reg] = number_posev_new 
+            proba_possible[cur_gr] = number_posev_new
         y += 1
     return possible_number
 
@@ -8235,6 +8238,30 @@ def merdge_pdf_files():
     Path.home()
     / "table_pdf"
     )
+
+def load_name_net_after_choice_for_wiev(fin):
+    """загружает список сетки после жеребьевки для ее просмотра"""
+    system = System.select().where(System.title_id == title_id())
+    for k in system:
+        stage = k.stage
+        if stage == fin:
+            vid_net = k.label_string
+            break
+    if vid_net == 'Сетка (с розыгрышем всех мест) на 8 участников':
+        setka_8_full_made(fin)
+    elif vid_net == 'Сетка (-2) на 8 участников':
+        setka_8_2_made(fin)
+    elif vid_net == 'Сетка (с розыгрышем всех мест) на 16 участников':
+        setka_16_full_made(fin)
+    elif vid_net == 'Сетка (-2) на 16 участников':
+        setka_16_2_made(fin)
+    elif vid_net == 'Сетка (с розыгрышем всех мест) на 32 участников':
+        setka_32_full_made(fin)
+    elif vid_net == 'Сетка (-2) на 32 участников':
+        setka_32_2_made(fin)
+    elif vid_net == 'Сетка (1-3 место) на 32 участников':
+        setka_32_made(fin)
+
 
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
