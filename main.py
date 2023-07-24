@@ -512,7 +512,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             load_combobox_filter_final()
                             add_open_tab(tab_page="Финалы")
                             load_name_net_after_choice_for_wiev(fin)
-                            # my_win.tabWidget.setCurrentIndex(5) 
+                            my_win.tabWidget.setCurrentIndex(5) 
                     else:
                         return
                 else:
@@ -4952,14 +4952,20 @@ def result_filter_name():
 def filter_fin(pl=False):
     """фильтрует таблицу -Result- на вкладке финалы"""
     msgBox = QMessageBox
+    sender = my_win.sender()
     num_game_fin = my_win.lineEdit_num_game_fin.text()
-    final = "все финалы"
     final = my_win.comboBox_filter_final.currentText()
+    if final == "":
+        final = "все финалы"
     name = my_win.comboBox_find_name_fin.currentText()
     round = my_win.lineEdit_tour.text()
     played = my_win.comboBox_filter_played_fin.currentText()
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     filter = Result.select().where(Result.title_id == title_id())
+    if sender == my_win.lineEdit_num_game_fin:
+        fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.tours == num_game_fin))
+        count = len(fltr)
+        my_win.label_38.setText(f'Всего в {final} {count} игры')
     if final != "все финалы":
         systems = system.select().where(System.stage == final).get()
         id_system = systems.id # получаем ид системы финала
@@ -5708,7 +5714,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                 elif len(num_set) == 1: # остался только один номер
                                     num_set = num_set[0]
                             else: # manual
-                                # wiev_table_choice() # функция реального просмотра жеребьевки
+                                wiev_table_choice() # функция реального просмотра жеребьевки
                                 player_list = []
                                 player_list_tmp = []
 
@@ -5819,9 +5825,10 @@ def choice_setka_automat(fin, flag, count_exit):
 
 def wiev_table_choice():
     """показ таблицы жеребьевки"""
-    model = QStandardItemModel(4, 4)
+    model = QStandardItemModel(32, 2)
         # Установить текстовое содержимое четырех меток заголовка в горизонтальном направлении
-    my_win.model.setHorizontalHeaderLabels(["Название 1","Название 2","Название 3","Название 4"])
+    model.setHorizontalHeaderLabels(["Игрок", "Регион"])
+ 
 
 
         # # Тодо оптимизации 2 добавить данные
@@ -5832,15 +5839,17 @@ def wiev_table_choice():
         #     QStandardItem('row %s,column %s' % (11,11)),
         # ])
 
-    for row in range(4):
-        for column in range(4):
-            item = QStandardItem('row %s,column %s'%(row,column))
+    for row in range(32):
+        # model.setRowHeight(row, 10)
+        for column in range(2):
+            item = QStandardItem("")
                 # Установить текстовое значение каждой позиции
-            my_win.model.setItem(row, column, item)
+            model.setItem(row, column, item)
 
         # Создать представление таблицы, установить модель на пользовательскую модель
-    my_win.tableView = QTableView()
-    my_win.tableView.setModel(my_win.model)
+    # my_win.tableView = QTableView()
+    my_win.tableView_net.setModel(model)
+    # my_win.tableView.show()
 
 
 
@@ -5850,7 +5859,7 @@ def wiev_table_choice():
         # # Горизонтальное направление, размер таблицы увеличивается до соответствующего размера
         # self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         #
-        # #TODO Optimization 3 Удалить текущие выбранные данные
+        # Optimization 3 Удалить текущие выбранные данные
         # indexs=self.tableView.selectionModel().selection().indexes()
         # print(indexs)
         # if len(indexs)>0:
@@ -11898,6 +11907,7 @@ my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
 
 my_win.lineEdit_range_tours.returnPressed.connect(enter_print_begunki)
+my_win.lineEdit_num_game_fin.returnPressed.connect(filter_fin)
 
 my_win.lineEdit_pl1_score_total_gr.returnPressed.connect(enter_total_score)
 my_win.lineEdit_pl2_score_total_gr.returnPressed.connect(enter_total_score)
@@ -12012,7 +12022,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+my_win.Button_proba.clicked.connect(wiev_table_choice) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)

@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>5</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3640,15 +3640,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>475</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3660,8 +3660,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>475</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4173,8 +4173,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>475</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4579,6 +4579,19 @@
           <number>1</number>
          </property>
          <item>
+          <spacer name="horizontalSpacer_11">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
           <widget class="QPushButton" name="Button_filter_gr">
            <property name="text">
             <string>Фильтр</string>
@@ -4622,9 +4635,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>270</y>
-        <width>215</width>
-        <height>221</height>
+        <y>230</y>
+        <width>221</width>
+        <height>161</height>
        </rect>
       </property>
       <property name="font">
@@ -4637,95 +4650,109 @@
       <property name="title">
        <string>Редактор групп</string>
       </property>
-      <widget class="QComboBox" name="comboBox_number_group_edit">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>191</width>
-         <height>26</height>
-        </rect>
+      <layout class="QVBoxLayout" name="verticalLayout_40">
+       <property name="spacing">
+        <number>1</number>
        </property>
-       <property name="editable">
-        <bool>true</bool>
+       <property name="leftMargin">
+        <number>5</number>
        </property>
-      </widget>
-      <widget class="QLabel" name="label_64">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>22</y>
-         <width>91</width>
-         <height>16</height>
-        </rect>
+       <property name="topMargin">
+        <number>5</number>
        </property>
-       <property name="font">
-        <font>
-         <family>Courier New</family>
-         <pointsize>14</pointsize>
-         <italic>true</italic>
-        </font>
+       <property name="rightMargin">
+        <number>5</number>
        </property>
-       <property name="text">
-        <string>№ группы</string>
+       <property name="bottomMargin">
+        <number>5</number>
        </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_player_group_edit">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>90</y>
-         <width>191</width>
-         <height>26</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_65">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>68</y>
-         <width>121</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Courier New</family>
-         <pointsize>14</pointsize>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string>Спортсмены</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="Button_add_in_group">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>178</y>
-         <width>101</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Добавить</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="Button_reset_filter_2">
-       <property name="geometry">
-        <rect>
-         <x>124</x>
-         <y>180</y>
-         <width>73</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Сброс</string>
-       </property>
-      </widget>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_38">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_64">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>14</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>№ группы</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_number_group_edit">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_39">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_65">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>14</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Спортсмены</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_player_group_edit"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_10">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_add_in_group">
+           <property name="text">
+            <string>Добавить</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_reset_filter_2">
+           <property name="text">
+            <string>Сброс</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="page_5">
@@ -4733,8 +4760,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>475</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4746,7 +4773,7 @@
         <x>10</x>
         <y>20</y>
         <width>221</width>
-        <height>227</height>
+        <height>251</height>
        </rect>
       </property>
       <property name="font">
@@ -4912,8 +4939,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>475</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5067,6 +5094,19 @@
             </widget>
            </item>
            <item>
+            <spacer name="horizontalSpacer_9">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <widget class="QLabel" name="label_51">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -5113,6 +5153,19 @@
             </widget>
            </item>
            <item>
+            <spacer name="horizontalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <widget class="QLineEdit" name="lineEdit_tour">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -5135,13 +5188,6 @@
           <number>1</number>
          </property>
          <item>
-          <widget class="QPushButton" name="Button_filter_fin">
-           <property name="text">
-            <string>Фильтр</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <spacer name="horizontalSpacer_7">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -5153,6 +5199,13 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_filter_fin">
+           <property name="text">
+            <string>Фильтр</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="Button_reset_filter_fin">
@@ -5193,8 +5246,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>475</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5563,8 +5616,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>475</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5759,14 +5812,20 @@
      <string>Проверка</string>
     </property>
    </widget>
-   <widget class="QTableView" name="tableView">
+   <widget class="QTableView" name="tableView_net">
     <property name="geometry">
      <rect>
       <x>1110</x>
       <y>24</y>
       <width>241</width>
-      <height>221</height>
+      <height>621</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+      <pointsize>11</pointsize>
+     </font>
     </property>
     <property name="gridStyle">
      <enum>Qt::DashDotLine</enum>
@@ -5796,16 +5855,6 @@
       <family>Times New Roman</family>
       <pointsize>11</pointsize>
      </font>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tableView_2">
-    <property name="geometry">
-     <rect>
-      <x>1110</x>
-      <y>250</y>
-      <width>241</width>
-      <height>192</height>
-     </rect>
     </property>
    </widget>
    <widget class="QListWidget" name="listWidget_second_group">
