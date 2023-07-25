@@ -5730,6 +5730,15 @@ def choice_setka_automat(fin, flag, count_exit):
                                 txt_tmp = []
     
                                 for g in player_list:
+                                    if len(num_id_player) == 2:
+                                        for l in num_id_player.keys():
+                                            list_pl = num_id_player[l]
+                                            text = l
+                                            players = Player.select().where(Player.title_id == title_id())
+                                            id_p = players.select().where(Player.id == list_pl[0]).get()
+                                            full_pl = id_p.full_name
+                                            fam_city = full_pl
+                                            view_table_choice(fam_city, text, num_id_player) # функция реального просмотра жеребьевки
                                     t_str = str(g[2])
                                     txt_str = f"{g[0]} - {g[1]} номера: {t_str}" 
                                     txt_tmp.append(txt_str)
@@ -5745,7 +5754,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                             text = random.choice(num_set)
                                         msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер: {text}")
                                         text = int(text)
-                                        wiev_table_choice(fam_city, text, num_id_player) # функция реального просмотра жеребьевки
+                                        view_table_choice(fam_city, text, num_id_player) # функция реального просмотра жеребьевки
                                     except ValueError:
                                         msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
                                         continue
@@ -5823,36 +5832,31 @@ def choice_setka_automat(fin, flag, count_exit):
 #             possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
 
 
-def wiev_table_choice(fam_city, text, num_id_player):
+def view_table_choice(fam_city, text, num_id_player):
     """показ таблицы жеребьевки"""
     manual_choice_dict = {}
     player = Player.select().where(Player.title_id == title_id())
-    n = 0
     for k in num_id_player.keys():
-        n += 1
         list_net = num_id_player[k]
         id_player = list_net[0]
         pl_full = player.select().where(Player.id == id_player).get()
         player_full = pl_full.full_name
         manual_choice_dict[k] = player_full
-        if n == 2:
-            break
     model = QStandardItemModel(32, 1)
         # Установить текстовое содержимое четырех меток заголовка в горизонтальном направлении
     model.setHorizontalHeaderLabels(["Участник/ Город"])
-    manual_choice_dict[text - 1] = fam_city
+    manual_choice_dict[text] = fam_city
     for row in range(32):
-        fam_city = manual_choice_dict[row]
+        fam_city = manual_choice_dict.get(row + 1, "")
         item = QStandardItem(fam_city)
-        my_win.tableView_net.setRowHeight(row, 7)
-                # Установить текстовое значение каждой позиции
-        model.setItem(text - 1, 0, item)
+        my_win.tableView_net.setRowHeight(row, 10)
+                    # Установить текстовое значение каждой позиции
+        model.setItem(row, 0, item)
 
     my_win.tableView_net.setModel(model)
     my_win.tableView_net.horizontalHeader().setStretchLastSection(True)
     my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-    # my_win.tableView.show()
-
+ 
 
 
         # #todo Оптимизация 1 Форма заполняет окно
@@ -5868,13 +5872,6 @@ def wiev_table_choice(fam_city, text, num_id_player):
         #     index=indexs[0]
         #     self.model.removeRows(index.row(),1)
 
-    # pass
-    # model = QStandardItemModel(3,32)
-    # model.setHorizontalHeaderLabels(['Номер', 'Фамилия', 'регион'])
-    # tableView = QTableView()
-    # tableView.setModel(model)
-    # table = Table()
-    # table.show()
 # class DialogWindow(QMainWindow):
 #     def __init__(self):
 #         super(DialogWindow, self).__init__()
@@ -12024,7 +12021,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-my_win.Button_proba.clicked.connect(wiev_table_choice) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(wiev_table_choice) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)

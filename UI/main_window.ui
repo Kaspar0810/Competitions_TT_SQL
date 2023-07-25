@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>6</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3640,15 +3640,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3660,8 +3660,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4173,8 +4173,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4760,8 +4760,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4939,8 +4939,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5246,8 +5246,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5257,7 +5257,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>150</y>
+        <y>110</y>
         <width>230</width>
         <height>91</height>
        </rect>
@@ -5325,7 +5325,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>40</y>
+        <y>10</y>
         <width>220</width>
         <height>91</height>
        </rect>
@@ -5404,7 +5404,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>258</y>
+        <y>200</y>
         <width>230</width>
         <height>200</height>
        </rect>
@@ -5610,14 +5610,27 @@
        </item>
       </layout>
      </widget>
+     <widget class="QProgressBar" name="progressBar">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>450</y>
+        <width>221</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_7">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5803,7 +5816,7 @@
     <property name="geometry">
      <rect>
       <x>1110</x>
-      <y>700</y>
+      <y>733</y>
       <width>113</width>
       <height>32</height>
      </rect>
@@ -5816,9 +5829,9 @@
     <property name="geometry">
      <rect>
       <x>1110</x>
-      <y>24</y>
+      <y>10</y>
       <width>241</width>
-      <height>621</height>
+      <height>720</height>
      </rect>
     </property>
     <property name="font">
@@ -6027,8 +6040,8 @@
    <widget class="QCheckBox" name="checkBox_3">
     <property name="geometry">
      <rect>
-      <x>1110</x>
-      <y>660</y>
+      <x>1320</x>
+      <y>737</y>
       <width>19</width>
       <height>18</height>
      </rect>
@@ -6040,8 +6053,8 @@
    <widget class="QPushButton" name="Button_system_made">
     <property name="geometry">
      <rect>
-      <x>1130</x>
-      <y>660</y>
+      <x>1220</x>
+      <y>733</y>
       <width>95</width>
       <height>32</height>
      </rect>
@@ -6054,19 +6067,6 @@
     </property>
     <property name="text">
      <string>Создать</string>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="progressBar">
-    <property name="geometry">
-     <rect>
-      <x>1110</x>
-      <y>740</y>
-      <width>240</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>24</number>
     </property>
    </widget>
   </widget>
