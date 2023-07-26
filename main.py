@@ -5731,9 +5731,8 @@ def choice_setka_automat(fin, flag, count_exit):
     
                                 for g in player_list:
                                     if len(num_id_player) == 2:
-                                        for a in num_id_player.keys():
-                                            list_pl = num_id_player[l]
-                                            number_net = a
+                                        for number_net in num_id_player.keys():
+                                            list_pl = num_id_player[number_net]
                                             players = Player.select().where(Player.title_id == title_id())
                                             id_p = players.select().where(Player.id == list_pl[0]).get()
                                             fam_city = id_p.full_name
@@ -5763,7 +5762,6 @@ def choice_setka_automat(fin, flag, count_exit):
                                             break
                                         else:
                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
-                            #===========
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
                 gr = full_posev[l][3]  
@@ -5782,6 +5780,12 @@ def choice_setka_automat(fin, flag, count_exit):
                             sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
                         for z in possible_number.keys():
                             possible_tmp = possible_number[z]
+                            #=====
+                            if flag is False and len(possible_number) == 1:
+                                number_net = possible_tmp[0]
+                                fam_city = f"{pl}/{reg}"
+                                view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки 
+                            #======
                             if num_set in possible_tmp: # проверяет посеянный номер в возможных номерах
                                 possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
                 elif count_sev == 1: # удаляет последний номер в посеве
@@ -5855,6 +5859,7 @@ def view_table_choice(fam_city, number_net, num_id_player):
     my_win.tableView_net.setModel(model)
     my_win.tableView_net.horizontalHeader().setStretchLastSection(True)
     my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+    my_win.tableView_net.setGridStyle(Qt.DashDotLine) # вид линии сетки 
     # my_win.tableView.show()
 
 
