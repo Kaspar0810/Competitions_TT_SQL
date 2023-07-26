@@ -5731,14 +5731,13 @@ def choice_setka_automat(fin, flag, count_exit):
     
                                 for g in player_list:
                                     if len(num_id_player) == 2:
-                                        for l in num_id_player.keys():
+                                        for a in num_id_player.keys():
                                             list_pl = num_id_player[l]
-                                            text = l
+                                            number_net = a
                                             players = Player.select().where(Player.title_id == title_id())
                                             id_p = players.select().where(Player.id == list_pl[0]).get()
-                                            full_pl = id_p.full_name
-                                            fam_city = full_pl
-                                            view_table_choice(fam_city, text, num_id_player) # функция реального просмотра жеребьевки
+                                            fam_city = id_p.full_name
+                                            view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
                                     t_str = str(g[2])
                                     txt_str = f"{g[0]} - {g[1]} номера: {t_str}" 
                                     txt_tmp.append(txt_str)
@@ -5747,20 +5746,20 @@ def choice_setka_automat(fin, flag, count_exit):
                                 txt = (','.join(list(map(str, num_set))))
                                 while True:
                                     try:
-                                        text, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
+                                        number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
                                         znak = text_str.find(":")
                                         fam_city = text_str[:znak - 7]
                                         if not ok:
-                                            text = random.choice(num_set)
-                                        msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер: {text}")
-                                        text = int(text)
-                                        view_table_choice(fam_city, text, num_id_player) # функция реального просмотра жеребьевки
+                                            number_net = random.choice(num_set)
+                                        msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер: {number_net}")
+                                        number_net = int(number_net)
+                                        view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
                                     except ValueError:
                                         msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
                                         continue
                                     else:
-                                        if text in num_set:
-                                            num_set = text
+                                        if number_net in num_set:
+                                            num_set = number_net
                                             break
                                         else:
                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
@@ -5832,7 +5831,7 @@ def choice_setka_automat(fin, flag, count_exit):
 #             possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
 
 
-def view_table_choice(fam_city, text, num_id_player):
+def view_table_choice(fam_city, number_net, num_id_player):
     """показ таблицы жеребьевки"""
     manual_choice_dict = {}
     player = Player.select().where(Player.title_id == title_id())
@@ -5845,7 +5844,7 @@ def view_table_choice(fam_city, text, num_id_player):
     model = QStandardItemModel(32, 1)
         # Установить текстовое содержимое четырех меток заголовка в горизонтальном направлении
     model.setHorizontalHeaderLabels(["Участник/ Город"])
-    manual_choice_dict[text] = fam_city
+    manual_choice_dict[number_net] = fam_city
     for row in range(32):
         fam_city = manual_choice_dict.get(row + 1, "")
         item = QStandardItem(fam_city)
@@ -5856,7 +5855,8 @@ def view_table_choice(fam_city, text, num_id_player):
     my_win.tableView_net.setModel(model)
     my_win.tableView_net.horizontalHeader().setStretchLastSection(True)
     my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
- 
+    # my_win.tableView.show()
+
 
 
         # #todo Оптимизация 1 Форма заполняет окно
@@ -5872,6 +5872,13 @@ def view_table_choice(fam_city, text, num_id_player):
         #     index=indexs[0]
         #     self.model.removeRows(index.row(),1)
 
+    # pass
+    # model = QStandardItemModel(3,32)
+    # model.setHorizontalHeaderLabels(['Номер', 'Фамилия', 'регион'])
+    # tableView = QTableView()
+    # tableView.setModel(model)
+    # table = Table()
+    # table.show()
 # class DialogWindow(QMainWindow):
 #     def __init__(self):
 #         super(DialogWindow, self).__init__()
