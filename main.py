@@ -6115,7 +6115,6 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                 count = len(num_tmp)
                 if count == 0:
                     print("ok")
-                net_8 = player_net // 8
  
                 if count == 1 and n == 1:
                     if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
@@ -6126,7 +6125,8 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                         number_posev_new = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
                     elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
                         number_posev_new = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
-                elif (count == 1 and n == 2) or (count == 1 and n == 3):
+                # elif (count == 1 and n == 2) or (count == 1 and n == 3):
+                elif (count == 1 and n == 2):
                     if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
                         number_posev_new = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
                     elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
@@ -6143,12 +6143,12 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                         number_posev_new = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
                     elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
                         number_posev_new = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
-                if len(number_posev) == 0:
-                    print(f"stop {num_tmp[0]}")
-                # else:            
-                #     number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
-                #     number_posev.clear()
-                #     number_posev = number_tmp.copy()
+                # if len(number_posev) == 0:
+                #     print(f"stop {num_tmp[0]}")
+                else:            
+                    number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
+                    number_posev.clear()
+                    number_posev = number_tmp.copy()
             number_posev_new = number_posev 
             possible_number[reg] = number_posev_new 
             proba_possible[cur_gr] = number_posev_new
@@ -6157,7 +6157,11 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
 
 
 def alignment_in_half(player_net, num_tmp, sev, count, number_posev):
-    """выравнивание количество областей по половинам -num_tmp- номера где уже есть эта область"""
+    """выравнивание количество областей по половинам 
+    -num_tmp- номера где уже есть эта область
+    -number_tmp- номера куда можно сеять,
+    -number_posev- возможные номера посева
+    -count- число регионов посеянных """
     number_tmp = [] 
     upper_half = 0
     quarter_num = -1
@@ -6170,7 +6174,7 @@ def alignment_in_half(player_net, num_tmp, sev, count, number_posev):
         if upper_half == count: # все области в верху сетки  1-16
             quarter_num = len([i for i in num_tmp if i <= player_net // 4]) # количество областей в верхней четверти сетки 1-8
             sev_tmp = [i for i in sev if i <= player_net // 2] # оставляет номера нижней половины
-        elif upper_half == 0: # все области в верху сетки  1-16:
+        elif upper_half == 0: # все области в низу сетки  17-32:
             quarter_num = len([i for i in num_tmp if i <= player_net * 3 / 4]) # количество областей в верхней четверти сетки 17-24
             sev_tmp = [i for i in sev if i > player_net // 2] # оставляет номера нижней половины
         else: # посеянные области в разных половинах
