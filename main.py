@@ -6146,7 +6146,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                 # if len(number_posev) == 0:
                 #     print(f"stop {num_tmp[0]}")
                 else:            
-                    number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
+                    number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev) # номер (а)куда можно сеять
                     number_posev.clear()
                     number_posev = number_tmp.copy()
             number_posev_new = number_posev 
@@ -6226,9 +6226,9 @@ def alignment_in_half(player_net, num_tmp, sev, count, number_posev):
         elif k >= 17 and k <= 20: # в первой четверти (17-20)
             np = [i for i in number_posev if i >= 21 and i <= 24]
         elif k >= 21 and k <= 24: # в первой четверти (21-24)
-            np= [i for i in number_posev if i >= 17 and i <= 20]
+            np = [i for i in number_posev if i >= 17 and i <= 20]
         elif k >= 25 and k <= 28: # в первой четверти (25-28)
-            np= [i for i in number_posev if i >= 29 and i <= 32]
+            np = [i for i in number_posev if i >= 29 and i <= 32]
         elif k >= 29: # в первой четверти (29-32)
             np = [i for i in number_posev if i >= 25 and i <= 28]
         number_tmp += np
