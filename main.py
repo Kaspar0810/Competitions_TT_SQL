@@ -6103,52 +6103,48 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
             number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
             reg_tmp.clear()
             # ======
-            for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
-                d = number_last.index(k)
-                reg_tmp.append(reg_last[d]) # список регионов     
-            if cur_reg in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
-                num_tmp = [] # список номеров сетки где есть такой же регион (в той половине или четверти с номером который сеятся)
-                for d in number_posev_old: # номер в сетке в предыдущем посеве
-                    posev_tmp = num_id_player[d]
-                    if cur_reg in posev_tmp:
-                        num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
-                count = len(num_tmp)
-                if count == 0:
-                    print("ok")
- 
-                if count == 1 and n == 1:
-                    if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
-                        number_posev_new = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
-                    elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
-                        number_posev_new = [i for i in number_posev if i < 9] # номера 1-8
-                    elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
-                        number_posev_new = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
-                    elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
-                        number_posev_new = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
-                # elif (count == 1 and n == 2) or (count == 1 and n == 3):
-                elif (count == 1 and n == 2):
-                    if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
-                        number_posev_new = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
-                    elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
-                        number_posev_new = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
-                    elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
-                        number_posev_new = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
-                    elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
-                        number_posev_new = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
-                    elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
-                        number_posev_new = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
-                    elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
-                        number_posev_new = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
-                    elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
-                        number_posev_new = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
-                    elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
-                        number_posev_new = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
-                # if len(number_posev) == 0:
-                #     print(f"stop {num_tmp[0]}")
-                else:            
-                    number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev) # номер (а)куда можно сеять
-                    number_posev.clear()
-                    number_posev = number_tmp.copy()
+            if n == 1 or n == 2:
+                for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
+                    d = number_last.index(k)
+                    reg_tmp.append(reg_last[d]) # список регионов     
+                if cur_reg in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
+                    num_tmp = [] # список номеров сетки где есть такой же регион (в той половине или четверти с номером который сеятся)
+                    for d in number_posev_old: # номер в сетке в предыдущем посеве
+                        posev_tmp = num_id_player[d]
+                        if cur_reg in posev_tmp:
+                            num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
+                    count = len(num_tmp)
+
+                    if count == 1 and n == 1:
+                        if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
+                            number_posev_new = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
+                        elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
+                            number_posev_new = [i for i in number_posev if i < 9] # номера 1-8
+                        elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
+                            number_posev_new = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
+                        elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
+                            number_posev_new = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
+                    elif (count == 1 and n == 2):
+                        if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
+                            number_posev_new = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
+                        elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
+                            number_posev_new = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
+                        elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
+                            number_posev_new = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
+                        elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
+                            number_posev_new = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
+                        elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
+                            number_posev_new = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
+                        elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
+                            number_posev_new = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
+                        elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
+                            number_posev_new = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
+                        elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
+                            number_posev_new = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
+                    else:           
+                        number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev) # номер (а)куда можно сеять
+                        number_posev.clear()
+                        number_posev = number_tmp.copy()
             number_posev_new = number_posev 
             possible_number[reg] = number_posev_new 
             proba_possible[cur_gr] = number_posev_new
