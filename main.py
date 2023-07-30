@@ -110,6 +110,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(6, False)
         self.toolBox.setItemEnabled(7, True)
 
+        self.tableView_net.hide()
 
     # ====== создание строки меню ===========
     def _createMenuBar(self):
@@ -470,6 +471,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
                 return
+            # ======
+            fin_list = []
+            stage_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
+            for k in system:
+                stage = k.stage
+                if stage not in stage_list:
+                    fin_list.append(stage)
+            count_fin = len(fin_list) 
+            if count_fin == 1:
+                title = Title.get(Title.id == title_id())
+                tab_str = title.tab_enabled       
+
+            # ======
             sys = system.select().where(System.stage == fin).get()
             type = sys.type_table
             kol_player_exit = sys.mesta_exit
@@ -592,11 +606,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif sender == self.fifth_comp_Action:
             go_to()
 
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.setWindowIcon(QIcon("CTT.png"))
+my_win.resize(1390, 804)
+my_win.center()
 
 
 class StartWindow(QMainWindow, Ui_Form):
@@ -1285,6 +1307,8 @@ def load_tableWidget():
     my_win.tableWidget.setColumnCount(z) # устанавливает колво столбцов
     my_win.tableWidget.setRowCount(1)
     my_win.tableWidget.verticalHeader().hide()
+    # my_win.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
     for i in range(0, z):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
         item = QtWidgets.QTableWidgetItem()
         brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
@@ -1655,8 +1679,6 @@ def find_city():
             ct = my_win.lineEdit_city_list.text()
             with db:
                 city = City(city=ct, region_id=ir).save()
-    # elif txt == "Поиск в текущем рейтинг листе.":
-        # pass
 
 
 def fill_table(player_list):
@@ -1670,7 +1692,6 @@ def fill_table(player_list):
         my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
     else:
         my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
-        # my_win.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
     if tb == 6:
         if row_count > 0:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
@@ -1763,21 +1784,12 @@ def fill_table_results():
     elif tb == 4:
         player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
     elif tb == 5:
-        # stage = my_win.comboBox_filter_final.currentText()
         for k in system: # заполняе список ид системы финальных этапов
             id_system = k.id
             if k.stage not in system_stage_list:
                 system_id_list.append(id_system)
         stage = my_win.comboBox_filter_final.currentText()
-        # if stage == "Одна таблица":
-        #     stage = "Одна таблица"
-        #     # system_id = system.select().where(System.stage == stage).get()
-        #     # id_system = system_id.id
-        # else:
-        #     for k in system: # заполняе список ид системы финальных этапов
-        #         id_system = k.id
-        #         if k.stage not in system_stage_list:
-        #             system_id_list.append(id_system)
+
         if stage == "все финалы":      
             player_result = result.select().where(Result.system_stage == "Финальный")  # проверка есть ли записи в таблице -result 
         else:
@@ -2226,12 +2238,14 @@ def page():
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-
+        my_win.resize(1110, 810)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 505))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         db_select_title()
-        load_tableWidget()
-        my_win.tableWidget.show()
+        # load_tableWidget()
+        # my_win.tableWidget.show()
     elif tb == 1:  # -список участников-
+        my_win.resize(1110, 810)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 530))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         load_comboBox_filter()
@@ -2249,6 +2263,7 @@ def page():
         my_win.label_46.setText(f"Всего: {count} участников")
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
+        my_win.resize(1110, 810)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 243, 841, 515))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 240))
         result = Result.select().where(Result.title_id == title_id())
@@ -2258,7 +2273,7 @@ def page():
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
         my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
-        label_playing_count()
+        label_playing_count() # пишет сколько игр сыграно в каждо этапе
         for k in sf:
             stage = k.stage
             if stage == "Предварительный":
@@ -2391,8 +2406,9 @@ def page():
         load_tableWidget()
     elif tb == 3:  # вкладка -группы-
         stage = "Предварительный"
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 188, 841, 568))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 181))
+        my_win.resize(1270, 810)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 608))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         system_stage = sf.select().where(System.stage == "Предварительный").get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -2409,8 +2425,9 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 4:  # вкладка -полуфиналы-
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 188, 841, 568))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 181))
+        my_win.resize(1270, 810)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 608))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -2439,8 +2456,9 @@ def page():
             visible_field()
             my_win.label_16.hide()
     elif tb == 5: # вкладка -финалы-
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 188, 841, 568))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 181))
+        my_win.resize(1270, 810)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 608))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.checkBox_5.setEnabled(False)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
@@ -2455,6 +2473,7 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 6: # вкладка -рейтинг-
+        my_win.resize(1270, 810)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 75, 841, 684))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
         # my_win.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -2468,6 +2487,7 @@ def page():
         my_win.lineEdit_range_tours.hide()
         load_combo_etap_begunki()
     elif tb == 7: # вкладка -дополнительно-
+        my_win.resize(1270, 810)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 505))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
 
@@ -2897,8 +2917,12 @@ def selection_of_the_draw_mode():
                     my_win, "Жеребьевка", "Выберите режим жеребьевки сетки.", vid, 0, False)
     if vid == "Автоматическая":
         flag = True
+        my_win.tableView_net.hide()
     else:
         flag = False
+        my_win.resize(1390, 804)
+        my_win.tableView_net.show()
+        my_win.tableView_net.setGeometry(QtCore.QRect(1110, 9, 271, 749))
     return flag
     
               
@@ -4962,6 +4986,7 @@ def filter_fin(pl=False):
     played = my_win.comboBox_filter_played_fin.currentText()
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     filter = Result.select().where(Result.title_id == title_id())
+                                  
     if sender == my_win.lineEdit_num_game_fin:
         fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.tours == num_game_fin))
         count = len(fltr)
@@ -5694,13 +5719,12 @@ def choice_setka_automat(fin, flag, count_exit):
                         if n != 0 or (n == 0 and l > 1):
                 # =========== определения кол-во возможны вариантов посева у каждого региона
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)                           
-                            # for l in current_region_posev.keys():
-                            #     possible_number[l] = sev
+
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                                 num_posev = list(possible_number.keys())   
                             l = list(possible_number.keys())[0]
-                            num_set = possible_number[l]
+                            num_set = possible_number[l] # номер куда можно сеять
                             # === выбор ручная или автомат ====
                             if flag is True: # автоматичекая
                                 if len(num_set) == 0:
@@ -5860,62 +5884,9 @@ def view_table_choice(fam_city, number_net, num_id_player):
     my_win.tableView_net.horizontalHeader().setStretchLastSection(True)
     my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
     my_win.tableView_net.setGridStyle(Qt.DashDotLine) # вид линии сетки 
-    # my_win.tableView.show()
+    my_win.tableView_net.show()
 
 
-
-        # #todo Оптимизация 1 Форма заполняет окно
-        # #Горизонтальная метка расширяет остальную часть окна и заполняет форму
-        # self.tableView.horizontalHeader().setStretchLastSection(True)
-        # # Горизонтальное направление, размер таблицы увеличивается до соответствующего размера
-        # self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        #
-        # Optimization 3 Удалить текущие выбранные данные
-        # indexs=self.tableView.selectionModel().selection().indexes()
-        # print(indexs)
-        # if len(indexs)>0:
-        #     index=indexs[0]
-        #     self.model.removeRows(index.row(),1)
-
-    # pass
-    # model = QStandardItemModel(3,32)
-    # model.setHorizontalHeaderLabels(['Номер', 'Фамилия', 'регион'])
-    # tableView = QTableView()
-    # tableView.setModel(model)
-    # table = Table()
-    # table.show()
-# class DialogWindow(QMainWindow):
-#     def __init__(self):
-#         super(DialogWindow, self).__init__()
-#         self.setWindowTitle("Номера посева:")
-#         self.setGeometry(300, 300, 290, 550)
-#         self.btn_manual = QPushButton('OK', self)
-#         self.btn_random = QPushButton('Рандом', self)
-#         self.btn_manual.setGeometry(150, 30, 50, 50)
-#         self.btn_random.setGeometry(210, 30, 50, 50)
-#         self.btn_manual.clicked.connect(self.click)
-#         self.show()
-# # dialog_manual = DialogWindow()
-#     def click():
-#         print("ok")
-
-# def showdialog(txt):
-#     dialog = QDialog()
-#     dialog.setGeometry(300, 300, 290, 550)
-#     dialog.setWindowTitle(f"Номера посева: {txt}")
-#                 # Создать кнопку для вновь созданного объекта диалога
-#     btn_manual = QPushButton('OK', dialog)
-#     btn_random = QPushButton('Рандом', dialog)
-#                 # Переместить кнопку, установить заголовок диалога
-#     btn_manual.setGeometry(150, 30, 50, 50)
-#     btn_random.setGeometry(210, 30, 50, 50)
-#     te = QTextEdit(dialog)
-#     te.setGeometry(30, 30, 50, 50)
-#     te.setFocus()
-#     te.setTextColor(QColor(255, 0, 0))
-#     te.setFontPointSize(20)а
-#     dialog.setModal(True)
-#     dialog.show()
 
 
 def setka_choice_number(fin, count_exit):
@@ -6096,14 +6067,14 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                        
                     number_posev = number_tmp.copy()
                     possible_number[reg] = number_posev
-            else:
+            else: # все номера в той части куда можно сеять
                 possible_number[reg] = sev
         else: # 2-й посев и последующие 
-            number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы
+            number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы без учета регионов
             number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
             reg_tmp.clear()
             # ======
-            if n == 1 or n == 2:
+            if n > 1:
                 for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
                     d = number_last.index(k)
                     reg_tmp.append(reg_last[d]) # список регионов     
@@ -6113,41 +6084,59 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                         posev_tmp = num_id_player[d]
                         if cur_reg in posev_tmp:
                             num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
-                    count = len(num_tmp)
-
-                    if count == 1 and n == 1:
+                    count = len(num_tmp) # количество областей в той части сетки, куде сеятся регион
+                # ======== отбирает номера из -number_posev- , где учитывается регион ======
+                    if count == 1 and n == 1: # есть только одна область в той же половине другой четверти (1 место и 2-е место в группе)
                         if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
-                            number_posev_new = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
+                            number_posev = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
                         elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
-                            number_posev_new = [i for i in number_posev if i < 9] # номера 1-8
+                            number_posev = [i for i in number_posev if i < 9] # номера 1-8
                         elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
-                            number_posev_new = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
+                            number_posev = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
                         elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
-                            number_posev_new = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
+                            number_posev = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
                     elif (count == 1 and n == 2):
                         if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
-                            number_posev_new = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
+                            number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
                         elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
-                            number_posev_new = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
+                            number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
                         elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
-                            number_posev_new = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
+                            number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
                         elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
-                            number_posev_new = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
+                            number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
                         elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
-                            number_posev_new = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
+                            number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
                         elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
-                            number_posev_new = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
+                            number_posev = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
                         elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
-                            number_posev_new = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
+                            number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
                         elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
-                            number_posev_new = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
-                    else:           
+                            number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
+                    elif n == 3:
+                        if count == 1 and len(number_posev) != 1:
+                            if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
+                                number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
+                            elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
+                                number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
+                            elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
+                                number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
+                            elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
+                                number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
+                            elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
+                                number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
+                            elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
+                                number_posev = [i for i in number_posev if i >= (player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
+                            elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
+                                number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
+                            elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
+                                number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
+                    else:  
                         number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev) # номер (а)куда можно сеять
                         number_posev.clear()
-                        number_posev = number_tmp.copy()
-            number_posev_new = number_posev 
-            possible_number[reg] = number_posev_new 
-            proba_possible[cur_gr] = number_posev_new
+                        number_posev = number_tmp.copy()         
+
+            possible_number[reg] = number_posev
+            proba_possible[cur_gr] = number_posev
         y += 1
     return possible_number
 
@@ -6232,7 +6221,7 @@ def alignment_in_half(player_net, num_tmp, sev, count, number_posev):
 
 
 def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net):
-    """промежуточные номера для посева в сетке"""
+    """промежуточные номера для посева в сетке после ухода от своей группы при выоде из группы больше двух"""
     if n == 0:
         if cur_reg in reg_last:
             index = reg_last.index(cur_reg)
@@ -6254,7 +6243,7 @@ def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, se
             number_last = number_last[8:] # список номеров 2-ого посева
         elif n == 3: # уводит 4-е место от 1-ого в другую четверть
             group_last = group_last[:8] 
-            number_last = number_last[:8]
+            number_last = number_last[:8] # номера 1 мест в группах
         index = group_last.index(cur_gr)
         set_number = number_last[index] # номер где посеянна группа, во 4-ом посеве от которой надо увести
 
@@ -6716,19 +6705,20 @@ def choice_filter_group():
     gamer = my_win.lineEdit_title_gamer.text()
     fg = my_win.comboBox_filter_choice.currentText()
     choice = Choice.select().where(Choice.title_id == title_id())
+    if fg == "":
+        fg = "все группы"
     if fg == "все группы":
         player_choice = Choice.select().where(Choice.title_id == title_id())
     elif my_win.radioButton_4.isChecked():
-        player_choice = choice.select().where(Choice.group == fg)
+        player_choice = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == fg))
         color_region_in_tableWidget(fg)
     else:
-        p_choice = Choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
-        player_choice = p_choice.select().where(Choice.title_id == title_id())
+        player_choice = choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
+        # player_choice = p_choice.select().where(Choice.title_id == title_id())
     count = len(player_choice)
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
     column_count = len(choice_list[0])  # кол-во столбцов в таблице
-    # column_count = 10  # кол-во столбцов в таблице
     # вставляет в таблицу необходимое кол-во строк
     my_win.tableWidget.setRowCount(row_count)
     if row_count != 0:
@@ -6738,7 +6728,6 @@ def choice_filter_group():
                 my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
                 if column == 4:
                     coach_list.append(item)
-
         # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
         color_region_in_tableWidget(fg)
@@ -9664,7 +9653,8 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 39
         column_last = 9
         row_end = 15
-        row_num_win = {5: [1, 5], 6: [9, 13], 7: [3, 11], 10: [17], 11: [21], 12: [20, 16]}
+        row_num_win = {1: [1], 2: [5], 3: [9], 4: [13], 5: [3], 6: [11], 7: [7], 8: [17], 9: [21],
+                        10: [16], 11: [20], 12: [18], 13: [25], 14: [31]}
                  # ======= list mest
         mesta_dict = {7: 7, 12: 18, 13: 25, 14: 31}
     elif table == "setka_16_full":

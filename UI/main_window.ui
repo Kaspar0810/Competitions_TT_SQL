@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1359</width>
-    <height>808</height>
+    <width>1111</width>
+    <height>804</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>260</x>
       <y>0</y>
       <width>841</width>
-      <height>71</height>
+      <height>147</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>5</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -1712,7 +1712,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>35</y>
+        <y>10</y>
         <width>810</width>
         <height>100</height>
        </rect>
@@ -1744,7 +1744,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>11</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
@@ -1767,7 +1767,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>11</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
@@ -1806,7 +1806,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>11</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
@@ -1821,7 +1821,7 @@
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>20</y>
+         <y>22</y>
          <width>51</width>
          <height>16</height>
         </rect>
@@ -1829,7 +1829,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>11</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
@@ -2233,101 +2233,6 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>520</x>
-        <y>10</y>
-        <width>271</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QGroupBox" name="groupBox_kolvo_vstrech_gr">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Матч из:</string>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <widget class="QRadioButton" name="radioButton_match_3">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>3</string>
-          </property>
-         </widget>
-         <widget class="QRadioButton" name="radioButton_match_5">
-          <property name="geometry">
-           <rect>
-            <x>50</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>5</string>
-          </property>
-         </widget>
-         <widget class="QRadioButton" name="radioButton_match_7">
-          <property name="geometry">
-           <rect>
-            <x>90</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>7</string>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_4">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Счет в партиях</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -2337,7 +2242,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>35</y>
+        <y>10</y>
         <width>810</width>
         <height>100</height>
        </rect>
@@ -2369,7 +2274,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>11</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
@@ -2392,7 +2297,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>11</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
@@ -2431,7 +2336,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>11</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
@@ -2446,7 +2351,7 @@
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>20</y>
+         <y>22</y>
          <width>51</width>
          <height>16</height>
         </rect>
@@ -2454,7 +2359,7 @@
        <property name="font">
         <font>
          <family>Courier New</family>
-         <pointsize>11</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <italic>true</italic>
          <bold>true</bold>
@@ -2858,101 +2763,6 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="layoutWidget_3">
-      <property name="geometry">
-       <rect>
-        <x>520</x>
-        <y>10</y>
-        <width>271</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_10">
-       <item>
-        <widget class="QGroupBox" name="groupBox_kolvo_vstrech_pf">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Матч из:</string>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <widget class="QRadioButton" name="radioButton_match_9">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>3</string>
-          </property>
-         </widget>
-         <widget class="QRadioButton" name="radioButton_match_10">
-          <property name="geometry">
-           <rect>
-            <x>50</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>5</string>
-          </property>
-         </widget>
-         <widget class="QRadioButton" name="radioButton_match_11">
-          <property name="geometry">
-           <rect>
-            <x>90</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>7</string>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_14">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Счет в партиях</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -2962,7 +2772,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>35</y>
+        <y>10</y>
         <width>810</width>
         <height>100</height>
        </rect>
@@ -3048,7 +2858,7 @@
          <x>87</x>
          <y>22</y>
          <width>171</width>
-         <height>20</height>
+         <height>16</height>
         </rect>
        </property>
        <property name="font">
@@ -3068,9 +2878,9 @@
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>20</y>
+         <y>22</y>
          <width>71</width>
-         <height>20</height>
+         <height>16</height>
         </rect>
        </property>
        <property name="font">
@@ -3479,95 +3289,6 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>510</x>
-        <y>10</y>
-        <width>291</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QGroupBox" name="groupBox_kolvo_vstrech_fin">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="title">
-          <string>Матч из:</string>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <widget class="QRadioButton" name="radioButton_match_4">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>3</string>
-          </property>
-         </widget>
-         <widget class="QRadioButton" name="radioButton_match_6">
-          <property name="geometry">
-           <rect>
-            <x>50</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>5</string>
-          </property>
-         </widget>
-         <widget class="QRadioButton" name="radioButton_match_8">
-          <property name="geometry">
-           <rect>
-            <x>90</x>
-            <y>20</y>
-            <width>31</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>7</string>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_5">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>11</pointsize>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Счет в партиях</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -3640,7 +3361,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4470,9 +4191,9 @@
      <widget class="QGroupBox" name="groupBox_filter_group">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>221</width>
+        <x>4</x>
+        <y>98</y>
+        <width>231</width>
         <height>191</height>
        </rect>
       </property>
@@ -4593,6 +4314,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="Button_filter_gr">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Фильтр</string>
            </property>
@@ -4600,6 +4327,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="Button_reset_filter_gr">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Сброс</string>
            </property>
@@ -4634,9 +4367,9 @@
      <widget class="QGroupBox" name="groupBox_edit_group">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>230</y>
-        <width>221</width>
+        <x>4</x>
+        <y>300</y>
+        <width>231</width>
         <height>161</height>
        </rect>
       </property>
@@ -4738,6 +4471,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="Button_add_in_group">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Добавить</string>
            </property>
@@ -4745,6 +4484,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="Button_reset_filter_2">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Сброс</string>
            </property>
@@ -4753,6 +4498,101 @@
         </layout>
        </item>
       </layout>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_4">
+      <property name="geometry">
+       <rect>
+        <x>122</x>
+        <y>53</y>
+        <width>108</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Счет в партиях</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_kolvo_vstrech_gr">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>30</y>
+        <width>112</width>
+        <height>46</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="title">
+       <string>Матч из:</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <widget class="QRadioButton" name="radioButton_match_3">
+       <property name="geometry">
+        <rect>
+         <x>6</x>
+         <y>22</y>
+         <width>34</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_match_5">
+       <property name="geometry">
+        <rect>
+         <x>39</x>
+         <y>22</y>
+         <width>34</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>5</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_match_7">
+       <property name="geometry">
+        <rect>
+         <x>72</x>
+         <y>22</y>
+         <width>33</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_5">
@@ -4770,10 +4610,10 @@
      <widget class="QGroupBox" name="groupBox_filter_group_semifinal">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>221</width>
-        <height>251</height>
+        <x>4</x>
+        <y>98</y>
+        <width>231</width>
+        <height>249</height>
        </rect>
       </property>
       <property name="font">
@@ -4791,8 +4631,8 @@
         <rect>
          <x>6</x>
          <y>27</y>
-         <width>211</width>
-         <height>233</height>
+         <width>221</width>
+         <height>211</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -4893,7 +4733,26 @@
            <number>1</number>
           </property>
           <item>
+           <spacer name="horizontalSpacer_12">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QPushButton" name="Button_filter_sf">
+            <property name="font">
+             <font>
+              <family>Courier New</family>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>Фильтр</string>
             </property>
@@ -4901,6 +4760,12 @@
           </item>
           <item>
            <widget class="QPushButton" name="Button_reset_filter_sf">
+            <property name="font">
+             <font>
+              <family>Courier New</family>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>Сброс</string>
             </property>
@@ -4933,6 +4798,101 @@
        <string>TextLabel</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="checkBox_14">
+      <property name="geometry">
+       <rect>
+        <x>122</x>
+        <y>53</y>
+        <width>108</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Счет в партиях</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_kolvo_vstrech_pf">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>30</y>
+        <width>112</width>
+        <height>46</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="title">
+       <string>Матч из:</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <widget class="QRadioButton" name="radioButton_match_9">
+       <property name="geometry">
+        <rect>
+         <x>6</x>
+         <y>22</y>
+         <width>34</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_match_10">
+       <property name="geometry">
+        <rect>
+         <x>39</x>
+         <y>22</y>
+         <width>34</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>5</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_match_11">
+       <property name="geometry">
+        <rect>
+         <x>72</x>
+         <y>22</y>
+         <width>33</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </widget>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_4">
      <property name="geometry">
@@ -4949,8 +4909,8 @@
      <widget class="QGroupBox" name="groupBox_filter_group_2">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>40</y>
+        <x>4</x>
+        <y>98</y>
         <width>231</width>
         <height>251</height>
        </rect>
@@ -5202,6 +5162,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="Button_filter_fin">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Фильтр</string>
            </property>
@@ -5209,6 +5175,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="Button_reset_filter_fin">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Сброс</string>
            </property>
@@ -5222,7 +5194,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
+        <y>0</y>
         <width>211</width>
         <height>20</height>
        </rect>
@@ -5239,6 +5211,95 @@
       <property name="text">
        <string>TextLabel</string>
       </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_5">
+      <property name="geometry">
+       <rect>
+        <x>122</x>
+        <y>53</y>
+        <width>108</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Счет в партиях</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_kolvo_vstrech_fin">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>30</y>
+        <width>112</width>
+        <height>46</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="title">
+       <string>Матч из:</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <widget class="QRadioButton" name="radioButton_match_4">
+       <property name="geometry">
+        <rect>
+         <x>6</x>
+         <y>22</y>
+         <width>34</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_match_6">
+       <property name="geometry">
+        <rect>
+         <x>39</x>
+         <y>22</y>
+         <width>31</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>5</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_match_8">
+       <property name="geometry">
+        <rect>
+         <x>72</x>
+         <y>22</y>
+         <width>31</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_8">
@@ -5810,28 +5871,60 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
+     <widget class="QPushButton" name="Button_proba">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>270</y>
+        <width>113</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Проверка</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Button_system_made">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>270</y>
+        <width>95</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Создать</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_3">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>310</y>
+        <width>19</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
-   </widget>
-   <widget class="QPushButton" name="Button_proba">
-    <property name="geometry">
-     <rect>
-      <x>1110</x>
-      <y>733</y>
-      <width>113</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Проверка</string>
-    </property>
    </widget>
    <widget class="QTableView" name="tableView_net">
     <property name="geometry">
      <rect>
       <x>1110</x>
-      <y>10</y>
-      <width>241</width>
-      <height>720</height>
+      <y>9</y>
+      <width>271</width>
+      <height>749</height>
      </rect>
     </property>
     <property name="font">
@@ -5973,9 +6066,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>75</y>
+      <y>149</y>
       <width>841</width>
-      <height>684</height>
+      <height>611</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -6037,38 +6130,6 @@
      <bool>true</bool>
     </attribute>
    </widget>
-   <widget class="QCheckBox" name="checkBox_3">
-    <property name="geometry">
-     <rect>
-      <x>1320</x>
-      <y>737</y>
-      <width>19</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Button_system_made">
-    <property name="geometry">
-     <rect>
-      <x>1220</x>
-      <y>733</y>
-      <width>95</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="text">
-     <string>Создать</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="font">
@@ -6085,7 +6146,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1359</width>
+     <width>1111</width>
      <height>21</height>
     </rect>
    </property>
