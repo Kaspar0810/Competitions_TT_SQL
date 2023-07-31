@@ -2242,8 +2242,8 @@ def page():
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 505))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         db_select_title()
-        # load_tableWidget()
-        # my_win.tableWidget.show()
+        load_tableWidget()
+        my_win.tableWidget.show()
     elif tb == 1:  # -список участников-
         my_win.resize(1110, 810)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 530))
@@ -2309,7 +2309,6 @@ def page():
         my_win.label_85.hide()
         my_win.label_86.hide()
 
-        # my_win.comboBox_etap.hide()
         my_win.comboBox_table_1.hide()
         my_win.comboBox_table_2.hide()
         my_win.comboBox_table_3.hide()
@@ -6702,7 +6701,7 @@ def choice_tbl_made():
 def choice_filter_group():
     """фильтрует таблицу жеребьевка по группам"""
     coach_list = []
-    gamer = my_win.lineEdit_title_gamer.text()
+    # gamer = my_win.lineEdit_title_gamer.text()
     fg = my_win.comboBox_filter_choice.currentText()
     choice = Choice.select().where(Choice.title_id == title_id())
     if fg == "":
@@ -6809,9 +6808,27 @@ def color_region_in_tableWidget(fg):
 
 def hide_show_columns(tb):
     """скрывает или показывает столбцы TableWidget"""
-    if tb == 1 or tb == 2:
+    if tb == 0: # титул
+        my_win.tableWidget.hideColumn(1)
+        my_win.tableWidget.showColumn(2)
+        my_win.tableWidget.hideColumn(9)
+        my_win.tableWidget.hideColumn(10)
+        my_win.tableWidget.hideColumn(11)
+        my_win.tableWidget.hideColumn(12)
+        my_win.tableWidget.hideColumn(13)
+        my_win.tableWidget.hideColumn(14)
+        my_win.tableWidget.hideColumn(15)
+        my_win.tableWidget.hideColumn(16)
+    elif tb == 1: # участники
         my_win.tableWidget.showColumn(0) # нумерация
         my_win.tableWidget.hideColumn(1) # id
+        my_win.tableWidget.showColumn(2) # фамилия имя
+        my_win.tableWidget.showColumn(3) # др
+        my_win.tableWidget.showColumn(4) # рейтинг
+        my_win.tableWidget.showColumn(5) # город
+        my_win.tableWidget.showColumn(6) # регион
+        my_win.tableWidget.showColumn(7) # разряд
+        my_win.tableWidget.showColumn(8) # тренеры
         my_win.tableWidget.showColumn(9) # место
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
@@ -6819,7 +6836,27 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.hideColumn(14)
         my_win.tableWidget.hideColumn(15)
-        # my_win.tableWidget.hideColumn(16)
+        my_win.tableWidget.hideColumn(16)
+        my_win.tableWidget.showColumn(17) # заявка
+    elif tb == 2: # система
+        my_win.tableWidget.showColumn(0) # нумерация
+        my_win.tableWidget.hideColumn(1) # id
+        my_win.tableWidget.showColumn(2) # фамилия имя
+        my_win.tableWidget.showColumn(3) # рейтинг
+        my_win.tableWidget.hideColumn(4) # др
+        my_win.tableWidget.showColumn(5) # город
+        my_win.tableWidget.showColumn(6) # регион
+        my_win.tableWidget.showColumn(7) # разряд
+        my_win.tableWidget.showColumn(8) # тренеры
+        my_win.tableWidget.showColumn(9) # место
+        my_win.tableWidget.hideColumn(10)
+        my_win.tableWidget.hideColumn(11)
+        my_win.tableWidget.hideColumn(12)
+        my_win.tableWidget.hideColumn(13)
+        my_win.tableWidget.hideColumn(14)
+        my_win.tableWidget.hideColumn(15)
+        my_win.tableWidget.hideColumn(16)
+        my_win.tableWidget.showColumn(17) # заявка
     elif tb == 0:
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
