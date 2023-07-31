@@ -2127,13 +2127,13 @@ def load_combobox_filter_group():
     my_win.comboBox_filter_group.clear()
     my_win.comboBox_filter_choice.clear()
 
-    system = System.select().order_by(System.id).where(System.title_id == title_id())  # находит system id последнего
+    system = System.select().where(System.title_id == title_id())  # находит system id последнего
     for i in system:
         e = i.stage
         etap.append(e)  # получает список этапов на данных соревнованиях
     if etap[0] != "":
         fir_e = "Предварительный"
-        flag = e in etap
+        flag = e in etap # проверка есть ли в списке этап
         if flag == True:
             sf = system.select().where(System.stage == fir_e).get()
             kg = int(sf.total_group)  # количество групп
