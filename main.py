@@ -6842,21 +6842,22 @@ def hide_show_columns(tb):
         my_win.tableWidget.showColumn(0) # нумерация
         my_win.tableWidget.hideColumn(1) # id
         my_win.tableWidget.showColumn(2) # фамилия имя
-        my_win.tableWidget.showColumn(3) # рейтинг
-        my_win.tableWidget.hideColumn(4) # др
-        my_win.tableWidget.showColumn(5) # город
-        my_win.tableWidget.showColumn(6) # регион
-        my_win.tableWidget.showColumn(7) # разряд
-        my_win.tableWidget.showColumn(8) # тренеры
-        my_win.tableWidget.showColumn(9) # место
+        my_win.tableWidget.showColumn(3) # регион
+        my_win.tableWidget.hideColumn(4) # тренеры
+        my_win.tableWidget.hideColumn(5) # рейтинг
+        my_win.tableWidget.showColumn(7) # предварительный
+        my_win.tableWidget.hideColumn(6) # разряд
+        my_win.tableWidget.hideColumn(8) # тренеры
+        my_win.tableWidget.showColumn(9) # место в группе
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
         my_win.tableWidget.hideColumn(12)
-        my_win.tableWidget.hideColumn(13)
-        my_win.tableWidget.hideColumn(14)
-        my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16)
-        my_win.tableWidget.showColumn(17) # заявка
+        my_win.tableWidget.hideColumn(13) 
+        my_win.tableWidget.showColumn(14) # финал
+        my_win.tableWidget.hideColumn(15) # 
+        my_win.tableWidget.showColumn(16) # место финала
+        my_win.tableWidget.hideColumn(17) # заявка
+        my_win.tableWidget.hideColumn(18) # заявка
     elif tb == 0:
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
@@ -6872,6 +6873,7 @@ def hide_show_columns(tb):
         my_win.tableWidget.hideColumn(0)
         my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
+        my_win.tableWidget.showColumn(3) # регион
         my_win.tableWidget.showColumn(9)
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
@@ -9673,6 +9675,7 @@ def write_in_setka(data, fin, first_mesto, table):
     "row_num_win - словарь, ключ - номер игры, значение - список(номер строки 1-ого игрока, номер строки 2-ого игрока) и записвает итоговые места в db"
     sender = my_win.sender()
     player = Player.select().where(Player.title_id == title_id())
+    choice = Choice.select().where(Choice.title_id == title_id())
     row_num_los = {}
     row_end = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
     flag_clear = False
@@ -9847,9 +9850,12 @@ def write_in_setka(data, fin, first_mesto, table):
                 mesto = first_mesto + (index * 2)
                 # записывает места в таблицу -Player-
                 player = Player.get(Player.id == id_win)
+                choice_pl = Choice.get(Choice.player_choice_id == id_win)
                 win = f"{player.player}/{player.city}"
                 player.mesto = mesto
+                choice_pl.mesto_final = mesto
                 player.save()
+                choice_pl.save()
                 if id_los != "":
                     player = Player.get(Player.id == id_los)
                     los = f"{player.player}/{player.city}"
