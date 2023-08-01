@@ -1293,8 +1293,8 @@ def load_tableWidget():
     elif tb == 2 or sender == my_win.choice_gr_Action or sender == my_win.choice_fin_Action:
         z = 19
         column_label = ["№", "Id", "Фамилия Имя", "Регион", "Тренер(ы)", "Рейтинг", "Основной", "Предварительный",
-                        "Посев",
-                        "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал", "Посев в финале", "Место", "Суперфинал", "Заявка"]
+                        "Посев", "Место в группе", "ПФ", "Посев в ПФ", "Место", "Финал посев", "Финал", "проба", 
+                        "Место", "Заявка"]
     elif my_win.checkBox_6.isChecked(): # если отмечен чекбокс -удаленные-
         z = 17
         column_label = ["№", "Id", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд",
@@ -1307,7 +1307,7 @@ def load_tableWidget():
     my_win.tableWidget.setColumnCount(z) # устанавливает колво столбцов
     my_win.tableWidget.setRowCount(1)
     my_win.tableWidget.verticalHeader().hide()
-    # my_win.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    my_win.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
     for i in range(0, z):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
         item = QtWidgets.QTableWidgetItem()
@@ -2600,6 +2600,23 @@ def find_player():
     else:
         pass
 
+
+def find_player_on_tab_system():
+    """выделяет строку в tablewidget при поиске фамилии на вкладке -система_"""
+    choice = Choice.select().where(Choice.title_id == title_id())
+    txt = my_win.lineEdit_find_player_in_system.text()
+    txt = txt.upper()
+    player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
+    count = len(player_list)
+    if count == 1:
+        # player_selected = player_list.dicts().execute()
+        # row_count = len(player_selected)  # кол-во строк в таблице
+        # number_column = 1
+        # my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
+        # my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+    print(count)
+    # fill_table(player_list)       
 
 def sort():
     """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
@@ -6845,9 +6862,9 @@ def hide_show_columns(tb):
         my_win.tableWidget.showColumn(3) # регион
         my_win.tableWidget.hideColumn(4) # тренеры
         my_win.tableWidget.hideColumn(5) # рейтинг
-        my_win.tableWidget.showColumn(7) # предварительный
         my_win.tableWidget.hideColumn(6) # разряд
-        my_win.tableWidget.hideColumn(8) # тренеры
+        my_win.tableWidget.showColumn(7) # предварительный
+        my_win.tableWidget.hideColumn(8) # посев
         my_win.tableWidget.showColumn(9) # место в группе
         my_win.tableWidget.hideColumn(10)
         my_win.tableWidget.hideColumn(11)
@@ -9850,12 +9867,15 @@ def write_in_setka(data, fin, first_mesto, table):
                 mesto = first_mesto + (index * 2)
                 # записывает места в таблицу -Player-
                 player = Player.get(Player.id == id_win)
-                choice_pl = Choice.get(Choice.player_choice_id == id_win)
                 win = f"{player.player}/{player.city}"
                 player.mesto = mesto
-                choice_pl.mesto_final = mesto
                 player.save()
-                choice_pl.save()
+                m = 0
+                for n in [id_win, id_los]: # записывает место в сетке в таблицу -choice-
+                    choice_pl = Choice.get(Choice.player_choice_id == n)
+                    choice_pl.mesto_final = mesto + m
+                    choice_pl.save()
+                    m += 1
                 if id_los != "":
                     player = Player.get(Player.id == id_los)
                     los = f"{player.player}/{player.city}"
@@ -11964,7 +11984,7 @@ my_win.lineEdit_Family_name.returnPressed.connect(input_player)
 my_win.lineEdit_bday.returnPressed.connect(next_field)
 my_win.lineEdit_city_list.returnPressed.connect(add_city)
 # ====== отслеживание изменения текста в полях ============
-
+my_win.lineEdit_find_player_in_system.textChanged.connect(find_player_on_tab_system)
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_player_rejting_list)
 my_win.lineEdit_coach.textChanged.connect(find_coach)

@@ -3361,7 +3361,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -3905,7 +3905,7 @@
       <property name="geometry">
        <rect>
         <x>23</x>
-        <y>370</y>
+        <y>300</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -3928,7 +3928,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>400</y>
+        <y>320</y>
         <width>216</width>
         <height>85</height>
        </rect>
@@ -4173,6 +4173,38 @@
       </property>
       <property name="text">
        <string>Создание этапа</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_49">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>420</y>
+        <width>211</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Поиск спортсмена</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_find_player_in_system">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>445</y>
+        <width>221</width>
+        <height>21</height>
+       </rect>
       </property>
      </widget>
     </widget>
