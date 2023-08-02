@@ -6829,11 +6829,9 @@ def hide_show_columns(tb):
     for k in range(0, 19):
         my_win.tableWidget.hideColumn(k)
     if tb == 0: # титул
-        # my_win.tableWidget.hideColumn(1)
-        my_win.tableWidget.showColumn(2)
+        pass
     elif tb == 1: # участники
         my_win.tableWidget.showColumn(0) # нумерация
-        # my_win.tableWidget.hideColumn(1) # id
         my_win.tableWidget.showColumn(2) # фамилия имя
         my_win.tableWidget.showColumn(3) # др
         my_win.tableWidget.showColumn(4) # рейтинг
@@ -6845,44 +6843,29 @@ def hide_show_columns(tb):
         my_win.tableWidget.showColumn(17) # заявка
     elif tb == 2: # система
         my_win.tableWidget.showColumn(0) # нумерация
-        # my_win.tableWidget.hideColumn(1) # id
         my_win.tableWidget.showColumn(2) # фамилия имя
         my_win.tableWidget.showColumn(3) # регион
         my_win.tableWidget.showColumn(7) # предварительный
         my_win.tableWidget.showColumn(9) # место в группе
         my_win.tableWidget.showColumn(14) # финал
         my_win.tableWidget.showColumn(16) # место финала
-    elif tb == 3:
-        # my_win.tableWidget.hideColumn(0)
-        # my_win.tableWidget.hideColumn(1)
+    elif tb == 3 or tb == 4 or tb == 5:
         my_win.tableWidget.showColumn(2)
         my_win.tableWidget.showColumn(3) # регион
         my_win.tableWidget.showColumn(4) # игрок 1
         my_win.tableWidget.showColumn(5) # игрок 2
         my_win.tableWidget.showColumn(6) # плбедитель
-        my_win.tableWidget.showColumn(9)
-    elif tb == 4:
-        # my_win.tableWidget.hideColumn(0)
-        # my_win.tableWidget.hideColumn(1)
-        my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.showColumn(3) # регион
-        my_win.tableWidget.showColumn(4) # игрок 1
-        my_win.tableWidget.showColumn(5) # игрок 2
-        my_win.tableWidget.showColumn(6) # плбедитель
-        my_win.tableWidget.showColumn(9)
-    elif tb == 5:
-        # my_win.tableWidget.hideColumn(0)
-        # my_win.tableWidget.hideColumn(1)
-        my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.showColumn(3) # регион
-        my_win.tableWidget.showColumn(4) # игрок 1
-        my_win.tableWidget.showColumn(5) # игрок 2
-        my_win.tableWidget.showColumn(6) # плбедитель
+        my_win.tableWidget.showColumn(8) # общий счет
         my_win.tableWidget.showColumn(9)
     elif tb == 6:
         my_win.tableWidget.showColumn(0)
         my_win.tableWidget.showColumn(1)
         my_win.tableWidget.showColumn(2)
+        my_win.tableWidget.showColumn(3)
+        my_win.tableWidget.showColumn(4)
+        my_win.tableWidget.showColumn(5)
+        my_win.tableWidget.showColumn(6)
+
 
 
 def etap_made():
@@ -9093,7 +9076,7 @@ def setka_32_made(fin):
         first_mesto = 1
     strok = 69
     for i in range(0, strok):
-        column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[12] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
@@ -9155,8 +9138,8 @@ def setka_32_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, strok), 'CENTER')
         style.append(fn)
-    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    style.append(fn)
+    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    # style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)
@@ -9698,28 +9681,31 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 69
         column_last = 11
         row_end = 31
-        row_num_win = {9: [1, 5], 10: [9, 13], 11: [17, 21], 12: [25, 29], 13: [3, 11], 14: [19, 27], 25: [41, 45], 26: [49, 53], 
-                    15: [7, 23], 19: [32, 36], 27: [43, 51], 31: [58, 62]}
+        row_num_win = {1: [1], 2: [5], 3: [9], 4: [13], 5: [17], 6: [21], 7: [25], 8: [29], 9: [3], 10: [11], 11: [19], 12: [27], 13: [7], 14: [23], 
+                       15: [15], 16: [29], 17: [32], 18: [36], 19: [34], 20: [39], 21: [41], 22: [45], 23: [49], 24: [53], 25: [43], 26: [51], 27: [47],
+                       28: [55], 29: [58], 30: [62], 31: [60], 32: [65]}
                  # ======= list mest
         mesta_dict = {15: 15, 16: 29, 19: 34, 20: 39, 27: 47, 28: 55, 31: 60, 32: 65}
     elif table == "setka_16_2": # встречи, где играют победители и проигравший из основного тура  например 22: [54, 54] в списке одинаковые строки
         row_last = 85
         column_last = 11
         row_end = 33
-        row_num_win = {9: [3, 7], 10: [11, 15], 11: [19, 23], 12: [27, 31], 13: [5, 13], 14: [21, 29], 16: [46], 17: [50], 18: [54], 19: [58],
-                    20: [46], 21: [50], 22: [54], 23: [58], 24: [45, 49], 25: [53, 57], 26: [47, 55], 27: [47, 55], 28: [45, 53], 33: [62, 66],
-                    37: [74, 78], 15: [9, 25]} 
+        row_num_win = {1: [3], 2: [7], 3: [11], 4: [15], 5: [19], 6: [23], 7: [27], 8: [31], 9: [5], 10: [13], 11: [21], 12: [29], 13: [9], 14: [25], 15: [17], 
+                       16: [46], 17: [50], 18: [54], 19: [58], 20: [46], 21: [50], 22: [54], 23: [58], 24: [47], 25: [55], 26: [45], 27: [53], 28: [49], 29: [61],
+                        30: [67],  31: [62], 32: [66], 33: [64], 34: [73], 35: [74], 36: [78], 37: [76], 38: [79]} 
                  # ======= list mest
         mesta_dict = {15: 17, 28: 49, 29: 61, 33: 64, 30: 67, 34: 73, 37: 76, 38: 79} # номер встречи - номер строки
     elif table == "setka_32":
         row_last = 69
         column_last = 11
         row_end = 65
-        row_num_win = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
-        24: [59, 63], 25: [5, 13], 26: [21, 29], 27: [37, 45], 28: [53, 61], 29: [9, 25], 30:[41, 57], 31: [17, 49], 
-        35: [72, 76], 41: [89, 93], 42: [97, 101], 43: [91, 99], 47: [114, 118],  57: [140, 144], 58: [148, 152], 
-        59: [156, 160], 60: [164, 168], 61: [142, 150], 62: [158, 166], 63: [146, 162], 67: [172, 176], 73: [179, 183],
-        74: [187, 191], 75: [181, 189], 79: [197, 201]}
+        row_num_win = {1: [3], 2: [7], 3: [11], 4: [15], 5: [19], 6: [23], 7: [27], 8: [31], 9: [35], 10: [39], 11: [43], 12: [47],
+        13: [51], 14: [55], 15: [59], 16: [63], 17: [5], 18: [13], 19: [21], 20: [29], 21: [37], 22: [45], 23: [53], 24: [61],
+        25: [9], 26: [25], 27: [41], 28: [57], 29: [17], 30:[49], 31: [33], 32: [61], 33: [72], 34: [76], 35: [74], 36: [84], 37: [89],
+        38: [93], 39: [97], 40: [101], 41: [91], 42: [99], 43: [95], 44: [106], 45: [114], 46: [118], 47: [116], 48: [126],  49: [140],
+        50: [144], 51: [148], 52: [152], 53: [156], 54: [158], 55: [162], 56: [166], 57: [142], 58: [150], 59: [158], 60: [166], 61: [146],
+        62: [162], 63: [154], 64: [168], 65: [172], 66: [176], 67: [174], 68: [182], 69: [179], 70: [183], 71: [187], 72: [191], 73: [181],
+        74: [189], 75: [185], 76: [194], 77: [197], 78: [201], 79: [199]}
         mesta_dict= {31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
                         64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80}
     elif table == "setka_32_2":
@@ -11417,6 +11403,8 @@ def color_mesta(data, first_mesto, table):
                 ml = [8, 7, 14, 6]
             elif table == "setka_32_full":
                 ml = [11, 31, 54, 22] 
+            elif table == "setka_32":
+                ml = [11, 31, 54, 22]
         elif c == 1: # 3-4 место
             if table == "setka_32_2":
                 ml = [13, 80, 97, 16]  
@@ -11428,8 +11416,10 @@ def color_mesta(data, first_mesto, table):
                 ml = [8, 16, 19, 2]
             elif table == "setka_8_2": 
                 ml = [8, 18, 23, 4]
-            else:                
+            elif table == "setka_32_full":               
                 ml = [11, 59, 65, 5] 
+            elif table == "setka_32":               
+                ml = [11, 59, 65, 5]    
         elif c == 2: # 5-6 место
             if table == "setka_32_2":
                 ml = [13, 101, 106, 4]  
