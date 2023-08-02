@@ -2609,6 +2609,7 @@ def find_player_on_tab_system():
     player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
     count = len(player_list)
     if count == 1:
+        pass
         # player_selected = player_list.dicts().execute()
         # row_count = len(player_selected)  # кол-во строк в таблице
         # number_column = 1
@@ -6825,20 +6826,14 @@ def color_region_in_tableWidget(fg):
 
 def hide_show_columns(tb):
     """скрывает или показывает столбцы TableWidget"""
+    for k in range(0, 19):
+        my_win.tableWidget.hideColumn(k)
     if tb == 0: # титул
-        my_win.tableWidget.hideColumn(1)
+        # my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.hideColumn(9)
-        my_win.tableWidget.hideColumn(10)
-        my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)
-        my_win.tableWidget.hideColumn(13)
-        my_win.tableWidget.hideColumn(14)
-        my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16)
     elif tb == 1: # участники
         my_win.tableWidget.showColumn(0) # нумерация
-        my_win.tableWidget.hideColumn(1) # id
+        # my_win.tableWidget.hideColumn(1) # id
         my_win.tableWidget.showColumn(2) # фамилия имя
         my_win.tableWidget.showColumn(3) # др
         my_win.tableWidget.showColumn(4) # рейтинг
@@ -6847,63 +6842,47 @@ def hide_show_columns(tb):
         my_win.tableWidget.showColumn(7) # разряд
         my_win.tableWidget.showColumn(8) # тренеры
         my_win.tableWidget.showColumn(9) # место
-        my_win.tableWidget.hideColumn(10)
-        my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)
-        my_win.tableWidget.hideColumn(13)
-        my_win.tableWidget.hideColumn(14)
-        my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16)
         my_win.tableWidget.showColumn(17) # заявка
     elif tb == 2: # система
         my_win.tableWidget.showColumn(0) # нумерация
-        my_win.tableWidget.hideColumn(1) # id
+        # my_win.tableWidget.hideColumn(1) # id
         my_win.tableWidget.showColumn(2) # фамилия имя
         my_win.tableWidget.showColumn(3) # регион
-        my_win.tableWidget.hideColumn(4) # тренеры
-        my_win.tableWidget.hideColumn(5) # рейтинг
-        my_win.tableWidget.hideColumn(6) # разряд
         my_win.tableWidget.showColumn(7) # предварительный
-        my_win.tableWidget.hideColumn(8) # посев
         my_win.tableWidget.showColumn(9) # место в группе
-        my_win.tableWidget.hideColumn(10)
-        my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)
-        my_win.tableWidget.hideColumn(13) 
         my_win.tableWidget.showColumn(14) # финал
-        my_win.tableWidget.hideColumn(15) # 
         my_win.tableWidget.showColumn(16) # место финала
-        my_win.tableWidget.hideColumn(17) # заявка
-        my_win.tableWidget.hideColumn(18) # заявка
-    elif tb == 0:
-        my_win.tableWidget.hideColumn(1)
-        my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.hideColumn(9)
-        my_win.tableWidget.hideColumn(10)
-        my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)
-        my_win.tableWidget.hideColumn(13)
-        my_win.tableWidget.hideColumn(14)
-        my_win.tableWidget.hideColumn(15)
-        my_win.tableWidget.hideColumn(16)
     elif tb == 3:
-        my_win.tableWidget.hideColumn(0)
-        my_win.tableWidget.hideColumn(1)
+        # my_win.tableWidget.hideColumn(0)
+        # my_win.tableWidget.hideColumn(1)
         my_win.tableWidget.showColumn(2)
         my_win.tableWidget.showColumn(3) # регион
+        my_win.tableWidget.showColumn(4) # игрок 1
+        my_win.tableWidget.showColumn(5) # игрок 2
+        my_win.tableWidget.showColumn(6) # плбедитель
         my_win.tableWidget.showColumn(9)
-        my_win.tableWidget.hideColumn(10)
-        my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12) 
+    elif tb == 4:
+        # my_win.tableWidget.hideColumn(0)
+        # my_win.tableWidget.hideColumn(1)
+        my_win.tableWidget.showColumn(2)
+        my_win.tableWidget.showColumn(3) # регион
+        my_win.tableWidget.showColumn(4) # игрок 1
+        my_win.tableWidget.showColumn(5) # игрок 2
+        my_win.tableWidget.showColumn(6) # плбедитель
+        my_win.tableWidget.showColumn(9)
+    elif tb == 5:
+        # my_win.tableWidget.hideColumn(0)
+        # my_win.tableWidget.hideColumn(1)
+        my_win.tableWidget.showColumn(2)
+        my_win.tableWidget.showColumn(3) # регион
+        my_win.tableWidget.showColumn(4) # игрок 1
+        my_win.tableWidget.showColumn(5) # игрок 2
+        my_win.tableWidget.showColumn(6) # плбедитель
+        my_win.tableWidget.showColumn(9)
     elif tb == 6:
         my_win.tableWidget.showColumn(0)
         my_win.tableWidget.showColumn(1)
         my_win.tableWidget.showColumn(2)
-        my_win.tableWidget.hideColumn(8)
-        my_win.tableWidget.hideColumn(9)
-        my_win.tableWidget.hideColumn(10)
-        my_win.tableWidget.hideColumn(11)
-        my_win.tableWidget.hideColumn(12)       
 
 
 def etap_made():
@@ -8542,7 +8521,7 @@ def setka_8_full_made(fin):
     else:
         first_mesto = 1  # временный финал для чистой сетки
     for i in range(0, 40):
-        # column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -8604,8 +8583,8 @@ def setka_8_full_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i + 1, 0), (i + 1, 39), 'CENTER')
         style.append(fn)
-    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    # style.append(fn)
+    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    style.append(fn)
 
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
@@ -9701,7 +9680,8 @@ def write_in_setka(data, fin, first_mesto, table):
         row_last = 33
         column_last = 8
         row_end = 15
-        row_num_win = {5: [1, 5], 6: [9, 13], 7: [3, 11], 11: [20, 24]}
+        row_num_win = {1: [1], 2: [5], 3: [9], 4: [13], 5: [3], 6: [11], 7: [7], 8: [16], 9: [20], 10: [24],
+                        11: [22], 12: [28]}
                  # ======= list mest
         mesta_dict = {7: 7, 8: 16, 11: 22, 12: 28}
     elif table == "setka_8_2":
