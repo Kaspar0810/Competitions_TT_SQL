@@ -27,6 +27,7 @@ from collections import Counter
 from itertools import *
 import os
 import openpyxl as op
+from openpyxl import Workbook
 import pandas as pd
 import sys
 import sqlite3
@@ -627,6 +628,7 @@ class StartWindow(QMainWindow, Ui_Form):
         super(StartWindow, self).__init__()
         self.setupUi(self)  # загружает настройки формы(окна) из QT
         self.setWindowTitle('Добро пожаловать в COMPETITIONS_TT')
+        self.setWindowIcon(QIcon("CTT.png"))
         self.Button_open.clicked.connect(self.open)
         self.Button_new.clicked.connect(self.new)
         self.Button_old.clicked.connect(self.load_old)
@@ -751,6 +753,8 @@ class StartWindow(QMainWindow, Ui_Form):
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
 
+class ToolTip(): # создание всплывающих подсказок
+    my_win.Button_made_R_file.setToolTip("Создание файла Excel для обсчета рейтинга")
 
 # class ProgressBarThread(QThread):
 #     def __init__(self, fir_window, parent=None):
@@ -2486,10 +2490,9 @@ def page():
         my_win.lineEdit_range_tours.hide()
         load_combo_etap_begunki()
     elif tb == 7: # вкладка -дополнительно-
-        my_win.resize(1270, 810)
+        my_win.resize(1110, 810)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 505))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
-
     hide_show_columns(tb)
 
 
@@ -4979,7 +4982,6 @@ def result_filter_name():
     result_list = c.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = len(result_list[0])  # кол-во столбцов в таблице
-    # column_count = 13  # кол-во столбцов в таблице
     # вставляет в таблицу необходимое кол-во строк
     my_win.tableWidget.setRowCount(row_count)
 
@@ -5127,7 +5129,11 @@ def filter_fin(pl=False):
                     break
 
     result_list = fltr.dicts().execute()
-
+    if count == 0: # если в финал по сетке ввели номер тура
+        my_win.lineEdit_tour.clear()
+        my_win.statusbar.showMessage("Финалы по сетке", 5000)
+        return 
+    
     my_win.label_38.show()
     row_count = len(fltr)  # кол-во строк в таблице
     column_count = len(result_list[0])  # кол-во столбцов в таблице
@@ -5204,13 +5210,6 @@ def filter_sf():
             item = str(list(result_list[row].values())[column])
             my_win.tableWidget.setItem(
                 row, column, QTableWidgetItem(str(item)))
-
-# def searchComboBox(self):
-#         text = my_win.comboBox_filter_group.currentText()
-#         index = my_win.comboBox_filter_group.findText(text)
-#         if index != -1:
-#             my_win.comboBox_filter_group.setCurrentIndex(index)
-#             my_win.comboBox_filter_group.lineEdit().setSelection(len(text), len(my_win.comboBox_filter_group.currentText()))
 
 
 def filter_gr():
@@ -11832,6 +11831,31 @@ def load_playing_game_in_table_for_final(fin):
     table_made(pv, stage)
 
 
+def made_file_excel_for_rejting():
+    """создание файла Excel для обсчета рейтинга"""
+    # import openpyxl # from openpyxl import workbook
+    result = Result.select().where(Result.title_id == title_id())
+    player_result = result.select().where(Result.loser != 0).order_by(Result.winner)
+    count = len(player_result)
+    book = op.Workbook()
+    # workbook = op.load_workbook("sales.xlsx")
+    worksheet = book.active
+    for l in player_result:
+        pl_win = l.winner
+        pl_los = l.loser
+        score = l.score_in_game
+
+        for k in range(1, count):
+            c1 = worksheet.cell(row = k, column = 0)
+            c1.value = pl_win
+            c2 = worksheet.cell(row = k, column = 1)
+            c2.value = pl_los
+            c3 = worksheet.cell(row = k, column = 2)
+            c3.value = score
+
+    book.save('test.xlsx')
+    print(count)
+
 
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
@@ -12070,5 +12094,6 @@ my_win.Button_reset_fltr_list.clicked.connect(filter_player_list)
 my_win.Button_reset_fltr_in_R.clicked.connect(clear_filter_rejting_list)
 my_win.Button_sort_alf_R.clicked.connect(filter_rejting_list)
 my_win.Button_sort_rejting_in_R.clicked.connect(filter_rejting_list)
+my_win.Button_made_R_file.clicked.connect(made_file_excel_for_rejting)
 
 sys.exit(app.exec())

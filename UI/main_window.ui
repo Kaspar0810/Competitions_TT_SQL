@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>7</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3321,6 +3321,37 @@
      <attribute name="title">
       <string>Дополнительно</string>
      </attribute>
+     <widget class="QPushButton" name="Button_made_R_file">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>10</y>
+        <width>131</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+       </font>
+      </property>
+      <property name="text">
+       <string>Создание файла
+ для рейтинга</string>
+      </property>
+      <property name="shortcut">
+       <string/>
+      </property>
+      <property name="autoRepeat">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QToolBox" name="toolBox">
@@ -3368,8 +3399,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3381,8 +3412,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4213,8 +4244,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4632,8 +4663,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4931,8 +4962,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5339,8 +5370,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5722,8 +5753,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>475</height>
       </rect>
      </property>
      <attribute name="label">
