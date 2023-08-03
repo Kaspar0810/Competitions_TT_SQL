@@ -924,8 +924,6 @@ def load_listR_in_db(fname, table_db):
                 # заменяет пустые строки рейтинга на ноль и преобразовывает в тип int
                 data_pandas['Рейтинг'] = data_pandas['Рейтинг'].fillna (0)
                 data_pandas['Рейтинг'] = data_pandas['Рейтинг'].astype(int)
-            #     if isinstance(player_data, datetime) == True: # преобразовывает к нормальному виду даты
-            #         player_data = player_data.strftime("%d.%m.%Y")
                 data_tmp.append(player_data)  # получает временный список строки
             data.append(data_tmp.copy())  # добавляет в список Data
             data_tmp.clear()  # очищает временный список
@@ -1285,9 +1283,9 @@ def load_tableWidget():
     sender = my_win.menuWidget().sender()
     # нажат пункт меню -текущий рейтинг- или -рейтинг январский
     if sender == my_win.rAction or sender == my_win.r1Action or tb == 6:
-        z = 10
+        z = 9
         column_label = ["№", "Место", "Рейтинг",
-                        "Фамилия Имя", "Дата рождения", "Город", "Регион", "Округ", "Заявка"]
+                        "Фамилия Имя", "Дата рождения", "Город", "Регион", "Округ"]
     elif tb == 3 or tb == 4 or tb == 5:
         z = 16
         column_label = ["№", "Этапы", "Группа/ финал", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Очки",
@@ -2476,7 +2474,7 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 6: # вкладка -рейтинг-
-        my_win.resize(1270, 810)
+        my_win.resize(1110, 810)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 75, 841, 684))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
         # my_win.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -4010,20 +4008,20 @@ def filter_rejting_list():
         rejting_date = r_data.r1_bithday  
     if sender == my_win.Button_sort_rejting_in_R: 
         if date_txt != "":
-            player_list = r_data.select().order_by(rejting_list.desc()).where(rejting_date > after_date)       
+            player_list = r_data.select().where(rejting_date > after_date).order_by(rejting_list.desc())       
         elif region_txt == "" and city_txt == "":
-            player_list = r_data.select().order_by(rejting_list.desc())
+            player_list = r_data.select().where(rejting_list).order_by(rejting_list.desc())
         elif region_txt != "" and city_txt == "":
-            player_list = r_data.select().where((rejting_region == region_txt) & (rejting_list.desc()))
+            player_list = r_data.select().where(rejting_region == region_txt).order_by(rejting_list.desc())
         elif region_txt == "" and city_txt != "":
-            player_list = r_data.select().order_by(rejting_list.desc()).where(rejting_city == city_txt)
+            player_list = r_data.select().where(rejting_city == city_txt).order_by(rejting_list.desc())
     elif sender == my_win.Button_sort_alf_R: 
         if region_txt == "" and city_txt == "":
-            player_list = r_data.select().order_by(rejting_name)
+            player_list = r_data.select().where(rejting_name).order_by(rejting_name)
         elif region_txt != "" and city_txt == "":
-            player_list = r_data.select().where((rejting_region == region_txt) & (rejting_name))
+            player_list = r_data.select().where(rejting_region == region_txt).order_by(rejting_name)
         elif region_txt == "" and city_txt != "":
-            player_list = r_data.select().where((rejting_city == city_txt) & (rejting_name))
+            player_list = r_data.select().where(rejting_city == city_txt).order_by(rejting_name)
     elif date_txt != "":
         player_list = r_data.select().where(rejting_date > after_date)
     else:
@@ -6864,7 +6862,6 @@ def hide_show_columns(tb):
         my_win.tableWidget.showColumn(4)
         my_win.tableWidget.showColumn(5)
         my_win.tableWidget.showColumn(6)
-
 
 
 def etap_made():
