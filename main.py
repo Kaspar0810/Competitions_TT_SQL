@@ -7815,8 +7815,8 @@ def max_exit_player_out_in_group(exit_stage):
 def no_play():
     """победа по неявке соперника"""
     sender = my_win.sender()
-    if sender == my_win.checkBox_7 or sender == my_win.checkBox_9:
-        none_player = 1
+    if sender == my_win.checkBox_7 or sender == my_win.checkBox_9 or sender == my_win.checkBox_12:
+        none_player = 1 # не явился на встречу 1-й игрок
     else:
         none_player = 2
     enter_score(none_player)
@@ -11830,27 +11830,27 @@ def load_playing_game_in_table_for_final(fin):
 
 def made_file_excel_for_rejting():
     """создание файла Excel для обсчета рейтинга"""
-    # import openpyxl # from openpyxl import workbook
     result = Result.select().where(Result.title_id == title_id())
-    player_result = result.select().where(Result.loser != 0).order_by(Result.winner)
+    player_result = result.select().where(Result.points_loser != 0).order_by(Result.winner)
     count = len(player_result)
     book = op.Workbook()
-    # workbook = op.load_workbook("sales.xlsx")
     worksheet = book.active
+    worksheet.append(("Победитель", "Проигравший", "Счет"))
+    k = 1
     for l in player_result:
         pl_win = l.winner
         pl_los = l.loser
         score = l.score_in_game
-
-        for k in range(1, count):
-            c1 = worksheet.cell(row = k, column = 0)
-            c1.value = pl_win
-            c2 = worksheet.cell(row = k, column = 1)
-            c2.value = pl_los
-            c3 = worksheet.cell(row = k, column = 2)
-            c3.value = score
-
-    book.save('test.xlsx')
+        c1 = worksheet.cell(row = k, column = 1)
+        c1.value = pl_win
+        c2 = worksheet.cell(row = k, column = 2)
+        c2.value = pl_los
+        c3 = worksheet.cell(row = k, column = 3)
+        c3.value = score
+        k += 1
+    t_id = Title.get(Title.id == title_id())
+    short_name = t_id.short_name_comp 
+    book.save(f"{short_name}_report.xlsx")
     print(count)
 
 
