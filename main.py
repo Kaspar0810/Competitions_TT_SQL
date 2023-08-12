@@ -11,7 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
-# from PyPDF2 import PdfFileMerger
+from PyPDF2 import PdfFileMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
@@ -27,8 +27,8 @@ from collections import Counter
 from itertools import *
 import os
 import openpyxl as op
-from openpyxl import Workbook
 import pandas as pd
+import contextlib
 import sys
 import sqlite3
 import pathlib
@@ -175,7 +175,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # меню просмотр
         view_Menu = menuBar.addMenu("Просмотр")
-        view_Menu.addAction(self.all_comp_Action)
+        view_Menu.addAction(self.view_all_comp_Action)
         view_Menu.addAction(self.view_title_Action)
         view_Menu.addAction(self.view_list_Action)
         view_Menu.addAction(self.view_gr_Action)
@@ -222,7 +222,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # подменю жеребьевка -полуфиналы-
         self.choice_pf_Action = QAction("Полуфиналы")
         self.choice_fin_Action = QAction("Финалы")  # подменю жеребьевка -финалы-
-        self.all_comp_Action = QAction("Полные соревнования")
+        self.view_all_comp_Action = QAction("Полные соревнования")
         self.view_title_Action = QAction("Титульный лист")
         self.view_list_Action = QAction("Список участников")
         self.view_gr_Action = QAction("Группы")
@@ -254,6 +254,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.choice_pf_Action.setEnabled(False)
         self.choice_fin_Action.setEnabled(False)
 
+        # self.view_all_comp_Action
         self.view_one_table_Action.setEnabled(False)
         self.view_gr_Action.setEnabled(False)
         self.view_pf1_Action.setEnabled(False)
@@ -285,6 +286,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.choice_gr_Action.triggered.connect(self.choice)
         self.choice_pf_Action.triggered.connect(self.choice)
         self.choice_fin_Action.triggered.connect(self.choice)
+        self.view_all_comp_Action.triggered.connect(self.view)
         self.view_title_Action.triggered.connect(self.view)
         self.view_list_Action.triggered.connect(self.view)
         self.view_one_table_Action.triggered.connect(self.view)
@@ -755,6 +757,7 @@ class StartWindow(QMainWindow, Ui_Form):
 
 class ToolTip(): # создание всплывающих подсказок
     my_win.Button_made_R_file.setToolTip("Создание файла Excel для обсчета рейтинга")
+    my_win.Button_made_one_file_pdf.setToolTip("Перед созданием одного файла, передвиньте строки с названием этапаов в необходимом порядке")
 
 # class ProgressBarThread(QThread):
 #     def __init__(self, fir_window, parent=None):
@@ -1463,7 +1466,7 @@ def title_pdf():
 
 
 def title_made():
-    """создание тильного листа соревнования"""
+    """создание титульного листа соревнования"""
     title_str = title_string()
     if my_win.Button_title_made.text() == "Редактировать":
         title_update()
@@ -2240,15 +2243,15 @@ def page():
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-
-        my_win.resize(1110, 810)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 505))
+        my_win.resize(1110, 825)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         db_select_title()
         load_tableWidget()
         my_win.tableWidget.show()
     elif tb == 1:  # -список участников-
-        my_win.resize(1110, 810)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 530))
+        my_win.resize(1110, 825)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 552))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         load_comboBox_filter()
         region()
@@ -2265,9 +2268,10 @@ def page():
         my_win.label_46.setText(f"Всего: {count} участников")
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
-        my_win.resize(1110, 810)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 243, 841, 515))
+        my_win.resize(1110, 825)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 243, 841, 533))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 240))
+        my_win.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
         count_result = len(result_played)
@@ -2407,9 +2411,10 @@ def page():
         load_tableWidget()
     elif tb == 3:  # вкладка -группы-
         stage = "Предварительный"
-        my_win.resize(1270, 810)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 608))
+        my_win.resize(1270, 825)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
+
         system_stage = sf.select().where(System.stage == "Предварительный").get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -2426,8 +2431,8 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 4:  # вкладка -полуфиналы-
-        my_win.resize(1270, 810)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 608))
+        my_win.resize(1270, 825)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
         game_visible = system_stage.visible_game
@@ -2457,8 +2462,8 @@ def page():
             visible_field()
             my_win.label_16.hide()
     elif tb == 5: # вкладка -финалы-
-        my_win.resize(1270, 810)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 608))
+        my_win.resize(1270, 825)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.checkBox_5.setEnabled(False)
         my_win.checkBox_9.setChecked(False)
@@ -2474,8 +2479,8 @@ def page():
         visible_field()
         my_win.label_16.hide()
     elif tb == 6: # вкладка -рейтинг-
-        my_win.resize(1110, 810)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 75, 841, 684))
+        my_win.resize(1110, 825)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 75, 841, 702))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
         # my_win.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
         my_win.comboBox_choice_R.clear()
@@ -2488,9 +2493,37 @@ def page():
         my_win.lineEdit_range_tours.hide()
         load_combo_etap_begunki()
     elif tb == 7: # вкладка -дополнительно-
-        my_win.resize(1110, 810)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 505))
+        my_win.resize(1110, 825)
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
+        # ===== заполняет tablewidget списком этапов соревнований в файлах пдф
+        title = Title.get(Title.id == title_id())
+        pdf_files_list = []
+        short_name = title.short_name_comp
+        all_pdf_files_list = os.listdir("table_pdf")
+        for name_files in all_pdf_files_list:
+            text = name_files.find(short_name)
+            if text == 0:
+                pdf_files_list.append(name_files)
+
+        row = len(pdf_files_list)
+        my_win.tableWidget.setColumnCount(2) # устанавливает колво столбцов
+        my_win.tableWidget.setRowCount(row)
+        column_label = ["№", "Этапы"]
+
+        my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+        my_win.tableWidget.setDragDropOverwriteMode(True)
+        my_win.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        row_count = 0
+        for item in pdf_files_list:
+            col = 1
+            my_win.tableWidget.setItem(row_count, col, (QTableWidgetItem(str(item))))
+            row_count += 1
+        my_win.Button_up.setEnabled(False)
+        my_win.Button_down.setEnabled(False)
+        # ======
     hide_show_columns(tb)
 
 
@@ -3011,6 +3044,16 @@ def view():
     t_id = Title.get(Title.id == title_id())
     tab = my_win.tabWidget.currentIndex()
     short_name = t_id.short_name_comp
+    if sender == my_win.view_all_comp_Action:
+        dir_path = pathlib.Path.cwd()
+        parent_dir = str(dir_path)  
+        f = parent_dir.rfind("competition_pdf")
+        if f == -1:
+            os.chdir("competition_pdf") # переходит в каталог pdf
+        else:
+            os.chdir(dir_path.parent)
+        view_file = f"{short_name}.pdf"
+
     if sender == my_win.view_list_Action:
         view_sort = ["По алфавиту", "По рейтингу", "По месту"]
         if tab != 1:
@@ -3023,13 +3066,10 @@ def view():
             elif view_sort == "По месту":
                 player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
             list_player_pdf(player_list) 
-    change_dir()
-    dir_path = pathlib.Path.cwd()
-    p = str(dir_path) # показывает текущий каталог
-    view_file = f"{short_name}_player_list.pdf"
-    
-    if sender == my_win.all_comp_Action:
-        pass
+        change_dir()
+        dir_path = pathlib.Path.cwd()
+        p = str(dir_path) # показывает текущий каталог
+        view_file = f"{short_name}_player_list.pdf"   
     elif sender == my_win.view_title_Action:
         view_file = f"{short_name}_title.pdf"
     elif sender == my_win.view_gr_Action:  # вкладка группы
@@ -4557,47 +4597,31 @@ def enter_score(none_player=0):
         elif tab == 5:
             pl1 = my_win.lineEdit_player1_fin.text()
             pl2 = my_win.lineEdit_player2_fin.text()
-        if none_player == 1 or st1 > st2:
-# выиграл 1-й участник или 2-й не явился на встречу
-            winner = pl1
-            loser = pl2
-            ts_winner = f"{st1} : {st2}"
-            ts_loser = f"{st1} : {st2}"
-        elif none_player == 2 or st1 < st2:
+    # ======= 
+        if none_player == 0:
+            if st1 > st2:
+                winner = pl1
+                loser = pl2
+                ts_winner = f"{st1} : {st2}"
+                ts_loser = f"{st2} : {st1}"
+            else:
+                winner = pl2
+                loser = pl1
+                ts_winner = f"{st1} : {st2}"
+                ts_loser = f"{st2} : {st1}"
+            winner_string = string_score_game()  # пишет счет в партии
+        elif none_player == 1: # не явился 1-й игрок
             winner = pl2
             loser = pl1
             ts_winner = f"{st2} : {st1}"
-            ts_loser = f"{st2} : {st1}"
-        loser_fam_name = loser 
-        if none_player == 0:
-            if st1 > st2 or none_player == 2:  # выиграл 1-й участник или 2-й не явился на встречу
-                if tab == 3:
-                    winner = my_win.lineEdit_player1_gr.text()
-                    loser = my_win.lineEdit_player2_gr.text()
-                elif tab == 4:
-                    winner = my_win.lineEdit_player1_pf.text()
-                    loser = my_win.lineEdit_player2_pf.text()
-                elif tab == 5:
-                    winner = my_win.lineEdit_player1_fin.text()
-                    loser = my_win.lineEdit_player2_fin.text()
-                ts_winner = f"{st1} : {st2}"
-                ts_loser = f"{st2} : {st1}"
-            else:  # выиграл 2-й участник или 1-й не явился на встречу
-                if tab == 3:  # игры в подгруппах
-                    winner = my_win.lineEdit_player2_gr.text()
-                    loser = my_win.lineEdit_player1_gr.text()
-                elif tab == 4:
-                    winner = my_win.lineEdit_player2_pf.text()
-                    loser = my_win.lineEdit_player1_pf.text()
-                elif tab == 5:  # игры в финалах
-                    winner = my_win.lineEdit_player2_fin.text()
-                    loser = my_win.lineEdit_player1_fin.text()
-                ts_winner = f"{st2} : {st1}"
-                ts_loser = f"{st1} : {st2}"
-            loser_fam_name = loser 
-        if none_player == 0:
-            winner_string = string_score_game()  # пишет счет в партии
+            ts_loser = f"{st1} : {st2}"
         else:
+            winner = pl1
+            loser = pl2
+            ts_winner = f"{st1} : {st2}"
+            ts_loser = f"{st2} : {st1}"
+        if none_player != 0: # если победа по неявке
+            # loser_fam_name = loser 
             if type == "сетка":
                 winner_string = ""
             elif type == "круг":
@@ -4609,14 +4633,15 @@ def enter_score(none_player=0):
         else:
             winner = my_win.lineEdit_player1_fin.text()
             loser = my_win.lineEdit_player2_fin.text()
-        loser_fam_name = loser # оставляет -X-
+        # loser_fam_name = loser # оставляет -X-
         winner_string = ""
         ts_winner = ""
         ts_loser = ""
-
-    flag = control_winner_player(winner, loser) # проверка реальности победы игрока (маленький рейтинг над большим)
-    if flag is False:
-        return
+    loser_fam_name = loser # 
+    if none_player == 0: # если победа по неявке, то не проверяет победу
+        flag = control_winner_player(winner, loser) # проверка реальности победы игрока (маленький рейтинг над большим)
+        if flag is False:
+            return
 
     with db:  # записывает в таблицу -Result- сыгранный матч в группах или финал по кругу
         result = Result.get(Result.id == id)
@@ -4740,7 +4765,7 @@ def setka_type(none_player):
             w = 2
             l = 1
         else:
-            if none_player == 1:
+            if none_player == 1: # не явился 1-й игрок
                 st1 = "П"
                 st2 = "В"
             elif none_player == 2:
@@ -5883,15 +5908,14 @@ def view_table_choice(fam_city, number_net, num_id_player):
         pl_full = player.select().where(Player.id == id_player).get()
         player_full = pl_full.full_name
         manual_choice_dict[k] = player_full
-    model = QStandardItemModel(32, 1)
+    model = QStandardItemModel(number_net, 1)
         # Установить текстовое содержимое четырех меток заголовка в горизонтальном направлении
     model.setHorizontalHeaderLabels(["Участник/ Город"])
     manual_choice_dict[number_net] = fam_city
-    for row in range(32):
+    for row in range(number_net):
         fam_city = manual_choice_dict.get(row + 1, "")
         item = QStandardItem(fam_city)
         my_win.tableView_net.setRowHeight(row, 10)
-                    # Установить текстовое значение каждой позиции
         model.setItem(row, 0, item)
 
     my_win.tableView_net.setModel(model)
@@ -5899,8 +5923,6 @@ def view_table_choice(fam_city, number_net, num_id_player):
     my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
     my_win.tableView_net.setGridStyle(Qt.DashDotLine) # вид линии сетки 
     my_win.tableView_net.show()
-
-
 
 
 def setka_choice_number(fin, count_exit):
@@ -6862,6 +6884,10 @@ def hide_show_columns(tb):
         my_win.tableWidget.showColumn(4)
         my_win.tableWidget.showColumn(5)
         my_win.tableWidget.showColumn(6)
+    elif tb == 7:
+        my_win.tableWidget.showColumn(0)
+        my_win.tableWidget.showColumn(1)
+
 
 
 def etap_made():
@@ -8257,10 +8283,38 @@ def enter_print_begunki():
 
 def merdge_pdf_files():
     """Слияние все таблиц соревнований в один файл"""
-    report_dir = (
-    Path.home()
-    / "table_pdf"
-    )
+    pdf_merger = PdfFileMerger()
+    title = Title.get(Title.id == title_id())
+    pdf_files_list = []
+    short_name = title.short_name_comp
+ 
+    count = my_win.tableWidget.rowCount()
+    for k in range(0, count):
+        name_files = my_win.tableWidget.item(k, 1).text()
+        pdf_files_list.append(name_files)
+
+    my_win.tableWidget.setColumnCount(2) # устанавливает колво столбцов
+    my_win.tableWidget.setRowCount(count)
+    column_label = ["№", "Этапы"]
+
+    my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+    my_win.tableWidget.setDragDropOverwriteMode(True)
+    my_win.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+    my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+    change_dir()
+    with contextlib.ExitStack() as stack:
+        files = [stack.enter_context(open(pdf, 'rb')) for pdf in pdf_files_list]
+        for f in files:
+            pdf_merger.append(f)
+        change_dir()
+        os.chdir("competition_pdf") # переходит в каталог pdf
+        with open(f'{short_name}.pdf', 'wb') as f:
+            pdf_merger.write(f)
+            title.pdf_comp = f'{short_name}.pdf'
+            title.save()
+    my_win.tableWidget.show()
+
 
 def load_name_net_after_choice_for_wiev(fin):
     """загружает список сетки после жеребьевки для ее просмотра"""
@@ -8481,6 +8535,95 @@ def table_made(pv, stage):
     doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     change_dir()
+
+
+def list_referee():
+    """список судейской коллегии"""
+    sender = my_win.sender()
+    from reportlab.platypus import Table
+    table = "setka_8_full"
+    elements = []
+    data = []
+    style = []
+    column = ['']
+    column_count = column * 10
+    # добавить в аргументы функции
+   
+    for i in range(0, 40):
+        column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        list_tmp = column_count.copy()
+        data.append(list_tmp)
+    # ========= места ==========
+    
+   
+    data[28][6] = str(12)  # создание номеров встреч 15
+    data[13][6] = str(-7)
+    data[18][6] = str(-8)
+    data[25][6] = str(-11)
+    data[30][6] = str(-12)
+    # ============= данные игроков и встреч и размещение по сетке =============
+    #===============
+    cw = ((0.3 * cm, 4.6 * cm, 0.4 * cm, 3.0 * cm, 0.4 * cm, 3.0 * cm, 0.4 * cm, 4.8 * cm, 1.5 * cm, 0.4 * cm))
+    # основа сетки на чем чертить таблицу (ширина столбцов и рядов, их кол-во)
+    t = Table(data, cw, 40 * [0.6 * cm])
+    # =========  цикл создания стиля таблицы ================
+    # ==== рисует основной столбец сетки 
+    # ======= встречи за места =====
+    for q in range(0, 7, 6):
+        fn = ('LINEABOVE', (7, q + 8), (8, q + 8),
+              1, colors.darkblue)  # за 1-2 место
+        style.append(fn)
+    for q in range(0, 3, 2):
+        fn = ('LINEABOVE', (7, q + 17), (8, q + 17),
+              1, colors.darkblue)  # за 3-4 место
+        style.append(fn)
+        fn = ('LINEABOVE', (7, q + 29), (8, q + 29),
+              1, colors.darkblue)  # за 7-8 место
+        style.append(fn)
+    for q in range(0, 4, 3):
+        fn = ('LINEABOVE', (7, q + 23), (8, q + 23),
+              1, colors.darkblue)  # за 5-6 место
+        style.append(fn)
+
+    for i in range(1, 6, 2):
+        fn = ('TEXTCOLOR', (i, 0), (i, 39), colors.black)  # цвет шрифта игроков
+        style.append(fn)
+        fn = ('TEXTCOLOR', (i + 1, 0), (i + 1, 39), colors.green)  # цвет шрифта номеров встреч
+        style.append(fn)
+        # выравнивание фамилий игроков по левому краю
+        fn = ('ALIGN', (i, 0), (i, 39), 'LEFT') 
+        style.append(fn)
+        # центрирование номеров встреч
+        fn = ('ALIGN', (i + 1, 0), (i + 1, 39), 'CENTER')
+        style.append(fn)
+    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    style.append(fn)
+
+    ts = style   # стиль таблицы (список оформления строк и шрифта)
+    t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+                           ('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
+                           ('FONTSIZE', (0, 0), (-1, -1), 7),
+                           ('FONTNAME', (1, 0), (1, 16), "DejaVuSerif-Bold"),
+                           ('FONTSIZE', (1, 0), (1, 16), 7),
+                           # 10 столбец с 0 по 68 ряд (цвет места)
+                           ('TEXTCOLOR', (8, 0), (8, 39), colors.red),
+                           ('ALIGN', (8, 0), (8, 39), 'RIGHT'),
+                           ('ALIGN', (7, 0), (7, 39), 'LEFT'),
+                           # цвет шрифта игроков 1 ого тура
+                           ('TEXTCOLOR', (0, 0), (0, 39), colors.blue),
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+                           ] + ts))
+
+    elements.append(t)
+    pv = A4
+
+    short_name = "clear_8_full_net"  # имя для чистой сетки
+    name_table_final = f"{short_name}.pdf"
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv)
+    change_dir()
+    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    change_dir()
+    return tds
 
 
 def setka_8_full_made(fin):
@@ -9697,13 +9840,8 @@ def write_in_setka(data, fin, first_mesto, table):
         row_end = 65
         row_num_win = {1: [3], 2: [7], 3: [11], 4: [15], 5: [19], 6: [23], 7: [27], 8: [31], 9: [35], 10: [39], 11: [43], 12: [47],
         13: [51], 14: [55], 15: [59], 16: [63], 17: [5], 18: [13], 19: [21], 20: [29], 21: [37], 22: [45], 23: [53], 24: [61],
-        25: [9], 26: [25], 27: [41], 28: [57], 29: [17], 30:[49], 31: [33], 32: [61], 33: [72], 34: [76], 35: [74], 36: [84], 37: [89],
-        38: [93], 39: [97], 40: [101], 41: [91], 42: [99], 43: [95], 44: [106], 45: [114], 46: [118], 47: [116], 48: [126],  49: [140],
-        50: [144], 51: [148], 52: [152], 53: [156], 54: [158], 55: [162], 56: [166], 57: [142], 58: [150], 59: [158], 60: [166], 61: [146],
-        62: [162], 63: [154], 64: [168], 65: [172], 66: [176], 67: [174], 68: [182], 69: [179], 70: [183], 71: [187], 72: [191], 73: [181],
-        74: [189], 75: [185], 76: [194], 77: [197], 78: [201], 79: [199]}
-        mesta_dict= {31, -31, 32, -32, 35, -35, 36, -36, 43, -43, 44, -44, 47, -47, 48, -48, 63, -63,
-                        64, -64, 67, -67, 68, -68, 75, -75, 76, -76, 79, -79, 80, -80}
+        25: [9], 26: [25], 27: [41], 28: [57], 29: [17], 30:[49], 31: [33], 32: [61]}
+        mesta_dict = {31: 33, 32: 61}
     elif table == "setka_32_2":
         # встреч, которые попадают на сноски (в сетке за 3 место) должно быть в row_num_win а список состоит из одного номера встречи куда идет победитель
         row_last = 207
@@ -9724,11 +9862,13 @@ def write_in_setka(data, fin, first_mesto, table):
         column_last = 11
         row_first = 0
         row_end = 65
-        row_num_win = {17: [3, 7], 18: [11, 15], 19: [19, 23], 20: [27, 31], 21: [35, 39], 22: [43, 47], 23: [51, 55],
-        24: [59, 63], 25: [5, 13], 26: [21, 29], 27: [37, 45], 28: [53, 61], 29: [9, 25], 30:[41, 57], 31: [17, 49], 
-        35: [72, 76], 41: [89, 93], 42: [97, 101], 43: [91, 99], 47: [114, 118],  57: [140, 144], 58: [148, 152], 
-        59: [156, 160], 60: [164, 168], 61: [142, 150], 62: [158, 166], 63: [146, 162], 67: [172, 176], 73: [179, 183],
-        74: [187, 191], 75: [181, 189], 79: [197, 201]}
+        row_num_win = {1: [3], 2: [7], 3: [11], 4: [15], 5: [19], 6: [23], 7: [27], 8: [31], 9: [35], 10: [39], 11: [43], 12: [47],
+        13: [51], 14: [55], 15: [59], 16: [63], 17: [5], 18: [13], 19: [21], 20: [29], 21: [37], 22: [45], 23: [53], 24: [61],
+        25: [9], 26: [25], 27: [41], 28: [57], 29: [17], 30:[49], 31: [33], 32: [61], 33: [72], 34: [76], 35: [74], 36: [84], 37: [89],
+        38: [93], 39: [97], 40: [101], 41: [91], 42: [99], 43: [95], 44: [106], 45: [114], 46: [118], 47: [116], 48: [126],  49: [140],
+        50: [144], 51: [148], 52: [152], 53: [156], 54: [158], 55: [162], 56: [166], 57: [142], 58: [150], 59: [158], 60: [166], 61: [146],
+        62: [162], 63: [154], 64: [168], 65: [172], 66: [176], 67: [174], 68: [182], 69: [179], 70: [183], 71: [187], 72: [191], 73: [181],
+        74: [189], 75: [185], 76: [194], 77: [197], 78: [201], 79: [199]}
                  # ======= dict mest
         mesta_dict = {31: 33, 32: 61, 35: 74, 36: 84, 43: 95, 44: 106, 47: 116, 48: 126, 63: 154,
                         64: 168, 67: 174, 68: 182, 75: 185, 76: 194, 79: 199, 80: 201}
@@ -11835,8 +11975,11 @@ def made_file_excel_for_rejting():
     count = len(player_result)
     book = op.Workbook()
     worksheet = book.active
-    worksheet.append(("Победитель", "Проигравший", "Счет"))
-    k = 1
+    names_headers = ["Победитель", "Проигравший", "Счет"]
+    for m in range(1, 4):
+        c =  worksheet.cell(row = 1, column = m)
+        c.value = names_headers[m - 1]
+    k = 2
     for l in player_result:
         pl_win = l.winner
         pl_los = l.loser
@@ -11848,11 +11991,105 @@ def made_file_excel_for_rejting():
         c3 = worksheet.cell(row = k, column = 3)
         c3.value = score
         k += 1
+
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp 
+    worksheet.column_dimensions['A'].width = 40
+    worksheet.column_dimensions['b'].width = 40
     book.save(f"{short_name}_report.xlsx")
-    print(count)
+    
 
+def button_move_enabled():
+    """включает или выключает кнопки перемещения по таблице в зависимости от выделенной строки"""
+    count = my_win.tableWidget.rowCount()
+    row = my_win.tableWidget.currentRow()
+    if row == 0:
+        my_win.Button_down.setEnabled(True)
+        my_win.Button_up.setEnabled(False)
+    elif row == count - 1:
+        my_win.Button_up.setEnabled(True)
+        my_win.Button_down.setEnabled(False)
+    else:
+        my_win.Button_up.setEnabled(True)
+        my_win.Button_down.setEnabled(True)
+
+
+def move_row_in_tablewidget():
+    """перемещяет выделенную строку по таблице вверх или вниз"""
+    sender = my_win.sender()
+    row_cur = my_win.tableWidget.currentRow()
+    item_cur = my_win.tableWidget.item(row_cur, 1).text()
+    if sender == my_win.Button_down:
+        item_tmp = my_win.tableWidget.item(row_cur + 1, 1).text()
+        my_win.tableWidget.selectRow(row_cur + 1)
+        my_win.tableWidget.setItem(row_cur + 1, 1, QTableWidgetItem(str(item_cur)))
+        my_win.tableWidget.setItem(row_cur, 1, QTableWidgetItem(str(item_tmp)))
+    else:
+        item_tmp = my_win.tableWidget.item(row_cur - 1, 1).text()
+        my_win.tableWidget.selectRow(row_cur - 1)
+        my_win.tableWidget.setItem(row_cur - 1, 1, QTableWidgetItem(str(item_cur)))
+        my_win.tableWidget.setItem(row_cur, 1, QTableWidgetItem(str(item_tmp)))
+
+
+def made_list_referee():
+    """создание списка судейской коллегии"""
+    my_win.tableWidget.clear()
+    number_of_referee, ok = QInputDialog.getText(my_win, "Главная судейская коллегия", "Введите число строк списка\n главной cудейской коллегии.")
+    row_label = []
+    for l in range(1, int(number_of_referee) + 1):
+        row_label.append(str(l))
+    if ok:
+        title = Title.get(Title.id == title_id())
+        referee = title.referee
+        kat_referee = title.kat_ref
+        secretary = title.secretary
+        kat_secretary = title.kat_sek
+        list_referee = [referee, secretary]
+        list_kategory = [kat_referee, kat_secretary]
+
+        my_win.tableWidget.setColumnCount(4) # устанавливает колво столбцов
+        my_win.tableWidget.setRowCount(int(number_of_referee))
+        column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
+        my_win.tableWidget.setColumnWidth(2, 10000)
+        for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+            item = QtWidgets.QTableWidgetItem()
+            brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
+            brush.setStyle(QtCore.Qt.SolidPattern)
+            item.setForeground(brush)
+        my_win.tableWidget.setHorizontalHeaderItem(i, item)
+        my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+        my_win.tableWidget.setVerticalHeaderLabels(row_label)
+        # my_win.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        # self.tableName.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        # my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
+        # my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
+        # my_win.tableWidget.setSelectionBehavior(QAbstractItemView.CurrentChangedEditing)
+        # my_win.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        # my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectItems)
+        # QAbstractItemView.CurrentChanged1Editing
+
+        post_list = ["ССВК", "Судья 1-й кат.", "Судья 2-й кат."]
+        category_list = ["Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        my_win.tableWidget.setItem(0, 1, QTableWidgetItem("Гл. судья"))
+        my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
+    for k in range(0, 2):
+        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
+        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
+    for n in range(2, int(number_of_referee)): 
+        comboBox_list_post = QComboBox()
+        comboBox_list_category = QComboBox()  
+        family_city = QTextEdit()
+        comboBox_list_category.addItems(category_list)
+        comboBox_list_post.addItems(post_list) 
+        my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
+        my_win.tableWidget.setCellWidget(n, 2, family_city)
+        my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)
+
+
+def made_pdf_list():
+    """создание страниц PDF соревнования"""
+    pass
 
 # def open_close_fail(view_file):
 # # Введите имя файла для проверки
@@ -11869,29 +12106,6 @@ def made_file_excel_for_rejting():
 #     except IOError:
 #         print("Файл уже открыт")
 
-# def proba():
-#     change_dir()
-#     from reportlab.pdfgen.canvas import Canvas
-#     from reportlab.lib.styles import getSampleStyleSheet
-#     from reportlab.lib.units import inch
-#     from reportlab.platypus import Paragraph, Frame
-#     styles = getSampleStyleSheet()
-#     styleN = styles['Normal']
-#     styleH = styles['Heading1']
-#     story = []
-
-#     #add some flowables
-#     story.append(Paragraph("This is a Heading",styleH))
-#     story.append(Paragraph("This is a paragraph in <i>Normal</i> style.",
-#         styleN))
-#     c  = Canvas('mydoc.pdf')
-#     f = Frame(inch, inch, 6*inch, 9*inch, showBoundary=0)
-#     f.addFromList(story,c)
-#     c.save()
-
-
-
-# 
 
 
 # def proba():
@@ -12043,10 +12257,12 @@ my_win.checkBox_4.stateChanged.connect(change_status_visible_and_score_game)
 my_win.checkBox_5.stateChanged.connect(change_status_visible_and_score_game)
 # при изменении чекбокса показывает список удаленных игроков
 my_win.checkBox_6.stateChanged.connect(del_player_table)
-my_win.checkBox_7.stateChanged.connect(no_play)  # поражение по неявке
-my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по неявке
-my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке
-my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке
+my_win.checkBox_7.stateChanged.connect(no_play)  # поражение по неявке игрок 1 группа
+my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по неявке игрок 2 группа
+my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке игрок 1 пф
+my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке игрок 2 пф
+my_win.checkBox_12.stateChanged.connect(no_play)  # поражение по неявке игрок 1 финал
+my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по неявке игрок 2 финал
 my_win.checkBox_11.stateChanged.connect(debtor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
@@ -12092,5 +12308,11 @@ my_win.Button_reset_fltr_in_R.clicked.connect(clear_filter_rejting_list)
 my_win.Button_sort_alf_R.clicked.connect(filter_rejting_list)
 my_win.Button_sort_rejting_in_R.clicked.connect(filter_rejting_list)
 my_win.Button_made_R_file.clicked.connect(made_file_excel_for_rejting)
+my_win.Button_made_one_file_pdf.clicked.connect(merdge_pdf_files)
 
+my_win.Button_up.clicked.connect(move_row_in_tablewidget)
+my_win.Button_down.clicked.connect(move_row_in_tablewidget)
+my_win.tableWidget.cellClicked.connect(button_move_enabled)
+my_win.Button_list_referee.clicked.connect(made_list_referee)
+my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 sys.exit(app.exec())
