@@ -3355,7 +3355,7 @@
      <widget class="Line" name="line_6">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>250</x>
         <y>20</y>
         <width>16</width>
         <height>181</height>
@@ -3368,9 +3368,9 @@
      <widget class="QLabel" name="label_48">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>27</x>
         <y>10</y>
-        <width>171</width>
+        <width>211</width>
         <height>20</height>
        </rect>
       </property>
@@ -3383,7 +3383,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Страницы соревнования</string>
+       <string>Создание страниц соревнования:</string>
       </property>
      </widget>
      <widget class="Line" name="line_7">
@@ -3391,7 +3391,7 @@
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>211</width>
+        <width>230</width>
         <height>16</height>
        </rect>
       </property>
@@ -3417,7 +3417,7 @@
        <rect>
         <x>10</x>
         <y>176</y>
-        <width>207</width>
+        <width>241</width>
         <height>32</height>
        </rect>
       </property>
@@ -3430,14 +3430,14 @@
        </font>
       </property>
       <property name="text">
-       <string> Создание страницы</string>
+       <string> Создать страницу</string>
       </property>
      </widget>
      <widget class="QPushButton" name="Button_up">
       <property name="geometry">
        <rect>
-        <x>255</x>
-        <y>40</y>
+        <x>270</x>
+        <y>92</y>
         <width>170</width>
         <height>29</height>
        </rect>
@@ -3458,8 +3458,8 @@
      <widget class="QPushButton" name="Button_down">
       <property name="geometry">
        <rect>
-        <x>255</x>
-        <y>70</y>
+        <x>270</x>
+        <y>117</y>
         <width>170</width>
         <height>29</height>
        </rect>
@@ -3480,9 +3480,9 @@
      <widget class="QLabel" name="label_54">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>10</y>
-        <width>171</width>
+        <x>289</x>
+        <y>70</y>
+        <width>131</width>
         <height>20</height>
        </rect>
       </property>
@@ -3501,9 +3501,9 @@
      <widget class="Line" name="line_9">
       <property name="geometry">
        <rect>
-        <x>250</x>
-        <y>100</y>
-        <width>181</width>
+        <x>265</x>
+        <y>140</y>
+        <width>175</width>
         <height>16</height>
        </rect>
       </property>
@@ -3514,9 +3514,9 @@
      <widget class="Line" name="line_10">
       <property name="geometry">
        <rect>
-        <x>250</x>
-        <y>30</y>
-        <width>181</width>
+        <x>265</x>
+        <y>82</y>
+        <width>175</width>
         <height>16</height>
        </rect>
       </property>
@@ -3527,7 +3527,7 @@
      <widget class="QPushButton" name="Button_made_one_file_pdf">
       <property name="geometry">
        <rect>
-        <x>255</x>
+        <x>270</x>
         <y>176</y>
         <width>170</width>
         <height>29</height>
@@ -3542,14 +3542,14 @@
        </font>
       </property>
       <property name="text">
-       <string>Создание файла</string>
+       <string>Создать файл</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_55">
       <property name="geometry">
        <rect>
-        <x>260</x>
-        <y>150</y>
+        <x>275</x>
+        <y>153</y>
         <width>181</width>
         <height>20</height>
        </rect>
@@ -3582,74 +3582,234 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>207</width>
-        <height>134</height>
+        <x>11</x>
+        <y>41</y>
+        <width>238</width>
+        <height>133</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <widget class="QPushButton" name="Button_list_referee">
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
+      <layout class="QVBoxLayout" name="verticalLayout_41">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>1</number>
          </property>
-         <property name="text">
-          <string>Судейская коллегия</string>
-         </property>
-        </widget>
+         <item>
+          <widget class="QRadioButton" name="radioButton_GSK">
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_list_referee">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <weight>75</weight>
+             <italic>true</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Судейская коллегия</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="1" column="0">
-        <widget class="QPushButton" name="Button_list_regions">
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
          </property>
-         <property name="text">
-          <string>Список регионов</string>
-         </property>
-        </widget>
+         <item>
+          <widget class="QRadioButton" name="radioButton_regions">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_list_regions">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <weight>75</weight>
+             <italic>true</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Список регионов</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="2" column="0">
-        <widget class="QPushButton" name="Button_list_winner">
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <property name="spacing">
+          <number>1</number>
          </property>
-         <property name="text">
-          <string>Победители и призеры</string>
-         </property>
-        </widget>
+         <item>
+          <widget class="QRadioButton" name="radioButton_winner">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_list_winner">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <weight>75</weight>
+             <italic>true</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Победители и призеры</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="Button_players_on_alf">
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-           <weight>75</weight>
-           <italic>true</italic>
-           <bold>true</bold>
-          </font>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_13">
+         <property name="spacing">
+          <number>1</number>
          </property>
-         <property name="text">
-          <string>Участники по алфавиту</string>
-         </property>
-        </widget>
+         <item>
+          <widget class="QRadioButton" name="radioButton_player_on_alf">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>4</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_players_on_alf">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <weight>75</weight>
+             <italic>true</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Участники по алфавиту</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
+     </widget>
+     <widget class="QLabel" name="label_56">
+      <property name="geometry">
+       <rect>
+        <x>264</x>
+        <y>10</y>
+        <width>181</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Показ страниц соревнования</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Button_view_page_pdf">
+      <property name="geometry">
+       <rect>
+        <x>265</x>
+        <y>41</y>
+        <width>170</width>
+        <height>29</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+        <underline>false</underline>
+       </font>
+      </property>
+      <property name="text">
+       <string>Просмотр</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_12">
+      <property name="geometry">
+       <rect>
+        <x>265</x>
+        <y>30</y>
+        <width>176</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
      </widget>
     </widget>
    </widget>
@@ -3698,8 +3858,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3711,8 +3871,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4211,8 +4371,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4530,8 +4690,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4949,8 +5109,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5248,8 +5408,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5656,8 +5816,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
