@@ -8534,7 +8534,7 @@ def table_made(pv, stage):
     doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
     doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    change_dir(catalog)
+    os.chdir("..")
 
 
 def list_regions_pdf():
@@ -8857,7 +8857,6 @@ def setka_8_full_made(fin):
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..") # переходит на один уровень на верх
-    # change_dir()
     return tds
 
 
@@ -8990,7 +8989,6 @@ def setka_8_2_made(fin):
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-
     return tds
 
 
@@ -9152,7 +9150,6 @@ def setka_16_full_made(fin):
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-    # change_dir()
     return tds
 
 
@@ -9447,7 +9444,6 @@ def setka_32_made(fin):
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-    # change_dir()
     return tds
 
 
@@ -9666,7 +9662,6 @@ def setka_32_full_made(fin):
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-    # change_dir()
     return tds
 
 
@@ -9906,7 +9901,6 @@ def setka_32_2_made(fin):
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-    # change_dir()
     return tds
 
 
@@ -12153,7 +12147,6 @@ def button_move_enabled():
     """включает или выключает кнопки перемещения по таблице в зависимости от выделенной строки"""
     count = my_win.tableWidget.rowCount()
     row = my_win.tableWidget.currentRow()
-    dir_path = pathlib.Path.cwd()
     if row == 0:
         my_win.Button_down.setEnabled(True)
         my_win.Button_up.setEnabled(False)
