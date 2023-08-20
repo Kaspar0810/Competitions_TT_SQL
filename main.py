@@ -176,6 +176,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню просмотр (последовательность вида в меню)
         view_Menu = menuBar.addMenu("Просмотр")
         view_Menu.addAction(self.view_all_comp_Action)
+        view_Menu.addSeparator()
         view_Menu.addAction(self.view_title_Action)
         view_Menu.addAction(self.view_regions_list_Action)
         view_Menu.addAction(self.view_referee_list_Action)
@@ -1736,7 +1737,8 @@ def fill_table(player_list):
         my_win.tableWidget.setRowCount(row_count)
         my_win.statusbar.showMessage(
             "Удаленных участников соревнований нет", 10000)
-
+    # dir_path = pathlib.Path.cwd()
+    # print(f"каталог-стр 1741 {dir_path}")
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
@@ -2278,6 +2280,8 @@ def page():
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
         list_player_pdf(player_list)
+        # dir_path = pathlib.Path.cwd()
+        # print(dir_path)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 243, 841, 533))
@@ -2510,6 +2514,7 @@ def page():
         my_win.Button_made_page_pdf.setEnabled(False)
         my_win.Button_up.setEnabled(False)
         my_win.Button_down.setEnabled(False)
+        my_win.Button_made_one_file_pdf.setEnabled(False)
         # ======
     hide_show_columns(tb)
 
@@ -2766,7 +2771,7 @@ def list_player_pdf(player_list):
     catalog = 1
     change_dir(catalog)
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    change_dir(catalog)
+    os.chdir("..")
 
 
 def exit_comp():
@@ -3090,7 +3095,7 @@ def view():
             view_file = "clear_8_2_net.pdf"
         elif sender == my_win.clear_s8_full_Action:
             view_file = "clear_8_full_net.pdf"
- 
+
     if platform == "linux" or platform == "linux2":  # linux
         pass
     elif platform == "darwin":  # OS X
@@ -3946,7 +3951,7 @@ def filter_player_list(sender):
             player_list = player.select().where(Player.city == city)
         elif region != "" and city == "":
             player_list = player.select().where(Player.region == region)
-    elif sender == my_win.checkBox_15:
+    elif sender == my_win.checkBox_15: # отмечен чекбокс предзаявка
         if my_win.checkBox_15.isChecked():
             player_list = player.select().where(Player.application == "предварительная")
         else:
@@ -3954,7 +3959,8 @@ def filter_player_list(sender):
     elif sender == my_win.Button_reset_fltr_list:
         player_list = Player.select().where(Player.title_id == title_id())
         my_win.comboBox_fltr_region.setCurrentIndex(0)
-        my_win.comboBox_fltr_city.setCurrentIndex(0)       
+        my_win.comboBox_fltr_city.setCurrentIndex(0) 
+        my_win.checkBox_15.setChecked(False)      
         load_comboBox_filter()
     fill_table(player_list)
 
@@ -4518,6 +4524,8 @@ def check_real_player():
     """Изменяет спортсменов по предварительной заявке не реальных"""
     player_list = Player.select().where(Player.title_id == title_id())
     indices = my_win.tableWidget.selectionModel().selectedRows()
+
+    dir_path = pathlib.Path.cwd()
     for index in indices:
         row_index = index.row()
         id_pl = int(my_win.tableWidget.item(row_index, 1).text())
@@ -5205,7 +5213,8 @@ def filter_sf():
 
     result_list = fltr.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
-    column_count = len(result_list[0])  # кол-во столбцов в таблице
+    if row_count != 0:
+        column_count = len(result_list[0])  # кол-во столбцов в таблице
     if played == "завершенные":
         my_win.label_17.setText(f"сыграно {row_count} встреч")
     elif played == "не сыгранные":
@@ -5215,12 +5224,12 @@ def filter_sf():
     my_win.label_17.show()
     # вставляет в таблицу необходимое кол-во строк
     my_win.tableWidget.setRowCount(row_count)
-
-    for row in range(row_count):  # добавляет данные из базы в TableWidget
-        for column in range(column_count):
-            item = str(list(result_list[row].values())[column])
-            my_win.tableWidget.setItem(
-                row, column, QTableWidgetItem(str(item)))
+    if row_count != 0:
+        for row in range(row_count):  # добавляет данные из базы в TableWidget
+            for column in range(column_count):
+                item = str(list(result_list[row].values())[column])
+                my_win.tableWidget.setItem(
+                    row, column, QTableWidgetItem(str(item)))
 
 
 def filter_gr():
@@ -5230,22 +5239,7 @@ def filter_gr():
     name = my_win.comboBox_find_name.currentText()
     played = my_win.comboBox_filter_played.currentText()
     find_player.append(name)
-    # ====
-    # edit_text = QLineEdit
-    # my_win.comboBox_filter_group.setLineEdit(edit_text)
-    # my_win.comboBox_filter_group.setEditable(True)
-    # my_win.comboBox_filter_group.lineEdit().returnPressed.connect(searchComboBox)
  
-    # model = QStandardItemModel()
-    # for i in range(my_win.comboBox_filter_group.count()):
-    #     item = QStandardItem(my_win.comboBox_filter_group.itemText(i))
-    #     model.appendRow(item)
- 
-    # completer = QCompleter(model)
-    # completer.setFilterMode(Qt.MatchContains)
-    # completer.setCaseSensitivity(Qt.CaseInsensitive)
-    # my_win.comboBox_filter_group.setCompleter(completer)
-    # ====
     if group == "":
         return
     fltr_id = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
@@ -5265,13 +5259,14 @@ def filter_gr():
         fltr = fl.select().where(Result.points_win == 2)
     elif group != "все группы" and played == "не сыгранные":
         fl = fltr_id.select().where(Result.number_group == group)
-        fltr = fl.select().where(Result.points_win != 2 and Result.points_win == None)
+        fltr = fl.select().where(Result.points_win != 2 & Result.points_win == None)
     elif group == "все группы" and played == "не сыгранные":
         fltr = fltr_id.select().where((Result.points_win != 2) & (Result.points_win == None))
  
     result_list = fltr.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
-    column_count = len(result_list[0])  # кол-во столбцов в таблице
+    if row_count != 0:
+        column_count = len(result_list[0])  # кол-во столбцов в таблице
     if played == "завершенные":
         my_win.label_16.setText(f"сыграно {row_count} встреч")
     elif played == "не сыгранные":
@@ -5281,12 +5276,12 @@ def filter_gr():
     my_win.label_16.show()
     # вставляет в таблицу необходимое кол-во строк
     my_win.tableWidget.setRowCount(row_count)
-
-    for row in range(row_count):  # добавляет данные из базы в TableWidget
-        for column in range(column_count):
-            item = str(list(result_list[row].values())[column])
-            my_win.tableWidget.setItem(
-                row, column, QTableWidgetItem(str(item)))
+    if row_count != 0:
+        for row in range(row_count):  # добавляет данные из базы в TableWidget
+            for column in range(column_count):
+                item = str(list(result_list[row].values())[column])
+                my_win.tableWidget.setItem(
+                    row, column, QTableWidgetItem(str(item)))
 
 
 def load_combo():
@@ -7915,7 +7910,7 @@ def func_zagolovok(canvas, doc):
                                 f"Гл. секретарь: судья {title.kat_sek} ______________{title.secretary}"
         if current_button == "3":
             # текста титула по основным
-            canvas.drawCentredString(width / 2.0, height - 10 * cm, main_referee_collegia)
+            canvas.drawCentredString(width / 2.0, height - 15 * cm, main_referee_collegia)
         else:
             # текста титула по основным
             canvas.drawCentredString(width / 2.0, height - 20 * cm, main_referee_collegia)
@@ -7994,8 +7989,6 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
             ts.add('TEXTCOLOR', (col, row + 1), (col, row + 1), colors.red)  # красный цвет очков победителя
         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
     return dict_tbl
-
-
 
 
 def tbl_begunki(ts, stage, number_group, tours, list_tours):
@@ -8604,7 +8597,7 @@ def list_regions_pdf():
     catalog = 1
     change_dir(catalog)
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    change_dir(catalog)
+    os.chdir("..")
 
 
 def list_winners_pdf():
@@ -8669,7 +8662,7 @@ def list_winners_pdf():
     catalog = 1
     change_dir(catalog)
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    change_dir(catalog)
+    os.chdir("..")
 
 
 def list_referee_pdf():
@@ -8736,7 +8729,7 @@ def list_referee_pdf():
     catalog = 1
     change_dir(catalog)
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-    change_dir(catalog)
+    os.chdir("..")
 
 
 def setka_8_full_made(fin):
@@ -8756,7 +8749,7 @@ def setka_8_full_made(fin):
     else:
         first_mesto = 1  # временный финал для чистой сетки
     for i in range(0, 40):
-        column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
+        # column_count[9] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
         data.append(list_tmp)
     # ========= места ==========
@@ -8835,7 +8828,11 @@ def setka_8_full_made(fin):
                            ('TEXTCOLOR', (0, 0), (0, 39), colors.blue),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
                            ] + ts))
-
+# === надпись финала
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(fin, h2))
+# ====
     elements.append(t)
     pv = A4
     znak = final.rfind("-")
@@ -8964,7 +8961,11 @@ def setka_8_2_made(fin):
                            ('TEXTCOLOR', (0, 0), (0, 39), colors.blue),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
                            ] + ts))
-
+# === надпись финала
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(fin, h2))
+# ====
     elements.append(t)
     pv = A4
     znak = final.rfind("-")
@@ -8989,7 +8990,7 @@ def setka_8_2_made(fin):
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-    # change_dir()
+
     return tds
 
 
@@ -9122,7 +9123,11 @@ def setka_16_full_made(fin):
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
                            ] + ts))
-
+# === надпись финала
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(fin, h2))
+# ====
     elements.append(t)
     pv = A4
     znak = final.rfind("-")
@@ -9290,7 +9295,11 @@ def setka_16_2_made(fin):
                            ('TEXTCOLOR', (0, 0), (0, 40), colors.blue),
                            ('TEXTCOLOR', (0, 41), (0, 85), colors.green),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
-
+# === надпись финала
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(fin, h2))
+# ====
     elements.append(t)
     pv = A4
     znak = final.rfind("-")
@@ -9315,7 +9324,6 @@ def setka_16_2_made(fin):
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-    # change_dir()
     return tds
 
 
@@ -9412,7 +9420,12 @@ def setka_32_made(fin):
                            + [
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
-                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))                          
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')])) 
+# === надпись финала
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(fin, h2))
+# ====                         
     elements.append(t)
     pv = A4
     znak = final.rfind("-")
@@ -9627,7 +9640,11 @@ def setka_32_full_made(fin):
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
                            
-
+# === надпись финала
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(fin, h2))
+# ====
     elements.append(t)
     pv = A4
     znak = final.rfind("-")
@@ -9863,7 +9880,11 @@ def setka_32_2_made(fin):
                            # цвет шрифта игроков 1 ого тура
                            ('TEXTCOLOR', (0, 0), (0, 68), colors.blue),
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')]))
-                           
+# === надпись финала
+    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+    elements.append(Paragraph(fin, h2))
+# ====                       
     elements.append(t)
     pv = A4
     znak = final.rfind("-")
@@ -12132,6 +12153,7 @@ def button_move_enabled():
     """включает или выключает кнопки перемещения по таблице в зависимости от выделенной строки"""
     count = my_win.tableWidget.rowCount()
     row = my_win.tableWidget.currentRow()
+    dir_path = pathlib.Path.cwd()
     if row == 0:
         my_win.Button_down.setEnabled(True)
         my_win.Button_up.setEnabled(False)
@@ -12227,6 +12249,8 @@ def view_all_page_pdf():
     rus_name_list = []
     stage_dict = {"table_group.pdf": "Предварительный",
                    "player_list.pdf": "Список участников",
+                   "winners_list.pdf": "Список победителей и призеров",
+                   "player_list_alf.pdf": "Список участников по алф",
                    "title.pdf": "Титульный лист",
                    "referee_list.pdf": "ГСК",
                    "regions_list.pdf": "Список субъктов РФ",
@@ -12247,7 +12271,7 @@ def view_all_page_pdf():
     for name_files in all_pdf_files_list:
         text = name_files.find(short_name)
         text_stage = name_files[count_mark + 1:]
-        if text == 0:
+        if text == 0 and text_stage != "player_list_payment.pdf":
             pdf_files_list.append(name_files)
             for latin_name in stage_dict.keys():
                 if text_stage == latin_name:
@@ -12273,6 +12297,7 @@ def view_all_page_pdf():
         my_win.tableWidget.setItem(row_count, 1, (QTableWidgetItem(str(item))))
         my_win.tableWidget.setItem(row_count, 2, (QTableWidgetItem(str(item_name))))
         row_count += 1
+    my_win.Button_made_one_file_pdf.setEnabled(True)
 
 
 def made_list_regions():
@@ -12308,12 +12333,77 @@ def made_list_regions():
     my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
 
 
+def made_list_players_on_alf():
+    """создание списка по алфавиту"""
+    from reportlab.platypus import Table
+    story = []  # Список данных таблицы участников
+    elements = []  # Список Заголовки столбцов таблицы
+    tit = Title.get(Title.id == title_id())
+    player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)
+    short_name = tit.short_name_comp
+    gamer = tit.gamer
+    count = len(player_list)  # количество записей в базе
+    kp = count + 1
+    n = 0
+    for l in player_list:
+        n += 1
+        p = l.player
+        b = l.bday
+        r = l.rank
+        c = l.city
+        g = l.region
+        z = l.razryad
+        coach_id = l.coach_id
+        t = coach_id.coach
+        m = l.mesto
+        data = [n, p, b, r, c, g, z, t, m]
+
+        elements.append(data)
+    elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
+                        "Место"])
+    t = Table(elements,
+              colWidths=(0.6 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
+              rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                            ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
+                           # Использую импортированный шрифта размер
+                           ('FONTSIZE', (0, 0), (-1, -1), 7),
+                           # межстрочный верхний инервал
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                           # межстрочный нижний инервал
+                           ('TOPPADDING', (0, 0), (-1, -1), 1),
+                           # вериткальное выравнивание в ячейке заголовка
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           # горизонтальное выравнивание в ячейке
+                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
+                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                           # цвет и толщину внутренних линий
+                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
+                           # внешние границы таблицы
+                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
+                           ]))
+
+
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+            firstLineIndent=-20)  # стиль параграфа
+    h3.spaceAfter = 10  # промежуток после заголовка
+    story.append(Paragraph(f'Список участников. {gamer}', h3))
+    story.append(t)
+
+    doc = SimpleDocTemplate(f"{short_name}_player_list_alf.pdf", pagesize=A4)
+    catalog = 1
+    change_dir(catalog)
+    doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    os.chdir("..")
+
+
 def made_list_winners():
     """создание списка победителей и призеров"""
     my_win.radioButton_winner.setChecked(True)
     my_win.Button_made_page_pdf.setEnabled(True)
     my_win.tableWidget.clear()
-    winners_list = []
     players = Player.select().where(Player.title_id == title_id())
     winners = players.select().where(Player.mesto < 4).order_by(Player.mesto)
     count = len(winners)
@@ -12333,9 +12423,7 @@ def made_list_winners():
         my_win.tableWidget.setItem(n, 5, QTableWidgetItem(str(l.region)))
         my_win.tableWidget.setItem(n, 6, QTableWidgetItem(str(l.razryad)))
         my_win.tableWidget.setItem(n, 7, QTableWidgetItem(str(family_coach)))
- 
-   
-        # my_win.tableWidget.setColumnWidth(2, 10000)
+
         for i in range(0, 8):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
             my_win.tableWidget.showColumn(i)
             item = QtWidgets.QTableWidgetItem()
@@ -12357,22 +12445,103 @@ def made_pdf_list():
         list_winners_pdf()
    
 
+def check_pay():
+    """список для отметки оплаты взноса"""
+    from reportlab.platypus import Table
+    from sys import platform
+    elements = []
+    story = []
+    tit = Title.get(Title.id == title_id())
+    view_sort = ["По алфавиту", "По региону"]
+    view_sort, ok = QInputDialog.getItem(
+                            my_win, "Сортировка", "Выберите вид сортировки,\n просмотра списка участников.", view_sort, 0, False)
+    if view_sort == "По алфавиту": 
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алф
+    elif view_sort == "По региону":
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.region)  # сортировка по региону
 
-# def open_close_fail(view_file):
-# # Введите имя файла для проверки
-#     # filename = input("Введите любое существующее имя файла:\n")
-# # Откройте файл в первый раз с помощью функции open()
-#     # fileHandler = open(view_file, "r")
-#     view(view_file)
-# # Попробуйте открыть файл с таким же именем снова
-#     try:
-#         with open("view_file") as file:
+    short_name = tit.short_name_comp
+    gamer = tit.gamer
+    count = len(player_list)  # количество записей в базе
+    kp = count + 1
+    n = 0
+    for l in player_list:
+        n += 1
+        p = l.player
+        # b = l.bday
+        c = l.city
+        g = l.region
+        coach_id = l.coach_id
+        t = coach_id.coach
 
-#             print("Файл открыт для чтения.")
-# # Вызовите ошибку, если файл был открыт раньше
-#     except IOError:
-#         print("Файл уже открыт")
+        data = [n, p, c, g, t]
+        elements.append(data)
 
+    # elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Город", "Регион", "Тренер(ы)"])
+    elements.insert(0, ["№", "Фамилия, Имя", "Город", "Регион", "Тренер(ы)"])
+    t = Table(elements, colWidths=(0.7 * cm, 5.0 * cm, 3.5 * cm, 4.5 * cm, 5.9 * cm), rowHeights=(0.6 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                            # ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
+                           # Использую импортированный шрифта размер
+                           ('FONTSIZE', (0, 0), (-1, -1), 10),
+                           # межстрочный верхний инервал
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                           # межстрочный нижний инервал
+                           ('TOPPADDING', (0, 0), (-1, -1), 1),
+                           # вериткальное выравнивание в ячейке заголовка
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           # горизонтальное выравнивание в ячейке
+                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
+                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                           # цвет и толщину внутренних линий
+                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
+                           # внешние границы таблицы
+                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
+                           ]))
+
+
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+            firstLineIndent=-20)  # стиль параграфа
+    h3.spaceAfter = 10  # промежуток после заголовка
+    story.append(Paragraph(f'Список участников. {gamer}', h3))
+    story.append(t)
+    doc = SimpleDocTemplate(f"{short_name}_player_list_payment.pdf", pagesize=A4, 
+                            rightMargin=1*cm, leftMargin=1*cm, topMargin=1.5*cm, bottomMargin=1*cm) # название, вид страницы, размер полей
+    view_file = f"{short_name}_player_list_payment.pdf"
+    catalog = 1
+    change_dir(catalog)
+    doc.build(story, onFirstPage=func_zagolovok)
+    if platform == "darwin":  # OS X
+        os.system(f"open {view_file}")
+    elif platform == "win32":  # Windows...
+        os.system(f"{view_file}")
+    change_dir(catalog)
+
+
+def open_close_file(view_file):
+# Введите имя файла для проверки
+# Импортировать модуль os для проверки существования файла
+    # import os
+    # Функция Drfine проверяет, закрыт ли файл или нет
+    # if view_file.closed == False:
+    # # Распечатать сообщение об успешном завершении
+    #     print("Файл открыт для чтения.")
+    # else:
+    # # Распечатать сообщение об ошибке
+    #     print(" Файл закрыт.")
+
+    # Взять имя файла для проверки
+    # Проверить, существует
+    if os.path.exists(view_file):
+    # Открыть файл для чтения
+        view_file = open(view_file, "r")
+    # Вызвать функцию
+        open_close_file(view_file)
+    else:
+    # Вывести сообщение, если файл не существует
+        print("Файл не существует.")
 
 
 # def proba():
@@ -12547,7 +12716,7 @@ my_win.Button_reset_filter_sf.clicked.connect(reset_filter)
 my_win.Button_filter_fin.clicked.connect(filter_fin)
 my_win.Button_filter_sf.clicked.connect(filter_sf)
 my_win.Button_filter_gr.clicked.connect(filter_gr)
-my_win.Button_app.clicked.connect(check_real_player)
+my_win.Button_app.clicked.connect(check_real_player) # отмечает что игрок по заявке
 # рисует таблицы группового этапа и заполняет game_list
 my_win.Button_etap_made.clicked.connect(etap_made)
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
@@ -12583,6 +12752,9 @@ my_win.tableWidget.cellClicked.connect(button_move_enabled)
 my_win.Button_list_referee.clicked.connect(made_list_referee)
 my_win.Button_list_regions.clicked.connect(made_list_regions)
 my_win.Button_list_winner.clicked.connect(made_list_winners)
+my_win.Button_players_on_alf.clicked.connect(made_list_players_on_alf)
 my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 my_win.Button_view_page_pdf.clicked.connect(view_all_page_pdf)
+
+my_win.Button_pay.clicked.connect(check_pay)
 sys.exit(app.exec())
