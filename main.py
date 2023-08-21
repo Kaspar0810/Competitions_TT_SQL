@@ -11,7 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
-from PyPDF2 import PdfMerger
+from PyPDF2 import PdfFileMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
@@ -361,9 +361,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         import subprocess
         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл архива базы данных", "", "comp_db_backup*.db")
         filepath = str(fname[0])
-        subprocess.Popen(('start', filepath), shell = True)
- 
-        filename, extension = QFileDialog.getSaveFileName(self,"Сохранить файл",f'{fname}',"DB Files(.db)")
+# 
+        # subprocess.Popen(('start', filepath), shell = True)
+        subprocess.call(('open', filepath), shell = True)
+        # filename, extension = QFileDialog.getSaveFileName(self,"Сохранить файл",f'{fname}',"DB Files(.db)")
         # filename, extension = QFileDialog.getSaveFileName(self, 'Save file', 'backup_x', filter=self.tr(".bak"))
 
     def exit(self):
@@ -8277,7 +8278,7 @@ def enter_print_begunki():
 
 def merdge_pdf_files():
     """Слияние все таблиц соревнований в один файл"""
-    pdf_merger = PdfMerger()
+    pdf_merger = PdfFileMerger()
     title = Title.get(Title.id == title_id())
     pdf_files_list = []
     short_name = title.short_name_comp
