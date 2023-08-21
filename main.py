@@ -1,17 +1,17 @@
 
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
-from reportlab.lib.styles import ParagraphStyle as PS, getSampleStyleSheet
+from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib import colors
 from reportlab.lib.colors import *
-from reportlab.platypus import Paragraph, TableStyle, Table, Image, SimpleDocTemplate, BaseDocTemplate, PageTemplate, NextPageTemplate, FrameBreak, Frame
+from reportlab.platypus import Paragraph, TableStyle, SimpleDocTemplate
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
-from PyPDF2 import PdfFileMerger
+from PyPDF2 import PdfMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
@@ -357,17 +357,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.lineEdit_find_player_in_R.setFocus()
 
     def import_db(self):
-        # filename, extension = QFileDialog.getSaveFileName(
-        #     self, 'Save file', 'backup_x', filter=self.tr(".bak"))
-        # try:
-        #     with open("text.txt", 'r') as inst, open(filename + extension, "w") as backup:
-        #         for line in inst:
-        #             backup.writelines(line)
-        # except IOError:
-        #     pass
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл архива базы данных", "", "comp_db_backup.db")
-        filepatch = str(fname[1])
-        filename, extension = QFileDialog.getSaveFileName(self,"Сохранить файл",f'{filepatch}',"DB Files(.db)")
+
+        import subprocess
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл архива базы данных", "", "comp_db_backup*.db")
+        filepath = str(fname[0])
+        subprocess.Popen(('start', filepath), shell = True)
+ 
+        filename, extension = QFileDialog.getSaveFileName(self,"Сохранить файл",f'{fname}',"DB Files(.db)")
         # filename, extension = QFileDialog.getSaveFileName(self, 'Save file', 'backup_x', filter=self.tr(".bak"))
 
     def exit(self):
@@ -7833,9 +7829,10 @@ def no_play():
 
 def backup():
     """резервное копирование базы данных"""
+    time_date = date.today()
     try:
         db = sqlite3.connect('comp_db.db')
-        db_backup = sqlite3.connect('comp_db_backup.db')
+        db_backup = sqlite3.connect(f'comp_db_backup_{time_date}.db')
         with db_backup:
             db.backup(db_backup, pages=3, progress=None)
         # показывает статус бар на 5 секунд
@@ -8280,7 +8277,7 @@ def enter_print_begunki():
 
 def merdge_pdf_files():
     """Слияние все таблиц соревнований в один файл"""
-    pdf_merger = PdfFileMerger()
+    pdf_merger = PdfMerger()
     title = Title.get(Title.id == title_id())
     pdf_files_list = []
     short_name = title.short_name_comp
