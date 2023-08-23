@@ -1,8 +1,8 @@
 
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
-from reportlab.platypus import PageBreak
+# from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS
-from reportlab.platypus.tableofcontents import TableOfContents
+# from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib import colors
 from reportlab.lib.colors import *
 from reportlab.platypus import Paragraph, TableStyle, SimpleDocTemplate
@@ -20,7 +20,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 # from PyQt5.QtWidgets import QApplication, QCompleter, QLineEdit
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtGui, QtWidgets, QtCore, QtPrintSupport
+from PyQt5 import QtGui, QtWidgets, QtCore
 # from QtCore import QtStringListModel, Qt
 from models import *
 from collections import Counter
@@ -34,6 +34,8 @@ import sqlite3
 import pathlib
 from pathlib import Path
 import random
+
+
 # import collections
 # from playhouse.migrate import *
 
@@ -1499,6 +1501,7 @@ def title_made():
         System.create_table()
         sys = System(id=s, title_id=title, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="",
                      label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True).save()
+    
 
 
 def data_title_string():
@@ -1529,27 +1532,27 @@ def data_title_string():
 def title_update():
     """обновляет запись титула, если был он изменен"""
     title_str = title_string()
-    nm = title_str[0]
-    sr = title_str[1]
-    vz = title_str[2]
-    ds = title_str[3]
-    de = title_str[4]
-    ms = title_str[5]
-    rf = title_str[6]
-    kr = title_str[7]
-    sk = title_str[8]
-    ks = title_str[9]
+    # nm = title_str[0]
+    # sr = title_str[1]
+    # vz = title_str[2]
+    # ds = title_str[3]
+    # de = title_str[4]
+    # ms = title_str[5]
+    # rf = title_str[6]
+    # kr = title_str[7]
+    # sk = title_str[8]
+    # ks = title_str[9]
 
     nazv = Title.select().order_by(Title.id.desc()).get()
-    nazv.name = nm
-    nazv.vozrast = vz
-    nazv.data_start = ds
-    nazv.data_end = de
-    nazv.mesto = ms
-    nazv.referee = rf
-    nazv.kat_ref = kr
-    nazv.secretary = sk
-    nazv.kat_sek = ks
+    nazv.name = title_str[0]
+    nazv.vozrast = title_str[2]
+    nazv.data_start = title_str[3]
+    nazv.data_end = title_str[4]
+    nazv.mesto = title_str[5]
+    nazv.referee = title_str[6]
+    nazv.kat_ref = title_str[7]
+    nazv.secretary = title_str[8]
+    nazv.kat_sek = title_str[9]
     nazv.save()
     title_pdf()
 
@@ -2631,9 +2634,19 @@ def find_player_on_tab_system():
     txt = txt.upper()
     player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
     count = len(player_list)
-    if count == 1:
-        pass
-        # player_selected = player_list.dicts().execute()
+    # if count == 1:
+    player_selected = player_list.dicts().execute()
+    column_count = len(player_selected[0])  # кол-во столбцов в таблице
+    for row in range(count):  # добавляет данные из базы в TableWidget
+        for column in range(0, column_count):
+            # if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+            #         coach_id = str(list(player_selected[row].values())[column])
+            #         coach = Coach.get(Coach.id == coach_id)
+            #         item = coach.coach
+            #     else:
+            item = str(list(player_selected[row].values())[column])
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
         # row_count = len(player_selected)  # кол-во строк в таблице
         # number_column = 1
         # my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
@@ -5073,6 +5086,7 @@ def filter_fin(pl=False):
                 row = 0
                 fl = filter.select().where(Result.system_stage == "Финальный")
                 fltr = fl.select().where((Result.player1 == name)| (Result.player2 == name)) # объединение запросов (отбор по 2-ум столбцам)
+                count = len(fltr)
         # один из финалов встречи которые не сыгранные
         elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "" and round == "":
             fl = filter.select().where(Result.system_id == id_system)
@@ -8857,6 +8871,8 @@ def setka_8_full_made(fin):
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     catalog = 1
     change_dir(catalog)
+    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..") # переходит на один уровень на верх
     return tds
@@ -8989,6 +9005,8 @@ def setka_8_2_made(fin):
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     catalog = 1
     change_dir(catalog)
+    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
     return tds
@@ -9150,6 +9168,8 @@ def setka_16_full_made(fin):
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     catalog = 1
     change_dir(catalog)
+    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
     return tds
@@ -9321,6 +9341,8 @@ def setka_16_2_made(fin):
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     catalog = 1
     change_dir(catalog)
+    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
     return tds
@@ -9444,6 +9466,8 @@ def setka_32_made(fin):
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     catalog = 1
     change_dir(catalog)
+    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
     return tds
@@ -9662,6 +9686,8 @@ def setka_32_full_made(fin):
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     catalog = 1
     change_dir(catalog)
+    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
     return tds
@@ -9901,6 +9927,8 @@ def setka_32_2_made(fin):
     doc = SimpleDocTemplate(name_table_final, pagesize=pv)
     catalog = 1
     change_dir(catalog)
+    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.8 * cm
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
     return tds
