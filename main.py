@@ -11,7 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
-from PyPDF2 import PdfFileMerger, PdfMerger
+from PyPDF2 import PdfFileMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
@@ -8277,11 +8277,11 @@ def enter_print_begunki():
 
 def merdge_pdf_files():
     """Слияние все таблиц соревнований в один файл"""
-    from sys import platform
-    if platform == "darwin":  # OS X
-        pdf_merger = PdfFileMerger()
-    elif platform == "win32":  # Windows...
-        pdf_merger = PdfMerger()
+    # from sys import platform
+    # if platform == "darwin":  # OS X
+    pdf_merger = PdfFileMerger()
+    # elif platform == "win32":  # Windows...
+    #     pdf_merger = PdfMerger()
     title = Title.get(Title.id == title_id())
     pdf_files_list = []
     short_name = title.short_name_comp
@@ -8696,7 +8696,7 @@ def list_referee_pdf():
         elements.append(data)
     elements.insert(0, ["№", "Должность", "Фамилия Имя/ город", "Категория"])
     t = Table(elements,
-              colWidths=(0.6 * cm, 5.0 * cm, 5.7 * cm, 5.2 * cm),
+              colWidths=(0.6 * cm, 7.0 * cm, 7.7 * cm, 3.2 * cm),
               rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
