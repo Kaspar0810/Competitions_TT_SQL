@@ -11,7 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
-from PyPDF2 import PdfFileMerger
+from PyPDF2 import PdfMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
@@ -8279,7 +8279,7 @@ def merdge_pdf_files():
     """Слияние все таблиц соревнований в один файл"""
     # from sys import platform
     # if platform == "darwin":  # OS X
-    pdf_merger = PdfFileMerger()
+    pdf_merger = PdfMerger()
     # elif platform == "win32":  # Windows...
     #     pdf_merger = PdfMerger()
     title = Title.get(Title.id == title_id())
@@ -8447,8 +8447,8 @@ def table_made(pv, stage):
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
 
     #  ============ создание таблиц и вставка данных =================
-    # h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-    #         leftIndent=150)  # стиль параграфа (номера таблиц)
+    h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+            leftIndent=300, spacebefore=10, textColor=blue)  # стиль параграфа ()
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
@@ -8534,6 +8534,7 @@ def table_made(pv, stage):
     change_dir(catalog)
     doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
     doc.bottomMargin = 1.8 * cm
+    elements.insert(0, (Paragraph("Предварительный этап", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
 
@@ -8576,11 +8577,12 @@ def list_regions_pdf():
                            # вериткальное выравнивание в ячейке заголовка
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                            # горизонтальное выравнивание в ячейке
-                           ('ALIGN', (0, 0), (0, 2), 'CENTER'),
-                           ('ALIGN', (1, 0), (1, kp), 'CENTER'),
-                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
-                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
-                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                           ('ALIGN', (0, 0), (-1, -1), 'CENTER'), # (1-я ячейка столб, ряд)  (2-я ячейка столб, ряд)
+                        #    ('ALIGN', (0, 0), (0, kp), 'CENTER'), # (1-я ячейка столб, ряд)  (2-я ячейка столб, ряд)
+                           ('ALIGN', (1, 1), (1, kp), 'LEFT'),
+                           ('BACKGROUND', (0, 0), (1, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (1, 0), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (-1, -1), 1, colors.blue),
                            # цвет и толщину внутренних линий
                            ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
                            # внешние границы таблицы
@@ -8588,7 +8590,7 @@ def list_regions_pdf():
                            ]))
 
 
-    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150, textColor=Color(0, 1, 1, 1),
             firstLineIndent=-20)  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph(f'Список субъектов РФ', h3))
@@ -12288,6 +12290,7 @@ def view_all_page_pdf():
     row_count = 0
     for item in pdf_files_list:
         item_name = rus_name_list[row_count]
+        my_win.tableWidget.setItem(row_count, 0, (QTableWidgetItem(str(row_count + 1))))
         my_win.tableWidget.setItem(row_count, 1, (QTableWidgetItem(str(item))))
         my_win.tableWidget.setItem(row_count, 2, (QTableWidgetItem(str(item_name))))
         row_count += 1
@@ -12437,7 +12440,8 @@ def made_pdf_list():
         list_regions_pdf()
     elif my_win.radioButton_winner.isChecked():
         list_winners_pdf()
-   
+    my_win.Button_made_page_pdf.setEnabled(False)
+
 
 def check_pay():
     """список для отметки оплаты взноса"""
