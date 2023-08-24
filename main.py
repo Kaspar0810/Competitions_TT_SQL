@@ -2758,7 +2758,7 @@ def list_player_pdf(player_list):
 
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
-            firstLineIndent=-20)  # стиль параграфа
+            firstLineIndent=-20, textColor="green")  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph(f'Список участников. {gamer}', h3))
     story.append(t)
@@ -8447,8 +8447,8 @@ def table_made(pv, stage):
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
 
     #  ============ создание таблиц и вставка данных =================
-    h1 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=300, spacebefore=10, textColor=blue)  # стиль параграфа ()
+    h1 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
+            leftIndent=300, spacebefore=10, textColor="green")  # стиль параграфа ()
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
@@ -8590,7 +8590,7 @@ def list_regions_pdf():
                            ]))
 
 
-    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150, textColor=Color(0, 1, 1, 1),
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150, textColor="green",
             firstLineIndent=-20)  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph(f'Список субъектов РФ', h3))
@@ -8655,7 +8655,7 @@ def list_winners_pdf():
                            ]))
 
 
-    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=200, textColor="green",
             firstLineIndent=-20)  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph(f'Список победителей и призеров', h3))
@@ -8722,7 +8722,7 @@ def list_referee_pdf():
                            ]))
 
 
-    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150, textColor="green",
             firstLineIndent=-20)  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph(f'Список главной судейской коллегии', h3))
@@ -8832,7 +8832,7 @@ def setka_8_full_made(fin):
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
                            ] + ts))
 # === надпись финала
-    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+    h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
     elements.append(Paragraph(fin, h2))
 # ====
@@ -8855,10 +8855,10 @@ def setka_8_full_made(fin):
     else:
         short_name = "clear_8_full_net"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
-    doc = SimpleDocTemplate(name_table_final, pagesize=pv)
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=3*cm, bottomMargin=1*cm)
     catalog = 1
     change_dir(catalog)
-    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    doc.build(elements, onFirstPage=func_zagolovok)
     os.chdir("..") # переходит на один уровень на верх
     return tds
 
@@ -8964,7 +8964,7 @@ def setka_8_2_made(fin):
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
                            ] + ts))
 # === надпись финала
-    h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+    h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
     elements.append(Paragraph(fin, h2))
 # ====
@@ -8987,10 +8987,10 @@ def setka_8_2_made(fin):
     else:
         short_name = "clear_8_2_net"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
-    doc = SimpleDocTemplate(name_table_final, pagesize=pv)
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=3*cm, bottomMargin=1*cm)
     catalog = 1
     change_dir(catalog)
-    doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    doc.build(elements, onFirstPage=func_zagolovok)
     os.chdir("..")
     return tds
 
@@ -9148,7 +9148,7 @@ def setka_16_full_made(fin):
     else:
         short_name = "clear_16_full_net"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
-    doc = SimpleDocTemplate(name_table_final, pagesize=pv)
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=1*cm, bottomMargin=1*cm)
     catalog = 1
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -9442,7 +9442,7 @@ def setka_32_made(fin):
     else:
         short_name = "clear_32_net"
         name_table_final = f"{short_name}.pdf"
-    doc = SimpleDocTemplate(name_table_final, pagesize=pv)
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=1*cm, bottomMargin=1*cm)
     catalog = 1
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -9899,7 +9899,7 @@ def setka_32_2_made(fin):
     else:
         short_name = "clear_32_2_net"
         name_table_final = f"{short_name}.pdf"
-    doc = SimpleDocTemplate(name_table_final, pagesize=pv)
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=1*cm, bottomMargin=1*cm)
     catalog = 1
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -12384,7 +12384,7 @@ def made_list_players_on_alf():
 
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
-            firstLineIndent=-20)  # стиль параграфа
+            firstLineIndent=-20, textColor="green")  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph(f'Список участников. {gamer}', h3))
     story.append(t)
@@ -12501,7 +12501,7 @@ def check_pay():
 
 
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
-            firstLineIndent=-20)  # стиль параграфа
+            firstLineIndent=-20, textColor="green")  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph(f'Список участников. {gamer}', h3))
     story.append(t)
