@@ -6717,7 +6717,6 @@ def choice_tbl_made():
 def choice_filter_group():
     """фильтрует таблицу жеребьевка по группам"""
     coach_list = []
-    # gamer = my_win.lineEdit_title_gamer.text()
     fg = my_win.comboBox_filter_choice.currentText()
     choice = Choice.select().where(Choice.title_id == title_id())
     if fg == "":
@@ -6729,7 +6728,6 @@ def choice_filter_group():
         color_region_in_tableWidget(fg)
     else:
         player_choice = choice.select().order_by(Choice.posev_group).where(Choice.group == fg)
-        # player_choice = p_choice.select().where(Choice.title_id == title_id())
     count = len(player_choice)
     choice_list = player_choice.dicts().execute()
     row_count = len(choice_list)  # кол-во строк в таблице
@@ -7017,7 +7015,17 @@ def control_all_player_in_final(etap):
                     msgBox.information(my_win, "Уведомление", txt)
                 elif t == 2:
                     txt = "Остались 2 игрока, они могут сыграть за место между собой"
-                    msgBox.information(my_win, "Уведомление", txt)   
+                    msgBox.information(my_win, "Уведомление", txt)  
+                # ====== вставить вопрос о суперфинале и игры за 3 место если финал сетка
+                result = msgBox.question(my_win, "", "Будет ли суперфинал?",
+                                        msgBox.Yes, msgBox.No) 
+                if result == msgBox.Yes:
+                    super_final = 1
+                    kol_player_in_final(super_final)
+                else:
+                    pass
+
+                # ========= 
                 add_open_tab(tab_page="Система")
 
                 result = msgBox.question(my_win, "", "Система соревнований создана.\n"
@@ -7700,7 +7708,7 @@ def number_final(last_etap):
     return fin
 
 
-def kol_player_in_final():
+def kol_player_in_final(super_final=0):
     """после выбора из комбобокс системы финала подсчитывает сколько игр в финале"""
     sender = my_win.sender()
     pv = my_win.comboBox_page_vid.currentText()
@@ -7709,52 +7717,54 @@ def kol_player_in_final():
     fin = ""
     exit_stage = ""
     label_text = my_win.label_10.text()
-    if my_win.comboBox_etap.currentText() == "Одна таблица":
-        if my_win.comboBox_table_1.currentText() == "Круговая система":
-            kol_game = count * (count - 1) // 2
-            my_win.label_50.show()
-            my_win.label_19.show()
-            my_win.label_101.show()
-            my_win.label_101.setText(my_win.comboBox_etap_1.currentText())
-            my_win.label_19.setText(f"{kol_game} игр.")
-            my_win.label_33.setText(f"Всего: {kol_game} игр.")
-            my_win.label_50.setText(f"{count} человек по круговой системе.")
-            my_win.comboBox_etap.hide()
-            my_win.comboBox_table_1.hide()
-            my_win.comboBox_page_vid.setCurrentText("альбомная")
-        else: # система из одной таблицы по олимпийской системе
-            my_win.comboBox_page_vid.setCurrentText("книжная")
-            cur_index = my_win.comboBox_table_1.currentIndex()
-            total_game = 0
-            if cur_index != 0:
-                player_in_final = count
-                total_game = numbers_of_games(cur_index, player_in_final)
-            my_win.label_50.show()
-            my_win.label_19.show()
-            my_win.label_19.setText(f"{total_game} игр.")
-            my_win.label_33.setText(f"Всего: {total_game} игр.")
-            my_win.label_50.setText(f"{count} человек в сетке.")
-            my_win.comboBox_table_1.hide()
-    else:
-        etap = my_win.comboBox_etap.currentText()
-        exit_player_stage = max_player_and_exit_stage(etap)
-        max_exit_group = exit_player_stage[0]
-        exit_stage = exit_player_stage[1]
-        fin = exit_player_stage[2]
-    # изменение падежа этапов в комбобоксе
-    if exit_stage == "Предварительный":
-        exit_stroka = "Предварительного этапа"
-    elif exit_stage == "1-й полуфинал":
-        exit_stroka = "1-ого полуфинала"
-    elif exit_stage == "2-й полуфинал":
-        exit_stroka = "2-ого полуфинала" 
- 
-    kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников, выходящих\n "
-                                                                  f"из {exit_stroka} в {fin}", min=1, max=max_exit_group)
-                
-        # возвращает из функции несколько значения в списке
-    list_pl_final = total_game_table(exit_stage, kpt, fin, pv)
-    if ok: # заполняет этапы значениями (label)
+    if super_final != 1:
+        if my_win.comboBox_etap.currentText() == "Одна таблица":
+            if my_win.comboBox_table_1.currentText() == "Круговая система":
+                kol_game = count * (count - 1) // 2
+                my_win.label_50.show()
+                my_win.label_19.show()
+                my_win.label_101.show()
+                my_win.label_101.setText(my_win.comboBox_etap_1.currentText())
+                my_win.label_19.setText(f"{kol_game} игр.")
+                my_win.label_33.setText(f"Всего: {kol_game} игр.")
+                my_win.label_50.setText(f"{count} человек по круговой системе.")
+                my_win.comboBox_etap.hide()
+                my_win.comboBox_table_1.hide()
+                my_win.comboBox_page_vid.setCurrentText("альбомная")
+            else: # система из одной таблицы по олимпийской системе
+                my_win.comboBox_page_vid.setCurrentText("книжная")
+                cur_index = my_win.comboBox_table_1.currentIndex()
+                total_game = 0
+                if cur_index != 0:
+                    player_in_final = count
+                    total_game = numbers_of_games(cur_index, player_in_final)
+                my_win.label_50.show()
+                my_win.label_19.show()
+                my_win.label_19.setText(f"{total_game} игр.")
+                my_win.label_33.setText(f"Всего: {total_game} игр.")
+                my_win.label_50.setText(f"{count} человек в сетке.")
+                my_win.comboBox_table_1.hide()
+        else:
+            etap = my_win.comboBox_etap.currentText()
+            exit_player_stage = max_player_and_exit_stage(etap)
+            max_exit_group = exit_player_stage[0]
+            exit_stage = exit_player_stage[1]
+            fin = exit_player_stage[2]
+        # изменение падежа этапов в комбобоксе
+        if exit_stage == "Предварительный":
+            exit_stroka = "Предварительного этапа"
+        elif exit_stage == "1-й полуфинал":
+            exit_stroka = "1-ого полуфинала"
+        elif exit_stage == "2-й полуфинал":
+            exit_stroka = "2-ого полуфинала" 
+    
+        kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников, выходящих\n "
+                                                                    f"из {exit_stroka} в {fin}", min=1, max=max_exit_group)
+                    
+            # возвращает из функции несколько значения в списке
+        list_pl_final = total_game_table(exit_stage, kpt, fin, pv)
+
+    if ok or super_final == 1: # заполняет этапы значениями (label)
         if label_text == "1-й этап":
             my_win.label_19.show()
             my_win.label_19.setText(list_pl_final[3])
@@ -7913,9 +7923,19 @@ def func_zagolovok(canvas, doc):
             canvas.drawCentredString(width / 2.0, height - 20 * cm, main_referee_collegia)
     else:
         main_referee = f"Гл. судья: судья {title.kat_ref} ______________{title.referee}"
-        if current_button == "1" or current_button == "2":
+        if current_button == "1":
             # подпись главного судьи
             canvas.drawString(2 * cm, 20 * cm, main_referee)
+        elif current_button == "2":
+            regions_list = [] # сдвигает подпись судьи относительно кол-во регионов
+            regions = Player.select().where(Player.title_id == title_id())
+            for k in regions:
+                region = k.region
+                regions_list.append(region)
+            regions_set = set(regions_list)
+            count = len(regions_set)
+            # подпись главного судьи
+            canvas.drawString(2 * cm, ((29 - count ) * cm), main_referee)
         else:
             main_secretary = f"Гл. секретарь: судья {title.kat_sek} ______________{title.secretary} "
             # подпись главного судьи
