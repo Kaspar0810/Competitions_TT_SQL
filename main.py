@@ -356,15 +356,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.lineEdit_find_player_in_R.setFocus()
 
     def import_db(self):
-
-        import subprocess
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "comp_db_backup*.db")
-        filepath = str(fname[0])
-# 
-        subprocess.Popen(('start', filepath), shell = True)
-        # subprocess.call(('open', filepath), shell = True)
-        # filename, extension = QFileDialog.getSaveFileName(self,"Сохранить файл",f'{fname}',"DB Files(.db)")
-        # filename, extension = QFileDialog.getSaveFileName(self, 'Save file', 'backup_x', filter=self.tr(".bak"))
+        """Импорт из бэкап в базу данных"""
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "comp_db_backup.db")
+        filepath = str(fname[1])
+        try:
+            db = sqlite3.connect('comp_db.db')
+            db_backup = sqlite3.connect(filepath)
+            with db_backup:
+                db_backup.backup(db, pages=3, progress=None)
+            # показывает статус бар на 5 секунд
+            my_win.statusbar.showMessage(
+                "Импорт базы данных завершен успешно", 5000)
+        except sqlite3.Error as error:
+            # показывает статус бар на 5 секунд
+            my_win.statusbar.showMessage(
+                "Ошибка при копировании базы данных", 5000)
+        finally:
+            if (db_backup):
+                db_backup.close()
 
     def exit(self):
         exit_comp()
@@ -2500,9 +2509,6 @@ def page():
         my_win.comboBox_choice_R.addItems(rejting_month)
         load_comboBox_filter_rejting()
         load_tableWidget()
-        my_win.Button_print_begunki.setEnabled(False)
-        my_win.lineEdit_range_tours.hide()
-        load_combo_etap_begunki()
     elif tb == 7: # вкладка -дополнительно-
         my_win.resize(1110, 825)
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
@@ -2511,6 +2517,9 @@ def page():
         my_win.Button_up.setEnabled(False)
         my_win.Button_down.setEnabled(False)
         my_win.Button_made_one_file_pdf.setEnabled(False)
+        my_win.Button_print_begunki.setEnabled(False)
+        my_win.lineEdit_range_tours.hide()
+        load_combo_etap_begunki()
         # ======
     hide_show_columns(tb)
 
@@ -7839,10 +7848,10 @@ def no_play():
 
 def backup():
     """резервное копирование базы данных"""
-    time_date = date.today()
+    # time_date = date.today()
     try:
         db = sqlite3.connect('comp_db.db')
-        db_backup = sqlite3.connect(f'comp_db_backup_{time_date}.db')
+        db_backup = sqlite3.connect(f'comp_db_backup.db')
         with db_backup:
             db.backup(db_backup, pages=3, progress=None)
         # показывает статус бар на 5 секунд
@@ -8018,7 +8027,7 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     result = Result.select().where(Result.title_id == title_id())
     if stage != "Финальный":
         system = systems.select().where(System.stage == stage).get()
-        total_group = system.total_group
+        # total_group = system.total_group
     else:
         system = systems.select().where(System.stage == number_group).get()
         final_type = system.type_table
@@ -8080,7 +8089,7 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
         city2 = pl2[s2 + 1:]
         pl1 = f"{player1}\n{city1}" # делает фамилия и город на разнызх строчках
         pl2 = f"{player2}\n{city2}"
-        # список строк бегунка
+            # список строк бегунка
         d_tmp = [[n_gr, 'тур', 'вст', 'стол'],
                 [sys_stage, round, tours, ''],
                 [pl1, '', pl2, ''],
@@ -8097,7 +8106,7 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
         tdt_new_tmp.append(tdt_new_temp)
         tdt_temp.clear()
     game = len(tdt_new_tmp)
-    # ===========================
+        # ===========================
     for i in range(0, game):      
         dict_tbl[i] = Table(tdt_new_tmp[i], colWidths=cW, rowHeights=rH)
         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
@@ -8110,6 +8119,7 @@ def begunki_made():
     """создание бегунков"""
     from sys import platform
     from reportlab.platypus import Table
+    msgBox = QMessageBox
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     result = Result.select().where(Result.title_id == title_id())
     number_group = my_win.comboBox_select_group_begunki.currentText()
@@ -8151,6 +8161,12 @@ def begunki_made():
     list_tours = []
     if final_type == "сетка":
         list_tours.append("несыгранные")
+        result_setka = result.select().where(Result.number_group == number_group)
+        result_all = result_setka.select().where((Result.player1 != "") & (Result.player2 != ""))
+        result_fin = result_all.select().where(Result.winner.is_null())
+        if len(result_fin) == 0:
+            msgBox.information(my_win, "Уведомление", "Все встречи сыграны,\n в печати бегунков нет необходимости.")
+            return
     elif final_type == "круг" or final_type == "группы":
         if tours != "все":
             range_tours_str = my_win.lineEdit_range_tours.text()
@@ -8178,8 +8194,6 @@ def begunki_made():
                     r = int(i.round)
                     if r not in list_tours:
                         list_tours.append(r)
-
-
         
     stiker = tbl_begunki(ts, stage, number_group, tours, list_tours) # здесь надо менять данные бегунков
     dict_table = stiker[0]
@@ -8263,7 +8277,6 @@ def select_stage_for_begunki():
                 pass
             else:
                 group_list.append(k.stage)
-
     my_win.comboBox_select_group_begunki.addItems(group_list)
 
         
@@ -12563,27 +12576,27 @@ def open_close_file(view_file):
 
 
 # def proba():
-#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+# #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
 
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
-#     application = CharField(null=True)
-#     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
-#     # system_id = ForeignKeyField(System, field=System.id, null=True)
-# # # #
-    # with db:
-#         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
-#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         # migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
-        # migrate(migrator.add_column('players', 'application', application)) # Добавление столбца (таблица, столбец, повтор название столбца)
+# #     application = CharField(null=True)
+# #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
+# #     # system_id = ForeignKeyField(System, field=System.id, null=True)
+# # # # #
+#     # with db:
+# #         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
+# #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+# #         # migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
+#         # migrate(migrator.add_column('players', 'application', application)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
-    # ========================= создание таблицы
-    # with db:
-    #     Game_list.create_table()
-    # ========================
-    # System.create_table()
-    # sys = System(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
-    #              kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
+#     # ========================= создание таблицы
+#     with db:
+#         my_db.create_table()
+#     # ========================
+#     # Referee.create_table()
+#     referee = Referee(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
+#                  kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
 my_win.lineEdit_pl1_s1_gr.returnPressed.connect(focus)
