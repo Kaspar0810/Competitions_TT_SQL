@@ -224,4 +224,14 @@ class Result(BaseModel):
         opder_by = "id"
 
 
+class Referee(BaseModel):
+    family = CharField()
+    city = CharField()
+    category = CharField(15)
+    signature = BlobField(null=True)
+
+
+    class Meta:
+        db_table = "referees"
+        order_by = "family"
 

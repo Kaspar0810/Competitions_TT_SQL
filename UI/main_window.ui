@@ -20,7 +20,7 @@
       <x>260</x>
       <y>0</y>
       <width>841</width>
-      <height>243</height>
+      <height>231</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -43,7 +43,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -136,7 +136,7 @@
         <x>10</x>
         <y>20</y>
         <width>641</width>
-        <height>192</height>
+        <height>171</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -440,6 +440,16 @@
          </item>
          <item>
           <layout class="QGridLayout" name="gridLayout_2">
+           <item row="1" column="0">
+            <widget class="QComboBox" name="comboBox_referee">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_main_refery">
              <property name="font">
@@ -474,22 +484,8 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2" colspan="2">
-            <widget class="QLabel" name="label_main_sekretar">
-             <property name="font">
-              <font>
-               <family>Times New Roman</family>
-               <pointsize>12</pointsize>
-               <italic>true</italic>
-              </font>
-             </property>
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Гл. секретарь / Город&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
+           <item row="1" column="1" colspan="2">
+            <widget class="QComboBox" name="comboBox_kategor_ref"/>
            </item>
            <item row="0" column="4">
             <widget class="QLabel" name="label_kat_sek">
@@ -508,17 +504,35 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLineEdit" name="lineEdit_refery"/>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QComboBox" name="comboBox_kategor_ref"/>
-           </item>
-           <item row="1" column="3">
-            <widget class="QLineEdit" name="lineEdit_sekretar"/>
+           <item row="0" column="2" colspan="2">
+            <widget class="QLabel" name="label_main_sekretar">
+             <property name="font">
+              <font>
+               <family>Times New Roman</family>
+               <pointsize>12</pointsize>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Гл. секретарь / Город&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
            </item>
            <item row="1" column="4">
-            <widget class="QComboBox" name="comboBox_kategor_sek"/>
+            <widget class="QComboBox" name="comboBox_kategor_sec"/>
+           </item>
+           <item row="1" column="3">
+            <widget class="QComboBox" name="comboBox_secretary">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -3870,7 +3884,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -3890,8 +3904,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4390,8 +4404,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4709,8 +4723,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5128,8 +5142,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5427,8 +5441,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5835,8 +5849,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6218,8 +6232,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6594,9 +6608,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>256</y>
+      <y>236</y>
       <width>841</width>
-      <height>521</height>
+      <height>541</height>
      </rect>
     </property>
     <property name="sizePolicy">

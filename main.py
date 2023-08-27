@@ -374,6 +374,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         finally:
             if (db_backup):
                 db_backup.close()
+                my_win.activateWindow()
 
     def exit(self):
         exit_comp()
@@ -817,7 +818,7 @@ def dbase():
     """Создание DB и таблиц"""
     with db:
         db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
-                          Result, Game_list, Choice, Delete_player])
+                          Result, Game_list, Choice, Delete_player, Referee])
 
 
 def db_r(gamer):  # table_db присваивает по умолчанию значение R_list
@@ -993,7 +994,7 @@ def change_sroki():
 
 #  ==== наполнение комбобоксов ==========
 page_orient = ("альбомная", "книжная")
-kategoria_list = ("2-я кат.", "1-я кат.", " ССВК")
+kategoria_list = ("-выбор категории-", "2-я кат.", "1-я кат.", " ССВК")
 mylist = ('мальчиков и девочек', 'юношей и девушек', 'мужчин и женщин')
 raz = ("б/р", "3-юн", "2-юн", "1-юн", "3-р",
        "2-р", "1-р", "КМС", "МС", "МСМК", "ЗМС")
@@ -1003,7 +1004,7 @@ vid_setki_one_table = ("-выбор типа таблицы-", "Сетка (-2)"
 
 my_win.comboBox_page_vid.addItems(page_orient)
 my_win.comboBox_kategor_ref.addItems(kategoria_list)
-my_win.comboBox_kategor_sek.addItems(kategoria_list)
+my_win.comboBox_kategor_sec.addItems(kategoria_list)
 my_win.comboBox_sredi.addItems(mylist)
 my_win.comboBox_razryad.addItems(raz)
 my_win.comboBox_filter_played.addItems(res)
@@ -1155,7 +1156,7 @@ def db_insert_title(title_str):
     if ok:
         # получение последней записи в таблице
         t = Title.select().order_by(Title.id.desc()).get()
-        nazv = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
+        title = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
                      kat_ref=kr, secretary=sk, kat_sek=ks, gamer=gm, full_name_comp=fn, pdf_comp="",
                      short_name_comp=short_name).save()
     else:
@@ -1199,9 +1200,9 @@ def go_to():
     my_win.dateEdit_start.setDate(titles.data_start)
     my_win.dateEdit_end.setDate(titles.data_end)
     my_win.lineEdit_city_title.setText(titles.mesto)
-    my_win.lineEdit_refery.setText(titles.referee)
+    my_win.comboBox_referee.setCurrentText(titles.referee)
     my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
-    my_win.lineEdit_sekretar.setText(titles.secretary)
+    my_win.comboBox_secretary.setCurrentText(titles.secretary)
     my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
     my_win.lineEdit_title_gamer.setText(titles.gamer)
     my_win.tabWidget.setCurrentIndex(0)  # открывает вкладку титул
@@ -1216,23 +1217,19 @@ def go_to():
 def db_select_title():
     """извлекаем из таблицы данные и заполняем поля титула для редактирования или просмотра"""
     sender = fir_window.sender()  # от какой кнопки сигнал
-
+    title = Title.get(Title.id == title_id())
     if sender == my_win.go_to_Action:  # переход к соревнованиям из меню основного окна
-        full_name = my_win.go_to_Action.text()  # полное название к которым переходим
-        tit = Title.get(Title.id == title_id())
-        name = tit.name
-        data = tit.data_start
-        gamer_current = tit.gamer
+        name = title.name
+        data = title.data_start
+        gamer_current = title.gamer
         # полное название текущих соревнований
         full_name_current = f"{name}.{data}.{gamer_current}"
         # присваиваем новый текст соревнований в меню -перейти к-
         my_win.go_to_Action.setText(full_name_current)
-        titles = Title.get(Title.full_name_comp == full_name)
-        gamer = titles.gamer
+        gamer = title.gamer
     elif sender == my_win.toolBox or sender.text() != "Открыть":
-        titles = Title.get(Title.id == title_id())
-        name = titles.name
-        gamer = titles.gamer
+        name = title.name
+        gamer = title.gamer
     # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
     else:
         change_sroki()
@@ -1242,19 +1239,19 @@ def db_select_title():
         name = txt[:key]
         sroki = fir_window.label_4.text()
         data = sroki[9:19]
-        full_name = f"{name}.{data}.{gamer}"
-        titles = Title.get(Title.full_name_comp == full_name)
     if name != "":
-        my_win.lineEdit_title_nazvanie.setText(titles.name)
-        my_win.lineEdit_title_vozrast.setText(titles.vozrast)
-        my_win.dateEdit_start.setDate(titles.data_start)
-        my_win.dateEdit_end.setDate(titles.data_end)
-        my_win.lineEdit_city_title.setText(titles.mesto)
-        my_win.lineEdit_refery.setText(titles.referee)
-        my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
-        my_win.lineEdit_sekretar.setText(titles.secretary)
-        my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
-        my_win.lineEdit_title_gamer.setText(titles.gamer)
+        my_win.lineEdit_title_nazvanie.setText(title.name)
+        my_win.lineEdit_title_vozrast.setText(title.vozrast)
+        my_win.dateEdit_start.setDate(title.data_start)
+        my_win.dateEdit_end.setDate(title.data_end)
+        my_win.lineEdit_city_title.setText(title.mesto)
+        my_win.comboBox_referee.setCurrentText(title.referee)
+        my_win.comboBox_kategor_ref.setCurrentText(title.kat_ref)
+        my_win.comboBox_secretary.setCurrentText(title.secretary)
+        my_win.comboBox_kategor_sec.setCurrentText(title.kat_sek)
+        my_win.lineEdit_title_gamer.setText(title.gamer)
+    else:
+        load_comboBox_referee()
     tab_enabled(gamer)
 
     return gamer
@@ -1407,8 +1404,8 @@ def title_string():
     ds = my_win.dateEdit_start.text()
     de = my_win.dateEdit_end.text()
     ms = my_win.lineEdit_city_title.text()
-    rf = my_win.lineEdit_refery.text()
-    sk = my_win.lineEdit_sekretar.text()
+    rf = my_win.comboBox_referee.currentText()
+    sk = my_win.comboBox_secretary.currentText()
     kr = my_win.comboBox_kategor_ref.currentText()
     ks = my_win.comboBox_kategor_sek.currentText()
     gm = title.gamer
@@ -2262,8 +2259,14 @@ def page():
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-
         my_win.resize(1110, 825)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 542))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 231))
+        my_win.comboBox_referee.setPlaceholderText("Введите фамилию судьи")
+        my_win.comboBox_referee.setCurrentIndex(-1)
+        my_win.comboBox_referee.setEditable(True)
+        my_win.comboBox_secretary.setPlaceholderText("Введите фамилию судьи")
+        my_win.comboBox_secretary.setCurrentIndex(-1)
+        my_win.comboBox_secretary.setEditable(True)
         db_select_title()
         load_tableWidget()
         my_win.tableWidget.show()
@@ -2685,7 +2688,6 @@ def sort():
         player_list = r_data.select().order_by(rejting_list.desc())
 
     fill_table(player_list)
-    # if sender == my_win.Button_sort_R or sender == my_win.Button_sort_Name or sender == my_win.Button_sort_mesto:
     if sender in signal_button_list:
         list_player_pdf(player_list)
 
@@ -5287,6 +5289,29 @@ def filter_gr():
                 item = str(list(result_list[row].values())[column])
                 my_win.tableWidget.setItem(
                     row, column, QTableWidgetItem(str(item)))
+
+
+def load_comboBox_referee():
+    """Загружает комбобокс списком судей"""
+    msgBox = QMessageBox()
+    my_win.comboBox_referee.clear()
+    my_win.comboBox_secretary.clear()
+    referee_list = []
+    referee = Referee.select()
+    if len(referee) == 0:
+       result = msgBox.information(my_win, "Уведомление", "База данных судей еще пуста!", msgBox.Ok)
+       if result == msgBox.Ok:
+            return
+    else:
+        for k in referee:
+            family = k.family
+            city = k.city
+            fam_city = f"{family}/ {city}"
+            if fam_city not in referee_list:
+                referee_list.append(fam_city)
+        my_win.comboBox_referee.addItems(referee_list)
+        my_win.comboBox_secretary.addItems(referee_list)      
+    return referee_list
 
 
 def load_combo():
@@ -12252,7 +12277,7 @@ def made_list_referee():
             item.setForeground(brush)
             my_win.tableWidget.setHorizontalHeaderItem(i, item)
         my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
-
+        referee_list = []
         post_list = ["ССВК", "Судья 1-й кат.", "Судья 2-й кат."]
         category_list = ["Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
         my_win.tableWidget.setItem(0, 1, QTableWidgetItem("Гл. судья"))
@@ -12263,12 +12288,19 @@ def made_list_referee():
     for n in range(2, int(number_of_referee)): 
         comboBox_list_post = QComboBox()
         comboBox_list_category = QComboBox()  
-        family_city = QLineEdit()
+        comboBox_family_city = QComboBox()
+        referee_list = load_comboBox_referee()
+        comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
+        comboBox_family_city.setCurrentIndex(-1)
+        comboBox_family_city.setEditable(True)
         comboBox_list_category.addItems(category_list)
         comboBox_list_post.addItems(post_list) 
+        comboBox_family_city.addItems(referee_list)
         my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
-        my_win.tableWidget.setCellWidget(n, 2, family_city)
+        my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
         my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)
+    row = my_win.tableWidget.selectRow()
+    comboBox_family_city = my_win.tableWidget.CellWidget(row, 2)
 
 
 def view_all_page_pdf():
@@ -12499,7 +12531,6 @@ def check_pay():
     for l in player_list:
         n += 1
         p = l.player
-        # b = l.bday
         c = l.city
         g = l.region
         coach_id = l.coach_id
@@ -12508,7 +12539,6 @@ def check_pay():
         data = [n, p, c, g, t]
         elements.append(data)
 
-    # elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Город", "Регион", "Тренер(ы)"])
     elements.insert(0, ["№", "Фамилия, Имя", "Город", "Регион", "Тренер(ы)"])
     t = Table(elements, colWidths=(0.7 * cm, 5.0 * cm, 3.5 * cm, 4.5 * cm, 5.9 * cm), rowHeights=(0.6 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
@@ -12532,7 +12562,6 @@ def check_pay():
                            ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
                            ]))
 
-
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
             firstLineIndent=-20, textColor="green")  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
@@ -12549,6 +12578,45 @@ def check_pay():
     elif platform == "win32":  # Windows...
         os.system(f"{view_file}")
     change_dir(catalog)
+
+
+def referee():
+    """добавление судей в базу"""
+    msgBox = QMessageBox()
+    sender = my_win.sender()
+    if sender == my_win.comboBox_referee: # комбобокс глав судьи
+        text = my_win.comboBox_referee.currentText()
+        index = my_win.comboBox_referee.findText(text)
+        if index != -1:
+            my_win.comboBox_referee.setCurrentIndex(index)
+            my_win.comboBox_referee.lineEdit().setSelection(len(text), len(my_win.comboBox_referee.currentText()))
+            category = find_referee_in_db(text)
+            my_win.comboBox_kategor_ref.setCurrentText(category)
+    elif sender == my_win.comboBox_secretary: # комбобокс глав секретарь:
+        text = my_win.comboBox_secretary.currentText()
+        index = my_win.comboBox_secretary.findText(text)
+        if index != -1:
+            my_win.comboBox_secretary.setCurrentIndex(index)
+            my_win.comboBox_secretary.lineEdit().setSelection(len(text), len(my_win.comboBox_secretary.currentText()))
+            category = find_referee_in_db(text)
+            my_win.comboBox_kategor_sec.setCurrentText(category)
+    elif sender == QComboBox.comboBox_family_city: # комбобокс выбора судей гск:
+        text = QComboBox.comboBox_family_city.currentText()
+        index = QComboBox.comboBox_family_city.findText(text)
+        if index != -1:
+            QComboBox.comboBox_family_city.setCurrentIndex(index)
+            QComboBox.comboBox_family_city.lineEdit().setSelection(len(text), len(QComboBox.comboBox_family_city.currentText()))
+            # category = find_referee_in_db(text)
+            # my_win.comboBox_kategor_sec.setCurrentText(category)
+
+
+def find_referee_in_db(text):
+    """ищет фамилию судьи в базе данных и возвращает судейскую категорию"""
+    mark = text.find("/")
+    fio = text[:mark]
+    referee = Referee.select().where(Referee.family == fio).get()
+    category = referee.category
+    return category
 
 
 def open_close_file(view_file):
@@ -12576,27 +12644,20 @@ def open_close_file(view_file):
 
 
 # def proba():
-# #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
 
 #     my_db = SqliteDatabase('comp_db.db')
 #     migrator = SqliteMigrator(my_db)
-# #     application = CharField(null=True)
-# #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
-# #     # system_id = ForeignKeyField(System, field=System.id, null=True)
-# # # # #
-#     # with db:
-# #         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
-# #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-# #         # migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
-#         # migrate(migrator.add_column('players', 'application', application)) # Добавление столбца (таблица, столбец, повтор название столбца)
+#     signature = BlobField(null=True)
+#     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
+#     # system_id = ForeignKeyField(System, field=System.id, null=True)
 
-#     # ========================= создание таблицы
 #     with db:
-#         my_db.create_table()
-#     # ========================
-#     # Referee.create_table()
-#     referee = Referee(title_id=t, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="", label_string="",
-#                  kol_game_string="", choice_flag=False, score_flag=5, visible_game=False).save()
+#         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
+#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+#         migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
+#         migrate(migrator.add_column('referees', 'signature', signature)) # Добавление столбца (таблица, столбец, повтор название столбца)
+
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
 my_win.lineEdit_pl1_s1_gr.returnPressed.connect(focus)
@@ -12701,6 +12762,9 @@ my_win.comboBox_choice_R.currentTextChanged.connect(r_list_load_tablewidget)
 my_win.comboBox_filter_region_in_R.currentTextChanged.connect(filter_rejting_list)
 my_win.comboBox_filter_city_in_R.currentTextChanged.connect(filter_rejting_list)
 my_win.comboBox_filter_date_in_R.currentTextChanged.connect(filter_rejting_list)
+
+my_win.comboBox_referee.currentTextChanged.connect(referee)
+my_win.comboBox_secretary.currentTextChanged.connect(referee)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
@@ -12760,7 +12824,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(wiev_table_choice) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
