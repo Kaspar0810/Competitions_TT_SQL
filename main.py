@@ -12299,9 +12299,13 @@ def made_list_referee():
         my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
         my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
         my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)
-    row = my_win.tableWidget.selectRow()
-    comboBox_family_city = my_win.tableWidget.CellWidget(row, 2)
+    # row = my_win.tableWidget.currentRow()
+    cell = my_win.tableWidget.cellWidget(2, 2)
+    print("OK")
+    # comboBox_family_city = my_win.tableWidget.cellWidget(row, 2)
 
+# def cell_was_clicked(row, column):
+#     cell_text = my_win.tableWidget.item(row, column).text()
 
 def view_all_page_pdf():
     """просмотр все страниц соревнования pdf"""
@@ -12765,6 +12769,8 @@ my_win.comboBox_filter_date_in_R.currentTextChanged.connect(filter_rejting_list)
 
 my_win.comboBox_referee.currentTextChanged.connect(referee)
 my_win.comboBox_secretary.currentTextChanged.connect(referee)
+comboBox_family_city = QComboBox()
+comboBox_family_city.currentIndexChanged.connect(referee)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
