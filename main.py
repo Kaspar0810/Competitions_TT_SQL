@@ -12288,17 +12288,17 @@ def made_list_referee():
     for n in range(2, int(number_of_referee)): 
         comboBox_list_post = QComboBox()
         comboBox_list_category = QComboBox()  
-        # textEdit_family_city = QTextEdit()
-        # referee_list = load_comboBox_referee()
+        comboBox_family_city = QComboBox()
+        referee_list = load_comboBox_referee()
 
-        # comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
-        # comboBox_family_city.setCurrentIndex(-1)
-        # comboBox_family_city.setEditable(True)
+        comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
+        comboBox_family_city.setCurrentIndex(-1)
+        comboBox_family_city.setEditable(True)
         comboBox_list_category.addItems(category_list)
         comboBox_list_post.addItems(post_list) 
-        # comboBox_family_city.addItems(referee_list)
+        comboBox_family_city.addItems(referee_list)
         my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
-        # my_win.tableWidget.setCellWidget(n, 2, textEdit_family_city)
+        my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
         my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)
     
 
@@ -12605,12 +12605,12 @@ def referee():
             my_win.comboBox_secretary.lineEdit().setSelection(len(text), len(my_win.comboBox_secretary.currentText()))
             category = find_referee_in_db(text)
             my_win.comboBox_kategor_sec.setCurrentText(category)
-    elif sender == QComboBox.comboBox_family_city: # комбобокс выбора судей гск:
-        text = QComboBox.comboBox_family_city.currentText()
-        index = QComboBox.comboBox_family_city.findText(text)
+    elif sender == my_win.tableWidget.comboBox_family_city: # комбобокс выбора судей гск:
+        text = my_win.tableWidget.comboBox_family_city.currentText()
+        index = my_win.tableWidget.comboBox_family_city.findText(text)
         if index != -1:
-            QComboBox.comboBox_family_city.setCurrentIndex(index)
-            QComboBox.comboBox_family_city.lineEdit().setSelection(len(text), len(QComboBox.comboBox_family_city.currentText()))
+            my_win.tableWidget.comboBox_family_city.setCurrentIndex(index)
+            my_win.tableWidget.comboBox_family_city.lineEdit().setSelection(len(text), len(my_win.tableWidget.comboBox_family_city.currentText()))
             # category = find_referee_in_db(text)
             # my_win.comboBox_kategor_sec.setCurrentText(category)
 
@@ -12728,8 +12728,8 @@ my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_player_rejting_list
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
 my_win.comboBox_region.currentTextChanged.connect(find_city)
-textEdit_family_city = QTextEdit()
-textEdit_family_city.textChanged.connect(referee)
+comboBox_family_city = QComboBox()
+comboBox_family_city.currentTextChanged.connect(referee)
 # ============= двойной клик
 # двойной клик по listWidget (рейтинг, тренеры)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
