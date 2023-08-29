@@ -19,7 +19,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5 import QtGui, QtWidgets, QtCore, QtPrintSupport
+from PyQt5 import QtGui, QtWidgets, QtCore
 # from QtCore import QtStringListModel, Qt
 from models import *
 from collections import Counter
@@ -12298,15 +12298,41 @@ def made_list_referee():
         comboBox_list_post.addItems(post_list) 
         comboBox_family_city.addItems(referee_list)
         my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
-        my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
+        # my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
         my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)
-    
+        # ============
+        signalMapper = QtCore.QSignalMapper()
+        # signalMapper.mapped[QWidget].connect(on_signalMapper_mapped)
+        # comboBox_family_city.clear()
+        # for rowNumber in range(2, int(number_of_referee)):
+            # for columnNumber in range(4):   
+        # button.clicked.connect(signalMapper.map) 
+        comboBox_family_city.currentTextChanged.connect(signalMapper.map)
+        # comboBox_family_city.addItems(referee_list)
+            # comboBox_family_city.addItems([
+            #         "{0}-{1}-{2}".format(rowNumber, columnNumber, itemNumber)
+            #         for itemNumber in range(3)])
+        # comboBox_family_city.row = rowNumber
+            # comboBox_family_city.column = columnNumber
 
-def proverka():
-    my_win.tableWidget.cellChanged.connect(my_win.onCellChanged)
+        my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
+            # my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
+        signalMapper.setMapping(comboBox_family_city, comboBox_family_city)
+        signalMapper.mapped.connect(on_signalMapper_mapped)
 
-def onCellChanged(row, column):
-        print("Cell changed:", row, column, item(row, column).text())
+def on_signalMapper_mapped(comboBox_family_city):
+        print ("row: {0} column: {1} text: {2}".format(
+            comboBox_family_city.row,
+            comboBox_family_city.column,
+            comboBox_family_city.currentText()
+        ))
+
+
+# def proverka():
+#     my_win.tableWidget.cellChanged.connect(my_win.onCellChanged)
+
+# def onCellChanged(row, column):
+#         print("Cell changed:", row, column, item(row, column).text())
 
 def view_all_page_pdf():
     """просмотр все страниц соревнования pdf"""
@@ -12728,8 +12754,8 @@ my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_player_rejting_list
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
 my_win.comboBox_region.currentTextChanged.connect(find_city)
-comboBox_family_city = QComboBox()
-comboBox_family_city.currentTextChanged.connect(referee)
+# comboBox_family_city = QComboBox()
+# comboBox_family_city.currentTextChanged.connect(referee)
 # ============= двойной клик
 # двойной клик по listWidget (рейтинг, тренеры)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
@@ -12772,6 +12798,8 @@ my_win.comboBox_filter_date_in_R.currentTextChanged.connect(filter_rejting_list)
 
 my_win.comboBox_referee.currentTextChanged.connect(referee)
 my_win.comboBox_secretary.currentTextChanged.connect(referee)
+comboBox_family_city = QComboBox()
+comboBox_family_city.currentTextChanged.connect(on_signalMapper_mapped)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
