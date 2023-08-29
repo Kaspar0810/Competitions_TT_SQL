@@ -12302,12 +12302,13 @@ def made_list_referee():
         my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)
         # ============
         signalMapper = QtCore.QSignalMapper()
-        # signalMapper.mapped[QWidget].connect(on_signalMapper_mapped)
+        signalMapper.mapped[QWidget].connect(on_signalMapper_mapped)
         # comboBox_family_city.clear()
         # for rowNumber in range(2, int(number_of_referee)):
             # for columnNumber in range(4):   
         # button.clicked.connect(signalMapper.map) 
-        comboBox_family_city.currentTextChanged.connect(signalMapper.map)
+        comboBox_family_city.currentIndexChanged.connect(signalMapper.map)
+        # comboBox_family_city.setProperty('row', n)
         # comboBox_family_city.addItems(referee_list)
             # comboBox_family_city.addItems([
             #         "{0}-{1}-{2}".format(rowNumber, columnNumber, itemNumber)
@@ -12318,7 +12319,19 @@ def made_list_referee():
         my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
             # my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
         signalMapper.setMapping(comboBox_family_city, comboBox_family_city)
-        signalMapper.mapped.connect(on_signalMapper_mapped)
+        QtCore.pyqtSlot(QWidget)
+
+
+        # for j in attr:
+        # self.tableWidget.setItem(i, 0, QTableWidgetItem(j))
+        # combobox = QComboBox()
+        # for txt in ["Sinus","Triangle","Square"]:
+        #     combobox.addItem(txt)
+        # combobox.setProperty('row', i)
+        # combobox.currentIndexChanged.connect(self.Combo_indexchanged)
+        # self.tableWidget.setCellWidget(i, 1, combobox)
+        # i += 1
+
 
 def on_signalMapper_mapped(comboBox_family_city):
         print ("row: {0} column: {1} text: {2}".format(
@@ -12798,8 +12811,8 @@ my_win.comboBox_filter_date_in_R.currentTextChanged.connect(filter_rejting_list)
 
 my_win.comboBox_referee.currentTextChanged.connect(referee)
 my_win.comboBox_secretary.currentTextChanged.connect(referee)
-comboBox_family_city = QComboBox()
-comboBox_family_city.currentTextChanged.connect(on_signalMapper_mapped)
+# comboBox_family_city = QComboBox()
+# comboBox_family_city.currentTextChanged.connect(on_signalMapper_mapped)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
