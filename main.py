@@ -12289,6 +12289,7 @@ def made_list_referee():
         comboBox_list_post = QComboBox()
         comboBox_list_category = QComboBox()  
         comboBox_family_city = QComboBox()
+        textEdit_family_city = QTextEdit()
         referee_list = load_comboBox_referee()
 
         comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
@@ -12297,57 +12298,26 @@ def made_list_referee():
         comboBox_list_category.addItems(category_list)
         comboBox_list_post.addItems(post_list) 
         comboBox_family_city.addItems(referee_list)
+        # textEdit_family_city.addItems(referee_list)
         my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
-        # my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
-        my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)
-        # ============
-        signalMapper = QtCore.QSignalMapper()
-        signalMapper.mapped[QWidget].connect(on_signalMapper_mapped)
-        # comboBox_family_city.clear()
-        # for rowNumber in range(2, int(number_of_referee)):
-            # for columnNumber in range(4):   
-        # button.clicked.connect(signalMapper.map) 
-        comboBox_family_city.currentIndexChanged.connect(signalMapper.map)
-        # comboBox_family_city.setProperty('row', n)
-        # comboBox_family_city.addItems(referee_list)
-            # comboBox_family_city.addItems([
-            #         "{0}-{1}-{2}".format(rowNumber, columnNumber, itemNumber)
-            #         for itemNumber in range(3)])
-        # comboBox_family_city.row = rowNumber
-            # comboBox_family_city.column = columnNumber
+        my_win.tableWidget.setCellWidget(n, 2, textEdit_family_city)
+        my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)   
 
-        my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
-            # my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
-        signalMapper.setMapping(comboBox_family_city, comboBox_family_city)
-        QtCore.pyqtSlot(QWidget)
+        my_win.tableWidget.itemChanged.connect(change_on_textEdit_referee)
+        # text = textEdit_family_city.toPlainText() 
+
+        comboBox_family_city.currentTextChanged.connect(change_on_textEdit_referee)
 
 
-        # for j in attr:
-        # self.tableWidget.setItem(i, 0, QTableWidgetItem(j))
-        # combobox = QComboBox()
-        # for txt in ["Sinus","Triangle","Square"]:
-        #     combobox.addItem(txt)
-        # combobox.setProperty('row', i)
-        # combobox.currentIndexChanged.connect(self.Combo_indexchanged)
-        # self.tableWidget.setCellWidget(i, 1, combobox)
-        # i += 1
+
+def change_on_textEdit_referee(comboBox_family_city):
+
+ 
+    print (comboBox_family_city)
 
 
-def on_signalMapper_mapped(comboBox_family_city):
-        print ("row: {0} column: {1} text: {2}".format(
-            comboBox_family_city.row,
-            comboBox_family_city.column,
-            comboBox_family_city.currentText()
-        ))
 
-
-# def proverka():
-#     my_win.tableWidget.cellChanged.connect(my_win.onCellChanged)
-
-# def onCellChanged(row, column):
-#         print("Cell changed:", row, column, item(row, column).text())
-
-def view_all_page_pdf():
+def view_all_page_pdf():    
     """просмотр все страниц соревнования pdf"""
     title = Title.get(Title.id == title_id())
     pdf_files_list = []
@@ -12766,6 +12736,7 @@ my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле п
 my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_player_rejting_list)
 my_win.lineEdit_coach.textChanged.connect(find_coach)
 my_win.lineEdit_city_list.textChanged.connect(find_city)
+
 my_win.comboBox_region.currentTextChanged.connect(find_city)
 # comboBox_family_city = QComboBox()
 # comboBox_family_city.currentTextChanged.connect(referee)
