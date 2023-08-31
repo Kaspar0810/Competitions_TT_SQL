@@ -12328,8 +12328,8 @@ def add_referee_to_db():
     # referees = Referee.select()
     count = my_win.tableWidget.rowCount()
     for k in range(2, count):
-        item = my_win.tableWidget.item(k, 2)
-        kat = my_win.tableWidget.item(k, 3).text()
+        item = my_win.tableWidget.cellWidget(k, 2).currentText()
+        kat = my_win.tableWidget.cellWidget(k, 3).currentText()
         mark = item.find("/")
         family_referee = item[:mark]
         city_referee = item[mark + 2:]
