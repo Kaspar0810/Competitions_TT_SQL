@@ -12278,8 +12278,8 @@ def made_list_referee():
             my_win.tableWidget.setHorizontalHeaderItem(i, item)
         my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
         referee_list = []
-        post_list = ["ССВК", "Судья 1-й кат.", "Судья 2-й кат."]
-        category_list = ["Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        post_list = ["-выберите категорию", "ССВК", "Судья 1-й кат.", "Судья 2-й кат."]
+        category_list = ["-судейская должность-","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
         my_win.tableWidget.setItem(0, 1, QTableWidgetItem("Гл. судья"))
         my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
     for k in range(0, 2):
@@ -12289,7 +12289,6 @@ def made_list_referee():
         comboBox_list_post = QComboBox()
         comboBox_list_category = QComboBox()  
         comboBox_family_city = QComboBox()
-        textEdit_family_city = QTextEdit()
         referee_list = load_comboBox_referee()
 
         comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
@@ -12298,22 +12297,57 @@ def made_list_referee():
         comboBox_list_category.addItems(category_list)
         comboBox_list_post.addItems(post_list) 
         comboBox_family_city.addItems(referee_list)
-        # textEdit_family_city.addItems(referee_list)
+
         my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
-        my_win.tableWidget.setCellWidget(n, 2, textEdit_family_city)
+        my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
         my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)   
 
-        my_win.tableWidget.itemChanged.connect(change_on_textEdit_referee)
-        # text = textEdit_family_city.toPlainText() 
-
-        comboBox_family_city.currentTextChanged.connect(change_on_textEdit_referee)
+        my_win.tableWidget.itemChanged.connect(change_on_comboBox_referee)
+        comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)
 
 
 
-def change_on_textEdit_referee(comboBox_family_city):
+def change_on_comboBox_referee(comboBox_family_city):
+    """добавляет в базу данных судей если их там нет"""
+    msgBox = QMessageBox()
+    referees = Referee.select()
+    mark = comboBox_family_city.find("/")
+    if mark > 0:
+        family_referee = comboBox_family_city[:mark]
+        city_referee = comboBox_family_city[mark + 2:]
+    else:
+        count = len(comboBox_family_city)
+        if count == 1:
+            result = msgBox.information(my_win, "Уведомление", "Введите фамилию судьи и его инициалы\n затем поставте / и город\n\n"
+            "Иванов И.И./ Город", msgBox.Ok)
 
- 
-    print (comboBox_family_city)
+
+
+def add_referee_to_db():
+    """добавляет в базу данных новых судей"""
+    # referees = Referee.select()
+    count = my_win.tableWidget.rowCount()
+    for k in range(2, count):
+        item = my_win.tableWidget.item(k, 2)
+        kat = my_win.tableWidget.item(k, 3).text()
+        mark = item.find("/")
+        family_referee = item[:mark]
+        city_referee = item[mark + 2:]
+        referees = Referee.select().where(Referee.family == family_referee)
+        if len(referees) == 0:
+            with db:
+                ref = Referee(id, family=family_referee, city=city_referee, categopy=kat).save()
+
+
+    # if mark != -1:
+    #     family_referee = family_referee.title()
+    #     referee = Referee.select().where(Referee.family == family_referee)
+    #     count = len(referee)
+    #     if count == 0:
+    #         with db:
+    #             referees.family = family_referee
+    #             referees.city = city_referee
+    #             referees.save() 
 
 
 
@@ -12514,6 +12548,7 @@ def made_list_winners():
 def made_pdf_list():
     """создание страниц PDF соревнования"""
     if my_win.radioButton_GSK.isChecked():
+        add_referee_to_db()
         list_referee_pdf()
     elif my_win.radioButton_regions.isChecked():
         list_regions_pdf()
@@ -12666,11 +12701,11 @@ def open_close_file(view_file):
 #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
 #     # system_id = ForeignKeyField(System, field=System.id, null=True)
 
-#     with db:
-#         # migrate(migrator.drop_column('system', 'system_id')) # удаление столбца
+    # with db:
+        # migrate(migrator.drop_column('referees', 'signature')) # удаление столбца
 #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
 #         migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
-#         migrate(migrator.add_column('referees', 'signature', signature)) # Добавление столбца (таблица, столбец, повтор название столбца)
+        # migrate(migrator.add_column('referees', 'signature', signature)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
