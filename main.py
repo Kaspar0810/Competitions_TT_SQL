@@ -8746,8 +8746,8 @@ def list_referee_pdf():
         else:
             post_combobox = my_win.tableWidget.cellWidget(l, 1)
             post = post_combobox.currentText()
-            fam_city_line = my_win.tableWidget.cellWidget(l, 2)
-            fam_city = fam_city_line.text()
+            fam_city_comboBox = my_win.tableWidget.cellWidget(l, 2)
+            fam_city = fam_city_comboBox.currentText()
             category_combobox = my_win.tableWidget.cellWidget(l, 3)
             category = category_combobox.currentText()
         num = my_win.tableWidget.item(l, 0).text()
@@ -12336,7 +12336,7 @@ def add_referee_to_db():
         referees = Referee.select().where(Referee.family == family_referee)
         if len(referees) == 0:
             with db:
-                ref = Referee(id, family=family_referee, city=city_referee, categopy=kat).save()
+                ref = Referee(family=family_referee, city=city_referee, categopy=kat).save()
 
 
     # if mark != -1:
