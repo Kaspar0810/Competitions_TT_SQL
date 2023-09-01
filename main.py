@@ -12250,11 +12250,12 @@ def move_row_in_tablewidget():
 
 def made_list_referee():
     """создание списка судейской коллегии"""
+    # Dialog = QInputDialg()
     my_win.tableWidget.clear()
     my_win.radioButton_GSK.setChecked(True)
     my_win.Button_made_page_pdf.setEnabled(True)
-    number_of_referee, ok = QInputDialog.getText(my_win, "Главная судейская коллегия", "Введите число строк списка\n главной cудейской коллегии.")
-    for l in range(0, int(number_of_referee)):
+    number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
+    for l in range(0, number_of_referee):
         my_win.tableWidget.setItem(l, 0, QTableWidgetItem(str(l + 1)))
     if ok:
         title = Title.get(Title.id == title_id())
@@ -12266,7 +12267,7 @@ def made_list_referee():
         list_kategory = [kat_referee, kat_secretary]
 
         my_win.tableWidget.setColumnCount(4) # устанавливает колво столбцов
-        my_win.tableWidget.setRowCount(int(number_of_referee))
+        my_win.tableWidget.setRowCount(number_of_referee)
         column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
         my_win.tableWidget.setColumnWidth(2, 10000)
         for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
@@ -12278,10 +12279,12 @@ def made_list_referee():
             my_win.tableWidget.setHorizontalHeaderItem(i, item)
         my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
         referee_list = []
-        post_list = ["-выберите категорию", "ССВК", "Судья 1-й кат.", "Судья 2-й кат."]
-        category_list = ["-судейская должность-","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        post_list = ["", "ССВК", "Судья 1-й кат.", "Судья 2-й кат."]
+        category_list = ["","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
         my_win.tableWidget.setItem(0, 1, QTableWidgetItem("Гл. судья"))
         my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
+    else:
+        return
     for k in range(0, 2):
         my_win.tableWidget.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
         my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
@@ -12310,45 +12313,44 @@ def made_list_referee():
 def change_on_comboBox_referee(comboBox_family_city):
     """добавляет в базу данных судей если их там нет"""
     msgBox = QMessageBox()
-    referees = Referee.select()
+    # row_count = my_win.tableWidget.rowCount()
+    row_cur = my_win.tableWidget.currentRow()
     mark = comboBox_family_city.find("/")
-    if mark > 0:
-        family_referee = comboBox_family_city[:mark]
-        city_referee = comboBox_family_city[mark + 2:]
-    else:
+    if mark == -1:
         count = len(comboBox_family_city)
         if count == 1:
-            result = msgBox.information(my_win, "Уведомление", "Введите фамилию судьи и его инициалы\n затем поставте / и город\n\n"
-            "Иванов И.И./ Город", msgBox.Ok)
-
+            add_referee_to_db()
+    else:
+        family_referee = comboBox_family_city[:mark]
+        family_referee = family_referee.title()
+        referees = Referee.select().where(Referee.family == family_referee)
+        # for row in range(row_count):
+        item = my_win.tableWidget.cellWidget(row_cur, 2).currentText()
+        if comboBox_family_city == item:
+            return
+        if len(referees) == 0:
+            kategor = referees.category
+            kat = my_win.tableWidget.cellWidget(row_cur, 3)
+            kat.setCurrentText(kategor)
+            # result = msgBox.information(my_win, "Уведомление", "Введите фамилию судьи и его инициалы\n затем поставте / и город\n\n"
+            # "Иванов И.И./ Город", msgBox.Ok)
 
 
 def add_referee_to_db():
     """добавляет в базу данных новых судей"""
-    # referees = Referee.select()
     count = my_win.tableWidget.rowCount()
     for k in range(2, count):
         item = my_win.tableWidget.cellWidget(k, 2).currentText()
         kat = my_win.tableWidget.cellWidget(k, 3).currentText()
         mark = item.find("/")
         family_referee = item[:mark]
+        family_referee = family_referee.title()
         city_referee = item[mark + 2:]
+        city_referee = city_referee.title()
         referees = Referee.select().where(Referee.family == family_referee)
         if len(referees) == 0:
             with db:
-                ref = Referee(family=family_referee, city=city_referee, categopy=kat).save()
-
-
-    # if mark != -1:
-    #     family_referee = family_referee.title()
-    #     referee = Referee.select().where(Referee.family == family_referee)
-    #     count = len(referee)
-    #     if count == 0:
-    #         with db:
-    #             referees.family = family_referee
-    #             referees.city = city_referee
-    #             referees.save() 
-
+                ref = Referee(family=family_referee, city=city_referee, category=kat).save()
 
 
 def view_all_page_pdf():    
