@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
@@ -20,7 +23,7 @@
       <x>260</x>
       <y>0</y>
       <width>841</width>
-      <height>231</height>
+      <height>239</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -845,7 +848,7 @@
         <x>1</x>
         <y>26</y>
         <width>821</width>
-        <height>191</height>
+        <height>181</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -998,7 +1001,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_28">
+      <widget class="QLabel" name="label_etap_2">
        <property name="geometry">
         <rect>
          <x>247</x>
@@ -1166,7 +1169,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_50">
+      <widget class="QLabel" name="label_etap_1">
        <property name="geometry">
         <rect>
          <x>247</x>
@@ -1323,7 +1326,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_60">
+      <widget class="QLabel" name="label_etap_3">
        <property name="geometry">
         <rect>
          <x>247</x>
@@ -1342,7 +1345,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_61">
+      <widget class="QLabel" name="label_etap_4">
        <property name="geometry">
         <rect>
          <x>247</x>
@@ -1361,7 +1364,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_62">
+      <widget class="QLabel" name="label_etap_5">
        <property name="geometry">
         <rect>
          <x>247</x>
@@ -1518,7 +1521,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_84">
+      <widget class="QLabel" name="label_etap_6">
        <property name="geometry">
         <rect>
          <x>248</x>
@@ -1537,7 +1540,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_85">
+      <widget class="QLabel" name="label_etap_7">
        <property name="geometry">
         <rect>
          <x>248</x>
@@ -1556,7 +1559,7 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_86">
+      <widget class="QLabel" name="label_etap_8">
        <property name="geometry">
         <rect>
          <x>249</x>
@@ -3917,7 +3920,7 @@
         <x>0</x>
         <y>0</y>
         <width>236</width>
-        <height>504</height>
+        <height>506</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -6608,9 +6611,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>236</y>
+      <y>241</y>
       <width>841</width>
-      <height>541</height>
+      <height>540</height>
      </rect>
     </property>
     <property name="sizePolicy">
