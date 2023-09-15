@@ -2,10 +2,12 @@
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS
-from reportlab.platypus.tableofcontents import TableOfContents
+# from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib import colors
 from reportlab.lib.colors import *
-from reportlab.platypus import Paragraph, TableStyle, SimpleDocTemplate
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, TableStyle, SimpleDocTemplate, Frame
+
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -15,10 +17,10 @@ from PyPDF2 import PdfMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, QThread
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon, QBrush, QColor
+from PyQt5.QtWidgets import QMainWindow, QMenu, QAction, QFileDialog, QMessageBox, QDesktopWidget, QApplication, QInputDialog, QProgressBar, QAbstractItemView, QTableWidgetItem
+from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem
 from PyQt5 import QtGui, QtWidgets, QtCore
 # from QtCore import QtStringListModel, Qt
 from models import *
@@ -1348,7 +1350,12 @@ def load_tableWidget():
         p = 0
         if tb == 3:
             stage = "Предварительный"
-            fill_table_results()
+            import time
+            start = time.time()
+            fill_table_results(upd=0)
+            end = time.time()
+            total = start - end
+            print("Программа выполнялась за", "%.2f" %total)
         else:
             system = System.select().where(System.title_id == title_id())  # должен получить первый номер id 
             choice_flag = {} # словарь финал - жеребьевка
@@ -1364,10 +1371,10 @@ def load_tableWidget():
                 if choice_flag[k] == True:
                     p += 1
             if p > 0:
-                fill_table_results()
+                fill_table_results(upd=0)
     elif tb == 4:
         stage = "Предварительный"
-        fill_table_results()
+        fill_table_results(upd=0)
     elif tb == 2 or sender == my_win.choice_gr_Action:
         if sender == my_win.choice_fin_Action:  # таблица жеребьевки
             pass
@@ -1744,8 +1751,7 @@ def fill_table(player_list):
         my_win.tableWidget.setRowCount(row_count)
         my_win.statusbar.showMessage(
             "Удаленных участников соревнований нет", 10000)
-    # dir_path = pathlib.Path.cwd()
-    # print(f"каталог-стр 1741 {dir_path}")
+    
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
@@ -1794,13 +1800,15 @@ def fill_table_R1_list():
     my_win.tableWidget.resizeColumnsToContents()
 
 
-def fill_table_results():
-    """заполняет таблицу результатов QtableWidget из db result"""
+def fill_table_results(upd):
+    """заполняет таблицу результатов QtableWidget из db result"""    
     system_id_list = []
     system_stage_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
     result = Result.select().where(Result.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     tb = my_win.tabWidget.currentIndex()
+    if upd == 1: # значит таблица загружена и идет ввод счета или обновление таблицы
+        row_number = my_win.tableWidget.currentRow()
     if tb == 3:
         stage = "Предварительный"
         system_id = system.select().where(System.stage == stage).get()
@@ -1820,12 +1828,12 @@ def fill_table_results():
         else:
             system_id = system.select().where(System.stage == stage).get()
             id_system = system_id.id
-            player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result           
- 
+            player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result     
+
     result_list = player_result.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = len(result_list[0])  # кол-во столбцов в таблице
-        # вставляет в таблицу необходимое кол-во строк
+            # вставляет в таблицу необходимое кол-во строк
     my_win.tableWidget.setRowCount(row_count)
     row_result = []
     for row in range(row_count):  # добавляет данные из базы в TableWidget
@@ -1840,18 +1848,18 @@ def fill_table_results():
                     if row_result[4] == row_result[6]:
                         my_win.tableWidget.item(row, 4).setForeground(
                             QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                            # в красный цвет 1-ого игрока
+                                # в красный цвет 1-ого игрока
                     else:
                         my_win.tableWidget.item(row, 5).setForeground(
                             QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                            # в красный цвет 2-ого игрока
+                                # в красный цвет 2-ого игрока
                 else:
                     my_win.tableWidget.item(row, 4).setForeground(
                         QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
                     my_win.tableWidget.item(row, 5).setForeground(
                         QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-
+    # ========
         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
         my_win.tableWidget.showColumn(9) # столбец счет в партиях
         my_win.tableWidget.hideColumn(1)
@@ -1861,7 +1869,7 @@ def fill_table_results():
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.showColumn(14)
         my_win.tableWidget.hideColumn(15)
-        # ставит размер столбцов согласно записям
+                # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
 
 
@@ -2438,7 +2446,15 @@ def page():
         load_tableWidget()
     elif tb == 3:  # вкладка -группы-
         stage = "Предварительный"
+        Button_view_group = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
+        Button_view_group.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
+        Button_view_group.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        Button_view_group.setText("Просмотр групп")
+        Button_view_group.show()
+        Button_view_group.clicked.connect(view)
+
         my_win.resize(1270, 825)
+
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
 
@@ -2459,6 +2475,11 @@ def page():
         my_win.label_16.hide()
     elif tb == 4:  # вкладка -полуфиналы-
         my_win.resize(1270, 825)
+        Button_view_semifinal = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
+        Button_view_semifinal.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
+        Button_view_semifinal.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        Button_view_semifinal.setText("Просмотр полуфиналов")
+        Button_view_semifinal.show()
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
@@ -2490,6 +2511,11 @@ def page():
             my_win.label_16.hide()
     elif tb == 5: # вкладка -финалы-
         my_win.resize(1270, 825)
+        Button_view_final = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
+        Button_view_final.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
+        Button_view_final.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        Button_view_final.setText("Просмотр финалов")
+        Button_view_final.show()
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.checkBox_5.setEnabled(False)
@@ -3078,7 +3104,7 @@ def view():
             view_file =  f"{short_name}_winners_list.pdf"    
         elif sender == my_win.view_title_Action:
             view_file = f"{short_name}_title.pdf"
-        elif sender == my_win.view_gr_Action:  # вкладка группы
+        elif sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
             view_file = f"{short_name}_table_group.pdf"
         elif sender == my_win.view_fin1_Action:
             view_file = f"{short_name}_1-final.pdf"
@@ -4561,7 +4587,7 @@ def enter_score(none_player=0):
     sys = System.select().where(System.title_id == title_id())   
     if tab == 3: # группы
         stage = "Предварительный"
-    elif tab == 4:# полуфиналы
+    elif tab == 4: # полуфиналы
         if r == -1:
             stage = "1-й полуфинал"
         else:
@@ -4616,8 +4642,8 @@ def enter_score(none_player=0):
             else:
                 winner = pl2
                 loser = pl1
-                ts_winner = f"{st1} : {st2}"
-                ts_loser = f"{st2} : {st1}"
+                ts_winner = f"{st2} : {st1}"
+                ts_loser = f"{st1} : {st2}"
             winner_string = string_score_game()  # пишет счет в партии
         elif none_player == 1: # не явился 1-й игрок
             winner = pl2
@@ -4689,8 +4715,12 @@ def enter_score(none_player=0):
                             player = loser_fam_name
         elif type == "круг":
             pass
-    fill_table_results()
-
+    import time
+    start = time.time()
+    fill_table_results(upd=1)
+    end = time.time()
+    total = start - end
+    print("Программа выполнялась за", "%.2f" %total)
     if tab == 3:
         line_edit_list = [my_win.lineEdit_pl1_s1_gr, my_win.lineEdit_pl2_s1_gr, my_win.lineEdit_pl1_s2_gr, my_win.lineEdit_pl2_s2_gr,
                           my_win.lineEdit_pl1_s3_gr, my_win.lineEdit_pl2_s3_gr, my_win.lineEdit_pl1_s4_gr, my_win.lineEdit_pl2_s4_gr,
@@ -7181,13 +7211,6 @@ def made_system_load_combobox_etap():
             number_etap = int(label_text[:mark])
             label_etap_list[number_etap - 1].show()
             label_etap_list[number_etap - 1].setText(f"{number_etap - 1}-й полуфинал")
-            # my_win.comboBox_table_4.show()   
-            # if label_text == "2-й этап":
-            #     my_win.label_102.show()
-            #     my_win.label_102.setText("1-й полуфинал")
-            # elif label_text == "3-й этап":
-            #     my_win.label_103.show()
-            #     my_win.label_103.setText("2-й полуфинал")
             kol_player_in_final()
         elif ct == "Финальный":
             if label_text == "2-й этап":
@@ -7213,48 +7236,18 @@ def made_system_load_combobox_etap():
                     final = f"{fin + 1}-й финал"    
                     my_win.label_104.setText(final)
                 my_win.comboBox_table_4.show()
-            # elif label_text == "5-й этап":
             else:
                 mark = label_text.find("-")
                 fin = int(txt[:mark])
                 final = f"{fin + 1}-й финал"  
                 label_etap_list[number_etap - 1].setText(final) 
                 combobox_etap_list[number_etap - 1].show() 
-            #     my_win.comboBox_table_8.show()    
-            #         txt = my_win.label_104.text()
-            #         znak = txt.find("-") 
-            #         fin = int(txt[:znak])
-            #         final = f"{fin + 1}-й финал"    
-            #         my_win.label_105.setText(final)
-            #         my_win.comboBox_table_5.show()
-            # elif label_text == "6-й этап":
-            #         txt = my_win.label_105.text()
-            #         znak = txt.find("-") 
-            #         fin = int(txt[:znak])
-            #         final = f"{fin + 1}-й финал"    
-            #         my_win.label_106.setText(final)
-            #         my_win.comboBox_table_6.show()
-            # elif label_text == "7-й этап":
-            #         txt = my_win.label_106.text()
-            #         znak = txt.find("-") 
-            #         fin = int(txt[:znak])
-            #         final = f"{fin + 1}-й финал"    
-            #         my_win.label_107.setText(final)
-            #         my_win.comboBox_table_7.show()
-            # elif label_text == "8-й этап":
-            #         mark = label_text.find("-")
-            #         fin = int(txt[:mark])
-            #         final = f"{fin + 1}-й финал"  
-            #         label_etap_list[number_etap - 1].setText(final)  
-            #         my_win.comboBox_table_8.show()
         elif ct == "Суперфинал":
             mark = label_text.find("-")
             number_etap = int(label_text[:mark])
             label_etap_list[number_etap - 1].show()
             label_etap_list[number_etap - 1].setText("Суперфинал")
             combobox_etap_list[number_etap - 1].show()
-
-            # my_win.comboBox_table_4.show()   
 
 
 def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
@@ -8446,6 +8439,21 @@ def table_made(pv, stage):
     from reportlab.platypus import Table
     system = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()  # находит system id последнего
     type_tbl = system.type_table
+    # =========
+    # styles = getSampleStyleSheet()
+    # styleN = styles['Normal']
+    # styleH = styles['Heading1']
+    # story = []
+    #     #add some flowables
+    # story.append(Paragraph("This is a Heading",styleH))
+    # story.append(Paragraph("This is a paragraph in <i>Normal</i> style.",
+    #        styleN))
+    # canvas  = Canvas('mydoc.pdf', pagesize=landscape(A4))
+    # f = Frame(5* cm, 3 * cm, 6 * cm, 25 * cm, showBoundary=0) # высота прямоугольника  6 Х 25, showBoundary = 1, рамка 0- нет
+    # f.addFromList(story,c)
+    # c.save()
+
+    # ==========
  
     if (stage == "Одна таблица" and type_tbl == "круг") or (stage != "Одна таблица" and type_tbl == "круг"):
         kg = 1
@@ -8486,7 +8494,6 @@ def table_made(pv, stage):
             rH = (0.34 * cm)  # высота строки
         else:
             rH = (0.32 * cm)  # высота строки
-    # rH = None  # высота строки
     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
 
     for i in range(max_pl):
@@ -8550,7 +8557,7 @@ def table_made(pv, stage):
     h1 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
             leftIndent=300, spacebefore=10, textColor="green")  # стиль параграфа ()
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=300, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+            leftIndent=300, spacebefore=20, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
     if kg == 1:  # одна таблицу
@@ -8586,9 +8593,15 @@ def table_made(pv, stage):
                 tmp_copy = s_tmp.copy()
                 shell_table.append(tmp_copy)
                 s_tmp.clear()
-                text = f'группа {l * 2 + 1} {"" * 5} группа {l * 2 + 2}'
+                text = f'группа {l * 2 + 1} группа {l * 2 + 2}'
                 elements.append(Paragraph(text, h2))
                 elements.append(shell_table[l][0])
+                # =======
+                # frame_list[l] = Frame(0.5 * cm, (15 - h) * cm, 29 * cm, 4 * cm, showBoundary=1) # (от левой стороны, от низа, ширина, высота прямоугольника showBoundary = 1, рамка 0- нет)
+                # frame_list[l].addFromList(shell_table[l][0], canvas)
+                # # h += 5
+                # # if h == 10:
+                # canvas.save()
         else:  # страница книжная, то таблицы размещаются обе в столбец
             for k in range(1, kg // 2 + 1):
                 for i in range(0, kg):
@@ -8629,6 +8642,22 @@ def table_made(pv, stage):
         txt = stage.rfind("-")
         number_fin = stage[:txt]
         name_table = f"{short_name}_{number_fin}-final.pdf"
+
+     # =========
+    # styles = getSampleStyleSheet()
+    # styleN = styles['Normal']
+    # styleH = styles['Heading1']
+    # story = []
+    #     #add some flowables
+    # # story.append(Paragraph("Основной заголовок",h1))
+    # story.append(Paragraph("Номера групп", h2))
+    # story.append(shell_table[1][0])
+    # canvas  = Canvas('mydoc.pdf', pagesize=landscape(A4))
+    # frame = Frame(0.5 * cm, 15 * cm, 29 * cm, 5 * cm, showBoundary=1) # (от левой стороны, от низа, ширина, высота прямоугольника showBoundary = 1, рамка 0- нет)
+    # frame.addFromList(elements, canvas)
+    # canvas.save()
+    # ==========
+
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     catalog = 1
     change_dir(catalog)
@@ -12750,6 +12779,69 @@ def open_close_file(view_file):
         print("Файл не существует.")
 
 
+def proba_pdf():
+    """проба пдф"""
+
+import itertools
+from random import randint
+from statistics import mean
+
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+
+
+def grouper(iterable, n):
+    args = [iter(iterable)] * n
+    return itertools.zip_longest(*args)
+
+
+def export_to_pdf(data):
+    c = canvas.Canvas("grid-students.pdf", pagesize=A4)
+    w, h = landscape(A4)
+    max_rows_per_page = 45
+    # Margin.
+    x_offset = 50
+    y_offset = 50
+    # Space between rows.
+    padding = 15
+
+    xlist = [x + x_offset for x in [0, 200, 250, 300, 350, 400, 480]]
+    ylist = [h - y_offset - i*padding for i in range(max_rows_per_page + 1)]
+
+    # for rows in grouper(data, max_rows_per_page):
+    #     rows = tuple(filter(bool, rows))
+    #     c.grid(xlist, ylist[:len(rows) + 1])
+    #     for y, row in zip(ylist[:-1], rows):
+    #         for x, cell in zip(xlist, row):
+    #             c.drawString(x + 2, y - padding + 3, str(cell))
+    #     c.showPage()
+
+    c.save()
+
+
+data = [("NAME", "GR. 1", "GR. 2", "GR. 3", "AVG", "STATUS")]
+
+for i in range(1, 101):
+    exams = [randint(0, 10) for _ in range(3)]
+    avg = round(mean(exams), 2)
+    state = "Approved" if avg >= 4 else "Disapproved"
+    data.append((f"Student {i}", *exams, avg, state))
+
+export_to_pdf(data)
+# . =====
+
+    # styles = getSampleStyleSheet()
+    # styleN = styles['Normal']
+    # styleH = styles['Heading1']
+    # story = []
+    #     #add some flowables
+    # story.append(Paragraph("This is a Heading", styleH))
+    # story.append(Paragraph("This is a paragraph in <i>Normal</i> style.", styleN))
+    # c  = Canvas('mydoc.pdf', pagesize = landscape)
+    # f = Frame(5* cm, 3 * cm, 6 * cm, 25 * cm, showBoundary=1) # высота прямоугольника  6 Х 25, showBoundary = 1, рамка 0- нет
+    # f.addFromList(story, c)
+    # c.save()
+# =======        
 # def proba():
 #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
 
@@ -12878,8 +12970,6 @@ my_win.comboBox_secretary.currentTextChanged.connect(referee)
 my_win.comboBox_kategor_ref.currentTextChanged.connect(add_referee_to_db)
 my_win.comboBox_kategor_sec.currentTextChanged.connect(add_referee_to_db)
 
-# comboBox_family_city = QComboBox()
-# comboBox_family_city.currentTextChanged.connect(on_signalMapper_mapped)
 # =======  отслеживание переключение чекбоксов =========
 my_win.radioButton_3.toggled.connect(load_combobox_filter_group)
 
@@ -12939,7 +13029,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+my_win.Button_proba.clicked.connect(proba_pdf) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
