@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3887,7 +3887,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -3907,8 +3907,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4407,8 +4407,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4726,8 +4726,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4856,19 +4856,6 @@
             </size>
            </property>
           </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="Button_filter_gr">
-           <property name="font">
-            <font>
-             <family>Courier New</family>
-             <pointsize>14</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Фильтр</string>
-           </property>
-          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="Button_reset_filter_gr">
@@ -5145,8 +5132,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5291,19 +5278,6 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="Button_filter_sf">
-            <property name="font">
-             <font>
-              <family>Courier New</family>
-              <pointsize>14</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Фильтр</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="Button_reset_filter_sf">
             <property name="font">
              <font>
@@ -5444,8 +5418,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5852,8 +5826,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6235,8 +6209,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
