@@ -6064,10 +6064,12 @@ def view_table_choice(fam_city, number_net, num_id_player):
 
     for l in range(1, 33):
         x = num_id_player.setdefault(l, "") 
-        if x == "":
-            player_full = x
-        elif fam_city != "" and l == number_net:
+        # if x == "":
+        #     player_full = x
+        if fam_city != "" and l == number_net:
             player_full = fam_city
+        elif x == "":
+            player_full = x
         else:
             list_net = num_id_player[l]
             id_player = list_net[0]
