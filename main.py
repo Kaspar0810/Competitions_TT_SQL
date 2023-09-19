@@ -6059,32 +6059,58 @@ def view_table_choice(fam_city, number_net, num_id_player):
     """показ таблицы жеребьевки"""
     data = []
     num_fam = []
+    n = 0
+    num_fam_temp = []
     manual_choice_dict = {}
     player = Player.select().where(Player.title_id == title_id())
-
-    for l in range(1, 33):
-        x = num_id_player.setdefault(l, "") 
-        # if x == "":
-        #     player_full = x
-        if fam_city != "" and l == number_net:
-            player_full = fam_city
-        elif x == "":
-            player_full = x
-        else:
-            list_net = num_id_player[l]
-            id_player = list_net[0]
-            pl_full = player.select().where(Player.id == id_player).get()
-            player_full = pl_full.full_name
-            manual_choice_dict[l] = player_full
-        num_fam_tmp = [l, player_full]
+    # if len(num_id_player) == 2:
+    # for m in range(1, 33):
+    data = [["1", ""]] * 32
+    # num_fam = num_fam_temp * 32
+    # num_fam_temp.clear()
+    # data.append(num_fam_temp)
+    # if len(num_id_player) == 2:
+    for k in num_id_player.keys():
+        list_net = num_id_player[k]
+        id_player = list_net[0]
+        pl_full = player.select().where(Player.id == id_player).get()
+        player_full = pl_full.full_name
+        manual_choice_dict[k] = player_full
+        num_fam_tmp = [k, player_full]
         num_fam = num_fam_tmp.copy()
         num_fam_tmp.clear()
-        data.append(num_fam)
-    # data.sort()
+        if n < 2:
+            data.pop(k - 1)
+            data.insert(k - 1, num_fam)  
+        else:
+            data.pop(number_net)
+            data.insert(number_net, fam_city)    
+        n += 1
+    # for l in range(1, 33):
+    #     x = num_id_player.setdefault(l, "") 
+    #     # if x == "":
+    #     #     player_full = x
+    #     if fam_city != "":
+    #         l = number_net
+    #         player_full = fam_city
+    #     elif x == "":
+    #         player_full = x
+    #     else:
+    #         for k in num_id_player.keys():
+    #             list_net = num_id_player[k]
+    #             id_player = list_net[0]
+    #             pl_full = player.select().where(Player.id == id_player).get()
+    #             player_full = pl_full.full_name
+    #             manual_choice_dict[k] = player_full
+    #             num_fam_tmp = [k, player_full]
+    #             num_fam = num_fam_tmp.copy()
+    #             num_fam_tmp.clear()
+    #             data.append(num_fam)
+    # # data.sort()
     model = MyTableModel(data)
     # model.setHorizontalHeaderLabels(["Участник/ Город"])
     # my_win.tableView_net.setHorizontalHeaderLabels(["Участник/ Город"])
-    my_win.tableView_net.setRowHeight(l, 8)
+    # my_win.tableView_net.setRowHeight(l, 8)
     my_win.tableView_net.setModel(model)
     my_win.tableView_net.show()
     # for row in range(32):
