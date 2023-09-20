@@ -105,6 +105,9 @@ class MyTableModel(QAbstractTableModel):
         return False
 
 
+  
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None, *args, **kwargs) -> object:
@@ -6091,15 +6094,11 @@ def view_table_choice(fam_city, number_net, num_id_player):
     #         data.insert(number_net, fam_city)    
     #     n += 1
     for l in range(1, 33):
-        list_net = num_id_player.setdefault(l, "-") 
-        # if x == "-":
-        #     player_full = x
-        # if fam_city != "":
-        if l == number_net:
-            # player_full = fam_city
-            num_fam = [l, fam_city]
-        elif list_net == "-":
-            num_fam = [l, list_net]
+        if l in num_id_player:
+            if l == number_net:
+                num_fam = [l, fam_city]
+            else: 
+                num_fam = [l, list_net]
         else:
             # for k in num_id_player.keys():
             # list_net = num_id_player[l]
