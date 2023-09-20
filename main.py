@@ -88,6 +88,9 @@ class MyTableModel(QAbstractTableModel):
             return len(self._data[0])
         else:
             return 0
+    def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
+        self.horizontalHeaderLabels = horizontalHeaderLabels
+
     def data(self, index, role):
         if role == QtCore.Qt.DisplayRole:
             return str(self._data[index.row()][index.column()])
@@ -6111,10 +6114,12 @@ def view_table_choice(fam_city, number_net, num_id_player):
     # # data.sort()
     model = MyTableModel(data)
     # model.setHorizontalHeaderLabels(["Участник/ Город"])
-    # my_win.tableView_net.setHorizontalHeaderLabels(["Участник/ Город"])
-    my_win.tableView_net.setRowHeight(l, 8)
+    model.setHorizontalHeaderLabels(["Участник/ Город"])
+    my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
+    # my_win.tableView_net.setRowHeight(l, 8)
     my_win.tableView_net.setModel(model)
-    my_win.tableView_net.show()
+    # my_win.tableView_net.show()
     # for row in range(32):
     #     # for column in range(2):
     #     item = QStandardItem('row %s,column %s'%(row, 1))
@@ -6149,8 +6154,8 @@ def view_table_choice(fam_city, number_net, num_id_player):
     #     model.setItem(row, 0, item)
 
     # my_win.tableView_net.setModel(model)
-    my_win.tableView_net.horizontalHeader().setStretchLastSection(True)
-    my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+    # my_win.tableView_net.horizontalHeader().setStretchLastSection(True)
+    # my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
     my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
     my_win.tableView_net.show()
 
