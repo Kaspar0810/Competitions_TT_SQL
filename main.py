@@ -78,31 +78,38 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
 
 class MyTableModel(QAbstractTableModel):
-    def __init__(self, data):
-        super().__init__()
-        self._data = data
-    def rowCount(self, parent):
-        return len(self._data)
-    def columnCount(self, parent):
-        if len(self._data) > 0:
-            return len(self._data[0])
-        else:
-            return 0
-    def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
-        self.horizontalHeaderLabels = horizontalHeaderLabels
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(self, *args, **kwargs)
+        # self._data = data
 
-    def data(self, index, role):
-        if role == QtCore.Qt.DisplayRole:
-            return str(self._data[index.row()][index.column()])
-        return None
+    def rowCount(self, *args, **kwargs) -> int:
+        # return super().rowCount(self, *args, **kwargs)
+        return 32
+
+    def columnCount(self, *args, **kwargs) -> int:
+        # return super().rowCount(self, *args, **kwargs)
+        return 2
+
+    # def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
+    #     self.horizontalHeaderLabels = horizontalHeaderLabels
+
+    def data(self, index:QtCore.QModelIndex, role:QtCore.Qt.ItemDataRole):
+        # return super().data(index, role)
+        if not index.isValid():
+            return
+        if role == QtCore.QitemDataRole.DisplayRole:
+            return "A"
+        # if role == QtCore.Qt.DisplayRole:
+        #     return str(self._data[index.row()][index.column()])
+        # return None
     # def flags(self, index):
     #     return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-    def setData(self, index, value, role=QtCore.Qt.EditRole):
-        if role == QtCore.Qt.EditRole:
-            self._data[index.row()][index.column()] = value
-            self.dataChanged.emit(index, index, [role])
-            return True
-        return False
+    # def setData(self, index, value, role=QtCore.Qt.EditRole):
+    #     if role == QtCore.Qt.EditRole:
+    #         self._data[index.row()][index.column()] = value
+    #         self.dataChanged.emit(index, index, [role])
+    #         return True
+    #     return False
 
 
   
@@ -141,8 +148,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(6, False)
         self.toolBox.setItemEnabled(7, True)
 
-        # model_choice_net = ItemsModel()
-        # my_win.tableView_net.setModel(model_choice_net)
+        self.model = MyTableModel()
+        my_win.tableView_net.setModel(self.model)
         # my_win.tableView_net.hide()
 
     # ====== создание строки меню ===========
@@ -6064,6 +6071,10 @@ def choice_setka_automat(fin, flag, count_exit):
 
 def view_table_choice(fam_city, number_net, num_id_player):
     """показ таблицы жеребьевки"""
+    # ===== 1 вариант
+    
+
+    # ========
     data = []
     num_fam = []
     n = 0
@@ -6097,11 +6108,10 @@ def view_table_choice(fam_city, number_net, num_id_player):
         if l in num_id_player:
             if l == number_net:
                 num_fam = [l, fam_city]
-            else: 
-                num_fam = [l, list_net]
+                # num_fam = [l, list_net]
         else:
             # for k in num_id_player.keys():
-            # list_net = num_id_player[l]
+            list_net = num_id_player[l]
             id_player = list_net[0]
             pl_full = player.select().where(Player.id == id_player).get()
             player_full = pl_full.full_name
