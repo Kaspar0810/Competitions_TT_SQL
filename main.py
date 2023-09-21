@@ -79,8 +79,11 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', e
 
 class MyTableModel(QAbstractTableModel):
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(self, *args, **kwargs)
-        # self._data = data
+        super().__init__(*args, **kwargs)
+        self.items = []
+
+    def setItems(self, items):
+        self.items = items
 
     def rowCount(self, *args, **kwargs) -> int:
         # return super().rowCount(self, *args, **kwargs)
@@ -90,15 +93,17 @@ class MyTableModel(QAbstractTableModel):
         # return super().rowCount(self, *args, **kwargs)
         return 2
 
-    # def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
-    #     self.horizontalHeaderLabels = horizontalHeaderLabels
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole):
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            return {0: "Номер",
+                    1: "Фамилия/ Город"}
 
     def data(self, index:QtCore.QModelIndex, role:QtCore.Qt.ItemDataRole):
         # return super().data(index, role)
         if not index.isValid():
             return
-        if role == QtCore.QitemDataRole.DisplayRole:
-            return "A"
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            return self.items
         # if role == QtCore.Qt.DisplayRole:
         #     return str(self._data[index.row()][index.column()])
         # return None
@@ -149,7 +154,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(7, True)
 
         self.model = MyTableModel()
-        my_win.tableView_net.setModel(self.model)
+        self.tableView_net.setModel(self.model)
         # my_win.tableView_net.hide()
 
     # ====== создание строки меню ===========
@@ -6081,90 +6086,25 @@ def view_table_choice(fam_city, number_net, num_id_player):
     num_fam_temp = []
     manual_choice_dict = {}
     player = Player.select().where(Player.title_id == title_id())
-    # if len(num_id_player) == 2:
-    # for m in range(1, 33):
-    # data = [["1", ""]] * 32
-    # num_fam = num_fam_temp * 32
-    # num_fam_temp.clear()
-    # data.append(num_fam_temp)
-    # if len(num_id_player) == 2:
-    # for k in num_id_player.keys():
-    #     list_net = num_id_player[k]
-    #     id_player = list_net[0]
-    #     pl_full = player.select().where(Player.id == id_player).get()
-    #     player_full = pl_full.full_name
-    #     manual_choice_dict[k] = player_full
-    #     num_fam_tmp = [k, player_full]
-    #     num_fam = num_fam_tmp.copy()
-    #     num_fam_tmp.clear()
-    #     if n < 2:
-    #         data.pop(k - 1)
-    #         data.insert(k - 1, num_fam)  
-    #     else:
-    #         data.pop(number_net)
-    #         data.insert(number_net, fam_city)    
-    #     n += 1
-    for l in range(1, 33):
-        if l in num_id_player:
-            if l == number_net:
-                num_fam = [l, fam_city]
-                # num_fam = [l, list_net]
-        else:
-            # for k in num_id_player.keys():
-            list_net = num_id_player[l]
-            id_player = list_net[0]
-            pl_full = player.select().where(Player.id == id_player).get()
-            player_full = pl_full.full_name
-            # manual_choice_dict[l] = player_full
-            num_fam_tmp = [l, player_full]
-            num_fam = num_fam_tmp.copy()
-            num_fam_tmp.clear()
-        data.append(num_fam)
-    # # data.sort()
-    model = MyTableModel(data)
+ 
+    for l in num_id_player.keys():
+
+        list_net = num_id_player[l]
+        id_player = list_net[0]
+        pl_full = player.select().where(Player.id == id_player).get()
+        player_full = pl_full.full_name
+        num_fam_tmp = [l, player_full]
+        num_fam = num_fam_tmp.copy()
+        num_fam_tmp.clear()
+    
+        model = MyTableModel()
+        model.setItems(num_fam)
+
     # model.setHorizontalHeaderLabels(["Участник/ Город"])
-    model.setHorizontalHeaderLabels(["Участник/ Город"])
+
     my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
-    # my_win.tableView_net.setRowHeight(l, 8)
-    my_win.tableView_net.setModel(model)
-    # my_win.tableView_net.show()
-    # for row in range(32):
-    #     # for column in range(2):
-    #     item = QStandardItem('row %s,column %s'%(row, 1))
-    #     model = QStandardItemModel(32, 1)
-    #         # Установить текстовое значение каждой позиции
-    #     model.setItem(row, 1, item)
-    #     # model = QStandardItemModel(4,4)
-    #     # Создать представление таблицы, установить модель на пользовательскую модель
-    # model.setHorizontalHeaderLabels(["Участник/ Город"])
-    # my_win.tableView_net.setRowHeight(row, 8)
-    # my_win.tableView_net.setModel(model)
-
-    # manual_choice_dict = {}
-    # player = Player.select().where(Player.title_id == title_id())
-    # for k in num_id_player.keys():
-    #     list_net = num_id_player[k]
-    #     id_player = list_net[0]
-    #     pl_full = player.select().where(Player.id == id_player).get()
-    #     player_full = pl_full.full_name
-    #     manual_choice_dict[k] = player_full
-    # model = QStandardItemModel(number_net, 1)
-    #     # Установить текстовое содержимое четырех меток заголовка в горизонтальном направлении
-    # model.setHorizontalHeaderLabels(["Участник/ Город"])
-    # manual_choice_dict[number_net] = fam_city
-    # num_net_list = list(num_id_player.keys())
-    # # for row in range(number_net):
-    # for row in num_net_list:
-    # # row = number_net
-    #     fam_city = manual_choice_dict.get(row - 1 , "")
-    #     item = QStandardItem(fam_city)
-    #     my_win.tableView_net.setRowHeight(row, 9)
-    #     model.setItem(row, 0, item)
-
-    # my_win.tableView_net.setModel(model)
-    # my_win.tableView_net.horizontalHeader().setStretchLastSection(True)
-    # my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+  
     my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
     my_win.tableView_net.show()
 
