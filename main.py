@@ -83,27 +83,43 @@ class MyTableModel(QAbstractTableModel):
         self.items = []
 
     def setItems(self, items):
+        self.beginResetModel()
         self.items = items
-
+        self.endResetModel()
+  
     def rowCount(self, *args, **kwargs) -> int:
         # return super().rowCount(self, *args, **kwargs)
         return 32
-
+    
     def columnCount(self, *args, **kwargs) -> int:
         # return super().rowCount(self, *args, **kwargs)
         return 2
 
     def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            return {0: "Номер",
-                    1: "Фамилия/ Город"}
+            if orientation == QtCore.Qt.Orientation.Horizontal:
+                return {0: "Номер",
+                        1: "Фамилия/ Город"}.get(section)
 
     def data(self, index:QtCore.QModelIndex, role:QtCore.Qt.ItemDataRole):
         # return super().data(index, role)
         if not index.isValid():
             return
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            return self.items
+            region_info = self.items[index.row()]
+            print(region_info)
+            col = index.column()
+            if col == 0:
+                return f'{region_info.id}'
+            # elif col == 1:
+            #     region_title = self.regions[region_info.region_id].title
+            #     return region_title
+        # elif role == QtCore.Qt.ItemDataRole.UserRole:
+        #     return self.items[index.row()]
+            # print(index.row())
+        
+            # return f"{index.row} {index.column}"
+            # return self.items
         # if role == QtCore.Qt.DisplayRole:
         #     return str(self._data[index.row()][index.column()])
         # return None
@@ -155,7 +171,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.model = MyTableModel()
         self.tableView_net.setModel(self.model)
-        # my_win.tableView_net.hide()
+        # self.tableView_net.horizontalHeader().setSectionResizeMode()
+        self.tableView_net.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.tableView_net.verticalHeader().setDefaultSectionSize(15)
+  
+        self.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
+        self.tableView_net.show()
 
     # ====== создание строки меню ===========
     def _createMenuBar(self):
@@ -6086,23 +6107,31 @@ def view_table_choice(fam_city, number_net, num_id_player):
     num_fam_temp = []
     manual_choice_dict = {}
     player = Player.select().where(Player.title_id == title_id())
- 
-    for l in num_id_player.keys():
 
-        list_net = num_id_player[l]
-        id_player = list_net[0]
-        pl_full = player.select().where(Player.id == id_player).get()
-        player_full = pl_full.full_name
-        num_fam_tmp = [l, player_full]
-        num_fam = num_fam_tmp.copy()
-        num_fam_tmp.clear()
-    
-        model = MyTableModel()
-        model.setItems(num_fam)
+    manual_choice_dict = num_id_player.copy()
+
+    for r in range(1, 33):
+        # list_net = manual_choice_dict[r]
+        manual_choice_dict.setdefault(r, "-")
+        list_net = manual_choice_dict[r]
+        if list_net == "-":
+            num_fam_tmp = [r, list_net]
+            num_fam = num_fam_tmp.copy()
+            num_fam_tmp.clear()
+        else:
+            id_player = list_net[0]
+            pl_full = player.select().where(Player.id == id_player).get()
+            player_full = pl_full.full_name
+            num_fam_tmp = [r, player_full]
+            num_fam = num_fam_tmp.copy()
+            num_fam_tmp.clear()
+        data.append(num_fam)
+    model = MyTableModel()
+    model.setItems(data)
 
     # model.setHorizontalHeaderLabels(["Участник/ Город"])
 
-    my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    # my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
   
     my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
