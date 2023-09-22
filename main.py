@@ -80,11 +80,11 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', e
 class MyTableModel(QAbstractTableModel):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.items = []
+        self.model = []
 
-    def setItems(self, items):
+    def setModel(self, model):
         self.beginResetModel()
-        self.items = items
+        self.model = model
         self.endResetModel()
   
     def rowCount(self, *args, **kwargs) -> int:
@@ -101,17 +101,19 @@ class MyTableModel(QAbstractTableModel):
                 return {0: "Номер",
                         1: "Фамилия/ Город"}.get(section)
 
+
     def data(self, index:QtCore.QModelIndex, role:QtCore.Qt.ItemDataRole):
         # return super().data(index, role)
         if not index.isValid():
             return
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            region_info = self.items[index.row()]
-            print(region_info)
-            col = index.column()
-            if col == 0:
-                return f'{region_info.id}'
-            # elif col == 1:
+            return {index: "A"}.get(index)
+            # region_info = self.items[index.row()]
+            # print(region_info)
+            # col = index.column()
+            # if col == 0:
+            #     return f'{region_info.id}'
+            # # elif col == 1:
             #     region_title = self.regions[region_info.region_id].title
             #     return region_title
         # elif role == QtCore.Qt.ItemDataRole.UserRole:
@@ -6125,10 +6127,10 @@ def view_table_choice(fam_city, number_net, num_id_player):
             num_fam_tmp = [r, player_full]
             num_fam = num_fam_tmp.copy()
             num_fam_tmp.clear()
-        data.append(num_fam)
-    model = MyTableModel()
-    model.setItems(data)
-
+        # data.append(num_fam)
+        model = MyTableModel()
+        # model.setModel(data)
+        my_win.tableView_net.setModel(r, 1, num_fam)
     # model.setHorizontalHeaderLabels(["Участник/ Город"])
 
     # my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
