@@ -23,7 +23,7 @@
       <x>260</x>
       <y>0</y>
       <width>841</width>
-      <height>239</height>
+      <height>241</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -58,98 +58,30 @@
      <attribute name="title">
       <string>Титул</string>
      </attribute>
-     <widget class="QLabel" name="label_nazvanie">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>1</y>
-        <width>211</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <pointsize>12</pointsize>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Название соревнования&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QWidget" name="layoutWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>30</y>
-        <width>152</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="Button_title_made">
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Создать</string>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-         <property name="default">
-          <bool>false</bool>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>641</width>
-        <height>171</height>
+        <x>4</x>
+        <y>10</y>
+        <width>831</width>
+        <height>194</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>1</number>
-       </property>
        <item>
-        <widget class="QLineEdit" name="lineEdit_title_nazvanie">
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
+        <widget class="QLabel" name="label_nazvanie">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>12</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Название соревнования&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -159,21 +91,70 @@
           <number>1</number>
          </property>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+          <layout class="QGridLayout" name="gridLayout_5">
+           <property name="horizontalSpacing">
+            <number>16</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>1</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLineEdit" name="lineEdit_title_nazvanie">
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+            </widget>
            </item>
-           <item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="checkBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="Button_title_made">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <family>Courier New</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Создать</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
+             <property name="default">
+              <bool>false</bool>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <property name="spacing">
+            <number>1</number>
+           </property>
+           <item row="0" column="0">
             <widget class="QLabel" name="label_sredi">
              <property name="font">
               <font>
@@ -190,20 +171,7 @@
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
+           <item row="0" column="1">
             <widget class="QLabel" name="label_sredi_2">
              <property name="font">
               <font>
@@ -216,24 +184,11 @@
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;возраст&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+              <set>Qt::AlignHCenter|Qt::AlignTop</set>
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
+           <item row="0" column="2">
             <widget class="QLabel" name="label_sredi_3">
              <property name="font">
               <font>
@@ -246,55 +201,48 @@
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;участники&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+           <item row="1" column="0" colspan="3">
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <property name="spacing">
+              <number>1</number>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+             <item>
+              <widget class="QComboBox" name="comboBox_sredi">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Times New Roman</family>
+                 <pointsize>12</pointsize>
+                 <italic>true</italic>
+                </font>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_title_vozrast"/>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_title_gamer"/>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <item>
-            <widget class="QComboBox" name="comboBox_sredi">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="font">
-              <font>
-               <family>Times New Roman</family>
-               <pointsize>12</pointsize>
-               <italic>true</italic>
-              </font>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_title_vozrast"/>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_title_gamer"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <property name="spacing">
+            <number>1</number>
+           </property>
+           <item row="0" column="0">
             <widget class="QLabel" name="label_data_provedenia">
              <property name="font">
               <font>
@@ -311,7 +259,7 @@
              </property>
             </widget>
            </item>
-           <item>
+           <item row="0" column="1">
             <widget class="QLabel" name="label_2str_4">
              <property name="font">
               <font>
@@ -328,123 +276,170 @@
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <widget class="QLabel" name="label_s">
-             <property name="font">
-              <font>
-               <family>Times New Roman</family>
-               <pointsize>14</pointsize>
-               <italic>true</italic>
-              </font>
+           <item row="1" column="0" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <property name="spacing">
+              <number>1</number>
              </property>
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;с&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDateEdit" name="dateEdit_start">
-             <property name="font">
-              <font>
-               <family>Times New Roman</family>
-              </font>
-             </property>
-             <property name="dateTime">
-              <datetime>
-               <hour>0</hour>
-               <minute>0</minute>
-               <second>0</second>
-               <year>2021</year>
-               <month>1</month>
-               <day>1</day>
-              </datetime>
-             </property>
-             <property name="displayFormat">
-              <string>yyyy-MM-dd</string>
-             </property>
-             <property name="calendarPopup">
-              <bool>true</bool>
-             </property>
-             <property name="date">
-              <date>
-               <year>2021</year>
-               <month>1</month>
-               <day>1</day>
-              </date>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_po">
-             <property name="font">
-              <font>
-               <family>Times New Roman</family>
-               <pointsize>14</pointsize>
-               <italic>true</italic>
-              </font>
-             </property>
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;по&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDateEdit" name="dateEdit_end">
-             <property name="font">
-              <font>
-               <family>Times New Roman</family>
-              </font>
-             </property>
-             <property name="dateTime">
-              <datetime>
-               <hour>0</hour>
-               <minute>0</minute>
-               <second>0</second>
-               <year>2021</year>
-               <month>1</month>
-               <day>1</day>
-              </datetime>
-             </property>
-             <property name="currentSection">
-              <enum>QDateTimeEdit::YearSection</enum>
-             </property>
-             <property name="displayFormat">
-              <string>yyyy-MM-dd</string>
-             </property>
-             <property name="calendarPopup">
-              <bool>true</bool>
-             </property>
-             <property name="currentSectionIndex">
-              <number>0</number>
-             </property>
-             <property name="date">
-              <date>
-               <year>2021</year>
-               <month>1</month>
-               <day>1</day>
-              </date>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_city_title"/>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="spacing">
+                <number>1</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_s">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                   <pointsize>14</pointsize>
+                   <italic>true</italic>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;с&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="dateEdit_start">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                  </font>
+                 </property>
+                 <property name="dateTime">
+                  <datetime>
+                   <hour>0</hour>
+                   <minute>0</minute>
+                   <second>0</second>
+                   <year>2021</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </datetime>
+                 </property>
+                 <property name="displayFormat">
+                  <string>yyyy-MM-dd</string>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                 <property name="date">
+                  <date>
+                   <year>2021</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </date>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_po">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                   <pointsize>14</pointsize>
+                   <italic>true</italic>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;по&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="dateEdit_end">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Times New Roman</family>
+                  </font>
+                 </property>
+                 <property name="dateTime">
+                  <datetime>
+                   <hour>0</hour>
+                   <minute>0</minute>
+                   <second>0</second>
+                   <year>2021</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </datetime>
+                 </property>
+                 <property name="currentSection">
+                  <enum>QDateTimeEdit::YearSection</enum>
+                 </property>
+                 <property name="displayFormat">
+                  <string>yyyy-MM-dd</string>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                 <property name="currentSectionIndex">
+                  <number>0</number>
+                 </property>
+                 <property name="date">
+                  <date>
+                   <year>2021</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </date>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_city_title">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
          <item>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="1" column="0">
-            <widget class="QComboBox" name="comboBox_referee">
+           <property name="spacing">
+            <number>1</number>
+           </property>
+           <item row="1" column="1" colspan="2">
+            <widget class="QComboBox" name="comboBox_kategor_ref"/>
+           </item>
+           <item row="1" column="3">
+            <widget class="QComboBox" name="comboBox_secretary">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -452,6 +447,9 @@
               </sizepolicy>
              </property>
             </widget>
+           </item>
+           <item row="1" column="4">
+            <widget class="QComboBox" name="comboBox_kategor_sec"/>
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_main_refery">
@@ -470,26 +468,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="label_kat_ref">
-             <property name="font">
-              <font>
-               <family>Times New Roman</family>
-               <pointsize>12</pointsize>
-               <italic>true</italic>
-              </font>
-             </property>
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Категория&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QComboBox" name="comboBox_kategor_ref"/>
-           </item>
            <item row="0" column="4">
             <widget class="QLabel" name="label_kat_sek">
              <property name="font">
@@ -507,7 +485,24 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2" colspan="2">
+           <item row="0" column="1" colspan="2">
+            <widget class="QLabel" name="label_kat_ref">
+             <property name="font">
+              <font>
+               <family>Times New Roman</family>
+               <pointsize>12</pointsize>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Категория&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
             <widget class="QLabel" name="label_main_sekretar">
              <property name="font">
               <font>
@@ -524,11 +519,8 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="4">
-            <widget class="QComboBox" name="comboBox_kategor_sec"/>
-           </item>
-           <item row="1" column="3">
-            <widget class="QComboBox" name="comboBox_secretary">
+           <item row="1" column="0">
+            <widget class="QComboBox" name="comboBox_referee">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -6442,7 +6434,7 @@
      <rect>
       <x>1110</x>
       <y>9</y>
-      <width>271</width>
+      <width>371</width>
       <height>749</height>
      </rect>
     </property>

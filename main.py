@@ -78,65 +78,34 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
 
 class MyTableModel(QAbstractTableModel):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.model = []
 
-    def setModel(self, model):
-        self.beginResetModel()
-        self.model = model
-        self.endResetModel()
-  
-    def rowCount(self, *args, **kwargs) -> int:
-        # return super().rowCount(self, *args, **kwargs)
-        return 32
+    def __init__(self, data):
+        super().__init__()
+        self._data = data
+
+    def rowCount(self, parent):
+        return len(self._data)
     
-    def columnCount(self, *args, **kwargs) -> int:
-        # return super().rowCount(self, *args, **kwargs)
-        return 2
-
+    def columnCount(self, parent):
+        if len(self._data) > 0:
+            return len(self._data[0])
+        else:
+            return 0
+        
+    def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
+        self.horizontalHeaderLabels = horizontalHeaderLabels
+ 
     def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             if orientation == QtCore.Qt.Orientation.Horizontal:
                 return {0: "Номер",
-                        1: "Фамилия/ Город"}.get(section)
-
-
-    def data(self, index:QtCore.QModelIndex, role:QtCore.Qt.ItemDataRole):
-        # return super().data(index, role)
-        if not index.isValid():
-            return
+                        1: "Фамилия/ Город",
+                        2: "Группа"}.get(section)
+ 
+    def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            return {index: "A"}.get(index)
-            # region_info = self.items[index.row()]
-            # print(region_info)
-            # col = index.column()
-            # if col == 0:
-            #     return f'{region_info.id}'
-            # # elif col == 1:
-            #     region_title = self.regions[region_info.region_id].title
-            #     return region_title
-        # elif role == QtCore.Qt.ItemDataRole.UserRole:
-        #     return self.items[index.row()]
-            # print(index.row())
-        
-            # return f"{index.row} {index.column}"
-            # return self.items
-        # if role == QtCore.Qt.DisplayRole:
-        #     return str(self._data[index.row()][index.column()])
-        # return None
-    # def flags(self, index):
-    #     return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-    # def setData(self, index, value, role=QtCore.Qt.EditRole):
-    #     if role == QtCore.Qt.EditRole:
-    #         self._data[index.row()][index.column()] = value
-    #         self.dataChanged.emit(index, index, [role])
-    #         return True
-    #     return False
-
-
-  
-
+            return str(self._data[index.row()][index.column()])
+        return None
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -171,14 +140,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(6, False)
         self.toolBox.setItemEnabled(7, True)
 
-        self.model = MyTableModel()
-        self.tableView_net.setModel(self.model)
-        # self.tableView_net.horizontalHeader().setSectionResizeMode()
-        self.tableView_net.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-        self.tableView_net.verticalHeader().setDefaultSectionSize(15)
-  
-        self.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
-        self.tableView_net.show()
 
     # ====== создание строки меню ===========
     def _createMenuBar(self):
@@ -3141,9 +3102,9 @@ def selection_of_the_draw_mode():
         my_win.tableView_net.hide()
     else:
         flag = False
-        my_win.resize(1390, 804)
+        my_win.resize(1440, 804)
         my_win.tableView_net.show()
-        my_win.tableView_net.setGeometry(QtCore.QRect(1110, 9, 271, 749))
+        my_win.tableView_net.setGeometry(QtCore.QRect(1110, 9, 321, 749)) # от лев края, от вверха, ширина и высота)
     return flag
     
               
@@ -5990,14 +5951,9 @@ def choice_setka_automat(fin, flag, count_exit):
     
                                 for g in player_list:
                                     if len(num_id_player) == 2:
-                                        # for number_net in num_id_player.keys():
-                                        #     list_pl = num_id_player[number_net]
-                                        #     players = Player.select().where(Player.title_id == title_id())
-                                        #     id_p = players.select().where(Player.id == list_pl[0]).get()
                                         fam_city = ""
                                         number_net = ""
                                         view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
-                                        # view_table_choice(num_id_player) # функция реального просмотра жеребьевки
                                     t_str = str(g[2])
                                     txt_str = f"{g[0]} - {g[1]} номера: {t_str}" 
                                     txt_tmp.append(txt_str)
@@ -6099,45 +6055,37 @@ def choice_setka_automat(fin, flag, count_exit):
 
 def view_table_choice(fam_city, number_net, num_id_player):
     """показ таблицы жеребьевки"""
-    # ===== 1 вариант
-    
-
-    # ========
     data = []
     num_fam = []
-    n = 0
-    num_fam_temp = []
     manual_choice_dict = {}
     player = Player.select().where(Player.title_id == title_id())
+    count_player = max(num_id_player.keys()) # наибольшой ключ в словаре (на сколько сетка)
 
     manual_choice_dict = num_id_player.copy()
 
-    for r in range(1, 33):
-        # list_net = manual_choice_dict[r]
+    for r in range(1, count_player + 1):
         manual_choice_dict.setdefault(r, "-")
         list_net = manual_choice_dict[r]
-        if list_net == "-":
-            num_fam_tmp = [r, list_net]
-            num_fam = num_fam_tmp.copy()
-            num_fam_tmp.clear()
+        if r == number_net:
+            num_fam_tmp = [r, fam_city, ""]
+        elif list_net == "-":
+            num_fam_tmp = [r, list_net, ""]
         else:
             id_player = list_net[0]
+            group = list_net[2]
+            group.replace("группа", "гр.")
             pl_full = player.select().where(Player.id == id_player).get()
             player_full = pl_full.full_name
-            num_fam_tmp = [r, player_full]
-            num_fam = num_fam_tmp.copy()
-            num_fam_tmp.clear()
-        # data.append(num_fam)
-        model = MyTableModel()
-        # model.setModel(data)
-        my_win.tableView_net.setModel(r, 1, num_fam)
-    # model.setHorizontalHeaderLabels(["Участник/ Город"])
-
-    # my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-    my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
-  
-    my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
-    my_win.tableView_net.show()
+            num_fam_tmp = [r, player_full, group]
+        num_fam = num_fam_tmp.copy()
+        num_fam_tmp.clear()
+        data.append(num_fam) # список списков
+        model = MyTableModel(data)
+        my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
+        my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
+        my_win.tableView_net.setModel(model)
+        my_win.tableView_net.show()
 
 
 def setka_choice_number(fin, count_exit):
@@ -6244,7 +6192,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
         cur_reg = current_region[y][0] # текущий регион посева
         cur_gr = current_region[y][1] # номер группы, которая сеятся
         if n == 0:
-            if cur_reg in reg_last:
+            if cur_reg in reg_last: # если регион который сеятся есть в уже посеянных областях
                 reg_tuple = tuple(reg_last)
                 count = reg_tuple.count(cur_reg) # количество регионов уже посеянных 
                 if count == 1: # значит только один регион в посеве
@@ -6313,7 +6261,9 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                                         f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
                                     number_tmp += f
                     elif count > 2:
-                        number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net)
+                        # number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net, count_exit)
+                        # if 
+                        number_posev = sev
                         number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
                        
                     number_posev = number_tmp.copy()
@@ -6473,6 +6423,7 @@ def alignment_in_half(player_net, num_tmp, sev, count, number_posev):
 
 def number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net):
     """промежуточные номера для посева в сетке после ухода от своей группы при выоде из группы больше двух"""
+    
     if n == 0:
         if cur_reg in reg_last:
             index = reg_last.index(cur_reg)
@@ -9966,7 +9917,7 @@ def setka_32_2_made(fin):
         data.append(list_tmp)
     # ========= нумерация встреч сетки ==========
     y = 0
-    for i in range(1, 65, 2):
+    for i in range(1, 64, 2):
         y += 1
         data[i + 1][0] = str(y)  # рисует начальные номера таблицы 1-32
     number_of_game = draw_num(row_n=3, row_step=2, col_n=2, number_of_columns=5, number_of_game=1, player=32, data=data) # рисует номера встреч 1-32 
@@ -10175,7 +10126,7 @@ def setka_32_2_made(fin):
     else:
         short_name = "clear_32_2_net"
         name_table_final = f"{short_name}.pdf"
-    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=1.5*cm, bottomMargin=1*cm)
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=3.4*cm, bottomMargin=1.0*cm)
     catalog = 1
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
