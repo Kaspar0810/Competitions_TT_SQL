@@ -2165,7 +2165,6 @@ def dclick_in_listwidget():
     coach_field = my_win.lineEdit_coach.text()
     if txt_tmp == "Список городов.": # если в listwidget список городов которые есть в базе
         my_win.label_63.setText("")
-    # text_city = my_win.lineEdit_city_list.text()
         my_win.lineEdit_city_list.setText(text)    
         cr = City.get(City.city == text)
         rg = Region.get(Region.id == cr.region_id)
@@ -2184,32 +2183,35 @@ def dclick_in_listwidget():
         name = name.capitalize()
         r = text[sz + 2:sz1]
         dr = text[sz1 + 2:sz2]
+        znak = dr.find(".")
         # ==== проверка правильность даты для участия в турнире
         title = Title.get(Title.id == title_id())
         vozrast_text = title.vozrast
-        text_1 = vozrast_text.rfind("моложе")
-        text_date = vozrast_text[:2]
-        if text_1 == -1 and text_date == "до":
-            mark = vozrast_text.find(" ")
-            total_old = int(vozrast_text[mark + 1:5])
-            year_current = int(datetime.today().strftime("%Y")) # текущий год
-            year_bday = year_current - total_old + 1
-        elif text_1 > -1: # если возраст г.р и моложе
-            year_bday = int(vozrast_text[:4])
-            year_current = int(datetime.today().strftime("%Y")) # текущий год
-        after_date = date(year_bday, 1, 1)
-        date_object = datetime.strptime(dr,"%Y-%m-%d")
-        dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
-        current_date = date(dr_year, 1, 1)
-        if after_date > current_date: # сравниваем две даты
-            result = msgBox.information(my_win, "", "Возраст спортсмена не соответсвует\nвозрастной категории соревнования.\n"
-                    "Или возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
-                                        msgBox.Ok, msgBox.Cancel)
-            if result == msgBox.Ok:
-                return
+        if vozrast_text != "": # если играют не мужчины или женщины то проверка на соответсвия возраста
+            text_1 = vozrast_text.rfind("моложе")
+            text_date = vozrast_text[:2]
+            if text_1 == -1 and text_date == "до":
+                mark = vozrast_text.find(" ")
+                total_old = int(vozrast_text[mark + 1:5])
+                year_current = int(datetime.today().strftime("%Y")) # текущий год
+                year_bday = year_current - total_old + 1
+            elif text_1 > -1: # если возраст г.р и моложе
+                year_bday = int(vozrast_text[:4])
+                year_current = int(datetime.today().strftime("%Y")) # текущий год
+            after_date = date(year_bday, 1, 1)
+            date_object = datetime.strptime(dr,"%Y-%m-%d")
+            dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
+            current_date = date(dr_year, 1, 1)
+            if after_date > current_date: # сравниваем две даты
+                result = msgBox.information(my_win, "", "Возраст спортсмена не соответсвует\nвозрастной категории соревнования.\n"
+                        "Или возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
+                                            msgBox.Ok, msgBox.Cancel)
+                if result == msgBox.Ok:
+                    return
         # ==== переводит строку с датой из базы даннных в строку к обычному виду
-        date_object = datetime.strptime(dr,"%Y-%m-%d")
-        dr = date_object.strftime('%d.%m.%Y')
+        if znak == -1:
+            date_object = datetime.strptime(dr,"%Y-%m-%d")
+            dr = date_object.strftime('%d.%m.%Y')
         #=====
         ci = text[sz2 + 2:ds] # город
         my_win.lineEdit_Family_name.setText(f"{fam} {name}")
