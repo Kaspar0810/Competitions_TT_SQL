@@ -776,7 +776,7 @@ class StartWindow(QMainWindow, Ui_Form):
                 my_win, "Участники", "Выберите категорию спортсменов", gamer, 0, False)
 
             title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
-                          kat_ref="", secretary="", kat_sek="", gamer=gamer, full_name_comp="", pdf_comp="",
+                          kat_ref="", secretary="", kat_sec="", gamer=gamer, full_name_comp="", pdf_comp="",
                           short_name_comp="", tab_enabled="Титул").save()
             # получение последней записи в таблице
             t_id = Title.select().order_by(Title.id.desc()).get()
@@ -806,6 +806,7 @@ class StartWindow(QMainWindow, Ui_Form):
         self.label_4.show()
         # получение последней записи в таблице
         t_id = Title.select().order_by(Title.id.desc())
+        count = len(t_id)
         n = 6
         for i in t_id:
             old_comp = i.name
@@ -845,7 +846,7 @@ class StartWindow(QMainWindow, Ui_Form):
                     my_win.fifth_comp_Action.setText(full_name)
                 else:
                     my_win.fifth_comp_Action.setText("Пусто") 
-
+                break
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
 
@@ -1053,17 +1054,18 @@ def change_sroki():
     t_id = Title.select().order_by(Title.id.desc())
     count = len(t_id)
     i = 0
-    if count < 6:
-        for k in t_id:
-            data_st = k.data_start
-            data_end = k.data_end
-            data_comp.append(data_st)
-            data_comp.append(data_end)
-            data_comp_tmp = data_comp.copy()
-            data_comp.clear()
-            if i > 0:
-                comp_data[i - 1] = data_comp_tmp
-            i += 1
+    for k in t_id:
+        data_st = k.data_start
+        data_end = k.data_end
+        data_comp.append(data_st)
+        data_comp.append(data_end)
+        data_comp_tmp = data_comp.copy()
+        data_comp.clear()
+        if i != 0:
+            comp_data[i - 1] = data_comp_tmp
+        i += 1
+        if i == 5 or i == count:
+            break
     index = fir_window.comboBox.currentIndex()
     data_list = comp_data[index]
     fir_window.label_4.setText(f"сроки: с {data_list[0]} по {data_list[1]}")
@@ -1234,7 +1236,7 @@ def db_insert_title(title_str):
         # получение последней записи в таблице
         t = Title.select().order_by(Title.id.desc()).get()
         title = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
-                     kat_ref=kr, secretary=sk, kat_sek=ks, gamer=gm, full_name_comp=fn, pdf_comp="",
+                     kat_ref=kr, secretary=sk, kat_sec=ks, gamer=gm, full_name_comp=fn, pdf_comp="",
                      short_name_comp=short_name).save()
     else:
         return
@@ -1280,7 +1282,7 @@ def go_to():
     my_win.comboBox_referee.setCurrentText(titles.referee)
     my_win.comboBox_kategor_ref.setCurrentText(titles.kat_ref)
     my_win.comboBox_secretary.setCurrentText(titles.secretary)
-    my_win.comboBox_kategor_sek.setCurrentText(titles.kat_sek)
+    my_win.comboBox_kategor_sec.setCurrentText(titles.kat_sec)
     my_win.lineEdit_title_gamer.setText(titles.gamer)
     my_win.tabWidget.setCurrentIndex(0)  # открывает вкладку титул
     tab_enabled(gamer)
@@ -1294,8 +1296,8 @@ def go_to():
 def db_select_title():
     """извлекаем из таблицы данные и заполняем поля титула для редактирования или просмотра"""
     sender = fir_window.sender()  # от какой кнопки сигнал
-    title = Title.get(Title.id == title_id())
     if sender == my_win.go_to_Action:  # переход к соревнованиям из меню основного окна
+        title = Title.get(Title.id == title_id())
         name = title.name
         data = title.data_start
         gamer_current = title.gamer
@@ -1305,6 +1307,7 @@ def db_select_title():
         my_win.go_to_Action.setText(full_name_current)
         gamer = title.gamer
     elif sender == my_win.toolBox or sender.text() != "Открыть":
+        title = Title.get(Title.id == title_id())
         name = title.name
         gamer = title.gamer
     # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
@@ -1316,6 +1319,14 @@ def db_select_title():
         name = txt[:key]
         sroki = fir_window.label_4.text()
         data = sroki[9:19]
+        titles = Title.select()
+        for title in titles:
+            name_title = title.name
+            gamer_title = title.gamer
+            data_title = str(title.data_start)
+            if name == name_title and gamer == gamer_title:
+                if data == data_title:
+                    break
     if name != "":
         my_win.lineEdit_title_nazvanie.setText(title.name)
         my_win.lineEdit_title_vozrast.setText(title.vozrast)
@@ -1325,7 +1336,7 @@ def db_select_title():
         my_win.comboBox_referee.setCurrentText(title.referee)
         my_win.comboBox_kategor_ref.setCurrentText(title.kat_ref)
         my_win.comboBox_secretary.setCurrentText(title.secretary)
-        my_win.comboBox_kategor_sec.setCurrentText(title.kat_sek)
+        my_win.comboBox_kategor_sec.setCurrentText(title.kat_sec)
         my_win.lineEdit_title_gamer.setText(title.gamer)
     else:
         load_comboBox_referee()
@@ -1638,7 +1649,7 @@ def title_update():
     nazv.referee = rf
     nazv.kat_ref = kr
     nazv.secretary = sk
-    nazv.kat_sek = ks
+    nazv.kat_sec = ks
     nazv.save()
     title_pdf()
 
@@ -3146,7 +3157,8 @@ def kol_player_in_group():
         my_win.comboBox_page_vid.setEnabled(False)
         my_win.spinBox_kol_group.hide()
         # ====== запись в таблицу db -system- первый этап
-        s = System.select().order_by(System.id.desc()).get()
+        # s = System.select().order_by(System.id.desc()).get()
+        s = System.select().where(System.title_id == title_id()).get()
         system = System.get(System.id == s)
         system.max_player = mp
         system.total_athletes = count
@@ -8053,8 +8065,8 @@ def title_id():
     if name != "":       
         data = my_win.dateEdit_start.text()
         gamer = my_win.lineEdit_title_gamer.text()
-        titles_data = Title.select().where(Title.name == name)  # получает эту строку в db
-        titles = titles_data.select().where((Title.gamer == gamer) & (Title.data_start == data)).get()
+        titles_data = Title.select().where((Title.name == name) & (Title.gamer == gamer)) # получает эту строку в db
+        titles = titles_data.select().where(Title.data_start == data).get()
         title_id = titles.id
     else:
         # получение последней записи в таблице
@@ -8102,7 +8114,7 @@ def func_zagolovok(canvas, doc):
     canvas.setFillColor(blue)  # меняет цвет шрифта списка судейской коллеги
     if pv == landscape(A4):
         main_referee_collegia = f"Гл. судья: судья {title.kat_ref}______________ {title.referee}   " \
-                                f"Гл. секретарь: судья {title.kat_sek} ______________{title.secretary}"
+                                f"Гл. секретарь: судья {title.kat_sec} ______________{title.secretary}"
         if current_button == "3":
             # текста титула по основным
             canvas.drawCentredString(width / 2.0, height - 15 * cm, main_referee_collegia)
@@ -8125,7 +8137,7 @@ def func_zagolovok(canvas, doc):
             # подпись главного судьи
             canvas.drawString(2 * cm, ((29 - count ) * cm), main_referee)
         else:
-            main_secretary = f"Гл. секретарь: судья {title.kat_sek} ______________{title.secretary} "
+            main_secretary = f"Гл. секретарь: судья {title.kat_sec} ______________{title.secretary} "
             # подпись главного судьи
             canvas.drawString(2 * cm, 2 * cm, main_referee)
             # подпись главного секретаря
@@ -12433,7 +12445,7 @@ def made_list_referee():
         referee = title.referee
         kat_referee = title.kat_ref
         secretary = title.secretary
-        kat_secretary = title.kat_sek
+        kat_secretary = title.kat_sec
         list_referee = [referee, secretary]
         list_kategory = [kat_referee, kat_secretary]
 
@@ -12945,16 +12957,16 @@ def open_close_file(view_file):
 # def proba():
 #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
 
-#     my_db = SqliteDatabase('comp_db.db')
-#     migrator = SqliteMigrator(my_db)
-#     signature = BlobField(null=True)
+    # my_db = SqliteDatabase('comp_db.db')
+    # migrator = SqliteMigrator(my_db)
+    # signature = BlobField(null=True)
 #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
 #     # system_id = ForeignKeyField(System, field=System.id, null=True)
 
-    # with db:
-        # migrate(migrator.drop_column('referees', 'signature')) # удаление столбца
-#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         migrate(migrator.rename_column('choices', 'n_group', 'sf_group')) # Переименование столбца (таблица, старое название, новое название столбца)
+#     with db:
+#         # migrate(migrator.drop_column('referees', 'signature')) # удаление столбца
+# #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+#         migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
         # migrate(migrator.add_column('referees', 'signature', signature)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
 
@@ -13131,7 +13143,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player)
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba_pdf) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)

@@ -99,7 +99,7 @@ class Title(BaseModel):
     referee = CharField()
     kat_ref = CharField(10)
     secretary = CharField()
-    kat_sek = CharField(10)
+    kat_sec = CharField(10)
     gamer = CharField(20)
     full_name_comp = CharField()
     pdf_comp = BlobField()
