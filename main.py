@@ -3159,7 +3159,6 @@ def selection_of_the_draw_mode():
 def kol_player_in_group():
     """подсчет кол-во групп и человек в группах"""
     sender = my_win.sender()  # сигнал от кнопки
-    # gamer = my_win.lineEdit_title_gamer.text()
     flag_visible = my_win.checkBox_visible_game.isChecked()
     kg = my_win.spinBox_kol_group.text()  # количество групп
     player_list = Player.select().where(Player.title_id == title_id())
@@ -3192,7 +3191,6 @@ def kol_player_in_group():
         my_win.comboBox_page_vid.setEnabled(False)
         my_win.spinBox_kol_group.hide()
         # ====== запись в таблицу db -system- первый этап
-        # s = System.select().order_by(System.id.desc()).get()
         s = System.select().where(System.title_id == title_id()).get()
         system = System.get(System.id == s)
         system.max_player = mp
@@ -4392,12 +4390,14 @@ def focus():
         sf = sys.score_flag  # флаг из скольки партий играется матч
         mark_index = mark_list_gr.index(sender)
         mark = mark_list_gr[mark_index].text()
-        # if mark == "":
-        control_mark_in_score(mark)
-            # return
+        flag_mistake = control_mark_in_score(mark)
+        if flag_mistake is True:
+            return
         if mark_index % 2 == 1:
             if mark_index >= sf:
                 sum_total_game = score_in_game()  # подсчет очков в партии
+                if len(sum_total_game) == 0: # значит была ошибка в счете и поэтому он вернул пустой список
+                    return
                 if sum_total_game[0] != sum_total_game[1]:
                     mark_list_gr[mark_index + 1].setFocus()
                 else:
@@ -4459,8 +4459,8 @@ def focus():
 def control_mark_in_score(mark):
     """проверка ввода счета в ячейку """
     msgBox = QMessageBox
-
     tab = my_win.tabWidget.currentIndex()
+
     sf = 5
     if tab == 3:
         score_list = [my_win.lineEdit_pl1_score_total_gr.text(), my_win.lineEdit_pl2_score_total_gr.text()] # список общий счет в партии
@@ -4475,18 +4475,21 @@ def control_mark_in_score(mark):
         mark_number = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
         if mark == "":
             msgBox.critical(my_win, "", "Ошибка при вводе счета!\nвведите счет")
-            return
+            flag_mistake = True
+            return flag_mistake
         else:
             count = len(mark)
             if count > 2:
                 msgBox.critical(my_win, "", "Ошибка при вводе счета!\nпроверьте правильность ввода")
-                return
+                flag_mistake = True
+                return flag_mistake
             else:
                 for k in range(0, count):
                     mark_zn = mark[k]
                     if mark_zn not in mark_number:
                         msgBox.critical(my_win, "", "Ошибка при вводе счета!\nпроверьте правильность ввода")
-                        return
+                        flag_mistake = True
+                        return flag_mistake
 
 
 def score_in_game():
@@ -7288,7 +7291,12 @@ def etap_made():
     if etap == "Предварительный":    
         kol_player_in_group() # кол-во участников в группах
     elif etap == "Финальный":
-        total_game_table(exit_stage="", kpt=0, fin="", pv="") # сколько игр в финале или пф   
+        total_game_table(exit_stage="", kpt=0, fin="", pv="") # сколько игр в финале или пф 
+        systems = system.select().order_by(System.id.desc()).get()
+        state_visible = my_win.checkBox_5.isChecked() # записывает в DB измененный статус видимости
+        with db:
+            systems.visible_game = state_visible
+            systems.save()
         # суммирует все игры этапов    
     for k in system:
         kol_game_str = k.kol_game_string
