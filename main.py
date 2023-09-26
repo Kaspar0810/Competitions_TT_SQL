@@ -519,6 +519,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     choice_semifinal_automat(stage)
                     my_win.tabWidget.setCurrentIndex(4)
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
+
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
                 return
@@ -663,28 +664,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-# class ItemsModel(QAbstractTableModel):
-#     """класс вывода просмотра сетки при ручной жеребьевки"""
-#     def __init__(self, *args, **kwargs) -> None:
-#         super().__init__(self, *args, **kwargs)
-    
-#     # def items(self, items):
-#     #     pass
-
-#     def rowCount(self, *args, **kwargs) -> int:
-#         # return super().rowCount(*args, **kwargs)
-#         return 32
-    
-#     def columnCount(self, columns) -> int:
-#         return 2
-
-#     def data(self, index: QtCore.QModelIndex, role: QtCore.Qt.ItemDataRole):
-#         if not index.isValid:
-#             return
-#         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-#             return "1" 
-
-
 
 app = QApplication(sys.argv)
 my_win = MainWindow()
@@ -692,31 +671,6 @@ my_win.setWindowTitle("Соревнования по настольному те
 my_win.setWindowIcon(QIcon("CTT.png"))
 my_win.resize(1390, 804)
 my_win.center()
-
-# class ItemsModel(QAbstractTableModel):
-#     """класс вывода просмотра сетки при ручной жеребьевки"""
-#     def __init__(self, *args, **kwargs) -> None:
-#         super().__init__(self, *args, **kwargs)
-    
-#     def items(self, items):
-#         pass
-
-#     def rowCount(self, *args, **kwargs) -> int:
-#         return super().rowCount(*args, **kwargs)
-
-#     def columnCount(self, columns) -> int:
-#         return 2
-
-#     def data(self, index: QtCore.QModelIndex, role: QtCore.Qt.ItemDataRole):
-#         if not index.isValid:
-#             return
-#         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-#             return "1" 
-        
-    # model_choice_net = ItemsModel()
-    # tableView_net.setModel(model_choice_net)
-    # tableView_net.hide()
-
 
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
@@ -777,7 +731,7 @@ class StartWindow(QMainWindow, Ui_Form):
 
             title = Title(name="", sredi="", vozrast="", data_start="", data_end="", mesto="", referee="",
                           kat_ref="", secretary="", kat_sec="", gamer=gamer, full_name_comp="", pdf_comp="",
-                          short_name_comp="", tab_enabled="Титул").save()
+                          short_name_comp="", tab_enabled="Титул", multiregion="").save()
             # получение последней записи в таблице
             t_id = Title.select().order_by(Title.id.desc()).get()
             title_id = t_id.id
@@ -1213,6 +1167,7 @@ def enabled_menu_after_choice():
 
 def db_insert_title(title_str):
     """Вставляем запись в таблицу титул"""
+    msgBox = QMessageBox()
     nm = title_str[0]
     sr = title_str[1]
     vz = title_str[2]
@@ -1225,6 +1180,14 @@ def db_insert_title(title_str):
     ks = title_str[9]
     gm = title_str[10]
     fn = title_str[11]
+    # mr = title_str[12]
+    mr, ok = QInputDialog.getText(my_win, "Если соревнования межрегиональные\n нажмите -ОК-, \n"
+                                            "Если принимают участие спортсмены одного реиона\n нажмите -NO-", msgBox.Yes, msgBox.No)
+    if msgBox.Yes:
+        mr = 1
+    else:
+        mr = 0                                        
+
     short_name, ok = QInputDialog.getText(my_win, "Краткое имя соревнования", "Создайте краткое имя соревнования,\nдля"
                                           " отбражения в названии файла при "
                                           "сохранении,\nиспользуете латинские буквы"
@@ -1237,7 +1200,7 @@ def db_insert_title(title_str):
         t = Title.select().order_by(Title.id.desc()).get()
         title = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=rf,
                      kat_ref=kr, secretary=sk, kat_sec=ks, gamer=gm, full_name_comp=fn, pdf_comp="",
-                     short_name_comp=short_name).save()
+                     short_name_comp=short_name, multiregion=mr).save()
     else:
         return
 
@@ -1435,7 +1398,7 @@ def load_tableWidget():
         if tb == 3:
             stage = "Предварительный"
             start = time.time()
-            fill_table_results(upd=0)
+            fill_table_results()
             end = time.time()
             total = start - end
             print("fill_table_results 1356 выполнялась за", "%.2f" %total)
@@ -1454,10 +1417,10 @@ def load_tableWidget():
                 if choice_flag[k] == True:
                     p += 1
             if p > 0:
-                fill_table_results(upd=0)
+                fill_table_results()
     elif tb == 4:
         stage = "Предварительный"
-        fill_table_results(upd=0)
+        fill_table_results()
     elif tb == 2 or sender == my_win.choice_gr_Action:
         if sender == my_win.choice_fin_Action:  # таблица жеребьевки
             pass
@@ -1883,16 +1846,112 @@ def fill_table_R1_list():
     my_win.tableWidget.resizeColumnsToContents()
 
 
-def fill_table_results(upd):
-    """заполняет таблицу результатов QtableWidget из db result"""    
+# def fill_table_results():
+#     """заполняет таблицу результатов QtableWidget из db result"""    
+#     system_id_list = []
+#     system_stage_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
+#     result = Result.select().where(Result.title_id == title_id())
+#     system = System.select().where(System.title_id == title_id())
+#     tb = my_win.tabWidget.currentIndex()
+#     # if upd == 1: # значит таблица загружена и идет ввод счета или обновление таблицы
+#     row_number = my_win.tableWidget.currentRow()
+#     id_game = my_win.tableWidget.item(row_number, 0).text()
+#     if tb == 3:
+#         stage = "Предварительный"
+#         system_id = system.select().where(System.stage == stage).get()
+#         id_system = system_id.id
+#         player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result
+#     elif tb == 4:
+#         player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
+#     elif tb == 5:
+#         for k in system: # заполняе список ид системы финальных этапов
+#             id_system = k.id
+#             if k.stage not in system_stage_list:
+#                 system_id_list.append(id_system)
+#         stage = my_win.comboBox_filter_final.currentText()
+
+#         if stage == "все финалы":      
+#             player_result = result.select().where(Result.system_stage == "Финальный")  # проверка есть ли записи в таблице -result 
+#         else:
+#             system_id = system.select().where(System.stage == stage).get()
+#             id_system = system_id.id
+#             player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result     
+
+#     result_list = player_result.dicts().execute()
+#     row_count = len(result_list)  # кол-во строк в таблице
+#     column_count = len(result_list[0])  # кол-во столбцов в таблице
+#             # вставляет в таблицу необходимое кол-во строк
+#     my_win.tableWidget.setRowCount(row_count)
+#     row_result = []
+#     # if upd == 0:
+#     for row in range(row_count):  # добавляет данные из базы в TableWidget
+#         row_result.clear()
+#         for column in range(column_count):
+#             item = str(list(result_list[row].values())[column])
+#             if column < 6 or column > 6:
+#                 row_result.append(item)
+#             elif column == 6: # столбец победителя
+#                 row_result.append(item)
+#                 if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
+#                     if row_result[4] == row_result[6]:
+#                         my_win.tableWidget.item(row, 4).setForeground(
+#                             QBrush(QColor(255, 0, 0)))  # окрашивает текст
+#                                     # в красный цвет 1-ого игрока
+#                     else:
+#                         my_win.tableWidget.item(row, 5).setForeground(
+#                             QBrush(QColor(255, 0, 0)))  # окрашивает текст
+#                                     # в красный цвет 2-ого игрока
+#                 else:
+#                     my_win.tableWidget.item(row, 4).setForeground(
+#                         QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
+#                     my_win.tableWidget.item(row, 5).setForeground(
+#                         QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
+#             my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+#     # else:
+#     result_list = result.select().where(Result.id == id_game).get()
+#     result_list = player_result.dicts().execute()
+#     for column in range(column_count):
+#         item = str(list(result_list[0].values())[column])
+#         if column < 6 or column > 6:
+#             row_result.append(item)
+#         elif column == 6: # столбец победителя
+#             row_result.append(item)
+#             if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
+#                 if row_result[4] == row_result[6]:
+#                     my_win.tableWidget.item(row_number, 4).setForeground(
+#                         QBrush(QColor(255, 0, 0)))  # окрашивает текст
+#                                     # в красный цвет 1-ого игрока
+#                 else:
+#                     my_win.tableWidget.item(row_number, 5).setForeground(
+#                         QBrush(QColor(255, 0, 0)))  # окрашивает текст
+#                                     # в красный цвет 2-ого игрока
+#             else:
+#                 my_win.tableWidget.item(row_number, 4).setForeground(
+#                     QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
+#                 my_win.tableWidget.item(row_number, 5).setForeground(
+#                     QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
+#         my_win.tableWidget.setItem(row_number, column, QTableWidgetItem(str(item)))
+#     # ========
+#         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
+#         my_win.tableWidget.showColumn(9) # столбец счет в партиях
+#         my_win.tableWidget.hideColumn(1)
+#         my_win.tableWidget.hideColumn(10)
+#         my_win.tableWidget.hideColumn(11)
+#         my_win.tableWidget.hideColumn(12)
+#         my_win.tableWidget.hideColumn(13)
+#         my_win.tableWidget.showColumn(14)
+#         my_win.tableWidget.hideColumn(15)
+#                 # ставит размер столбцов согласно записям
+#         my_win.tableWidget.resizeColumnsToContents()
+
+
+def fill_table_results():
+    """заполняет таблицу результатов QtableWidget из db result"""
     system_id_list = []
     system_stage_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
     result = Result.select().where(Result.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     tb = my_win.tabWidget.currentIndex()
-    if upd == 1: # значит таблица загружена и идет ввод счета или обновление таблицы
-        row_number = my_win.tableWidget.currentRow()
-        id_game = my_win.tableWidget.item(row_number, 0).text()
     if tb == 3:
         stage = "Предварительный"
         system_id = system.select().where(System.stage == stage).get()
@@ -1912,63 +1971,38 @@ def fill_table_results(upd):
         else:
             system_id = system.select().where(System.stage == stage).get()
             id_system = system_id.id
-            player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result     
-
+            player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result           
+ 
     result_list = player_result.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = len(result_list[0])  # кол-во столбцов в таблице
-            # вставляет в таблицу необходимое кол-во строк
+        # вставляет в таблицу необходимое кол-во строк
     my_win.tableWidget.setRowCount(row_count)
     row_result = []
-    if upd == 0:
-        for row in range(row_count):  # добавляет данные из базы в TableWidget
-            row_result.clear()
-            for column in range(column_count):
-                item = str(list(result_list[row].values())[column])
-                if column < 6 or column > 6:
-                    row_result.append(item)
-                elif column == 6: # столбец победителя
-                    row_result.append(item)
-                    if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
-                        if row_result[4] == row_result[6]:
-                            my_win.tableWidget.item(row, 4).setForeground(
-                                QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                                    # в красный цвет 1-ого игрока
-                        else:
-                            my_win.tableWidget.item(row, 5).setForeground(
-                                QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                                    # в красный цвет 2-ого игрока
-                    else:
-                        my_win.tableWidget.item(row, 4).setForeground(
-                            QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
-                        my_win.tableWidget.item(row, 5).setForeground(
-                            QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
-                my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
-    else:
-        result_list = result.select().where(Result.id == id_game).get()
-        result_list = player_result.dicts().execute()
+    for row in range(row_count):  # добавляет данные из базы в TableWidget
+        row_result.clear()
         for column in range(column_count):
-            item = str(list(result_list[0].values())[column])
+            item = str(list(result_list[row].values())[column])
             if column < 6 or column > 6:
                 row_result.append(item)
             elif column == 6: # столбец победителя
                 row_result.append(item)
                 if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
                     if row_result[4] == row_result[6]:
-                        my_win.tableWidget.item(row_number, 4).setForeground(
+                        my_win.tableWidget.item(row, 4).setForeground(
                             QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                                    # в красный цвет 1-ого игрока
+                            # в красный цвет 1-ого игрока
                     else:
-                        my_win.tableWidget.item(row_number, 5).setForeground(
+                        my_win.tableWidget.item(row, 5).setForeground(
                             QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                                    # в красный цвет 2-ого игрока
+                            # в красный цвет 2-ого игрока
                 else:
-                    my_win.tableWidget.item(row_number, 4).setForeground(
+                    my_win.tableWidget.item(row, 4).setForeground(
                         QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
-                    my_win.tableWidget.item(row_number, 5).setForeground(
+                    my_win.tableWidget.item(row, 5).setForeground(
                         QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
-            my_win.tableWidget.setItem(row_number, column, QTableWidgetItem(str(item)))
-    # ========
+            my_win.tableWidget.setItem(row, column, QTableWidgetItem(str(item)))
+
         my_win.tableWidget.showColumn(6)  # показывает столбец победитель
         my_win.tableWidget.showColumn(9) # столбец счет в партиях
         my_win.tableWidget.hideColumn(1)
@@ -1978,7 +2012,7 @@ def fill_table_results(upd):
         my_win.tableWidget.hideColumn(13)
         my_win.tableWidget.showColumn(14)
         my_win.tableWidget.hideColumn(15)
-                # ставит размер столбцов согласно записям
+        # ставит размер столбцов согласно записям
         my_win.tableWidget.resizeColumnsToContents()
 
 
@@ -2585,6 +2619,7 @@ def page():
         load_combo()
         visible_field()
         my_win.label_16.hide()
+        my_win.tableView_net.hide()
     elif tb == 4:  # вкладка -полуфиналы-
         my_win.resize(1270, 825)
         Button_view_semifinal = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
@@ -3748,11 +3783,11 @@ def change_status_visible_and_score_game():
             my_win.lineEdit_pl1_score_total_fin.setFocus(True)
         my_win.label_22.setVisible(False)
 
-    if state_visible_db != state_visible:
-        with db:
-            system_stage.visible_game = state_visible
-            system_stage.save()
-            my_win.checkBox_5.setEnabled(state_visible)
+    # if state_visible_db != state_visible:
+    #     with db:
+    #         system_stage.visible_game = state_visible
+    #         system_stage.save()
+    #         my_win.checkBox_5.setEnabled(state_visible)
     if match_current != match_db:
         with db:
             system_stage.score_flag = match_current
@@ -4703,7 +4738,6 @@ def check_real_player():
 def enter_score(none_player=0):
     """заносит в таблицу -результаты- победителя, счет и т.п. sc_total [партии выигранные, проигранные, очки победителя
      очки проигравшего]"""
-    # start = time.time()
     tab = my_win.tabWidget.currentIndex()
     r = my_win.tableWidget.currentRow()
     id = my_win.tableWidget.item(r, 0).text()
@@ -4840,7 +4874,7 @@ def enter_score(none_player=0):
                             player = loser_fam_name
         elif type == "круг":
             pass
-    fill_table_results(upd=1)
+    fill_table_results()
     if tab == 3:
         line_edit_list = [my_win.lineEdit_pl1_s1_gr, my_win.lineEdit_pl2_s1_gr, my_win.lineEdit_pl1_s2_gr, my_win.lineEdit_pl2_s2_gr,
                           my_win.lineEdit_pl1_s3_gr, my_win.lineEdit_pl2_s3_gr, my_win.lineEdit_pl1_s4_gr, my_win.lineEdit_pl2_s4_gr,
@@ -4850,6 +4884,7 @@ def enter_score(none_player=0):
         fin = my_win.tableWidget.item(r, 1).text()
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
+        filter_gr()
     elif tab == 4:
         line_edit_list = [my_win.lineEdit_pl1_s1_pf, my_win.lineEdit_pl2_s1_pf, my_win.lineEdit_pl1_s2_pf, my_win.lineEdit_pl2_s2_pf,
                           my_win.lineEdit_pl1_s3_pf, my_win.lineEdit_pl2_s3_pf, my_win.lineEdit_pl1_s4_pf, my_win.lineEdit_pl2_s4_pf,
@@ -4900,9 +4935,7 @@ def enter_score(none_player=0):
             elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
                 setka_32_made(fin)    
         # filter_fin()
-    # end = time.time()
-    # total = start - end
-    # print("enter_score выполнялась за", "%.2f" %total)
+    
 
 def setka_type(none_player):
     """сетка ставит очки в зависимости от неявки игрока, встреча состоялась ли пропуск встречи -bye-"""
@@ -6194,141 +6227,296 @@ def free_place_in_setka(max_player, real_all_player_in_final):
     return free_num
     
 
+# def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net):
+#     """возможные номера посева"""
+#     possible_number = {}
+#     proba_possible = {} 
+#     num_tmp = []
+#     reg_tmp = []
+# 
+#     current_region = list(current_region_posev.values())
+#     y = 0
+#     for reg in current_region_posev.keys():
+#         cur_reg = current_region[y][0] # текущий регион посева
+#         cur_gr = current_region[y][1] # номер группы, которая сеятся
+
+#         if n == 0:
+#             if cur_reg in reg_last: # если регион который сеятся есть в уже посеянных областях
+#                 reg_tuple = tuple(reg_last)
+#                 count = reg_tuple.count(cur_reg) # количество регионов уже посеянных 
+#                 if count == 1: # значит только один регион в посеве
+#                     cur_gr = current_region[y][1]
+#                     number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net)
+#                     possible_number[reg] = number_posev
+#                 else: # если есть уже областей более двух
+#                     number_tmp = []
+#                     num_tmp.clear()
+#                     start = 0
+#                     for k in reg_last: # получаем список номеров сетки областей в той половине куда идет сев
+#                         if k == cur_reg:
+#                             index = reg_last.index(k, start)
+#                             set_number = number_last[index] # номер где уже посеянна такая же область
+#                             num_tmp.append(set_number)
+#                         start += 1
+#                     if count % 2 == 0: # если число четное
+#                         if count == 2: # посеяны 2 области разводит по четвертям
+#                             for h in num_tmp:
+#                                 if h <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз
+#                                     f = [i for i in sev if i >= player_net // 4 + 1 and i <= player_net // 2] # отсеивает в списке номера 9-16
+#                                 elif h > player_net // 4 and h <= player_net // 2: 
+#                                     f = [i for i in sev if i <= player_net // 4] # отсеивает в списке номера 1-8
+#                                 elif h >= player_net // 2 + 1 and h <= int(player_net * 3 / 4): 
+#                                     f = [i for i in sev if i > player_net * 3 / 4] # отсеивает в списке номера 25-32
+#                                 elif h > player_net * 3 / 4: 
+#                                     f = [i for i in sev if i >= player_net // 2 + 1 and i <= int(player_net * 3 / 4)] # отсеивает в списке номера 17-24
+#                                 number_tmp += f
+#                         elif count == 4: # посеяны 4 области разводит по восьмушкам
+#                             if player_net == 16:
+#                                 for h in num_tmp:
+#                                     if h <= 2: # если номер в сетке 1-2
+#                                         f = [i for i in sev if i >= 3 and i <= 4] # отсеивает в списке номера 3-4 ()
+#                                     elif h >= 3 and h <= 4: # если номер в сетке 3-4
+#                                         f = [i for i in sev if i < 3] # отсеивает в списке номера 1-2 ()
+#                                     elif h >= 5 and h <= 6: # если номер в сетке 5-6
+#                                         f = [i for i in sev if i >= 7 and i <= 8] # отсеивает в списке номера 25-32
+#                                     elif h >= 7 and h <= 8: # если номер в сетке 7-8
+#                                         f = [i for i in sev if i >= 5 and i <= 6] # отсеивает в списке номера 17-24
+#                                     elif h >= 9 and h <= 10: # если номер в сетке вверху, то наде сеять вниз
+#                                         f = [i for i in sev if i >= 11 and i <= 12] # отсеивает в списке номера 9-16
+#                                     elif h >= 11 and h <= 12: 
+#                                         f = [i for i in sev if i <= 9 and i <= 10] # отсеивает в списке номера 1-8
+#                                     elif h >= 13 and h <= 14: 
+#                                         f = [i for i in sev if i > 14] # отсеивает в списке номера 25-32
+#                                     elif h > 14: 
+#                                         f = [i for i in sev if i >= 12 and i <= 13] # отсеивает в списке номера 17-24    
+#                                     number_tmp += f
+#                             elif player_net == 32:
+#                                 for h in num_tmp:
+#                                     if h <= player_net // 8: # если номер в сетке вверху, то наде сеять вниз
+#                                         f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 3-4 ()
+#                                     elif h >= 5 and h <= 8: 
+#                                         f = [i for i in sev if i < 5] # отсеивает в списке номера 1-2 ()
+#                                     elif h >= 9 and h <= 12: 
+#                                         f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
+#                                     elif h >= 13 and h <= 16: 
+#                                         f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
+#                                     elif h >= 17 and h <= 20: # если номер в сетке вверху, то наде сеять вниз
+#                                         f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
+#                                     elif h >= 21 and h <= 24: 
+#                                         f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
+#                                     elif h >= 25 and h <= 28: 
+#                                         f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
+#                                     elif h > 28: 
+#                                         f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
+#                                     number_tmp += f
+#                     elif count > 2:
+#                         # number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net, count_exit)
+#                         # if 
+#                         number_posev = sev
+#                         number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
+                       
+#                     number_posev = number_tmp.copy()
+#                     possible_number[reg] = number_posev
+#             else: # все номера в той части куда можно сеять
+#                 possible_number[reg] = sev
+#         else: # 2-й посев и последующие 
+#             number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы без учета регионов
+#             number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
+#             reg_tmp.clear()
+#             # ======
+#             if n > 1:
+#                 for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
+#                     d = number_last.index(k)
+#                     reg_tmp.append(reg_last[d]) # список регионов     
+#                 if cur_reg in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
+#                     num_tmp = [] # список номеров сетки где есть такой же регион (в той половине или четверти с номером который сеятся)
+#                     for d in number_posev_old: # номер в сетке в предыдущем посеве
+#                         posev_tmp = num_id_player[d]
+#                         if cur_reg in posev_tmp:
+#                             num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
+#                     count = len(num_tmp) # количество областей в той части сетки, куде сеятся регион
+#                 # ======== отбирает номера из -number_posev- , где учитывается регион ======
+#                     if count == 1 and n == 1: # есть только одна область в той же половине другой четверти (1 место и 2-е место в группе)
+#                         if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
+#                             number_posev = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
+#                         elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
+#                             number_posev = [i for i in number_posev if i < 9] # номера 1-8
+#                         elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
+#                             number_posev = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
+#                         elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
+#                             number_posev = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
+#                     elif (count == 1 and n == 2):
+#                         if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
+#                             number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
+#                         elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
+#                             number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
+#                         elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
+#                             number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
+#                         elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
+#                             number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
+#                         elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
+#                             number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
+#                         elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
+#                             number_posev = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
+#                         elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
+#                             number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
+#                         elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
+#                             number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
+#                     elif n == 3:
+#                         if count == 1 and len(number_posev) != 1:
+#                             if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
+#                                 number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
+#                             elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
+#                                 number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
+#                             elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
+#                                 number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
+#                             elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
+#                                 number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
+#                             elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
+#                                 number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
+#                             elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
+#                                 number_posev = [i for i in number_posev if i >= (player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
+#                             elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
+#                                 number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
+#                             elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
+#                                 number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
+#                     else:  
+#                         number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev) # номер (а)куда можно сеять
+#                         number_posev.clear()
+#                         number_posev = number_tmp.copy()         
+
+#             possible_number[reg] = number_posev
+#             proba_possible[cur_gr] = number_posev
+#         y += 1
+#     return possible_number
+
+
+
 def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net):
-    """возможные номера посева"""
+    """возможные номера посева new"""
     possible_number = {}
     proba_possible = {} 
     num_tmp = []
     reg_tmp = []
+    # =========
+    titles = Title.get(Title.id == title_id())
+    multi_reg = titles.multiregion
+    #============
     current_region = list(current_region_posev.values())
     y = 0
     for reg in current_region_posev.keys():
         cur_reg = current_region[y][0] # текущий регион посева
         cur_gr = current_region[y][1] # номер группы, которая сеятся
-        if n == 0:
-            if cur_reg in reg_last: # если регион который сеятся есть в уже посеянных областях
-                reg_tuple = tuple(reg_last)
-                count = reg_tuple.count(cur_reg) # количество регионов уже посеянных 
-                if count == 1: # значит только один регион в посеве
-                    cur_gr = current_region[y][1]
-                    number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net)
-                    possible_number[reg] = number_posev
-                else: # если есть уже областей более двух
-                    number_tmp = []
-                    num_tmp.clear()
-                    start = 0
-                    for k in reg_last: # получаем список номеров сетки областей в той половине куда идет сев
-                        if k == cur_reg:
-                            index = reg_last.index(k, start)
-                            set_number = number_last[index] # номер где уже посеянна такая же область
-                            num_tmp.append(set_number)
-                        start += 1
-                    if count % 2 == 0: # если число четное
-                        if count == 2: # посеяны 2 области разводит по четвертям
-                            for h in num_tmp:
-                                if h <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз
-                                    f = [i for i in sev if i >= player_net // 4 + 1 and i <= player_net // 2] # отсеивает в списке номера 9-16
-                                elif h > player_net // 4 and h <= player_net // 2: 
-                                    f = [i for i in sev if i <= player_net // 4] # отсеивает в списке номера 1-8
-                                elif h >= player_net // 2 + 1 and h <= int(player_net * 3 / 4): 
-                                    f = [i for i in sev if i > player_net * 3 / 4] # отсеивает в списке номера 25-32
-                                elif h > player_net * 3 / 4: 
-                                    f = [i for i in sev if i >= player_net // 2 + 1 and i <= int(player_net * 3 / 4)] # отсеивает в списке номера 17-24
-                                number_tmp += f
-                        elif count == 4: # посеяны 4 области разводит по восьмушкам
-                            if player_net == 16:
+        #=======
+        if multi_reg == 0: # если спортсмены одного региона нет рассеивания
+            possible_number[reg] = sev
+        else:
+            if n == 0:
+                if cur_reg in reg_last: # если регион который сеятся есть в уже посеянных областях
+                    reg_tuple = tuple(reg_last)
+                    count = reg_tuple.count(cur_reg) # количество регионов уже посеянных 
+                    if count == 1: # значит только один регион в посеве
+                        cur_gr = current_region[y][1]
+                        number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net)
+                        possible_number[reg] = number_posev
+                    else: # если есть уже областей более двух
+                        number_tmp = []
+                        num_tmp.clear()
+                        start = 0
+                        for k in reg_last: # получаем список номеров сетки областей в той половине куда идет сев
+                            if k == cur_reg:
+                                index = reg_last.index(k, start)
+                                set_number = number_last[index] # номер где уже посеянна такая же область
+                                num_tmp.append(set_number)
+                            start += 1
+                        if count % 2 == 0: # если число четное
+                            if count == 2: # посеяны 2 области разводит по четвертям
                                 for h in num_tmp:
-                                    if h <= 2: # если номер в сетке 1-2
-                                        f = [i for i in sev if i >= 3 and i <= 4] # отсеивает в списке номера 3-4 ()
-                                    elif h >= 3 and h <= 4: # если номер в сетке 3-4
-                                        f = [i for i in sev if i < 3] # отсеивает в списке номера 1-2 ()
-                                    elif h >= 5 and h <= 6: # если номер в сетке 5-6
-                                        f = [i for i in sev if i >= 7 and i <= 8] # отсеивает в списке номера 25-32
-                                    elif h >= 7 and h <= 8: # если номер в сетке 7-8
-                                        f = [i for i in sev if i >= 5 and i <= 6] # отсеивает в списке номера 17-24
-                                    elif h >= 9 and h <= 10: # если номер в сетке вверху, то наде сеять вниз
-                                        f = [i for i in sev if i >= 11 and i <= 12] # отсеивает в списке номера 9-16
-                                    elif h >= 11 and h <= 12: 
-                                        f = [i for i in sev if i <= 9 and i <= 10] # отсеивает в списке номера 1-8
-                                    elif h >= 13 and h <= 14: 
-                                        f = [i for i in sev if i > 14] # отсеивает в списке номера 25-32
-                                    elif h > 14: 
-                                        f = [i for i in sev if i >= 12 and i <= 13] # отсеивает в списке номера 17-24    
+                                    if h <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз
+                                        f = [i for i in sev if i >= player_net // 4 + 1 and i <= player_net // 2] # отсеивает в списке номера 9-16
+                                    elif h > player_net // 4 and h <= player_net // 2: 
+                                        f = [i for i in sev if i <= player_net // 4] # отсеивает в списке номера 1-8
+                                    elif h >= player_net // 2 + 1 and h <= int(player_net * 3 / 4): 
+                                        f = [i for i in sev if i > player_net * 3 / 4] # отсеивает в списке номера 25-32
+                                    elif h > player_net * 3 / 4: 
+                                        f = [i for i in sev if i >= player_net // 2 + 1 and i <= int(player_net * 3 / 4)] # отсеивает в списке номера 17-24
                                     number_tmp += f
-                            elif player_net == 32:
-                                for h in num_tmp:
-                                    if h <= player_net // 8: # если номер в сетке вверху, то наде сеять вниз
-                                        f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 3-4 ()
-                                    elif h >= 5 and h <= 8: 
-                                        f = [i for i in sev if i < 5] # отсеивает в списке номера 1-2 ()
-                                    elif h >= 9 and h <= 12: 
-                                        f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
-                                    elif h >= 13 and h <= 16: 
-                                        f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
-                                    elif h >= 17 and h <= 20: # если номер в сетке вверху, то наде сеять вниз
-                                        f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
-                                    elif h >= 21 and h <= 24: 
-                                        f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
-                                    elif h >= 25 and h <= 28: 
-                                        f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
-                                    elif h > 28: 
-                                        f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
-                                    number_tmp += f
-                    elif count > 2:
-                        # number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net, count_exit)
-                        # if 
-                        number_posev = sev
-                        number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
-                       
-                    number_posev = number_tmp.copy()
-                    possible_number[reg] = number_posev
-            else: # все номера в той части куда можно сеять
-                possible_number[reg] = sev
-        else: # 2-й посев и последующие 
-            number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы без учета регионов
-            number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
-            reg_tmp.clear()
-            # ======
-            if n > 1:
-                for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
-                    d = number_last.index(k)
-                    reg_tmp.append(reg_last[d]) # список регионов     
-                if cur_reg in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
-                    num_tmp = [] # список номеров сетки где есть такой же регион (в той половине или четверти с номером который сеятся)
-                    for d in number_posev_old: # номер в сетке в предыдущем посеве
-                        posev_tmp = num_id_player[d]
-                        if cur_reg in posev_tmp:
-                            num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
-                    count = len(num_tmp) # количество областей в той части сетки, куде сеятся регион
-                # ======== отбирает номера из -number_posev- , где учитывается регион ======
-                    if count == 1 and n == 1: # есть только одна область в той же половине другой четверти (1 место и 2-е место в группе)
-                        if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
-                            number_posev = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
-                        elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
-                            number_posev = [i for i in number_posev if i < 9] # номера 1-8
-                        elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
-                            number_posev = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
-                        elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
-                            number_posev = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
-                    elif (count == 1 and n == 2):
-                        if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
-                            number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
-                        elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
-                            number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
-                        elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
-                            number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
-                        elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
-                            number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
-                        elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
-                            number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
-                        elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
-                            number_posev = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
-                        elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
-                            number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
-                        elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
-                            number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
-                    elif n == 3:
-                        if count == 1 and len(number_posev) != 1:
+                            elif count == 4: # посеяны 4 области разводит по восьмушкам
+                                if player_net == 16:
+                                    for h in num_tmp:
+                                        if h <= 2: # если номер в сетке 1-2
+                                            f = [i for i in sev if i >= 3 and i <= 4] # отсеивает в списке номера 3-4 ()
+                                        elif h >= 3 and h <= 4: # если номер в сетке 3-4
+                                            f = [i for i in sev if i < 3] # отсеивает в списке номера 1-2 ()
+                                        elif h >= 5 and h <= 6: # если номер в сетке 5-6
+                                            f = [i for i in sev if i >= 7 and i <= 8] # отсеивает в списке номера 25-32
+                                        elif h >= 7 and h <= 8: # если номер в сетке 7-8
+                                            f = [i for i in sev if i >= 5 and i <= 6] # отсеивает в списке номера 17-24
+                                        elif h >= 9 and h <= 10: # если номер в сетке вверху, то наде сеять вниз
+                                            f = [i for i in sev if i >= 11 and i <= 12] # отсеивает в списке номера 9-16
+                                        elif h >= 11 and h <= 12: 
+                                            f = [i for i in sev if i <= 9 and i <= 10] # отсеивает в списке номера 1-8
+                                        elif h >= 13 and h <= 14: 
+                                            f = [i for i in sev if i > 14] # отсеивает в списке номера 25-32
+                                        elif h > 14: 
+                                            f = [i for i in sev if i >= 12 and i <= 13] # отсеивает в списке номера 17-24    
+                                        number_tmp += f
+                                elif player_net == 32:
+                                    for h in num_tmp:
+                                        if h <= player_net // 8: # если номер в сетке вверху, то наде сеять вниз
+                                            f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 3-4 ()
+                                        elif h >= 5 and h <= 8: 
+                                            f = [i for i in sev if i < 5] # отсеивает в списке номера 1-2 ()
+                                        elif h >= 9 and h <= 12: 
+                                            f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
+                                        elif h >= 13 and h <= 16: 
+                                            f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
+                                        elif h >= 17 and h <= 20: # если номер в сетке вверху, то наде сеять вниз
+                                            f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
+                                        elif h >= 21 and h <= 24: 
+                                            f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
+                                        elif h >= 25 and h <= 28: 
+                                            f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
+                                        elif h > 28: 
+                                            f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
+                                        number_tmp += f
+                        elif count > 2:
+                            # number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net, count_exit)
+                            # if 
+                            number_posev = sev
+                            number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
+                        
+                        number_posev = number_tmp.copy()
+                        possible_number[reg] = number_posev
+                else: # все номера в той части куда можно сеять
+                    possible_number[reg] = sev
+            else: # 2-й посев и последующие 
+                number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы без учета регионов
+                number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
+                reg_tmp.clear()
+                # ======
+                if n > 1:
+                    for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
+                        d = number_last.index(k)
+                        reg_tmp.append(reg_last[d]) # список регионов     
+                    if cur_reg in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
+                        num_tmp = [] # список номеров сетки где есть такой же регион (в той половине или четверти с номером который сеятся)
+                        for d in number_posev_old: # номер в сетке в предыдущем посеве
+                            posev_tmp = num_id_player[d]
+                            if cur_reg in posev_tmp:
+                                num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
+                        count = len(num_tmp) # количество областей в той части сетки, куде сеятся регион
+                    # ======== отбирает номера из -number_posev- , где учитывается регион ======
+                        if count == 1 and n == 1: # есть только одна область в той же половине другой четверти (1 место и 2-е место в группе)
+                            if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
+                                number_posev = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
+                            elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
+                                number_posev = [i for i in number_posev if i < 9] # номера 1-8
+                            elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
+                                number_posev = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
+                            elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
+                                number_posev = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
+                        elif (count == 1 and n == 2):
                             if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
                                 number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
                             elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
@@ -6340,19 +6528,37 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                             elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
                                 number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
                             elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
-                                number_posev = [i for i in number_posev if i >= (player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
+                                number_posev = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
                             elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
                                 number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
                             elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
                                 number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
-                    else:  
-                        number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev) # номер (а)куда можно сеять
-                        number_posev.clear()
-                        number_posev = number_tmp.copy()         
+                        elif n == 3:
+                            if count == 1 and len(number_posev) != 1:
+                                if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
+                                    number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
+                                elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
+                                    number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
+                                elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
+                                    number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
+                                elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
+                                    number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
+                                elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
+                                    number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
+                                elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
+                                    number_posev = [i for i in number_posev if i >= (player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
+                                elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
+                                    number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
+                                elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
+                                    number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
+                        else:  
+                            number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev) # номер (а)куда можно сеять
+                            number_posev.clear()
+                            number_posev = number_tmp.copy()         
 
-            possible_number[reg] = number_posev
-            proba_possible[cur_gr] = number_posev
-        y += 1
+                possible_number[reg] = number_posev
+                proba_possible[cur_gr] = number_posev
+            y += 1
     return possible_number
 
 
@@ -6879,7 +7085,7 @@ def change_player_between_group_after_draw():
 # =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
-    player_in_table_group_and_write_Game_list_Result()
+    player_in_table_group_and_write_Game_list_Result(stage="Предварительный")
     my_win.comboBox_first_group.setCurrentText("-выберите группу-")
     my_win.listWidget_first_group.clear()
     my_win.comboBox_first_group.setCurrentText(gr_pl1)
@@ -7222,28 +7428,30 @@ def control_all_player_in_final(etap):
                                     msgBox.Yes, msgBox.No) 
             if result == msgBox.Yes:
                 flag = True
-                return flag
-            else:
-                pass
-        else:        # ========= 
-            add_open_tab(tab_page="Система")
-            result = msgBox.question(my_win, "", "Система соревнований создана.\n"
-                                                        "Теперь необходимо сделать жеребъевку\n"
-                                                        "предварительного этапа.\n"
-                                                        "Хотите ее сделать сейчас?",
-                                        msgBox.Ok, msgBox.Cancel)
-            if result == msgBox.Ok:
-                choice_gr_automat()
-                add_open_tab(tab_page="Группы")
-                tab_enabled(gamer)
-                with db:
-                    system_stage.choice_flag = True
-                    system_stage.save()
-                    flag = True
-            else:
-                return    
+            # else:
+            #     flag = False
+            # return flag   
+            else:        # ========= 
+                add_open_tab(tab_page="Система")
+                result = msgBox.question(my_win, "", "Система соревнований создана.\n"
+                                                            "Теперь необходимо сделать жеребъевку\n"
+                                                            "предварительного этапа.\n"
+                                                            "Хотите ее сделать сейчас?",
+                                            msgBox.Ok, msgBox.Cancel)
+                if result == msgBox.Ok:
+                    choice_gr_automat()
+                    add_open_tab(tab_page="Группы")
+                    tab_enabled(gamer)
+                    with db:
+                        system_stage.choice_flag = True
+                        system_stage.save()
+                        flag = True
+                else:
+                    return    
     elif t >= 3: # продолжает создание системы
         flag = True
+    elif t == 0:
+        flag = False
     return flag
 
 
@@ -8773,8 +8981,8 @@ def table_made(pv, stage):
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     catalog = 1
     change_dir(catalog)
-    doc.topMargin = 2.2 * cm # высота отступа от верха листа pdf
-    doc.bottomMargin = 1.8 * cm
+    doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
+    doc.bottomMargin = 1.6 * cm
     elements.insert(0, (Paragraph("Предварительный этап", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
@@ -9389,7 +9597,7 @@ def setka_16_full_made(fin):
     else:
         short_name = "clear_16_full_net"  # имя для чистой сетки
         name_table_final = f"{short_name}.pdf"
-    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=1*cm, bottomMargin=1*cm)
+    doc = SimpleDocTemplate(name_table_final, pagesize=pv, rightMargin=1*cm, leftMargin=1*cm, topMargin=2.2*cm, bottomMargin=1*cm)
     catalog = 1
     change_dir(catalog)
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -12959,15 +13167,15 @@ def open_close_file(view_file):
 
     # my_db = SqliteDatabase('comp_db.db')
     # migrator = SqliteMigrator(my_db)
-    # signature = BlobField(null=True)
+    # multiregion = IntegerField(null=True)
 #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
 #     # system_id = ForeignKeyField(System, field=System.id, null=True)
 
-#     with db:
+    # with db:
 #         # migrate(migrator.drop_column('referees', 'signature')) # удаление столбца
 # #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
 #         migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
-        # migrate(migrator.add_column('referees', 'signature', signature)) # Добавление столбца (таблица, столбец, повтор название столбца)
+        # migrate(migrator.add_column('titles', 'multiregion', multiregion)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-

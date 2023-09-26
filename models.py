@@ -105,6 +105,7 @@ class Title(BaseModel):
     pdf_comp = BlobField()
     short_name_comp = CharField()
     tab_enabled = CharField()
+    multiregion = IntegerField()
 
     class Meta:
         db_table = "titles"
