@@ -3458,12 +3458,13 @@ def player_fin_on_circle(fin):
         num = int(n[z + 1:])
         number_tours.append(num)
 
-    for nt in number_tours:
+    # for nt in number_tours:
+    for nt in range(1, player_in_final + 1):
         fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
         game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=system_id,
                             title_id=title_id())
         game_list.save()
-        
+  
     # === запись в db игроков которые попали в финал из группы
     ps_final = 1
     for l in fin_list:
