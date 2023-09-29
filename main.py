@@ -1,6 +1,5 @@
 
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
-from reportlab.platypus import PageBreak
 from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.lib import colors
 from reportlab.lib.colors import *
@@ -16,7 +15,7 @@ from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
 from PyQt5.QtCore import QAbstractTableModel
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon, QBrush, QColor
+from PyQt5.QtGui import QIcon, QBrush, QColor
 from PyQt5.QtWidgets import QMainWindow, QMenu, QAction, QFileDialog, QMessageBox, QDesktopWidget, QApplication, QInputDialog, QProgressBar, QAbstractItemView, QTableWidgetItem
 from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem, QTableView
 from PyQt5 import QtGui, QtWidgets, QtCore
