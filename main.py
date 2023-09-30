@@ -14,10 +14,12 @@ from PyPDF2 import PdfMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
+from PyQt5 import *
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtGui import QIcon, QBrush, QColor
-from PyQt5.QtWidgets import QMainWindow, QMenu, QAction, QFileDialog, QMessageBox, QDesktopWidget, QApplication, QInputDialog, QProgressBar, QAbstractItemView, QTableWidgetItem
 from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem, QTableView
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem
+from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget
 from PyQt5 import QtGui, QtWidgets, QtCore
 from models import *
 from collections import Counter
