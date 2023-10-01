@@ -1181,8 +1181,8 @@ def db_insert_title(title_str):
     ks = title_str[9]
     gm = title_str[10]
     fn = title_str[11]
-    # mr = title_str[12]
-    mr, ok = QInputDialog.getText(my_win, "Если соревнования межрегиональные\n нажмите -ОК-, \n"
+
+    reply = msgBox.question(my_win, "Уведомление", "Если соревнования межрегиональные\n нажмите -YES-, \n"
                                             "Если принимают участие спортсмены одного реиона\n нажмите -NO-", msgBox.Yes, msgBox.No)
     if msgBox.Yes:
         mr = 1
