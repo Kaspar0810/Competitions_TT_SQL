@@ -2917,13 +2917,14 @@ def list_player_pdf(player_list):
         coach_id = l.coach_id
         t = coach_id.coach
         m = l.mesto
+        chop_line(t)
         data = [n, p, b, r, c, g, z, t, m]
 
         elements.append(data)
     elements.insert(0, ["№", "Фамилия, Имя", "Дата рожд.", "Рейтинг", "Город", "Регион", "Разряд", "Тренер(ы)",
                         "Место"])
     t = Table(elements,
-              colWidths=(0.6 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
+              colWidths=(0.8 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, 4.8 * cm, 1.0 * cm),
               rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
@@ -3233,17 +3234,18 @@ def view():
         change_dir(catalog)
         if sender == my_win.view_list_Action:
             view_sort = ["По алфавиту", "По рейтингу", "По месту"]
-            if tab != 1:
-                view_sort, ok = QInputDialog.getItem(
-                            my_win, "Сортировка", "Выберите вид сортировки,\n просмотра списка участников.", view_sort, 0, False)
-                if view_sort == "По рейтингу":
-                    player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
-                elif view_sort == "По алфавиту": 
-                    player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player) # сортировка по алфавиту
-                elif view_sort == "По месту":
-                    player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
-                list_player_pdf(player_list) 
-                view_file =  f"{short_name}_player_list.pdf"
+            # if tab != 1:
+            view_sort, ok = QInputDialog.getItem(
+                        my_win, "Сортировка", "Выберите вид сортировки,\n просмотра списка участников.", view_sort, 0, False)
+            if view_sort == "По рейтингу":
+                player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
+            elif view_sort == "По алфавиту": 
+                player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player) # сортировка по алфавиту
+            elif view_sort == "По месту":
+                player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
+            list_player_pdf(player_list)
+            change_dir(catalog)
+            view_file =  f"{short_name}_player_list.pdf"
         elif sender == my_win.view_referee_list_Action:
             view_file =  f"{short_name}_referee_list.pdf"
         elif sender == my_win.view_regions_list_Action:
@@ -3590,27 +3592,27 @@ def player_in_table_group_and_write_Game_list_Result(stage):
                                          tours=match, title_id=title_id(), round=round, system_id=system_id).save()
 
 
-def chop_line(q, maxline=31):
+def chop_line(t, maxline=31):
     """перевод строки если слишком длинный список тренеров"""
-    l = len(q)
+    l = len(t)
     if l > maxline:
-        s1 = q.find(",", 0, maxline)
-        s2 = q.find(",", s1 + 1, maxline)       
-        cant = len(q) // maxline
+        s1 = t.find(",", 0, maxline)
+        s2 = t.find(",", s1 + 1, maxline)       
+        cant = len(t) // maxline
         cant += 1
         strline = ""
         if s2 == -1: # если две фамилии больше 31, перевод после 1-ой фамилии
             for k in range(1, cant):
                 index = maxline * k
-                strline += "%s\n" % (q[(index - maxline):s1 + 1])
-            strline += "%s" % (q[s1 + 1:])
+                strline += "%s\n" % (t[(index - maxline):s1 + 1])
+            strline += "%s" % (t[s1 + 1:])
         else:
             for k in range(1, cant):
                 index = maxline * k
-                strline += "%s\n" % (q[(index - maxline):s2 + 1])
-            strline += "%s" % (q[s2 + 1:])
-        q = strline
-    return q
+                strline += "%s\n" % (t[(index - maxline):s2 + 1])
+            strline += "%s" % (t[s2 + 1:])
+        t = strline
+    return t
 
 
 def chop_line_city(g, maxline=15):
