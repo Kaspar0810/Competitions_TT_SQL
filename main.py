@@ -2841,30 +2841,30 @@ def sort():
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
     cur_index = my_win.comboBox_choice_R.currentIndex()
-    if cur_index == 0: # если выбран текущий рейтинг
-            if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-                r_data = r_data_w[0]
-            else:
-                r_data = r_data_m[0]
-            rejting_name = r_data.r_fname
-            rejting_list = r_data.r_list
-    elif cur_index == 1: # если рейтинг за январь
-            if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-                r_data = r_data_w[1]
-            else:
-                r_data = r_data_m[1] 
-            rejting_name = r_data.r1_fname
-            rejting_list = r_data.r1_list
+    # if cur_index == 0: # если выбран текущий рейтинг
+    #         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+    #             r_data = r_data_w[0]
+    #         else:
+    #             r_data = r_data_m[0]
+    #         rejting_name = r_data.r_fname
+    #         rejting_list = r_data.r_list
+    # elif cur_index == 1: # если рейтинг за январь
+    #         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+    #             r_data = r_data_w[1]
+    #         else:
+    #             r_data = r_data_m[1] 
+    #         rejting_name = r_data.r1_fname
+    #         rejting_list = r_data.r1_list
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
     elif sender == my_win.Button_sort_Name:
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алфавиту
     elif sender == my_win.Button_sort_mesto:
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
-    elif sender == my_win.Button_sort_alf_R:
-        player_list = r_data.select().order_by(rejting_name)
-    elif sender == my_win.Button_sort_rejting_in_R:
-        player_list = r_data.select().order_by(rejting_list.desc())
+    # elif sender == my_win.Button_sort_alf_R:
+    #     player_list = r_data.select().order_by(rejting_name)
+    # elif sender == my_win.Button_sort_rejting_in_R:
+    #     player_list = r_data.select().order_by(rejting_list.desc())
 
     fill_table(player_list)
     if sender in signal_button_list:
