@@ -1053,6 +1053,9 @@ my_win.comboBox_table_5.addItems(vid_setki_one_table)
 my_win.comboBox_table_6.addItems(vid_setki_one_table)
 my_win.comboBox_table_7.addItems(vid_setki_one_table)
 my_win.comboBox_table_8.addItems(vid_setki_one_table)
+my_win.comboBox_table_9.addItems(vid_setki_one_table)
+my_win.comboBox_table_10.addItems(vid_setki_one_table)
+my_win.comboBox_table_11.addItems(vid_setki_one_table)
 # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
@@ -1341,6 +1344,10 @@ def system_made():
     my_win.Button_2etap_made.setEnabled(False)
     my_win.Button_3etap_made.setEnabled(False)
     my_win.Button_4etap_made.setEnabled(False)
+    my_win.Button_5etap_made.setEnabled(False)
+    my_win.Button_6etap_made.setEnabled(False)
+    my_win.Button_7etap_made.setEnabled(False)
+    my_win.Button_8etap_made.setEnabled(False)
 
 
 def load_tableWidget():
@@ -2451,8 +2458,8 @@ def page():
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 241, 841, 540))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 239))
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 320, 841, 461))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 301))
         my_win.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
@@ -2505,6 +2512,9 @@ def page():
         my_win.comboBox_table_6.hide()
         my_win.comboBox_table_7.hide()
         my_win.comboBox_table_8.hide()
+        my_win.comboBox_table_9.hide()
+        my_win.comboBox_table_10.hide()
+        my_win.comboBox_table_11.hide()
 
         my_win.spinBox_kol_group.hide()
 
@@ -2719,6 +2729,9 @@ def label_playing_count():
     my_win.label_playing_etap6.hide()
     my_win.label_playing_etap7.hide()
     my_win.label_playing_etap8.hide()
+    my_win.label_playing_etap9.hide()
+    my_win.label_playing_etap10.hide()
+    my_win.label_playing_etap11.hide()
     for k in system:
         n += 1
         system_id = k.id
@@ -3015,16 +3028,28 @@ def system_competition():
         my_win.label_etap_6.hide()
         my_win.label_etap_7.hide()
         my_win.label_etap_8.hide() 
+        my_win.label_etap_9.hide()
+        my_win.label_etap_10.hide()
+        my_win.label_etap_11.hide()
         my_win.label_30.hide()
         my_win.label_31.hide()
         my_win.label_103.hide()
         my_win.label_104.hide()
         my_win.label_105.hide()
+        my_win.label_106.hide()
+        my_win.label_107.hide()
+        my_win.label_108.hide()
+        my_win.label_109.hide()
+        my_win.label_110.hide()
+        my_win.label_111.hide()
         my_win.label_53.hide()
         my_win.label_58.hide() 
         my_win.label_81.hide()
         my_win.label_82.hide()
         my_win.label_83.hide()  
+        my_win.label_84.hide()
+        my_win.label_85.hide()
+        my_win.label_86.hide()
  
         my_win.tabWidget.setTabEnabled(2, True)
 
@@ -7445,7 +7470,13 @@ def current_index_combobox_table(sender):
     elif sender == my_win.comboBox_table_7:
         cur_index = my_win.comboBox_table_7.currentIndex() 
     elif sender == my_win.comboBox_table_8:
-        cur_index = my_win.comboBox_table_8.currentIndex()       
+        cur_index = my_win.comboBox_table_8.currentIndex()  
+    elif sender == my_win.comboBox_table_9:
+        cur_index = my_win.comboBox_table_9.currentIndex()
+    elif sender == my_win.comboBox_table_10:
+        cur_index = my_win.comboBox_table_10.currentIndex() 
+    elif sender == my_win.comboBox_table_11:
+        cur_index = my_win.comboBox_table_11.currentIndex()      
     return cur_index
 
 
@@ -7528,10 +7559,11 @@ def made_system_load_combobox_etap():
     """подготовка комбобокса для дальнейшего создания системы"""
     sender = my_win.sender()
     ct = my_win.comboBox_etap.currentText()
-    label_etap_list = [my_win.label_101, my_win.label_102, my_win.label_103, my_win.label_104, my_win.label_105,my_win.label_106,
-                       my_win.label_107, my_win.label_108]
+    label_etap_list = [my_win.label_101, my_win.label_102, my_win.label_103, my_win.label_104, my_win.label_105, my_win.label_106,
+                       my_win.label_107, my_win.label_108, my_win.label_109, my_win.label_110,  my_win.label_111]
     combobox_etap_list = [my_win.comboBox_table_1, my_win.comboBox_table_2, my_win.comboBox_table_3, my_win.comboBox_table_4, 
-                          my_win.comboBox_table_5, my_win.comboBox_table_6, my_win.comboBox_table_7, my_win.comboBox_table_8]
+                          my_win.comboBox_table_5, my_win.comboBox_table_6, my_win.comboBox_table_7, my_win.comboBox_table_8,
+                          my_win.comboBox_table_9, my_win.comboBox_table_10, my_win.comboBox_table_11]
     label_text = my_win.label_10.text() # номер текущего этапа
     real_list = []
  # после выбора из комбобокса соответственно этапу включает label   
@@ -7585,6 +7617,21 @@ def made_system_load_combobox_etap():
             combobox_etap_compare(real_list)
             my_win.label_108.show()
             my_win.label_10.setText("8-й этап")
+        elif  label_text == "8-й этап": 
+            real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
+            combobox_etap_compare(real_list)
+            my_win.label_109.show()
+            my_win.label_10.setText("9-й этап")
+        elif  label_text == "9-й этап": 
+            real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
+            combobox_etap_compare(real_list)
+            my_win.label_110.show()
+            my_win.label_10.setText("10-й этап")
+        elif  label_text == "10-й этап": 
+            real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
+            combobox_etap_compare(real_list)
+            my_win.label_111.show()
+            my_win.label_10.setText("11-й этап")
         my_win.comboBox_etap.setCurrentText("-выбор этапа-")   
     else:   # выбор значения из комбобокса создания этапов
         if ct == "Одна таблица":
@@ -7629,6 +7676,55 @@ def made_system_load_combobox_etap():
                     final = f"{fin + 1}-й финал"    
                     my_win.label_104.setText(final)
                 my_win.comboBox_table_4.show()
+            elif label_text == "5-й этап":
+                txt = my_win.label_104.text()
+                znak = txt.find("-") 
+                fin = int(txt[:znak])
+                final = f"{fin + 1}-й финал"    
+                my_win.label_105.setText(final)
+                my_win.comboBox_table_5.show()
+            elif label_text == "6-й этап":
+                txt = my_win.label_105.text()
+                znak = txt.find("-") 
+                fin = int(txt[:znak])
+                final = f"{fin + 1}-й финал"    
+                my_win.label_106.setText(final)
+                my_win.comboBox_table_6.show()
+            elif label_text == "7-й этап":
+                txt = my_win.label_106.text()
+                znak = txt.find("-") 
+                fin = int(txt[:znak])
+                final = f"{fin + 1}-й финал"    
+                my_win.label_107.setText(final)
+                my_win.comboBox_table_7.show()
+            elif label_text == "8-й этап":
+                txt = my_win.label_107.text()
+                znak = txt.find("-") 
+                fin = int(txt[:znak])
+                final = f"{fin + 1}-й финал"    
+                my_win.label_108.setText(final)
+                my_win.comboBox_table_8.show()
+            elif label_text == "9-й этап":
+                txt = my_win.label_108.text()
+                znak = txt.find("-") 
+                fin = int(txt[:znak])
+                final = f"{fin + 1}-й финал"    
+                my_win.label_109.setText(final)
+                my_win.comboBox_table_9.show()
+            elif label_text == "10-й этап":
+                txt = my_win.label_109.text()
+                znak = txt.find("-") 
+                fin = int(txt[:znak])
+                final = f"{fin + 1}-й финал"    
+                my_win.label_110.setText(final)
+                my_win.comboBox_table_10.show()
+            elif label_text == "11-й этап":
+                txt = my_win.label_110.text()
+                znak = txt.find("-") 
+                fin = int(txt[:znak])
+                final = f"{fin + 1}-й финал"    
+                my_win.label_111.setText(final)
+                my_win.comboBox_table_11.show()
             else:
                 mark = label_text.find("-")
                 fin = int(txt[:mark])
@@ -7717,7 +7813,12 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             elif player_in_final == 32:
                 total_games = 80
         elif cur_index == 3:  # сетка с розыгрышем призовых мест
-            pass
+            if player_in_final == 8:
+                total_games = 4
+            elif player_in_final == 16:
+                total_games = 8
+            elif player_in_final == 32:
+                total_games = 32
         elif cur_index == 4: # игры в круг
             total_games = total_games_in_final_without_group_games(player_in_final, gr, kpt)
 
@@ -8274,6 +8375,24 @@ def kol_player_in_final():
             my_win.label_etap_8.setText(list_pl_final[0])
             my_win.label_etap_8.show()
             my_win.comboBox_table_8.hide()
+        elif label_text == "9-й этап":
+            my_win.label_84.setText(list_pl_final[3])
+            my_win.label_84.show()
+            my_win.label_etap_9.setText(list_pl_final[0])
+            my_win.label_etap_9.show()
+            my_win.comboBox_table_9.hide()
+        elif label_text == "10-й этап":
+            my_win.label_85.setText(list_pl_final[3])
+            my_win.label_85.show()
+            my_win.label_etap_10.setText(list_pl_final[0])
+            my_win.label_etap_10.show()
+            my_win.comboBox_table_10.hide()
+        elif label_text == "11-й этап":
+            my_win.label_86.setText(list_pl_final[3])
+            my_win.label_86.show()
+            my_win.label_etap_11.setText(list_pl_final[0])
+            my_win.label_etap_11.show()
+            my_win.comboBox_table_11.hide()
         my_win.Button_etap_made.setEnabled(True)
         my_win.comboBox_page_vid.setEnabled(True)
         my_win.Button_etap_made.setFocus(True)
@@ -13321,6 +13440,9 @@ my_win.comboBox_table_5.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_6.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_7.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_8.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_9.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_10.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_11.currentTextChanged.connect(kol_player_in_final)
 
 my_win.comboBox_etap.currentTextChanged.connect(made_system_load_combobox_etap)
 

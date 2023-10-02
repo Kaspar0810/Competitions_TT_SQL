@@ -21,9 +21,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>0</y>
+      <y>10</y>
       <width>841</width>
-      <height>241</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -58,7 +58,7 @@
      <attribute name="title">
       <string>Титул</string>
      </attribute>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -848,7 +848,7 @@
         <x>1</x>
         <y>26</y>
         <width>821</width>
-        <height>181</height>
+        <height>241</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -1095,7 +1095,7 @@
          <x>630</x>
          <y>10</y>
          <width>16</width>
-         <height>161</height>
+         <height>221</height>
         </rect>
        </property>
        <property name="orientation">
@@ -1448,7 +1448,7 @@
        <property name="geometry">
         <rect>
          <x>152</x>
-         <y>134</y>
+         <y>133</y>
          <width>170</width>
          <height>26</height>
         </rect>
@@ -1559,29 +1559,10 @@
         <string>TextLabel</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_etap_8">
-       <property name="geometry">
-        <rect>
-         <x>249</x>
-         <y>151</y>
-         <width>315</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_83">
        <property name="geometry">
         <rect>
-         <x>572</x>
+         <x>571</x>
          <y>156</y>
          <width>70</width>
          <height>20</height>
@@ -1610,7 +1591,7 @@
       <widget class="QLabel" name="label_108">
        <property name="geometry">
         <rect>
-         <x>11</x>
+         <x>10</x>
          <y>153</y>
          <width>147</width>
          <height>20</height>
@@ -1634,6 +1615,308 @@
          <x>650</x>
          <y>156</y>
          <width>150</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_109">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>174</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_playing_etap8_2">
+       <property name="geometry">
+        <rect>
+         <x>1119</x>
+         <y>193</y>
+         <width>150</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_table_9">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>175</y>
+         <width>170</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_etap_9">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>177</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_110">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>195</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_111">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>216</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_table_10">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>196</y>
+         <width>170</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_table_11">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>217</y>
+         <width>170</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_etap_10">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>200</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_etap_11">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>220</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_playing_etap9">
+       <property name="geometry">
+        <rect>
+         <x>650</x>
+         <y>177</y>
+         <width>150</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_playing_etap10">
+       <property name="geometry">
+        <rect>
+         <x>650</x>
+         <y>198</y>
+         <width>150</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_playing_etap11">
+       <property name="geometry">
+        <rect>
+         <x>650</x>
+         <y>219</y>
+         <width>150</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_85">
+       <property name="geometry">
+        <rect>
+         <x>571</x>
+         <y>199</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_etap_8">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>157</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_84">
+       <property name="geometry">
+        <rect>
+         <x>571</x>
+         <y>177</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_86">
+       <property name="geometry">
+        <rect>
+         <x>571</x>
+         <y>219</y>
+         <width>70</width>
          <height>20</height>
         </rect>
        </property>
@@ -3894,8 +4177,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -3907,8 +4190,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4407,8 +4690,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4726,8 +5009,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5132,8 +5415,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5826,8 +6109,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6209,8 +6492,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6460,7 +6743,7 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>260</y>
+      <y>320</y>
       <width>181</width>
       <height>22</height>
      </rect>
@@ -6470,9 +6753,9 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>290</y>
+      <y>349</y>
       <width>400</width>
-      <height>320</height>
+      <height>261</height>
      </rect>
     </property>
     <property name="font">
@@ -6486,9 +6769,9 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>290</y>
+      <y>349</y>
       <width>400</width>
-      <height>320</height>
+      <height>261</height>
      </rect>
     </property>
     <property name="font">
@@ -6502,7 +6785,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>260</y>
+      <y>320</y>
       <width>181</width>
       <height>22</height>
      </rect>
@@ -6585,9 +6868,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>241</y>
+      <y>320</y>
       <width>841</width>
-      <height>540</height>
+      <height>461</height>
      </rect>
     </property>
     <property name="sizePolicy">
