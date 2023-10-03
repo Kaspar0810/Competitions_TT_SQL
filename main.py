@@ -7812,6 +7812,8 @@ def numbers_of_games(cur_index, player_in_final, kpt):
                 total_games = 32
             elif player_in_final == 32:
                 total_games = 80
+            else:
+                total_games= 80
         elif cur_index == 3:  # сетка с розыгрышем призовых мест
             if player_in_final == 8:
                 total_games = 4
