@@ -17,9 +17,9 @@ from datetime import *
 from PyQt5 import *
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtGui import QIcon, QBrush, QColor
-from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem, QTableView
+from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem
-from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget
+from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget, QTableView
 from PyQt5 import QtGui, QtWidgets, QtCore
 from models import *
 from collections import Counter
@@ -455,9 +455,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                         msg.Ok)
                 if reply == msg.Ok:
                     my_win.tabWidget.setCurrentIndex(2)                                                        
-            for stage in system:
-                if stage.stage == "Предварительный":
-                    if stage.choice_flag == True:
+            for stage_sys in system:
+                stage = stage_sys.stage
+                if stage == "Предварительный":
+                    if stage_sys.choice_flag == True:
                         reply = msg.information(my_win, 'Уведомление',
                                                         "Жеребъевка была произведена,\nесли хотите сделать "
                                                         "повторно\nнажмите -ОК-, если нет то - Cancel-",
@@ -1766,17 +1767,62 @@ def find_city():
                 city = City(city=ct, region_id=ir).save()
 
 
+# def fill_table(player_list):
+#     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
+#     tb = my_win.tabWidget.currentIndex()
+#     player_selected = player_list.dicts().execute()
+#     row_count = len(player_selected)  # кол-во строк в таблице
+#     number_column = 1
+#     if tb == 1:
+#         my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
+#         my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+#     else:
+#         my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
+#     if tb == 6:
+#         if row_count > 0:
+#             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
+#         else:
+#             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
+#         number_column = 0
+#     if row_count != 0:  # список удаленных игроков пуст если R = 0
+#         column_count = len(player_selected[0]) # кол-во столбцов в таблице
+#         # вставляет в таблицу необходимое кол-во строк
+#         my_win.tableWidget.setRowCount(row_count)
+#         for row in range(row_count):  # добавляет данные из базы в TableWidget
+#             for column in range(0, column_count):
+#                 if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+#                     coach_id = str(list(player_selected[row].values())[column])
+#                     coach = Coach.get(Coach.id == coach_id)
+#                     item = coach.coach
+#                 else:
+#                     item = str(list(player_selected[row].values())[column])
+#                 my_win.tableWidget.setItem(row, column + number_column, QTableWidgetItem(str(item)))
+#         # ставит размер столбцов согласно записям
+#         my_win.tableWidget.resizeColumnsToContents()
+#         for i in range(0, row_count):  # отсортировывает номера строк по порядку
+#            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+#     else:
+#         # вставляет в таблицу необходимое кол-во строк
+#         my_win.tableWidget.setRowCount(row_count)
+#         my_win.statusbar.showMessage(
+#             "Удаленных участников соревнований нет", 10000)
+
+
+
+
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
+    model_view = []
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
     number_column = 1
-    if tb == 1:
-        my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
-        my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-    else:
-        my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
+    model = QStandardItemModel(row_count, 11)
+    # if tb == 1:
+    #     my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
+    #     my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+    # else:
+    #     my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
     if tb == 6:
         if row_count > 0:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
@@ -1786,7 +1832,7 @@ def fill_table(player_list):
     if row_count != 0:  # список удаленных игроков пуст если R = 0
         column_count = len(player_selected[0]) # кол-во столбцов в таблице
         # вставляет в таблицу необходимое кол-во строк
-        my_win.tableWidget.setRowCount(row_count)
+        # my_win.tableView.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(0, column_count):
                 if column == 7 and tb != 6:  # преобразует id тренера в фамилию
@@ -1794,18 +1840,23 @@ def fill_table(player_list):
                     coach = Coach.get(Coach.id == coach_id)
                     item = coach.coach
                 else:
-                    item = str(list(player_selected[row].values())[column])
+                    # item = str(list(player_selected[row].values())[column])
+                    item = QStandardItem('row %s,column %s'%(row, column))
+                # Установить текстовое значение каждой позиции
+                model.setItem(row, column, item)
+
+                model_view = 
                 my_win.tableWidget.setItem(row, column + number_column, QTableWidgetItem(str(item)))
         # ставит размер столбцов согласно записям
-        my_win.tableWidget.resizeColumnsToContents()
-        for i in range(0, row_count):  # отсортировывает номера строк по порядку
-           my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+        # my_win.tableWidget.resizeColumnsToContents()
+        # for i in range(0, row_count):  # отсортировывает номера строк по порядку
+        #    my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.tableWidget.setRowCount(row_count)
         my_win.statusbar.showMessage(
             "Удаленных участников соревнований нет", 10000)
-    
+
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
@@ -2440,12 +2491,13 @@ def page():
         my_win.tableWidget.show()
     elif tb == 1:  # -список участников-
         my_win.resize(1110, 825)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 552))
+        # my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 552))
+        my_win.tableview.setGeometry(QtCore.QRect(260, 227, 841, 552))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         load_comboBox_filter()
         region()
-        load_tableWidget()
-        my_win.tableWidget.show()
+        # load_tableWidget()
+        # my_win.tableWidget.show()
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_clear_del.setEnabled(False)
         my_win.Button_pay_R.setEnabled(False)
@@ -5743,7 +5795,7 @@ def choice_gr_automat():
             if remains > group: 
                 finish = group  # если остаток больше кол-во групп
             else:
-                finish = remains               
+                finish = remains            
             for y in range(0, finish):
                 group_list_tmp = []  
                 z = key_reg_current[y] # список регионов которые уже были посеяны
@@ -6829,27 +6881,39 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         reg_list = list(kol_group_free.keys())  # список ключей (регионов)
         last = len(reg_list)  # кол-во остатка посева
         region = reg_list[0]  # номер региона, который сейчас сеется
-        free_gr = kol_group_free[i]  # кол-во групп куда можно сеять
+        # free_gr = kol_group_free[i]  # кол-во групп куда можно сеять
+        free_gr = kol_group_free[region]  # кол-во групп куда можно сеять
         # ==== сделать последний посев по наименшему количеству вариантов посева
+ 
         if 1 in free_list and last > 1 or last == 1 and free_gr == 1 :  # проверка есть ли группа где осталось только одно места для посева
             # сделать посев 1 регион но много групп
             region = reg_list[free_list.index(1)]  # регион если в списке free list есть значение -1-, т.е. осталась одна группа
-            u = current_region_group[region][0]  # номер группы
-            posev_tmp[u] = region  # запись региона в группу (посев)
+            u = current_region_group[region][0]  # номер группы 
+            values = posev_tmp[u] 
+            if values == 0:
+                posev_tmp[u] = region  # запись региона в группу (посев)
         else:
-            if free_gr != 1:
-                f = current_region_group[region]  # список номеров групп для посева текущего региона
-                if m % 2 != 0:  # в зависимости от четности посева меняет направления посева групп в списке
-                    f.sort()
-                else:
-                    f.sort(reverse = True)
-                if s in f:
-                    posev_tmp[s] = region
-                    u = s #  присваивает переменной u - номер группы, если она идет по порядку
-                else:
-                    g = f[0]
-                    posev_tmp[g] = region
-                    u = g    # присваивает переменной u - номер группы, если она идет не по порядку
+            f = current_region_group[region]  # список номеров групп для посева текущего региона
+            if free_gr == 0:
+                temp_list = []                   
+                for i in range (1, len(posev) + 1):
+                    gr_dict = posev[f"{m}_посев"]
+                    gr = gr_dict[i]
+                    if gr == 0:
+                        temp_list.append(i)
+                current_region_group[region] = temp_list
+                f = current_region_group[region]                      
+            if m % 2 != 0:  # в зависимости от четности посева меняет направления посева групп в списке
+                f.sort()
+            else:
+                f.sort(reverse = True)
+            if s in f:
+                posev_tmp[s] = region
+                u = s #  присваивает переменной u - номер группы, если она идет по порядку
+            else:
+                g = f[0]
+                posev_tmp[g] = region
+                u = g    # присваивает переменной u - номер группы, если она идет не по порядку
         # ====не правильное соответствие номера региона и номера группы
         index = key_reg_current.index(region)
         p = player_list[index]

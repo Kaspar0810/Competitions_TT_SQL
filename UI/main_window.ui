@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -4170,15 +4170,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4190,8 +4190,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4203,12 +4203,21 @@
         <x>0</x>
         <y>0</y>
         <width>236</width>
-        <height>547</height>
+        <height>484</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_37">
        <property name="spacing">
-        <number>1</number>
+        <number>4</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
        </property>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_36">
@@ -4229,6 +4238,9 @@
          </property>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_35">
+           <property name="spacing">
+            <number>1</number>
+           </property>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_34">
              <property name="spacing">
@@ -4236,6 +4248,9 @@
              </property>
              <item>
               <layout class="QVBoxLayout" name="verticalLayout_33">
+               <property name="spacing">
+                <number>1</number>
+               </property>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <property name="spacing">
@@ -4309,7 +4324,7 @@
                      <number>1</number>
                     </property>
                     <property name="leftMargin">
-                     <number>3</number>
+                     <number>0</number>
                     </property>
                     <property name="topMargin">
                      <number>3</number>
@@ -4318,7 +4333,7 @@
                      <number>3</number>
                     </property>
                     <property name="bottomMargin">
-                     <number>3</number>
+                     <number>0</number>
                     </property>
                     <item>
                      <widget class="QPushButton" name="Button_sort_Name">
@@ -4531,16 +4546,16 @@
            <number>1</number>
           </property>
           <property name="leftMargin">
-           <number>5</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>5</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>5</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>5</number>
+           <number>0</number>
           </property>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -4690,8 +4705,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5009,8 +5024,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5415,8 +5430,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6109,8 +6124,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6492,8 +6507,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6868,69 +6883,21 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>320</y>
+      <y>220</y>
       <width>841</width>
-      <height>461</height>
+      <height>631</height>
      </rect>
     </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
+   </widget>
+   <widget class="QTableView" name="tableView">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>220</y>
+      <width>841</width>
+      <height>561</height>
+     </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>10</pointsize>
-      <italic>true</italic>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Box</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <property name="lineWidth">
-     <number>2</number>
-    </property>
-    <property name="midLineWidth">
-     <number>0</number>
-    </property>
-    <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOn</enum>
-    </property>
-    <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::AdjustToContents</enum>
-    </property>
-    <property name="autoScroll">
-     <bool>false</bool>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::SelectedClicked</set>
-    </property>
-    <property name="selectionMode">
-     <enum>QAbstractItemView::MultiSelection</enum>
-    </property>
-    <property name="gridStyle">
-     <enum>Qt::SolidLine</enum>
-    </property>
-    <property name="sortingEnabled">
-     <bool>true</bool>
-    </property>
-    <property name="rowCount">
-     <number>0</number>
-    </property>
-    <property name="columnCount">
-     <number>0</number>
-    </property>
-    <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-     <bool>true</bool>
-    </attribute>
-    <attribute name="horizontalHeaderStretchLastSection">
-     <bool>true</bool>
-    </attribute>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar">
