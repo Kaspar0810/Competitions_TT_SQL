@@ -92,16 +92,17 @@ class MyTableModel(QAbstractTableModel):
             return len(self._data[0])
         else:
             return 0
-        
+  
     def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
         self.horizontalHeaderLabels = horizontalHeaderLabels
  
     def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole):
-        if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            if orientation == QtCore.Qt.Orientation.Horizontal:
-                return {0: "Номер",
-                        1: "Фамилия/ Город",
-                        2: "Группа"}.get(section)
+        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation == QtCore.Qt.Orientation.Horizontal:
+            return QAbstractTableModel.headerData(self, section, )
+            # if orientation == QtCore.Qt.Orientation.Horizontal:
+            # return {0: "Номер",
+            #         1: "Фамилия/ Город",
+            #         2: "Группа"}.get(section)
  
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
@@ -1811,18 +1812,18 @@ def find_city():
 
 
 def fill_table(player_list):
-    """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
-    model_view = []
+    """заполняет таблицу со списком участников QtableView спортсменами из db"""
+    data = []
+    data_table_tmp = []
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
     number_column = 1
-    model = QStandardItemModel(row_count, 11)
-    # if tb == 1:
-    #     my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
-    #     my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-    # else:
-    #     my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
+    if tb == 1:
+        my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection)
+        my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
+    else:
+        my_win.tableView.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
     if tb == 6:
         if row_count > 0:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
@@ -1832,7 +1833,6 @@ def fill_table(player_list):
     if row_count != 0:  # список удаленных игроков пуст если R = 0
         column_count = len(player_selected[0]) # кол-во столбцов в таблице
         # вставляет в таблицу необходимое кол-во строк
-        # my_win.tableView.setRowCount(row_count)
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in range(0, column_count):
                 if column == 7 and tb != 6:  # преобразует id тренера в фамилию
@@ -1840,20 +1840,21 @@ def fill_table(player_list):
                     coach = Coach.get(Coach.id == coach_id)
                     item = coach.coach
                 else:
-                    # item = str(list(player_selected[row].values())[column])
-                    item = QStandardItem('row %s,column %s'%(row, column))
+                    item = str(list(player_selected[row].values())[column])
                 # Установить текстовое значение каждой позиции
-                model.setItem(row, column, item)
-
-                model_view = 
-                my_win.tableWidget.setItem(row, column + number_column, QTableWidgetItem(str(item)))
-        # ставит размер столбцов согласно записям
-        # my_win.tableWidget.resizeColumnsToContents()
-        # for i in range(0, row_count):  # отсортировывает номера строк по порядку
-        #    my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+                data_table_tmp.append(item)
+            data.append(data_table_tmp.copy())
+            data_table_tmp.clear()
+        model = MyTableModel(data)
+        # my_win.tableView.setHorizontalHeaderLabelshorizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        # my_win.tableView.setverticalHeader().setDefaultSectionSize(15)
+        my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+        model.setHeaderData(["A", "B"])
+        my_win.tableView.setModel(model)
+        my_win.tableView.show()
     else:
         # вставляет в таблицу необходимое кол-во строк
-        my_win.tableWidget.setRowCount(row_count)
+        my_win.tableView.setRowCount(row_count)
         my_win.statusbar.showMessage(
             "Удаленных участников соревнований нет", 10000)
 
@@ -2492,7 +2493,7 @@ def page():
     elif tb == 1:  # -список участников-
         my_win.resize(1110, 825)
         # my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 552))
-        my_win.tableview.setGeometry(QtCore.QRect(260, 227, 841, 552))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 227, 841, 552))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         load_comboBox_filter()
         region()
