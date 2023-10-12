@@ -20,7 +20,7 @@ from PyQt5.QtGui import QIcon, QBrush, QColor
 from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget, QTableView
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5 import QtGui, QtWidgets, QtCore, Qt
 from models import *
 from collections import Counter
 from itertools import *
@@ -87,14 +87,10 @@ class MyTableModel(QAbstractTableModel):
  
     def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
         self.horizontalHeaderLabels = horizontalHeaderLabels
-
-    # def setV    (self, horizontalHeaderLabels):
-    #     self.horizontalHeaderLabels = horizontalHeaderLabels
  
     def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
         if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole and len(self.horizontalHeaderLabels) == self.columnCount(None)):
             return self.horizontalHeaderLabels[section]
-            # return QtGui.QColor('red')
         return super().headerData(section, orientation, role)
 
     def rowCount(self, parent):
@@ -105,23 +101,11 @@ class MyTableModel(QAbstractTableModel):
             return len(self._data[0])
         else:
             return 0
-        
-    # def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
-    #     self.horizontalHeaderLabels = horizontalHeaderLabels
- 
-    # def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
-    #     if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation == QtCore.Qt.Orientation.Horizontal:
-    #         return QAbstractTableModel.headerData(self, section, role)
-             # if orientation == QtCore.Qt.Orientation.Horizontal:
-             # return {0: "Номер",
-             #         1: "Фамилия/ Город",
-             #         2: "Группа"}.get(section)
 
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
         return None
-
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -1832,25 +1816,29 @@ def fill_table(player_list):
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
-    number_column = 1
-    column_count = [1, 2, 3, 4, 5, 6, 7, 8] # кол-во столбцов в таблице
+    # number_column = 1
+    column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8] # номера столбцов в таблице
+    # if tb == 1:
+    #     column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    #     my_win.tableView.hideColumn(0)
     if tb == 1:
-        column_count = [1, 2, 3, 4, 5, 6, 7, 8]
-    if tb == 1:
-        my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection)
-        my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
+        column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        my_win.tableView.hideColumn(0)
+        if my_win.checkBox_15.isChecked():
+            my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
+        else:
+            my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
+        my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) # 
     else:
-        my_win.tableView.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
+        my_win.tableView.setSelectionMode(QAbstractItemView.NoSelection) # нет выделение строк по клику мышью
 
     if tb == 6:
         if row_count > 0:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
         else:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
-        number_column = 0
     if row_count != 0:  # список удаленных игроков пуст если R = 0
         for row in range(row_count):  # добавляет данные из базы в TableWidget
-            # for column in range(0, column_count):
             for column in column_count:
                 if column == 7 and tb != 6:  # преобразует id тренера в фамилию
                     coach_id = str(list(player_selected[row].values())[column])
@@ -1862,27 +1850,18 @@ def fill_table(player_list):
                 data_table_tmp.append(item)
             data.append(data_table_tmp.copy())
             data_table_tmp.clear()
+            my_win.tableView.setRowHeight(row, 10)
         model = MyTableModel(data)
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
-        # my_win.tableView.setFont(QtGui.QColor.blue)
+
         my_win.tableView.resizeColumnsToContents()
-        my_win.tableView.setRowHeight = 10
-        # my_win.tableView.setFont(Qt.Core.Q    ( "Times", 10, QFont.Black) )
-        # model->item(0, 0)->setFont( QFont( "Times", 10, QFont::Black ) );
-        # QHeaderView *verticalHeader = myTableView->verticalHeader();
-        # verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
-        # verticalHeader->setDefaultSectionSize(24);
-        # model.set     setverticalHeader().setDefaultSectionSize(15)
-        model.setHorizontalHeaderLabels(['Фамилия имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 't'])
+        my_win.tableView.horizontalHeader().setStyleSheet(Qt.Q    .Red)
+        # model.item(1, 1).setFont( QFont( "Times", 10, QFont.Red ) )
+        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 't']) # кол-во наваний должно совпадать со списком столбцов
         my_win.tableView.setModel(model)
         my_win.tableView.show()
-        # ставит размер столбцов согласно записям
-
-        # for i in range(0, row_count):  # отсортировывает номера строк по порядку
-        #    my_win.tableView.setItem(i, 0, QTableWidgetItem(str(i + 1)))
     else:
         # вставляет в таблицу необходимое кол-во строк
-        my_win.tableView.setRowCount(row_count)
         my_win.statusbar.showMessage(
              "Удаленных участников соревнований нет", 10000)
 
@@ -4020,43 +3999,24 @@ def visible_field():
 
 def select_player_in_list():
     """выводит данные игрока в поля редактирования или удаления"""
-    # r = my_win.tableWidget.currentRow()
-    # pl_id = my_win.tableWidget.item(r, 1).text()
-    # family = my_win.tableWidget.item(r, 2).text()
-    # birthday = my_win.tableWidget.item(r, 3).text()
-    # rank = my_win.tableWidget.item(r, 4).text()
-    # city = my_win.tableWidget.item(r, 5).text()
-    # region = my_win.tableWidget.item(r, 6).text()
-    # rn = len(region)
-    # razrayd = my_win.tableWidget.item(r, 7).text()
-    # coach = my_win.tableWidget.item(r, 8).text()
-    #=======
-    row = my_win.tableView.currentIndex().row()
-    # for idx in my_win.tableView.selectionModel().selectedIndexes():
-    #     row_num = idx.row()
-    #     col_num = idx.column()
-        # break
-        # column_number = idx.column()
-    data = my_win.tableView.currentIndex().data()
-    # pl_id = my_win.tableView.item(r, 1).text()
-    family = my_win.tableView.item(r, 2).text()
-    birthday = my_win.tableView.item(r, 3).text()
-    rank = my_win.tableView.item(r, 4).text()
-    city = my_win.tableView.item(r, 5).text()
-    region = my_win.tableView.item(r, 6).text()
-    rn = len(region)
-    razrayd = my_win.tableView.item(r, 7).text()
-    coach = my_win.tableView.item(r, 8).text()
+    data_list = []
+
+    for idx in my_win.tableView.selectionModel().selectedIndexes():
+        row_num = idx.row()
+        col_num = idx.column()
+        data = my_win.tableView.model().index(row_num, col_num).data()
+        data_list.append(data)
 # ================================
-    my_win.lineEdit_id.setText(pl_id)
+    my_win.lineEdit_id.setText(data_list[0])
     my_win.lineEdit_id.setEnabled(False)
-    my_win.lineEdit_Family_name.setText(family)
-    my_win.lineEdit_bday.setText(birthday)
-    my_win.lineEdit_R.setText(rank)
-    my_win.lineEdit_city_list.setText(city)
-    my_win.comboBox_region.setCurrentText(region)
-    my_win.comboBox_razryad.setCurrentText(razrayd)
-    my_win.lineEdit_coach.setText(coach)
+    my_win.lineEdit_Family_name.setText(data_list[1])
+    my_win.lineEdit_bday.setText(data_list[2])
+    my_win.lineEdit_R.setText(data_list[3])
+    my_win.lineEdit_city_list.setText(data_list[4])
+    my_win.comboBox_region.setCurrentText(data_list[5])
+    my_win.comboBox_razryad.setCurrentText(data_list[6])
+    my_win.lineEdit_coach.setText(data_list[7])
+
     my_win.Button_add_edit_player.setEnabled(True)
     if my_win.checkBox_6.isChecked():  # отмечен флажок -удаленные-
         my_win.Button_del_player.setEnabled(False)
