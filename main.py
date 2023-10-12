@@ -1766,68 +1766,29 @@ def find_city():
                 city = City(city=ct, region_id=ir).save()
 
 
-# def fill_table(player_list):
-#     """заполняет таблицу со списком участников QtableWidget спортсменами из db"""
-#     tb = my_win.tabWidget.currentIndex()
-#     player_selected = player_list.dicts().execute()
-#     row_count = len(player_selected)  # кол-во строк в таблице
-#     number_column = 1
-#     if tb == 1:
-#         my_win.tableWidget.setSelectionMode(QAbstractItemView.MultiSelection)
-#         my_win.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-#     else:
-#         my_win.tableWidget.setSelectionMode(QAbstractItemView.NoSelection) # выделение несколких строк по клику мышью
-#     if tb == 6:
-#         if row_count > 0:
-#             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
-#         else:
-#             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
-#         number_column = 0
-#     if row_count != 0:  # список удаленных игроков пуст если R = 0
-#         column_count = len(player_selected[0]) # кол-во столбцов в таблице
-#         # вставляет в таблицу необходимое кол-во строк
-#         my_win.tableWidget.setRowCount(row_count)
-#         for row in range(row_count):  # добавляет данные из базы в TableWidget
-#             for column in range(0, column_count):
-#                 if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-#                     coach_id = str(list(player_selected[row].values())[column])
-#                     coach = Coach.get(Coach.id == coach_id)
-#                     item = coach.coach
-#                 else:
-#                     item = str(list(player_selected[row].values())[column])
-#                 my_win.tableWidget.setItem(row, column + number_column, QTableWidgetItem(str(item)))
-#         # ставит размер столбцов согласно записям
-#         my_win.tableWidget.resizeColumnsToContents()
-#         for i in range(0, row_count):  # отсортировывает номера строк по порядку
-#            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1)))
-#     else:
-#         # вставляет в таблицу необходимое кол-во строк
-#         my_win.tableWidget.setRowCount(row_count)
-#         my_win.statusbar.showMessage(
-#             "Удаленных участников соревнований нет", 10000)
-
-
-
-
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     data = []
     data_table_tmp = []
+    model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
-    # number_column = 1
     column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8] # номера столбцов в таблице
-    # if tb == 1:
-    #     column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    #     my_win.tableView.hideColumn(0)
     if tb == 1:
         column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        my_win.tableView.hideColumn(0)
+        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
+    elif tb == 3:
+        column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
+    if tb == 1:
         if my_win.checkBox_15.isChecked():
             my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
         else:
             my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
+        my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) 
+    elif tb == 3:
+        my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) # 
     else:
         my_win.tableView.setSelectionMode(QAbstractItemView.NoSelection) # нет выделение строк по клику мышью
@@ -1837,28 +1798,34 @@ def fill_table(player_list):
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
         else:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
+    # создание  data (списка списков)
     if row_count != 0:  # список удаленных игроков пуст если R = 0
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             for column in column_count:
-                if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-                    coach_id = str(list(player_selected[row].values())[column])
-                    coach = Coach.get(Coach.id == coach_id)
-                    item = coach.coach
+                if tb == 1:
+                    if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+                        coach_id = str(list(player_selected[row].values())[column])
+                        coach = Coach.get(Coach.id == coach_id)
+                        item = coach.coach
+                    else:
+                        item = str(list(player_selected[row].values())[column])
                 else:
                     item = str(list(player_selected[row].values())[column])
-                # Установить текстовое значение каждой позиции
                 data_table_tmp.append(item)
             data.append(data_table_tmp.copy())
             data_table_tmp.clear()
-            my_win.tableView.setRowHeight(row, 10)
-        model = MyTableModel(data)
-        my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
 
-        my_win.tableView.resizeColumnsToContents()
-        my_win.tableView.horizontalHeader().setStyleSheet(Qt.Q    .Red)
-        # model.item(1, 1).setFont( QFont( "Times", 10, QFont.Red ) )
-        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 't']) # кол-во наваний должно совпадать со списком столбцов
         my_win.tableView.setModel(model)
+
+        font = my_win.tableView.font()
+
+        font.setPointSize(11)
+        my_win.tableView.setFont(font)
+        my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+        my_win.tableView.hideColumn(0)
+        my_win.tableView.hideColumn(1)
+        my_win.tableView.hideColumn(6)
+        my_win.tableView.resizeColumnsToContents()
         my_win.tableView.show()
     else:
         # вставляет в таблицу необходимое кол-во строк
@@ -2044,7 +2011,7 @@ def fill_table_results():
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = len(result_list[0])  # кол-во столбцов в таблице
         # вставляет в таблицу необходимое кол-во строк
-    my_win.tableWidget.setRowCount(row_count)
+    # my_win.tableWidget.setRowCount(row_count)
     row_result = []
     for row in range(row_count):  # добавляет данные из базы в TableWidget
         row_result.clear()
@@ -2480,7 +2447,6 @@ def tool_page():
 
 def page():
     """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
-
     msgBox = QMessageBox()
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
@@ -2495,17 +2461,13 @@ def page():
         my_win.comboBox_secretary.setCurrentIndex(-1)
         my_win.comboBox_secretary.setEditable(True)
         db_select_title()
-        load_tableWidget()
-        my_win.tableWidget.show()
+        # my_win.tableWidget.show()
     elif tb == 1:  # -список участников-
         my_win.resize(1110, 825)
-        # my_win.tableWidget.setGeometry(QtCore.QRect(260, 227, 841, 552))
         my_win.tableView.setGeometry(QtCore.QRect(260, 227, 841, 552))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         load_comboBox_filter()
         region()
-        # load_tableWidget()
-        # my_win.tableWidget.show()
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_clear_del.setEnabled(False)
         my_win.Button_pay_R.setEnabled(False)
@@ -2672,7 +2634,7 @@ def page():
 
         my_win.resize(1270, 825)
 
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
 
         system_stage = sf.select().where(System.stage == "Предварительный").get()
@@ -2683,12 +2645,11 @@ def page():
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
 
-        my_win.tableWidget.show()
         my_win.Button_Ok_gr.setEnabled(False)
         load_combobox_filter_group()
-        load_tableWidget()
+        player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
+        fill_table(player_list)
         load_combo()
-        visible_field()
         my_win.label_16.hide()
         my_win.tableView_net.hide()
     elif tb == 4:  # вкладка -полуфиналы-
@@ -2698,7 +2659,7 @@ def page():
         Button_view_semifinal.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
         Button_view_semifinal.setText("Просмотр полуфиналов")
         Button_view_semifinal.show()
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
         game_visible = system_stage.visible_game
@@ -2723,7 +2684,7 @@ def page():
             my_win.tableWidget.show()
             my_win.Button_Ok_pf.setEnabled(False)
             load_combobox_filter_group_semifinal()
-            load_tableWidget()
+            # load_tableWidget()
             load_combo()
             visible_field()
             my_win.label_16.hide()
@@ -2735,7 +2696,7 @@ def page():
         Button_view_final.setText("Просмотр финалов")
         Button_view_final.show()
         my_win.resize(1270, 825)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 149, 1000, 626))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 149, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.checkBox_5.setEnabled(False)
         my_win.checkBox_9.setChecked(False)
@@ -2746,13 +2707,13 @@ def page():
         my_win.Button_Ok_fin.setEnabled(False)
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(False)
         load_combobox_filter_final()
-        load_tableWidget()
+        # load_tableWidget()
         load_combo()
         visible_field()
         my_win.label_16.hide()
     elif tb == 6: # вкладка -рейтинг-
         my_win.resize(1110, 825)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 75, 841, 702))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
         # my_win.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
         my_win.comboBox_choice_R.clear()
@@ -2760,10 +2721,10 @@ def page():
         rejting_month = ["За текуший месяц", "За январь месяц"]
         my_win.comboBox_choice_R.addItems(rejting_month)
         load_comboBox_filter_rejting()
-        load_tableWidget()
+        # load_tableWidget()
     elif tb == 7: # вкладка -дополнительно-
         my_win.resize(1110, 825)
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 525))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         my_win.Button_made_page_pdf.setEnabled(False)
         my_win.Button_up.setEnabled(False)
@@ -4096,12 +4057,20 @@ def select_player_in_game():
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
         state_visible = change_status_visible_and_score_game()
-        sc = my_win.tableWidget.item(r, 8).text()
-        pl1 = my_win.tableWidget.item(r, 4).text()
-        pl2 = my_win.tableWidget.item(r, 5).text()
-        win_pole = my_win.tableWidget.item(r, 6).text()
+        data_list = []
+        for idx in my_win.tableView.selectionModel().selectedIndexes():
+            row_num = idx.row()
+            col_num = idx.column()
+            data = my_win.tableView.model().index(row_num, col_num).data()
+            data_list.append(data)
+
+        sc = data_list[8]
+        pl1 = data_list[4]
+        pl2 = data_list[5]
+        win_pole = data_list[7]
+
         if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
-            if pl1 == my_win.tableWidget.item(r, 6).text():
+            if pl1 == data_list[6]:
                 # если в сетке недостающие игроки (bye), то нет счета
                 if sc != "":
                     sc1 = sc[0]
@@ -4166,7 +4135,7 @@ def select_player_in_game():
                         my_win.lineEdit_pl1_s1_fin.setFocus()
                     else:
                         my_win.lineEdit_pl1_score_total_fin.setFocus()
-        my_win.tableWidget.selectRow(r)
+        my_win.tableView.selectRow(row_num)
 
 
 def delete_player():
@@ -4870,11 +4839,17 @@ def check_real_player():
 def enter_score(none_player=0):
     """заносит в таблицу -результаты- победителя, счет и т.п. sc_total [партии выигранные, проигранные, очки победителя
      очки проигравшего]"""
+    data_list = []
     tab = my_win.tabWidget.currentIndex()
-    r = my_win.tableWidget.currentRow()
-    id = my_win.tableWidget.item(r, 0).text()
-    num_game = my_win.tableWidget.item(r, 3).text()
-    fin = my_win.tableWidget.item(r, 2).text()
+    for idx in my_win.tableView.selectionModel().selectedIndexes():
+        row_num = idx.row()
+        col_num = idx.column()
+        data = my_win.tableView.model().index(row_num, col_num).data()
+        data_list.append(data)
+    # r = my_win.tableWidget.currentRow()
+    id = data_list[0]
+    num_game = data_list[2]
+    fin = data_list[1]
     sys = System.select().where(System.title_id == title_id())   
     if tab == 3: # группы
         stage = "Предварительный"
@@ -7326,19 +7301,19 @@ def duplicat_coach_in_group(coach_list):
         return duplicat
 
 
-def color_coach_in_tablewidget(duplicat, coach_list):
-    """окаршиваает в красный цвет повторяющиеся фамилия тренеров"""
-    if duplicat is not None:
-        num_gr = []
-        p = 0
-        for i in coach_list:
-            p += 1
-            for n in duplicat:
-                if n in i:
-                    if p not in num_gr:
-                        num_gr.append(p) 
-        for k in num_gr:
-            my_win.tableWidget.item(k - 1, 4).setForeground(QBrush(QColor(0, 0, 255)))  # окрашивает текст в красный цвет
+# def color_coach_in_tablewidget(duplicat, coach_list):
+#     """окаршиваает в красный цвет повторяющиеся фамилия тренеров"""
+#     if duplicat is not None:
+#         num_gr = []
+#         p = 0
+#         for i in coach_list:
+#             p += 1
+#             for n in duplicat:
+#                 if n in i:
+#                     if p not in num_gr:
+#                         num_gr.append(p) 
+#         for k in num_gr:
+#             my_win.tableWidget.item(k - 1, 4).setForeground(QBrush(QColor(0, 0, 255)))  # окрашивает текст в красный цвет
 
 
 def color_region_in_tableWidget(fg):
