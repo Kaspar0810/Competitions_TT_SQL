@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>7</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -845,9 +845,9 @@
      <widget class="QFrame" name="frame">
       <property name="geometry">
        <rect>
-        <x>1</x>
+        <x>2</x>
         <y>26</y>
-        <width>821</width>
+        <width>828</width>
         <height>241</height>
        </rect>
       </property>
@@ -3717,7 +3717,7 @@
        <rect>
         <x>10</x>
         <y>176</y>
-        <width>241</width>
+        <width>231</width>
         <height>32</height>
        </rect>
       </property>
@@ -3884,7 +3884,7 @@
        <rect>
         <x>11</x>
         <y>41</y>
-        <width>255</width>
+        <width>231</width>
         <height>133</height>
        </rect>
       </property>
@@ -4170,15 +4170,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4190,8 +4190,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4705,8 +4705,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5024,8 +5024,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5430,8 +5430,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5716,8 +5716,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6204,7 +6204,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>266</width>
+        <width>221</width>
         <height>104</height>
        </rect>
       </property>
@@ -6432,7 +6432,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_14">
          <item>
-          <widget class="QPushButton" name="Button_print_R">
+          <widget class="QPushButton" name="Button_filter_R">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -6447,7 +6447,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Печать рейтинга листа</string>
+            <string>Применить</string>
            </property>
           </widget>
          </item>
@@ -6507,8 +6507,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6879,23 +6879,13 @@
      </item>
     </layout>
    </widget>
-   <widget class="QTableWidget" name="tableWidget">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>220</y>
-      <width>841</width>
-      <height>631</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QTableView" name="tableView">
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>220</y>
+      <y>310</y>
       <width>841</width>
-      <height>561</height>
+      <height>471</height>
      </rect>
     </property>
    </widget>
