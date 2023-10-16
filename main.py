@@ -78,34 +78,53 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
 
+
 class MyTableModel(QAbstractTableModel):
 
     def __init__(self, data):
         super().__init__()
         self._data = data
-        self.horizontalHeaderLabels = []
- 
-    def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
-        self.horizontalHeaderLabels = horizontalHeaderLabels
- 
-    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
-        if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole and len(self.horizontalHeaderLabels) == self.columnCount(None)):
-            return self.horizontalHeaderLabels[section]
-        return super().headerData(section, orientation, role)
-
-    def rowCount(self, parent):
-        return len(self._data)
-    
-    def columnCount(self, parent):
-        if len(self._data) > 0:
-            return len(self._data[0])
-        else:
-            return 0
 
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            return str(self._data[index.row()][index.column()])
-        return None
+            value = str(self._data.iloc[index.row(), index.column()])
+            # return str(self._data[index.row()][index.column()])
+        # return None
+        return value
+        # self.horizontalHeaderLabels = []
+ 
+    # def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
+        # self.horizontalHeaderLabels = horizontalHeaderLabels
+ 
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
+        if role == QtCore.Qt.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal:
+                return str(self._data.columns[section])
+            if orientation ==  QtCore.Qt.Vertical:
+                return str(self._data.index[section])
+        # if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole and len(self.horizontalHeaderLabels) == self.columnCount(None)):
+        #     return self.horizontalHeaderLabels[section]
+        # return super().headerData(section, orientation, role)
+
+    # def rowCount(self, parent):
+    def rowCount(self, index):
+        return self._data
+        # return len(self._data)
+    
+    # def columnCount(self, parent):
+    def columnCount(self, index):
+        return self._data
+        # if len(self._data) > 0:
+        #     return len(self._data[0])
+        # else:
+        #     return 0
+
+    # def data(self, index, role):
+    #     if role == QtCore.Qt.ItemDataRole.DisplayRole:
+    #         value = str(self._data.iloc[index.row(), index.column()])
+    #         # return str(self._data[index.row()][index.column()])
+    #     # return None
+    #     return value
     
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -1774,7 +1793,8 @@ def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     # start = time.time()
 
-    data = []
+    # data = ()
+    data_tbl = []
     data_table_tmp = []
     model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
@@ -1785,13 +1805,13 @@ def fill_table(player_list):
     column_count = len(player_selected[0])  # кол-во столбцов в таблице
     if tb == 1:
         column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
-    if tb == 2:
+        # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
+    elif tb == 2:
         column_count = [1, 2, 3, 7, 9, 10, 13, 15, 16]
-        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) # кол-во наваний должно совпадать со списком столбцов
+        # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) # кол-во наваний должно совпадать со списком столбцов
     elif tb == 3:
         column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
+        # model.setHorizontalHeaderLabels(['id', 'Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
     elif tb == 6:
         index = my_win.comboBox_choice_R.currentIndex()
         if index == 0:
@@ -1831,10 +1851,18 @@ def fill_table(player_list):
                 else:
                     item = str(list(player_selected[row].values())[column])
                 data_table_tmp.append(item)
-            data.append(data_table_tmp.copy())
-            data_table_tmp.clear()
+            data_tbl.append(data_table_tmp.copy())
+            # data_table_tmp.clear()
+            row_num = []
+            # for k in range(row_count):
+            row_num.append(row)
+        data = pd.DataFrame(data_tbl, index=row_num,
+                    columns=['id', 'Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']
+            )
+
 
         my_win.tableView.setModel(model)
+        data_table_tmp.clear()
 
         font = my_win.tableView.font()
         font.setPointSize(11)
