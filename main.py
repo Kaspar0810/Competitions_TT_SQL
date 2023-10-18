@@ -85,28 +85,67 @@ class MyTableModel(QAbstractTableModel):
     def __init__(self, data):
         QAbstractTableModel.__init__(self)
         self._data = data
-        # self.column = list(self._data[0].keys())
+        # self.headerdata = headerdata
+        self.columns = data[0]
 
-    def rowCount(self, parent):
-        # print(len(self._data))
-        return len(self._data)
+    # def setHorizontalHeaderLabels(self, columns_list):
+    #     self.horizontalHeaderLabels = columns_list
+
+
+    # def __init__(self, datain, headerdata, parent=None, *args): 
+    #     QAbstractTableModel.__init__(self, parent, *args) 
+    #     self.arraydata = datain
+    #     self.headerdata = headerdata
+ 
+    def rowCount(self, parent): 
+        return len(self.data) 
+ 
+    def columnCount(self, parent): 
+        return len(self.data[0]) 
+ 
+
+    # def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
+    #     if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole):
+    #         return self.horizontalHeaderLabels[section]
+    #     return super().headerData(section, orientation, role)
     
-    def columnCount(self, parent):
-        if len(self._data) > 0:
-            return len(self._data)
-        else:
-            return 0
+
+    # def rowCount(self, parent):
+    #     return len(self._data)
+    
+    # def columnCount(self, parent):
+    #     if len(self._data) > 0:
+    #         return len(self._data)
+    #     else:
+    #         return 0
+    def headerData(self, section, orientation, role):
+        # section is the index of the column/row.
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal:
+                return str(columns[section])
+
+    # def headerData(self, col, orientation, role):
+    #     # section is the index of the column/row.
+    #     if role == QtCore.Qt.ItemDataRole.DisplayRole:
+    #         if orientation == QtCore.Qt.Horizontal:
+    #             return str(self.headerdata[col])
+        
     def data(self, index, role=QtCore.Qt.ItemDataRole.DisplayRole):
         if index.isValid():
             if role == QtCore.Qt.ItemDataRole.DisplayRole:
-                return str(self._data.iloc[index.row(), index.column()])
+                return self._data[index.row()][index.column()]
         return None
 
-    def headerData(self, column, orientation, role):
-        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.ItemDataRole.DisplayRole:
-            return self._data.columns[column]
-        return None
+    # def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
+    #     if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole):
+    #         return self.column[section]
+    #     return super().headerData(section, orientation, role)
 
+    # def headerData(self, section, orientation, role):
+    #     # section is the index of the column/row.
+    #     if role == QtCore.Qt.ItemDataRole.DisplayRole:
+    #         if orientation == QtCore.Qt.Horizontal:
+    #             return str(columns[section])
 
 
 # ===========
@@ -1767,44 +1806,45 @@ def fill_table(player_list):
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
     # создание  data (списка списков)
     if row_count != 0:  # список удаленных игроков пуст если R = 0
-        for row in range(row_count):  # добавляет данные из базы в TableWidget
-            for column in range(len(columns_list)):
-                if tb == 1:
-                    if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-                        coach_id = str(list(player_selected[row].values())[column])
-                        coach = Coach.get(Coach.id == coach_id)
-                        item = coach.coach
-                    else:
-                        item = str(list(player_selected[row].values())[column])
-                else:
-                    item = str(list(player_selected[row].values())[column])
-                data_table_tmp.append(item)
-            data_tbl[row] = data_table_tmp.copy() 
-            data_table_tmp.clear()   
-
-# ======
-        # col = 0
-        # for column in columns_list:
-        #     for row in range(row_count):                
+        # for row in range(row_count):  # добавляет данные из базы в TableWidget
+        #     for column in range(len(columns_list)):
         #         if tb == 1:
-        #             if col == 7 and tb != 6:  # преобразует id тренера в фамилию
-        #                 coach_id = str(list(player_selected[row].values())[col])
+        #             if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+        #                 coach_id = str(list(player_selected[row].values())[column])
         #                 coach = Coach.get(Coach.id == coach_id)
         #                 item = coach.coach
         #             else:
-        #                 item = str(list(player_selected[row].values())[col])
+        #                 item = str(list(player_selected[row].values())[column])
         #         else:
-        #             item = str(list(player_selected[row].values())[col])
+        #             item = str(list(player_selected[row].values())[column])
         #         data_table_tmp.append(item)
-        #     data_tbl[column] = data_table_tmp.copy() 
-        #     col += 1 
+        #     data_tbl[row] = data_table_tmp.copy() 
+        #     data_table_tmp.clear()   
+
+# ======
+        col = 0
+        for column in columns_list:
+            for row in range(row_count):                
+                if tb == 1:
+                    if col == 7 and tb != 6:  # преобразует id тренера в фамилию
+                        coach_id = str(list(player_selected[row].values())[col])
+                        coach = Coach.get(Coach.id == coach_id)
+                        item = coach.coach
+                    else:
+                        item = str(list(player_selected[row].values())[col])
+                else:
+                    item = str(list(player_selected[row].values())[col])
+                data_table_tmp.append(item)
+            data_tbl[column] = data_table_tmp.copy() 
+            data_table_tmp.clear()
+            col += 1 
 # =======
 
-        # data = pd.DataFrame(data_tbl, columns=columns_list)
-        # data = pd.DataFrame(data_tbl)
-        df = pd.DataFrame(data_tbl)
+        data = pd.DataFrame(data_tbl)
+
+        # df = pd.DataFrame(data_tbl)
         # df.columns = columns_list
-        model = MyTableModel(df)
+        model = MyTableModel(data)
         my_win.tableView.setModel(model)
 
         font = my_win.tableView.font()
