@@ -88,6 +88,7 @@ class MyTableModel(QAbstractTableModel):
         # self.column = list(self._data[0].keys())
 
     def rowCount(self, parent):
+        # print(len(self._data))
         return len(self._data)
     
     def columnCount(self, parent):
@@ -95,7 +96,6 @@ class MyTableModel(QAbstractTableModel):
             return len(self._data)
         else:
             return 0
-
     def data(self, index, role=QtCore.Qt.ItemDataRole.DisplayRole):
         if index.isValid():
             if role == QtCore.Qt.ItemDataRole.DisplayRole:
@@ -1301,7 +1301,7 @@ def go_to():
     player_list = Player.select().where(Player.title_id == title_id())
     count_player = len(player_list)
     my_win.label_46.setText(f"Всего: {count_player} участников")
-    fill_table(player_list)  # заполняет TableWidget списком игроков
+    # fill_table(player_list)  # заполняет TableWidget списком игроков
     list_player_pdf(player_list)
 
 
@@ -1632,7 +1632,7 @@ def find_in_rlist():
                 player_list = r_data.select().where(r_data.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
             else:
                 player_list = r_data.select().where(r_data.r1_fname ** f'{txt}%')  # like поиск в текущем рейтинге
-            fill_table(player_list)
+            # fill_table(player_list)
         else:
             for r_list in r_data:
                 p = r_list.select()
@@ -1722,7 +1722,6 @@ def fill_table(player_list):
     data = []
     data_tbl = {}
     data_table_tmp = []
-    # model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
@@ -1732,13 +1731,13 @@ def fill_table(player_list):
     if tb == 1:
         # column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
-        columns_list = (['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
+        columns_list = ['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'] # кол-во наваний должно совпадать со списком столбцов
     elif tb == 2:
         # column_count = [1, 2, 3, 7, 9, 10, 13, 15, 16]
         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) 
         columns_list = (['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) # кол-во наваний должно совпадать со списком столбцов
     elif tb == 3:
-        column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        # column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         columns_list = ['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']
         # model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
     elif tb == 6:
@@ -1768,57 +1767,54 @@ def fill_table(player_list):
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
     # создание  data (списка списков)
     if row_count != 0:  # список удаленных игроков пуст если R = 0
-        # for row in range(row_count):  # добавляет данные из базы в TableWidget
-        #     # col = 0
-        #     for column in range(len(columns_list)):
-        #         if tb == 1:
-        #             if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-        #                 coach_id = str(list(player_selected[row].values())[column])
-        #                 coach = Coach.get(Coach.id == coach_id)
-        #                 item = coach.coach
-        #             else:
-        #                 item = str(list(player_selected[row].values())[column])
-        #         else:
-        #             item = str(list(player_selected[row].values())[column])
-        #         data_table_tmp.append(item)
-        #     data_tbl[column] = data_table_tmp.copy()    
-                # col += 1
-    # =========
-    #   for row in range(row_count):  # добавляет данные из базы в TableWidget
-        col = 0
-        for column in columns_list:
-            for row in range(row_count):                
+        for row in range(row_count):  # добавляет данные из базы в TableWidget
+            for column in range(len(columns_list)):
                 if tb == 1:
-                    if col == 7 and tb != 6:  # преобразует id тренера в фамилию
-                        coach_id = str(list(player_selected[row].values())[col])
+                    if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+                        coach_id = str(list(player_selected[row].values())[column])
                         coach = Coach.get(Coach.id == coach_id)
                         item = coach.coach
                     else:
-                        item = str(list(player_selected[row].values())[col])
+                        item = str(list(player_selected[row].values())[column])
                 else:
-                    item = str(list(player_selected[row].values())[col])
+                    item = str(list(player_selected[row].values())[column])
                 data_table_tmp.append(item)
-            data_tbl[column] = data_table_tmp.copy() 
-            col += 1 
-    # ==========          
+            data_tbl[row] = data_table_tmp.copy() 
+            data_table_tmp.clear()   
 
-            # data_tbl.append(data_table_tmp.copy())
-            data_table_tmp.clear()
+# ======
+        # col = 0
+        # for column in columns_list:
+        #     for row in range(row_count):                
+        #         if tb == 1:
+        #             if col == 7 and tb != 6:  # преобразует id тренера в фамилию
+        #                 coach_id = str(list(player_selected[row].values())[col])
+        #                 coach = Coach.get(Coach.id == coach_id)
+        #                 item = coach.coach
+        #             else:
+        #                 item = str(list(player_selected[row].values())[col])
+        #         else:
+        #             item = str(list(player_selected[row].values())[col])
+        #         data_table_tmp.append(item)
+        #     data_tbl[column] = data_table_tmp.copy() 
+        #     col += 1 
+# =======
 
+        # data = pd.DataFrame(data_tbl, columns=columns_list)
         # data = pd.DataFrame(data_tbl)
-        # data_array = np.array(data_tbl)
-        df = pd.DataFrame(data=data_tbl, column=columns_list)
-
+        df = pd.DataFrame(data_tbl)
+        # df.columns = columns_list
         model = MyTableModel(df)
         my_win.tableView.setModel(model)
 
-        # font = my_win.tableView.font()
-        # font.setPointSize(11)
-        # my_win.tableView.setFont(font)
-        # my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
-        # my_win.tableView.horizontalHeader().setStretchLastSection(True)
-        # my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
-        # my_win.tableView.resizeColumnsToContents()
+        font = my_win.tableView.font()
+        font.setPointSize(11)
+        my_win.tableView.setFont(font)
+        my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
+        my_win.tableView.horizontalHeader().setStretchLastSection(True)
+        my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+        my_win.tableView.resizeColumnsToContents()
+        my_win.tableView.show()
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.statusbar.showMessage(
@@ -1830,9 +1826,9 @@ def fill_table(player_list):
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
-    data = []
-    data_table_tmp = []
-    model = MyTableModel(data)
+    # data = []
+    # data_table_tmp = []
+    # model = MyTableModel(data)
     title = Title.select().where(Title.id == title_id()).get()
     gamer = title.gamer
     if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
@@ -1845,30 +1841,30 @@ def fill_table_R_list():
     column_count = len(player_r[0])  # кол-во столбцов в таблице
     # вставляет в таблицу необходимое кол-во строк
     my_win.label_78.setText(f"Всего {row_count} записей.")
-    for row in range(row_count):  # добвляет данные из базы в TableWidget
-        for column in column_count:
-            item = str(list(player_r[row].values())[column])
-            data_table_tmp.append(item)
-        data.append(data_table_tmp.copy())
-        data_table_tmp.clear()
+    # for row in range(row_count):  # добвляет данные из базы в TableWidget
+    #     for column in column_count:
+    #         item = str(list(player_r[row].values())[column])
+    #         data_table_tmp.append(item)
+    #     data.append(data_table_tmp.copy())
+    #     data_table_tmp.clear()
 
-    model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город', 'Субъект РФ', 'Округ']) # кол-во наваний должно совпадать со списком столбцов
-    my_win.tableView.setModel(model)
-    font = my_win.tableView.font()
-    font.setPointSize(11)
-    my_win.tableView.setFont(font)
+    # model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город', 'Субъект РФ', 'Округ']) # кол-во наваний должно совпадать со списком столбцов
+    # my_win.tableView.setModel(model)
+    # font = my_win.tableView.font()
+    # font.setPointSize(11)
+    # my_win.tableView.setFont(font)
 
-    my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
-    my_win.tableView.horizontalHeader().setStretchLastSection(True)
-    # ставит размер столбцов согласно записям
-    my_win.tableView.resizeColumnsToContents()
+    # my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
+    # my_win.tableView.horizontalHeader().setStretchLastSection(True)
+    # # ставит размер столбцов согласно записям
+    # my_win.tableView.resizeColumnsToContents()
 
 
 def fill_table_R1_list():
     """заполняет таблицу списком из январского рейтинг листа"""
-    data = []
-    data_table_tmp = []
-    model = MyTableModel(data)
+    # data = []
+    # data_table_tmp = []
+    # model = MyTableModel(data)
     title = Title.select().where(Title.id == title_id()).get()
     gamer = title.gamer
     if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
@@ -1887,31 +1883,31 @@ def fill_table_R1_list():
         data.append(data_table_tmp.copy())
         data_table_tmp.clear()
 
-    model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город']) # кол-во наваний должно совпадать со списком столбцов
-    my_win.tableView.setModel(model)
-    font = my_win.tableView.font()
-    font.setPointSize(11)
-    my_win.tableView.setFont(font)
+    # model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город']) # кол-во наваний должно совпадать со списком столбцов
+    # my_win.tableView.setModel(model)
+    # font = my_win.tableView.font()
+    # font.setPointSize(11)
+    # my_win.tableView.setFont(font)
 
-    my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
-    my_win.tableView.horizontalHeader().setStretchLastSection(True)
-    # ставит размер столбцов согласно записям
-    my_win.tableView.resizeColumnsToContents()
+    # my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
+    # my_win.tableView.horizontalHeader().setStretchLastSection(True)
+    # # ставит размер столбцов согласно записям
+    # my_win.tableView.resizeColumnsToContents()
 
 
 def fill_table_results():
     """заполняет таблицу результатов QtableView из db result"""
     system_id_list = []
-    data = []
-    data_table_tmp = []
-    model = MyTableModel(data)
+    # data = []
+    # data_table_tmp = []
+    # model = MyTableModel(data)
     system_stage_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
     result = Result.select().where(Result.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     tb = my_win.tabWidget.currentIndex()
     if tb == 3:
-        column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
+        # column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        # model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
         stage = "Предварительный"
         system_id = system.select().where(System.stage == stage).get()
         id_system = system_id.id
@@ -1935,15 +1931,15 @@ def fill_table_results():
     result_list = player_result.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
     column_count = len(result_list[0])  # кол-во столбцов в таблице
-    for row in range(row_count):  # добавляет данные из базы в TableWidget
-        for column in range(column_count):
-            item = str(list(result_list[row].values())[column])
-            if column < 6 or column > 6:
-                data_table_tmp.append(item)
-            elif column == 6: # столбец победителя
-               data_table_tmp.append(item)
-        data.append(data_table_tmp.copy())
-        data_table_tmp.clear()
+    # for row in range(row_count):  # добавляет данные из базы в TableWidget
+    #     for column in range(column_count):
+    #         item = str(list(result_list[row].values())[column])
+    #         if column < 6 or column > 6:
+    #             data_table_tmp.append(item)
+    #         elif column == 6: # столбец победителя
+    #            data_table_tmp.append(item)
+    #     data.append(data_table_tmp.copy())
+    #     data_table_tmp.clear()
 
           # if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
                 #     if row_result[4] == row_result[6]:
@@ -1961,15 +1957,15 @@ def fill_table_results():
                 #         QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
             # data_table_tmp.append(item)
 
-    my_win.tableView.setModel(model)  
-    my_win.tableView.resizeColumnsToContents()
-    # my_win.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+    # my_win.tableView.setModel(model)  
+    # my_win.tableView.resizeColumnsToContents()
+    # # my_win.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
       
-    font = my_win.tableView.font()
-    font.setPointSize(11)
-    my_win.tableView.setFont(font)
-    my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
-    my_win.tableView.show()
+    # font = my_win.tableView.font()
+    # font.setPointSize(11)
+    # my_win.tableView.setFont(font)
+    # my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+    # my_win.tableView.show()
 
 
 def fill_table_choice():
@@ -2574,7 +2570,7 @@ def page():
             my_win.label_33.setText(f"Всего {total_game} игр")
             my_win.label_33.show()
         player_list = Choice.select().where(Choice.title_id == title_id())
-        fill_table(player_list)
+        # fill_table(player_list)
     elif tb == 3:  # вкладка -группы-
         stage = "Предварительный"
         Button_view_group = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
@@ -2771,7 +2767,7 @@ def find_coach():
             list_coach.append(c_id)
 
         player_list = player.select().where(Player.coach_id << list_coach) # окончательная выборка со всеми тренерами (id)
-        fill_table(player_list)
+        # fill_table(player_list)
     else:
         c = Coach.select()
         c = c.where(Coach.coach ** f'{cp}%')  # like
@@ -2859,7 +2855,7 @@ def sort():
     # elif sender == my_win.Button_sort_rejting_in_R:
     #     player_list = r_data.select().order_by(rejting_list.desc())
 
-    fill_table(player_list)
+    # fill_table(player_list)
     if sender in signal_button_list:
         list_player_pdf(player_list)
 
@@ -4136,7 +4132,7 @@ def delete_player():
         player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
-        fill_table(player_list)
+        # fill_table(player_list)
     else:
         return
 
@@ -4217,7 +4213,7 @@ def filter_player_list(sender):
         my_win.comboBox_fltr_city.setCurrentIndex(0) 
         my_win.checkBox_15.setChecked(False)      
         load_comboBox_filter()
-    fill_table(player_list)
+    # fill_table(player_list)
 
 
 def find_in_player_list():
@@ -4258,7 +4254,7 @@ def find_in_player_rejting_list():
            r_data = r_data_m[1]
         player_list = r_data.select().where(r_data.r1_fname ** f'{txt_r}%')
  
-    fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
+    # fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
 
 
 def filter_rejting_list():
@@ -4321,7 +4317,7 @@ def filter_rejting_list():
         elif region_txt == "" and city_txt != "":
             player_list = r_data.select().where(rejting_city == city_txt)
 
-    fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
+    # fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
 
 
 def enter_total_score():
@@ -5503,10 +5499,10 @@ def filter_sf():
 
 def filter_gr():
     """фильтрует таблицу -результаты- на вкладке группы"""
-    data = []
-    data_table_tmp = []
+    # data = []
+    # data_table_tmp = []
     find_player = []
-    model = MyTableModel(data)
+    # model = MyTableModel(data)
 
     group = my_win.comboBox_filter_group.currentText()
     name = my_win.comboBox_find_name.currentText()
@@ -5517,27 +5513,27 @@ def filter_gr():
         return
     fltr_id = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
     if group != "все группы":
-        fltr = fltr_id.select().where(Result.number_group == group)
+        player_list = fltr_id.select().where(Result.number_group == group)
 
     if group == "все группы" and my_win.comboBox_find_name.currentText() != "":
         pl1_query = fltr_id.select().where(Result.player1 == name)
         pl2_query = fltr_id.select().where(Result.player2 == name)
-        fltr = pl1_query | pl2_query # объдиняет два запроса в один
+        player_list = pl1_query | pl2_query # объдиняет два запроса в один
     elif group == "все группы" and played == "все игры":
-        fltr = fltr_id.select()
+        player_listr = fltr_id.select()
     elif group == "все группы" and played == "завершенные":
-        fltr = fltr_id.select().where(Result.points_win == 2)
+        player_list = fltr_id.select().where(Result.points_win == 2)
     elif group != "все группы" and played == "завершенные":
         fl = fltr_id.select().where(Result.number_group == group)
-        fltr = fl.select().where(Result.points_win == 2)
+        player_list = fl.select().where(Result.points_win == 2)
     elif group != "все группы" and played == "не сыгранные":
         fl = fltr_id.select().where(Result.number_group == group)
-        fltr = fl.select().where(Result.points_win != 2 & Result.points_win == None)
+        player_list = fl.select().where(Result.points_win != 2 & Result.points_win == None)
     elif group == "все группы" and played == "не сыгранные":
-        fltr = fltr_id.select().where((Result.points_win != 2 & Result.points_win == None))
+        player_list = fltr_id.select().where((Result.points_win != 2 & Result.points_win == None))
 
     # result_list = fltr.dicts().execute()
-    player_list = fltr.dicts().execute()
+    # player_list = fltr.dicts().execute()
     row_count = len(player_list)  # кол-во строк в таблице
     if row_count != 0:
         column_count = len(player_list[0])  # кол-во столбцов в таблице
@@ -8126,7 +8122,7 @@ def del_player_table():
         if count == 0:
             my_win.statusbar.showMessage(
                 "Удаленных участников соревнований нет", 10000)
-            fill_table(player_list)
+            # fill_table(player_list)
         else:
             # load_tableWidget()
             my_win.tableWidget.hideColumn(8)
@@ -8135,7 +8131,7 @@ def del_player_table():
             my_win.tableWidget.hideColumn(11)
             my_win.tableWidget.hideColumn(12)
             my_win.tableWidget.hideColumn(13)
-            fill_table(player_list)
+            # fill_table(player_list)
             my_win.statusbar.showMessage(
                 "Список удаленных участников соревнований", 10000)
             if my_win.lineEdit_Family_name.text() != "":
@@ -8145,7 +8141,7 @@ def del_player_table():
                 my_win.Button_add_edit_player.setEnabled(False)
     else:
         player_list = Player.select().where(Player.title_id == title_id())
-        fill_table(player_list)
+        # fill_table(player_list)
         my_win.tableWidget.showColumn(8)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.Button_add_edit_player.setEnabled(True)
