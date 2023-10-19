@@ -1684,17 +1684,17 @@ def fill_table(player_list):
     start = time.time()
     data = []
     data_table_tmp = []
+    data_table_list = []
     model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
-    column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8] # номера столбцов в таблице
     if tb == 1:
-        column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
     elif tb == 3:
-        column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
+    elif tb == 6:
+        model.setHorizontalHeaderLabels(['id',' Место', ' R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) # кол-во наваний должно совпадать со списком столбцов
     if tb == 1:
         if my_win.checkBox_15.isChecked():
             my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
@@ -1722,27 +1722,29 @@ def fill_table(player_list):
             item_5 = str(list(player_selected[row].values())[4])
             item_6 = str(list(player_selected[row].values())[5])
             item_7 = str(list(player_selected[row].values())[6])
-            item_8 = str(list(player_selected[row].values())[7])
-            item_9 = str(list(player_selected[row].values())[8])
-            data_table_tmp = [item_1, item_2, item_3, item_4, item_5, item_6, item_7, item_8, item_9]
+            data_table_list = [item_1, item_2, item_3, item_4, item_5, item_6, item_7]
+            if tb == 1:
+                coach_id = str(list(player_selected[row].values())[7])
+                coach = Coach.get(Coach.id == coach_id)
+                item_8 = coach.coach
+                item_9 = str(list(player_selected[row].values())[8])
+                data_table_list.extend([item_8, item_9]) 
+            elif tb != 6:
+                item_8 = str(list(player_selected[row].values())[7])
+                item_9 = str(list(player_selected[row].values())[8])
+                data_table_list.extend([item_8, item_9]) 
 
-            import itertools # 
-            # Создание вложенного цикла 
-            for i, j in itertools.product(range(10), range(10)): # Ваш код здесь pass 
-            # for column in column_count:
-            #     if tb == 1:
-            #         if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-            #             coach_id = str(list(player_selected[row].values())[column])
-            #             coach = Coach.get(Coach.id == coach_id)
-            #             item = coach.coach
-            #         else:
-            #             item = str(list(player_selected[row].values())[column])
-            #     else:
-            #         item = str(list(player_selected[row].values())[column])
-                # data_table_tmp.append(item)
+            if tb == 1:
+                data_table_tmp = data_table_list
+            elif tb == 3:
+                item_10 = str(list(player_selected[row].values())[9])
+                data_table_list.append(item_10)
+                data_table_tmp = data_table_list
+            elif tb == 6:
+                data_table_tmp = data_table_list
+
             data.append(data_table_tmp.copy())
-            # data_table_tmp.clear()
-
+        my_win.tableView.setModel(model)
         font = my_win.tableView.font()
         font.setPointSize(11)
         my_win.tableView.setFont(font)
@@ -1750,7 +1752,6 @@ def fill_table(player_list):
         # my_win.tableView.horizontalHeader().setStretchLastSection(True)
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
         my_win.tableView.resizeColumnsToContents()
-        my_win.tableView.setModel(model)
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.statusbar.showMessage(
@@ -1900,15 +1901,17 @@ def fill_table_R_list():
     title = Title.select().where(Title.id == title_id()).get()
     gamer = title.gamer
     if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-        player_rlist = R_list_d.select().order_by(R_list_d.r_fname)
+        # player_rlist = R_list_d.select().order_by(R_list_d.r_fname)
+        player_list = R_list_d.select().order_by(R_list_d.r_fname)
     else:
         player_rlist = R_list_m.select().order_by(R_list_m.r_fname)
-    player_r = player_rlist.dicts().execute()
-    row_count = len(player_r)  # кол-во строк в таблице
+    # player_r = player_rlist.dicts().execute()
+    row_count = len(player_list)  # кол-во строк в таблице
     # column_count = [0, 1, 2, 3, 4, 5, 6, 7]
-    column_count = len(player_r[0])  # кол-во столбцов в таблице
+    # column_count = len(player_r[0])  # кол-во столбцов в таблице
     # вставляет в таблицу необходимое кол-во строк
     my_win.label_78.setText(f"Всего {row_count} записей.")
+    fill_table(player_list)
     # for row in range(row_count):  # добвляет данные из базы в TableWidget
     #     for column in column_count:
     #         item = str(list(player_r[row].values())[column])
@@ -2663,7 +2666,7 @@ def page():
         my_win.Button_Ok_gr.setEnabled(False)
         player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
         fill_table(player_list)
-        # load_combobox_filter_group()
+        load_combobox_filter_group()
         load_combo()
         visible_field()
         my_win.label_16.hide()
@@ -5567,10 +5570,7 @@ def filter_sf():
 
 def filter_gr():
     """фильтрует таблицу -результаты- на вкладке группы"""
-    # data = []
-    # data_table_tmp = []
     find_player = []
-    # model = MyTableModel(data)
 
     group = my_win.comboBox_filter_group.currentText()
     name = my_win.comboBox_find_name.currentText()
@@ -5588,7 +5588,7 @@ def filter_gr():
         pl2_query = fltr_id.select().where(Result.player2 == name)
         player_list = pl1_query | pl2_query # объдиняет два запроса в один
     elif group == "все группы" and played == "все игры":
-        player_listr = fltr_id.select()
+        player_list = fltr_id.select()
     elif group == "все группы" and played == "завершенные":
         player_list = fltr_id.select().where(Result.points_win == 2)
     elif group != "все группы" and played == "завершенные":
@@ -5600,11 +5600,8 @@ def filter_gr():
     elif group == "все группы" and played == "не сыгранные":
         player_list = fltr_id.select().where((Result.points_win != 2 & Result.points_win == None))
 
-    # result_list = fltr.dicts().execute()
-    # player_list = fltr.dicts().execute()
     row_count = len(player_list)  # кол-во строк в таблице
-    if row_count != 0:
-        column_count = len(player_list[0])  # кол-во столбцов в таблице
+
     if played == "завершенные":
         my_win.label_16.setText(f"сыграно {row_count} встреч")
     elif played == "не сыгранные":
@@ -5615,16 +5612,7 @@ def filter_gr():
 
     fill_table(player_list)
 
-    # if row_count != 0:
-    #     for row in range(row_count):  # добавляет данные из базы в TableWidget
-    #         for column in range(column_count):
-    #             item = str(list(result_list[row].values())[column])
-    #             data_table_tmp.append(item)
-    #         data.append(data_table_tmp.copy())
-    #         data_table_tmp.clear()
-    #     my_win.tableView.setModel(model)
-
-
+ 
 def load_comboBox_referee():
     """Загружает комбобокс списком судей"""
     msgBox = QMessageBox()
