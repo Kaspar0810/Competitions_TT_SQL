@@ -81,112 +81,36 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', e
 
 
 class MyTableModel(QAbstractTableModel):
-
     def __init__(self, data):
-        QAbstractTableModel.__init__(self)
+        super().__init__()
         self._data = data
-        # self.headerdata = headerdata
-        self.columns = data[0]
-
-    # def setHorizontalHeaderLabels(self, columns_list):
-    #     self.horizontalHeaderLabels = columns_list
-
-
-    # def __init__(self, datain, headerdata, parent=None, *args): 
-    #     QAbstractTableModel.__init__(self, parent, *args) 
-    #     self.arraydata = datain
-    #     self.headerdata = headerdata
+        self.horizontalHeaderLabels = []
  
-    def rowCount(self, parent): 
-        return len(self.data) 
+    def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
+        self.horizontalHeaderLabels = horizontalHeaderLabels
  
-    def columnCount(self, parent): 
-        return len(self.data[0]) 
- 
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
+        if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole and len(self.horizontalHeaderLabels) == self.columnCount(None)):
+            return self.horizontalHeaderLabels[section]
+        return super().headerData(section, orientation, role)
 
-    # def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
-    #     if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole):
-    #         return self.horizontalHeaderLabels[section]
-    #     return super().headerData(section, orientation, role)
+    def rowCount(self, parent):
+        return len(self._data)
     
+    def columnCount(self, parent):
+        if len(self._data) > 0:
+            return len(self._data[0])
+        else:
+            return 0
 
-    # def rowCount(self, parent):
-    #     return len(self._data)
-    
-    # def columnCount(self, parent):
-    #     if len(self._data) > 0:
-    #         return len(self._data)
-    #     else:
-    #         return 0
-    def headerData(self, section, orientation, role):
-        # section is the index of the column/row.
+    def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            if orientation == QtCore.Qt.Horizontal:
-                return str(columns[section])
-
-    # def headerData(self, col, orientation, role):
-    #     # section is the index of the column/row.
-    #     if role == QtCore.Qt.ItemDataRole.DisplayRole:
-    #         if orientation == QtCore.Qt.Horizontal:
-    #             return str(self.headerdata[col])
-        
-    def data(self, index, role=QtCore.Qt.ItemDataRole.DisplayRole):
-        if index.isValid():
-            if role == QtCore.Qt.ItemDataRole.DisplayRole:
-                return self._data[index.row()][index.column()]
+            return str(self._data[index.row()][index.column()])
         return None
 
-    # def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
-    #     if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole):
-    #         return self.column[section]
-    #     return super().headerData(section, orientation, role)
-
-    # def headerData(self, section, orientation, role):
-    #     # section is the index of the column/row.
-    #     if role == QtCore.Qt.ItemDataRole.DisplayRole:
-    #         if orientation == QtCore.Qt.Horizontal:
-    #             return str(columns[section])
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-# ===========
-    # def __init__(self, data):
-    #     super().__init__()
-    #     self._data = data
-    #     # self.horizontalHeaderLabels = []
-    #     self.columns = []
-
-   
-    # def setHorizontalHeaderLabels(self, columns):
-    #     self.horizontalHeaderLabels = columns
-
-    # def headerData(self, section, orientation, role):
-    #     # section is the index of the column/row.
-    #     if role == QtCore.Qt.ItemDataRole.DisplayRole:
-    #         if orientation == QtCore.Qt.Horizontal:
-    #             return str(columns[section])
-
-            # if orientation == QtCore.Qt.Vertical:
-            #     return str(self._data.index[section])
- 
-    # def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
-    #     # if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole and len(self.horizontalHeaderLabels) == self.columnCount(None)):
-    #     if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole):
-    #         return self.horizontalHeaderLabels[section]
-    #     return super().headerData(section, orientation, role)
-
-    # def rowCount(self, parent):
-    #     return len(self._data)
-    
-    # def columnCount(self, parent):
-    #     if len(self._data) > 0:
-    #         return len(self._data[0])
-    #     else:
-    #         return 0
-
-    # def data(self, index, role):
-    #     if role == QtCore.Qt.ItemDataRole.DisplayRole:
-    #         return str(self._data[index.row()][index.column()])
-    #     return None
     
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -1759,34 +1683,18 @@ def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     start = time.time()
     data = []
-    data_tbl = {}
     data_table_tmp = []
+    model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
-    if row_count == 0:
-        return
-    # column_count = len(player_selected[0])  # кол-во столбцов в таблице
+    column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8] # номера столбцов в таблице
     if tb == 1:
-        # column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
-        columns_list = ['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'] # кол-во наваний должно совпадать со списком столбцов
-    elif tb == 2:
-        # column_count = [1, 2, 3, 7, 9, 10, 13, 15, 16]
-        # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) 
-        columns_list = (['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) # кол-во наваний должно совпадать со списком столбцов
+        column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
     elif tb == 3:
-        # column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        columns_list = ['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']
-        # model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
-    elif tb == 6:
-        index = my_win.comboBox_choice_R.currentIndex()
-        if index == 0:
-            # column_count = [0, 1, 2, 3, 4, 5, 6, 7]
-            model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город', 'Субъект РФ', 'Округ']) # кол-во наваний должно совпадать со списком столбцов
-        else:
-            # column_count = [0, 1, 2, 3, 4, 5]
-            model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город']) # кол-во наваний должно совпадать со списком столбцов
+        column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
     if tb == 1:
         if my_win.checkBox_15.isChecked():
             my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
@@ -1806,62 +1714,172 @@ def fill_table(player_list):
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
     # создание  data (списка списков)
     if row_count != 0:  # список удаленных игроков пуст если R = 0
-        # for row in range(row_count):  # добавляет данные из базы в TableWidget
-        #     for column in range(len(columns_list)):
-        #         if tb == 1:
-        #             if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-        #                 coach_id = str(list(player_selected[row].values())[column])
-        #                 coach = Coach.get(Coach.id == coach_id)
-        #                 item = coach.coach
-        #             else:
-        #                 item = str(list(player_selected[row].values())[column])
-        #         else:
-        #             item = str(list(player_selected[row].values())[column])
-        #         data_table_tmp.append(item)
-        #     data_tbl[row] = data_table_tmp.copy() 
-        #     data_table_tmp.clear()   
-
-# ======
-        col = 0
-        for column in columns_list:
-            for row in range(row_count):                
+        for row in range(row_count):  # добавляет данные из базы в TableWidget
+            for column in column_count:
                 if tb == 1:
-                    if col == 7 and tb != 6:  # преобразует id тренера в фамилию
-                        coach_id = str(list(player_selected[row].values())[col])
+                    if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+                        coach_id = str(list(player_selected[row].values())[column])
                         coach = Coach.get(Coach.id == coach_id)
                         item = coach.coach
                     else:
-                        item = str(list(player_selected[row].values())[col])
+                        item = str(list(player_selected[row].values())[column])
                 else:
-                    item = str(list(player_selected[row].values())[col])
+                    item = str(list(player_selected[row].values())[column])
                 data_table_tmp.append(item)
-            data_tbl[column] = data_table_tmp.copy() 
+            data.append(data_table_tmp.copy())
             data_table_tmp.clear()
-            col += 1 
-# =======
 
-        data = pd.DataFrame(data_tbl)
-
-        # df = pd.DataFrame(data_tbl)
-        # df.columns = columns_list
-        model = MyTableModel(data)
         my_win.tableView.setModel(model)
 
         font = my_win.tableView.font()
+
         font.setPointSize(11)
         my_win.tableView.setFont(font)
-        my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
-        my_win.tableView.horizontalHeader().setStretchLastSection(True)
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+        my_win.tableView.hideColumn(0)
+        my_win.tableView.hideColumn(1)
+        my_win.tableView.hideColumn(6)
         my_win.tableView.resizeColumnsToContents()
         my_win.tableView.show()
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.statusbar.showMessage(
              "Удаленных участников соревнований нет", 10000)
+
+
     end = time.time()
     total = start - end
     print("fill_table выполнялась за", "%.2f" %total)
+    #======
+#     start = time.time()
+#     data = []
+#     data_tbl = {}
+#     data_table_tmp = []
+#     tb = my_win.tabWidget.currentIndex()
+#     player_selected = player_list.dicts().execute()
+#     row_count = len(player_selected)  # кол-во строк в таблице
+#     column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+#     if row_count == 0:
+#         return
+#     # column_count = len(player_selected[0])  # кол-во столбцов в таблице
+#     if tb == 1:
+#         column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+#         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
+#         columns_list = ['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'] # кол-во наваний должно совпадать со списком столбцов
+#     elif tb == 2:
+#         # column_count = [1, 2, 3, 7, 9, 10, 13, 15, 16]
+#         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) 
+#         columns_list = (['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) # кол-во наваний должно совпадать со списком столбцов
+#     elif tb == 3:
+#         # column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+#         columns_list = ['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']
+#         # model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
+#     elif tb == 6:
+#         index = my_win.comboBox_choice_R.currentIndex()
+#         if index == 0:
+#             # column_count = [0, 1, 2, 3, 4, 5, 6, 7]
+#             model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город', 'Субъект РФ', 'Округ']) # кол-во наваний должно совпадать со списком столбцов
+#         else:
+#             # column_count = [0, 1, 2, 3, 4, 5]
+#             model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город']) # кол-во наваний должно совпадать со списком столбцов
+#     if tb == 1:
+#         if my_win.checkBox_15.isChecked():
+#             my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
+#         else:
+#             my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
+#         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) 
+#     elif tb == 3:
+#         my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
+#         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) # 
+#     else:
+#         my_win.tableView.setSelectionMode(QAbstractItemView.NoSelection) # нет выделение строк по клику мышью
+
+#     if tb == 6:
+#         if row_count > 0:
+#             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
+#         else:
+#             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
+#     # создание  data (списка списков)
+#     # ===== old ====
+
+#     # ===========
+#     # if row_count != 0:  # список удаленных игроков пуст если R = 0
+#     #     for row in range(row_count):  # добавляет данные из базы в TableWidget
+#     #         # for column in range(0, column_count):
+#     #         for column in column_count:
+#     #             if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+#     #                 coach_id = str(list(player_selected[row].values())[column])
+#     #                 coach = Coach.get(Coach.id == coach_id)
+#     #                 item = coach.coach
+#     #             else:
+#     #                 item = str(list(player_selected[row].values())[column])
+#     #             # Установить текстовое значение каждой позиции
+#     #             data_table_tmp.append(item)
+#     #         data.append(data_table_tmp.copy())
+#     #         data_table_tmp.clear()
+#     #     model = MyTableModel(data)
+
+
+#     #     data = pd.DataFrame(data, columns = ['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'])
+
+#         # for row in range(row_count):  # добавляет данные из базы в TableWidget
+#         #     for column in range(len(columns_list)):
+#         #         if tb == 1:
+#         #             if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+#         #                 coach_id = str(list(player_selected[row].values())[column])
+#         #                 coach = Coach.get(Coach.id == coach_id)
+#         #                 item = coach.coach
+#         #             else:
+#         #                 item = str(list(player_selected[row].values())[column])
+#         #         else:
+#         #             item = str(list(player_selected[row].values())[column])
+#         #         data_table_tmp.append(item)
+#         #     data_tbl[row] = data_table_tmp.copy() 
+#         #     data_table_tmp.clear()   
+
+# # ======
+# #  словарь со название столбцов
+#         col = 0
+#         for column in columns_list:
+#             for row in range(row_count):                
+#                 if tb == 1:
+#                     if col == 7 and tb != 6:  # преобразует id тренера в фамилию
+#                         coach_id = str(list(player_selected[row].values())[col])
+#                         coach = Coach.get(Coach.id == coach_id)
+#                         item = coach.coach
+#                     else:
+#                         item = str(list(player_selected[row].values())[col])
+#                 else:
+#                     item = str(list(player_selected[row].values())[col])
+#                 data_table_tmp.append(item)
+#             data_tbl[column] = data_table_tmp.copy() 
+#             data_table_tmp.clear()
+#             col += 1 
+# # # =======
+
+#         data = pd.DataFrame(data_tbl)
+
+#         # df = pd.DataFrame(data_tbl)
+#         # df.columns = columns_list
+#         model = MyTableModel(data)
+#         # model.setHorizontalHeaderLabels(['Фамилия имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 't'])
+#         my_win.tableView.setModel(model)
+
+#         font = my_win.tableView.font()
+#         font.setPointSize(11)
+#         my_win.tableView.setFont(font)
+#         my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
+#         my_win.tableView.horizontalHeader().setStretchLastSection(True)
+#         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+#         my_win.tableView.resizeColumnsToContents()
+
+#     else:
+#         # вставляет в таблицу необходимое кол-во строк
+#         my_win.statusbar.showMessage(
+#              "Удаленных участников соревнований нет", 10000)
+#     end = time.time()
+#     total = start - end
+#     print("fill_table выполнялась за", "%.2f" %total)
 
 
 def fill_table_R_list():
