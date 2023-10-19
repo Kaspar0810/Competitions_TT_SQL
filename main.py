@@ -1715,32 +1715,42 @@ def fill_table(player_list):
     # создание  data (списка списков)
     if row_count != 0:  # список удаленных игроков пуст если R = 0
         for row in range(row_count):  # добавляет данные из базы в TableWidget
-            for column in column_count:
-                if tb == 1:
-                    if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-                        coach_id = str(list(player_selected[row].values())[column])
-                        coach = Coach.get(Coach.id == coach_id)
-                        item = coach.coach
-                    else:
-                        item = str(list(player_selected[row].values())[column])
-                else:
-                    item = str(list(player_selected[row].values())[column])
-                data_table_tmp.append(item)
-            data.append(data_table_tmp.copy())
-            data_table_tmp.clear()
+            item_1 = str(list(player_selected[row].values())[0])
+            item_2 = str(list(player_selected[row].values())[1])
+            item_3 = str(list(player_selected[row].values())[2])
+            item_4 = str(list(player_selected[row].values())[3])
+            item_5 = str(list(player_selected[row].values())[4])
+            item_6 = str(list(player_selected[row].values())[5])
+            item_7 = str(list(player_selected[row].values())[6])
+            item_8 = str(list(player_selected[row].values())[7])
+            item_9 = str(list(player_selected[row].values())[8])
+            data_table_tmp = [item_1, item_2, item_3, item_4, item_5, item_6, item_7, item_8, item_9]
 
-        my_win.tableView.setModel(model)
+            import itertools # 
+            # Создание вложенного цикла 
+            for i, j in itertools.product(range(10), range(10)): # Ваш код здесь pass 
+            # for column in column_count:
+            #     if tb == 1:
+            #         if column == 7 and tb != 6:  # преобразует id тренера в фамилию
+            #             coach_id = str(list(player_selected[row].values())[column])
+            #             coach = Coach.get(Coach.id == coach_id)
+            #             item = coach.coach
+            #         else:
+            #             item = str(list(player_selected[row].values())[column])
+            #     else:
+            #         item = str(list(player_selected[row].values())[column])
+                # data_table_tmp.append(item)
+            data.append(data_table_tmp.copy())
+            # data_table_tmp.clear()
 
         font = my_win.tableView.font()
-
         font.setPointSize(11)
         my_win.tableView.setFont(font)
+        my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
+        # my_win.tableView.horizontalHeader().setStretchLastSection(True)
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
-        my_win.tableView.hideColumn(0)
-        my_win.tableView.hideColumn(1)
-        my_win.tableView.hideColumn(6)
         my_win.tableView.resizeColumnsToContents()
-        my_win.tableView.show()
+        my_win.tableView.setModel(model)
     else:
         # вставляет в таблицу необходимое кол-во строк
         my_win.statusbar.showMessage(
@@ -1749,7 +1759,7 @@ def fill_table(player_list):
 
     end = time.time()
     total = start - end
-    print("fill_table выполнялась за", "%.2f" %total)
+    print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
     #======
 #     start = time.time()
 #     data = []
