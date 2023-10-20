@@ -1683,6 +1683,7 @@ def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     start = time.time()
     data = []
+    data_tmp = []
     data_table_tmp = []
     data_table_list = []
     model = MyTableModel(data)
@@ -1744,6 +1745,8 @@ def fill_table(player_list):
                 data_table_tmp = data_table_list
 
             data.append(data_table_tmp.copy())
+            # data_tmp.append(data_table_tmp.copy())
+            # data = np.array(data_tmp)
         my_win.tableView.setModel(model)
         font = my_win.tableView.font()
         font.setPointSize(11)
@@ -1895,96 +1898,47 @@ def fill_table(player_list):
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
-    # data = []
-    # data_table_tmp = []
-    # model = MyTableModel(data)
     title = Title.select().where(Title.id == title_id()).get()
     gamer = title.gamer
     if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-        # player_rlist = R_list_d.select().order_by(R_list_d.r_fname)
         player_list = R_list_d.select().order_by(R_list_d.r_fname)
     else:
-        player_rlist = R_list_m.select().order_by(R_list_m.r_fname)
-    # player_r = player_rlist.dicts().execute()
-    row_count = len(player_list)  # кол-во строк в таблице
-    # column_count = [0, 1, 2, 3, 4, 5, 6, 7]
-    # column_count = len(player_r[0])  # кол-во столбцов в таблице
+        player_list = R_list_m.select().order_by(R_list_m.r_fname)
     # вставляет в таблицу необходимое кол-во строк
+    row_count = len(player_list)
     my_win.label_78.setText(f"Всего {row_count} записей.")
     fill_table(player_list)
-    # for row in range(row_count):  # добвляет данные из базы в TableWidget
-    #     for column in column_count:
-    #         item = str(list(player_r[row].values())[column])
-    #         data_table_tmp.append(item)
-    #     data.append(data_table_tmp.copy())
-    #     data_table_tmp.clear()
-
-    # model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город', 'Субъект РФ', 'Округ']) # кол-во наваний должно совпадать со списком столбцов
-    # my_win.tableView.setModel(model)
-    # font = my_win.tableView.font()
-    # font.setPointSize(11)
-    # my_win.tableView.setFont(font)
-
-    # my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
-    # my_win.tableView.horizontalHeader().setStretchLastSection(True)
-    # # ставит размер столбцов согласно записям
-    # my_win.tableView.resizeColumnsToContents()
 
 
 def fill_table_R1_list():
     """заполняет таблицу списком из январского рейтинг листа"""
-    # data = []
-    # data_table_tmp = []
-    # model = MyTableModel(data)
     title = Title.select().where(Title.id == title_id()).get()
     gamer = title.gamer
     if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-        player_rlist = R1_list_d.select().order_by(R1_list_d.r1_fname)
+        player_list = R1_list_d.select().order_by(R1_list_d.r1_fname)
     else:
-        player_rlist = R1_list_m.select().order_by(R1_list_m.r1_fname)
-    player_r1 = player_rlist.dicts().execute()
-    row_count = len(player_r1)  # кол-во строк в таблице
-    column_count = [0, 1, 2, 3, 4, 5]
+        player_list = R1_list_m.select().order_by(R1_list_m.r1_fname)
     # вставляет в таблицу необходимое кол-во строк
+    row_count = len(player_list)
     my_win.label_78.setText(f"Всего {row_count} записей.")
-    for row in range(row_count):  # добавляет данные из базы в TableWidget
-        for column in column_count:
-            item = str(list(player_r1[row].values())[column])
-            data_table_tmp.append(item)
-        data.append(data_table_tmp.copy())
-        data_table_tmp.clear()
-
-    # model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город']) # кол-во наваний должно совпадать со списком столбцов
-    # my_win.tableView.setModel(model)
-    # font = my_win.tableView.font()
-    # font.setPointSize(11)
-    # my_win.tableView.setFont(font)
-
-    # my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
-    # my_win.tableView.horizontalHeader().setStretchLastSection(True)
-    # # ставит размер столбцов согласно записям
-    # my_win.tableView.resizeColumnsToContents()
+    fill_table(player_list)
 
 
 def fill_table_results():
     """заполняет таблицу результатов QtableView из db result"""
     system_id_list = []
-    # data = []
-    # data_table_tmp = []
-    # model = MyTableModel(data)
+
     system_stage_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
     result = Result.select().where(Result.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     tb = my_win.tabWidget.currentIndex()
     if tb == 3:
-        # column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        # model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
         stage = "Предварительный"
         system_id = system.select().where(System.stage == stage).get()
         id_system = system_id.id
-        player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result
+        player_list = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result
     elif tb == 4:
-        player_result = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
+        player_list = result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал")) # проверка есть ли записи в таблице -result-
     elif tb == 5:
         for k in system: # заполняе список ид системы финальных этапов
             id_system = k.id
@@ -1993,15 +1947,28 @@ def fill_table_results():
         stage = my_win.comboBox_filter_final.currentText()
 
         if stage == "все финалы":      
-            player_result = result.select().where(Result.system_stage == "Финальный")  # проверка есть ли записи в таблице -result 
+            player_list = result.select().where(Result.system_stage == "Финальный")  # проверка есть ли записи в таблице -result 
         else:
             system_id = system.select().where(System.stage == stage).get()
             id_system = system_id.id
-            player_result = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result           
- 
-    result_list = player_result.dicts().execute()
-    row_count = len(result_list)  # кол-во строк в таблице
-    column_count = len(result_list[0])  # кол-во столбцов в таблице
+            player_list = result.select().where(Result.system_id == id_system)  # проверка есть ли записи в таблице -result 
+
+    # ==== окрашивает победителя в красный цвет
+    index = my_win.tableView.selectionModel().selectedRows()
+    for ind in index:
+        row_num = ind.row()
+
+    row = my_win.tableView.currentIndex().row () # Number of lines
+    column = my_win.tableView.currentIndex().column()  # Get the number of columns
+    contents = my_win.tableView.currentIndex().data()  # retrieve data
+    # QModelIndex myIndex
+    # myIdex = my_win.tableView.model.index( row_num, 4)  
+    fill_table(player_list)
+    # student_model->item(0, 2)->setForeground(QBrush(QColor(255, 0, 0))); 
+    # row_current = 
+    # result_list = player_result.dicts().execute()
+    # row_count = len(result_list)  # кол-во строк в таблице
+    # column_count = len(result_list[0])  # кол-во столбцов в таблице
     # for row in range(row_count):  # добавляет данные из базы в TableWidget
     #     for column in range(column_count):
     #         item = str(list(result_list[row].values())[column])
@@ -2012,21 +1979,21 @@ def fill_table_results():
     #     data.append(data_table_tmp.copy())
     #     data_table_tmp.clear()
 
-          # if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
-                #     if row_result[4] == row_result[6]:
-                #         my_win.tableWidget.item(row, 4).setForeground(
-                #             QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                #             # в красный цвет 1-ого игрока
-                #     else:
-                #         my_win.tableWidget.item(row, 5).setForeground(
-                #             QBrush(QColor(255, 0, 0)))  # окрашивает текст
-                #             # в красный цвет 2-ого игрока
-                # else:
-                #     my_win.tableWidget.item(row, 4).setForeground(
-                #         QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
-                #     my_win.tableWidget.item(row, 5).setForeground(
-                #         QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
-            # data_table_tmp.append(item)
+        #   if row_result[6] != "None" and row_result[6] != "":  # встреча сыграна
+        #             if row_result[4] == row_result[6]:
+        #                 my_win.tableWidget.item(row, 4).setForeground(
+        #                     QBrush(QColor(255, 0, 0)))  # окрашивает текст
+        #                     # в красный цвет 1-ого игрока
+        #             else:
+        #                 my_win.tableWidget.item(row, 5).setForeground(
+        #                     QBrush(QColor(255, 0, 0)))  # окрашивает текст
+        #                     # в красный цвет 2-ого игрока
+        #         else:
+        #             my_win.tableWidget.item(row, 4).setForeground(
+        #                 QBrush(QColor(0, 0, 0)))  # в черный цвет 1-ого
+        #             my_win.tableWidget.item(row, 5).setForeground(
+        #                 QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
+        #     data_table_tmp.append(item)
 
     # my_win.tableView.setModel(model)  
     # my_win.tableView.resizeColumnsToContents()
@@ -4361,7 +4328,7 @@ def filter_rejting_list():
         if date_txt != "":
             player_list = r_data.select().where(rejting_date > after_date).order_by(rejting_list.desc())       
         elif region_txt == "" and city_txt == "":
-            player_list = r_data.select().where(rejting_list).order_by(rejting_list.desc())
+            player_list = r_data.select().order_by(rejting_list.desc()) 
         elif region_txt != "" and city_txt == "":
             player_list = r_data.select().where(rejting_region == region_txt).order_by(rejting_list.desc())
         elif region_txt == "" and city_txt != "":
@@ -4388,7 +4355,7 @@ def filter_rejting_list():
         elif region_txt == "" and city_txt != "":
             player_list = r_data.select().where(rejting_city == city_txt)
 
-    # fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
+    fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
 
 
 def enter_total_score():
