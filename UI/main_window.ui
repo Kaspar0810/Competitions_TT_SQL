@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -759,7 +759,7 @@
        <rect>
         <x>490</x>
         <y>30</y>
-        <width>301</width>
+        <width>341</width>
         <height>153</height>
        </rect>
       </property>
@@ -3884,7 +3884,7 @@
        <rect>
         <x>11</x>
         <y>41</y>
-        <width>231</width>
+        <width>238</width>
         <height>133</height>
        </rect>
       </property>
@@ -4170,15 +4170,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4190,8 +4190,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4705,8 +4705,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5024,8 +5024,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5430,8 +5430,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5716,8 +5716,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6507,8 +6507,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
