@@ -4170,7 +4170,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4763,7 +4763,7 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QRadioButton" name="radioButton_3">
+      <widget class="QRadioButton" name="radioButton_group">
        <property name="geometry">
         <rect>
          <x>2</x>
@@ -4779,7 +4779,7 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QRadioButton" name="radioButton_2">
+      <widget class="QRadioButton" name="radioButton_PF">
        <property name="geometry">
         <rect>
          <x>2</x>
@@ -4792,7 +4792,7 @@
         <string>ПФ</string>
        </property>
       </widget>
-      <widget class="QRadioButton" name="radioButton">
+      <widget class="QRadioButton" name="radioButton_Fin">
        <property name="geometry">
         <rect>
          <x>2</x>
@@ -4805,7 +4805,7 @@
         <string>Финалы</string>
        </property>
       </widget>
-      <widget class="QRadioButton" name="radioButton_4">
+      <widget class="QRadioButton" name="radioButton_repeat_regions">
        <property name="geometry">
         <rect>
          <x>2</x>
