@@ -79,20 +79,6 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
 
-# class FindDelegate(QItemDelegate):
-#     def __init__(self):
-#         super().__init__()
-#         self.filter = ''
-        
-#     def paint(self,painter,option,index):
-#         data = index.data(Qt.DisplayRole)
-#         if self.filter and self.filter in data :
-#             painter.fillRect(option.rect,QColor(255,255,0,128))
-#         return QItemDelegate.paint(self, painter, option, index)
-        
-#     def setFilter(self,value=''):
-#         self.filter = value
-
 class MyTableModel(QAbstractTableModel):
     def __init__(self, data):
         super().__init__()
@@ -120,19 +106,7 @@ class MyTableModel(QAbstractTableModel):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
         return None
-        # if role == QtCore.Qt.ItemDataRole.DisplayRole:
-        # # if role == QtCore.Qt.ForegroundRole and role == QtCore.Qt.ItemDataRole.DisplayRole:
-        #     value = str(self._data[index.row()][index.column()])
-
-        #     if value == "Москва":
-        #         return setBackground(QtGui.QColor(125,125,125))
-        #     else:
-        #         return str(self._data[index.row()][index.column()])
-
-
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
     
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -1716,8 +1690,12 @@ def fill_table(player_list):
     num_columns = [0, 1, 2, 3, 4, 5, 6]
     # кол-во наваний должно совпадать со списком столбцов
     if tb == 1:
-        num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
+        if my_win.checkBox_6.isChecked():
+            num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место', 'id_del'])
+        else:
+            num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
     elif tb == 2:
         if my_win.comboBox_filter_choice.currentIndex() == 0:
             num_columns = [0, 2, 3, 4, 7, 9, 10, 13, 14, 16]
@@ -1764,6 +1742,9 @@ def fill_table(player_list):
                 item_8 = coach.coach
                 item_9 = str(list(player_selected[row].values())[num_columns[8]])
                 data_table_tmp = [item_8, item_9]
+                if my_win.checkBox_6.isChecked():
+                    item_10 = str(list(player_selected[row].values())[num_columns[9]])
+                    data_table_tmp = [item_8, item_9, item_10]
                 data_table_list.extend(data_table_tmp) 
             elif tb ==2:
                 if my_win.comboBox_filter_choice.currentIndex() == 0:
@@ -1796,7 +1777,13 @@ def fill_table(player_list):
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
     else:
         # вставляет в таблицу необходимое кол-во строк
-        if tb == 6:
+        if tb == 1:
+            row = 0
+            my_win.statusbar.showMessage(
+                "Нет спортсменов удаленных из списка", 10000)
+            my_win.textEdit.setText("Нет спортсменов удаленных из списка")
+            my_win.checkBox_6.setChecked(False)
+        elif tb == 6:
             row = 0
             my_win.statusbar.showMessage(
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
@@ -2090,7 +2077,6 @@ def add_player():
     player_list = Player.select().where(Player.title_id == title_id())
     txt = my_win.Button_add_edit_player.text()
     count = len(player_list)
-    my_win.tableWidget.setRowCount(count + 1)
     pl_id = my_win.lineEdit_id.text()
     pl = my_win.lineEdit_Family_name.text()
     bd = my_win.lineEdit_bday.text()
@@ -2100,11 +2086,11 @@ def add_player():
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
     if pl_id == "": # добавляет нового игрока
-        flag = check_repeat_player(pl, bd)
-    else:
-        player = Player.select().where(Player.id == pl_id).get()
-        pay_R = player.pay_rejting
-        comment = player.comment
+        flag = check_repeat_player(pl, bd) # проверка повторного ввода игрока
+    # else:
+    #     player = Player.select().where(Player.id == pl_id).get()
+    #     pay_R = player.pay_rejting
+    #     comment = player.comment
 
     num = count + 1
     fn = f"{pl}/{ct}"
@@ -2130,7 +2116,6 @@ def add_player():
         zayavka = "основная"
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
-        row = my_win.tableWidget.currentRow()
         with db:
             player_del = Delete_player.get(Delete_player.id == pl_id)
             player_id = player_del.player_del_id           
@@ -2163,12 +2148,9 @@ def add_player():
                                 coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
         pl_id = Player.select().order_by(Player.id.desc()).get() # id нового игрока
         player_id = pl_id.id
-        # ========
-    spisok = (player_id, str(num), pl, bd, rn, ct, rg, rz, ch, ms)
-    for i in range(0, 10):  # добавляет в tablewidget
-        my_win.tableWidget.setItem(count + 1, i, QTableWidgetItem(spisok[i]))
-    # load_tableWidget()  # заново обновляет список
+        # ======== попробовать вставить одну строку в tableView
     player_list = Player.select().where(Player.title_id == title_id())
+    fill_table(player_list)
     count = len(player_list)  # подсчитывает новое кол-во игроков
     my_win.label_46.setText(f"Всего: {count} участников")
     list_player_pdf(player_list)
@@ -3981,6 +3963,8 @@ def select_player_in_list():
         data_list.append(data)
 # ================================
     my_win.lineEdit_id.setText(data_list[0])
+    # if my_win.checkBox_6.isChecked():
+    #     my_win.lineEdit_id.setText(data_list[9])
     my_win.lineEdit_id.setEnabled(False)
     my_win.lineEdit_Family_name.setText(data_list[1])
     my_win.lineEdit_bday.setText(data_list[2])
@@ -6030,14 +6014,7 @@ def choice_setka_automat(fin, flag, count_exit):
             city = player.city
             rank = player.rank
 
-            psv.append(pl_id)
-            psv.append(family)
-            psv.append(region)
-            psv.append(group_number)
-            psv.append(group)
-            psv.append(city)
-            psv.append(rank)
-            psv.append(mesto_group)
+            psv = [pl_id, family, region, group_number, group, city, rank, mesto_group]
             full_posev.append(psv)
 
         if count_exit == 1 or fin == "Одна таблица":
@@ -8021,6 +7998,12 @@ def clear_db_before_choice_final(fin):
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
+    choice = Choice.select().where(Choice.title_id == title_id())
+    ch = choice.select().where(Choice.final == fin)
+    for i in ch:
+        ch_d = Choice.get(Choice.id == i)
+        ch_d.posev_final = ""
+        ch_d.save()
 
 
 def clear_db_before_choice_semifinal(stage):
@@ -8191,10 +8174,11 @@ def del_player_table():
         if count == 0:
             my_win.statusbar.showMessage(
                 "Удаленных участников соревнований нет", 10000)
+            # return
             fill_table(player_list)
         else:
             my_win.tableView.hideColumn(8)
-            my_win.tableView.hideColumn(9)
+            # my_win.tableView.hideColumn(9)
             my_win.tableView.hideColumn(10)
             my_win.tableView.hideColumn(11)
             my_win.tableView.hideColumn(12)
