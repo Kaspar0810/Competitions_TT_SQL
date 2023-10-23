@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>7</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -64,7 +64,7 @@
         <x>0</x>
         <y>30</y>
         <width>831</width>
-        <height>171</height>
+        <height>184</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -3677,6 +3677,7 @@
       <property name="font">
        <font>
         <family>Times New Roman</family>
+        <pointsize>10</pointsize>
         <weight>75</weight>
         <italic>true</italic>
         <bold>true</bold>
@@ -3780,15 +3781,16 @@
      <widget class="QLabel" name="label_54">
       <property name="geometry">
        <rect>
-        <x>289</x>
+        <x>269</x>
         <y>70</y>
-        <width>131</width>
+        <width>171</width>
         <height>20</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Times New Roman</family>
+        <pointsize>10</pointsize>
         <weight>75</weight>
         <italic>true</italic>
         <bold>true</bold>
@@ -3848,15 +3850,16 @@
      <widget class="QLabel" name="label_55">
       <property name="geometry">
        <rect>
-        <x>275</x>
+        <x>265</x>
         <y>153</y>
-        <width>181</width>
+        <width>191</width>
         <height>20</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Times New Roman</family>
+        <pointsize>10</pointsize>
         <weight>75</weight>
         <italic>true</italic>
         <bold>true</bold>
@@ -3884,7 +3887,7 @@
        <rect>
         <x>11</x>
         <y>41</y>
-        <width>238</width>
+        <width>231</width>
         <height>133</height>
        </rect>
       </property>
@@ -3918,6 +3921,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <italic>true</italic>
              <bold>true</bold>
@@ -3959,6 +3963,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <italic>true</italic>
              <bold>true</bold>
@@ -4000,6 +4005,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <italic>true</italic>
              <bold>true</bold>
@@ -4041,6 +4047,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
+             <pointsize>10</pointsize>
              <weight>75</weight>
              <italic>true</italic>
              <bold>true</bold>
@@ -4067,6 +4074,7 @@
       <property name="font">
        <font>
         <family>Times New Roman</family>
+        <pointsize>10</pointsize>
         <weight>75</weight>
         <italic>true</italic>
         <bold>true</bold>
@@ -4178,7 +4186,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4191,7 +4199,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4203,7 +4211,7 @@
         <x>0</x>
         <y>0</y>
         <width>236</width>
-        <height>484</height>
+        <height>527</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4706,7 +4714,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5025,7 +5033,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5431,7 +5439,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5717,7 +5725,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6125,7 +6133,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6204,7 +6212,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>221</width>
+        <width>266</width>
         <height>104</height>
        </rect>
       </property>
@@ -6508,7 +6516,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">

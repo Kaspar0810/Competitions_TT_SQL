@@ -358,6 +358,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fifth_comp_Action.triggered.connect(self.last)
 
         self.ed_gr_Action.triggered.connect(self.edit_group)
+        self.ed_pf_Action.triggered.connect(self.edit_group)
+
 
         self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
@@ -1153,8 +1155,10 @@ def enabled_menu_after_choice():
                 my_win.ed_gr_Action.setEnabled(True) # включает меню - редакирование жеребьевки групп
             elif stage == "1-й полуфинал":
                 my_win.view_pf1_Action.setEnabled(True)
+                # my_win.ed_pf1_Action.setEnabled(True)
             elif stage == "2-й полуфинал":
                 my_win.view_pf2_Action.setEnabled(True)
+                # my_win.ed_pf2_Action.setEnabled(True)
             elif stage == "1-й финал":
                 my_win.view_fin1_Action.setEnabled(True)
             elif stage == "2-й финал":
@@ -1679,7 +1683,7 @@ def find_city():
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
-    start = time.time()
+    # start = time.time()
     data = []
     data_table_tmp = []
     data_table_list = []
@@ -1789,9 +1793,9 @@ def fill_table(player_list):
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
 
     my_win.tableView.show()
-    end = time.time()
-    total = start - end
-    print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
+    # end = time.time()
+    # total = start - end
+    # print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
     #======
 #     start = time.time()
 #     data = []
@@ -2635,7 +2639,6 @@ def page():
         visible_field()
         my_win.label_16.hide()
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
-        # my_win.tableView.show()
     elif tb == 4:  # вкладка -полуфиналы-
         my_win.resize(1270, 825)
         Button_view_semifinal = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
@@ -2665,12 +2668,9 @@ def page():
                 sf.save()
             my_win.tabWidget.setCurrentIndex(3)
         else:  # жеребьевка сделана
-            my_win.tableWidget.show()
             my_win.Button_Ok_pf.setEnabled(False)
-            # ==== проверить
-            player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Полуфинальный"))
+            player_list = Result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
             fill_table(player_list)
-            # ===== 
             load_combobox_filter_group_semifinal()
             load_combo()
             visible_field()
@@ -2696,7 +2696,6 @@ def page():
         load_combobox_filter_final()
         player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Финальный"))
         fill_table(player_list)
-        # load_combobox_filter_final()
         load_combo()
         visible_field()
         my_win.label_16.hide()
@@ -3844,6 +3843,10 @@ def visible_field():
         my_win.checkBox_4.setChecked(state_visible)
     elif tab == 4:
         my_win.checkBox_14.setChecked(True)
+        # my_win.checkBox_5.setChecked(True)
+        my_win.radioButton_match_10.setChecked(True)
+        state_visible = True
+        match_db = 5
     else:
             # устанавливает начальное значение - со счетом ищ 5-ти партий
         if row_num == -1:
@@ -7027,12 +7030,21 @@ def edit_group_after_draw():
     """редактирование групп после жеребьевки"""
     group = ["-выберите группу-"]
     player = []
-    my_win.tabWidget.setCurrentIndex(3)
+    sender = my_win.sender()
     my_win.tableView.setVisible(False)
     my_win.comboBox_first_group.clear()
     my_win.comboBox_second_group.clear()
     system = System.select().where(System.title_id == title_id())
-    system_group = system.select().where(System.stage == "Предварительный").get()
+    if sender == my_win.ed_gr_Action:
+        my_win.tabWidget.setCurrentIndex(3)
+        system_group = system.select().where(System.stage == "Предварительный").get()
+    elif sender == my_win.ed_pf_Action:
+        my_win.tabWidget.setCurrentIndex(4)
+        # if my_win.comboBox_edit.currentIndex(0):
+        system_group = system.select().where(System.stage == "1-й полуфинал").get()
+        # else:
+        #     system_group = system.select().where(System.stage == "2-й полуфинал") 
+
     players = Player.select().where(Player.title_id == title_id())
     total_gr = system_group.total_group
     for i in range(1, total_gr + 1):
