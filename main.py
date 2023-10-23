@@ -2030,22 +2030,23 @@ def fill_table_after_choice():
     """заполняет TableWidget после жеребьевки """
     choice = Choice.select().where(Choice.title_id == title_id())
     pl_choice = choice.select().order_by(Choice.group)
-    player_choice = pl_choice.select().order_by(Choice.posev_group)
-    choice_list = player_choice.dicts().execute()
-    row_count = len(choice_list)  # кол-во строк в таблице
-    if row_count != 0:
-        column_count = len(choice_list[0])  # кол-во столбцов в таблице
-        # вставляет в таблицу необходимое кол-во строк
-        my_win.tableWidget.setRowCount(row_count)
-        for row in range(row_count):  # добавляет данные из базы в TableWidget
-            for column in range(column_count):
-                item = str(list(choice_list[row].values())[column])
-                my_win.tableWidget.setItem(
-                    row, column, QTableWidgetItem(str(item)))
-        # ставит размер столбцов согласно записям
-        my_win.tableWidget.resizeColumnsToContents()
-        for i in range(0, row_count):  # отсортировывает номера строк по порядку
-            my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1))) 
+    player_list = pl_choice.select().order_by(Choice.posev_group)
+    fill_table(player_list)
+    # choice_list = player_choice.dicts().execute()
+    # row_count = len(choice_list)  # кол-во строк в таблице
+    # if row_count != 0:
+    #     column_count = len(choice_list[0])  # кол-во столбцов в таблице
+    #     # вставляет в таблицу необходимое кол-во строк
+    #     my_win.tableWidget.setRowCount(row_count)
+    #     for row in range(row_count):  # добавляет данные из базы в TableWidget
+    #         for column in range(column_count):
+    #             item = str(list(choice_list[row].values())[column])
+    #             my_win.tableWidget.setItem(
+    #                 row, column, QTableWidgetItem(str(item)))
+    #     # ставит размер столбцов согласно записям
+    #     my_win.tableWidget.resizeColumnsToContents()
+    #     for i in range(0, row_count):  # отсортировывает номера строк по порядку
+    #         my_win.tableWidget.setItem(i, 0, QTableWidgetItem(str(i + 1))) 
 
 
 def progressbar(count):
@@ -4254,7 +4255,7 @@ def filter_player_list(sender):
         my_win.comboBox_fltr_city.setCurrentIndex(0) 
         my_win.checkBox_15.setChecked(False)      
         load_comboBox_filter()
-    # fill_table(player_list)
+    fill_table(player_list)
 
 
 def find_in_player_list():
@@ -4819,18 +4820,17 @@ def control_winner_player(winner, loser):
 
 def check_real_player():
     """Изменяет спортсменов по предварительной заявке на реальных"""
+    my_win.tabWidget.setCurrentIndex(1)
     player_list = Player.select().where(Player.title_id == title_id())
-    indices = my_win.tableView.selectionModel().selectedRows()
+    count = len(player_list)
 
-    dir_path = pathlib.Path.cwd()
-    for index in indices:
-        row_index = index.row()
-        id_pl = int(my_win.tableWidget.item(row_index, 1).text())
+    for row_num in range(0, count):
+        id_pl = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
         app = player_list.select().where(Player.id == id_pl).get()
         with db:
             app.application = "основная"
             app.save()
- 
+
 
 def enter_score(none_player=0):
     """заносит в таблицу -результаты- победителя, счет и т.п. sc_total [партии выигранные, проигранные, очки победителя
@@ -7933,7 +7933,6 @@ def clear_db_before_choice(stage):
     total_player = system.total_athletes
     max_pl = system.max_player
     new_total_player = len(player)
-    # free_group = 0
     if total_player != new_total_player: #  если изменилось число участников
         result = msgBox.question(my_win, "Список участников", "Был изменено число участников.\n"
         "вы хотите изменить систему соревнований?",
