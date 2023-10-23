@@ -509,7 +509,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     else:
                         return
                     add_open_tab(tab_page="Полуфиналы")
-
                     my_win.tabWidget.setCurrentIndex(4)
                     my_win.ed_pf_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
                     return
@@ -1155,7 +1154,7 @@ def enabled_menu_after_choice():
                 my_win.ed_gr_Action.setEnabled(True) # включает меню - редакирование жеребьевки групп
             elif stage == "1-й полуфинал":
                 my_win.view_pf1_Action.setEnabled(True)
-                # my_win.ed_pf1_Action.setEnabled(True)
+                my_win.ed_pf_Action.setEnabled(True)
             elif stage == "2-й полуфинал":
                 my_win.view_pf2_Action.setEnabled(True)
                 # my_win.ed_pf2_Action.setEnabled(True)
@@ -1167,6 +1166,14 @@ def enabled_menu_after_choice():
                 my_win.view_fin3_Action.setEnabled(True)
             elif stage == "4-й финал":
                 my_win.view_fin4_Action.setEnabled(True)
+            elif stage == "5-й финал":
+                my_win.view_fin5_Action.setEnabled(True)
+            elif stage == "6-й финал":
+                my_win.view_fin6_Action.setEnabled(True)
+            elif stage == "7-й финал":
+                my_win.view_fin7_Action.setEnabled(True)
+            elif stage == "8-й финал":
+                my_win.view_fin8_Action.setEnabled(True)
         stage = k.stage
 
         if stage == "Одна таблица":
@@ -7063,6 +7070,7 @@ def add_item_listwidget():
     sender = my_win.sender()
     coach_list = []
     coach = ""
+    tb = my_win.tabWidget.currentIndex()
     if sender == my_win.comboBox_first_group:
         my_win.listWidget_first_group.clear()
         gr = my_win.comboBox_first_group.currentText()
@@ -7072,8 +7080,12 @@ def add_item_listwidget():
 
     choices = Choice.select().where(Choice.title_id == title_id())
     if gr != "":
-        group = choices.select().order_by(Choice.posev_group).where(Choice.group == gr)
-        count = len(group)
+        if tb == 3:
+            group = choices.select().order_by(Choice.posev_group).where(Choice.group == gr)
+        elif tb == 4 :
+            group = choices.select().order_by(Choice.posev_group).where(Choice.sf_group == gr)
+
+
         for k in group:
             item = QListWidgetItem()
             n = k.posev_group
@@ -7196,7 +7208,7 @@ def change_player_between_group_after_draw():
             choice.group = gr_pl2 
             choice.posev_group = number_posev2
             choice.save()
-    else:
+    else: # из меняет спортсменов местами
         znak = player1.find(":")
         znak1 = player1.find("/")  
         number_posev1 = int(player1[:znak]) # номера посева
