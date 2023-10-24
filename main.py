@@ -1800,9 +1800,10 @@ def fill_table(player_list):
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
 
     my_win.tableView.show()
-    end = time.time()
-    total = start - end
-    print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
+    # end = time.time()
+    # total = start - end
+    # # if row != 0:
+    # print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
     #======
 #     start = time.time()
 #     data = []
@@ -11417,7 +11418,7 @@ def rank_in_group(total_score, td, num_gr, stage):
     pg_los = {}
     tr = []
     player_rank_tmp = []
-    player_rank = []
+    # player_rank = []
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
     player_rank_group = []    
     sys = System.select().where(System.title_id == title_id())
@@ -11459,13 +11460,12 @@ def rank_in_group(total_score, td, num_gr, stage):
     kol_tours_in_group = len(game_max)  # кол-во всего игр в группе
 
     for key, value in total_score.items():
-        rev_dict.setdefault(value, set()).add(key) # словарь (число очков, номера групп)
+        rev_dict.setdefault(value, set()).add(key) # словарь (число очков, номера участников группы у которых они есть)
     res = [key for key, values in rev_dict.items() if len(values) > 1]
 
     # отдельно составляет список ключей (номера участников группы)
-    key_list = list(total_score.keys())
-    # отдельно составляет список значений (очки каждого игрока)
-    val_list = list(total_score.values())
+    # key_list = list(total_score.keys())
+    val_list = list(total_score.values())  # отдельно составляет список значений (очки каждого игрока)
     # ======== новый вариант =========
     # получает словарь(ключ - номер участника, значение - очки)
     ds = {index: value for index, value in enumerate(val_list)}  
@@ -11487,8 +11487,7 @@ def rank_in_group(total_score, td, num_gr, stage):
             # записывает место победителю
             td[p1 * 2 - 2][max_person + 4] = mesto
             player_rank_tmp.append([p1, mesto])
-        # если кол-во очков у двух спортсмена (определение мест по игре между собой)
-        elif m_new == 2:
+        elif m_new == 2:  # если кол-во очков у двух спортсмена (определение мест по игре между собой)
             player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr)
         elif m_new == 3: # если кол-во очков у трех спортсмена
             men_of_circle = m_new
@@ -11499,15 +11498,13 @@ def rank_in_group(total_score, td, num_gr, stage):
             points_person = z[0]
             player_rank_tmp = circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr,
                                               tr_all, men_of_circle, pg_win, pg_los, pp, pps)
-        # если кол-во очков у более трех спортсменов (крутиловка)
-        elif m_new > 3:
+        elif m_new > 3:  # если кол-во очков у более трех спортсменов (крутиловка)
             m_circle = m_new
             men_of_circle = m_new
             player_rank_tmp = circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle)
         tr.clear()
 
         for i in player_rank_tmp:
-            player_rank.append(i)
             # список участников в группе и его место
             player_rank_group.append(i)
 
@@ -11515,7 +11512,7 @@ def rank_in_group(total_score, td, num_gr, stage):
         player_rank_tmp.clear()
     if kol_tours_played == kol_tours_in_group:  # когда все встречи сыграны
         # функция простановки мест из группы в -Choice-
-        result_rank_group_in_choice(num_gr, player_rank_group,stage)
+        result_rank_group_in_choice(num_gr, player_rank_group, stage)
 
 
 def get_unique_numbers(pp_all):
@@ -11865,37 +11862,54 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage):
         res = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
     else:
         res = result.select().where(Result.number_group == num_gr)
-    c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу
+    c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу c - id - встречи в таблице Result
  
     if c.winner == c.player1:  # победил 1-й игрок
         points_p1 = c.points_win  # очки победителя
         points_p2 = c.points_loser  # очки проигравшего
-        # счет во встречи (выигранные и проигранные партии) победителя
-        game_p1 = c.score_in_game
-        # счет во встречи (выигранные и проигранные партии) проигравшего
-        game_p2 = c.score_loser
-        if game_p1 != "В : П" or game_p1 != "П : В":
+        game_p1 = c.score_in_game  # счет во встречи (выигранные и проигранные партии) победителя
+        game_p2 = c.score_loser # счет во встречи (выигранные и проигранные партии) проигравшего
+        if game_p1 == "В : П":
+            p1_game_win = game_p1[0]
+            p1_game_los = game_p1[4]
+        else:
             p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
             p1_game_los = int(game_p1[4])
             p2_game_win = int(game_p2[0])
             p2_game_los = int(game_p2[4])
-        else:
-            p1_game_win = game_p1[0]
-            p1_game_los = game_p1[4]
+        # if game_p1 != "В : П" or game_p1 != "П : В":
+        #     p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
+        #     p1_game_los = int(game_p1[4])
+        #     p2_game_win = int(game_p2[0])
+        #     p2_game_los = int(game_p2[4])
+        # else:
+        #     p1_game_win = game_p1[0]
+        #     p1_game_los = game_p1[4]
     else: # победил 2-й игрок
         points_p1 = c.points_loser # очки 1-ого игрока проигранные
         points_p2 = c.points_win # очки 2-ого игрока выигранные
         game_p1 = c.score_loser # счет во встречи 1-ого игрока
         game_p2 = c.score_in_game # счет во встречи 2-ого игрока
         # ======= если победа по неявке исправить
-        if game_p1 != "В : П" or game_p1 != "П : В":
+        if game_p1 == "П : В":
+            p1_game_win = game_p1[0]
+            p1_game_los = game_p1[4]
+        else:
             p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
             p1_game_los = int(game_p1[4])
             p2_game_win = int(game_p2[0])
             p2_game_los = int(game_p2[4])
-        else:
-            p1_game_win = game_p1[0]
-            p1_game_los = game_p1[4]
+        # else:
+        #     p1_game_win = game_p1[0]
+        #     p1_game_los = game_p1[4]
+        # if game_p1 != "В : П" or game_p1 != "П : В":
+        #     p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
+        #     p1_game_los = int(game_p1[4])
+        #     p2_game_win = int(game_p2[0])
+        #     p2_game_los = int(game_p2[4])
+        # else:
+        #     p1_game_win = game_p1[0]
+        #     p1_game_los = game_p1[4]
     pp[ki1].append(points_p1)  # добавляет очки 1-ому игроку встречи
     pp[ki2].append(points_p2)  # добавляет очки 2-ому игроку встречи
     # записывает в словарь счет во встречи 1-ого игрока

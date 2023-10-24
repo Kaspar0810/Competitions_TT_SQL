@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>5</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -2213,7 +2213,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
       </widget>
@@ -2228,7 +2228,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>13</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
       </widget>
@@ -4144,7 +4144,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>20</y>
       <width>243</width>
       <height>765</height>
      </rect>
@@ -4178,7 +4178,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4186,7 +4186,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>483</height>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4199,7 +4199,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>483</height>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4714,7 +4714,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>483</height>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5033,7 +5033,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>483</height>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5451,7 +5451,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>483</height>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5463,7 +5463,7 @@
         <x>4</x>
         <y>98</y>
         <width>231</width>
-        <height>271</height>
+        <height>221</height>
        </rect>
       </property>
       <property name="font">
@@ -5479,13 +5479,13 @@
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>6</x>
-         <y>27</y>
+         <x>3</x>
+         <y>31</y>
          <width>221</width>
-         <height>233</height>
+         <height>191</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_13">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
          <number>1</number>
         </property>
@@ -5578,10 +5578,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_11">
-          <property name="spacing">
-           <number>1</number>
-          </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QPushButton" name="Button_filter_sf">
             <property name="font">
@@ -5595,7 +5592,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_12">
+           <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -5749,7 +5746,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>483</height>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6157,7 +6154,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>483</height>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6540,7 +6537,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>483</height>
+       <height>491</height>
       </rect>
      </property>
      <attribute name="label">
