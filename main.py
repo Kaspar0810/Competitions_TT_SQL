@@ -1690,7 +1690,7 @@ def find_city():
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
-    # start = time.time()
+    start = time.time()
     data = []
     data_table_tmp = []
     data_table_list = []
@@ -1800,9 +1800,9 @@ def fill_table(player_list):
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
 
     my_win.tableView.show()
-    # end = time.time()
-    # total = start - end
-    # print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
+    end = time.time()
+    total = start - end
+    print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
     #======
 #     start = time.time()
 #     data = []
@@ -4927,10 +4927,9 @@ def enter_score(none_player=0):
             ts_winner = f"{st1} : {st2}"
             ts_loser = f"{st2} : {st1}"
         if none_player != 0: # если победа по неявке
-            # loser_fam_name = loser 
             if type == "сетка":
                 winner_string = ""
-            elif type == "круг":
+            elif type == "круг" or type == "группы":
                 winner_string = "В : П"
     else: # если нет одного игрока -X-
         if my_win.lineEdit_player1_fin.text() == "X":

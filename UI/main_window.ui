@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>3</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -2213,7 +2213,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>13</pointsize>
+         <pointsize>10</pointsize>
         </font>
        </property>
       </widget>
@@ -2743,7 +2743,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>13</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
       </widget>
@@ -2758,7 +2758,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>13</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
       </widget>
@@ -3269,7 +3269,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>13</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
       </widget>
@@ -3284,7 +3284,7 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>13</pointsize>
+         <pointsize>12</pointsize>
         </font>
        </property>
       </widget>
@@ -4178,7 +4178,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -5084,7 +5084,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
-             <pointsize>14</pointsize>
+             <pointsize>12</pointsize>
              <italic>true</italic>
             </font>
            </property>
@@ -5105,7 +5105,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
-             <pointsize>14</pointsize>
+             <pointsize>12</pointsize>
              <italic>true</italic>
             </font>
            </property>
@@ -5122,7 +5122,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
-             <pointsize>14</pointsize>
+             <pointsize>12</pointsize>
              <italic>true</italic>
             </font>
            </property>
@@ -5151,6 +5151,18 @@
           <number>1</number>
          </property>
          <item>
+          <widget class="QPushButton" name="Button_filter_gr">
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Применить</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_11">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -5168,7 +5180,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
-             <pointsize>14</pointsize>
+             <pointsize>12</pointsize>
             </font>
            </property>
            <property name="text">
@@ -5192,7 +5204,7 @@
       <property name="font">
        <font>
         <family>Times New Roman</family>
-        <pointsize>14</pointsize>
+        <pointsize>12</pointsize>
         <weight>75</weight>
         <italic>true</italic>
         <bold>true</bold>
@@ -5451,7 +5463,7 @@
         <x>4</x>
         <y>98</y>
         <width>231</width>
-        <height>249</height>
+        <height>271</height>
        </rect>
       </property>
       <property name="font">
@@ -5487,7 +5499,7 @@
             <property name="font">
              <font>
               <family>Courier New</family>
-              <pointsize>14</pointsize>
+              <pointsize>12</pointsize>
               <italic>true</italic>
              </font>
             </property>
@@ -5504,7 +5516,7 @@
             <property name="font">
              <font>
               <family>Courier New</family>
-              <pointsize>14</pointsize>
+              <pointsize>12</pointsize>
               <italic>true</italic>
              </font>
             </property>
@@ -5525,7 +5537,7 @@
             <property name="font">
              <font>
               <family>Courier New</family>
-              <pointsize>14</pointsize>
+              <pointsize>12</pointsize>
               <italic>true</italic>
              </font>
             </property>
@@ -5542,7 +5554,7 @@
             <property name="font">
              <font>
               <family>Courier New</family>
-              <pointsize>14</pointsize>
+              <pointsize>12</pointsize>
               <italic>true</italic>
              </font>
             </property>
@@ -5571,6 +5583,18 @@
            <number>1</number>
           </property>
           <item>
+           <widget class="QPushButton" name="Button_filter_sf">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Применить</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_12">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -5588,7 +5612,7 @@
             <property name="font">
              <font>
               <family>Courier New</family>
-              <pointsize>14</pointsize>
+              <pointsize>12</pointsize>
              </font>
             </property>
             <property name="text">
@@ -5613,7 +5637,7 @@
       <property name="font">
        <font>
         <family>Times New Roman</family>
-        <pointsize>14</pointsize>
+        <pointsize>12</pointsize>
         <weight>75</weight>
         <italic>true</italic>
         <bold>true</bold>
@@ -5737,7 +5761,7 @@
         <x>4</x>
         <y>98</y>
         <width>231</width>
-        <height>251</height>
+        <height>261</height>
        </rect>
       </property>
       <property name="font">
@@ -5776,7 +5800,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
-             <pointsize>14</pointsize>
+             <pointsize>12</pointsize>
              <italic>true</italic>
             </font>
            </property>
@@ -5804,7 +5828,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
-             <pointsize>14</pointsize>
+             <pointsize>12</pointsize>
              <italic>true</italic>
             </font>
            </property>
@@ -5828,7 +5852,7 @@
            <property name="font">
             <font>
              <family>Courier New</family>
-             <pointsize>14</pointsize>
+             <pointsize>12</pointsize>
              <italic>true</italic>
             </font>
            </property>
@@ -5869,7 +5893,7 @@
              <property name="font">
               <font>
                <family>Courier New</family>
-               <pointsize>14</pointsize>
+               <pointsize>12</pointsize>
                <italic>true</italic>
               </font>
              </property>
@@ -5902,7 +5926,7 @@
              <property name="font">
               <font>
                <family>Courier New</family>
-               <pointsize>14</pointsize>
+               <pointsize>12</pointsize>
                <italic>true</italic>
               </font>
              </property>
@@ -5973,6 +5997,19 @@
           <number>1</number>
          </property>
          <item>
+          <widget class="QPushButton" name="Button_filter_fin">
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Применить</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_7">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -5986,24 +6023,11 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="Button_filter_fin">
-           <property name="font">
-            <font>
-             <family>Courier New</family>
-             <pointsize>14</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Фильтр</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="Button_reset_filter_fin">
            <property name="font">
             <font>
              <family>Courier New</family>
-             <pointsize>14</pointsize>
+             <pointsize>12</pointsize>
             </font>
            </property>
            <property name="text">
