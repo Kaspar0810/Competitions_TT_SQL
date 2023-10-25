@@ -1800,10 +1800,10 @@ def fill_table(player_list):
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
 
     my_win.tableView.show()
-    # end = time.time()
-    # total = start - end
+    end = time.time()
+    total = start - end
     # # if row != 0:
-    # print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
+    print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
     #======
 #     start = time.time()
 #     data = []
@@ -11495,7 +11495,7 @@ def rank_in_group(total_score, td, num_gr, stage):
             u = summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr, stage)
             # значения очков и список значения очков и у скольких спортсменов они есть
             z = u[1]  # список списков кол-во очков и у сколько игроков они есть
-            points_person = z[0]
+            points_person = z[0] # список [колво очко, у скольки игроков они есть]
             player_rank_tmp = circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr,
                                               tr_all, men_of_circle, pg_win, pg_los, pp, pps)
         elif m_new > 3:  # если кол-во очков у более трех спортсменов (крутиловка)
@@ -11722,7 +11722,7 @@ def summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr, s
         list_tmp.clear()
     u.append(points_person)
     u.append(list_uniq)
-    return u
+    return u # список списков 1-й кол-во игроков 2-й очки выйигранные и проигранные
 
 
 def circle_2_player(tr, td, max_person, mesto, num_gr):
@@ -11771,9 +11771,10 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
                     pg_win, pg_los, pp, pps):
     """в крутиловке 3-и спортсмена
     -pp- словарь (номер игрока, очки)
-    -ps- список коэфициентов"""
+    -ps- список коэфициентов
+    -points_person - список [1-е значение колво очков, 2-е у скольки участников оное есть"""
     ps = []
-    if points_person[0] == points_person[1]:  # у всех трех участников равное кол-во очков
+    if points_person[1] == 3:  # у всех трех участников равное кол-во очков   
         for k in tr:  # суммирует выигранные и проигранные партии каждого игрока
             k = int(k)
             pg_win[k] = sum(pg_win[k])  # сумма выигранных партий
@@ -11814,7 +11815,6 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
                 # получает ключ, по которому в списке ищет игрока
                 w = key_l[val_l.index(i)]
                 # получает номер участника, соответствующий
-                # новый вариант получения номера участника
                 wq = int(d.setdefault(w))
                 # записывает соотношения игроку
                 td[wq * 2 - 2][max_person + 3] = str(i)
@@ -11823,7 +11823,7 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
                 # добавляет в список группа, место, чтоб занести в таблицу Choice
                 player_rank_tmp.append([wq, m + mesto])
                 m += 1
-    else:   # у трех участников разное кол-во очков
+    elif points_person[1] == 2 or points_person[1] == 1:
         # получает словарь(ключ, номер участника)
         d = {index: value for index, value in enumerate(tr)}
         # сортирует словарь по убыванию соот
@@ -11831,16 +11831,30 @@ def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, n
         key_l = list(sorted_tuple.keys()) # номера игроков по убыванию очков
         val_l = list(sorted_tuple.values()) # очки игроков по убыванию
         m = 0
-        for i in val_l:
-            q = val_l.index(i) # индекс в списке
-            # wq = int(d.setdefault(q))  # получает номер группы, соответствующий
-            wq = key_l[q] # получает номер группы, соответствующий
-            # записывает соотношения игроку
-            td[wq * 2 - 2][max_person + 3] = str(i)
-            td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
-            # добавляет в список группа, место, чтоб занести в таблицу Choice
-            player_rank_tmp.append([wq, m + mesto])
-            m += 1
+        # вставить если в крутиловке игра по неявке
+        if points_person[1] == 2:
+            if val_l[0] == val_l[1]:
+                tr = [str(key_l[0]), str(key_l[1])] 
+                player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr)
+                player_rank_tmp.append([key_l[2], mesto + 2])
+            else:
+                player_rank_tmp = ([key_l[0], mesto])
+                tr = [str(key_l[1]), str(key_l[2])] 
+                player_rank_temp = circle_2_player(tr, td, max_person, mesto, num_gr)
+                player_rank_tmp.extend(player_rank_temp)
+            for k in player_rank_tmp:
+                td[k[0] * 2 - 2][max_person + 4] = str(k[1])  # записывает место
+        else:
+            for i in val_l:
+                q = val_l.index(i) # индекс в списке
+                # wq = int(d.setdefault(q))  # получает номер группы, соответствующий
+                wq = key_l[q] # получает номер участника группы, соответствующий
+                # записывает соотношения игроку
+                td[wq * 2 - 2][max_person + 3] = str(i)
+                td[wq * 2 - 2][max_person + 4] = str(m + mesto)  # записывает место
+                # добавляет в список группа, место, чтоб занести в таблицу Choice
+                player_rank_tmp.append([wq, m + mesto])
+                m += 1
     return player_rank_tmp
 
 
@@ -11870,21 +11884,15 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage):
         game_p1 = c.score_in_game  # счет во встречи (выигранные и проигранные партии) победителя
         game_p2 = c.score_loser # счет во встречи (выигранные и проигранные партии) проигравшего
         if game_p1 == "В : П":
-            p1_game_win = game_p1[0]
-            p1_game_los = game_p1[4]
+            p1_game_win = 0
+            p1_game_los = 0
+            p2_game_win = 0
+            p2_game_los = 0
         else:
             p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
             p1_game_los = int(game_p1[4])
             p2_game_win = int(game_p2[0])
             p2_game_los = int(game_p2[4])
-        # if game_p1 != "В : П" or game_p1 != "П : В":
-        #     p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
-        #     p1_game_los = int(game_p1[4])
-        #     p2_game_win = int(game_p2[0])
-        #     p2_game_los = int(game_p2[4])
-        # else:
-        #     p1_game_win = game_p1[0]
-        #     p1_game_los = game_p1[4]
     else: # победил 2-й игрок
         points_p1 = c.points_loser # очки 1-ого игрока проигранные
         points_p2 = c.points_win # очки 2-ого игрока выигранные
@@ -11892,27 +11900,18 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage):
         game_p2 = c.score_in_game # счет во встречи 2-ого игрока
         # ======= если победа по неявке исправить
         if game_p1 == "П : В":
-            p1_game_win = game_p1[0]
-            p1_game_los = game_p1[4]
+            p1_game_win = 0
+            p1_game_los = 0
+            p2_game_win = 0
+            p2_game_los = 0
         else:
             p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
             p1_game_los = int(game_p1[4])
             p2_game_win = int(game_p2[0])
             p2_game_los = int(game_p2[4])
-        # else:
-        #     p1_game_win = game_p1[0]
-        #     p1_game_los = game_p1[4]
-        # if game_p1 != "В : П" or game_p1 != "П : В":
-        #     p1_game_win = int(game_p1[0]) # кол-во выигранных партий 1 игрока
-        #     p1_game_los = int(game_p1[4])
-        #     p2_game_win = int(game_p2[0])
-        #     p2_game_los = int(game_p2[4])
-        # else:
-        #     p1_game_win = game_p1[0]
-        #     p1_game_los = game_p1[4]
     pp[ki1].append(points_p1)  # добавляет очки 1-ому игроку встречи
     pp[ki2].append(points_p2)  # добавляет очки 2-ому игроку встречи
-    # записывает в словарь счет во встречи 1-ого игрока
+# записывает в словарь счет во встречи 1-ого игрока
     pg_win[ki1].append(p1_game_win)
     # записывает в словарь счет во встречи 1-ого игрока
     pg_los[ki1].append(p1_game_los)
