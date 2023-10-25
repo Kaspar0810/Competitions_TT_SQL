@@ -1690,7 +1690,7 @@ def find_city():
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
-    start = time.time()
+    # start = time.time()
     data = []
     data_table_tmp = []
     data_table_list = []
@@ -1730,6 +1730,7 @@ def fill_table(player_list):
         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) # 
     else:
         my_win.tableView.setSelectionMode(QAbstractItemView.NoSelection) # нет выделение строк по клику мышью
+        # my_win.tableView.setSortingEnabled(True)
 
     if tb == 6:
         if row_count > 0:
@@ -1800,140 +1801,6 @@ def fill_table(player_list):
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
 
     my_win.tableView.show()
-    end = time.time()
-    total = start - end
-    # # if row != 0:
-    print(f"fill_table ячеекк {row * 9} выполнялась за", "%.2f" %total)
-    #======
-#     start = time.time()
-#     data = []
-#     data_tbl = {}
-#     data_table_tmp = []
-#     tb = my_win.tabWidget.currentIndex()
-#     player_selected = player_list.dicts().execute()
-#     row_count = len(player_selected)  # кол-во строк в таблице
-#     column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-#     if row_count == 0:
-#         return
-#     # column_count = len(player_selected[0])  # кол-во столбцов в таблице
-#     if tb == 1:
-#         column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-#         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) # кол-во наваний должно совпадать со списком столбцов
-#         columns_list = ['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'] # кол-во наваний должно совпадать со списком столбцов
-#     elif tb == 2:
-#         # column_count = [1, 2, 3, 7, 9, 10, 13, 15, 16]
-#         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) 
-#         columns_list = (['id','Фамилия Имя', 'Регион', 'Группа', 'Место в гр', 'ПФ', 'Место ПФ', 'Финал', 'Место в финале']) # кол-во наваний должно совпадать со списком столбцов
-#     elif tb == 3:
-#         # column_count = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-#         columns_list = ['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']
-#         # model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки', 'Общ. счет', 'Счет в партиях']) # кол-во наваний должно совпадать со списком столбцов
-#     elif tb == 6:
-#         index = my_win.comboBox_choice_R.currentIndex()
-#         if index == 0:
-#             # column_count = [0, 1, 2, 3, 4, 5, 6, 7]
-#             model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город', 'Субъект РФ', 'Округ']) # кол-во наваний должно совпадать со списком столбцов
-#         else:
-#             # column_count = [0, 1, 2, 3, 4, 5]
-#             model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия, Имя', 'Дата рождения', 'Город']) # кол-во наваний должно совпадать со списком столбцов
-#     if tb == 1:
-#         if my_win.checkBox_15.isChecked():
-#             my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
-#         else:
-#             my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
-#         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) 
-#     elif tb == 3:
-#         my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
-#         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) # 
-#     else:
-#         my_win.tableView.setSelectionMode(QAbstractItemView.NoSelection) # нет выделение строк по клику мышью
-
-#     if tb == 6:
-#         if row_count > 0:
-#             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
-#         else:
-#             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
-#     # создание  data (списка списков)
-#     # ===== old ====
-
-#     # ===========
-#     # if row_count != 0:  # список удаленных игроков пуст если R = 0
-#     #     for row in range(row_count):  # добавляет данные из базы в TableWidget
-#     #         # for column in range(0, column_count):
-#     #         for column in column_count:
-#     #             if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-#     #                 coach_id = str(list(player_selected[row].values())[column])
-#     #                 coach = Coach.get(Coach.id == coach_id)
-#     #                 item = coach.coach
-#     #             else:
-#     #                 item = str(list(player_selected[row].values())[column])
-#     #             # Установить текстовое значение каждой позиции
-#     #             data_table_tmp.append(item)
-#     #         data.append(data_table_tmp.copy())
-#     #         data_table_tmp.clear()
-#     #     model = MyTableModel(data)
-
-
-#     #     data = pd.DataFrame(data, columns = ['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'])
-
-#         # for row in range(row_count):  # добавляет данные из базы в TableWidget
-#         #     for column in range(len(columns_list)):
-#         #         if tb == 1:
-#         #             if column == 7 and tb != 6:  # преобразует id тренера в фамилию
-#         #                 coach_id = str(list(player_selected[row].values())[column])
-#         #                 coach = Coach.get(Coach.id == coach_id)
-#         #                 item = coach.coach
-#         #             else:
-#         #                 item = str(list(player_selected[row].values())[column])
-#         #         else:
-#         #             item = str(list(player_selected[row].values())[column])
-#         #         data_table_tmp.append(item)
-#         #     data_tbl[row] = data_table_tmp.copy() 
-#         #     data_table_tmp.clear()   
-
-# # ======
-# #  словарь со название столбцов
-#         col = 0
-#         for column in columns_list:
-#             for row in range(row_count):                
-#                 if tb == 1:
-#                     if col == 7 and tb != 6:  # преобразует id тренера в фамилию
-#                         coach_id = str(list(player_selected[row].values())[col])
-#                         coach = Coach.get(Coach.id == coach_id)
-#                         item = coach.coach
-#                     else:
-#                         item = str(list(player_selected[row].values())[col])
-#                 else:
-#                     item = str(list(player_selected[row].values())[col])
-#                 data_table_tmp.append(item)
-#             data_tbl[column] = data_table_tmp.copy() 
-#             data_table_tmp.clear()
-#             col += 1 
-# # # =======
-
-#         data = pd.DataFrame(data_tbl)
-
-#         # df = pd.DataFrame(data_tbl)
-#         # df.columns = columns_list
-#         model = MyTableModel(data)
-#         # model.setHorizontalHeaderLabels(['Фамилия имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 't'])
-#         my_win.tableView.setModel(model)
-
-#         font = my_win.tableView.font()
-#         font.setPointSize(11)
-#         my_win.tableView.setFont(font)
-#         my_win.tableView.verticalHeader().setDefaultSectionSize(22) # высота строки 20 пикселей
-#         my_win.tableView.horizontalHeader().setStretchLastSection(True)
-#         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
-#         my_win.tableView.resizeColumnsToContents()
-
-#     else:
-#         # вставляет в таблицу необходимое кол-во строк
-#         my_win.statusbar.showMessage(
-#              "Удаленных участников соревнований нет", 10000)
-#     end = time.time()
-#     total = start - end
-#     print("fill_table выполнялась за", "%.2f" %total)
 
 
 def fill_table_R_list():
@@ -2415,8 +2282,8 @@ def page():
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 240, 841, 552))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 231))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 240, 841, 511))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 251))
         my_win.comboBox_referee.setPlaceholderText("Введите фамилию судьи")
         my_win.comboBox_referee.setCurrentIndex(-1)
         my_win.comboBox_referee.setEditable(True)
@@ -2440,7 +2307,6 @@ def page():
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
         list_player_pdf(player_list)
-        # my_win.tableView.show()
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 308, 841, 471))
@@ -2615,9 +2481,12 @@ def page():
             my_win.Button_system_made.setEnabled(False)
             my_win.label_33.setText(f"Всего {total_game} игр")
             my_win.label_33.show()
-        player_list = Choice.select().where(Choice.title_id == title_id())
+            # сделать правильную сортировку по группам
+        if my_win.radioButton_gr_sort.isChecked():
+            player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_group, Choice.group)
+        elif my_win.radioButton_sf_sort.isChecked():
+            player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_semifinal_group, Choice.sf_group)
         fill_table(player_list)
-        # my_win.tableView.show()
     elif tb == 3:  # вкладка -группы-
         stage = "Предварительный"
         Button_view_group = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
@@ -2864,7 +2733,7 @@ def find_player_on_tab_system():
 
 
 def sort():
-    """сортировка таблицы QtableWidget (по рейтингу или по алфавиту)"""
+    """сортировка таблицы QtableView (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
@@ -2897,7 +2766,7 @@ def sort():
     # elif sender == my_win.Button_sort_rejting_in_R:
     #     player_list = r_data.select().order_by(rejting_list.desc())
 
-    # fill_table(player_list)
+    fill_table(player_list)
     if sender in signal_button_list:
         list_player_pdf(player_list)
 

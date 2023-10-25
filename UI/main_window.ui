@@ -4178,7 +4178,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4724,7 +4724,7 @@
       <property name="geometry">
        <rect>
         <x>23</x>
-        <y>300</y>
+        <y>250</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -4747,7 +4747,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>320</y>
+        <y>270</y>
         <width>216</width>
         <height>85</height>
        </rect>
@@ -4998,7 +4998,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>420</y>
+        <y>445</y>
         <width>211</width>
         <height>20</height>
        </rect>
@@ -5020,10 +5020,78 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>445</y>
+        <y>470</y>
         <width>221</width>
         <height>21</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>380</y>
+        <width>216</width>
+        <height>45</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QRadioButton" name="radioButton_gr_sort">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>1</y>
+         <width>81</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Группы</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_sf_sort">
+       <property name="geometry">
+        <rect>
+         <x>2</x>
+         <y>21</y>
+         <width>151</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Полуфиналы</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QLabel" name="label_28">
+      <property name="geometry">
+       <rect>
+        <x>23</x>
+        <y>355</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>14</pointsize>
+        <weight>50</weight>
+        <italic>true</italic>
+        <bold>false</bold>
+        <underline>true</underline>
+       </font>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Сортировка по месту&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </widget>
