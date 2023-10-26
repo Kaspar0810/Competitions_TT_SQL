@@ -1774,7 +1774,6 @@ def fill_table(player_list):
           
 
             data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
-
         my_win.tableView.setModel(model)
         font = my_win.tableView.font()
         font.setPointSize(11)
@@ -1801,7 +1800,7 @@ def fill_table(player_list):
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
 
     my_win.tableView.show()
-
+ 
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
@@ -3134,9 +3133,31 @@ def view():
     """просмотр PDF файлов средствами OS"""
     from sys import platform
     sender = my_win.sender()
+    made_pdf_table_for_view(sender)
     t_id = Title.get(Title.id == title_id())
     tab = my_win.tabWidget.currentIndex()
     short_name = t_id.short_name_comp
+    # ===== просмотр тольк при вызове
+    # sys = System.select().where(System.title_id == title_id())
+    # if tab == 3: # группы
+    #     stage = "Предварительный"
+    #     system = sys.select().where(System.stage == stage).get()
+    #     pv = system.page_vid
+    #     table_made(pv, stage)
+    # elif tab == 4: # полуфиналы
+    #     if row_num == -1:
+    #         stage = "1-й полуфинал"
+    #     else:
+    #         id_res = my_win.tableView.model().index(row_num, 0).data() #  данные ячейки (из какого финала играют встречу)
+    #         result = Result.select().where(Result.id == id_res).get()
+    #         stage = result.system_stage
+    # else:  # финальный
+    #     if fin == "1 группа":
+    #         stage = "Одна таблица"
+    #     else:
+    #         stage = fin
+    # находит system id последнего
+    #===========
     if sender == my_win.view_all_comp_Action: # просмотр полных соревнований в каталоге /competition_pdf
         catalog = 2
         change_dir(catalog)
@@ -4884,10 +4905,84 @@ def enter_score(none_player=0):
     for line in line_edit_list:
             line.clear()
     # ===== вызов функции заполнения таблицы pdf группы сыгранными играми
-    if stage == "Одна таблица":
-        system = sys.select().where(System.stage == stage).get()
-    else:
-        system = sys.select().where(System.stage == fin).get()
+    # if stage == "Одна таблица":
+    #     system = sys.select().where(System.stage == stage).get()
+    # else:
+    #     system = sys.select().where(System.stage == fin).get()
+
+    # if system.stage == "Предварительный":
+    #     pv = system.page_vid
+    #     table_made(pv, stage)
+    # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+    #     pv = system.page_vid
+    #     table_made(pv, stage)
+    # elif system.stage == "Одна таблица" or system.stage == fin:
+    #     if system.type_table == "круг":
+    #         pv = system.page_vid
+    #         table_made(pv, stage)
+    #     else:
+    #         system_table = system.label_string
+    #         pv = system.page_vid
+    #         if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
+    #             setka_8_full_made(fin)
+    #         elif system_table == "Сетка (-2) на 8 участников":
+    #             setka_8_2_made(fin)
+    #         elif system_table == "Сетка (с розыгрышем всех мест) на 16 участников":
+    #             setka_16_full_made(fin)
+    #         elif system_table == "Сетка (-2) на 16 участников":
+    #             setka_16_2_made(fin)
+    #         elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
+    #             setka_32_full_made(fin)
+    #         elif system_table == "Сетка (-2) на 32 участников":
+    #             setka_32_2_made(fin)
+    #         elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
+    #             setka_32_made(fin)    
+def made_pdf_table_for_view(sender):
+    """вызов функции заполнения таблицы pdf группы сыгранными играми"""
+    # sender = my_win.sender()
+    tab = my_win.tabWidget.currentIndex()
+    sys = System.select().where(System.title_id == title_id())
+    if sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
+        stage = "Предварительный"
+    elif sender == my_win.view_fin1_Action:
+        stage == "1-й финал"
+        fin = stage
+    elif sender == my_win.view_fin2_Action:
+        stage == "2-й финал"
+        fin = stage
+    elif sender == my_win.view_fin3_Action:
+        stage == "3-й финал"
+        fin = stage
+    elif sender == my_win.view_fin4_Action:
+        stage == "4-й финал"
+        fin = stage
+    elif sender == my_win.view_one_table_Action:
+        stage = "Одна таблица"
+    elif sender == my_win.view_pf1_Action:
+        stage = "1-й полуфинал"
+    elif sender == my_win.view_pf2_Action:
+        stage = "2-й полуфинал"
+
+    # if tab == 3: # группы
+    #     stage = "Предварительный"
+    # elif tab == 4: # полуфиналы
+    #     if row_num == -1:
+    #         stage = "1-й полуфинал"
+    #     else:
+    #         id_res = my_win.tableView.model().index(row_num, 0).data() #  данные ячейки (из какого финала играют встречу)
+    #         result = Result.select().where(Result.id == id_res).get()
+    #         stage = result.system_stage
+    # else:  # финальный
+    #     if fin == "1 группа":
+    #         stage = "Одна таблица"
+    #     else:
+    #         stage = fin
+
+    # if stage == "Одна таблица":
+    #     system = sys.select().where(System.stage == stage).get()
+    # else:
+    #     system = sys.select().where(System.stage == fin).get()
+    system = sys.select().where(System.stage == stage).get()
     if system.stage == "Предварительный":
         pv = system.page_vid
         table_made(pv, stage)
@@ -4915,8 +5010,7 @@ def enter_score(none_player=0):
                 setka_32_2_made(fin)
             elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
                 setka_32_made(fin)    
-        # filter_fin()
-    
+
 
 def setka_type(none_player):
     """сетка ставит очки в зависимости от неявки игрока, встреча состоялась ли пропуск встречи -bye-"""
@@ -8912,9 +9006,13 @@ def load_name_net_after_choice_for_wiev(fin):
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
+    start_time = time.time()
     from reportlab.platypus import Table
     system = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()  # находит system id последнего
     type_tbl = system.type_table
+    titles = Title.select().where(Title.id == title_id()).get()
+    sex = titles.gamer
+
     # =========
     # styles = getSampleStyleSheet()
     # styleN = styles['Normal']
@@ -9125,10 +9223,12 @@ def table_made(pv, stage):
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
     doc.bottomMargin = 1.6 * cm
-    elements.insert(0, (Paragraph("Предварительный этап", h1)))
+    elements.insert(0, (Paragraph(f"Предварительный этап.{sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
- 
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"Время выполнения: {execution_time} секунд")
 
 def list_regions_pdf():
     """список субъектов РФ"""
@@ -11101,7 +11201,6 @@ def score_in_table(td, num_gr):
 
     if a == count_game:
         rank_in_group(total_score, td, num_gr, stage)  # определяет места в группе
-
     return td_color
 
 
