@@ -3137,27 +3137,7 @@ def view():
     t_id = Title.get(Title.id == title_id())
     tab = my_win.tabWidget.currentIndex()
     short_name = t_id.short_name_comp
-    # ===== просмотр тольк при вызове
-    # sys = System.select().where(System.title_id == title_id())
-    # if tab == 3: # группы
-    #     stage = "Предварительный"
-    #     system = sys.select().where(System.stage == stage).get()
-    #     pv = system.page_vid
-    #     table_made(pv, stage)
-    # elif tab == 4: # полуфиналы
-    #     if row_num == -1:
-    #         stage = "1-й полуфинал"
-    #     else:
-    #         id_res = my_win.tableView.model().index(row_num, 0).data() #  данные ячейки (из какого финала играют встречу)
-    #         result = Result.select().where(Result.id == id_res).get()
-    #         stage = result.system_stage
-    # else:  # финальный
-    #     if fin == "1 группа":
-    #         stage = "Одна таблица"
-    #     else:
-    #         stage = fin
-    # находит system id последнего
-    #===========
+
     if sender == my_win.view_all_comp_Action: # просмотр полных соревнований в каталоге /competition_pdf
         catalog = 2
         change_dir(catalog)
@@ -3167,7 +3147,6 @@ def view():
         change_dir(catalog)
         if sender == my_win.view_list_Action:
             view_sort = ["По алфавиту", "По рейтингу", "По месту"]
-            # if tab != 1:
             view_sort, ok = QInputDialog.getItem(
                         my_win, "Сортировка", "Выберите вид сортировки,\n просмотра списка участников.", view_sort, 0, False)
             if view_sort == "По рейтингу":
@@ -3197,6 +3176,14 @@ def view():
             view_file = f"{short_name}_3-final.pdf"
         elif sender == my_win.view_fin4_Action:
             view_file = f"{short_name}_4-final.pdf"
+        elif sender == my_win.view_fin5_Action:
+            view_file = f"{short_name}_5-final.pdf"
+        elif sender == my_win.view_fin6_Action:
+            view_file = f"{short_name}_6-final.pdf"
+        elif sender == my_win.view_fin7_Action:
+            view_file = f"{short_name}_7-final.pdf"
+        elif sender == my_win.view_fin8_Action:
+            view_file = f"{short_name}_8-final.pdf"
         elif sender == my_win.view_one_table_Action:
             view_file = f"{short_name}_one_table.pdf"
         elif sender == my_win.view_pf1_Action:
@@ -3225,18 +3212,6 @@ def view():
     elif platform == "win32":  # Windows...
         os.system(f"{view_file}")
     os.chdir("..")
- 
-
-# def real_view_group():
-#     """просмотр групп из вкладки группы"""
-#     sys = System.select().where(System.title_id == title_id())  
-#     tab = my_win.tabWidget.currentIndex()
-#     if tab == 3:
-#         stage = "Предварительный"
-#         system = sys.select().where(System.stage == stage).get()
-#         pv = system.page_vid
-#     table_made(pv, stage)
-#     view()
 
 
 def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
@@ -4634,8 +4609,10 @@ def score_in_game():
                     sum_total_game[0] = max_game
                     sum_total_game[1] = max_score
             elif flag is False:
-                # желательно сюда ввести чтобы фокус ставился на туже ячейку
                 sum_total_game = []
+                return sum_total_game
+                # желательно сюда ввести чтобы фокус ставился на туже ячейку
+
     return sum_total_game
 
 
@@ -4904,84 +4881,56 @@ def enter_score(none_player=0):
                           my_win.lineEdit_pl1_score_total_fin, my_win.lineEdit_pl2_score_total_fin]
     for line in line_edit_list:
             line.clear()
-    # ===== вызов функции заполнения таблицы pdf группы сыгранными играми
-    # if stage == "Одна таблица":
-    #     system = sys.select().where(System.stage == stage).get()
-    # else:
-    #     system = sys.select().where(System.stage == fin).get()
 
-    # if system.stage == "Предварительный":
-    #     pv = system.page_vid
-    #     table_made(pv, stage)
-    # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-    #     pv = system.page_vid
-    #     table_made(pv, stage)
-    # elif system.stage == "Одна таблица" or system.stage == fin:
-    #     if system.type_table == "круг":
-    #         pv = system.page_vid
-    #         table_made(pv, stage)
-    #     else:
-    #         system_table = system.label_string
-    #         pv = system.page_vid
-    #         if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
-    #             setka_8_full_made(fin)
-    #         elif system_table == "Сетка (-2) на 8 участников":
-    #             setka_8_2_made(fin)
-    #         elif system_table == "Сетка (с розыгрышем всех мест) на 16 участников":
-    #             setka_16_full_made(fin)
-    #         elif system_table == "Сетка (-2) на 16 участников":
-    #             setka_16_2_made(fin)
-    #         elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
-    #             setka_32_full_made(fin)
-    #         elif system_table == "Сетка (-2) на 32 участников":
-    #             setka_32_2_made(fin)
-    #         elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
-    #             setka_32_made(fin)    
+
 def made_pdf_table_for_view(sender):
     """вызов функции заполнения таблицы pdf группы сыгранными играми"""
-    # sender = my_win.sender()
     tab = my_win.tabWidget.currentIndex()
     sys = System.select().where(System.title_id == title_id())
     if sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
         stage = "Предварительный"
+        my_win.tabWidget.setCurrentIndex(3)
     elif sender == my_win.view_fin1_Action:
         stage == "1-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin2_Action:
         stage == "2-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin3_Action:
         stage == "3-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin4_Action:
         stage == "4-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
+        fin = stage
+    elif sender == my_win.view_fin5_Action:
+        stage == "5-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
+        fin = stage
+    elif sender == my_win.view_fin6_Action:
+        stage == "6-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
+        fin = stage
+    elif sender == my_win.view_fin7_Action:
+        stage == "7-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
+        fin = stage
+    elif sender == my_win.view_fin8_Action:
+        stage == "8-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_one_table_Action:
         stage = "Одна таблица"
     elif sender == my_win.view_pf1_Action:
         stage = "1-й полуфинал"
+        my_win.tabWidget.setCurrentIndex(4)
     elif sender == my_win.view_pf2_Action:
         stage = "2-й полуфинал"
+        my_win.tabWidget.setCurrentIndex(4)
 
-    # if tab == 3: # группы
-    #     stage = "Предварительный"
-    # elif tab == 4: # полуфиналы
-    #     if row_num == -1:
-    #         stage = "1-й полуфинал"
-    #     else:
-    #         id_res = my_win.tableView.model().index(row_num, 0).data() #  данные ячейки (из какого финала играют встречу)
-    #         result = Result.select().where(Result.id == id_res).get()
-    #         stage = result.system_stage
-    # else:  # финальный
-    #     if fin == "1 группа":
-    #         stage = "Одна таблица"
-    #     else:
-    #         stage = fin
-
-    # if stage == "Одна таблица":
-    #     system = sys.select().where(System.stage == stage).get()
-    # else:
-    #     system = sys.select().where(System.stage == fin).get()
     system = sys.select().where(System.stage == stage).get()
     if system.stage == "Предварительный":
         pv = system.page_vid
