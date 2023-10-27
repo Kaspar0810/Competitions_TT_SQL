@@ -3924,25 +3924,33 @@ def select_player_in_game():
         my_win.checkBox_10.setEnabled(True)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
-        # numer_game = my_win.tableView.item(row_num, 3).text()
-        # my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
+        my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
         state_visible = change_status_visible_and_score_game()
-        data_list = []
-        for idx in my_win.tableView.selectionModel().selectedIndexes():
-            row_num = idx.row()
-            col_num = idx.column()
-            data = my_win.tableView.model().index(row_num, col_num).data()
-            data_list.append(data)
+        # data_list = []
+        # for idx in my_win.tableView.selectionModel().selectedIndexes():
+        row_num = my_win.tableView.currentIndex().row() # номер выделенной строки
+        # row_num = idx.row()
+            # col_num = idx.column()
+            # data = my_win.tableView.model().index(row_num, col_num).data()
+        pl1 = my_win.tableView.model().index(row_num, 4).data()
+        pl2 = my_win.tableView.model().index(row_num, 5).data()
+        pl_win = my_win.tableView.model().index(row_num, 6).data()
+        win_pole = my_win.tableView.model().index(row_num, 7).data()
+        sc = my_win.tableView.model().index(row_num, 8).data()
+        # data6 = my_win.tableView.model().index(row_num, 6).data()
+            
+        # data_list = [data1, data2, data3, data4, data5]
 
-        sc = data_list[8]
-        pl1 = data_list[4]
-        pl2 = data_list[5]
-        win_pole = data_list[7]
+        # sc = data_list[8]
+        # pl1 = data_list[4]
+        # pl2 = data_list[5]
+        # win_pole = data_list[7]
 
         if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
-            if pl1 == data_list[6]:
+            # if pl1 == data_list[6]:
+            if pl1 == pl_win:
                 # если в сетке недостающие игроки (bye), то нет счета
                 if sc != "":
                     sc1 = sc[0]
@@ -4658,7 +4666,7 @@ def control_winner_player(winner, loser):
     if total_game_win < 5 or total_game_los < 5: # если еще сыграно мало игр и определяем по разности рейтинга
         if r_win - r_los > 0:
             flag = True
-        elif abs(r_los - r_win) < 15:
+        elif abs(r_los - r_win) < 30:
             flag = True 
         else:
             flag = False      
