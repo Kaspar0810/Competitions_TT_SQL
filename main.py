@@ -3924,32 +3924,19 @@ def select_player_in_game():
         my_win.checkBox_10.setEnabled(True)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
-        my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
+        # numer_game = my_win.tableView.item(row_num, 3).text()
+        # my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
         state_visible = change_status_visible_and_score_game()
-        # data_list = []
-        # for idx in my_win.tableView.selectionModel().selectedIndexes():
-        row_num = my_win.tableView.currentIndex().row() # номер выделенной строки
-        # row_num = idx.row()
-            # col_num = idx.column()
-            # data = my_win.tableView.model().index(row_num, col_num).data()
+        row_num= my_win.tableView.currentIndex().row() # определиние номера строки
         pl1 = my_win.tableView.model().index(row_num, 4).data()
         pl2 = my_win.tableView.model().index(row_num, 5).data()
         pl_win = my_win.tableView.model().index(row_num, 6).data()
         win_pole = my_win.tableView.model().index(row_num, 7).data()
         sc = my_win.tableView.model().index(row_num, 8).data()
-        # data6 = my_win.tableView.model().index(row_num, 6).data()
-            
-        # data_list = [data1, data2, data3, data4, data5]
-
-        # sc = data_list[8]
-        # pl1 = data_list[4]
-        # pl2 = data_list[5]
-        # win_pole = data_list[7]
 
         if win_pole != "None" and win_pole != "":  # если встреча сыграна, то заполняет поля общий счет
-            # if pl1 == data_list[6]:
             if pl1 == pl_win:
                 # если в сетке недостающие игроки (bye), то нет счета
                 if sc != "":
@@ -4480,8 +4467,8 @@ def score_in_game():
     ts2 = []
     total_game = []
     sum_total_game = []
-    idx = my_win.tableView.currentIndex() # определиние номера строки
-    row_num = idx.row()
+    row_num = my_win.tableView.currentIndex().row() # определиние номера строки
+    # row_num = idx.row()
 
     tab = my_win.tabWidget.currentIndex()
     s11 = s21 = s12 = s22 = s13 = s23 = s14 = s24 = s15 = s25 = s16 = s26 = s17 = s27 = 0
@@ -4550,21 +4537,16 @@ def score_in_game():
         s27 = my_win.lineEdit_pl2_s7_fin.text()
     if sf == 3:
         total_score = [s11, s21, s12, s22, s13, s23]
+        max_game = 2
     elif sf == 5:
         total_score = [s11, s21, s12, s22, s13, s23, s14, s24, s15, s25]
+        max_game = 3
     elif sf == 7:
         total_score = [s11, s21, s12, s22, s13, s23, s14, s24, s15, s25, s16, s26, s17, s27]
-
+        max_game = 4
     point = 0
 
     n = len(total_score)
-    #  максимальное кол-во партий
-    if sf == 3:
-        max_game = 2
-    elif sf == 5:
-        max_game = 3
-    elif sf == 7:
-        max_game = 4
 
     for i in range(0, n, 2):
         if total_score[i] != "":
@@ -4620,7 +4602,6 @@ def score_in_game():
                 sum_total_game = []
                 return sum_total_game
                 # желательно сюда ввести чтобы фокус ставился на туже ячейку
-
     return sum_total_game
 
 
@@ -4666,7 +4647,7 @@ def control_winner_player(winner, loser):
     if total_game_win < 5 or total_game_los < 5: # если еще сыграно мало игр и определяем по разности рейтинга
         if r_win - r_los > 0:
             flag = True
-        elif abs(r_los - r_win) < 30:
+        elif abs(r_los - r_win) < 15:
             flag = True 
         else:
             flag = False      
@@ -4721,16 +4702,13 @@ def check_real_player():
 def enter_score(none_player=0):
     """заносит в таблицу -результаты- победителя, счет и т.п. sc_total [партии выигранные, проигранные, очки победителя
      очки проигравшего]"""
-    data_list = []
     tab = my_win.tabWidget.currentIndex()
-    for idx in my_win.tableView.selectionModel().selectedIndexes():
-        row_num = idx.row()
-        col_num = idx.column()
-        data = my_win.tableView.model().index(row_num, col_num).data() # данные ячейки tableView
-        data_list.append(data)
-    id = data_list[0]
-    num_game = data_list[3]
-    fin = data_list[2]
+    row_num = my_win.tableView.currentIndex().row()
+    id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
+    # fin = my_win.tableView.model().index(row_num, 1).data() # данные ячейки tableView
+    fin = my_win.tableView.model().index(row_num, 2).data() # данные ячейки tableView
+    num_game = my_win.tableView.model().index(row_num, 3).data() # данные ячейки tableView
+
     sys = System.select().where(System.title_id == title_id())   
     if tab == 3: # группы
         stage = "Предварительный"
@@ -4780,7 +4758,7 @@ def enter_score(none_player=0):
             pl1 = my_win.lineEdit_player1_fin.text()
             pl2 = my_win.lineEdit_player2_fin.text()
     # ======= 
-        if none_player == 0:
+        if none_player == 0: # встреча состоялась
             if st1 > st2:
                 winner = pl1
                 loser = pl2
@@ -4868,7 +4846,7 @@ def enter_score(none_player=0):
                           my_win.lineEdit_pl1_s5_gr, my_win.lineEdit_pl2_s5_gr, my_win.lineEdit_pl1_s6_gr, my_win.lineEdit_pl2_s6_gr,
                           my_win.lineEdit_pl1_s7_gr, my_win.lineEdit_pl2_s7_gr, my_win.lineEdit_player1_gr,  my_win.lineEdit_player2_gr,
                           my_win.lineEdit_pl1_score_total_gr, my_win.lineEdit_pl2_score_total_gr]
-        fin = data_list[1]
+        # fin = data_list[1]
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
         filter_gr()
@@ -4878,7 +4856,7 @@ def enter_score(none_player=0):
                           my_win.lineEdit_pl1_s5_pf, my_win.lineEdit_pl2_s5_pf, my_win.lineEdit_pl1_s6_pf, my_win.lineEdit_pl2_s6_pf,
                           my_win.lineEdit_pl1_s7_pf, my_win.lineEdit_pl2_s7_pf, my_win.lineEdit_player1_pf,  my_win.lineEdit_player2_pf,
                           my_win.lineEdit_pl1_score_total_pf, my_win.lineEdit_pl2_score_total_pf]
-        fin = data_list[1]
+        # fin = data_list[1]
         my_win.checkBox_12.setChecked(False)
         my_win.checkBox_13.setChecked(False)
     elif tab == 5:
@@ -8428,11 +8406,23 @@ def max_exit_player_out_in_group(exit_stage):
 
 def no_play():
     """победа по неявке соперника"""
-    sender = my_win.sender()
-    if sender == my_win.checkBox_7 or sender == my_win.checkBox_9 or sender == my_win.checkBox_12:
-        none_player = 1 # не явился на встречу 1-й игрок
-    else:
-        none_player = 2
+    tb = my_win.tabWidget.currentIndex()
+    check_gr_pl1 = my_win.checkBox_7.isChecked() 
+    check_gr_pl2 = my_win.checkBox_8.isChecked()
+    check_sf_pl1 = my_win.checkBox_9.isChecked() 
+    check_sf_pl2 = my_win.checkBox_10.isChecked()
+    check_fin_pl1 = my_win.checkBox_11.isChecked() 
+    check_fin_pl2 = my_win.checkBox_12.isChecked()
+    if tb == 3:
+        if check_gr_pl1 is False and check_gr_pl2 is False:
+            return
+    elif tb == 4:
+        if check_sf_pl1 is False and check_sf_pl2 is False:
+            return
+    elif tb == 5:
+        if check_fin_pl1 is False and check_fin_pl2 is False:
+            return
+    none_player = 1 if check_gr_pl1 is True or check_sf_pl1 is True or check_fin_pl1 is True else 2
     enter_score(none_player)
 
 
