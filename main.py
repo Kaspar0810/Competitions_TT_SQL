@@ -11095,6 +11095,8 @@ def score_in_table(td, num_gr):
                 tp1 = str(list(result_list[i].values())[7])
                 # очки 2-ого игрока
                 tp2 = str(list(result_list[i].values())[11])
+                tp1 = 0 if tp1 == "" else str(list(result_list[i].values())[7])
+                tp2 = 0 if tp2 == "" else str(list(result_list[i].values())[11])
                 # считывает из словаря 1-ого игрока всего очков
                 plr1 = total_score[p1]
                 # считывает из словаря 2-ого игрока всего очков
@@ -11118,6 +11120,8 @@ def score_in_table(td, num_gr):
                 tp1 = str(list(result_list[i].values())[11])
                 # очки 2-ого игрока
                 tp2 = str(list(result_list[i].values())[7])
+                tp1 = 0 if tp1 == "" else str(list(result_list[i].values())[11])
+                tp2 = 0 if tp2 == "" else str(list(result_list[i].values())[7])
                 # считывает из словаря 1-ого игрока очки
                 plr1 = total_score[p1]
                 # считывает из словаря 2-ого игрока очки
@@ -11367,7 +11371,33 @@ def rank_in_group(total_score, td, num_gr, stage):
     #     game_list_group = game_list.select().where(Game_list.system_id == id_system)
     #     game_max = result.select().where(Result.system_id == system_id)  # сколько всего игр в финале по кругу
     #     max_person = len(game_list_group)
+    # ======== проверка на неявку ======
+    fio_no_player = []
+    game_not_player = game_max.select().where(Result.points_loser == 0)
+    count_not_player = len(game_not_player)
+    if count_not_player != 0:
+        for k in game_not_player:
+            pl = k.points_loser
+            if pl == 0:
+                player_no = k.loser
+                if player_no not in fio_no_player:
+                    fio_no_player.append(player_no)
+                    
+        for fio in fio_no_player:
+            fio_loser = game_not_player.select().where(Result.loser == fio)
+            count_fio_loser = len(fio_loser)
 
+            game_one_person = max_person // 2
+            if count_fio_loser >= game_one_person: # игры по неявке более 50%
+                # player_no = fio_loser.loser
+                game_id_not_player = game_not_player.select().where(Result.loser == fio)
+                for game_id in game_id_not_player:
+                    game_id.points_win = ""
+                    game_id.points_loser = ""
+                    game_id.save()
+            # print(count_not_player)
+
+    # ===========================================
     # 1-й запрос на выборку с группой
     game_played = game_max.select().where((Result.winner is None) | (Result.winner != ""))  # 2-й запрос на выборку
     # с победителями из 1-ого запроса
