@@ -3757,78 +3757,6 @@ def visible_field():
     return state_visible
 
 
-# def visible_field():
-#     """включает или выключает поля для ввода счета, state - игра со счетом, True если включить поля для счета"""
-#     sender = my_win.sender()
-#     system = System.select().where(System.title_id == title_id())
-#     # ==== текущее состояние радиокнопок и чекбокса кол-во партий и ввод счета =====
-#     tab = my_win.tabWidget.currentIndex()
-#     r = my_win.tableWidget.currentRow()
-#     flag = 0
-
-#     if r == -1 and flag == 0: # если просто открыта вкладка устанавливает значения по умолчанию
-#         state_visible_current = True
-#         state_visible = state_visible_current
-#         if tab == 3:
-#             state_visible = change_status_visible_and_score_game()
-#             flag = 1
-#             my_win.checkBox_4.setChecked(state_visible)
-#         elif tab == 4:
-#             state_visible = change_status_visible_and_score_game()
-#             flag = 1
-#             my_win.checkBox_14.setChecked(state_visible)
-#         else:
-#             # устанавливает начальное значение - со счетом ищ 5-ти партий
-#             stage = "все финалы"
-#             my_win.checkBox_5.setChecked(True)
-#             my_win.radioButton_match_6.setChecked(True)
-#     elif r != -1: # если двойной клик по встрече игроков
-#         if tab == 3:
-#             my_win.checkBox_4.setEnabled(True)
-#             stage = "Предварительный" # из какого финала играют встречу
-#         elif tab == 4:
-#             my_win.checkBox_14.setEnabled(True)
-            
-#         else:
-#             state_visible = my_win.checkBox_5.isChecked()
-#             stage = my_win.tableWidget.item(r, 2).text() # из какого финала играют встречу
-#             # то что записано в базе на данный финал (из скольки партий и игра со счетом)
-#         system_stage = system.select().where(System.stage == stage).get()
-#         match_db = system_stage.score_flag
-#         state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-#         state_visible = state_visible_db
-#         change_status_visible_and_score_game()
-#         # ======= записывает изменение в базу данных
-#         if state_visible != state_visible_db:
-#             with db:
-#                 system_stage.visible_game = state_visible
-#                 system_stage.save()
-
-#         state_visible = state_visible_db
-#     if sender == my_win.checkBox_4 or sender == my_win.checkBox_14 or sender == my_win.checkBox_5: # изменяет состояние чекбокса игра со счетом или нет
-#         if tab == 3:
-#             state_visible = my_win.checkBox_4.isChecked()
-#             if state_visible is True:
-#                 my_win.lineEdit_pl1_s1_gr.setFocus()
-#             else:
-#                 my_win.lineEdit_pl1_gr_score_total.setFocus()
-#         elif tab == 4:
-#             state_visible = my_win.checkBox_14.isChecked()
-#             if state_visible is True:
-#                 my_win.lineEdit_pl1_s1_pf.setFocus()
-#             else:
-#                 my_win.lineEdit_pl1_pf_score_total.setFocus()
-#         else:
-#             state_visible = my_win.checkBox_5.isChecked()
-#             if state_visible is True:
-#                 my_win.lineEdit_pl1_s1_fin.setFocus()
-#             else:
-#                 my_win.lineEdit_pl1_score_total_fin.setFocus()
-#     change_status_visible_and_score_game()
- 
-#     return state_visible
-
-
 def select_player_in_list():
     """выводит данные игрока в поля редактирования или удаления"""
     data_list = []
@@ -3925,7 +3853,7 @@ def select_player_in_game():
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
         # numer_game = my_win.tableView.item(row_num, 3).text()
-        # my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
+        my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
         state_visible = change_status_visible_and_score_game()
@@ -4468,7 +4396,6 @@ def score_in_game():
     total_game = []
     sum_total_game = []
     row_num = my_win.tableView.currentIndex().row() # определиние номера строки
-    # row_num = idx.row()
 
     tab = my_win.tabWidget.currentIndex()
     s11 = s21 = s12 = s22 = s13 = s23 = s14 = s24 = s15 = s25 = s16 = s26 = s17 = s27 = 0
@@ -4705,7 +4632,6 @@ def enter_score(none_player=0):
     tab = my_win.tabWidget.currentIndex()
     row_num = my_win.tableView.currentIndex().row()
     id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
-    # fin = my_win.tableView.model().index(row_num, 1).data() # данные ячейки tableView
     fin = my_win.tableView.model().index(row_num, 2).data() # данные ячейки tableView
     num_game = my_win.tableView.model().index(row_num, 3).data() # данные ячейки tableView
 
@@ -4846,7 +4772,6 @@ def enter_score(none_player=0):
                           my_win.lineEdit_pl1_s5_gr, my_win.lineEdit_pl2_s5_gr, my_win.lineEdit_pl1_s6_gr, my_win.lineEdit_pl2_s6_gr,
                           my_win.lineEdit_pl1_s7_gr, my_win.lineEdit_pl2_s7_gr, my_win.lineEdit_player1_gr,  my_win.lineEdit_player2_gr,
                           my_win.lineEdit_pl1_score_total_gr, my_win.lineEdit_pl2_score_total_gr]
-        # fin = data_list[1]
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
         filter_gr()
@@ -4856,7 +4781,6 @@ def enter_score(none_player=0):
                           my_win.lineEdit_pl1_s5_pf, my_win.lineEdit_pl2_s5_pf, my_win.lineEdit_pl1_s6_pf, my_win.lineEdit_pl2_s6_pf,
                           my_win.lineEdit_pl1_s7_pf, my_win.lineEdit_pl2_s7_pf, my_win.lineEdit_player1_pf,  my_win.lineEdit_player2_pf,
                           my_win.lineEdit_pl1_score_total_pf, my_win.lineEdit_pl2_score_total_pf]
-        # fin = data_list[1]
         my_win.checkBox_12.setChecked(False)
         my_win.checkBox_13.setChecked(False)
     elif tab == 5:
@@ -9079,6 +9003,11 @@ def table_made(pv, stage):
     #  ============ создание таблиц и вставка данных =================
     h1 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
             leftIndent=center_stage, spacebefore=10, textColor="green")  # стиль параграфа ()
+
+    # styles = getSampleStyleSheet()
+    # title_style = styles['Title']
+    # title_style.textColor = colors.red
+    # title_style.fontSize = 24
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=300, spacebefore=20, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
             #========
@@ -9120,11 +9049,6 @@ def table_made(pv, stage):
                 elements.append(Paragraph(text, h2))
                 elements.append(shell_table[l][0])
                 # =======
-                # frame_list[l] = Frame(0.5 * cm, (15 - h) * cm, 29 * cm, 4 * cm, showBoundary=1) # (от левой стороны, от низа, ширина, высота прямоугольника showBoundary = 1, рамка 0- нет)
-                # frame_list[l].addFromList(shell_table[l][0], canvas)
-                # # h += 5
-                # # if h == 10:
-                # canvas.save()
         else:  # страница книжная, то таблицы размещаются обе в столбец
             for k in range(1, kg // 2 + 1):
                 for i in range(0, kg):
@@ -9143,6 +9067,8 @@ def table_made(pv, stage):
                 tmp_copy = s_tmp.copy()
                 shell_table.append(tmp_copy)
                 s_tmp.clear()
+                # # elements.insert(0, (Paragraph(f"Предварительный этап.{sex}", h1)))
+                # elements.insert(l, (Paragraph(f'группа {l + 1}', h2)))
                 elements.append(Paragraph(f'группа {l + 1}', h2))
                 elements.append(shell_table[l][0])
 
@@ -9176,6 +9102,22 @@ def table_made(pv, stage):
     end_time = time.time()
     execution_time = end_time - start_time
     print(f"Время выполнения: {execution_time} секунд")
+ # ========
+# def create_report():
+#     doc = SimpleDocTemplate("sample_report.pdf")
+     
+#     styles = getSampleStyleSheet()
+#     title_style = styles['Title']
+#     title_style.textColor = colors.red
+#     title_style.fontSize = 24
+     
+#     story = []
+#     title = Paragraph("Пример отчета", styles['Title'])
+#     story.append(title)
+     
+#     doc.build(story)
+# # ===========
+
 
 def list_regions_pdf():
     """список субъектов РФ"""
