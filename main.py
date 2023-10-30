@@ -12811,12 +12811,16 @@ def move_row_in_tablewidget():
 def made_list_referee():
     """создание списка судейской коллегии"""
     # Dialog = QInputDialg()
-    my_win.tableWidget.clear()
+    data = []
+    my_win.tableView.clear()
     my_win.radioButton_GSK.setChecked(True)
     my_win.Button_made_page_pdf.setEnabled(True)
+    model = MyTableModel(data)
+    num_columns = [0, 1, 2, 3]
+    model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]) 
     number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
-    for l in range(0, number_of_referee):
-        my_win.tableWidget.setItem(l, 0, QTableWidgetItem(str(l + 1)))
+    # for l in range(0, number_of_referee):
+    #     my_win.tableWidget.setItem(l, 0, QTableWidgetItem(str(l + 1)))
     if ok:
         title = Title.get(Title.id == title_id())
         referee = title.referee
@@ -12826,18 +12830,18 @@ def made_list_referee():
         list_referee = [referee, secretary]
         list_kategory = [kat_referee, kat_secretary]
 
-        my_win.tableWidget.setColumnCount(4) # устанавливает колво столбцов
-        my_win.tableWidget.setRowCount(number_of_referee)
-        column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
-        my_win.tableWidget.setColumnWidth(2, 10000)
-        for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
-            my_win.tableWidget.showColumn(i)
-            item = QtWidgets.QTableWidgetItem()
-            brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
-            brush.setStyle(QtCore.Qt.SolidPattern)
-            item.setForeground(brush)
-            my_win.tableWidget.setHorizontalHeaderItem(i, item)
-        my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+        # my_win.tableWidget.setColumnCount(4) # устанавливает колво столбцов
+        # my_win.tableWidget.setRowCount(number_of_referee)
+        # column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
+        # my_win.tableWidget.setColumnWidth(2, 10000)
+        # for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+        #     my_win.tableWidget.showColumn(i)
+        #     item = QtWidgets.QTableWidgetItem()
+        #     brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
+        #     brush.setStyle(QtCore.Qt.SolidPattern)
+        #     item.setForeground(brush)
+        #     my_win.tableWidget.setHorizontalHeaderItem(i, item)
+        # my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
         referee_list = []
         post_list = ["", "ССВК", "1-й кат.", "2-й кат."]
         category_list = ["","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
@@ -12845,28 +12849,30 @@ def made_list_referee():
         my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
     else:
         return
-    for k in range(0, 2):
-        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
-        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
-    for n in range(2, int(number_of_referee)): 
-        comboBox_list_post = QComboBox()
-        comboBox_list_category = QComboBox()  
-        comboBox_family_city = QComboBox()
-        referee_list = load_comboBox_referee()
+    # for k in range(0, 2):
+    #     my_win.tableView.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
+    #     my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
+    for n in range(0, int(number_of_referee)): 
+        
 
-        comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
-        comboBox_family_city.setCurrentIndex(-1)
-        comboBox_family_city.setEditable(True)
-        comboBox_list_category.addItems(category_list)
-        comboBox_list_post.addItems(post_list) 
-        comboBox_family_city.addItems(referee_list)
+        # comboBox_list_post = QComboBox()
+        # comboBox_list_category = QComboBox()  
+        # comboBox_family_city = QComboBox()
+        # referee_list = load_comboBox_referee()
 
-        my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
-        my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
-        my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)   
+        # comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
+        # comboBox_family_city.setCurrentIndex(-1)
+        # comboBox_family_city.setEditable(True)
+        # comboBox_list_category.addItems(category_list)
+        # comboBox_list_post.addItems(post_list) 
+        # comboBox_family_city.addItems(referee_list)
 
-        my_win.tableWidget.itemChanged.connect(change_on_comboBox_referee)
-        comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)
+        # my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
+        # my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
+        # my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)   
+
+        # my_win.tableWidget.itemChanged.connect(change_on_comboBox_referee)
+        # comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)
 
 
 def change_on_comboBox_referee(comboBox_family_city):
