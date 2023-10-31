@@ -523,7 +523,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 remains = all_game - playing_games
                 if remains == 0:
                     choice_semifinal_automat(stage)
+                    reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить {stage} результатами "
+                                                                            f"встреч, сыгранных в группах.",                                                                            
+                                            msg.Ok,
+                                            msg.Cancel)
+                    if reply == msg.Ok:
+                        load_playing_game_in_table_for_semifinal(stage)
+                    else:
+                        return
+                    add_open_tab(tab_page="Полуфиналы")
                     my_win.tabWidget.setCurrentIndex(4)
+                    my_win.ed_pf_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
 
             fin = select_choice_final()
@@ -6857,8 +6867,7 @@ def choice_setka(fin):
 
 def edit_group_after_draw():
     """редактирование групп после жеребьевки"""
-    group = ["-выберите группу-"]
-    player = []
+    # player = []
     sender = my_win.sender()
     my_win.tableView.setVisible(False)
     my_win.comboBox_first_group.clear()
@@ -6876,12 +6885,11 @@ def edit_group_after_draw():
 
     players = Player.select().where(Player.title_id == title_id())
     total_gr = system_group.total_group
-    for i in range(1, total_gr + 1):
-        group.append(f"{i} группа")
+    group = [f"{i} группа" for i in range(1, total_gr + 1)] # генератор списка
+    group.insert(0, "-выберите группу-")   
     my_win.comboBox_first_group.addItems(group)
     my_win.comboBox_second_group.addItems(group)
-    for k in players:
-        player.append(k.full_name)
+    player = [k.full_name for k in players]
     player.sort()
     my_win.comboBox_player_group_edit.addItems(player)
 
@@ -9067,8 +9075,6 @@ def table_made(pv, stage):
                 tmp_copy = s_tmp.copy()
                 shell_table.append(tmp_copy)
                 s_tmp.clear()
-                # # elements.insert(0, (Paragraph(f"Предварительный этап.{sex}", h1)))
-                # elements.insert(l, (Paragraph(f'группа {l + 1}', h2)))
                 elements.append(Paragraph(f'группа {l + 1}', h2))
                 elements.append(shell_table[l][0])
 
@@ -9082,23 +9088,27 @@ def table_made(pv, stage):
     if stage == "Одна таблица":
         name_table = f"{short_name}_one_table.pdf"
     elif stage == "Предварительный":
+        title = "Предварительный этап"
         name_table = f"{short_name}_table_group.pdf"
     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
         txt = stage.rfind("-")
         number_fin = stage[:txt]
+        title = stage
         name_table = f"{short_name}_{number_fin}-semifinal.pdf"
     else:
         txt = stage.rfind("-")
         number_fin = stage[:txt]
+        title = stage
         name_table = f"{short_name}_{number_fin}-final.pdf"
     doc = SimpleDocTemplate(name_table, pagesize=pv)
     catalog = 1
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
     doc.bottomMargin = 1.6 * cm
-    elements.insert(0, (Paragraph(f"Предварительный этап.{sex}", h1)))
+    elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
+
     end_time = time.time()
     execution_time = end_time - start_time
     print(f"Время выполнения: {execution_time} секунд")
@@ -12853,6 +12863,7 @@ def made_list_referee():
     #     my_win.tableView.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
     #     my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
     for n in range(0, int(number_of_referee)): 
+        print(1)
         
 
         # comboBox_list_post = QComboBox()
