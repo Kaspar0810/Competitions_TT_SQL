@@ -6867,7 +6867,6 @@ def choice_setka(fin):
 
 def edit_group_after_draw():
     """редактирование групп после жеребьевки"""
-    # player = []
     sender = my_win.sender()
     my_win.tableView.setVisible(False)
     my_win.comboBox_first_group.clear()
@@ -6898,6 +6897,7 @@ def add_item_listwidget():
     """добавление элементов в листвиджет"""
     flag_combo = 0
     sender = my_win.sender()
+    my_win.tableView.setVisible(False)
     coach_list = []
     coach = ""
     tb = my_win.tabWidget.currentIndex()
@@ -6911,14 +6911,13 @@ def add_item_listwidget():
     choices = Choice.select().where(Choice.title_id == title_id())
     if gr != "":
         if tb == 3:
-            group = choices.select().order_by(Choice.posev_group).where(Choice.group == gr)
+            group = choices.select().where(Choice.group == gr).order_by(Choice.posev_group)
         elif tb == 4 :
-            group = choices.select().order_by(Choice.posev_group).where(Choice.sf_group == gr)
-
-
+            group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf)
+        n = 0
         for k in group:
             item = QListWidgetItem()
-            n = k.posev_group
+            n += 1
             family = k.family
             region = k.region
             coach = k.coach
@@ -6931,9 +6930,9 @@ def add_item_listwidget():
                 my_win.listWidget_second_group.addItem(item)
                 flag_combo = 2
             coach_list.append(coach)
-        duplicat = duplicat_coach_in_group(coach_list)
-        if duplicat is not None:
-            color_coach_in_listwidget(duplicat, flag_combo)
+        # duplicat = duplicat_coach_in_group(coach_list)
+        # if duplicat is not None:
+        #     color_coach_in_listwidget(duplicat, flag_combo)
         # color_coach_in_tablewidget(duplicat, coach_list)
 
 
@@ -6992,8 +6991,15 @@ def list_player_in_group_after_draw():
 def change_player_between_group_after_draw():
     """Смена игроков в группах после жеребьевки при отметки в listwidget при редакитровании"""
     msgBox = QMessageBox
-
-    gamelist = Game_list.select().where(Game_list.title_id == title_id())
+    tb = my_win.tabWidget.currentIndex()
+    game_list = Game_list.select().where(Game_list.title_id == title_id())
+    if tb == 3:
+        systems = System.select().where((System.title_id == title_id()) & (System.stage == "Предварительный")).get()
+    elif tb == 4:
+        systems = System.select().where((System.title_id == title_id()) & (System.stage == "1-й полуфинал")).get()
+    system_id = systems.id
+        
+    gamelist = game_list.select().where(Game_list.system_id == system_id)
     choices = Choice.select().where(Choice.title_id == title_id())
     player1 = my_win.lineEdit_change_pl1.text()
     player2 = my_win.lineEdit_change_pl2.text()
@@ -7038,7 +7044,7 @@ def change_player_between_group_after_draw():
             choice.group = gr_pl2 
             choice.posev_group = number_posev2
             choice.save()
-    else: # из меняет спортсменов местами
+    else: # меняет спортсменов местами
         znak = player1.find(":")
         znak1 = player1.find("/")  
         number_posev1 = int(player1[:znak]) # номера посева
