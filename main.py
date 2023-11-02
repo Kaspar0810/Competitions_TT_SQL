@@ -6993,14 +6993,15 @@ def change_player_between_group_after_draw():
     msgBox = QMessageBox
     tb = my_win.tabWidget.currentIndex()
     game_list = Game_list.select().where(Game_list.title_id == title_id())
+    choices = Choice.select().where(Choice.title_id == title_id())
     if tb == 3:
-        systems = System.select().where((System.title_id == title_id()) & (System.stage == "Предварительный")).get()
+        stage = "Предварительный"
     elif tb == 4:
-        systems = System.select().where((System.title_id == title_id()) & (System.stage == "1-й полуфинал")).get()
+        stage = "1-й полуфинал"
+    systems = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()
     system_id = systems.id
         
     gamelist = game_list.select().where(Game_list.system_id == system_id)
-    choices = Choice.select().where(Choice.title_id == title_id())
     player1 = my_win.lineEdit_change_pl1.text()
     player2 = my_win.lineEdit_change_pl2.text()
     gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы
@@ -7065,12 +7066,18 @@ def change_player_between_group_after_draw():
             g_list.rank_number_group = number_posev1
             g_list.save()   
 #  ==================
-        choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        if tb == 3:
+            choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        elif tb == 4:
+            choice = choices.select().where((Choice.family== family1) & (Choice.posev_sf == number_posev1)).get()
         with db:
             choice.group = gr_pl2 
             choice.posev_group = number_posev2
             choice.save()
-        choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
+        if tb == 3:
+            choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
+        elif tb == 4:
+            choice = choices.select().where((Choice.family== family2) & (Choice.posev_sf == number_posev2)).get()
         with db:
             choice.group = gr_pl1 
             choice.posev_group = number_posev1
@@ -7078,7 +7085,7 @@ def change_player_between_group_after_draw():
 # =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
-    player_in_table_group_and_write_Game_list_Result(stage="Предварительный")
+    player_in_table_group_and_write_Game_list_Result(stage)
     my_win.comboBox_first_group.setCurrentText("-выберите группу-")
     my_win.listWidget_first_group.clear()
     my_win.comboBox_first_group.setCurrentText(gr_pl1)
