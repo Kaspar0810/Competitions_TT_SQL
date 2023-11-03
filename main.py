@@ -7054,34 +7054,60 @@ def change_player_between_group_after_draw():
         znak1 = player2.find("/")  
         number_posev2 = int(player2[:znak]) # номера посева
         family2 = player2[znak + 1:znak1]
+    #======= new
+        family = [family1, family2]
+        number_posev = [number_posev1, number_posev2]
+        gr_pl = [gr_pl1, gr_pl2]
 # ================= 
-        g_list = gamelist.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get() # находит 1 - ого игрока
-        with db:
-            g_list.number_group = gr_pl2
-            g_list.rank_number_group = number_posev2
-            g_list.save()
-        g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 2 - ого игрока
-        with db:
-            g_list.number_group = gr_pl1
-            g_list.rank_number_group = number_posev1
-            g_list.save()   
-#  ==================
+        for k in range(0, 2):
+            g_list = gamelist.select().where((Game_list.player_group_id == family[k]) & (Game_list.rank_num_player == number_posev[k])).get() # находит 1 - ого игрока
+            with db:
+                g_list.number_group = gr_pl[1 - k]
+                g_list.rank_number_group = number_posev[1 - k]
+                g_list.save()
+
+        # g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 2 - ого игрока
+        # with db:
+        #     g_list.number_group = gr_pl1
+        #     g_list.rank_number_group = number_posev1
+        #     g_list.save()   
+#  ================== new
         if tb == 3:
-            choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+            posev_gr = Choice.posev_group
+            gr = Choice.group
+            # choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
         elif tb == 4:
-            choice = choices.select().where((Choice.family== family1) & (Choice.posev_sf == number_posev1)).get()
-        with db:
-            choice.group = gr_pl2 
-            choice.posev_group = number_posev2
-            choice.save()
-        if tb == 3:
-            choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
-        elif tb == 4:
-            choice = choices.select().where((Choice.family== family2) & (Choice.posev_sf == number_posev2)).get()
-        with db:
-            choice.group = gr_pl1 
-            choice.posev_group = number_posev1
-            choice.save()
+            posev_gr = Choice.posev_sf
+            gr = Choice.sf_group
+
+        for k in range(0, 2):
+            choice = choices.select().where((Choice.family== family[k]) & (posev_gr == number_posev[k])).get()
+            with db:
+                choice.gr = gr_pl[1 - k]
+                choice.posev_gr = number_posev[1 - k]
+                choice.save()
+        # choice = choices.select().where((Choice.family== family2) & (posev_gr == number_posev2)).get()
+        # with db:
+        #     gr = gr_pl1 
+        #     posev_gr = number_posev1
+        #     choice.save()
+
+        # if tb == 3:
+        #     choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        # elif tb == 4:
+        #     choice = choices.select().where((Choice.family== family1) & (Choice.posev_sf == number_posev1)).get()
+        # with db:
+        #     choice.group = gr_pl2 
+        #     choice.posev_group = number_posev2
+        #     choice.save()
+        # if tb == 3:
+        #     choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
+        # elif tb == 4:
+        #     choice = choices.select().where((Choice.family== family2) & (Choice.posev_sf == number_posev2)).get()
+        # with db:
+        #     choice.group = gr_pl1 
+        #     choice.posev_group = number_posev1
+        #     choice.save()
 # =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
