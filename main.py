@@ -185,9 +185,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         last_comp.addAction(self.fifth_comp_Action)
         ed_Menu = editMenu.addMenu("Жеребьевка")
         ed_Menu.addAction(self.ed_one_table_Action)
-        ed_Menu.addAction(self.ed_gr_Action)
-        ed_Menu.addAction(self.ed_pf_Action)
-        ed_Menu.addAction(self.ed_fin_Action)
+        ed_Menu.addAction(self.ed_etap_Action)
+        # ed_Menu.addAction(self.ed_pf_Action)
+        # ed_Menu.addAction(self.ed_fin_Action)
 
         editMenu.addAction(self.vid_edit_Action)  #в осн меню -Редактировать- добавлен пункт сразу с акцией -Вид страницы этапов
         # меню Рейтинг
@@ -247,9 +247,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fourth_comp_Action = QAction("пусто")
         self.fifth_comp_Action = QAction("пусто")
         self.ed_one_table_Action = QAction("Редакитровать таблицу")
-        self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
-        self.ed_pf_Action = QAction("Редактировать полуфиналы")
-        self.ed_fin_Action = QAction("Редактировать финалы")
+
+        self.ed_etap_Action = QAction("Редактирование этапов")  # подменю редактор
+        # self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
+        # self.ed_pf_Action = QAction("Редактировать полуфиналы")
+        # self.ed_fin_Action = QAction("Редактировать финалы")
         self.vid_edit_Action = QAction("Вид страницы этапов")
 
         self.choice_one_table_Action = QAction("Одна таблица")
@@ -309,9 +311,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin8_Action.setEnabled(False)  # делает пункт меню не видимым
         # пункты меню редактирование жеребьевки
         self.ed_one_table_Action.setEnabled(False)  # делает пункт меню не видимым
-        self.ed_gr_Action.setEnabled(False)  # делает пункт меню не видимым
-        self.ed_pf_Action.setEnabled(False)  # делает пункт меню не видимым
-        self.ed_fin_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.ed_etap_Action.setEnabled(False)  # делает пункт меню не видимым
+        # self.ed_gr_Action.setEnabled(False)  # делает пункт меню не видимым
+        # self.ed_pf_Action.setEnabled(False)  # делает пункт меню не видимым
+        # self.ed_fin_Action.setEnabled(False)  # делает пункт меню не видимым
 
         self.copy_db_Action = QAction("Импорт из базы данных")
 
@@ -357,9 +360,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fourth_comp_Action.triggered.connect(self.last)
         self.fifth_comp_Action.triggered.connect(self.last)
 
-        self.ed_gr_Action.triggered.connect(self.edit_group)
-        self.ed_pf_Action.triggered.connect(self.edit_group)
-
+        # self.ed_gr_Action.triggered.connect(self.edit_group)
+        # self.ed_pf_Action.triggered.connect(self.edit_group)
+        self.ed_etap_Action.triggered.connect(self.edit_etap)
 
         self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
@@ -381,7 +384,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fill_table_R_list()
         my_win.comboBox_choice_R.setCurrentIndex(0)
         my_win.lineEdit_find_player_in_R.setFocus()
-
 
     def r1_File(self):
         # Logic for creating a new file goes here...
@@ -627,9 +629,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def help(self):
         pass
 
-    def edit_group(self):
-        """редактирование жеребьевки групп"""
-        edit_group_after_draw()
+    def edit_etap(self):
+        """редактирование жеребьевки этапов соревнования"""
+        my_win.tabWidget.setCurrentIndex(7)
+        my_win.tableView.hide()
+        # edit_group_after_draw()
 
     def open(self):
         go_to()
@@ -1161,10 +1165,10 @@ def enabled_menu_after_choice():
                 my_win.view_one_table_Action.setEnabled(True)
             elif stage == "Предварительный":
                 my_win.view_gr_Action.setEnabled(True)
-                my_win.ed_gr_Action.setEnabled(True) # включает меню - редакирование жеребьевки групп
+                # my_win.ed_gr_Action.setEnabled(True) # включает меню - редакирование жеребьевки групп
             elif stage == "1-й полуфинал":
                 my_win.view_pf1_Action.setEnabled(True)
-                my_win.ed_pf_Action.setEnabled(True)
+                # my_win.ed_pf_Action.setEnabled(True)
             elif stage == "2-й полуфинал":
                 my_win.view_pf2_Action.setEnabled(True)
                 # my_win.ed_pf2_Action.setEnabled(True)
@@ -1184,6 +1188,7 @@ def enabled_menu_after_choice():
                 my_win.view_fin7_Action.setEnabled(True)
             elif stage == "8-й финал":
                 my_win.view_fin8_Action.setEnabled(True)
+            my_win.ed_etap_Action.setEnabled(True)
         stage = k.stage
 
         if stage == "Одна таблица":
@@ -2604,6 +2609,8 @@ def page():
         my_win.Button_made_one_file_pdf.setEnabled(False)
         my_win.Button_print_begunki.setEnabled(False)
         my_win.lineEdit_range_tours.hide()
+        my_win.comboBox_first_group.setEnabled(False)
+        my_win.comboBox_second_group.setEnabled(False)
         load_combo_etap_begunki()
         # ======
     hide_show_columns(tb)
@@ -5493,6 +5500,7 @@ def load_combo():
 def load_combo_etap_begunki():
     """загружает комбобокс выбора этапов системы на вкладке дополнительно"""
     my_win.comboBox_select_stage_begunki.clear()
+    my_win.comboBox_edit_etap1.clear()
     stage_system = ["-Выбор этапа-"]
     results = Result.select().where(Result.title_id == title_id())
     for i in results:
@@ -5500,6 +5508,8 @@ def load_combo_etap_begunki():
         if stage not in stage_system:
             stage_system.append(stage)
     my_win.comboBox_select_stage_begunki.addItems(stage_system)
+    my_win.comboBox_edit_etap1.addItems(stage_system)
+    my_win.comboBox_edit_etap2.addItems(stage_system)
 
 
 def reset_filter():
@@ -6861,26 +6871,63 @@ def choice_setka(fin):
         with db:  # запись в таблицу Choice результата жеребъевки
             system.choice_flag = False
             system.save()
-        # ========= рано отмечает, что сделана жеребьевка
-    # load_tableWidget()
+
+
+def select_stage_for_edit():
+    """выбор финалов или номеров групп для редактирования игроков """
+    sender = my_win.sender()
+    if sender == my_win.comboBox_edit_etap1:
+        my_win.comboBox_first_group.clear()
+    else:
+        my_win.comboBox_second_group.clear()
+    systems = System.select().where(System.title_id == title_id())
+    if sender == my_win.comboBox_edit_etap1:
+        stage = my_win.comboBox_edit_etap1.currentText()
+    elif sender ==  my_win.comboBox_edit_etap2:
+        stage = my_win.comboBox_edit_etap2.currentText()
+    else:
+        stage = "-Выбор этапа-"
+
+    if stage == "-Выбор этапа-":
+       return
+    elif stage == "Предварительный" or stage == "1-й полуфинал" or stage == "2-й полуфинал":
+        sys_id = systems.select().where(System.stage == stage).get()
+        group = sys_id.total_group
+        group_list = [f"{i} группа" for i in range(1, group + 1)] # генератор списка
+    elif stage == "Одна таблица":
+        pass
+    else:
+        for k in systems:
+            if k.stage == "Предварительный":
+                pass
+            elif k.stage == "Полуфинал":
+                pass
+            else:
+                group_list.append(k.stage)
+    group_list.insert(0, "-Выбор группы или финала-")
+    if sender == my_win.comboBox_edit_etap1:
+        my_win.comboBox_first_group.addItems(group_list)
+        my_win.comboBox_first_group.setEnabled(True)
+    else:
+        my_win.comboBox_second_group.addItems(group_list)
+        my_win.comboBox_second_group.setEnabled(True)
 
 
 def edit_group_after_draw():
     """редактирование групп после жеребьевки"""
-    sender = my_win.sender()
+    if my_win.comboBox_edit_etap1.currentText() == "-Выбор этапа-":
+        return
+    else:
+        stage = my_win.comboBox_edit_etap1.currentText()
+    if my_win.comboBox_edit_etap2.currentText() == "-Выбор этапа-":
+        return
+    else:
+        stage = my_win.comboBox_edit_etap2.currentText()
     my_win.tableView.setVisible(False)
     my_win.comboBox_first_group.clear()
     my_win.comboBox_second_group.clear()
     system = System.select().where(System.title_id == title_id())
-    if sender == my_win.ed_gr_Action:
-        my_win.tabWidget.setCurrentIndex(3)
-        system_group = system.select().where(System.stage == "Предварительный").get()
-    elif sender == my_win.ed_pf_Action:
-        my_win.tabWidget.setCurrentIndex(4)
-        # if my_win.comboBox_edit.currentIndex(0):
-        system_group = system.select().where(System.stage == "1-й полуфинал").get()
-        # else:
-        #     system_group = system.select().where(System.stage == "2-й полуфинал") 
+    system_group = system.select().where(System.stage == stage).get()
 
     players = Player.select().where(Player.title_id == title_id())
     total_gr = system_group.total_group
@@ -6897,10 +6944,10 @@ def add_item_listwidget():
     """добавление элементов в листвиджет"""
     flag_combo = 0
     sender = my_win.sender()
+    choices = Choice.select().where(Choice.title_id == title_id())
     my_win.tableView.setVisible(False)
     coach_list = []
     coach = ""
-    tb = my_win.tabWidget.currentIndex()
     if sender == my_win.comboBox_first_group:
         my_win.listWidget_first_group.clear()
         gr = my_win.comboBox_first_group.currentText()
@@ -6908,12 +6955,17 @@ def add_item_listwidget():
         my_win.listWidget_second_group.clear()
         gr = my_win.comboBox_second_group.currentText()
 
-    choices = Choice.select().where(Choice.title_id == title_id())
-    if gr != "":
-        if tb == 3:
-            group = choices.select().where(Choice.group == gr).order_by(Choice.posev_group)
-        elif tb == 4 :
-            group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf)
+    if gr != "-выберите группу-":
+        if sender == my_win.comboBox_first_group:
+            if my_win.comboBox_edit_etap1.currentText() == "Предварительный":
+                group = choices.select().where(Choice.group == gr).order_by(Choice.posev_group)
+            elif my_win.comboBox_edit_etap1.currentText() == "1-й полуфинал":
+                group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf)
+        else:
+            if my_win.comboBox_edit_etap2.currentText() == "Предварительный":
+                group = choices.select().where(Choice.group == gr).order_by(Choice.posev_group)
+            elif my_win.comboBox_edit_etap2.currentText() == "1-й полуфинал":
+                group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf) 
         n = 0
         for k in group:
             item = QListWidgetItem()
@@ -6925,10 +6977,10 @@ def add_item_listwidget():
             item.setText(text) 
             if sender == my_win.comboBox_first_group:
                 my_win.listWidget_first_group.addItem(item)
-                flag_combo = 1
+                # flag_combo = 1
             else:
                 my_win.listWidget_second_group.addItem(item)
-                flag_combo = 2
+                # flag_combo = 2
             coach_list.append(coach)
         # duplicat = duplicat_coach_in_group(coach_list)
         # if duplicat is not None:
@@ -7065,49 +7117,22 @@ def change_player_between_group_after_draw():
                 g_list.number_group = gr_pl[1 - k]
                 g_list.rank_number_group = number_posev[1 - k]
                 g_list.save()
-
-        # g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 2 - ого игрока
-        # with db:
-        #     g_list.number_group = gr_pl1
-        #     g_list.rank_number_group = number_posev1
-        #     g_list.save()   
 #  ================== new
         if tb == 3:
             posev_gr = Choice.posev_group
-            gr = Choice.group
-            # choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
         elif tb == 4:
             posev_gr = Choice.posev_sf
-            gr = Choice.sf_group
 
         for k in range(0, 2):
             choice = choices.select().where((Choice.family== family[k]) & (posev_gr == number_posev[k])).get()
             with db:
-                choice.gr = gr_pl[1 - k]
-                choice.posev_gr = number_posev[1 - k]
+                if tb == 3:
+                    choice.posev_group = number_posev[1 - k]
+                    choice.group = gr_pl[1 - k]
+                elif tb == 4:
+                    choice.posev_sf = number_posev[1 - k]
+                    choice.sf_group = gr_pl[1 - k]
                 choice.save()
-        # choice = choices.select().where((Choice.family== family2) & (posev_gr == number_posev2)).get()
-        # with db:
-        #     gr = gr_pl1 
-        #     posev_gr = number_posev1
-        #     choice.save()
-
-        # if tb == 3:
-        #     choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
-        # elif tb == 4:
-        #     choice = choices.select().where((Choice.family== family1) & (Choice.posev_sf == number_posev1)).get()
-        # with db:
-        #     choice.group = gr_pl2 
-        #     choice.posev_group = number_posev2
-        #     choice.save()
-        # if tb == 3:
-        #     choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
-        # elif tb == 4:
-        #     choice = choices.select().where((Choice.family== family2) & (Choice.posev_sf == number_posev2)).get()
-        # with db:
-        #     choice.group = gr_pl1 
-        #     choice.posev_group = number_posev1
-        #     choice.save()
 # =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
@@ -8816,8 +8841,7 @@ def select_stage_for_begunki():
     elif stage == "Предварительный" or stage == "1-й полуфинал" or stage == "2-й полуфинал":
         sys_id = systems.select().where(System.stage == stage).get()
         group = sys_id.total_group
-        for k in range(1, group + 1):
-            group_list.append(f"{k} группа")
+        group_list = [f"{i} группа" for i in range(1, group + 1)] # генератор списка
     elif stage == "Одна таблица":
         pass
     else:
@@ -13506,8 +13530,11 @@ my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
 my_win.comboBox_select_stage_begunki.currentTextChanged.connect(select_stage_for_begunki)
 my_win.comboBox_select_group_begunki.currentTextChanged.connect(select_tour_for_begunki)
 my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)
+my_win.comboBox_edit_etap1.currentTextChanged.connect(select_stage_for_edit)
+my_win.comboBox_edit_etap2.currentTextChanged.connect(select_stage_for_edit)
 my_win.comboBox_first_group.currentTextChanged.connect(add_item_listwidget)
 my_win.comboBox_second_group.currentTextChanged.connect(add_item_listwidget)
+
 # my_win.comboBox_filter_group.currentTextChanged.connect(filter_gr)
 # my_win.comboBox_filter_played.currentTextChanged.connect(filter_gr)
 # my_win.comboBox_find_name.currentTextChanged.connect(filter_gr)
@@ -13554,6 +13581,7 @@ my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по не
 my_win.checkBox_11.stateChanged.connect(debtor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
+# my_win.checkBox_edit_etap.stateChanged.connect(change_player_in_etap )
 # =======  нажатие кнопок =========
 
 

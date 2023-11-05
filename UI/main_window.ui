@@ -23,7 +23,7 @@
       <x>260</x>
       <y>10</y>
       <width>841</width>
-      <height>301</height>
+      <height>241</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>7</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -3633,6 +3633,7 @@
       <property name="font">
        <font>
         <family>Times New Roman</family>
+        <italic>true</italic>
        </font>
       </property>
       <property name="text">
@@ -4123,7 +4124,7 @@
       <property name="geometry">
        <rect>
         <x>700</x>
-        <y>151</y>
+        <y>70</y>
         <width>121</width>
         <height>51</height>
        </rect>
@@ -4131,6 +4132,7 @@
       <property name="font">
        <font>
         <family>Times New Roman</family>
+        <italic>true</italic>
        </font>
       </property>
       <property name="text">
@@ -4178,15 +4180,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>7</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4198,8 +4200,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4713,8 +4715,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5100,8 +5102,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5518,8 +5520,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5813,8 +5815,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6221,8 +6223,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6789,7 +6791,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>270</y>
+        <y>420</y>
         <width>113</width>
         <height>32</height>
        </rect>
@@ -6802,7 +6804,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>270</y>
+        <y>420</y>
         <width>95</width>
         <height>32</height>
        </rect>
@@ -6821,7 +6823,7 @@
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>310</y>
+        <y>460</y>
         <width>19</width>
         <height>18</height>
        </rect>
@@ -6854,20 +6856,27 @@
    <widget class="QComboBox" name="comboBox_first_group">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>320</y>
-      <width>181</width>
-      <height>22</height>
+      <x>470</x>
+      <y>319</y>
+      <width>201</width>
+      <height>26</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>12</pointsize>
+      <italic>true</italic>
+     </font>
     </property>
    </widget>
    <widget class="QListWidget" name="listWidget_first_group">
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>349</y>
+      <y>359</y>
       <width>400</width>
-      <height>261</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="font">
@@ -6881,9 +6890,9 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>349</y>
+      <y>359</y>
       <width>400</width>
-      <height>261</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="font">
@@ -6896,11 +6905,18 @@
    <widget class="QComboBox" name="comboBox_second_group">
     <property name="geometry">
      <rect>
-      <x>700</x>
-      <y>320</y>
-      <width>181</width>
-      <height>22</height>
+      <x>900</x>
+      <y>319</y>
+      <width>201</width>
+      <height>26</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>12</pointsize>
+      <italic>true</italic>
+     </font>
     </property>
    </widget>
    <widget class="QPushButton" name="Button_add_pl1">
@@ -6980,10 +6996,76 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>310</y>
+      <y>490</y>
       <width>841</width>
-      <height>471</height>
+      <height>291</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_edit_etap1">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>319</y>
+      <width>191</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_edit_etap2">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>319</y>
+      <width>191</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_57">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>279</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Times New Roman</family>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <italic>true</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Редактирование этапов</string>
     </property>
    </widget>
   </widget>
