@@ -6992,16 +6992,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="QTableView" name="tableView">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>490</y>
-      <width>841</width>
-      <height>291</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QComboBox" name="comboBox_edit_etap1">
     <property name="geometry">
      <rect>
@@ -7066,6 +7056,16 @@
     </property>
     <property name="text">
      <string>Редактирование этапов</string>
+    </property>
+   </widget>
+   <widget class="QTableView" name="tableView">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>260</y>
+      <width>841</width>
+      <height>521</height>
+     </rect>
     </property>
    </widget>
   </widget>
