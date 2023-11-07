@@ -3452,15 +3452,15 @@ def player_in_table_group_and_write_Game_list_Result(stage):
     """заполняет таблицу Game_list данными спортсменами из группы td - список списков данных из групп и записывает
     встречи по турам в таблицу -Result- """
     sys = System.select().where(System.title_id == title_id())  # находит system id последнего
-    # system = sys.select().where(System.stage == "Предварительный").get()
     system = sys.select().where(System.stage == stage).get()
-    # удаление старых записей в game_list после редактирования жеребьевки групп
+    # удаление старых записей в game_list и Result после редактирования жеребьевки групп
     if stage == "Предварительный":
         gamelist = Game_list.delete().where(Game_list.title_id == title_id())
         query = Result.delete().where(Result.title_id == title_id())
     else:
-        gamelist = Game_list.delete().where((Game_list.title_id == title_id()) & (Game_list.number_group == stage))
-        query = Result.delete().where((Result.title_id == title_id()) & (Result.number_group == stage))
+        gamelist = Game_list.delete().where((Game_list.title_id == title_id()) & (Game_list.system_id == system))
+        query = Result.delete().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+        load_playing_game_in_table_for_semifinal(stage)
     gamelist.execute()
     query.execute()
     #==========
@@ -3605,15 +3605,15 @@ def change_status_visible_and_score_game():
         if row_num == -1:
             stage = "1-й полуфинал"
         else:
-            id_res = my_win.tableWidget.item(row_num, 0).text() # из какого полуфинала играют встречу
+            id_res = my_win.tableView.model().index(row_num, 0).data() # данные строки tableView
             result = Result.select().where(Result.id == id_res).get()
             stage = result.system_stage
-        my_win.checkBox_14.setEnabled(state_visible)
         system_stage = system.select().where(System.stage == stage).get()
         match_db = system_stage.score_flag
         state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
         match_current = match_db
         state_visible = state_visible_db
+        my_win.checkBox_14.setEnabled(state_visible)
         #  ==== изменение состояние =====
         if sender == my_win.checkBox_14:
             for i in my_win.groupBox_kolvo_vstrech_pf.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
@@ -7180,18 +7180,18 @@ def change_player_between_group_after_draw():
 # =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
-    # if stage == "Предварительный":
-    #     my_win.tabWidget.setCurrentIndex(3)
-    # elif stage == "1-й полуфинал":
-    #     my_win.tabWidget.setCurrentIndex(4)
     player_in_table_group_and_write_Game_list_Result(stage)
-    # my_win.tabWidget.setCurrentIndex(7)
-    # # my_win.comboBox_first_group.setCurrentText("-выберите группу-")
-    # my_win.listWidget_first_group.clear()
+    my_win.comboBox_first_group.setCurrentText("-выберите группу-")
+    my_win.comboBox_second_group.setCurrentText("-выберите группу-")
+    my_win.listWidget_first_group.clear()
+    my_win.listWidget_second_group.clear()
+    my_win.comboBox_edit_etap1.setCurrentIndex(0)
+    my_win.comboBox_edit_etap2.setCurrentIndex(0)
     # my_win.comboBox_first_group.setCurrentText(gr_pl1)
-    # # my_win.comboBox_second_group.setCurrentText("-выберите группу-")
-    # my_win.listWidget_second_group.clear()
+   
     # my_win.comboBox_second_group.setCurrentText(gr_pl2)
+    # my_win.comboBox_first_group.clear()
+    # my_win.comboBox_second_group.clear()
  
 
 # def add_player_to_group():
@@ -11097,8 +11097,13 @@ def score_in_table(td, num_gr):
     result = Result.select().where(Result.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     gamelist = Game_list.select().where(Game_list.title_id == title_id())
-
-    if tab == 3:
+    if tab == 7: # открыта вкладка для редактирования групп
+        stage = my_win.comboBox_edit_etap1.currentText()
+        system_id = system.select().where(System.stage == stage).get()
+        mp = len(gamelist.select().where((Game_list.system_id == system_id) & (Game_list.number_group == num_gr)))
+        r = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
+        ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
+    elif tab == 3:
         ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
         r = result.select().where((Result.system_stage == "Предварительный") & (Result.number_group == num_gr))
         ch = choice.select().where(Choice.group == num_gr)  # фильтрует по группе
@@ -11110,7 +11115,7 @@ def score_in_table(td, num_gr):
         mp = len(gamelist.select().where((Game_list.system_id == ta) & (Game_list.number_group == num_gr)))
         r = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
-    else:
+    elif tab == 5:
         system_id = system.select().where(System.stage == num_gr).get()
         id_system = system_id.id
         r = result.select().where(Result.system_id == id_system)
