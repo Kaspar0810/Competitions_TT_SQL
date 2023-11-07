@@ -3720,7 +3720,7 @@
         <x>10</x>
         <y>176</y>
         <width>231</width>
-        <height>32</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
@@ -3741,7 +3741,7 @@
         <x>270</x>
         <y>92</y>
         <width>170</width>
-        <height>29</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
@@ -3761,9 +3761,9 @@
       <property name="geometry">
        <rect>
         <x>270</x>
-        <y>117</y>
+        <y>121</y>
         <width>170</width>
-        <height>29</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -3833,7 +3833,7 @@
         <x>270</x>
         <y>176</y>
         <width>170</width>
-        <height>29</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
@@ -4091,7 +4091,7 @@
         <x>265</x>
         <y>41</y>
         <width>170</width>
-        <height>29</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4187,8 +4187,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4200,8 +4200,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4715,8 +4715,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5102,8 +5102,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5520,8 +5520,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5552,7 +5552,7 @@
          <x>3</x>
          <y>31</y>
          <width>221</width>
-         <height>191</height>
+         <height>223</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -5815,8 +5815,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6223,8 +6223,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6607,7 +6607,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>483</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6919,79 +6919,6 @@
      </font>
     </property>
    </widget>
-   <widget class="QPushButton" name="Button_add_pl1">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>680</y>
-      <width>221</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Добавить игрока 1-ой группы</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Button_add_pl2">
-    <property name="geometry">
-     <rect>
-      <x>710</x>
-      <y>680</y>
-      <width>221</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Добавить игрока 2- ой группы</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>269</x>
-      <y>630</y>
-      <width>831</width>
-      <height>33</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_8">
-     <item>
-      <widget class="QLineEdit" name="lineEdit_change_pl1">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>11</pointsize>
-         <italic>true</italic>
-        </font>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Buttom_change_player">
-       <property name="text">
-        <string>&lt;     &gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEdit_change_pl2">
-       <property name="font">
-        <font>
-         <family>Times New Roman</family>
-         <pointsize>11</pointsize>
-         <italic>true</italic>
-        </font>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QComboBox" name="comboBox_edit_etap1">
     <property name="geometry">
      <rect>
@@ -7041,7 +6968,7 @@
      <rect>
       <x>590</x>
       <y>279</y>
-      <width>161</width>
+      <width>231</width>
       <height>20</height>
      </rect>
     </property>
@@ -7062,11 +6989,150 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>260</y>
+      <y>750</y>
       <width>841</width>
-      <height>521</height>
+      <height>31</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>271</x>
+      <y>620</y>
+      <width>831</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_13">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_change_pl1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>11</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_change_pl1_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>11</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Button_add_pl1">
+         <property name="text">
+          <string>Добавить игрока 1-ой группы</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_43">
+       <item>
+        <widget class="QLabel" name="label_59">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <italic>true</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Поменять игроков</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Buttom_change_player">
+         <property name="text">
+          <string>&lt;     &gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_42">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_change_pl2">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>11</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_change_pl2_2">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>11</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Button_add_pl2">
+         <property name="text">
+          <string>Добавить игрока 2- ой группы</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar">
