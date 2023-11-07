@@ -7030,19 +7030,23 @@ def list_player_in_group_after_draw():
     """Смена игроков в группах после жеребьевки при отметки в listwidget при редакитровании"""
     sender = my_win.sender()
     if sender == my_win.Button_add_pl1:
-        item = my_win.listWidget_first_group.item
         for row in range(my_win.listWidget_first_group.count()):
             select_item = my_win.listWidget_first_group.selectedItems()
         for i in select_item:
             player_first = i.text()
-            my_win.lineEdit_change_pl1.setText(player_first)
+            if my_win.lineEdit_change_pl1.text() == "":
+                my_win.lineEdit_change_pl1.setText(player_first)
+            else:
+                my_win.lineEdit_change_pl1_2.setText(player_first)
     else:
-        item = my_win.listWidget_second_group.item
         for row in range(my_win.listWidget_second_group.count()):
             select_item = my_win.listWidget_second_group.selectedItems()
-            for i in select_item:
-                player_second = i.text()
+        for i in select_item:
+            player_second = i.text()
+            if my_win.lineEdit_change_pl2.text() == "":
                 my_win.lineEdit_change_pl2.setText(player_second)
+            else:
+                my_win.lineEdit_change_pl2_2.setText(player_second)
 
 
 def change_player_between_group_after_draw():
@@ -7054,6 +7058,8 @@ def change_player_between_group_after_draw():
     etap_2 = my_win.comboBox_edit_etap2.currentText()
     player1 = my_win.lineEdit_change_pl1.text()
     player2 = my_win.lineEdit_change_pl2.text()
+    player1_2 = my_win.lineEdit_change_pl1_2.text() # 2-й игрок из группы для смены в ПФ
+    player2_2 = my_win.lineEdit_change_pl2_2.text() # 2-й игрок из группы для смены в ПФ
     gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы
     gr_pl2 = my_win.comboBox_second_group.currentText() # номер группы
 
@@ -7150,16 +7156,29 @@ def change_player_between_group_after_draw():
         znak1 = player2.find("/")  
         number_posev2 = int(player2[:znak]) # номера посева
         family2 = player2[znak + 1:znak1]
+        family_list1 = [family1, family2]
+        if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
+            znak = player1_2.find(":")
+            znak1 = player1_2.find("/") 
+            number_posev1 = int(player1_2[:znak]) # номера посева
+            family1_2 = player1_2[znak + 1:znak1]
+            znak = player2_2.find(":")
+            znak1 = player2_2.find("/")  
+            number_posev2 = int(player2_2[:znak]) # номера посева
+            family2_2 = player2_2[znak + 1:znak1]
+            family_list2 = [family1_2, family2_2]
     #======= new
-        family = [family1, family2]
+        family_list = family_list1 + family_list2
+        count_family = len(family_list)
         number_posev = [number_posev1, number_posev2]
         gr_pl = [gr_pl1, gr_pl2]
 # ================= 
-        for k in range(0, 2): # перезаписывает game list с новыми изменениями
-            g_list = gamelist.select().where((Game_list.player_group_id == family[k]) & (Game_list.rank_num_player == number_posev[k])).get() # находит 1 - ого игрока
+        for k in range(0, count_family): # перезаписывает game list с новыми изменениями
+            # g_list = gamelist.select().where((Game_list.player_group_id == family_list[k]) & (Game_list.rank_num_player == number_posev[k])).get() # находит 1 - ого игрока
+            g_list = gamelist.select().where(Game_list.player_group_id == family_list[k]).get() # находит 1 - ого игрока
             with db:
                 g_list.number_group = gr_pl[1 - k]
-                g_list.rank_number_group = number_posev[1 - k]
+                # g_list.rank_number_group = number_posev[1 - k]
                 g_list.save()
 #  ================== new
         if stage == "Предварительный":
@@ -7168,7 +7187,7 @@ def change_player_between_group_after_draw():
             posev_gr = Choice.posev_sf
 
         for k in range(0, 2): # перезаписывает таблицу Choice
-            choice = choices.select().where((Choice.family== family[k]) & (posev_gr == number_posev[k])).get()
+            choice = choices.select().where((Choice.family== family_list[k]) & (posev_gr == number_posev[k])).get()
             with db:
                 if stage == "Предварительный":
                     choice.posev_group = number_posev[1 - k]
