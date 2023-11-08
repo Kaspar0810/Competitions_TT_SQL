@@ -7157,6 +7157,7 @@ def change_player_between_group_after_draw():
         number_posev2 = int(player2[:znak]) # номера посева
         family2 = player2[znak + 1:znak1]
         family_list1 = [family1, family2]
+        gr_pl = [gr_pl2, gr_pl1]
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
             znak = player1_2.find(":")
             znak1 = player1_2.find("/") 
@@ -7167,35 +7168,52 @@ def change_player_between_group_after_draw():
             number_posev2 = int(player2_2[:znak]) # номера посева
             family2_2 = player2_2[znak + 1:znak1]
             family_list2 = [family1_2, family2_2]
+            gr_pl = [gr_pl2, gr_pl1, gr_pl2, gr_pl1]
     #======= new
         family_list = family_list1 + family_list2
         count_family = len(family_list)
-        number_posev = [number_posev1, number_posev2]
-        gr_pl = [gr_pl1, gr_pl2]
+        # number_posev = [number_posev1, number_posev2]
 # ================= 
         for k in range(0, count_family): # перезаписывает game list с новыми изменениями
             # g_list = gamelist.select().where((Game_list.player_group_id == family_list[k]) & (Game_list.rank_num_player == number_posev[k])).get() # находит 1 - ого игрока
             g_list = gamelist.select().where(Game_list.player_group_id == family_list[k]).get() # находит 1 - ого игрока
             with db:
-                g_list.number_group = gr_pl[1 - k]
+                g_list.number_group = gr_pl[k]
                 # g_list.rank_number_group = number_posev[1 - k]
                 g_list.save()
 #  ================== new
-        if stage == "Предварительный":
-            posev_gr = Choice.posev_group
-        elif stage == "1-й полуфинал":
-            posev_gr = Choice.posev_sf
+        # if stage == "Предварительный":
+        #     posev_gr = Choice.posev_group
+        # elif stage == "1-й полуфинал":
+        #     posev_gr = Choice.posev_sf
 
-        for k in range(0, 2): # перезаписывает таблицу Choice
-            choice = choices.select().where((Choice.family== family_list[k]) & (posev_gr == number_posev[k])).get()
+        for k in range(0, count_family): # перезаписывает таблицу Choice
+            choice = choices.select().where(Choice.family== family_list[k]).get()
+            # choice = choices.select().where((Choice.family== family_list[k]) & (posev_gr == number_posev[k])).get()
             with db:
                 if stage == "Предварительный":
-                    choice.posev_group = number_posev[1 - k]
-                    choice.group = gr_pl[1 - k]
+                    # choice.posev_group = number_posev[1 - k]
+                    choice.group = gr_pl[k]
                 elif stage == "1-й полуфинал":
-                    choice.posev_sf = number_posev[1 - k]
-                    choice.sf_group = gr_pl[1 - k]
+                    # choice.posev_sf = number_posev[1 - k]
+                    choice.sf_group = gr_pl[k]
                 choice.save()
+        # ====== если меняет в полуфинале группы (менять результат) ======
+        if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
+            for k in range(0, 2): # перезаписывает таблицу Choice
+                results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+                result = results.select().where((Result.player1 == family_list[k]) | (Result.player2 == family_list[k + 2])).get()
+                with db:
+                    result.nuber_group = gr_pl[k]
+                    result.save()
+                    # if stage == "Предварительный":
+                    #     # choice.posev_group = number_posev[1 - k]
+                    #     choice.group = gr_pl[k]
+                    # elif stage == "1-й полуфинал":
+                    #     # choice.posev_sf = number_posev[1 - k]
+                    #     choice.sf_group = gr_pl[k]
+                    # choice.save()
+
 # =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
