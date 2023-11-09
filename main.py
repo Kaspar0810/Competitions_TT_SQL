@@ -7203,9 +7203,9 @@ def change_player_between_group_after_draw():
                 fam_city = pl.full_name
                 fam_city_list.append(fam_city)
 
-                # for n in fam_city_list:
-            result1 = results.select().where(Result.player1.in_(fam_city_list))
-            result2 = result1.select().where(Result.player2.in_(fam_city_list)).get()
+                for n in fam_city_list:
+                    result1 = results.select().where(Result.player1.in_(fam_city_list))
+                    result2 = result1.select().where(Result.player2.in_(fam_city_list)).get()
                     # result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
 
                     # result_pre_fin = results.select().where(Result.system_stage == stage)
@@ -7219,9 +7219,9 @@ def change_player_between_group_after_draw():
                     # for m in result1:
                     #     result2 = m.select().where(Result.player2 == family_list[k + 2]).get()
                     #     if len(result2) == 1:
-                with db:
-                    result2.nuber_group = gr_pl[k]
-                    result2.save()
+                    with db:
+                        result2.nuber_group = gr_pl[k]
+                        result2.save()
 
 # =====================
     my_win.lineEdit_change_pl1.clear()
