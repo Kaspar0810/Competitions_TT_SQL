@@ -7170,10 +7170,9 @@ def change_player_between_group_after_draw():
             family2_2 = player2_2[znak + 1:znak1]
             family_list2 = [family1_2, family2_2]
             gr_pl = [gr_pl2, gr_pl1, gr_pl2, gr_pl1]
-    #======= new
         family_list = family_list1 + family_list2
         count_family = len(family_list)
-# ================= 
+
         for k in range(0, count_family): # перезаписывает game list с новыми изменениями
             g_list = gamelist.select().where(Game_list.player_group_id == family_list[k]).get() # находит 1 - ого игрока
             with db:
@@ -7192,7 +7191,7 @@ def change_player_between_group_after_draw():
         # ====== если меняет в полуфинале группы (менять результат) ======
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
             fam_city_list = []
-            for k in range(0, 2): # перезаписывает таблицу Choice
+
             results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
             players = Player.select().where(Player.title_id == title_id())
 
@@ -7202,28 +7201,13 @@ def change_player_between_group_after_draw():
                 pl = players.select().where(Player.id == id_pl).get()
                 fam_city = pl.full_name
                 fam_city_list.append(fam_city)
-
-                for n in fam_city_list:
-                    result1 = results.select().where(Result.player1.in_(fam_city_list))
-                    result2 = result1.select().where(Result.player2.in_(fam_city_list)).get()
-                    # result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
-
-                    # result_pre_fin = results.select().where(Result.system_stage == stage)
-                    # result_semifin_player1 = result_pre_fin.select().where(Result.player1.in_(player_exit))
-                    # result_semifin = result_semifin_player1.select().where(Result.player2.in_(player_exit)).get()
-
-                    # result_pre_fin = results.select().where(Result.system_stage == stage)
-                    # result1 = results.select().where(Result.player1.in_(family_list))
-                    # result2 = result1.select().where(Result.player2.in_(family_list)).get()
-                                                     
-                    # for m in result1:
-                    #     result2 = m.select().where(Result.player2 == family_list[k + 2]).get()
-                    #     if len(result2) == 1:
-                    with db:
-                        result2.nuber_group = gr_pl[k]
-                        result2.save()
-
-# =====================
+            for k in range(0, 4, 2): # перезаписывает таблицу Choice
+                result1 = results.select().where(Result.player1 == fam_city_list[k])
+                result2 = result1.select().where(Result.player2 == fam_city_list[k + 1]).get()
+                with db:
+                    result2.number_group = gr_pl[k // 2]
+                    result2.save()
+        # =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
     my_win.lineEdit_change_pl1_2.clear()
