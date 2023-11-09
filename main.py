@@ -7158,6 +7158,7 @@ def change_player_between_group_after_draw():
         family2 = player2[znak + 1:znak1]
         family_list1 = [family1, family2]
         gr_pl = [gr_pl2, gr_pl1]
+
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
             znak = player1_2.find(":")
             znak1 = player1_2.find("/") 
@@ -7178,9 +7179,10 @@ def change_player_between_group_after_draw():
             with db:
                 g_list.number_group = gr_pl[k]
                 g_list.save()
-
+        id_player_dict = {}
         for k in range(0, count_family): # перезаписывает таблицу Choice
             choice = choices.select().where(Choice.family== family_list[k]).get()
+            id_player_dict[family_list[k]] = choice.player_choice_id
             with db:
                 if stage == "Предварительный":
                     choice.group = gr_pl[k]
@@ -7189,18 +7191,21 @@ def change_player_between_group_after_draw():
                 choice.save()
         # ====== если меняет в полуфинале группы (менять результат) ======
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
-             for k in range(0, 2): # перезаписывает таблицу Choice
-                results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
-                for n in results:
-                    pl1 = n.player1
-                    pl2 = n.player2
-                    # znak = pl1.find("/")
-                    # player1 = pl1[:znak]
-                    # znak = pl2.find("/")
-                    # player2 = pl2[:znak]
-                    player_list = [pl1, pl2]
-                    result1 = results.select().where(Result.player1.in_(player_list))
-                    result2 = result1.select().where(Result.player2.in_(player_list)).get()
+            fam_city_list = []
+            for k in range(0, 2): # перезаписывает таблицу Choice
+            results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+            players = Player.select().where(Player.title_id == title_id())
+
+            pl_list = [family1, family1_2, family2, family2_2]
+            for p in pl_list:
+                id_pl = id_player_dict[p]
+                pl = players.select().where(Player.id == id_pl).get()
+                fam_city = pl.full_name
+                fam_city_list.append(fam_city)
+
+                # for n in fam_city_list:
+            result1 = results.select().where(Result.player1.in_(fam_city_list))
+            result2 = result1.select().where(Result.player2.in_(fam_city_list)).get()
                     # result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
 
                     # result_pre_fin = results.select().where(Result.system_stage == stage)
@@ -7214,9 +7219,9 @@ def change_player_between_group_after_draw():
                     # for m in result1:
                     #     result2 = m.select().where(Result.player2 == family_list[k + 2]).get()
                     #     if len(result2) == 1:
-                    with db:
-                        result2.nuber_group = gr_pl[k]
-                        result2.save()
+                with db:
+                    result2.nuber_group = gr_pl[k]
+                    result2.save()
 
 # =====================
     my_win.lineEdit_change_pl1.clear()
