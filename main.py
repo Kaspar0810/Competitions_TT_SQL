@@ -535,7 +535,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         return
                     add_open_tab(tab_page="Полуфиналы")
                     my_win.tabWidget.setCurrentIndex(4)
-                    my_win.ed_pf_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                    my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
 
             fin = select_choice_final()
@@ -3457,12 +3457,15 @@ def player_in_table_group_and_write_Game_list_Result(stage):
     if stage == "Предварительный":
         gamelist = Game_list.delete().where(Game_list.title_id == title_id())
         query = Result.delete().where(Result.title_id == title_id())
-        gamelist.execute()
-        query.execute()
+        # gamelist.execute()
+        # query.execute()
+        # load_playing_game_in_table_for_semifinal(stage)
     else:
         gamelist = Game_list.delete().where((Game_list.title_id == title_id()) & (Game_list.system_id == system))
-        gamelist.execute()
-        load_playing_game_in_table_for_semifinal(stage)
+        query = Result.delete().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+    gamelist.execute()
+    query.execute()  
+        # load_playing_game_in_table_for_semifinal(stage)
     
     kg = system.total_group
     system_id = system.id
@@ -7188,7 +7191,7 @@ def change_player_between_group_after_draw():
                 elif stage == "1-й полуфинал":
                     choice.sf_group = gr_pl[k]
                 choice.save()
-        player_in_table_group_and_write_Game_list_Result(stage)
+        # player_in_table_group_and_write_Game_list_Result(stage)
         # ====== если меняет в полуфинале группы (менять результат) ======
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
             fam_city_list = []
@@ -7223,7 +7226,7 @@ def change_player_between_group_after_draw():
         my_win.tabWidget.setCurrentIndex(3)
     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
          my_win.tabWidget.setCurrentIndex(4)            
- 
+    my_win.tableView.setVisible(True)
 
 # def add_player_to_group():
 #     """добавление игрока в группу при редактировании"""
@@ -12702,6 +12705,100 @@ def tours_list(cp):
     return tour_list
 
 
+# ====
+# def load_playing_game_in_table_for_semifinal(stage):
+#     """растановка в полуфинале игроков со встречей сыгранной в группе"""
+#     id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы в порядке занятых место по возрастанию
+#     posev_player_exit_out_gr = []
+#     player_exit = []    
+#     mesto_rank = 1 # начальное место с которого вышли в финал
+#     system = System.select().where(System.title_id == title_id())
+#     choice = Choice.select().where(Choice.title_id == title_id())
+#     results = Result.select().where(Result.title_id == title_id())
+#     sys = system.select().where(System.stage == "Предварительный").get()
+#     sys_semifin = system.select().where(System.stage == stage).get()
+#     kol_gr = sys.total_group
+#     if stage == "1-й полуфинал":
+#         mesto_rank = 1
+#     else:
+#         sys_fin_last = system.select().where(System.stage == stage).get()
+#         mesto_rank = sys_fin_last.mesta_exit + 1 # место, попадающих в финал из группы начало
+#     how_many_mest_exit = sys_semifin.mesta_exit # количество мест попадающих из предварительного этапа
+#     for i in range(1, kol_gr + 1): # цикл по группам
+#         posev_player_exit_out_gr.clear()
+#         id_player_exit_out_gr.clear()
+#         choice_group = choice.select().where(Choice.group == f"{i} группа") 
+#         kol_player = len(choice_group) # число участников в группе
+#         if mesto_rank + how_many_mest_exit <= kol_player:
+#             mesto_rank_end = mesto_rank + how_many_mest_exit
+#         else:
+#             mesto_rank_end = kol_player + 1
+#         n = 0
+#         for k in range(mesto_rank, mesto_rank_end): # цикл в группе начиная с места с которого выходят в финал (зависит скольк игроков выходят из группы)
+#             ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
+#             pl_id = ch_mesto_exit.player_choice_id # id игрока, занявшего данное место
+#             pl_posev = ch_mesto_exit.posev_group
+#             id_player_exit_out_gr.append(pl_id)
+#             posev_player_exit_out_gr.append(pl_posev) # номера игроков в группе вышедших в финал
+#             n += 1
+
+#         posev_pl = []
+#         temp = []
+#         posev_id_pl = []
+#         all_posev_id_pl = []
+#         if n > 1:
+#             # получаем все варианты встреч, сыгранных в группе игроков которые попали в финал
+#             for i in combinations(posev_player_exit_out_gr, 2):
+#                 posev_player_exit = list(i)
+#                 for v in posev_player_exit:
+#                     ind = posev_player_exit_out_gr.index(v)
+#                     id_player = id_player_exit_out_gr[ind]
+#                     temp.append(id_player)
+#                     posev_id_pl = temp.copy()
+#                 temp.clear()
+#                 posev_pl.append(posev_player_exit)
+#                 all_posev_id_pl.append(posev_id_pl)
+
+#             result_pre = results.select().where(Result.system_stage == "Предварительный") # изменить откуда выходят из группы или пф
+#             for d in range(0, len(posev_pl)):
+#                 posev_exit = posev_pl[d]
+#                 id_player_exit = all_posev_id_pl[d]
+#                 if posev_exit[0] > posev_exit[1]: # если спортсмены заняли места не по расстановки в табл меняем на номера встречи в правильном порядке по возр
+#                     id_player_exit.reverse()
+                    
+#                 player_exit.clear()
+#                 posev_exit.clear()
+#                 for l in id_player_exit:
+#                     players = Player.select().where(Player.id == l).get()
+#                     family_city = players.full_name
+#                     player_exit.append(family_city)  
+#                     # номер ид в таблице -Result- встречи игроков, попавших в полуфинал идущих по расстоновке в таблице   
+#                 result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
+
+#                 result_pre_fin = results.select().where(Result.system_stage == stage)
+#                 result_semifin_player1 = result_pre_fin.select().where(Result.player1.in_(player_exit))
+#                 result_semifin = result_semifin_player1.select().where(Result.player2.in_(player_exit)).get()
+
+#                 with db:
+#                     result_semifin.winner = result_gr.winner
+#                     result_semifin.points_win = result_gr.points_win
+#                     result_semifin.score_in_game = result_gr.score_in_game
+#                     result_semifin.score_win = result_gr.score_win
+#                     result_semifin.loser = result_gr.loser
+#                     result_semifin.points_loser = result_gr.points_loser
+#                     result_semifin.score_loser = result_gr.score_loser
+#                     result_semifin.save()
+#     pv = sys_semifin.page_vid
+#     my_win.tabWidget.setCurrentIndex(4)
+#     table_made(pv, stage)
+
+
+# ====
+
+
+
+
+
 def load_playing_game_in_table_for_semifinal(stage):
     """растановка в полуфинале игроков со встречей сыгранной в группе"""
     id_player_exit_out_gr = [] # список ид игроков попадающих в финал из группы в порядке занятых место по возрастанию
@@ -12786,7 +12883,7 @@ def load_playing_game_in_table_for_semifinal(stage):
                     result_semifin.save()
     pv = sys_semifin.page_vid
     my_win.tabWidget.setCurrentIndex(4)
-    table_made(pv, stage)
+    # table_made(pv, stage)
 
 
 def load_playing_game_in_table_for_final(fin):
