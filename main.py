@@ -7188,6 +7188,7 @@ def change_player_between_group_after_draw():
                 elif stage == "1-й полуфинал":
                     choice.sf_group = gr_pl[k]
                 choice.save()
+        player_in_table_group_and_write_Game_list_Result(stage)
         # ====== если меняет в полуфинале группы (менять результат) ======
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
             fam_city_list = []
@@ -7212,13 +7213,16 @@ def change_player_between_group_after_draw():
     my_win.lineEdit_change_pl2.clear()
     my_win.lineEdit_change_pl1_2.clear()
     my_win.lineEdit_change_pl2_2.clear()
-    player_in_table_group_and_write_Game_list_Result(stage)
     my_win.comboBox_first_group.setCurrentText("-выберите группу-")
     my_win.comboBox_second_group.setCurrentText("-выберите группу-")
     my_win.listWidget_first_group.clear()
     my_win.listWidget_second_group.clear()
     my_win.comboBox_edit_etap1.setCurrentIndex(0)
     my_win.comboBox_edit_etap2.setCurrentIndex(0)
+    if stage == "Предварительный":
+        my_win.tabWidget.setCurrentIndex(3)
+    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+         my_win.tabWidget.setCurrentIndex(4)            
  
 
 # def add_player_to_group():
