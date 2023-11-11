@@ -4826,31 +4826,31 @@ def made_pdf_table_for_view(sender):
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin2_Action:
-        stage == "2-й финал"
+        stage = "2-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin3_Action:
-        stage == "3-й финал"
+        stage = "3-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin4_Action:
-        stage == "4-й финал"
+        stage = "4-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin5_Action:
-        stage == "5-й финал"
+        stage = "5-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin6_Action:
-        stage == "6-й финал"
+        stage = "6-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin7_Action:
-        stage == "7-й финал"
+        stage = "7-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin8_Action:
-        stage == "8-й финал"
+        stage = "8-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_one_table_Action:
@@ -5937,7 +5937,8 @@ def choice_setka_automat(fin, flag, count_exit):
                             group_last.append(v[2]) # список номеров групп уже посеянных
                         if n != 0 or (n == 0 and l > 1):
                 # =========== определения кол-во возможны вариантов посева у каждого региона
-                            possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)                           
+                            # possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)   
+                            possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net, count_exit)                        
 
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
@@ -5957,7 +5958,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                 elif len(num_set) == 1: # остался только один номер
                                     num_set = num_set[0]
                             else: # manual
-                                my_win.tableWidget.setGeometry(QtCore.QRect(260, 241, 841, 540))
+                                my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
                                 player_list = []
                                 player_list_tmp = []
 
@@ -6369,7 +6370,7 @@ def free_place_in_setka(max_player, real_all_player_in_final):
 
 
 
-def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net):
+def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net, count_exit):
     """возможные номера посева new"""
     possible_number = {}
     proba_possible = {} 
@@ -6385,7 +6386,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
         cur_reg = current_region[y][0] # текущий регион посева
         cur_gr = current_region[y][1] # номер группы, которая сеятся
         #=======
-        if multi_reg == 0: # если спортсмены одного региона нет рассеивания
+        if multi_reg == 0 or (len(num_id_player) >= player_net // 2 and count_exit == 1): # если спортсмены одного региона нет рассеивания
             possible_number[reg] = sev
         else:
             if n == 0:
@@ -7182,6 +7183,7 @@ def change_player_between_group_after_draw():
                 g_list.number_group = gr_pl[k]
                 g_list.save()
         id_player_dict = {}
+     
         for k in range(0, count_family): # перезаписывает таблицу Choice
             choice = choices.select().where(Choice.family== family_list[k]).get()
             id_player_dict[family_list[k]] = choice.player_choice_id
@@ -7195,7 +7197,8 @@ def change_player_between_group_after_draw():
         # ====== если меняет в полуфинале группы (менять результат) ======
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
             fam_city_list = []
-
+            player_in_table_group_and_write_Game_list_Result(stage)
+            load_playing_game_in_table_for_semifinal(stage)
             results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
             players = Player.select().where(Player.title_id == title_id())
 
@@ -7205,7 +7208,7 @@ def change_player_between_group_after_draw():
                 pl = players.select().where(Player.id == id_pl).get()
                 fam_city = pl.full_name
                 fam_city_list.append(fam_city)
-            for k in range(0, 4, 2): # перезаписывает таблицу Choice
+            for k in range(0, 4, 2): # перезаписывает таблицу Result
                 result1 = results.select().where(Result.player1 == fam_city_list[k])
                 result2 = result1.select().where(Result.player2 == fam_city_list[k + 1]).get()
                 with db:
