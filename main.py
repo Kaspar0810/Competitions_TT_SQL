@@ -2123,7 +2123,10 @@ def dclick_in_listwidget():
                 year_bday = int(vozrast_text[:4])
                 year_current = int(datetime.today().strftime("%Y")) # текущий год
             after_date = date(year_bday, 1, 1)
-            date_object = datetime.strptime(dr,"%Y-%m-%d")
+            if znak != -1:
+                date_object = datetime.strptime(dr,"%d.%m.%Y")
+            else:                    
+                date_object = datetime.strptime(dr,"%Y-%m-%d")
             dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
             current_date = date(dr_year, 1, 1)
             if after_date > current_date: # сравниваем две даты
