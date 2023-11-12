@@ -6745,7 +6745,6 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
             if values == 0:
                 posev_tmp[u] = region  # запись региона в группу (посев)
         else:
-<<<<<<< HEAD
             if free_gr != 1:
                 f = current_region_group[region]  # список номеров групп для посева текущего региона
                 if len(f) == 0:
@@ -6768,7 +6767,7 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                 # else: # во все группах уже есть одинаковое количество регионов и теперь посев снвоа во все группы
                 #     pass
             
-=======
+
             f = current_region_group[region]  # список номеров групп для посева текущего региона
             if free_gr == 0:
                 temp_list = []                   
@@ -6790,7 +6789,6 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                 g = f[0]
                 posev_tmp[g] = region
                 u = g    # присваивает переменной u - номер группы, если она идет не по порядку
->>>>>>> 7659cac379053401674e201fafb9764a78439ecf
         # ====не правильное соответствие номера региона и номера группы
         index = key_reg_current.index(region)
         p = player_list[index]
