@@ -1666,7 +1666,7 @@ def next_field():
     """переход к следующему полю ввода спортсмена"""
     my_win.lineEdit_R.setText('0')
     pl = my_win.lineEdit_Family_name.text()
-    check_rejting_pay(pl, txt_edit="")
+    check_rejting_pay(pl)
     my_win.label_63.setText("Список городов.")
     my_win.lineEdit_city_list.setFocus()
 
@@ -1982,10 +1982,10 @@ def add_player():
     ch = my_win.lineEdit_coach.text()
     if pl_id == "": # добавляет нового игрока
         flag = check_repeat_player(pl, bd) # проверка повторного ввода игрока
-    # else:
-    #     player = Player.select().where(Player.id == pl_id).get()
-    #     pay_R = player.pay_rejting
-    #     comment = player.comment
+    else:
+        player = Player.select().where(Player.id == pl_id).get()
+        pay_R = player.pay_rejting
+        comment = player.comment
 
     num = count + 1
     fn = f"{pl}/{ct}"
@@ -2037,9 +2037,10 @@ def add_player():
                 plr.comment = comment
                 plr.save()
         elif txt == "Добавить":
+            debt = "долг" if txt_edit == "Спортсмену необходимо оплатить рейтинг!" else ""
             with db:
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
-                                coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting="", comment="", 
+                                coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting=debt, comment="", 
                                 coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
         pl_id = Player.select().order_by(Player.id.desc()).get() # id нового игрока
         player_id = pl_id.id
@@ -2054,7 +2055,7 @@ def add_player():
     my_win.lineEdit_R.clear()
     my_win.lineEdit_city_list.clear()
     my_win.lineEdit_coach.clear()
-    check_rejting_pay(pl, txt_edit)
+    # check_rejting_pay(pl)
     if txt == "Редактировать":
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.Button_del_player.setEnabled(False) 
@@ -2062,8 +2063,9 @@ def add_player():
     my_win.lineEdit_Family_name.setFocus()
 
 
-def check_rejting_pay(pl, txt_edit):
+def check_rejting_pay(pl):
     """Проверка игрока на оплату рейтинга и запись в базу данных"""
+    txt_edit = my_win.textEdit.toPlainText()
     txt_tmp = my_win.label_63.text()
     if txt_tmp == "Поиск в январском рейтинге.":
         b_day = my_win.lineEdit_bday.text()
@@ -2074,8 +2076,9 @@ def check_rejting_pay(pl, txt_edit):
             my_win.textEdit.setText("Спортсмену необходимо оплатить рейтинг!")
     elif txt_edit == "Спортсмену необходимо оплатить рейтинг!":
         plr = Player.select().where(Player.title_id == title_id())
+        player_id = plr.select().where(Player.player == pl).get()
         with db:
-            player_id = plr.select().where(Player.player == pl).get()
+                # player_id = plr.select().where(Player.player == pl).get()
             player_id.pay_rejting = "долг"
             player_id.comment = ""
             player_id.save()
@@ -2145,6 +2148,11 @@ def dclick_in_listwidget():
         my_win.lineEdit_bday.setText(dr)
         my_win.lineEdit_R.setText(r)
         my_win.lineEdit_city_list.setText(ci)
+         # ======= проверка на рейтинг ====
+        if txt_tmp == "Поиск в январском рейтинге.":
+            # txt_edit = txt_tmp
+            pl = fam_name
+            check_rejting_pay(pl)
         c = City.select()  # находит город и соответсвующий ему регион
         c = c.where(City.city ** f'{ci}')  # like
         if (len(c)) == 0:
