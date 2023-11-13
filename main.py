@@ -478,7 +478,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             choice_gr_automat()
                             add_open_tab(tab_page="Группы")
                             my_win.tabWidget.setCurrentIndex(3)
-                            my_win.ed_gr_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                            my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
                             return
                         else:
                             return
@@ -512,7 +512,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         return
                     add_open_tab(tab_page="Полуфиналы")
                     my_win.tabWidget.setCurrentIndex(4)
-                    my_win.ed_pf_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                    my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
                     return
                 else:
                     return
@@ -6756,10 +6756,12 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
             if values == 0:
                 posev_tmp[u] = region  # запись региона в группу (посев)
         else:
+            f = current_region_group[region]  # список номеров групп для посева текущего региона
+            temp_list = []
             if free_gr != 1:
-                f = current_region_group[region]  # список номеров групп для посева текущего региона
+                # f = current_region_group[region]  # список номеров групп для посева текущего региона
                 if len(f) == 0:
-                    temp_list = []
+                    # temp_list = []
                     for i in range(1, 33):
                         temp_list.append(i)
                     current_region_group[region] = temp_list
@@ -6779,9 +6781,9 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                 #     pass
             
 
-            f = current_region_group[region]  # список номеров групп для посева текущего региона
-            if free_gr == 0:
-                temp_list = []                   
+            # f = current_region_group[region]  # список номеров групп для посева текущего региона
+            elif free_gr == 0:
+                # temp_list = []                   
                 for i in range (1, len(posev) + 1):
                     gr_dict = posev[f"{m}_посев"]
                     gr = gr_dict[i]
