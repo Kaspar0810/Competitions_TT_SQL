@@ -4380,8 +4380,8 @@
                       <property name="font">
                        <font>
                         <family>Courier New</family>
-                        <pointsize>12</pointsize>
-                        <weight>50</weight>
+                        <pointsize>10</pointsize>
+                        <weight>45</weight>
                         <bold>false</bold>
                        </font>
                       </property>
@@ -4566,6 +4566,7 @@
             <height>81</height>
            </rect>
           </property>
+<<<<<<< HEAD
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <property name="spacing">
             <number>1</number>
@@ -4688,6 +4689,146 @@
            </item>
           </layout>
          </widget>
+=======
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <item>
+               <widget class="QCheckBox" name="checkBox_6">
+                <property name="font">
+                 <font>
+                  <family>Times</family>
+                  <pointsize>12</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Удаленные</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_15">
+                <property name="font">
+                 <font>
+                  <family>Times</family>
+                  <pointsize>12</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Предзаявка</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="Button_clear_del">
+              <property name="font">
+               <font>
+                <family>Courier New</family>
+                <pointsize>12</pointsize>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="text">
+               <string>Очистить</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="checkBox_11">
+              <property name="font">
+               <font>
+                <family>Times</family>
+                <pointsize>10</pointsize>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Должники R</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="Button_pay_R">
+              <property name="font">
+               <font>
+                <family>Courier New</family>
+                <pointsize>10</pointsize>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="text">
+               <string>Оплата</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="Button_app">
+            <property name="font">
+             <font>
+              <family>Courier New</family>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>По заявке</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+>>>>>>> 8b217a84b40bfc1e7248cc65f85ae56c24c7e600
         </widget>
        </item>
       </layout>
@@ -6264,8 +6405,8 @@
          <property name="font">
           <font>
            <family>Times New Roman</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
+           <pointsize>10</pointsize>
+           <weight>45</weight>
            <italic>true</italic>
            <bold>false</bold>
           </font>
@@ -6280,8 +6421,8 @@
          <property name="font">
           <font>
            <family>Times New Roman</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
+           <pointsize>10</pointsize>
+           <weight>45</weight>
            <italic>true</italic>
            <bold>false</bold>
           </font>
