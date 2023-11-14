@@ -7188,6 +7188,7 @@ def change_player_between_group_after_draw():
                     choice.posev_group = number_posev2
                     choice.save()
     else: # меняет спортсменов местами
+        fam_city_list = []
         znak = player1.find(":")
         znak1 = player1.find("/")  
         number_posev1 = int(player1[:znak]) # номера посева
@@ -7198,7 +7199,7 @@ def change_player_between_group_after_draw():
         family2 = player2[znak + 1:znak1]
         family_list1 = [family1, family2]
         gr_pl = [gr_pl2, gr_pl1]
-
+        family_list = family_list1
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
             znak = player1_2.find(":")
             znak1 = player1_2.find("/") 
@@ -7210,7 +7211,7 @@ def change_player_between_group_after_draw():
             family2_2 = player2_2[znak + 1:znak1]
             family_list2 = [family1_2, family2_2]
             gr_pl = [gr_pl2, gr_pl1, gr_pl2, gr_pl1]
-        family_list = family_list1 + family_list2
+            family_list = family_list1 + family_list2
         count_family = len(family_list)
 
         for k in range(0, count_family): # перезаписывает game list с новыми изменениями
@@ -7229,10 +7230,25 @@ def change_player_between_group_after_draw():
                 elif stage == "1-й полуфинал":
                     choice.sf_group = gr_pl[k]
                 choice.save()
+        player_in_table_group_and_write_Game_list_Result(stage)
+        results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+        players = Player.select().where(Player.title_id == title_id()) 
+        pl_list = [family1, family2]  
+        for p in pl_list:
+                id_pl = id_player_dict[p]
+                pl = players.select().where(Player.id == id_pl).get()
+                fam_city = pl.full_name
+                fam_city_list.append(fam_city)
+        for k in range(0, 2): # перезаписывает таблицу Result
+            result1 = results.select().where(Result.player1 == fam_city_list[k])
+            result2 = result1.select().where(Result.player2 == fam_city_list[k + 1]).get()
+            with db:
+                result2.number_group = gr_pl[k // 2]
+                result2.save()     
         # player_in_table_group_and_write_Game_list_Result(stage)
         # ====== если меняет в полуфинале группы (менять результат) ======
         if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
-            fam_city_list = []
+            # fam_city_list = []
             player_in_table_group_and_write_Game_list_Result(stage)
             load_playing_game_in_table_for_semifinal(stage)
             results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
