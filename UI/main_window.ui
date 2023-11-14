@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1111</width>
-    <height>825</height>
+    <height>824</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -4146,9 +4146,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>243</width>
-      <height>765</height>
+      <y>10</y>
+      <width>241</width>
+      <height>771</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -4180,15 +4180,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>239</width>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4200,8 +4200,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>239</width>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4212,13 +4212,13 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>236</width>
-        <height>527</height>
+        <width>225</width>
+        <height>510</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_37">
        <property name="spacing">
-        <number>4</number>
+        <number>1</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -4520,24 +4520,6 @@
              </item>
             </layout>
            </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_find_player">
-             <property name="font">
-              <font>
-               <family>Times</family>
-               <pointsize>13</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Поиск спортсмена</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
          <item>
@@ -4551,160 +4533,161 @@
        </item>
        <item>
         <widget class="QWidget" name="widget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_32">
-          <property name="spacing">
-           <number>1</number>
+         <widget class="QCheckBox" name="checkBox_find_player">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>90</y>
+            <width>221</width>
+            <height>18</height>
+           </rect>
           </property>
-          <property name="leftMargin">
-           <number>0</number>
+          <property name="font">
+           <font>
+            <family>Times</family>
+            <pointsize>13</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
           </property>
-          <property name="topMargin">
-           <number>0</number>
+          <property name="text">
+           <string>Поиск спортсмена</string>
           </property>
-          <property name="rightMargin">
-           <number>0</number>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
-          <property name="bottomMargin">
-           <number>0</number>
+         </widget>
+         <widget class="QWidget" name="">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>231</width>
+            <height>81</height>
+           </rect>
           </property>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_7">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-            <property name="leftMargin">
-             <number>2</number>
-            </property>
-            <property name="topMargin">
-             <number>2</number>
-            </property>
-            <property name="rightMargin">
-             <number>2</number>
-            </property>
-            <property name="bottomMargin">
-             <number>2</number>
-            </property>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_20">
-              <item>
-               <widget class="QCheckBox" name="checkBox_6">
-                <property name="font">
-                 <font>
-                  <family>Times</family>
-                  <pointsize>12</pointsize>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Удаленные</string>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkBox_15">
-                <property name="font">
-                 <font>
-                  <family>Times</family>
-                  <pointsize>12</pointsize>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Предзаявка</string>
-                </property>
-                <property name="checkable">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QPushButton" name="Button_clear_del">
-              <property name="font">
-               <font>
-                <family>Courier New</family>
-                <pointsize>12</pointsize>
-                <kerning>true</kerning>
-               </font>
-              </property>
-              <property name="text">
-               <string>Очистить</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_8">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-            <property name="leftMargin">
-             <number>2</number>
-            </property>
-            <property name="topMargin">
-             <number>2</number>
-            </property>
-            <property name="rightMargin">
-             <number>2</number>
-            </property>
-            <property name="bottomMargin">
-             <number>2</number>
-            </property>
-            <item>
-             <widget class="QCheckBox" name="checkBox_11">
-              <property name="font">
-               <font>
-                <family>Times</family>
-                <pointsize>12</pointsize>
-                <weight>50</weight>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Должники R</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="Button_pay_R">
-              <property name="font">
-               <font>
-                <family>Courier New</family>
-                <pointsize>12</pointsize>
-                <kerning>true</kerning>
-               </font>
-              </property>
-              <property name="text">
-               <string>Оплата</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QPushButton" name="Button_app">
-            <property name="font">
-             <font>
-              <family>Courier New</family>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>По заявке</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="spacing">
+            <number>1</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <property name="spacing">
+              <number>1</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="checkBox_6">
+               <property name="font">
+                <font>
+                 <family>Times</family>
+                 <pointsize>12</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Удаленные</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="Button_clear_del">
+               <property name="font">
+                <font>
+                 <family>Courier New</family>
+                 <pointsize>12</pointsize>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>Очистить</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <property name="spacing">
+              <number>1</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="checkBox_15">
+               <property name="font">
+                <font>
+                 <family>Times</family>
+                 <pointsize>12</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Предзаявка</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="Button_app">
+               <property name="font">
+                <font>
+                 <family>Courier New</family>
+                 <pointsize>12</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>По заявке</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_20">
+             <property name="spacing">
+              <number>1</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="checkBox_11">
+               <property name="font">
+                <font>
+                 <family>Times</family>
+                 <pointsize>12</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Должники R</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="Button_pay_R">
+               <property name="font">
+                <font>
+                 <family>Courier New</family>
+                 <pointsize>12</pointsize>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>Оплата</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -4715,8 +4698,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>239</width>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5102,8 +5085,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>239</width>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5520,8 +5503,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>239</width>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5827,8 +5810,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>239</width>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6235,8 +6218,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>491</height>
+       <width>239</width>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6619,7 +6602,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>491</height>
+       <height>537</height>
       </rect>
      </property>
      <attribute name="label">
