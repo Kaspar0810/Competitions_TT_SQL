@@ -8964,6 +8964,7 @@ def select_stage_for_begunki():
         sys_id = systems.select().where(System.stage == stage).get()
         group = sys_id.total_group
         group_list = [f"{i} группа" for i in range(1, group + 1)] # генератор списка
+        group_list.insert(0, "все")
     elif stage == "Одна таблица":
         pass
     else:

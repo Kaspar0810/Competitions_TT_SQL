@@ -4380,8 +4380,8 @@
                       <property name="font">
                        <font>
                         <family>Courier New</family>
-                        <pointsize>12</pointsize>
-                        <weight>50</weight>
+                        <pointsize>10</pointsize>
+                        <weight>45</weight>
                         <bold>false</bold>
                        </font>
                       </property>
@@ -4662,7 +4662,7 @@
               <property name="font">
                <font>
                 <family>Times</family>
-                <pointsize>12</pointsize>
+                <pointsize>10</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
                </font>
@@ -4680,7 +4680,7 @@
               <property name="font">
                <font>
                 <family>Courier New</family>
-                <pointsize>12</pointsize>
+                <pointsize>10</pointsize>
                 <kerning>true</kerning>
                </font>
               </property>
@@ -4696,7 +4696,7 @@
             <property name="font">
              <font>
               <family>Courier New</family>
-              <pointsize>12</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -6281,8 +6281,8 @@
          <property name="font">
           <font>
            <family>Times New Roman</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
+           <pointsize>10</pointsize>
+           <weight>45</weight>
            <italic>true</italic>
            <bold>false</bold>
           </font>
@@ -6297,8 +6297,8 @@
          <property name="font">
           <font>
            <family>Times New Roman</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
+           <pointsize>10</pointsize>
+           <weight>45</weight>
            <italic>true</italic>
            <bold>false</bold>
           </font>
