@@ -4180,7 +4180,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4188,7 +4188,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>476</height>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4201,22 +4201,25 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>476</height>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
       <string>Список участников</string>
      </attribute>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
         <width>241</width>
-        <height>461</height>
+        <height>431</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_37">
+       <property name="spacing">
+        <number>1</number>
+       </property>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_36">
          <item>
@@ -4631,7 +4634,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>476</height>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4640,8 +4643,8 @@
      <widget class="QLabel" name="label_20">
       <property name="geometry">
        <rect>
-        <x>23</x>
-        <y>250</y>
+        <x>30</x>
+        <y>220</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -4663,9 +4666,9 @@
      <widget class="QFrame" name="frame_3">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>270</y>
-        <width>216</width>
+        <x>5</x>
+        <y>250</y>
+        <width>230</width>
         <height>85</height>
        </rect>
       </property>
@@ -4680,7 +4683,7 @@
         <rect>
          <x>87</x>
          <y>2</y>
-         <width>127</width>
+         <width>133</width>
          <height>26</height>
         </rect>
        </property>
@@ -4747,10 +4750,10 @@
      <widget class="QFrame" name="frame_2">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>5</x>
         <y>23</y>
-        <width>221</width>
-        <height>221</height>
+        <width>230</width>
+        <height>193</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -4848,6 +4851,9 @@
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_11">
+         <property name="spacing">
+          <number>1</number>
+         </property>
          <item>
           <widget class="QLabel" name="label_13">
            <property name="font">
@@ -4915,7 +4921,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>445</y>
+        <y>420</y>
         <width>211</width>
         <height>20</height>
        </rect>
@@ -4937,7 +4943,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>470</y>
+        <y>440</y>
         <width>221</width>
         <height>21</height>
        </rect>
@@ -4946,9 +4952,9 @@
      <widget class="QFrame" name="frame_4">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>380</y>
-        <width>216</width>
+        <x>5</x>
+        <y>370</y>
+        <width>230</width>
         <height>45</height>
        </rect>
       </property>
@@ -4991,8 +4997,8 @@
      <widget class="QLabel" name="label_28">
       <property name="geometry">
        <rect>
-        <x>23</x>
-        <y>355</y>
+        <x>30</x>
+        <y>340</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -5018,7 +5024,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>476</height>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5436,7 +5442,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>476</height>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5743,7 +5749,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>476</height>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6151,7 +6157,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>476</height>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6534,7 +6540,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>476</height>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">

@@ -7123,14 +7123,19 @@ def change_player_between_group_after_draw():
     for p in range(0, 4):
         player_dict[p] = player_list[p]
 
-    if len(player_list == 0):
+    element_count = len([item for item in player_list  if item != ""]) # подсчитывает колличество не пустых значений
+
+    if element_count  == 0:
         result = msgBox.information(my_win, "Уведомление", "Вы не выбрали игроков группы!", msgBox.Ok)
         return
-    else:
+    elif element_count == 1:
         posev, ok = QInputDialog.getInt(my_win, "Номер посева", "Введите номер посева", min=1, max=5)
         if not ok:
             return
-
+        else:
+            pass
+    else:
+        pass
 
     if etap_1 == etap_2: # оба игрока из одного этапа соревнования
         stage = etap_1

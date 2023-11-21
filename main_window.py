@@ -14,11 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-<<<<<<< HEAD
         MainWindow.resize(1111, 823)
-=======
-        MainWindow.resize(1111, 825)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         MainWindow.setStyleSheet("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -1752,11 +1748,7 @@ class Ui_MainWindow(object):
         self.Button_pay.setObjectName("Button_pay")
         self.tabWidget.addTab(self.tab_7, "")
         self.toolBox = QtWidgets.QToolBox(self.centralwidget)
-<<<<<<< HEAD
         self.toolBox.setGeometry(QtCore.QRect(10, 20, 243, 758))
-=======
-        self.toolBox.setGeometry(QtCore.QRect(10, 20, 243, 765))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -1772,57 +1764,25 @@ class Ui_MainWindow(object):
         self.toolBox.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.toolBox.setObjectName("toolBox")
         self.page = QtWidgets.QWidget()
-<<<<<<< HEAD
-        self.page.setGeometry(QtCore.QRect(0, 0, 241, 476))
+        self.page.setGeometry(QtCore.QRect(0, 0, 241, 484))
         self.page.setObjectName("page")
         self.toolBox.addItem(self.page, "")
         self.page_2 = QtWidgets.QWidget()
-        self.page_2.setGeometry(QtCore.QRect(0, 0, 241, 476))
-        self.page_2.setObjectName("page_2")
-        self.widget = QtWidgets.QWidget(self.page_2)
-        self.widget.setGeometry(QtCore.QRect(0, 0, 241, 461))
-        self.widget.setObjectName("widget")
-        self.verticalLayout_37 = QtWidgets.QVBoxLayout(self.widget)
-        self.verticalLayout_37.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_37.setObjectName("verticalLayout_37")
-        self.verticalLayout_36 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_36.setObjectName("verticalLayout_36")
-        self.verticalLayout_9 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_9.setSpacing(1)
-        self.verticalLayout_9.setObjectName("verticalLayout_9")
-        self.label_46 = QtWidgets.QLabel(self.widget)
-=======
-        self.page.setGeometry(QtCore.QRect(0, 0, 241, 491))
-        self.page.setObjectName("page")
-        self.toolBox.addItem(self.page, "")
-        self.page_2 = QtWidgets.QWidget()
-        self.page_2.setGeometry(QtCore.QRect(0, 0, 241, 491))
+        self.page_2.setGeometry(QtCore.QRect(0, 0, 241, 484))
         self.page_2.setObjectName("page_2")
         self.layoutWidget2 = QtWidgets.QWidget(self.page_2)
-        self.layoutWidget2.setGeometry(QtCore.QRect(0, 0, 236, 527))
+        self.layoutWidget2.setGeometry(QtCore.QRect(0, 0, 241, 431))
         self.layoutWidget2.setObjectName("layoutWidget2")
         self.verticalLayout_37 = QtWidgets.QVBoxLayout(self.layoutWidget2)
         self.verticalLayout_37.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_37.setSpacing(4)
+        self.verticalLayout_37.setSpacing(1)
         self.verticalLayout_37.setObjectName("verticalLayout_37")
         self.verticalLayout_36 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_36.setContentsMargins(2, 2, 2, 2)
-        self.verticalLayout_36.setSpacing(1)
         self.verticalLayout_36.setObjectName("verticalLayout_36")
-        self.verticalLayout_35 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_35.setSpacing(1)
-        self.verticalLayout_35.setObjectName("verticalLayout_35")
-        self.verticalLayout_34 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_34.setSpacing(1)
-        self.verticalLayout_34.setObjectName("verticalLayout_34")
-        self.verticalLayout_33 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_33.setSpacing(1)
-        self.verticalLayout_33.setObjectName("verticalLayout_33")
         self.verticalLayout_9 = QtWidgets.QVBoxLayout()
         self.verticalLayout_9.setSpacing(1)
         self.verticalLayout_9.setObjectName("verticalLayout_9")
         self.label_46 = QtWidgets.QLabel(self.layoutWidget2)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(13)
@@ -1835,11 +1795,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_6 = QtWidgets.QVBoxLayout()
         self.verticalLayout_6.setSpacing(1)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
-<<<<<<< HEAD
-        self.Button_add_edit_player = QtWidgets.QPushButton(self.widget)
-=======
         self.Button_add_edit_player = QtWidgets.QPushButton(self.layoutWidget2)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         font = QtGui.QFont()
         font.setFamily("Courier New")
         font.setPointSize(12)
@@ -1847,11 +1803,7 @@ class Ui_MainWindow(object):
         self.Button_add_edit_player.setFont(font)
         self.Button_add_edit_player.setObjectName("Button_add_edit_player")
         self.verticalLayout_6.addWidget(self.Button_add_edit_player)
-<<<<<<< HEAD
-        self.Button_del_player = QtWidgets.QPushButton(self.widget)
-=======
         self.Button_del_player = QtWidgets.QPushButton(self.layoutWidget2)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         font = QtGui.QFont()
         font.setFamily("Courier New")
         font.setPointSize(12)
@@ -1860,57 +1812,7 @@ class Ui_MainWindow(object):
         self.Button_del_player.setObjectName("Button_del_player")
         self.verticalLayout_6.addWidget(self.Button_del_player)
         self.verticalLayout_9.addLayout(self.verticalLayout_6)
-<<<<<<< HEAD
-        self.groupBox_2 = QtWidgets.QGroupBox(self.widget)
-=======
-        self.groupBox = QtWidgets.QGroupBox(self.layoutWidget2)
-        font = QtGui.QFont()
-        font.setPointSize(13)
-        font.setBold(True)
-        font.setWeight(75)
-        self.groupBox.setFont(font)
-        self.groupBox.setObjectName("groupBox")
-        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.groupBox)
-        self.verticalLayout_5.setContentsMargins(0, 3, 3, 0)
-        self.verticalLayout_5.setSpacing(1)
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
-        self.Button_sort_Name = QtWidgets.QPushButton(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Courier New")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setWeight(50)
-        self.Button_sort_Name.setFont(font)
-        self.Button_sort_Name.setObjectName("Button_sort_Name")
-        self.verticalLayout_5.addWidget(self.Button_sort_Name)
-        self.Button_sort_R = QtWidgets.QPushButton(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Courier New")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setWeight(50)
-        self.Button_sort_R.setFont(font)
-        self.Button_sort_R.setObjectName("Button_sort_R")
-        self.verticalLayout_5.addWidget(self.Button_sort_R)
-        self.Button_sort_mesto = QtWidgets.QPushButton(self.groupBox)
-        font = QtGui.QFont()
-        font.setFamily("Courier New")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setWeight(50)
-        self.Button_sort_mesto.setFont(font)
-        self.Button_sort_mesto.setObjectName("Button_sort_mesto")
-        self.verticalLayout_5.addWidget(self.Button_sort_mesto)
-        self.verticalLayout_9.addWidget(self.groupBox)
-        self.verticalLayout_33.addLayout(self.verticalLayout_9)
-        self.line_2 = QtWidgets.QFrame(self.layoutWidget2)
-        self.line_2.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_2.setObjectName("line_2")
-        self.verticalLayout_33.addWidget(self.line_2)
-        self.verticalLayout_34.addLayout(self.verticalLayout_33)
         self.groupBox_2 = QtWidgets.QGroupBox(self.layoutWidget2)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         font = QtGui.QFont()
         font.setPointSize(13)
         font.setBold(True)
@@ -1970,9 +1872,8 @@ class Ui_MainWindow(object):
         self.comboBox_fltr_region.setEditable(False)
         self.comboBox_fltr_region.setObjectName("comboBox_fltr_region")
         self.gridLayout.addWidget(self.comboBox_fltr_region, 1, 0, 1, 3)
-<<<<<<< HEAD
         self.verticalLayout_9.addWidget(self.groupBox_2)
-        self.groupBox = QtWidgets.QGroupBox(self.widget)
+        self.groupBox = QtWidgets.QGroupBox(self.layoutWidget2)
         font = QtGui.QFont()
         font.setPointSize(13)
         font.setBold(True)
@@ -2011,7 +1912,7 @@ class Ui_MainWindow(object):
         self.Button_sort_mesto.setObjectName("Button_sort_mesto")
         self.verticalLayout_5.addWidget(self.Button_sort_mesto)
         self.verticalLayout_9.addWidget(self.groupBox)
-        self.line_2 = QtWidgets.QFrame(self.widget)
+        self.line_2 = QtWidgets.QFrame(self.layoutWidget2)
         self.line_2.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_2.setObjectName("line_2")
@@ -2023,40 +1924,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_7 = QtWidgets.QVBoxLayout()
         self.verticalLayout_7.setSpacing(1)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
-=======
-        self.verticalLayout_34.addWidget(self.groupBox_2)
-        self.verticalLayout_35.addLayout(self.verticalLayout_34)
-        self.checkBox_find_player = QtWidgets.QCheckBox(self.layoutWidget2)
-        font = QtGui.QFont()
-        font.setFamily("Times")
-        font.setPointSize(13)
-        font.setBold(False)
-        font.setWeight(50)
-        self.checkBox_find_player.setFont(font)
-        self.checkBox_find_player.setCheckable(True)
-        self.checkBox_find_player.setObjectName("checkBox_find_player")
-        self.verticalLayout_35.addWidget(self.checkBox_find_player)
-        self.verticalLayout_36.addLayout(self.verticalLayout_35)
-        self.line_4 = QtWidgets.QFrame(self.layoutWidget2)
-        self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_4.setObjectName("line_4")
-        self.verticalLayout_36.addWidget(self.line_4)
-        self.verticalLayout_37.addLayout(self.verticalLayout_36)
-        self.widget = QtWidgets.QWidget(self.layoutWidget2)
-        self.widget.setObjectName("widget")
-        self.verticalLayout_32 = QtWidgets.QVBoxLayout(self.widget)
-        self.verticalLayout_32.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_32.setSpacing(1)
-        self.verticalLayout_32.setObjectName("verticalLayout_32")
-        self.verticalLayout_7 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_7.setContentsMargins(2, 2, 2, 2)
-        self.verticalLayout_7.setSpacing(1)
-        self.verticalLayout_7.setObjectName("verticalLayout_7")
-        self.horizontalLayout_20 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_20.setObjectName("horizontalLayout_20")
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
-        self.checkBox_6 = QtWidgets.QCheckBox(self.widget)
+        self.checkBox_6 = QtWidgets.QCheckBox(self.layoutWidget2)
         font = QtGui.QFont()
         font.setFamily("Times")
         font.setPointSize(12)
@@ -2065,12 +1933,8 @@ class Ui_MainWindow(object):
         self.checkBox_6.setFont(font)
         self.checkBox_6.setCheckable(True)
         self.checkBox_6.setObjectName("checkBox_6")
-<<<<<<< HEAD
         self.verticalLayout_7.addWidget(self.checkBox_6)
-=======
-        self.horizontalLayout_20.addWidget(self.checkBox_6)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
-        self.checkBox_15 = QtWidgets.QCheckBox(self.widget)
+        self.checkBox_15 = QtWidgets.QCheckBox(self.layoutWidget2)
         font = QtGui.QFont()
         font.setFamily("Times")
         font.setPointSize(12)
@@ -2079,26 +1943,8 @@ class Ui_MainWindow(object):
         self.checkBox_15.setFont(font)
         self.checkBox_15.setCheckable(True)
         self.checkBox_15.setObjectName("checkBox_15")
-<<<<<<< HEAD
         self.verticalLayout_7.addWidget(self.checkBox_15)
-=======
-        self.horizontalLayout_20.addWidget(self.checkBox_15)
-        self.verticalLayout_7.addLayout(self.horizontalLayout_20)
-        self.Button_clear_del = QtWidgets.QPushButton(self.widget)
-        font = QtGui.QFont()
-        font.setFamily("Courier New")
-        font.setPointSize(12)
-        font.setKerning(True)
-        self.Button_clear_del.setFont(font)
-        self.Button_clear_del.setObjectName("Button_clear_del")
-        self.verticalLayout_7.addWidget(self.Button_clear_del)
-        self.verticalLayout_32.addLayout(self.verticalLayout_7)
-        self.verticalLayout_8 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_8.setContentsMargins(2, 2, 2, 2)
-        self.verticalLayout_8.setSpacing(1)
-        self.verticalLayout_8.setObjectName("verticalLayout_8")
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
-        self.checkBox_11 = QtWidgets.QCheckBox(self.widget)
+        self.checkBox_11 = QtWidgets.QCheckBox(self.layoutWidget2)
         font = QtGui.QFont()
         font.setFamily("Times")
         font.setPointSize(12)
@@ -2107,41 +1953,28 @@ class Ui_MainWindow(object):
         self.checkBox_11.setFont(font)
         self.checkBox_11.setCheckable(True)
         self.checkBox_11.setObjectName("checkBox_11")
-<<<<<<< HEAD
         self.verticalLayout_7.addWidget(self.checkBox_11)
         self.horizontalLayout_8.addLayout(self.verticalLayout_7)
         self.verticalLayout_8 = QtWidgets.QVBoxLayout()
         self.verticalLayout_8.setContentsMargins(2, 2, 2, 2)
         self.verticalLayout_8.setSpacing(1)
         self.verticalLayout_8.setObjectName("verticalLayout_8")
-        self.Button_clear_del = QtWidgets.QPushButton(self.widget)
-=======
-        self.verticalLayout_8.addWidget(self.checkBox_11)
-        self.Button_pay_R = QtWidgets.QPushButton(self.widget)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
+        self.Button_clear_del = QtWidgets.QPushButton(self.layoutWidget2)
         font = QtGui.QFont()
         font.setFamily("Courier New")
         font.setPointSize(12)
         font.setKerning(True)
-<<<<<<< HEAD
         self.Button_clear_del.setFont(font)
         self.Button_clear_del.setObjectName("Button_clear_del")
         self.verticalLayout_8.addWidget(self.Button_clear_del)
-=======
-        self.Button_pay_R.setFont(font)
-        self.Button_pay_R.setObjectName("Button_pay_R")
-        self.verticalLayout_8.addWidget(self.Button_pay_R)
-        self.verticalLayout_32.addLayout(self.verticalLayout_8)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
-        self.Button_app = QtWidgets.QPushButton(self.widget)
+        self.Button_app = QtWidgets.QPushButton(self.layoutWidget2)
         font = QtGui.QFont()
         font.setFamily("Courier New")
         font.setPointSize(12)
         self.Button_app.setFont(font)
         self.Button_app.setObjectName("Button_app")
-<<<<<<< HEAD
         self.verticalLayout_8.addWidget(self.Button_app)
-        self.Button_pay_R = QtWidgets.QPushButton(self.widget)
+        self.Button_pay_R = QtWidgets.QPushButton(self.layoutWidget2)
         font = QtGui.QFont()
         font.setFamily("Courier New")
         font.setPointSize(12)
@@ -2152,7 +1985,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_8.addLayout(self.verticalLayout_8)
         self.verticalLayout_36.addLayout(self.horizontalLayout_8)
         self.verticalLayout_37.addLayout(self.verticalLayout_36)
-        self.checkBox_find_player = QtWidgets.QCheckBox(self.widget)
+        self.checkBox_find_player = QtWidgets.QCheckBox(self.layoutWidget2)
         font = QtGui.QFont()
         font.setFamily("Times")
         font.setPointSize(13)
@@ -2164,17 +1997,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_37.addWidget(self.checkBox_find_player)
         self.toolBox.addItem(self.page_2, "")
         self.page_6 = QtWidgets.QWidget()
-        self.page_6.setGeometry(QtCore.QRect(0, 0, 241, 476))
-=======
-        self.verticalLayout_32.addWidget(self.Button_app)
-        self.verticalLayout_37.addWidget(self.widget)
-        self.toolBox.addItem(self.page_2, "")
-        self.page_6 = QtWidgets.QWidget()
-        self.page_6.setGeometry(QtCore.QRect(0, 0, 241, 491))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
+        self.page_6.setGeometry(QtCore.QRect(0, 0, 241, 484))
         self.page_6.setObjectName("page_6")
         self.label_20 = QtWidgets.QLabel(self.page_6)
-        self.label_20.setGeometry(QtCore.QRect(23, 250, 201, 20))
+        self.label_20.setGeometry(QtCore.QRect(30, 220, 201, 20))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(14)
@@ -2185,12 +2011,12 @@ class Ui_MainWindow(object):
         self.label_20.setFont(font)
         self.label_20.setObjectName("label_20")
         self.frame_3 = QtWidgets.QFrame(self.page_6)
-        self.frame_3.setGeometry(QtCore.QRect(10, 270, 216, 85))
+        self.frame_3.setGeometry(QtCore.QRect(5, 250, 230, 85))
         self.frame_3.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_3.setObjectName("frame_3")
         self.comboBox_filter_choice = QtWidgets.QComboBox(self.frame_3)
-        self.comboBox_filter_choice.setGeometry(QtCore.QRect(87, 2, 127, 26))
+        self.comboBox_filter_choice.setGeometry(QtCore.QRect(87, 2, 133, 26))
         self.comboBox_filter_choice.setEditable(True)
         self.comboBox_filter_choice.setObjectName("comboBox_filter_choice")
         self.radioButton_group = QtWidgets.QRadioButton(self.frame_3)
@@ -2207,7 +2033,7 @@ class Ui_MainWindow(object):
         self.radioButton_repeat_regions.setGeometry(QtCore.QRect(2, 59, 181, 20))
         self.radioButton_repeat_regions.setObjectName("radioButton_repeat_regions")
         self.frame_2 = QtWidgets.QFrame(self.page_6)
-        self.frame_2.setGeometry(QtCore.QRect(10, 23, 221, 221))
+        self.frame_2.setGeometry(QtCore.QRect(5, 23, 230, 193))
         self.frame_2.setFrameShape(QtWidgets.QFrame.Box)
         self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_2.setObjectName("frame_2")
@@ -2253,6 +2079,7 @@ class Ui_MainWindow(object):
         spacerItem1 = QtWidgets.QSpacerItem(20, 4, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_12.addItem(spacerItem1)
         self.verticalLayout_11 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_11.setSpacing(1)
         self.verticalLayout_11.setObjectName("verticalLayout_11")
         self.label_13 = QtWidgets.QLabel(self.frame_2)
         font = QtGui.QFont()
@@ -2288,7 +2115,7 @@ class Ui_MainWindow(object):
         self.label_18.setFont(font)
         self.label_18.setObjectName("label_18")
         self.label_49 = QtWidgets.QLabel(self.page_6)
-        self.label_49.setGeometry(QtCore.QRect(10, 445, 211, 20))
+        self.label_49.setGeometry(QtCore.QRect(10, 420, 211, 20))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(12)
@@ -2298,10 +2125,10 @@ class Ui_MainWindow(object):
         self.label_49.setFont(font)
         self.label_49.setObjectName("label_49")
         self.lineEdit_find_player_in_system = QtWidgets.QLineEdit(self.page_6)
-        self.lineEdit_find_player_in_system.setGeometry(QtCore.QRect(10, 470, 221, 21))
+        self.lineEdit_find_player_in_system.setGeometry(QtCore.QRect(10, 440, 221, 21))
         self.lineEdit_find_player_in_system.setObjectName("lineEdit_find_player_in_system")
         self.frame_4 = QtWidgets.QFrame(self.page_6)
-        self.frame_4.setGeometry(QtCore.QRect(10, 380, 216, 45))
+        self.frame_4.setGeometry(QtCore.QRect(5, 370, 230, 45))
         self.frame_4.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_4.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_4.setObjectName("frame_4")
@@ -2313,7 +2140,7 @@ class Ui_MainWindow(object):
         self.radioButton_sf_sort.setGeometry(QtCore.QRect(2, 21, 151, 20))
         self.radioButton_sf_sort.setObjectName("radioButton_sf_sort")
         self.label_28 = QtWidgets.QLabel(self.page_6)
-        self.label_28.setGeometry(QtCore.QRect(23, 355, 201, 20))
+        self.label_28.setGeometry(QtCore.QRect(30, 340, 201, 20))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(14)
@@ -2325,11 +2152,7 @@ class Ui_MainWindow(object):
         self.label_28.setObjectName("label_28")
         self.toolBox.addItem(self.page_6, "")
         self.page_3 = QtWidgets.QWidget()
-<<<<<<< HEAD
-        self.page_3.setGeometry(QtCore.QRect(0, 0, 241, 476))
-=======
-        self.page_3.setGeometry(QtCore.QRect(0, 0, 241, 491))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
+        self.page_3.setGeometry(QtCore.QRect(0, 0, 241, 484))
         self.page_3.setObjectName("page_3")
         self.groupBox_filter_group = QtWidgets.QGroupBox(self.page_3)
         self.groupBox_filter_group.setGeometry(QtCore.QRect(4, 98, 231, 191))
@@ -2510,11 +2333,7 @@ class Ui_MainWindow(object):
         self.radioButton_match_7.setObjectName("radioButton_match_7")
         self.toolBox.addItem(self.page_3, "")
         self.page_5 = QtWidgets.QWidget()
-<<<<<<< HEAD
-        self.page_5.setGeometry(QtCore.QRect(0, 0, 241, 476))
-=======
-        self.page_5.setGeometry(QtCore.QRect(0, 0, 241, 491))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
+        self.page_5.setGeometry(QtCore.QRect(0, 0, 241, 484))
         self.page_5.setObjectName("page_5")
         self.groupBox_filter_group_semifinal = QtWidgets.QGroupBox(self.page_5)
         self.groupBox_filter_group_semifinal.setGeometry(QtCore.QRect(4, 98, 231, 221))
@@ -2647,11 +2466,7 @@ class Ui_MainWindow(object):
         self.radioButton_match_11.setObjectName("radioButton_match_11")
         self.toolBox.addItem(self.page_5, "")
         self.page_4 = QtWidgets.QWidget()
-<<<<<<< HEAD
-        self.page_4.setGeometry(QtCore.QRect(0, 0, 241, 476))
-=======
-        self.page_4.setGeometry(QtCore.QRect(0, 0, 241, 491))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
+        self.page_4.setGeometry(QtCore.QRect(0, 0, 241, 484))
         self.page_4.setObjectName("page_4")
         self.groupBox_filter_group_2 = QtWidgets.QGroupBox(self.page_4)
         self.groupBox_filter_group_2.setGeometry(QtCore.QRect(4, 98, 231, 261))
@@ -2839,11 +2654,7 @@ class Ui_MainWindow(object):
         self.radioButton_match_8.setObjectName("radioButton_match_8")
         self.toolBox.addItem(self.page_4, "")
         self.page_8 = QtWidgets.QWidget()
-<<<<<<< HEAD
-        self.page_8.setGeometry(QtCore.QRect(0, 0, 241, 476))
-=======
-        self.page_8.setGeometry(QtCore.QRect(0, 0, 241, 491))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
+        self.page_8.setGeometry(QtCore.QRect(0, 0, 241, 484))
         self.page_8.setObjectName("page_8")
         self.groupBox_5 = QtWidgets.QGroupBox(self.page_8)
         self.groupBox_5.setGeometry(QtCore.QRect(5, 110, 230, 91))
@@ -2876,28 +2687,17 @@ class Ui_MainWindow(object):
         self.Button_sort_rejting_in_R.setFont(font)
         self.Button_sort_rejting_in_R.setObjectName("Button_sort_rejting_in_R")
         self.verticalLayout_15.addWidget(self.Button_sort_rejting_in_R)
-<<<<<<< HEAD
-        self.layoutWidget2 = QtWidgets.QWidget(self.page_8)
-        self.layoutWidget2.setGeometry(QtCore.QRect(10, 10, 266, 104))
-        self.layoutWidget2.setObjectName("layoutWidget2")
-        self.verticalLayout_22 = QtWidgets.QVBoxLayout(self.layoutWidget2)
-=======
         self.layoutWidget3 = QtWidgets.QWidget(self.page_8)
         self.layoutWidget3.setGeometry(QtCore.QRect(10, 10, 266, 104))
         self.layoutWidget3.setObjectName("layoutWidget3")
         self.verticalLayout_22 = QtWidgets.QVBoxLayout(self.layoutWidget3)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_22.setSpacing(1)
         self.verticalLayout_22.setObjectName("verticalLayout_22")
         self.verticalLayout_17 = QtWidgets.QVBoxLayout()
         self.verticalLayout_17.setSpacing(1)
         self.verticalLayout_17.setObjectName("verticalLayout_17")
-<<<<<<< HEAD
-        self.label_47 = QtWidgets.QLabel(self.layoutWidget2)
-=======
         self.label_47 = QtWidgets.QLabel(self.layoutWidget3)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -2912,11 +2712,7 @@ class Ui_MainWindow(object):
         self.label_47.setFont(font)
         self.label_47.setObjectName("label_47")
         self.verticalLayout_17.addWidget(self.label_47)
-<<<<<<< HEAD
-        self.comboBox_choice_R = QtWidgets.QComboBox(self.layoutWidget2)
-=======
         self.comboBox_choice_R = QtWidgets.QComboBox(self.layoutWidget3)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -2928,11 +2724,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_16 = QtWidgets.QVBoxLayout()
         self.verticalLayout_16.setSpacing(1)
         self.verticalLayout_16.setObjectName("verticalLayout_16")
-<<<<<<< HEAD
-        self.label_77 = QtWidgets.QLabel(self.layoutWidget2)
-=======
         self.label_77 = QtWidgets.QLabel(self.layoutWidget3)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setBold(True)
@@ -2941,11 +2733,7 @@ class Ui_MainWindow(object):
         self.label_77.setFont(font)
         self.label_77.setObjectName("label_77")
         self.verticalLayout_16.addWidget(self.label_77)
-<<<<<<< HEAD
-        self.lineEdit_find_player_in_R = QtWidgets.QLineEdit(self.layoutWidget2)
-=======
         self.lineEdit_find_player_in_R = QtWidgets.QLineEdit(self.layoutWidget3)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         self.lineEdit_find_player_in_R.setObjectName("lineEdit_find_player_in_R")
         self.verticalLayout_16.addWidget(self.lineEdit_find_player_in_R)
         self.verticalLayout_22.addLayout(self.verticalLayout_16)
@@ -3078,11 +2866,7 @@ class Ui_MainWindow(object):
         self.progressBar.setObjectName("progressBar")
         self.toolBox.addItem(self.page_8, "")
         self.page_7 = QtWidgets.QWidget()
-<<<<<<< HEAD
-        self.page_7.setGeometry(QtCore.QRect(0, 0, 241, 476))
-=======
-        self.page_7.setGeometry(QtCore.QRect(0, 0, 241, 491))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
+        self.page_7.setGeometry(QtCore.QRect(0, 0, 241, 484))
         self.page_7.setObjectName("page_7")
         self.groupBox_4 = QtWidgets.QGroupBox(self.page_7)
         self.groupBox_4.setGeometry(QtCore.QRect(10, 2, 216, 241))
@@ -3270,28 +3054,17 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.label_57.setFont(font)
         self.label_57.setObjectName("label_57")
-<<<<<<< HEAD
-        self.layoutWidget3 = QtWidgets.QWidget(self.centralwidget)
-        self.layoutWidget3.setGeometry(QtCore.QRect(271, 620, 831, 91))
-        self.layoutWidget3.setObjectName("layoutWidget3")
-        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.layoutWidget3)
-=======
         self.layoutWidget4 = QtWidgets.QWidget(self.centralwidget)
         self.layoutWidget4.setGeometry(QtCore.QRect(271, 620, 831, 91))
         self.layoutWidget4.setObjectName("layoutWidget4")
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_7.setSpacing(6)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.verticalLayout_13 = QtWidgets.QVBoxLayout()
         self.verticalLayout_13.setSpacing(1)
         self.verticalLayout_13.setObjectName("verticalLayout_13")
-<<<<<<< HEAD
-        self.lineEdit_change_pl1 = QtWidgets.QLineEdit(self.layoutWidget3)
-=======
         self.lineEdit_change_pl1 = QtWidgets.QLineEdit(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -3304,11 +3077,7 @@ class Ui_MainWindow(object):
         self.lineEdit_change_pl1.setFont(font)
         self.lineEdit_change_pl1.setObjectName("lineEdit_change_pl1")
         self.verticalLayout_13.addWidget(self.lineEdit_change_pl1)
-<<<<<<< HEAD
-        self.lineEdit_change_pl1_2 = QtWidgets.QLineEdit(self.layoutWidget3)
-=======
         self.lineEdit_change_pl1_2 = QtWidgets.QLineEdit(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -3321,21 +3090,13 @@ class Ui_MainWindow(object):
         self.lineEdit_change_pl1_2.setFont(font)
         self.lineEdit_change_pl1_2.setObjectName("lineEdit_change_pl1_2")
         self.verticalLayout_13.addWidget(self.lineEdit_change_pl1_2)
-<<<<<<< HEAD
-        self.Button_add_pl1 = QtWidgets.QPushButton(self.layoutWidget3)
-=======
         self.Button_add_pl1 = QtWidgets.QPushButton(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         self.Button_add_pl1.setObjectName("Button_add_pl1")
         self.verticalLayout_13.addWidget(self.Button_add_pl1)
         self.horizontalLayout_7.addLayout(self.verticalLayout_13)
         self.verticalLayout_43 = QtWidgets.QVBoxLayout()
         self.verticalLayout_43.setObjectName("verticalLayout_43")
-<<<<<<< HEAD
-        self.label_59 = QtWidgets.QLabel(self.layoutWidget3)
-=======
         self.label_59 = QtWidgets.QLabel(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(10)
@@ -3345,11 +3106,7 @@ class Ui_MainWindow(object):
         self.label_59.setFont(font)
         self.label_59.setObjectName("label_59")
         self.verticalLayout_43.addWidget(self.label_59)
-<<<<<<< HEAD
-        self.Buttom_change_player = QtWidgets.QPushButton(self.layoutWidget3)
-=======
         self.Buttom_change_player = QtWidgets.QPushButton(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         self.Buttom_change_player.setObjectName("Buttom_change_player")
         self.verticalLayout_43.addWidget(self.Buttom_change_player)
         spacerItem9 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -3358,11 +3115,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_42 = QtWidgets.QVBoxLayout()
         self.verticalLayout_42.setSpacing(1)
         self.verticalLayout_42.setObjectName("verticalLayout_42")
-<<<<<<< HEAD
-        self.lineEdit_change_pl2 = QtWidgets.QLineEdit(self.layoutWidget3)
-=======
         self.lineEdit_change_pl2 = QtWidgets.QLineEdit(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(11)
@@ -3370,11 +3123,7 @@ class Ui_MainWindow(object):
         self.lineEdit_change_pl2.setFont(font)
         self.lineEdit_change_pl2.setObjectName("lineEdit_change_pl2")
         self.verticalLayout_42.addWidget(self.lineEdit_change_pl2)
-<<<<<<< HEAD
-        self.lineEdit_change_pl2_2 = QtWidgets.QLineEdit(self.layoutWidget3)
-=======
         self.lineEdit_change_pl2_2 = QtWidgets.QLineEdit(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setPointSize(11)
@@ -3382,11 +3131,7 @@ class Ui_MainWindow(object):
         self.lineEdit_change_pl2_2.setFont(font)
         self.lineEdit_change_pl2_2.setObjectName("lineEdit_change_pl2_2")
         self.verticalLayout_42.addWidget(self.lineEdit_change_pl2_2)
-<<<<<<< HEAD
-        self.Button_add_pl2 = QtWidgets.QPushButton(self.layoutWidget3)
-=======
         self.Button_add_pl2 = QtWidgets.QPushButton(self.layoutWidget4)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         self.Button_add_pl2.setObjectName("Button_add_pl2")
         self.verticalLayout_42.addWidget(self.Button_add_pl2)
         self.horizontalLayout_7.addLayout(self.verticalLayout_42)
@@ -3414,13 +3159,8 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
 
         self.retranslateUi(MainWindow)
-<<<<<<< HEAD
         self.tabWidget.setCurrentIndex(1)
-        self.toolBox.setCurrentIndex(1)
-=======
-        self.tabWidget.setCurrentIndex(7)
-        self.toolBox.setCurrentIndex(5)
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
+        self.toolBox.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -3552,19 +3292,11 @@ class Ui_MainWindow(object):
         self.label_46.setText(_translate("MainWindow", "Всего"))
         self.Button_add_edit_player.setText(_translate("MainWindow", "Добавить"))
         self.Button_del_player.setText(_translate("MainWindow", "Удалить"))
-<<<<<<< HEAD
-=======
-        self.groupBox.setTitle(_translate("MainWindow", "Сортировка"))
-        self.Button_sort_Name.setText(_translate("MainWindow", "По алфавиту"))
-        self.Button_sort_R.setText(_translate("MainWindow", "По рейтингу"))
-        self.Button_sort_mesto.setText(_translate("MainWindow", "По месту"))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         self.groupBox_2.setTitle(_translate("MainWindow", "Фильтр"))
         self.Button_fltr_list.setText(_translate("MainWindow", "Применить"))
         self.label_66.setText(_translate("MainWindow", "Город"))
         self.label_67.setText(_translate("MainWindow", "Субъекты РФ"))
         self.Button_reset_fltr_list.setText(_translate("MainWindow", "Сбросить"))
-<<<<<<< HEAD
         self.groupBox.setTitle(_translate("MainWindow", "Сортировка"))
         self.Button_sort_Name.setText(_translate("MainWindow", "По алфавиту"))
         self.Button_sort_R.setText(_translate("MainWindow", "По рейтингу"))
@@ -3576,15 +3308,6 @@ class Ui_MainWindow(object):
         self.Button_app.setText(_translate("MainWindow", "По заявке"))
         self.Button_pay_R.setText(_translate("MainWindow", "Оплата"))
         self.checkBox_find_player.setText(_translate("MainWindow", "Поиск спортсмена"))
-=======
-        self.checkBox_find_player.setText(_translate("MainWindow", "Поиск спортсмена"))
-        self.checkBox_6.setText(_translate("MainWindow", "Удаленные"))
-        self.checkBox_15.setText(_translate("MainWindow", "Предзаявка"))
-        self.Button_clear_del.setText(_translate("MainWindow", "Очистить"))
-        self.checkBox_11.setText(_translate("MainWindow", "Должники R"))
-        self.Button_pay_R.setText(_translate("MainWindow", "Оплата"))
-        self.Button_app.setText(_translate("MainWindow", "По заявке"))
->>>>>>> 5e7c6ba52a7808b10df6bb46e8befd46688860df
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_2), _translate("MainWindow", "Список участников"))
         self.label_20.setText(_translate("MainWindow", "<html><head/><body><p>Фильтр по жеребьевке</p></body></html>"))
         self.radioButton_group.setText(_translate("MainWindow", "Группы"))
