@@ -3471,7 +3471,7 @@ def player_in_table_group_and_write_Game_list_Result(stage):
         # gamelist.execute()
         # query.execute()
         # load_playing_game_in_table_for_semifinal(stage)
-    else:
+    else: # полуфиналы
         gamelist = Game_list.delete().where((Game_list.title_id == title_id()) & (Game_list.system_id == system))
         query = Result.delete().where((Result.title_id == title_id()) & (Result.system_stage == stage))
     gamelist.execute()
@@ -5594,7 +5594,6 @@ def choice_gr_automat():
     "новая система жеребьевки групп"
     " current_region_group - словарь (регион - список номеров групп куда можно сеять)"
     " reg_player - словарь регион ид игрока, player_current - список сеящихся игроков, posev - словарь всего посева"
-    # load_tableWidget()
     posev_tmp = {}
     reg_player = {}
     gr_region = {}
@@ -7124,16 +7123,22 @@ def change_player_between_group_after_draw():
         player_dict[p] = player_list[p]
 
     element_count = len([item for item in player_list  if item != ""]) # подсчитывает колличество не пустых значений
-
+    # колличество игроков в группеы
+    count_in_group = my_win.listWidget_first_group.count() if my_win.listWidget_first_group.count() != 0 else my_win.listWidget_second_group.count()
     if element_count  == 0:
         result = msgBox.information(my_win, "Уведомление", "Вы не выбрали игроков группы!", msgBox.Ok)
         return
     elif element_count == 1:
-        posev, ok = QInputDialog.getInt(my_win, "Номер посева", "Введите номер посева", min=1, max=5)
+        posev, ok = QInputDialog.getInt(my_win, "Номер посева", "Введите номер посева", min=1, max=(count_in_group + 1))
         if not ok:
             return
         else:
-            pass
+            for pl in player_list:
+                if pl != "":
+                    gamelist = game_list.select().where(Game_list.player_group_id == pl).get()
+                    with db:
+                        gamelist.runk_num_player = posev
+                        gamelist.save()
     else:
         pass
 
