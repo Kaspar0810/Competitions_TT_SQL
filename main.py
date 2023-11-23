@@ -7149,12 +7149,18 @@ def change_player_between_group_after_draw():
                 if result == msgBox.No:
                     return
                 else:
-                    gamelist = game_list.select().where((Game_list.player_group_id == family) & (Game_list.system_id == system_etap_id)).get()
+                    gamelist = game_list.select().where((Game_list.rank_num_player == posev) & (Game_list.system_id == system_etap_id)).get() # Game_list игрока которго заменяют
+                    with db:
+                        gamelist.number_group = gr, 
+                        gamelist.rank_num_player = posev, 
+                        gamelist.player_group_id = family,
+                        gamelist.system_id = system_etap_id, 
+                        gamelist.save()
             else: # == если добавляют игрока в конец группы
                     with db:
                         game_list = Game_list(number_group=gr, 
                                             rank_num_player=posev, 
-                                            player_group_id=pl,
+                                            player_group_id=family,
                                             system_id=system_etap_id, 
                                             title_id=title_id()
                                             ).save()
