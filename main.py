@@ -7119,8 +7119,10 @@ def change_player_between_group_after_draw():
 
     player_dict = {}
     player_list = [player1, player2, player1_2, player2_2]
-    for p in range(0, 4):
-        player_dict[p] = player_list[p]
+    family_player_list = [pl[:pl.find("/")] for pl in player_list] # генератор списка получает одни фамилии и имя спортсмена
+
+    # for p in range(0, 4):
+    #     player_dict[p] = player_list[p]
 
     element_count = len([item for item in player_list if item != ""]) # подсчитывает колличество не пустых значений
     # колличество игроков в группы
@@ -7131,22 +7133,31 @@ def change_player_between_group_after_draw():
     elif element_count == 1: # добавляет игрока из списка участников в группу
         etap = etap_1 if etap_1 == "Предварительный" else etap_2
         gr = gr_pl1 if etap_1 != "Списки участников" else gr_pl2
+        system = systems.select().where(System.stage == etap).get()
+        system_etap_id = system.id # id этапа
+        for family in family_player_list:
+            if family != "":
+                break
+       
         posev, ok = QInputDialog.getInt(my_win, "Номер посева", "Введите номер посева", min=1, max=(count_in_group + 1))
         if not ok:
             return
         else:
-            for pl in player_list:
-                if pl != "":
-                    znak = pl.find("/")  
-                    family = pl[:znak]
-                    system = systems.select().where(System.stage == etap).get()
-                    system_etap_id = system.id
+            if posev <= count_in_group: # если пытаются заменить игрока в группе
+                result = msgBox.question(my_win, "Уведомление", "Вы хотите заменить игрока группы\n"
+                f"{posev} посева?", msgBox.No, msgBox.Ok) 
+                if result == msgBox.No:
+                    return
+                else:
                     gamelist = game_list.select().where((Game_list.player_group_id == family) & (Game_list.system_id == system_etap_id)).get()
+            else: # == если добавляют игрока в конец группы
                     with db:
-                        gamelist.system_id = system_etap_id
-                        gamelist.runk_num_player = posev
-                        gamelist.group = gr
-                        gamelist.save()
+                        game_list = Game_list(number_group=gr, 
+                                            rank_num_player=posev, 
+                                            player_group_id=pl,
+                                            system_id=system_etap_id, 
+                                            title_id=title_id()
+                                            ).save()
     else:
         pass
 
