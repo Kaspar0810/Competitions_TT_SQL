@@ -690,8 +690,6 @@ app = QApplication(sys.argv)
 my_win = MainWindow()
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.setWindowIcon(QIcon("CTT.png"))
-# my_win.setStyleSheet("background-image:url(fon.jpg”))
-# my_win.setStyleSheet("#MainWindow{background-color:blue}")
 my_win.resize(1390, 804)
 my_win.center()
 
@@ -1411,18 +1409,7 @@ def title_string():
     gm = title.gamer
     fn = f"{nm}.{ds}.{gm}"
 
-    title_str.append(nm)
-    title_str.append(sr)
-    title_str.append(vz)
-    title_str.append(ds)
-    title_str.append(de)
-    title_str.append(ms)
-    title_str.append(rf)
-    title_str.append(kr)
-    title_str.append(sk)
-    title_str.append(ks)
-    title_str.append(gm)
-    title_str.append(fn)
+    title_str = [nm, sr, vz, ds, de, ms, rf, kr, sk, gm, fn]
     return title_str
 
 
@@ -7117,14 +7104,16 @@ def change_player_between_group_after_draw():
     gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы
     gr_pl2 = my_win.comboBox_second_group.currentText() # номер группы
 
-    player_dict = {}
+    # player_dict = {}
     player_list = [player1, player2, player1_2, player2_2]
     family_player_list = [pl[:pl.find("/")] for pl in player_list] # генератор списка получает одни фамилии и имя спортсмена
-
-    # for p in range(0, 4):
-    #     player_dict[p] = player_list[p]
-
-    element_count = len([item for item in player_list if item != ""]) # подсчитывает колличество не пустых значений
+    # # получаем id игрока
+    # for p in player_list:
+    #     if p != "":
+    #         pl_id = players.select().where(Player.full_name == p).get()
+    #         player_dict[p] = pl_id
+    # подсчитывает колличество не пустых значений
+    element_count = len([item for item in player_list if item != ""]) 
     # колличество игроков в группы
     count_in_group = my_win.listWidget_first_group.count() if my_win.listWidget_first_group.count() != 0 else my_win.listWidget_second_group.count()
     if element_count  == 0:
@@ -7148,14 +7137,15 @@ def change_player_between_group_after_draw():
                 f"{posev} посева?", msgBox.No, msgBox.Ok) 
                 if result == msgBox.No:
                     return
-                else:
-                    gamelist = game_list.select().where((Game_list.rank_num_player == posev) & (Game_list.system_id == system_etap_id)).get() # Game_list игрока которго заменяют
+                else: #=== не работает !!!!!! +++++
+                    gamelist = game_list.select().where(Game_list.system_id == system_etap_id) # Game_list id этапа
+                    gl = gamelist.select().where((Game_list.number_group == gr) & (Game_list.rank_num_player == posev)).get()
                     with db:
-                        gamelist.number_group = gr, 
-                        gamelist.rank_num_player = posev, 
-                        gamelist.player_group_id = family,
-                        gamelist.system_id = system_etap_id, 
-                        gamelist.save()
+                        # gl.number_group = gr, 
+                        # gl.rank_num_player = posev, 
+                        gl.player_group_id = family,
+                        # gl.system_id = system_etap_id, 
+                        gl.save()
             else: # == если добавляют игрока в конец группы
                     with db:
                         game_list = Game_list(number_group=gr, 
