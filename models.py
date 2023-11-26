@@ -224,7 +224,6 @@ class Result(BaseModel):
         db_table = "results"
         opder_by = "id"
 
-
 class Referee(BaseModel):
     family = CharField()
     city = CharField()
