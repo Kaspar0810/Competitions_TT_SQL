@@ -186,8 +186,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ed_Menu = editMenu.addMenu("Жеребьевка")
         ed_Menu.addAction(self.ed_one_table_Action)
         ed_Menu.addAction(self.ed_etap_Action)
-        # ed_Menu.addAction(self.ed_pf_Action)
-        # ed_Menu.addAction(self.ed_fin_Action)
 
         editMenu.addAction(self.vid_edit_Action)  #в осн меню -Редактировать- добавлен пункт сразу с акцией -Вид страницы этапов
         # меню Рейтинг
@@ -249,9 +247,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_one_table_Action = QAction("Редакитровать таблицу")
 
         self.ed_etap_Action = QAction("Редактирование этапов")  # подменю редактор
-        # self.ed_gr_Action = QAction("Редактировать группы")  # подменю редактор
-        # self.ed_pf_Action = QAction("Редактировать полуфиналы")
-        # self.ed_fin_Action = QAction("Редактировать финалы")
         self.vid_edit_Action = QAction("Вид страницы этапов")
 
         self.choice_one_table_Action = QAction("Одна таблица")
@@ -312,9 +307,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # пункты меню редактирование жеребьевки
         self.ed_one_table_Action.setEnabled(False)  # делает пункт меню не видимым
         self.ed_etap_Action.setEnabled(False)  # делает пункт меню не видимым
-        # self.ed_gr_Action.setEnabled(False)  # делает пункт меню не видимым
-        # self.ed_pf_Action.setEnabled(False)  # делает пункт меню не видимым
-        # self.ed_fin_Action.setEnabled(False)  # делает пункт меню не видимым
 
         self.copy_db_Action = QAction("Импорт из базы данных")
 
@@ -360,8 +352,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fourth_comp_Action.triggered.connect(self.last)
         self.fifth_comp_Action.triggered.connect(self.last)
 
-        # self.ed_gr_Action.triggered.connect(self.edit_group)
-        # self.ed_pf_Action.triggered.connect(self.edit_group)
         self.ed_etap_Action.triggered.connect(self.edit_etap)
 
         self.go_to_Action.triggered.connect(self.open)
@@ -386,7 +376,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.lineEdit_find_player_in_R.setFocus()
 
     def r1_File(self):
-        # Logic for creating a new file goes here...
         self.statusbar.showMessage("Загружен рейтинг-лист на январь месяц")
         my_win.tabWidget.setTabEnabled(6, True)
         my_win.tabWidget.setCurrentIndex(6)
@@ -552,7 +541,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if count_fin == 1:
                 title = Title.get(Title.id == title_id())
                 tab_str = title.tab_enabled       
-
             # ======
             sys = system.select().where(System.stage == fin).get()
             type = sys.type_table
@@ -779,49 +767,36 @@ class StartWindow(QMainWindow, Ui_Form):
     def load_old(self):
         """загружает в комбобокс архивные соревнования"""
         self.label_4.show()
+        comp_list = []
         # получение последней записи в таблице
         t_id = Title.select().order_by(Title.id.desc())
         count = len(t_id)
-        n = 6
-        for i in t_id:
-            old_comp = i.name
-            gamer = i.gamer
-            n -= 1
-            if n != 5:
-                if old_comp != "":
-                    name_comp = f"{old_comp}.{gamer}"
-                    self.comboBox.addItem(name_comp)
-                else:
-                    return
-            full_name = i.full_name_comp
-            if n > 5:
-                break
-            if n == 4: 
-                if full_name != "":
-                    my_win.first_comp_Action.setText(full_name)
-                else:
-                    my_win.first_comp_Action.setText("Пусто")
-            elif n == 3: 
-                if full_name != "":
-                    my_win.second_comp_Action.setText(full_name)
-                else:
-                    my_win.second_comp_Action.setText("Пусто")
-            elif n == 2: 
-                if full_name != "":
-                    my_win.third_comp_Action.setText(full_name)
-                else:
-                    my_win.third_comp_Action.setText("Пусто")
-            elif n == 1: 
-                if full_name != "":
-                    my_win.fourth_comp_Action.setText(full_name)
-                else:
-                    my_win.fourth_comp_Action.setText("Пусто")
-            elif n == 0: 
-                if full_name != "":
-                    my_win.fifth_comp_Action.setText(full_name)
-                else:
-                    my_win.fifth_comp_Action.setText("Пусто") 
-                break
+        n = 7
+        if count != 0: 
+            for i in t_id:
+                n -= 1
+                if n == 0:
+                    break
+                elif  n < 6:                   
+                    old_comp = i.name
+                    gamer = i.gamer
+                    if old_comp != "":
+                        name_comp = f"{old_comp}.{gamer}"
+                        self.comboBox.addItem(name_comp)
+                        full_name = i.full_name_comp
+                    else:
+                        full_name = "пусто"
+                    comp_list.append(full_name)
+ 
+        else:       
+            print("нет соревнований")
+            
+        my_win.first_comp_Action.setText(comp_list[0])   
+        my_win.second_comp_Action.setText(comp_list[1])
+        my_win.third_comp_Action.setText(comp_list[2])
+        my_win.fourth_comp_Action.setText(comp_list[3])
+        my_win.fifth_comp_Action.setText(comp_list[4])
+               
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
 
@@ -1084,16 +1059,24 @@ my_win.dateEdit_end.setDate(date.today())
 def tab_enabled(gamer):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
     # включает вкладки меню системы
+    title_list = []
     my_win.system_edit_Action.setEnabled(True) # делает меню  -редактировать- видиммым
     my_win.system_made_Action.setEnabled(True) # делает меню  -редактировать- видиммым
 
     sender = my_win.sender()
     tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
-    titles = Title.select().where(Title.id == title_id()).get() # id текущего соревнования
-    title_id_current = titles.id # текущий ид соревнования
-    count_title = len(Title.select())
-    title_last = Title.select().order_by(Title.id.desc()).get()  # получает последний title.id
-    title_id_last = title_last.id # последний ид соревнования
+    titles = Title.select().order_by(Title.id.desc())  # получает последний title.id
+    n = 2
+    for k in titles:
+        if n != 0: 
+            title_list.append(k.id)
+            n -= 1
+        else:
+            break
+    # count_title = len(Title.select())
+    # title_last = Title.select().order_by(Title.id.desc()).get()  # получает последний title.id
+    title_id_current = title_list[0]
+    title_id_last = title_list[1].id # последний ид соревнования
  
     if count_title > 0: # если соревнования не первые
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
@@ -1287,7 +1270,6 @@ def go_to():
     player_list = Player.select().where(Player.title_id == title_id())
     count_player = len(player_list)
     my_win.label_46.setText(f"Всего: {count_player} участников")
-    # fill_table(player_list)  # заполняет TableWidget списком игроков
     list_player_pdf(player_list)
 
 
@@ -2607,6 +2589,7 @@ def page():
         my_win.Button_down.setEnabled(False)
         my_win.Button_made_one_file_pdf.setEnabled(False)
         my_win.Button_print_begunki.setEnabled(False)
+        my_win.Buttom_change_player.setEnabled(False)
         my_win.lineEdit_range_tours.hide()
         my_win.comboBox_first_group.setEnabled(False)
         my_win.comboBox_second_group.setEnabled(False)
@@ -6935,6 +6918,8 @@ def select_stage_for_edit():
     else:
         my_win.comboBox_second_group.addItems(group_list)
         my_win.comboBox_second_group.setEnabled(True)
+    if my_win.comboBox_edit_etap1.currentIndex() != 0 and my_win.comboBox_edit_etap2.currentIndex() != 0:
+        my_win.Buttom_change_player.setEnabled(True)
 
 
 def edit_group_after_draw():
@@ -6981,8 +6966,7 @@ def add_item_listwidget():
 
     if gr == "":
         return
-
-    if gr != "-Выбор участников-":
+    else:
         if sender == my_win.comboBox_first_group:
             if my_win.comboBox_edit_etap1.currentText() == "Предварительный":
                 group = choices.select().where(Choice.group == gr).order_by(Choice.posev_group)
@@ -7010,11 +6994,10 @@ def add_item_listwidget():
             item.setText(text) 
             if sender == my_win.comboBox_first_group:
                 my_win.listWidget_first_group.addItem(item)
-                # flag_combo = 1
             else:
                 my_win.listWidget_second_group.addItem(item)
-                # flag_combo = 2
             coach_list.append(coach)
+   
         # duplicat = duplicat_coach_in_group(coach_list)
         # if duplicat is not None:
         #     color_coach_in_listwidget(duplicat, flag_combo)
@@ -7094,7 +7077,7 @@ def change_player_between_group_after_draw():
     player2_2 = my_win.lineEdit_change_pl2_2.text() # 2-й игрок из группы для смены в ПФ
     gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы
     gr_pl2 = my_win.comboBox_second_group.currentText() # номер группы
-
+    group_list = [gr_pl1, gr_pl2]
     player_list = [player1, player2, player1_2, player2_2]
     #  === получаем full_name для определения id игроков
     full_name_list = []
@@ -7130,7 +7113,7 @@ def change_player_between_group_after_draw():
                 if family_pl != "":
                     id_pl = player_dict[family_pl]
                     players_data = players.select().where(Player.id == id_pl).get()
-                    family = players_data.player
+                    # family = players_data.player
                     region = players_data.region
                     coach_id = players_data.coach_id
                     coachs = Coach.select().where(Coach.id == coach_id).get()
@@ -7156,28 +7139,8 @@ def change_player_between_group_after_draw():
                 f"{posev} посева?", msgBox.No, msgBox.Ok) 
                 if result == msgBox.No:
                     return
-            elif posev > count_in_group:
-                #=== заменяем спортсмена в группу на последний посев и добавляет в Game_list и  обновляет Choice    
-                # with db:
-                #     game_list = Game_list(number_group=gr, 
-                #                         rank_num_player=posev, 
-                #                         player_group_id=family_name,
-                #                         system_id=system_etap_id, 
-                #                         title_id=title_id()
-                #                         ).save() 
-                #              
-                # query = Artist.update(name=Artist.name + '!!!').where(Artist.artist_id > 275)
-                # query.execute()
-
-                id_pl = player_dict[full_name]
-                # choice = choices.select().where(Choice.player_choice_id == id_pl).get()
-
-                # g_list = gamelist.select().where(Game_list.rank_num_player == posev).get()
-                # gl_id = g_list.id # получаем id записи Game_list
-                # player_old = g_list.player_group_id # игрок в в группе которого заменяют
-                # query = g_list.update(player_group_id=family).where(Game_list.id == gl_id) # обновляет запись в Game_list
-                # query = choice.update(player_choice_id=id_pl, family=player_old) # обновляет запись в Choice  
-                query = Choice.update(group=gr, posev_group=posev).where(Choice.player_choice_id == id_pl) # обновляет запись в Choice                 
+            elif posev > count_in_group:  #=== заменяем спортсмена в группу на последний посев и  обновляет Choice (хотя он потом встает в группе по R)  
+                query = Choice.update(group=gr, posev_group=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice                 
                 query.execute()
             else: # == если добавляют игрока в конец группы                   
                 with db:
@@ -7197,15 +7160,23 @@ def change_player_between_group_after_draw():
                                     posev_group=posev,
                                     title_id=title_id()
                                     ).save()
-            player_in_table_group_and_write_Game_list_Result(stage)    
+            # player_in_table_group_and_write_Game_list_Result(stage)    
     elif element_count == 2:
         if etap_1 == etap_2: # оба игрока из одного этапа соревнования
             stage = etap_1
-
-            systems = systems.select().where(System.stage == stage).get()
-            system_id = systems.id       
-            gamelist = game_list.select().where(Game_list.system_id == system_id)
-            flag_one_etap = True
+            for pl in player_list:
+                if pl != "":
+                    znak = pl.find(":")
+                    posev = int(pl[:znak]) 
+                    break
+            n = 0      
+            for pl in full_name_list:
+                pl_id = player_dict[pl]
+                gr = group_list[1 - n]
+                query = Choice.update(group=gr, posev_group=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice                 
+                query.execute()
+                n += 1
+            # player_in_table_group_and_write_Game_list_Result(stage) 
         else: # игроки из разных этапов соревнования для исправления ошибок
             if etap_1 == "Списки участников":
                 pl1_id = players.select().where(Player.full_name == player1).get()
@@ -7217,140 +7188,16 @@ def change_player_between_group_after_draw():
             systems_2 = systems.select().where(System.stage == etap_2).get()
             system_id_2 = systems_2.id       
             gamelist_2 = game_list.select().where(Game_list.system_id == system_id_2)
-
-        if player1 == "" and player2 != "": # из правой группы перемещает в левую
-            family1 = ""
-            znak = player2.find(":")
-            znak1 = player2.find("/")  
-            number_posev2 = int(player2[:znak]) # номера посева
-            number_posev1 = number_posev2
-            family2 = player2[znak + 1:znak1]
-            # =====
-            if flag_one_etap is True: # оба игрока из одного этапа
-                g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 1 - ого игрока
-                with db:
-                    g_list.number_group = gr_pl1
-                    g_list.rank_number_group = number_posev1
-                    g_list.save()
-                choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
-                with db:
-                    choice.group = gr_pl1 
-                    choice.posev_group = number_posev1
-                    choice.save()
-            else:
-                for gl in [gamelist_1, gamelist_2]:
-                    g_list = gl.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 1 - ого игрока
-                    with db:
-                        g_list.number_group = gr_pl1
-                        g_list.rank_number_group = number_posev1
-                        g_list.save()
-                    choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
-                    with db:
-                        choice.group = gr_pl1 
-                        choice.posev_group = number_posev1
-                        choice.save()
-        elif player1 != "" and player2 == "": # из левой группы перемещает в правую
-            family2 = ""
-            znak = player1.find(":")
-            znak1 = player1.find("/")  
-            number_posev1 = int(player1[:znak]) # номера посева
-            number_posev2 = number_posev1
-            family1 = player1[znak + 1:znak1]
-            # ======
-            if flag_one_etap is True:
-                # == записывает в Gamelist и Choice измененные данные (группу и посев)
-                g_list = gamelist.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get() # находит 2 - ого игрока
-                choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
-                with db:
-                    g_list.number_group = gr_pl2
-                    g_list.rank_number_group = number_posev2
-                    g_list.save()
-                # choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
-                # with db:
-                    choice.group = gr_pl2 
-                    choice.posev_group = number_posev2
-                    choice.save()
-            else: # === если игрок перемещается в другой этап ===
-                for gl in [gamelist_1, gamelist_2]:
-                    g_list = gl.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get() # находит 2 - ого игрока
-                    choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
-                    with db:
-                        g_list.number_group = gr_pl2
-                        g_list.rank_number_group = number_posev2
-                        g_list.save()
-                    # choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
-                    # with db:
-                        choice.group = gr_pl2 
-                        choice.posev_group = number_posev2
-                        choice.save()
-    else: # меняет спортсменов местами
-        fam_city_list = []
-        znak = player1.find(":")
-        znak1 = player1.find("/")  
-        number_posev1 = int(player1[:znak]) # номера посева
-        family1 = player1[znak + 1:znak1]
-        znak = player2.find(":")
-        znak1 = player2.find("/")  
-        number_posev2 = int(player2[:znak]) # номера посева
-        family2 = player2[znak + 1:znak1]
-        family_list1 = [family1, family2]
-        gr_pl = [gr_pl2, gr_pl1]
-        family_list = family_list1
-        if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
-            znak = player1_2.find(":")
-            znak1 = player1_2.find("/") 
-            number_posev1 = int(player1_2[:znak]) # номера посева
-            family1_2 = player1_2[znak + 1:znak1]
-            znak = player2_2.find(":")
-            znak1 = player2_2.find("/")  
-            number_posev2 = int(player2_2[:znak]) # номера посева
-            family2_2 = player2_2[znak + 1:znak1]
-            family_list2 = [family1_2, family2_2]
-            gr_pl = [gr_pl2, gr_pl1, gr_pl2, gr_pl1]
-            family_list = family_list1 + family_list2
-        count_family = len(family_list)
-
-        for k in range(0, count_family): # перезаписывает game list с новыми изменениями
-            g_list = gamelist.select().where(Game_list.player_group_id == family_list[k]).get() # находит 1 - ого игрока
-            with db:
-                g_list.number_group = gr_pl[k]
-                g_list.save()
-        id_player_dict = {}
-     
-        for k in range(0, count_family): # перезаписывает таблицу Choice
-            choice = choices.select().where(Choice.family== family_list[k]).get()
-            id_player_dict[family_list[k]] = choice.player_choice_id
-            with db:
-                if stage == "Предварительный":
-                    choice.group = gr_pl[k]
-                elif stage == "1-й полуфинал":
-                    choice.sf_group = gr_pl[k]
-                choice.save()
-        player_in_table_group_and_write_Game_list_Result(stage)
-        results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
-        players = Player.select().where(Player.title_id == title_id()) 
-        pl_list = [family1, family2]  
-        for p in pl_list:
-                id_pl = id_player_dict[p]
-                pl = players.select().where(Player.id == id_pl).get()
-                fam_city = pl.full_name
-                fam_city_list.append(fam_city)
-        for k in range(0, 2): # перезаписывает таблицу Result
-            result1 = results.select().where(Result.player1 == fam_city_list[k])
-            result2 = result1.select().where(Result.player2 == fam_city_list[k + 1]).get()
-            with db:
-                result2.number_group = gr_pl[k // 2]
-                result2.save()     
-        # player_in_table_group_and_write_Game_list_Result(stage)
+    else:
         # ====== если меняет в полуфинале группы (менять результат) ======
-        if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
+        if element_count == 4: # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
             # fam_city_list = []
-            player_in_table_group_and_write_Game_list_Result(stage)
-            load_playing_game_in_table_for_semifinal(stage)
+            # player_in_table_group_and_write_Game_list_Result(stage)
+            # load_playing_game_in_table_for_semifinal(stage)
             results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
             players = Player.select().where(Player.title_id == title_id())
 
-            pl_list = [family1, family1_2, family2, family2_2]
+            # pl_list = [family1, family1_2, family2, family2_2]
             for p in pl_list:
                 id_pl = id_player_dict[p]
                 pl = players.select().where(Player.id == id_pl).get()
@@ -7362,6 +7209,154 @@ def change_player_between_group_after_draw():
                 with db:
                     result2.number_group = gr_pl[k // 2]
                     result2.save()
+        # =====================
+    player_in_table_group_and_write_Game_list_Result(stage)     
+        # ========
+
+        # if player1 == "" and player2 != "": # из правой группы перемещает в левую
+        #     family1 = ""
+        #     znak = player2.find(":")
+        #     znak1 = player2.find("/")  
+        #     number_posev2 = int(player2[:znak]) # номера посева
+        #     number_posev1 = number_posev2
+        #     family2 = player2[znak + 1:znak1]
+        #     # =====
+        #     if flag_one_etap is True: # оба игрока из одного этапа
+        #         # g_list = gamelist.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 1 - ого игрока
+        #         # with db:
+        #         #     g_list.number_group = gr_pl1
+        #         #     g_list.rank_number_group = number_posev1
+        #         #     g_list.save()
+        #         choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
+        #         with db:
+        #             choice.group = gr_pl1 
+        #             choice.posev_group = number_posev1
+        #             choice.save()
+        #     else:
+        #         for gl in [gamelist_1, gamelist_2]:
+        #             g_list = gl.select().where((Game_list.player_group_id == family2) & (Game_list.rank_num_player == number_posev2)).get() # находит 1 - ого игрока
+        #             with db:
+        #                 g_list.number_group = gr_pl1
+        #                 g_list.rank_number_group = number_posev1
+        #                 g_list.save()
+        #             choice = choices.select().where((Choice.family== family2) & (Choice.posev_group == number_posev2)).get()
+        #             with db:
+        #                 choice.group = gr_pl1 
+        #                 choice.posev_group = number_posev1
+        #                 choice.save()
+        # # elif player1 != "" and player2 == "": # из левой группы перемещает в правую
+        #     family2 = ""
+        #     znak = player1.find(":")
+        #     znak1 = player1.find("/")  
+        #     number_posev1 = int(player1[:znak]) # номера посева
+        #     number_posev2 = number_posev1
+        #     family1 = player1[znak + 1:znak1]
+        #     # ======
+        #     if flag_one_etap is True:
+        #         # == записывает в Gamelist и Choice измененные данные (группу и посев)
+        #         g_list = gamelist.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get() # находит 2 - ого игрока
+        #         choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        #         with db:
+        #             g_list.number_group = gr_pl2
+        #             g_list.rank_number_group = number_posev2
+        #             g_list.save()
+        #         # choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        #         # with db:
+        #             choice.group = gr_pl2 
+        #             choice.posev_group = number_posev2
+        #             choice.save()
+        #     else: # === если игрок перемещается в другой этап ===
+        #         for gl in [gamelist_1, gamelist_2]:
+        #             g_list = gl.select().where((Game_list.player_group_id == family1) & (Game_list.rank_num_player == number_posev1)).get() # находит 2 - ого игрока
+        #             choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        #             with db:
+        #                 g_list.number_group = gr_pl2
+        #                 g_list.rank_number_group = number_posev2
+        #                 g_list.save()
+        #             # choice = choices.select().where((Choice.family== family1) & (Choice.posev_group == number_posev1)).get()
+        #             # with db:
+        #                 choice.group = gr_pl2 
+        #                 choice.posev_group = number_posev2
+        #                 choice.save()
+    # else: # меняет спортсменов местами
+    #     fam_city_list = []
+    #     znak = player1.find(":")
+    #     znak1 = player1.find("/")  
+    #     number_posev1 = int(player1[:znak]) # номера посева
+    #     family1 = player1[znak + 1:znak1]
+    #     znak = player2.find(":")
+    #     znak1 = player2.find("/")  
+    #     number_posev2 = int(player2[:znak]) # номера посева
+    #     family2 = player2[znak + 1:znak1]
+    #     family_list1 = [family1, family2]
+    #     gr_pl = [gr_pl2, gr_pl1]
+    #     family_list = family_list1
+    #     if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
+    #         znak = player1_2.find(":")
+    #         znak1 = player1_2.find("/") 
+    #         number_posev1 = int(player1_2[:znak]) # номера посева
+    #         family1_2 = player1_2[znak + 1:znak1]
+    #         znak = player2_2.find(":")
+    #         znak1 = player2_2.find("/")  
+    #         number_posev2 = int(player2_2[:znak]) # номера посева
+    #         family2_2 = player2_2[znak + 1:znak1]
+    #         family_list2 = [family1_2, family2_2]
+    #         gr_pl = [gr_pl2, gr_pl1, gr_pl2, gr_pl1]
+    #         family_list = family_list1 + family_list2
+    #     count_family = len(family_list)
+
+    #     for k in range(0, count_family): # перезаписывает game list с новыми изменениями
+    #         g_list = gamelist.select().where(Game_list.player_group_id == family_list[k]).get() # находит 1 - ого игрока
+    #         with db:
+    #             g_list.number_group = gr_pl[k]
+    #             g_list.save()
+    #     id_player_dict = {}
+     
+    #     for k in range(0, count_family): # перезаписывает таблицу Choice
+    #         choice = choices.select().where(Choice.family== family_list[k]).get()
+    #         id_player_dict[family_list[k]] = choice.player_choice_id
+    #         with db:
+    #             if stage == "Предварительный":
+    #                 choice.group = gr_pl[k]
+    #             elif stage == "1-й полуфинал":
+    #                 choice.sf_group = gr_pl[k]
+    #             choice.save()
+    #     player_in_table_group_and_write_Game_list_Result(stage)
+    #     results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+    #     players = Player.select().where(Player.title_id == title_id()) 
+    #     pl_list = [family1, family2]  
+    #     for p in pl_list:
+    #             id_pl = id_player_dict[p]
+    #             pl = players.select().where(Player.id == id_pl).get()
+    #             fam_city = pl.full_name
+    #             fam_city_list.append(fam_city)
+    #     for k in range(0, 2): # перезаписывает таблицу Result
+    #         result1 = results.select().where(Result.player1 == fam_city_list[k])
+    #         result2 = result1.select().where(Result.player2 == fam_city_list[k + 1]).get()
+    #         with db:
+    #             result2.number_group = gr_pl[k // 2]
+    #             result2.save()     
+    #     # player_in_table_group_and_write_Game_list_Result(stage)
+    #     # ====== если меняет в полуфинале группы (менять результат) ======
+    #     if player1_2 != "" and player2_2 != "": # если присутствуют 2-е игроки для обмена (ПФ смена регионов)
+    #         # fam_city_list = []
+    #         player_in_table_group_and_write_Game_list_Result(stage)
+    #         load_playing_game_in_table_for_semifinal(stage)
+    #         results = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+    #         players = Player.select().where(Player.title_id == title_id())
+
+    #         pl_list = [family1, family1_2, family2, family2_2]
+    #         for p in pl_list:
+    #             id_pl = id_player_dict[p]
+    #             pl = players.select().where(Player.id == id_pl).get()
+    #             fam_city = pl.full_name
+    #             fam_city_list.append(fam_city)
+    #         for k in range(0, 4, 2): # перезаписывает таблицу Result
+    #             result1 = results.select().where(Result.player1 == fam_city_list[k])
+    #             result2 = result1.select().where(Result.player2 == fam_city_list[k + 1]).get()
+    #             with db:
+    #                 result2.number_group = gr_pl[k // 2]
+    #                 result2.save()
         # =====================
     my_win.lineEdit_change_pl1.clear()
     my_win.lineEdit_change_pl2.clear()
