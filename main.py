@@ -1065,7 +1065,8 @@ def tab_enabled(gamer):
 
     sender = my_win.sender()
     tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
-    titles = Title.select().order_by(Title.id.desc())  # получает последний title.id
+    titles = Title.select().order_by(Title.id.desc())  # получает все title.id по убыванию
+    title = Title.get(Title.id == title_id()) # текущий title
     n = 2
     for k in titles:
         if n != 0: 
@@ -1073,15 +1074,15 @@ def tab_enabled(gamer):
             n -= 1
         else:
             break
-    # count_title = len(Title.select())
-    # title_last = Title.select().order_by(Title.id.desc()).get()  # получает последний title.id
+    count_title = len(Title.select())
     title_id_current = title_list[0]
-    title_id_last = title_list[1].id # последний ид соревнования
+    title_id_last = title_list[1]# последний ид соревнования
  
     if count_title > 0: # если соревнования не первые
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
         if sender == fir_window.LinkButton or sender == my_win.toolBox:  # если переход со стартового окна последение соревнование
-            if title_id_last == title_id_current:
+            title_current = title.id
+            if title_current == title_id_current:
                 tit_id = Title.get(Title.id == title_id_last)
             else:
                 tit_id = Title.get(Title.id == title_id_current)
@@ -1099,7 +1100,7 @@ def tab_enabled(gamer):
     my_win.tabWidget.setTabEnabled(6, False)
     my_win.tabWidget.setTabEnabled(7, True)
 # включает вкладки записаные в Титул
-    tab_str = titles.tab_enabled
+    tab_str = title.tab_enabled
     tab_list = tab_str.split(" ")
     for k in tab_list:
         ind = tab_index.index(k)
