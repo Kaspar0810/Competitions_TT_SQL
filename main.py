@@ -6904,11 +6904,25 @@ def select_stage_for_edit():
             group_list.append(f_name)
         group_list.sort()
         title = "-Выбор спортсменов-"
-    elif index == 2:
+    elif index == 2 or index == 3:
         sys_id = systems.select().where(System.stage == stage).get()
         group = sys_id.total_group
         group_list = [f"{i} группа" for i in range(1, group + 1)] # генератор списка
         title = "-Выбор группы-"
+    elif index == 4:
+        etap_list = []
+        etap_not_in_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
+        systems = systems.select().where(System.title_id == title_id())
+        for s in systems:
+            etap = s.stage
+            if etap not in etap_not_in_list:
+                system_choice = systems.select().where(System.stage == etap).get()
+                flag = system_choice.choice_flag
+                if flag is True:
+                    etap_list.append(etap)
+
+        group_list = [i for i in etap_list] # генератор списка
+        title = "-Выбор финала-"
     elif stage == "Одна таблица":
         pass
 
@@ -6973,17 +6987,22 @@ def add_item_listwidget():
                 group = choices.select().where(Choice.group == gr).order_by(Choice.posev_group)
             elif my_win.comboBox_edit_etap1.currentText() == "1-й полуфинал":
                 group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf)
-            else:
+            elif my_win.comboBox_edit_etap1.currentText() == "1-й полуфинал":
+                group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf)
                 my_win.lineEdit_change_pl1.setText(gr)
                 return
+            else:
+                final = my_win.comboBox_first_group.currentText()
+                group = choices.select().where(Choice.final == final)
+               
         else:
             if my_win.comboBox_edit_etap2.currentText() == "Предварительный":
                 group = choices.select().where(Choice.group == gr).order_by(Choice.posev_group)
             elif my_win.comboBox_edit_etap2.currentText() == "1-й полуфинал":
                 group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf) 
             else:
-                my_win.lineEdit_change_pl2.setText(gr)
-                return
+                final = my_win.comboBox_second_group.currentText()
+                group = choices.select().where(Choice.final == final)
         n = 0
         for k in group:
             item = QListWidgetItem()
