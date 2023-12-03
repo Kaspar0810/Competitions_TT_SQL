@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1111</width>
-    <height>823</height>
+    <height>671</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>7</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -4663,90 +4663,6 @@
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Фильтр по жеребьевке&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
-     <widget class="QFrame" name="frame_3">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>250</y>
-        <width>230</width>
-        <height>85</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QComboBox" name="comboBox_filter_choice">
-       <property name="geometry">
-        <rect>
-         <x>87</x>
-         <y>2</y>
-         <width>133</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="editable">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="radioButton_group">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>2</y>
-         <width>81</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Группы</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="radioButton_PF">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>21</y>
-         <width>51</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>ПФ</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="radioButton_Fin">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>40</y>
-         <width>101</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Финалы</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="radioButton_repeat_regions">
-       <property name="geometry">
-        <rect>
-         <x>2</x>
-         <y>59</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Повтор регионов</string>
-       </property>
-      </widget>
-     </widget>
      <widget class="QFrame" name="frame_2">
       <property name="geometry">
        <rect>
@@ -4921,7 +4837,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>420</y>
+        <y>440</y>
         <width>211</width>
         <height>20</height>
        </rect>
@@ -4943,7 +4859,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>440</y>
+        <y>460</y>
         <width>221</width>
         <height>21</height>
        </rect>
@@ -4953,7 +4869,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>370</y>
+        <y>390</y>
         <width>230</width>
         <height>45</height>
        </rect>
@@ -4998,7 +4914,7 @@
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>340</y>
+        <y>364</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -5016,6 +4932,92 @@
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Сортировка по месту&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+     </widget>
+     <widget class="QFrame" name="frame_3">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>240</y>
+        <width>230</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>211</width>
+         <height>82</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_32">
+        <property name="spacing">
+         <number>1</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_50">
+          <property name="font">
+           <font>
+            <family>Times New Roman</family>
+            <pointsize>12</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Выбор этапа</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_filter_choice_stage">
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_60">
+          <property name="font">
+           <font>
+            <family>Times New Roman</family>
+            <pointsize>12</pointsize>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Выбор группы / финала</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_filter_number_group_final">
+          <property name="editable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QRadioButton" name="radioButton_repeat_regions">
+       <property name="geometry">
+        <rect>
+         <x>13</x>
+         <y>97</y>
+         <width>141</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Повтор регионов</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_3">
@@ -6998,7 +7000,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="Buttom_change_player">
+        <widget class="QPushButton" name="Button_change_player">
          <property name="text">
           <string>&lt;     &gt;</string>
          </property>
