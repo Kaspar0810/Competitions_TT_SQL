@@ -3911,7 +3911,7 @@ def select_player_in_game():
 def delete_player():
     """удаляет игрока из списка и заносит его в архив"""
     msgBox = QMessageBox
-    player_current = Player.select().where(Player.title_id == title_id())
+    # player_current = Player.select().where(Player.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
@@ -3970,31 +3970,34 @@ def delete_player():
                                                     (Result.number_group == number_group))
             fam_city_del = f"{player_del}/{player_city_del}"
             for k in result_game:
-                tour = k.tours
-                znak = tour.find("-")
-                p1 = int(tour[:znak])  # игрок под номером в группе
-                p2 = int(tour[znak + 1:])  # игрок под номером в группе
-                if p1 > posev:
-                    p1 -= 1
-                elif p2 > posev:
-                    p2 -= 1
-                new_tour = f"{p1}-{p2}"
                 pl1 = k.player1
                 pl2 = k.player2
                 if pl1 == fam_city_del or pl2 == fam_city_del:
                     res = Result.delete().where(Result.id == k)
                     res.execute()
-                else:
-                    res = Result.update(Result.tours == new_tour).where(Result.id == k)
-                    res.execute()
+            for k in result_game:
+                tour = k.tours
+                znak = tour.find("-")
+                p1 = int(tour[:znak])  # игрок под номером в группе
+                p2 = int(tour[znak + 1:])  # игрок под номером в группе
+                if p1 > posev and p2 > posev:
+                    p1 -= 1
+                    p2 -= 1
+                elif p1 > posev:
+                    p1 -= 1
+                elif p2 > posev:
+                    p2 -= 1
+                new_tour = f"{p1}-{p2}"
+                res = Result.update(tours=new_tour).where(Result.id == k)
+                res.execute()
         else: # записывает в таблицу -Удаленные-
             with db: 
                 del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
                                             region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
                                             player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
 
-            player = Player.delete().where(Player.id == player_id)
-            player.execute()
+        player = Player.delete().where(Player.id == player_id)
+        player.execute()
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
         my_win.lineEdit_R.clear()
