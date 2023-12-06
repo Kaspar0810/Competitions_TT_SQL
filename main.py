@@ -3932,14 +3932,14 @@ def delete_player():
     pay_R = player.pay_rejting
     comment = player.comment
 
-    result = msgBox.question(my_win, "", f"Вы действительно хотите удалить\n"
+    question = msgBox.question(my_win, "", f"Вы действительно хотите удалить\n"
                                          f" {player_del} город {player_city_del}?",
                              msgBox.Ok, msgBox.Cancel)
-    if result == msgBox.Ok:
+    if question == msgBox.Ok:
         systems = system.select().where(System.stage == "Предварительный").get()
         choice_flag = systems.choice_flag
         if choice_flag is True:
-            result = msgBox.information(my_win, "", f"Уже была произведена жеребьевка!\n"
+            question = msgBox.information(my_win, "", f"Уже была произведена жеребьевка!\n"
                                             f" {player_del} город {player_city_del}\n"
                                             "будет удален(а) из посева.",
                                 msgBox.Ok)
@@ -3947,51 +3947,63 @@ def delete_player():
             system_id = sys.id # id системы -Предварительного этапа-
             
             choices = Choice.delete().where(Choice.player_choice_id == player_id)
+            choices.execute()
             game_lists = game_list.select().where(Game_list.player_group_id == player_del).get()
             posev = game_lists.rank_num_player
             number_group = game_lists.number_group
-        # === изменяет номера посева, если удаляемый игрок не в последний посев ==
+            # === изменяет номера посева, если удаляемый игрок не в последний посев ==
             g_list = game_list.select().where((Game_list.system_id == system_id) & 
                                             (Game_list.number_group == number_group))
             for k in g_list:
-                pl = k.player_group_id # игрок в группе
+                gl_id = k.id
                 ps = k.rank_num_player # посев игрока
                 if posev < ps:
-                    gl = g_list.update(rank_num_player=posev - 1).where(Game_list.player_group_id == pl)
+                    rank_in_group = ps - 1
+                    gl = Game_list.update(rank_num_player=rank_in_group).where(Game_list.id == gl_id)
                     gl.execute()
-        # === удвляет игрок из Game_list ===
-            gl = game_list.delete().where(Game_list.player_group_id == player_del)
-            gl.execute()
-        # ==== заменяет туры (удаляет встречи с удаленным игроком)
+                elif posev == ps:
+            # === удаляет игрока из Game_list ===
+                    gl = Game_list.delete().where(Game_list.id == gl_id)
+                    gl.execute()
+            # ==== заменяет туры (удаляет встречи с удаленным игроком)
             result_game = result.select().where((Result.system_id == system_id) & 
-                                                (Result.number_group == number_group))
+                                                    (Result.number_group == number_group))
+            fam_city_del = f"{player_del}/{player_city_del}"
             for k in result_game:
-                tour_txt = k.tours
+                tour = k.tours
+                znak = tour.find("-")
+                p1 = int(tour[:znak])  # игрок под номером в группе
+                p2 = int(tour[znak + 1:])  # игрок под номером в группе
+                if p1 > posev:
+                    p1 -= 1
+                elif p2 > posev:
+                    p2 -= 1
+                new_tour = f"{p1}-{p2}"
                 pl1 = k.player1
                 pl2 = k.player2
-                if pl1 == player_del or pl2 == player_del:
-                    res = result_game.delete()
-
-            game_lists.execute()
-            choices.execute()
-
-        else:
-            with db:
+                if pl1 == fam_city_del or pl2 == fam_city_del:
+                    res = Result.delete().where(Result.id == k)
+                    res.execute()
+                else:
+                    res = Result.update(Result.tours == new_tour).where(Result.id == k)
+                    res.execute()
+        else: # записывает в таблицу -Удаленные-
+            with db: 
                 del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
-                                        region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
-                                        player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
+                                            region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
+                                            player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
 
-                player = player_current.select().where(Player.id == player_id).get()
-                player.delete_instance()
-            my_win.lineEdit_Family_name.clear()
-            my_win.lineEdit_bday.clear()
-            my_win.lineEdit_R.clear()
-            my_win.lineEdit_city_list.clear()
-            my_win.lineEdit_coach.clear()
-            player_list = Player.select().where(Player.title_id == title_id())
-            count = len(player_list)
-            my_win.label_46.setText(f"Всего: {count} участников")
-            fill_table(player_list)
+            player = Player.delete().where(Player.id == player_id)
+            player.execute()
+        my_win.lineEdit_Family_name.clear()
+        my_win.lineEdit_bday.clear()
+        my_win.lineEdit_R.clear()
+        my_win.lineEdit_city_list.clear()
+        my_win.lineEdit_coach.clear()
+        player_list = Player.select().where(Player.title_id == title_id())
+        count = len(player_list)
+        my_win.label_46.setText(f"Всего: {count} участников")
+        fill_table(player_list)
     else:
         return
 
