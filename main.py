@@ -3694,7 +3694,6 @@ def visible_field():
         my_win.checkBox_4.setChecked(state_visible)
     elif tab == 4:
         my_win.checkBox_14.setChecked(True)
-        # my_win.checkBox_5.setChecked(True)
         my_win.radioButton_match_10.setChecked(True)
         state_visible = True
         match_db = 5
@@ -3746,8 +3745,6 @@ def select_player_in_list():
         data_list.append(data)
 # ================================
     my_win.lineEdit_id.setText(data_list[0])
-    # if my_win.checkBox_6.isChecked():
-    #     my_win.lineEdit_id.setText(data_list[9])
     my_win.lineEdit_id.setEnabled(False)
     my_win.lineEdit_Family_name.setText(data_list[1])
     my_win.lineEdit_bday.setText(data_list[2])
@@ -3915,6 +3912,9 @@ def delete_player():
     """удаляет игрока из списка и заносит его в архив"""
     msgBox = QMessageBox
     player_current = Player.select().where(Player.title_id == title_id())
+    game_list = Game_list.select().where(Game_list.title_id == title_id())
+    system = System.select().where(System.title_id == title_id())
+    result = Result.select().where(Result.title_id == title_id())
     idx = my_win.tableView.currentIndex() # определиние номера строки
     row_num = idx.row()
 
@@ -3936,22 +3936,62 @@ def delete_player():
                                          f" {player_del} город {player_city_del}?",
                              msgBox.Ok, msgBox.Cancel)
     if result == msgBox.Ok:
-        with db:
-            del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
-                                       region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
-                                       player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
+        systems = system.select().where(System.stage == "Предварительный").get()
+        choice_flag = systems.choice_flag
+        if choice_flag is True:
+            result = msgBox.information(my_win, "", f"Уже была произведена жеребьевка!\n"
+                                            f" {player_del} город {player_city_del}\n"
+                                            "будет удален(а) из посева.",
+                                msgBox.Ok)
+            sys = system.select().where(System.stage == "Предварительный").get()
+            system_id = sys.id # id системы -Предварительного этапа-
+            
+            choices = Choice.delete().where(Choice.player_choice_id == player_id)
+            game_lists = game_list.select().where(Game_list.player_group_id == player_del).get()
+            posev = game_lists.rank_num_player
+            number_group = game_lists.number_group
+        # === изменяет номера посева, если удаляемый игрок не в последний посев ==
+            g_list = game_list.select().where((Game_list.system_id == system_id) & 
+                                            (Game_list.number_group == number_group))
+            for k in g_list:
+                pl = k.player_group_id # игрок в группе
+                ps = k.rank_num_player # посев игрока
+                if posev < ps:
+                    gl = g_list.update(rank_num_player=posev - 1).where(Game_list.player_group_id == pl)
+                    gl.execute()
+        # === удвляет игрок из Game_list ===
+            gl = game_list.delete().where(Game_list.player_group_id == player_del)
+            gl.execute()
+        # ==== заменяет туры (удаляет встречи с удаленным игроком)
+            result_game = result.select().where((Result.system_id == system_id) & 
+                                                (Result.number_group == number_group))
+            for k in result_game:
+                tour_txt = k.tours
+                pl1 = k.player1
+                pl2 = k.player2
+                if pl1 == player_del or pl2 == player_del:
+                    res = result_game.delete()
 
-            player = player_current.select().where(Player.id == player_id).get()
-            player.delete_instance()
-        my_win.lineEdit_Family_name.clear()
-        my_win.lineEdit_bday.clear()
-        my_win.lineEdit_R.clear()
-        my_win.lineEdit_city_list.clear()
-        my_win.lineEdit_coach.clear()
-        player_list = Player.select().where(Player.title_id == title_id())
-        count = len(player_list)
-        my_win.label_46.setText(f"Всего: {count} участников")
-        fill_table(player_list)
+            game_lists.execute()
+            choices.execute()
+
+        else:
+            with db:
+                del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
+                                        region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
+                                        player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
+
+                player = player_current.select().where(Player.id == player_id).get()
+                player.delete_instance()
+            my_win.lineEdit_Family_name.clear()
+            my_win.lineEdit_bday.clear()
+            my_win.lineEdit_R.clear()
+            my_win.lineEdit_city_list.clear()
+            my_win.lineEdit_coach.clear()
+            player_list = Player.select().where(Player.title_id == title_id())
+            count = len(player_list)
+            my_win.label_46.setText(f"Всего: {count} участников")
+            fill_table(player_list)
     else:
         return
 
