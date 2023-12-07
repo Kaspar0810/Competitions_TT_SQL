@@ -1688,10 +1688,10 @@ def fill_table(player_list):
     if tb == 1:
         if my_win.checkBox_6.isChecked():
             num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место', 'id_del'])
+            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место', 'id_del'])
         else:
             num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Дата рождения', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
+            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
     elif tb == 2:
         stage = my_win.comboBox_filter_choice_stage.currentText()
         if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
@@ -1789,16 +1789,20 @@ def fill_table(player_list):
     else:
         # вставляет в таблицу необходимое кол-во строк
         if tb == 1:
-            row = 0
-            my_win.statusbar.showMessage(
-                "Нет спортсменов удаленных из списка", 10000)
-            my_win.textEdit.setText("Нет спортсменов удаленных из списка")
-            my_win.checkBox_6.setChecked(False)
+            if my_win.checkBox_15.isChecked() and row_count == 0:
+                my_win.statusbar.showMessage(
+                "Нет спортсменов из предварительной заявки", 10000)
+                my_win.textEdit.setText("Нет спортсменов из предварительной заявки")
+            else:
+                row = 0
+                my_win.statusbar.showMessage(
+                    "Нет спортсменов удаленных из списка", 10000)
+                my_win.textEdit.setText("Нет спортсменов удаленных из списка")
+                my_win.checkBox_6.setChecked(False)
         elif tb == 6:
             row = 0
             my_win.statusbar.showMessage(
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
-
     my_win.tableView.show()
  
 
@@ -4648,15 +4652,15 @@ def control_winner_player(winner, loser):
 def check_real_player():
     """Изменяет спортсменов по предварительной заявке на реальных"""
     my_win.tabWidget.setCurrentIndex(1)
-    player_list = Player.select().where(Player.title_id == title_id())
-    count = len(player_list)
 
-    for row_num in range(0, count):
-        id_pl = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
-        app = player_list.select().where(Player.id == id_pl).get()
-        with db:
-            app.application = "основная"
-            app.save()
+    indices = my_win.tableView.selectionModel().selectedRows()
+    for index in sorted(indices):
+        rows = index.row()
+        id_pl = my_win.tableView.model().index(rows, 0).data() # данные ячейки tableView
+        app = Player.update(application="основная").where(Player.id == id_pl)
+        app.execute()
+    player_list = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
+    fill_table(player_list)
 
 
 def enter_score(none_player=0):
