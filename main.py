@@ -2280,6 +2280,7 @@ def page():
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         load_comboBox_filter()
         region()
+        my_win.Button_app.setEnabled(False)
         my_win.Button_del_player.setEnabled(False)
         my_win.Button_clear_del.setEnabled(False)
         my_win.Button_pay_R.setEnabled(False)
@@ -3774,16 +3775,18 @@ def select_player_in_list():
 
 def save_in_db_pay_R():
     """запись в базу данных оплату рейтинга"""
-    r = my_win.tableWidget.currentRow()
-    family = my_win.tableWidget.item(r, 1).text()
-    player = Player.select().where(Player.title_id == title_id())
-    plr = player.select().where(Player.player == family).get()
+    # r = my_win.tableWidget.currentRow()
+    # family = my_win.tableWidget.item(r, 1).text()
+    idx = my_win.tableView.currentIndex() # номер выделенной строки
+    row_num = idx.row()
+    pl_id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
+    # player = Player.select().where(Player.title_id == title_id())
+    # plr = player.select().where(Player.player == family).get()
+    # pl_id = plr.id
     comment, ok = QInputDialog.getText(my_win, "Коментарий", "Введите коментарий о месте нахождении квитанции.")
     if ok:
-        with db:
-            plr.pay_rejting = "оплачен"
-            plr.comment = comment
-            plr.save()
+        query = Player.update(pay_rejting="оплачен", comment=comment).where(Player.id == pl_id)
+        query.execute()
     else:
         return
     debtor_R()
@@ -4082,8 +4085,10 @@ def filter_player_list(sender):
             player_list = player.select().where(Player.region == region)
     elif sender == my_win.checkBox_15: # отмечен чекбокс предзаявка
         if my_win.checkBox_15.isChecked():
+            my_win.Button_app.setEnabled(True)
             player_list = player.select().where(Player.application == "предварительная")
         else:
+            my_win.Button_app.setEnabled(False)
             player_list = Player.select().where(Player.title_id == title_id())
     elif sender == my_win.Button_reset_fltr_list:
         player_list = Player.select().where(Player.title_id == title_id())
@@ -13105,7 +13110,7 @@ def made_list_referee():
     """создание списка судейской коллегии"""
     # Dialog = QInputDialg()
     data = []
-    my_win.tableView.clear()
+    # my_win.tableView.clear()
     my_win.radioButton_GSK.setChecked(True)
     my_win.Button_made_page_pdf.setEnabled(True)
     model = MyTableModel(data)
