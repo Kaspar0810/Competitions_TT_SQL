@@ -1929,14 +1929,16 @@ def debtor_R():
     """показывает список должников оплаты рейтинга"""
     player_list = Player.select().where(Player.title_id == title_id())
     if my_win.checkBox_11.isChecked():
-        player_debtor = player_list.select().where(Player.pay_rejting == "долг")
-        if len(player_debtor) == 0:
+        player_debitor_R = player_list.select().where(Player.pay_rejting == "долг")
+        my_win.label_dolg_R.setText("Нет спортсменов без лицензии.")
+        if len(player_debitor_R) == 0:
             my_win.textEdit.setText("Спортсменов, не оплативших регистрационыый взнос за рейтинг нет.")
     else:
-        player_debtor = player_list.select()
+        player_debitor_R = player_list.select().where(Player.pay_rejting == "долг")
         my_win.Button_pay_R.setEnabled(False)
         my_win.textEdit.clear()
-    fill_table(player_debtor)
+    my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участников.")
+    fill_table(player_debitor_R)
 
 
 def add_player(): 
@@ -2287,9 +2289,20 @@ def page():
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
         player_list = Player.select().where(Player.title_id == title_id())
+        player_debitor_R = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг"))
+        count_debitor_R = len(player_debitor_R)
+        num_debitor_1 = [1]
+        num_debitor_2 = [2, 3, 4]
+        if count_debitor_R in num_debitor_1:
+            end_word = "участник"
+        elif count_debitor_R in num_debitor_2:
+            end_word = "участника"
+        else:
+            end_word = "участников"
         fill_table(player_list)  # заполняет TableWidget списком игроков
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
+        my_win.label_dolg_R.setText(f"Без лицензии: {count_debitor_R} {end_word}")
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
@@ -2311,7 +2324,6 @@ def page():
                 flag_choice = ready_choice(stage)
                 if flag_choice is True:
                     choice_filter_on_system()
-                    # load_combobox_filter_group()
                 break
         my_win.label_etap_1.hide()
         my_win.label_etap_2.hide()
