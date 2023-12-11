@@ -13140,23 +13140,44 @@ def made_list_referee():
         list_referee = [referee, secretary]
         list_kategory = [kat_referee, kat_secretary]
 
+        ref_list = Referee.select()
+        referee_selected = ref_list.dicts().execute()
+        row_count = len(referee_selected)  # кол-во строк в таблице
+
+        title_competition = Title.get(Title.id == title_id())
+        referee = title_competition.referee
+        kat_ref = title_competition.kat_ref
+        secretary = title_competition.secretary
+        kat_sec = title_competition.kat_sec
+        data = [["Главный судья", referee, kat_ref], ["Главный секретарь", secretary, kat_sec]]
+
         # my_win.tableWidget.setColumnCount(4) # устанавливает колво столбцов
         # my_win.tableWidget.setRowCount(number_of_referee)
         # column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
-        # my_win.tableWidget.setColumnWidth(2, 10000)
-        # for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
-        #     my_win.tableWidget.showColumn(i)
-        #     item = QtWidgets.QTableWidgetItem()
-        #     brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
-        #     brush.setStyle(QtCore.Qt.SolidPattern)
-        #     item.setForeground(brush)
-        #     my_win.tableWidget.setHorizontalHeaderItem(i, item)
-        # my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
-        referee_list = []
-        post_list = ["", "ССВК", "1-й кат.", "2-й кат."]
-        category_list = ["","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-        my_win.tableWidget.setItem(0, 1, QTableWidgetItem("Гл. судья"))
-        my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
+        # # my_win.tableWidget.setColumnWidth(2, 10000)
+        # for row in range(0, number_of_referee):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+        #     item_1 = str(list(referee_selected[row].values())[num_columns[0]])
+        #     item_2 = str(list(referee_selected[row].values())[num_columns[1]])
+        #     item_3 = str(list(referee_selected[row].values())[num_columns[2]])
+        #     item_4 = str(list(referee_selected[row].values())[num_columns[3]])
+
+
+        comboBox_list_post = QComboBox()
+        comboBox_list_category = QComboBox()  
+        comboBox_family_city = QComboBox()
+        referee_list = load_comboBox_referee()
+
+        # referee_list = []
+        category_list = ["-выберите категорию-", "ССВК", "1-й кат.", "2-й кат."]
+        post_list = ["-выберите должность-","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        comboBox_list_post.addItems(post_list)
+        my_win.tableView.setModel(model)
+        my_win.tableView.setIndexWidget(model().index(1, 1), comboBox_list_post)
+        # comboBox_list_category = QComboBox()  
+        # comboBox_family_city = QComboBox()
+        # referee_list = load_comboBox_referee())
+        # my_win.tableWidget.setItem(0, 1, QTableWidgetItem("Гл. судья"))
+        # my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
     else:
         return
     # for k in range(0, 2):
