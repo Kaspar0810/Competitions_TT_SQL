@@ -18,8 +18,8 @@ from PyQt5 import *
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtGui import QIcon, QBrush, QColor, QFont, QPalette
 from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem, QItemDelegate
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem
-from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget, QTableView
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem, QLineEdit
+from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget, QTableView, QColorDialog
 from PyQt5 import QtGui, QtWidgets, QtCore
 from models import *
 from collections import Counter
@@ -107,7 +107,58 @@ class MyTableModel(QAbstractTableModel):
             return str(self._data[index.row()][index.column()])
         return None
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
-    
+
+class MyComboDelegate(QItemDelegate):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def createEditor(self, parent, option, index):
+        if index.column() == 2:
+            combo = QComboBox(parent)
+            post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+            combo.addItems(post_list)
+            return combo
+
+    def setEditorData(self, combo, index):
+        value = index.model().data(index, QtCore.Qt.EditRole)
+        if value:
+            combo.setCurrentIndex(int(value))
+        # text = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
+        # editor.setText(text)
+
+    def setModelData(self, combo, model, index):
+        # text = editor.text()
+        model.setData(index, combo.currentIndex(), QtCore.Qt.ItemDataRole.DisplayRole)
+
+
+class MyColorDelegate(QItemDelegate):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def paint(self, painter, option, index):
+        if index.isValid():
+            color = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
+        # if color.isValid():
+        #     painter.fillRect(option.rect, color)
+
+    def createEditor(self, parent, option, index):
+        color_dialog = QColorDialog(parent)
+        color_dialog.setOption(QColorDialog.ShowAlphaChannel, True)
+        return color_dialog
+
+    def setEditorData(self, editor, index):
+        value = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
+        if value.isValid():
+            editor.setCurrentColor(value)
+
+    def setModelData(self, editor, model, index):
+        value = editor.currentColor()
+        model.setData(index, value, QtCore.Qt.ItemDataRole.DisplayRole)
+
+
+# =====================================    
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None, *args, **kwargs) -> object:
@@ -13120,14 +13171,10 @@ def move_row_in_tablewidget():
 
 def made_list_referee():
     """создание списка судейской коллегии"""
-    # Dialog = QInputDialg()
-    data = []
-    # my_win.tableView.clear()
     my_win.radioButton_GSK.setChecked(True)
     my_win.Button_made_page_pdf.setEnabled(True)
-    model = MyTableModel(data)
     num_columns = [0, 1, 2, 3]
-    model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]) 
+    # model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]) 
     number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
     # for l in range(0, number_of_referee):
     #     my_win.tableWidget.setItem(l, 0, QTableWidgetItem(str(l + 1)))
@@ -13149,8 +13196,10 @@ def made_list_referee():
         kat_ref = title_competition.kat_ref
         secretary = title_competition.secretary
         kat_sec = title_competition.kat_sec
-        data = [["Главный судья", referee, kat_ref], ["Главный секретарь", secretary, kat_sec]]
 
+        data = [["1", "Главный судья", referee, kat_ref], ["2", "Главный секретарь", secretary, kat_sec], ["", "", "", ""]]
+        model = MyTableModel(data)
+        model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]) 
         # my_win.tableWidget.setColumnCount(4) # устанавливает колво столбцов
         # my_win.tableWidget.setRowCount(number_of_referee)
         # column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
@@ -13162,17 +13211,32 @@ def made_list_referee():
         #     item_4 = str(list(referee_selected[row].values())[num_columns[3]])
 
 
-        comboBox_list_post = QComboBox()
-        comboBox_list_category = QComboBox()  
-        comboBox_family_city = QComboBox()
-        referee_list = load_comboBox_referee()
-
-        # referee_list = []
-        category_list = ["-выберите категорию-", "ССВК", "1-й кат.", "2-й кат."]
-        post_list = ["-выберите должность-","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-        comboBox_list_post.addItems(post_list)
+        # comboBox_list_post = QComboBox()
+        # comboBox_list_category = QComboBox()  
+        # comboBox_family_city = QComboBox()
+        # referee_list = load_comboBox_referee()
+        # c = QComboBox()
+        # c.addItems(['cell11','cell12','cell13','cell14','cell15',])
+        # i = self.tableView.model().index(row,2)
+        # self.tableView.setIndexWidget(i,c)
+        # # referee_list = []
+        # category_list = ["-выберите категорию-", "ССВК", "1-й кат.", "2-й кат."]
+        post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        # comboBox_list_post.addItems(post_list)
+        # i = my_win.tableView.model().index(2, 2)
+        # my_win.tableView.setIndexWidget(i, comboBox_list_post)
+        #  self._model = TableModel(self)
+        # my_win._delegate = QItemDelegate()
         my_win.tableView.setModel(model)
-        my_win.tableView.setIndexWidget(model().index(1, 1), comboBox_list_post)
+        color_delegate = MyColorDelegate(my_win.tableView)
+        delegate = MyComboDelegate(my_win.tableView)
+        # delegate.addItems(post_list)
+        my_win.tableView.setItemDelegateForColumn(0, color_delegate)
+        my_win.tableView.setItemDelegateForColumn(3, delegate)
+        my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
+        # my_win.tableView.setModel(model)
+        # my_win.tableView.setItemDelegateForColumn(0, my_win._delegate)
+        my_win.tableView.show()
         # comboBox_list_category = QComboBox()  
         # comboBox_family_city = QComboBox()
         # referee_list = load_comboBox_referee())
@@ -13180,31 +13244,8 @@ def made_list_referee():
         # my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
     else:
         return
-    # for k in range(0, 2):
-    #     my_win.tableView.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
-    #     my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
     for n in range(0, int(number_of_referee)): 
         print(1)
-        
-
-        # comboBox_list_post = QComboBox()
-        # comboBox_list_category = QComboBox()  
-        # comboBox_family_city = QComboBox()
-        # referee_list = load_comboBox_referee()
-
-        # comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
-        # comboBox_family_city.setCurrentIndex(-1)
-        # comboBox_family_city.setEditable(True)
-        # comboBox_list_category.addItems(category_list)
-        # comboBox_list_post.addItems(post_list) 
-        # comboBox_family_city.addItems(referee_list)
-
-        # my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
-        # my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
-        # my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)   
-
-        # my_win.tableWidget.itemChanged.connect(change_on_comboBox_referee)
-        # comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)
 
 
 def change_on_comboBox_referee(comboBox_family_city):
