@@ -114,23 +114,45 @@ class MyComboDelegate(QItemDelegate):
         super().__init__(parent)
 
     def createEditor(self, parent, option, index):
-        if index.column() == 2:
-            combo = QComboBox(parent)
-            post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-            combo.addItems(post_list)
-            return combo
+        # if index.column() == 2:
+        editor = QComboBox(parent)
+        post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        editor.addItems(post_list)
+        return editor
 
-    def setEditorData(self, combo, index):
+    def setEditorData(self, editor, index):
         value = index.model().data(index, QtCore.Qt.EditRole)
         if value:
-            combo.setCurrentIndex(int(value))
+            editor.setCurrentIndex(int(value))
         # text = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
         # editor.setText(text)
 
-    def setModelData(self, combo, model, index):
+    def setModelData(self, editor, model, index):
         # text = editor.text()
-        model.setData(index, combo.currentIndex(), QtCore.Qt.ItemDataRole.DisplayRole)
+        model.setData(index, editor.currentIndex(), QtCore.Qt.ItemDataRole.DisplayRole)
 
+#  ===
+class ComboDelegate(QItemDelegate):
+    """
+    A delegate to add QComboBox in every cell of the given column
+    """
+
+    def __init__(self, parent):
+        super(ComboDelegate, self).__init__(parent)
+        self.parent = parent
+
+    def createEditor(self, parent, option, index):
+        editor = QComboBox(parent)
+        post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        editor.addItems(post_list)
+        # editor.currentTextChanged.connect(lambda value: self.currentIndexChanged(index, value))
+        return editor
+
+    def setEditorData(self, editor, index):
+        value = index.data()
+        if value:
+            maxval = len(value)
+            editor.setCurrentIndex(maxval - 1)
 
 class MyColorDelegate(QItemDelegate):
 
@@ -1838,7 +1860,6 @@ def fill_table(player_list):
         my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
     else:
-        # вставляет в таблицу необходимое кол-во строк
         if tb == 1:
             if my_win.checkBox_15.isChecked() and row_count == 0:
                 my_win.statusbar.showMessage(
@@ -13174,10 +13195,8 @@ def made_list_referee():
     my_win.radioButton_GSK.setChecked(True)
     my_win.Button_made_page_pdf.setEnabled(True)
     num_columns = [0, 1, 2, 3]
-    # model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]) 
     number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
-    # for l in range(0, number_of_referee):
-    #     my_win.tableWidget.setItem(l, 0, QTableWidgetItem(str(l + 1)))
+  
     if ok:
         title = Title.get(Title.id == title_id())
         referee = title.referee
@@ -13197,56 +13216,52 @@ def made_list_referee():
         secretary = title_competition.secretary
         kat_sec = title_competition.kat_sec
 
-        data = [["1", "Главный судья", referee, kat_ref], ["2", "Главный секретарь", secretary, kat_sec], ["", "", "", ""]]
+        data = [["1", "Главный судья", referee, kat_ref], ["2", "Главный секретарь", secretary, kat_sec]]
+        data_extend = ["", "", "", ""]
+        data_tmp = []
+
+        for k in range(number_of_referee - 2):
+            data_extend[0] = str(k + 3)
+            data_tmp = data_extend.copy()      
+            data.append(data_tmp.copy())
+            data_tmp.clear()
+
         model = MyTableModel(data)
-        model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]) 
-        # my_win.tableWidget.setColumnCount(4) # устанавливает колво столбцов
-        # my_win.tableWidget.setRowCount(number_of_referee)
-        # column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
-        # # my_win.tableWidget.setColumnWidth(2, 10000)
-        # for row in range(0, number_of_referee):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
-        #     item_1 = str(list(referee_selected[row].values())[num_columns[0]])
-        #     item_2 = str(list(referee_selected[row].values())[num_columns[1]])
-        #     item_3 = str(list(referee_selected[row].values())[num_columns[2]])
-        #     item_4 = str(list(referee_selected[row].values())[num_columns[3]])
-
-
-        # comboBox_list_post = QComboBox()
-        # comboBox_list_category = QComboBox()  
-        # comboBox_family_city = QComboBox()
-        # referee_list = load_comboBox_referee()
-        # c = QComboBox()
-        # c.addItems(['cell11','cell12','cell13','cell14','cell15',])
-        # i = self.tableView.model().index(row,2)
-        # self.tableView.setIndexWidget(i,c)
-        # # referee_list = []
-        # category_list = ["-выберите категорию-", "ССВК", "1-й кат.", "2-й кат."]
-        post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-        # comboBox_list_post.addItems(post_list)
-        # i = my_win.tableView.model().index(2, 2)
-        # my_win.tableView.setIndexWidget(i, comboBox_list_post)
-        #  self._model = TableModel(self)
-        # my_win._delegate = QItemDelegate()
+        model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"])
         my_win.tableView.setModel(model)
-        color_delegate = MyColorDelegate(my_win.tableView)
-        delegate = MyComboDelegate(my_win.tableView)
-        # delegate.addItems(post_list)
-        my_win.tableView.setItemDelegateForColumn(0, color_delegate)
-        my_win.tableView.setItemDelegateForColumn(3, delegate)
+        combo = QComboBox()
+        lineEd = QLineEdit()
+        post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+       
+        combo.addItems(post_list)
+        for i in range(2, number_of_referee):
+            my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 1), combo) # вставляет в строку i, 1 столбец combobox
+            my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 2), lineEd) # вставляет в строку i, 1 столбец combobox
+        # delegate = MyComboDelegate(my_win.view)
+        # my_win.view.setIndexWidget(my_win.view.model().index(3, 1), delegate)
+        # delegate = MyComboDelegate(my_win.view)
+        # my_win.view.setItemDelegateForColumn(3, delegate)
+        # my_win.view.show()
+
+        # category_list = ["-выберите категорию-", "ССВК", "1-й кат.", "2-й кат."]
+        # post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+
+
+ 
+        # -  my_win.tableView.setModel(model)
+       
+        # color_delegate = MyColorDelegate(my_win.tableView)
+        # my_win.delegate = MyComboDelegate(my_win.tableView)
+        # my_win.tableView.setItemDelegateForColumn(0, color_delegate)
+        # my_win.tableView.setItemDelegateForColumn(3, my_win.delegate)
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
-        # my_win.tableView.setModel(model)
-        # my_win.tableView.setItemDelegateForColumn(0, my_win._delegate)
+
         my_win.tableView.show()
-        # comboBox_list_category = QComboBox()  
-        # comboBox_family_city = QComboBox()
-        # referee_list = load_comboBox_referee())
-        # my_win.tableWidget.setItem(0, 1, QTableWidgetItem("Гл. судья"))
-        # my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
+  
+
     else:
         return
-    for n in range(0, int(number_of_referee)): 
-        print(1)
-
+   
 
 def change_on_comboBox_referee(comboBox_family_city):
     """добавляет в базу данных судей если их там нет"""
