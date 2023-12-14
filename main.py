@@ -13237,6 +13237,8 @@ def made_list_referee():
         for i in range(2, number_of_referee):
             my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 1), combo) # вставляет в строку i, 1 столбец combobox
             my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 2), lineEd) # вставляет в строку i, 1 столбец combobox
+
+        data_1 = lineEd.text()
         # delegate = MyComboDelegate(my_win.view)
         # my_win.view.setIndexWidget(my_win.view.model().index(3, 1), delegate)
         # delegate = MyComboDelegate(my_win.view)
@@ -13728,8 +13730,8 @@ def open_close_file(view_file):
     # c.save()
 # =======        
 # def proba():
-#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
-
+# #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+#     data = my_win.lineEd.text()
     # my_db = SqliteDatabase('comp_db.db')
     # migrator = SqliteMigrator(my_db)
     # multiregion = IntegerField(null=True)
