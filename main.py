@@ -105,7 +105,13 @@ class MyTableModel(QAbstractTableModel):
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
-        return None
+        return 
+        
+    def flags(self, index):
+        if (index.column() == 1):
+            return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled
+        else:
+            return QtCore.Qt.ItemIsEnabled
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class MyComboDelegate(QItemDelegate):
@@ -118,19 +124,28 @@ class MyComboDelegate(QItemDelegate):
         editor = QComboBox(parent)
         post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
         editor.addItems(post_list)
+        self.connect(editor, QtCore.SIGNAL("currentIndexChanged(int)"), 
+                 self, QtCore.SLOT("currentIndexChanged()"))
         return editor
 
     def setEditorData(self, editor, index):
         value = index.model().data(index, QtCore.Qt.EditRole)
         if value:
             editor.setCurrentIndex(int(value))
-        # text = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
-        # editor.setText(text)
+
+    @QtCore.pyqtSlot()
+    def currentIndexChanged(self):
+        self.commitData.emit(self.sender())
+    
+    # def setModelData(self, editor, model, index):
+    #     model.setData(index, editor.currentIndex())  
 
     def setModelData(self, editor, model, index):
-        # text = editor.text()
         model.setData(index, editor.currentIndex(), QtCore.Qt.ItemDataRole.DisplayRole)
 
+    def setData(self, index, value, role=QtCore.Qt.ItemDataRole.DisplayRole):
+        print ("setData", index.row(), index.column(), value)
+        # todo: remember the data
 #  ===
 class ComboDelegate(QItemDelegate):
     """
@@ -13229,16 +13244,18 @@ def made_list_referee():
         model = MyTableModel(data)
         model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"])
         my_win.tableView.setModel(model)
-        combo = QComboBox()
-        lineEd = QLineEdit()
-        post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        #======== ++++
+        # combo = QComboBox()
+        # lineEd = QLineEdit()
+        # post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
        
-        combo.addItems(post_list)
-        for i in range(2, number_of_referee):
-            my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 1), combo) # вставляет в строку i, 1 столбец combobox
-            my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 2), lineEd) # вставляет в строку i, 1 столбец combobox
+        # combo.addItems(post_list)
+        # for i in range(2, number_of_referee):
+        #     my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 1), combo) # вставляет в строку i, 1 столбец combobox
+        #     my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 2), lineEd) # вставляет в строку i, 1 столбец combobox
+        # ======= ++++++++
 
-        data_1 = lineEd.text()
+      
         # delegate = MyComboDelegate(my_win.view)
         # my_win.view.setIndexWidget(my_win.view.model().index(3, 1), delegate)
         # delegate = MyComboDelegate(my_win.view)
@@ -13253,9 +13270,9 @@ def made_list_referee():
         # -  my_win.tableView.setModel(model)
        
         # color_delegate = MyColorDelegate(my_win.tableView)
-        # my_win.delegate = MyComboDelegate(my_win.tableView)
+        delegate = MyComboDelegate(my_win.tableView)
         # my_win.tableView.setItemDelegateForColumn(0, color_delegate)
-        # my_win.tableView.setItemDelegateForColumn(3, my_win.delegate)
+        my_win.tableView.setItemDelegateForColumn(2, delegate)
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
 
         my_win.tableView.show()
@@ -13865,6 +13882,8 @@ my_win.comboBox_referee.currentTextChanged.connect(referee)
 my_win.comboBox_secretary.currentTextChanged.connect(referee)
 my_win.comboBox_kategor_ref.currentTextChanged.connect(add_referee_to_db)
 my_win.comboBox_kategor_sec.currentTextChanged.connect(add_referee_to_db)
+
+
 
 # =======  отслеживание переключение чекбоксов =========
 # my_win.radioButton_group.toggled.connect(load_combobox_filter_group)
