@@ -3273,7 +3273,8 @@ def view():
     """просмотр PDF файлов средствами OS"""
     from sys import platform
     sender = my_win.sender()
-    made_pdf_table_for_view(sender)
+    if sender != my_win.view_list_Action:
+        made_pdf_table_for_view(sender)
     t_id = Title.get(Title.id == title_id())
     tab = my_win.tabWidget.currentIndex()
     short_name = t_id.short_name_comp
@@ -3898,6 +3899,17 @@ def select_player_in_list():
     # row_num = idx.row()
     # pl_id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
     # for idx in my_win.tableView.selectionModel().selectedRows():
+
+    # rows = {index.row() for index in my_win.tableView.selectionModel().selectedIndexes()}
+    # # output = []
+    # for row in rows:
+    #     # row_data = []
+    #     for column in range(my_win.tableView.model().columnCount()):
+    #         index = my_win.tableView.model().index(row, column)
+    #         data_list.append(index.data())
+    #     # output.append(data_list)
+
+
     indexes = my_win.tableView.selectionModel().selectedRows()
     for idx in sorted(indexes):
 
@@ -5003,7 +5015,7 @@ def made_pdf_table_for_view(sender):
         stage = "Предварительный"
         my_win.tabWidget.setCurrentIndex(3)
     elif sender == my_win.view_fin1_Action:
-        stage == "1-й финал"
+        stage = "1-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_fin2_Action:
@@ -10875,10 +10887,11 @@ def mesto_in_final(fin):
             sys = system.select().where(System.id == k).get()
             max_player = sys.max_player
             stage = sys.stage
-            if stage == fin:
+            if stage != fin:
                 final.append(max_player)
+            else:   
+                mesto[fin] = sum(final) + 1
                 break
-        mesto[fin] = sum(final) + 1
     first_mesto = mesto[fin]
 
     return first_mesto
@@ -11237,7 +11250,7 @@ def setka_player_after_choice(fin):
     posev_data = []
     player = Player.select().where(Player.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
-    pl_list = game_list.select().where(Game_list.number_group == fin)
+    pl_list = game_list.select().where(Game_list.number_group == fin).order_by(Game_list.rank_num_player)
     for i in pl_list:
         p_data['посев'] = i.rank_num_player
         txt = i.player_group_id
