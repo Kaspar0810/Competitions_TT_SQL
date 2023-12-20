@@ -3987,6 +3987,8 @@ def check_repeat_player(pl, bd):
 def select_player_in_game():
     """выводит фамилии игроков встречи"""
     tab = my_win.tabWidget.currentIndex()
+    row_num= my_win.tableView.currentIndex().row() # определиние номера строки
+    numer_game = my_win.tableView.model().index(row_num, 3).data()
     if tab == 1:
         select_player_in_list()
     elif tab ==2:
@@ -3996,6 +3998,7 @@ def select_player_in_game():
         my_win.checkBox_8.setEnabled(True)
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
+        # my_win.groupBox_match_1.setTitle(f"Встреча №{numer_game}")
     elif tab == 4:
         my_win.checkBox_12.setEnabled(True)
         my_win.checkBox_13.setEnabled(True)
@@ -4006,12 +4009,10 @@ def select_player_in_game():
         my_win.checkBox_10.setEnabled(True)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
-        # numer_game = my_win.tableView.item(row_num, 3).text()
         my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
         state_visible = change_status_visible_and_score_game()
-        row_num= my_win.tableView.currentIndex().row() # определиние номера строки
         pl1 = my_win.tableView.model().index(row_num, 4).data()
         pl2 = my_win.tableView.model().index(row_num, 5).data()
         pl_win = my_win.tableView.model().index(row_num, 6).data()
