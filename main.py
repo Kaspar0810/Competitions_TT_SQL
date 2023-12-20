@@ -107,14 +107,14 @@ class MyTableModel(QAbstractTableModel):
             return str(self._data[index.row()][index.column()])
         return 
         
-    def flags(self, index):
-        if (index.column() == 1) or (index.column() == 2):
-            return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled
-        else:
-            return QtCore.Qt.ItemIsEnabled
+    # def flags(self, index):
+    #     if (index.column() == 1) or (index.column() == 2):
+    #         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled
+    #     else:
+    #         return QtCore.Qt.ItemIsEnabled
         
-    def setData(self, index, text):
-        self.items[index.row()] = text
+    # def setData(self, index, text):
+    #     self.items[index.row()] = text
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
 # class MyComboDelegate(QItemDelegate):
 
@@ -3893,34 +3893,15 @@ def visible_field():
 def select_player_in_list():
     """выводит данные игрока в поля редактирования или удаления"""
     data_list = []
-    # row_num = my_win.tableView.currentIndex().row() # определиние номера строки
-    # row_num = idx.row()
-    # idx = my_win.tableView.currentIndex() # номер выделенной строки
-    # row_num = idx.row()
-    # pl_id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
-    # for idx in my_win.tableView.selectionModel().selectedRows():
 
-    # rows = {index.row() for index in my_win.tableView.selectionModel().selectedIndexes()}
-    # # output = []
-    # for row in rows:
-    #     # row_data = []
-    #     for column in range(my_win.tableView.model().columnCount()):
-    #         index = my_win.tableView.model().index(row, column)
-    #         data_list.append(index.data())
-    #     # output.append(data_list)
-
-
-    indexes = my_win.tableView.selectionModel().selectedRows()
-    for idx in sorted(indexes):
-
-        # print('Row %d is selected' % index.row())
-    # for idx in my_win.tableView.selectedIndexes():
-    # for idx in my_win.tableView.currentIndex() # определиние номера строки
+    for idx in my_win.tableView.selectedIndexes():
         row_num = idx.row()
         col_num = idx.column()
         data = my_win.tableView.model().index(row_num, col_num).data()
         data_list.append(data)
 # ================================
+    pl_id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
+    data_list.insert(0, pl_id)
     my_win.lineEdit_id.setText(data_list[0])
     my_win.lineEdit_id.setEnabled(False)
     my_win.lineEdit_Family_name.setText(data_list[1])
@@ -3998,7 +3979,7 @@ def select_player_in_game():
         my_win.checkBox_8.setEnabled(True)
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
-        # my_win.groupBox_match_1.setTitle(f"Встреча №{numer_game}")
+        my_win.groupBox_match.setTitle(f"Встреча №{numer_game}")
     elif tab == 4:
         my_win.checkBox_12.setEnabled(True)
         my_win.checkBox_13.setEnabled(True)
@@ -5663,6 +5644,7 @@ def load_combo_etap_begunki():
     """загружает комбобокс выбора этапов системы на вкладке дополнительно"""
     my_win.comboBox_select_stage_begunki.clear()
     my_win.comboBox_edit_etap1.clear()
+    my_win.comboBox_edit_etap2.clear()
     stage_system = ["-Выбор спортсменов-", "Списки участников"]
     results = Result.select().where(Result.title_id == title_id())
     for i in results:
