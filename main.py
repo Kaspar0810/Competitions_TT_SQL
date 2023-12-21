@@ -2329,9 +2329,8 @@ def load_combobox_filter_group_semifinal():
     """заполняет комбобокс фильтр групп для таблицы результаты"""
     sf_list = ["-все полуфиналы-"]
     gr_txt = []
-    # sender = my_win.menuWidget().sender()
+
     my_win.comboBox_filter_semifinal.clear()
-    # my_win.comboBox_filter_choice.clear()
     my_win.comboBox_filter_group_sf.clear()
 
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
@@ -2342,10 +2341,9 @@ def load_combobox_filter_group_semifinal():
     my_win.comboBox_filter_semifinal.addItems(sf_list)
 
     my_win.comboBox_filter_group_sf.addItem("все группы")
-    # my_win.comboBox_filter_choice.addItem("все группы")
     gr_txt = [f"{i} группа" for i in range(1, kg + 1)]
     my_win.comboBox_filter_group_sf.addItems(gr_txt)
-    # my_win.comboBox_filter_choice.addItems(gr_txt)
+
 
 
 def load_comboBox_filter_rejting():
@@ -2357,19 +2355,26 @@ def load_comboBox_filter_rejting():
     r_data_w = [R_list_d, R1_list_d]
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
-    cur_index = my_win.comboBox_choice_R.currentIndex()
-
+    cur_index = my_win.comboBox_choice_R.currentIndex() # комбобокс выбора рейтинга
+    reg_index = my_win.comboBox_filter_region_in_R.currentIndex()
+    reg_text = my_win.comboBox_filter_region_in_R.currentText() # 
     if cur_index == 0: # если выбран текущий рейтинг
         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
             r_data = r_data_w[0]
         else:
             r_data = r_data_m[0] 
+        # r_region = r_data.select().where(r_data.r_region == reg_text)
     elif cur_index == 1: # если рейтинг за январь
         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
             r_data = r_data_w[1]
         else:
            r_data = r_data_m[1]
+        # r_region = r_data.select().where(r_data.r1_region == reg_text)
+    # if reg_index == -1 or reg_index == 0:
     player_list = r_data.select()
+    # else:
+    #     player_list = r_region
+
     for k in player_list:
         region = k.r_region
         city = k.r_city
@@ -14014,7 +14019,9 @@ my_win.comboBox_page_vid.currentTextChanged.connect(page_vid)
 my_win.comboBox_filter_number_group_final.currentTextChanged.connect(filter_player_on_system)
 my_win.comboBox_filter_choice_stage.currentTextChanged.connect(choice_filter_on_system)
 my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
+# my_win.comboBox_filter_region_in_R.currentTextChanged.connect(load_comboBox_filter_rejting)
 my_win.comboBox_filter_region_in_R.currentTextChanged.connect(change_city_from_region_in_R)
+# my_win.comboBox_filter_city_in_R.currentTextChanged.connect(change_city_from_region_in_R)
 my_win.comboBox_select_stage_begunki.currentTextChanged.connect(select_stage_for_begunki)
 my_win.comboBox_select_group_begunki.currentTextChanged.connect(select_tour_for_begunki)
 my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1111</width>
-    <height>671</height>
+    <height>827</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>6</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -4368,7 +4368,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4388,8 +4388,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4862,8 +4862,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5254,8 +5254,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5672,8 +5672,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5979,8 +5979,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6770,8 +6770,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7301,9 +7301,9 @@
    <widget class="QTableWidget" name="tableWidget_GSK">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>270</x>
       <y>310</y>
-      <width>571</width>
+      <width>821</width>
       <height>161</height>
      </rect>
     </property>
