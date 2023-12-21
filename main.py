@@ -2064,17 +2064,17 @@ def progressbar(count):
 def debtor_R():
     """показывает список должников оплаты рейтинга"""
     player_list = Player.select().where(Player.title_id == title_id())
-    if my_win.checkBox_11.isChecked():
-        player_debitor_R = player_list.select().where(Player.pay_rejting == "долг")
-        my_win.label_dolg_R.setText("Нет спортсменов без лицензии.")
+    player_debitor_R = player_list.select().where(Player.pay_rejting == "долг")
+    if my_win.checkBox_11.isChecked():        
         if len(player_debitor_R) == 0:
+            my_win.label_dolg_R.setText("Нет спортсменов без лицензии.")
             my_win.textEdit.setText("Спортсменов, не оплативших регистрационыый взнос за рейтинг нет.")
+        player_list = player_debitor_R
     else:
-        player_debitor_R = player_list.select().where(Player.pay_rejting == "долг")
         my_win.Button_pay_R.setEnabled(False)
         my_win.textEdit.clear()
     my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участников.")
-    fill_table(player_debitor_R)
+    fill_table(player_list)
 
 
 def add_player(): 
@@ -2856,7 +2856,9 @@ def find_player():
     if my_win.checkBox_find_player.isChecked():
         my_win.lineEdit_Family_name.setFocus()
     else:
-        pass
+        my_win.lineEdit_Family_name.clear()
+        player_list = Player.select().where(Player.title_id == title_id())
+        fill_table(player_list) 
 
 
 def find_player_on_tab_system():
@@ -4203,6 +4205,36 @@ def load_comboBox_filter():
         gorod.sort(key=sortByAlphabet)
         gorod.insert(0, "")
         my_win.comboBox_fltr_city.addItems(gorod)
+
+
+def change_city_from_region_in_R():
+    """изменяет список городов в комбобоксе фильтра списка в зависимости от региона на вкладке рейтинг"""
+    gorod = []
+    region = my_win.comboBox_filter_region_in_R.currentText()
+    r_data_m = [R_list_m, R1_list_m]
+    r_data_w = [R_list_d, R1_list_d]
+    gamer_w = ["Девочки", "Девушки", "Женщины"]
+    id_title = Title.select().where(Title.id == title_id()).get()
+    gamer = id_title.gamer
+    cur_index = my_win.comboBox_choice_R.currentIndex()
+    if cur_index == 0: # если выбран текущий рейтинг
+        if gamer in gamer_w:
+            r_data = r_data_w[0]
+        else:
+            r_data = r_data_m[0]
+        r_region = r_data.select().where(r_data.r_region == region)
+    elif cur_index == 1: # если рейтинг за январь
+        if gamer in gamer_w:
+            r_data = r_data_w[1]
+        else:
+           r_data = r_data_m[1]
+        r_region = r_data.select().where(r_data.r1_region == region)    
+    for pl_reg in r_region:
+        if pl_reg.r_city not in gorod:
+            gorod.append(pl_reg.r_city)
+    gorod.sort(key=sortByAlphabet)
+    gorod.insert(0, "")
+    my_win.comboBox_filter_city_in_R.addItems(gorod)
 
 
 def change_city_from_region():
@@ -13982,6 +14014,7 @@ my_win.comboBox_page_vid.currentTextChanged.connect(page_vid)
 my_win.comboBox_filter_number_group_final.currentTextChanged.connect(filter_player_on_system)
 my_win.comboBox_filter_choice_stage.currentTextChanged.connect(choice_filter_on_system)
 my_win.comboBox_fltr_region.currentTextChanged.connect(change_city_from_region)
+my_win.comboBox_filter_region_in_R.currentTextChanged.connect(change_city_from_region_in_R)
 my_win.comboBox_select_stage_begunki.currentTextChanged.connect(select_stage_for_begunki)
 my_win.comboBox_select_group_begunki.currentTextChanged.connect(select_tour_for_begunki)
 my_win.comboBox_select_tours.currentTextChanged.connect(select_diapazon)
