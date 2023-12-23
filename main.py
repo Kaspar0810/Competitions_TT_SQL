@@ -35,6 +35,10 @@ import pathlib
 from pathlib import Path
 import random
 import time
+os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
+# app = QtGui.QApplication(sys.argv)
+# screen_rect = app.desktop().screenGeometry()
+# width, height = screen_rect.width(), screen_rect.height()
 # import collections
 # from playhouse.migrate import *
 
@@ -251,6 +255,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+        w = self.size().width()     # "определение ширины"
+        h = self.size().height()    # "определение высоты"
+
+        # app = QApplication(sys.argv)
+        # screen_rect = app.desktop().screenGeometry()
+        # width, height = screen_rect.width(), screen_rect.height()
+        # if height < h:
+        #     form_heidht = height
+        # else:
+        #     form_heidht = height
+        # # print(self.w, self.h) # получение разрешения экрана
+        # my_win.setGeometry(w, form_heidht)
         self._createAction()
         self._createMenuBar()
         self._connectActions()
@@ -2065,7 +2081,7 @@ def debtor_R():
     """показывает список должников оплаты рейтинга"""
     player_list = Player.select().where(Player.title_id == title_id())
     player_debitor_R = player_list.select().where(Player.pay_rejting == "долг")
-    if my_win.checkBox_11.isChecked():        
+    if my_win.checkBox_11.isChecked():       
         if len(player_debitor_R) == 0:
             my_win.label_dolg_R.setText("Нет спортсменов без лицензии.")
             my_win.textEdit.setText("Спортсменов, не оплативших регистрационыый взнос за рейтинг нет.")
@@ -4215,6 +4231,7 @@ def load_comboBox_filter():
 def change_city_from_region_in_R():
     """изменяет список городов в комбобоксе фильтра списка в зависимости от региона на вкладке рейтинг"""
     gorod = []
+    my_win.comboBox_filter_city_in_R.clear()
     region = my_win.comboBox_filter_region_in_R.currentText()
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
@@ -4386,6 +4403,8 @@ def filter_rejting_list():
     else:
         if region_txt == "" and city_txt == "":
             player_list = r_data.select()
+        elif region_txt != "" and city_txt != "":
+            player_list = r_data.select().where((rejting_region == region_txt) & (rejting_city == city_txt))
         elif region_txt != "" and city_txt == "":
             player_list = r_data.select().where(rejting_region == region_txt)
         elif region_txt == "" and city_txt != "":
@@ -13383,62 +13402,67 @@ def made_list_GSK():
     """создание списка судейской коллегии"""
     # Dialog = QInputDialg()
     my_win.tableWidget_GSK.clear()
-    my_win.tableWidget_GSK.show()
-    # my_win.radioButton_GSK.setChecked(True)
-    # my_win.Button_made_page_pdf.setEnabled(True)
-    number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
-    for l in range(0, number_of_referee):
-        my_win.tableWidget_GSK.setItem(l, 0, QTableWidgetItem(str(l + 1)))
-    if ok:
-        title = Title.get(Title.id == title_id())
-        referee = title.referee
-        kat_referee = title.kat_ref
-        secretary = title.secretary
-        kat_secretary = title.kat_sec
-        list_referee = [referee, secretary]
-        list_kategory = [kat_referee, kat_secretary]
+    if my_win.checkBox_GSK.isChecked():
+        my_win.tableWidget_GSK.show()
+        number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
+        for l in range(0, number_of_referee):
+            my_win.tableWidget_GSK.setItem(l, 0, QTableWidgetItem(str(l + 1)))
+        if ok:
+            title = Title.get(Title.id == title_id())
+            referee = title.referee
+            kat_referee = title.kat_ref
+            secretary = title.secretary
+            kat_secretary = title.kat_sec
+            list_referee = [referee, secretary]
+            list_kategory = [kat_referee, kat_secretary]
 
-        my_win.tableWidget_GSK.setColumnCount(4) # устанавливает колво столбцов
-        my_win.tableWidget_GSK.setRowCount(number_of_referee)
-        column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
-        my_win.tableWidget_GSK.setColumnWidth(2, 10000)
-        for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
-            my_win.tableWidget_GSK.showColumn(i)
-            item = QtWidgets.QTableWidgetItem()
-            brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
-            brush.setStyle(QtCore.Qt.SolidPattern)
-            item.setForeground(brush)
-            my_win.tableWidget_GSK.setHorizontalHeaderItem(i, item)
-        my_win.tableWidget_GSK.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
-        referee_list = []
-        post_list = ["", "ССВК", "1-й кат.", "2-й кат."]
-        category_list = ["","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-        my_win.tableWidget_GSK.setItem(0, 1, QTableWidgetItem("Гл. судья"))
-        my_win.tableWidget_GSK.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
+            my_win.tableWidget_GSK.setColumnCount(4) # устанавливает колво столбцов
+            my_win.tableWidget_GSK.setRowCount(number_of_referee)
+            column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
+            my_win.tableWidget_GSK.resizeColumnsToContents()
+            # my_win.tableWidget_GSK.horizontalHeader().setStretchLastSection(True)
+            # my_win.tableWidget_GSK.setColumnWidth(2, 10000)
+            for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+                my_win.tableWidget_GSK.showColumn(i)
+                item = QtWidgets.QTableWidgetItem()
+                brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
+                brush.setStyle(QtCore.Qt.SolidPattern)
+                item.setForeground(brush)
+                my_win.tableWidget_GSK.setHorizontalHeaderItem(i, item)
+            my_win.tableWidget_GSK.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+            referee_list = []
+            post_list = ["", "ССВК", "1-й кат.", "2-й кат."]
+            category_list = ["","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+            my_win.tableWidget_GSK.setItem(0, 1, QTableWidgetItem("Гл. судья"))
+            my_win.tableWidget_GSK.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
+        else:
+            return
+        for k in range(0, 2):
+            my_win.tableWidget_GSK.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
+            my_win.tableWidget_GSK.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
+        for n in range(2, int(number_of_referee)): 
+            comboBox_list_post = QComboBox()
+            comboBox_list_category = QComboBox()  
+            comboBox_family_city = QComboBox()
+            referee_list = load_comboBox_referee()
+
+            comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
+            comboBox_family_city.setCurrentIndex(-1)
+            comboBox_family_city.setEditable(True)
+            comboBox_list_category.addItems(category_list)
+            comboBox_list_post.addItems(post_list) 
+            comboBox_family_city.addItems(referee_list)
+
+            my_win.tableWidget_GSK.setCellWidget(n, 1, comboBox_list_category)
+            my_win.tableWidget_GSK.setCellWidget(n, 2, comboBox_family_city)
+            my_win.tableWidget_GSK.setCellWidget(n, 3, comboBox_list_post)   
+
+            # my_win.tableWidget_GSK.itemChanged.connect(change_on_comboBox_referee)
+            my_win.tableWidget_GSK.resizeColumnsToContents()
+            comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)   
     else:
-        return
-    for k in range(0, 2):
-        my_win.tableWidget_GSK.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
-        my_win.tableWidget_GSK.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
-    for n in range(2, int(number_of_referee)): 
-        comboBox_list_post = QComboBox()
-        comboBox_list_category = QComboBox()  
-        comboBox_family_city = QComboBox()
-        referee_list = load_comboBox_referee()
+        my_win.tableWidget_GSK.hide()
 
-        comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
-        comboBox_family_city.setCurrentIndex(-1)
-        comboBox_family_city.setEditable(True)
-        comboBox_list_category.addItems(category_list)
-        comboBox_list_post.addItems(post_list) 
-        comboBox_family_city.addItems(referee_list)
-
-        my_win.tableWidget_GSK.setCellWidget(n, 1, comboBox_list_category)
-        my_win.tableWidget_GSK.setCellWidget(n, 2, comboBox_family_city)
-        my_win.tableWidget_GSK.setCellWidget(n, 3, comboBox_list_post)   
-
-        # my_win.tableWidget_GSK.itemChanged.connect(change_on_comboBox_referee)
-        comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)   
 
 def change_on_comboBox_referee(comboBox_family_city):
     """добавляет в базу данных судей если их там нет"""
@@ -13463,7 +13487,7 @@ def change_on_comboBox_referee(comboBox_family_city):
 def add_referee_to_db():
     """добавляет в базу данных новых судей"""
     sender = my_win.sender()
-    # count = my_win.tableWidget.rowCount()
+    count = my_win.tableWidget_GSK.rowCount()
     if sender == my_win.comboBox_kategor_ref:
         kat = my_win.comboBox_kategor_ref.currentText()
         item = my_win.comboBox_referee.currentText()
@@ -13474,8 +13498,8 @@ def add_referee_to_db():
         whrite_referee_to_db(kat, item, k=0)
     else:
         for k in range(2, count):
-            item = my_win.tableWidget.cellWidget(k, 2).currentText()
-            kat = my_win.tableWidget.cellWidget(k, 3).currentText()
+            item = my_win.tableWidget_GSK.cellWidget(k, 2).currentText()
+            kat = my_win.tableWidget_GSK.cellWidget(k, 3).currentText()
             whrite_referee_to_db(kat, item, k)
 
 
