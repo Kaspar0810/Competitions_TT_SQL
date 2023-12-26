@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -95,7 +95,7 @@
         <x>420</x>
         <y>70</y>
         <width>405</width>
-        <height>121</height>
+        <height>131</height>
        </rect>
       </property>
       <property name="font">
@@ -113,7 +113,7 @@
          <x>10</x>
          <y>21</y>
          <width>391</width>
-         <height>91</height>
+         <height>103</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -290,7 +290,7 @@
          <x>10</x>
          <y>21</y>
          <width>120</width>
-         <height>95</height>
+         <height>105</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_47">
@@ -471,7 +471,7 @@
          <x>10</x>
          <y>20</y>
          <width>231</width>
-         <height>91</height>
+         <height>99</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_48">
@@ -561,7 +561,7 @@
      <widget class="QCheckBox" name="checkBox_GSK">
       <property name="geometry">
        <rect>
-        <x>440</x>
+        <x>590</x>
         <y>210</y>
         <width>111</width>
         <height>20</height>
@@ -656,7 +656,7 @@
         <x>20</x>
         <y>190</y>
         <width>131</width>
-        <height>41</height>
+        <height>48</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_49">
@@ -693,7 +693,7 @@
         <x>160</x>
         <y>190</y>
         <width>251</width>
-        <height>41</height>
+        <height>48</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -730,6 +730,19 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QPushButton" name="Button_GSK_made">
+      <property name="geometry">
+       <rect>
+        <x>700</x>
+        <y>210</y>
+        <width>121</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Создать ГСК</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_1">
@@ -4376,7 +4389,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4388,8 +4401,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4401,7 +4414,7 @@
         <x>0</x>
         <y>0</y>
         <width>241</width>
-        <height>421</height>
+        <height>439</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4862,8 +4875,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5183,7 +5196,7 @@
          <x>10</x>
          <y>10</y>
          <width>211</width>
-         <height>82</height>
+         <height>97</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -5254,8 +5267,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5672,8 +5685,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5979,8 +5992,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6388,7 +6401,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6770,8 +6783,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7304,7 +7317,7 @@
       <x>270</x>
       <y>310</y>
       <width>821</width>
-      <height>161</height>
+      <height>271</height>
      </rect>
     </property>
    </widget>

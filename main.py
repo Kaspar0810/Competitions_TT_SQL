@@ -2330,7 +2330,6 @@ def load_combobox_filter_group():
         if flag == True:
             sf = systems.select().where(System.stage == fir_e).get()
             kg = int(sf.total_group)  # количество групп
-        # if sender == my_win.choice_gr_Action or (my_win.tabWidget.currentIndex() == 2 and my_win.radioButton_group.isChecked()):
         if sender == my_win.choice_gr_Action or (my_win.tabWidget.currentIndex() == 2 and my_win.radioButton_gr_sort.isChecked()):
             gr_txt = [f"{i} группа" for i in range(1, kg + 1)]
             gr_txt.insert(0, "все группы")
@@ -13318,86 +13317,86 @@ def move_row_in_tablewidget():
         my_win.tableWidget.setItem(row_cur, 2, QTableWidgetItem(str(item_temp)))
 
 
-def made_list_referee():
-    """создание списка судейской коллегии"""
-    my_win.radioButton_GSK.setChecked(True)
-    my_win.Button_made_page_pdf.setEnabled(True)
-    num_columns = [0, 1, 2, 3]
-    number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
+# def made_list_referee():
+#     """создание списка судейской коллегии"""
+#     my_win.radioButton_GSK.setChecked(True)
+#     my_win.Button_made_page_pdf.setEnabled(True)
+#     num_columns = [0, 1, 2, 3]
+#     number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
   
-    if ok:
-        title = Title.get(Title.id == title_id())
-        referee = title.referee
-        kat_referee = title.kat_ref
-        secretary = title.secretary
-        kat_secretary = title.kat_sec
-        list_referee = [referee, secretary]
-        list_kategory = [kat_referee, kat_secretary]
+#     if ok:
+#         title = Title.get(Title.id == title_id())
+#         referee = title.referee
+#         kat_referee = title.kat_ref
+#         secretary = title.secretary
+#         kat_secretary = title.kat_sec
+#         list_referee = [referee, secretary]
+#         list_kategory = [kat_referee, kat_secretary]
 
-        ref_list = Referee.select()
-        referee_selected = ref_list.dicts().execute()
-        row_count = len(referee_selected)  # кол-во строк в таблице
+#         ref_list = Referee.select()
+#         referee_selected = ref_list.dicts().execute()
+#         row_count = len(referee_selected)  # кол-во строк в таблице
 
-        title_competition = Title.get(Title.id == title_id())
-        referee = title_competition.referee
-        kat_ref = title_competition.kat_ref
-        secretary = title_competition.secretary
-        kat_sec = title_competition.kat_sec
+#         title_competition = Title.get(Title.id == title_id())
+#         referee = title_competition.referee
+#         kat_ref = title_competition.kat_ref
+#         secretary = title_competition.secretary
+#         kat_sec = title_competition.kat_sec
 
-        data = [["1", "Главный судья", referee, kat_ref], ["2", "Главный секретарь", secretary, kat_sec]]
-        data_extend = ["", "", "", ""]
-        data_tmp = []
+#         data = [["1", "Главный судья", referee, kat_ref], ["2", "Главный секретарь", secretary, kat_sec]]
+#         data_extend = ["", "", "", ""]
+#         data_tmp = []
 
-        for k in range(number_of_referee - 2):
-            data_extend[0] = str(k + 3)
-            data_tmp = data_extend.copy()      
-            data.append(data_tmp.copy())
-            data_tmp.clear()
+#         for k in range(number_of_referee - 2):
+#             data_extend[0] = str(k + 3)
+#             data_tmp = data_extend.copy()      
+#             data.append(data_tmp.copy())
+#             data_tmp.clear()
 
-        model = MyTableModel(data)
-        model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"])
-        my_win.tableView.setModel(model)
-        #======== ++++
-        post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-        combo = QComboBox()
-        # lineEd = QLineEdit()
-        combo.addItems(post_list)
-        for i in range(2, number_of_referee):
-            my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 1), combo) # вставляет в строку i, 1 столбец combobox
-        #     my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 2), lineEd) # вставляет в строку i, 1 столбец combobox
-        # ======= ++++++++
-        delegate = LineDelegate(my_win.tableView)
-        my_win.tableView.setItemDelegateForColumn(2, delegate)
+#         model = MyTableModel(data)
+#         model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"])
+#         my_win.tableView.setModel(model)
+#         #======== ++++
+#         post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+#         combo = QComboBox()
+#         # lineEd = QLineEdit()
+#         combo.addItems(post_list)
+#         for i in range(2, number_of_referee):
+#             my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 1), combo) # вставляет в строку i, 1 столбец combobox
+#         #     my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 2), lineEd) # вставляет в строку i, 1 столбец combobox
+#         # ======= ++++++++
+#         delegate = LineDelegate(my_win.tableView)
+#         my_win.tableView.setItemDelegateForColumn(2, delegate)
 
-        # delegate = ComboBoxDelegate(post_list)
-        # my_win.tableView.setItemDelegateForColumn(1, delegate)
-#  ======== +++++++ ==========
-        # # delegate = ComboBoxDelegate(my_win.tableView)
-        # # my_win.tableView.setIndexWidget(my_win.tableView.model().index(3, 1), delegate)
-        # my_win.tableView.setItemDelegateForColumn(2, ComboBoxDelegate(my_win.tableView))
-        # delegate = MyComboDelegate(my_win.view)
-        # my_win.view.setItemDelegateForColumn(3, delegate)
-        # my_win.view.show()
+#         # delegate = ComboBoxDelegate(post_list)
+#         # my_win.tableView.setItemDelegateForColumn(1, delegate)
+# #  ======== +++++++ ==========
+#         # # delegate = ComboBoxDelegate(my_win.tableView)
+#         # # my_win.tableView.setIndexWidget(my_win.tableView.model().index(3, 1), delegate)
+#         # my_win.tableView.setItemDelegateForColumn(2, ComboBoxDelegate(my_win.tableView))
+#         # delegate = MyComboDelegate(my_win.view)
+#         # my_win.view.setItemDelegateForColumn(3, delegate)
+#         # my_win.view.show()
 
-        # category_list = ["-выберите категорию-", "ССВК", "1-й кат.", "2-й кат."]
-        # post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+#         # category_list = ["-выберите категорию-", "ССВК", "1-й кат.", "2-й кат."]
+#         # post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
 
 
  
-        # -  my_win.tableView.setModel(model)
+#         # -  my_win.tableView.setModel(model)
        
-        # color_delegate = MyColorDelegate(my_win.tableView)
-        # delegate = MyComboDelegate(my_win.tableView)
-        # delegate = ComboDelegate(my_win.tableView)
-        # my_win.tableView.setItemDelegateForColumn(0, color_delegate)
-        # my_win.tableView.setItemDelegateForColumn(2, delegate)
-        my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
+#         # color_delegate = MyColorDelegate(my_win.tableView)
+#         # delegate = MyComboDelegate(my_win.tableView)
+#         # delegate = ComboDelegate(my_win.tableView)
+#         # my_win.tableView.setItemDelegateForColumn(0, color_delegate)
+#         # my_win.tableView.setItemDelegateForColumn(2, delegate)
+#         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
 
-        my_win.tableView.show()
+#         my_win.tableView.show()
   
 
-    else:
-        return
+    # else:
+    #     return
 def made_list_GSK():
     """создание списка судейской коллегии"""
     # Dialog = QInputDialg()
@@ -14154,7 +14153,7 @@ my_win.Button_made_one_file_pdf.clicked.connect(merdge_pdf_files)
 my_win.Button_up.clicked.connect(move_row_in_tablewidget)
 my_win.Button_down.clicked.connect(move_row_in_tablewidget)
 # my_win.tableWidget.cellClicked.connect(button_move_enabled)
-my_win.Button_list_referee.clicked.connect(made_list_referee)
+my_win.Button_list_referee.clicked.connect(made_list_GSK)
 my_win.Button_list_regions.clicked.connect(made_list_regions)
 my_win.Button_list_winner.clicked.connect(made_list_winners)
 my_win.Button_players_on_alf.clicked.connect(made_list_players_on_alf)
