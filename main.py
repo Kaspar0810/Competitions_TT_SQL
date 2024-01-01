@@ -120,73 +120,7 @@ class MyTableModel(QAbstractTableModel):
     # def setData(self, index, text):
     #     self.items[index.row()] = text
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
-# class MyComboDelegate(QItemDelegate):
 
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-
-#     def createEditor(self, parent, option, index):
-#         # if index.column() == 2:
-#         editor = QComboBox(parent)
-#         post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-#         editor.addItems(post_list)
-#         self.connect(editor, QtCore.SIGNAL("currentIndexChanged(int)"), 
-#                  self, QtCore.SLOT("currentIndexChanged()"))
-#         return editor
-
-#     def setEditorData(self, editor, index):
-#         value = index.model().data(index, QtCore.Qt.EditRole)
-#         if value:
-#             editor.setCurrentIndex(int(value))
-
-#     @QtCore.pyqtSlot()
-#     def currentIndexChanged(self):
-#         self.commitData.emit(self.sender())
-    
-#     # def setModelData(self, editor, model, index):
-#     #     model.setData(index, editor.currentIndex())  
-
-#     def setModelData(self, editor, model, index):
-#         comboIndex = editor.currentIndex()
-#         text = self.comboItems[comboIndex]
-#         model.setData(index, text)
-
-#     def setData(self, index, value, role=QtCore.Qt.ItemDataRole.DisplayRole):
-#         print ("setData", index.row(), index.column(), value)
-#         # todo: remember the data
-#  ===
-# class ComboDelegate(QItemDelegate):
-#     """
-#     A delegate to add QComboBox in every cell of the given column
-#     """
-
-#     def __init__(self, options, parent=None):
-#         super(ComboDelegate, self).__init__(parent)
-#         self.parent = parent
-#         self.options = options
-
-#     def createEditor(self, parent, option, index):
-#         editor = QComboBox(parent)
-#         # post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-#         # editor.addItems(post_list)
-#         # self.connect(editor, QtCore.SIGNAL("currentIndexChanged(int)"), 
-#                 #  self, QtCore.SLOT("currentIndexChanged()"))
-#         editor.currentTextChanged.connect(lambda value: self.currentIndexChanged(index, value))
-#         return editor
-    
-#     @QtCore.pyqtSlot()
-#     def currentIndexChanged(self):
-#         self.commitData.emit(self.sender())
-
-#     def setModelData(self, editor, model, index):
-#         value = editor.currentText()
-#         # text = self.comboItems[comboIndex]
-#         model.setData(index, value, QtCore.Qt.EditRole)   
-#     # def setEditorData(self, editor, index):
-#     #     value = index.data()
-#     #     if value:
-#     #         maxval = len(value)
-#     #         editor.setCurrentIndex(maxval - 1)
 class MyColorDelegate(QItemDelegate):
 
     def __init__(self, parent=None):
@@ -214,41 +148,7 @@ class MyColorDelegate(QItemDelegate):
 
 
 # =====================================  
-class ComboBoxDelegate(QItemDelegate):
-    def __init__(self, options, parent=None):
-        super().__init__(parent)
-        self._options = options
-    
-    def createEditor(self, parent, option, index):
-        editor = QComboBox(parent)
-        editor.addItems(self._options)
-        return editor
-    
-    def setEditorData(self, editor, index):
-        value = index.data(QtCore.Qt.EditRole)
-        editor.setCurrentIndex(editor.findText(str(value)))
-    
-    def setModelData(self, editor, model, index):
-        value = editor.currentText()
-        model.setData(index, value, QtCore.Qt.EditRole)
-    
-class LineDelegate(QItemDelegate):
-    def __init__(self, options, parent=None):
-        super().__init__(parent)
 
-    
-    def createEditor(self, parent, index):
-        lineEd = QLineEdit(parent)
-        return lineEd
-    
-    def setEditorData(self, lineEd, index):
-        value = index.data(QtCore.Qt.EditRole)
-        # editor.setCurrentIndex(editor.findText(str(value)))
-    
-    def setModelData(self, lineEd, model, index):
-        value = lineEd.text()
-        model.setData(index, value, QtCore.Qt.EditRole)
-# ++++++  
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None, *args, **kwargs) -> object:
@@ -444,6 +344,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.choice_fin_Action.setEnabled(False)
 
         # self.view_all_comp_Action
+        # self.view_referee_list_Action.setEnabled(False)
         self.view_one_table_Action.setEnabled(False)
         self.view_gr_Action.setEnabled(False)
         self.view_pf1_Action.setEnabled(False)
@@ -2277,7 +2178,6 @@ def dclick_in_listwidget():
         my_win.lineEdit_city_list.setText(ci)
          # ======= проверка на рейтинг ====
         if txt_tmp == "Поиск в январском рейтинге.":
-            # txt_edit = txt_tmp
             pl = fam_name
             check_rejting_pay(pl)
         c = City.select()  # находит город и соответсвующий ему регион
@@ -2330,7 +2230,6 @@ def load_combobox_filter_group():
         if flag == True:
             sf = systems.select().where(System.stage == fir_e).get()
             kg = int(sf.total_group)  # количество групп
-        # if sender == my_win.choice_gr_Action or (my_win.tabWidget.currentIndex() == 2 and my_win.radioButton_group.isChecked()):
         if sender == my_win.choice_gr_Action or (my_win.tabWidget.currentIndex() == 2 and my_win.radioButton_gr_sort.isChecked()):
             gr_txt = [f"{i} группа" for i in range(1, kg + 1)]
             gr_txt.insert(0, "все группы")
@@ -2434,7 +2333,7 @@ def page():
         my_win.comboBox_secretary.setCurrentIndex(-1)
         my_win.comboBox_secretary.setEditable(True)
         db_select_title()
-        my_win.tableWidget_GSK.hide()
+        my_win.tableWidget.hide()
     elif tb == 1:  # -список участников-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
@@ -2745,7 +2644,9 @@ def page():
     elif tb == 7: # вкладка -дополнительно-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 525))
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
+
         my_win.Button_made_page_pdf.setEnabled(False)
         my_win.Button_up.setEnabled(False)
         my_win.Button_down.setEnabled(False)
@@ -2844,7 +2745,6 @@ def find_coach():
             list_coach.append(c_id)
 
         player_list = player.select().where(Player.coach_id << list_coach) # окончательная выборка со всеми тренерами (id)
-        # fill_table(player_list)
     else:
         c = Coach.select()
         c = c.where(Coach.coach ** f'{cp}%')  # like
@@ -2979,7 +2879,7 @@ def list_player_pdf(player_list):
         coach_id = l.coach_id
         t = coach_id.coach
         m = l.mesto
-        chop_line(t)
+        t = chop_line(t)
         data = [n, p, b, r, c, g, z, t, m]
 
         elements.append(data)
@@ -3113,7 +3013,6 @@ def system_competition():
         elif flag_system is False:
             sb = "Выбор системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
-# ================
             my_win.spinBox_kol_group.hide()
             my_win.comboBox_etap.clear()
             real_list = ["-выбор этапа-", "Одна таблица", "Предварительный"] # который нужен в комбобокс
@@ -3124,7 +3023,6 @@ def system_competition():
             my_win.label_10.setText("1-й этап")
             my_win.Button_etap_made.setEnabled(False)
             my_win.comboBox_page_vid.setEnabled(True)
-# =======
             player = Player.select().where(Player.title_id == title_id())
             count = len(player)
             if count != 0:
@@ -3295,11 +3193,13 @@ def page_vid():
 def view():
     """просмотр PDF файлов средствами OS"""
     from sys import platform
+    msgBox = QMessageBox()
     sender = my_win.sender()
-    if sender != my_win.view_list_Action:
+    tab = my_win.tabWidget.currentIndex()
+    name_file = ""
+    if tab == 3 or tab == 4 or tab == 5: # если просмотр результатов игр
         made_pdf_table_for_view(sender)
     t_id = Title.get(Title.id == title_id())
-    tab = my_win.tabWidget.currentIndex()
     short_name = t_id.short_name_comp
 
     if sender == my_win.view_all_comp_Action: # просмотр полных соревнований в каталоге /competition_pdf
@@ -3324,10 +3224,13 @@ def view():
             view_file =  f"{short_name}_player_list.pdf"
         elif sender == my_win.view_referee_list_Action:
             view_file =  f"{short_name}_referee_list.pdf"
+            name_file = "Список ГСК"
         elif sender == my_win.view_regions_list_Action:
             view_file =  f"{short_name}_regions_list.pdf"
+            name_file = "Список регионов"
         elif sender == my_win.view_winners_list_Action:
-            view_file =  f"{short_name}_winners_list.pdf"    
+            view_file =  f"{short_name}_winners_list.pdf" 
+            name_file = "Список победителей"   
         elif sender == my_win.view_title_Action:
             view_file = f"{short_name}_title.pdf"
         elif sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
@@ -3368,14 +3271,20 @@ def view():
             view_file = "clear_8_2_net.pdf"
         elif sender == my_win.clear_s8_full_Action:
             view_file = "clear_8_full_net.pdf"
-
-    if platform == "linux" or platform == "linux2":  # linux
-        pass
-    elif platform == "darwin":  # OS X
-        os.system(f"open {view_file}")
-    elif platform == "win32":  # Windows...
-        os.system(f"{view_file}")
-    os.chdir("..")
+    flag = open_close_file(view_file)
+    if flag is False:
+        result = msgBox.information(my_win, "", "Такой файл не существует.\n"
+                                                 f"-{name_file}- необходимо создать!",
+                                     msgBox.Ok)
+        return
+    else:
+        if platform == "linux" or platform == "linux2":  # linux
+            pass
+        elif platform == "darwin":  # OS X
+            os.system(f"open {view_file}")
+        elif platform == "win32":  # Windows...
+            os.system(f"{view_file}")
+        os.chdir("..")
 
 
 def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
@@ -4095,7 +4004,6 @@ def select_player_in_game():
 def delete_player():
     """удаляет игрока из списка и заносит его в архив"""
     msgBox = QMessageBox
-    # player_current = Player.select().where(Player.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
@@ -8841,8 +8749,8 @@ def func_zagolovok(canvas, doc):
     canvas.setFont("DejaVuSerif-Italic", 11)
     # текста титула по основным
     canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
-    canvas.drawRightString(width - 1 * cm, height - 1.6 * cm, f"г. {ms}")  # город
-    canvas.drawString(0.8 * cm, height - 1.6 * cm, data_comp)  # дата начала
+    canvas.drawRightString(width - 1 * cm, height - 1.9 * cm, f"г. {ms}")  # город
+    canvas.drawString(0.8 * cm, height - 1.9 * cm, data_comp)  # дата начала
 
     canvas.setFont("DejaVuSerif-Italic", 11)
     canvas.setFillColor(blue)  # меняет цвет шрифта списка судейской коллеги
@@ -8873,9 +8781,9 @@ def func_zagolovok(canvas, doc):
         else:
             main_secretary = f"Гл. секретарь: судья {title.kat_sec} ______________{title.secretary} "
             # подпись главного судьи
-            canvas.drawString(2 * cm, 2 * cm, main_referee)
+            canvas.drawString(2 * cm, 1.8 * cm, main_referee)
             # подпись главного секретаря
-            canvas.drawString(2 * cm, 1 * cm, main_secretary)
+            canvas.drawString(2 * cm, 0.8 * cm, main_secretary)
     canvas.restoreState()
     return func_zagolovok
 
@@ -11624,6 +11532,7 @@ def score_in_setka(fin):
     system = sys.select().where(System.stage == fin).get()
     system_id = system.id
     vid_setki = system.label_string
+    visible_game = system.visible_game
     # получение id последнего соревнования
     player = Player.select().where(Player.title_id == title_id())
     result = Result.select().where(Result.system_id == system_id)
@@ -11640,7 +11549,10 @@ def score_in_setka(fin):
             snoska = numer_game(num_game, vid_setki)
             tmp_match.append(snoska[0]) # номер на сетке куда идет победитель
             tmp_match.append(short_name_win)
-            tmp_match.append(f'{res.score_in_game} {res.score_win}')
+            if visible_game == 1: # если счет в партиии
+                tmp_match.append(f'{res.score_in_game} {res.score_win}')
+            else:
+                tmp_match.append(f'{res.score_in_game}')
             tmp_match.append(snoska[2])
             tmp_match.append(short_name_los)
             match = tmp_match.copy()
@@ -13138,7 +13050,6 @@ def load_playing_game_in_table_for_semifinal(stage):
                     result_semifin.save()
     pv = sys_semifin.page_vid
     my_win.tabWidget.setCurrentIndex(4)
-    # table_made(pv, stage)
 
 
 def load_playing_game_in_table_for_final(fin):
@@ -13318,13 +13229,13 @@ def move_row_in_tablewidget():
         my_win.tableWidget.setItem(row_cur, 2, QTableWidgetItem(str(item_temp)))
 
 
-def made_list_referee():
+def made_list_GSK():
     """создание списка судейской коллегии"""
+    my_win.tableWidget.clear()
     my_win.radioButton_GSK.setChecked(True)
     my_win.Button_made_page_pdf.setEnabled(True)
-    num_columns = [0, 1, 2, 3]
+    my_win.tableWidget.show()
     number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
-  
     if ok:
         title = Title.get(Title.id == title_id())
         referee = title.referee
@@ -13334,139 +13245,54 @@ def made_list_referee():
         list_referee = [referee, secretary]
         list_kategory = [kat_referee, kat_secretary]
 
-        ref_list = Referee.select()
-        referee_selected = ref_list.dicts().execute()
-        row_count = len(referee_selected)  # кол-во строк в таблице
+        my_win.tableWidget.setColumnCount(4) # устанавливает колво столбцов
+        my_win.tableWidget.setRowCount(number_of_referee)
 
-        title_competition = Title.get(Title.id == title_id())
-        referee = title_competition.referee
-        kat_ref = title_competition.kat_ref
-        secretary = title_competition.secretary
-        kat_sec = title_competition.kat_sec
-
-        data = [["1", "Главный судья", referee, kat_ref], ["2", "Главный секретарь", secretary, kat_sec]]
-        data_extend = ["", "", "", ""]
-        data_tmp = []
-
-        for k in range(number_of_referee - 2):
-            data_extend[0] = str(k + 3)
-            data_tmp = data_extend.copy()      
-            data.append(data_tmp.copy())
-            data_tmp.clear()
-
-        model = MyTableModel(data)
-        model.setHorizontalHeaderLabels(["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"])
-        my_win.tableView.setModel(model)
-        #======== ++++
-        post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-        combo = QComboBox()
-        # lineEd = QLineEdit()
-        combo.addItems(post_list)
-        for i in range(2, number_of_referee):
-            my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 1), combo) # вставляет в строку i, 1 столбец combobox
-        #     my_win.tableView.setIndexWidget(my_win.tableView.model().index(i, 2), lineEd) # вставляет в строку i, 1 столбец combobox
-        # ======= ++++++++
-        delegate = LineDelegate(my_win.tableView)
-        my_win.tableView.setItemDelegateForColumn(2, delegate)
-
-        # delegate = ComboBoxDelegate(post_list)
-        # my_win.tableView.setItemDelegateForColumn(1, delegate)
-#  ======== +++++++ ==========
-        # # delegate = ComboBoxDelegate(my_win.tableView)
-        # # my_win.tableView.setIndexWidget(my_win.tableView.model().index(3, 1), delegate)
-        # my_win.tableView.setItemDelegateForColumn(2, ComboBoxDelegate(my_win.tableView))
-        # delegate = MyComboDelegate(my_win.view)
-        # my_win.view.setItemDelegateForColumn(3, delegate)
-        # my_win.view.show()
-
-        # category_list = ["-выберите категорию-", "ССВК", "1-й кат.", "2-й кат."]
-        # post_list = ["-выберите должность-", "Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-
-
- 
-        # -  my_win.tableView.setModel(model)
-       
-        # color_delegate = MyColorDelegate(my_win.tableView)
-        # delegate = MyComboDelegate(my_win.tableView)
-        # delegate = ComboDelegate(my_win.tableView)
-        # my_win.tableView.setItemDelegateForColumn(0, color_delegate)
-        # my_win.tableView.setItemDelegateForColumn(2, delegate)
-        my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
-
-        my_win.tableView.show()
-  
-
+        column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
+        my_win.tableWidget.resizeColumnsToContents()
+        for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+            my_win.tableWidget.showColumn(i)
+            item = QtWidgets.QTableWidgetItem()
+            brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
+            brush.setStyle(QtCore.Qt.SolidPattern)
+            item.setForeground(brush)
+            my_win.tableWidget.setHorizontalHeaderItem(i, item)
+        my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+        referee_list = []
+        post_list = ["", "ССВК", "1-й кат.", "2-й кат."]
+        category_list = ["","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
+        my_win.tableWidget.setItem(0, 1, QTableWidgetItem("Гл. судья"))
+        my_win.tableWidget.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
     else:
         return
-def made_list_GSK():
-    """создание списка судейской коллегии"""
-    # Dialog = QInputDialg()
-    my_win.tableWidget_GSK.clear()
-    if my_win.checkBox_GSK.isChecked():
-        my_win.tableWidget_GSK.show()
-        number_of_referee, ok = QInputDialog.getInt(my_win, "Главная судейская коллегия", "Укажите число судей списка\n главной cудейской коллегии.", 4, 3, 10)
+    for k in range(0, 2):
+        my_win.tableWidget.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
+        my_win.tableWidget.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
+    for n in range(2, int(number_of_referee)): 
+        comboBox_list_post = QComboBox()
+        comboBox_list_category = QComboBox()  
+        comboBox_family_city = QComboBox()
+        referee_list = load_comboBox_referee()
+
+        comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
+        comboBox_family_city.setCurrentIndex(-1)
+        comboBox_family_city.setEditable(True)
+        comboBox_list_category.addItems(category_list)
+        comboBox_list_post.addItems(post_list) 
+        comboBox_family_city.addItems(referee_list)
+
+        my_win.tableWidget.setCellWidget(n, 1, comboBox_list_category)
+        my_win.tableWidget.setCellWidget(n, 2, comboBox_family_city)
+        my_win.tableWidget.setCellWidget(n, 3, comboBox_list_post)   
         for l in range(0, number_of_referee):
-            my_win.tableWidget_GSK.setItem(l, 0, QTableWidgetItem(str(l + 1)))
-        if ok:
-            title = Title.get(Title.id == title_id())
-            referee = title.referee
-            kat_referee = title.kat_ref
-            secretary = title.secretary
-            kat_secretary = title.kat_sec
-            list_referee = [referee, secretary]
-            list_kategory = [kat_referee, kat_secretary]
-
-            my_win.tableWidget_GSK.setColumnCount(4) # устанавливает колво столбцов
-            my_win.tableWidget_GSK.setRowCount(number_of_referee)
-            column_label = ["№", "Должность", "Фамилия Имя Отчество/ Город", "Категория"]
-            my_win.tableWidget_GSK.resizeColumnsToContents()
-            # my_win.tableWidget_GSK.horizontalHeader().setStretchLastSection(True)
-            # my_win.tableWidget_GSK.setColumnWidth(2, 10000)
-            for i in range(0, 4):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
-                my_win.tableWidget_GSK.showColumn(i)
-                item = QtWidgets.QTableWidgetItem()
-                brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
-                brush.setStyle(QtCore.Qt.SolidPattern)
-                item.setForeground(brush)
-                my_win.tableWidget_GSK.setHorizontalHeaderItem(i, item)
-            my_win.tableWidget_GSK.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
-            referee_list = []
-            post_list = ["", "ССВК", "1-й кат.", "2-й кат."]
-            category_list = ["","Зам. Главного судьи", "Зам. Главного секретаря", "Ведущий судья"]
-            my_win.tableWidget_GSK.setItem(0, 1, QTableWidgetItem("Гл. судья"))
-            my_win.tableWidget_GSK.setItem(1, 1, QTableWidgetItem("Гл. секретарь"))
-        else:
-            return
-        for k in range(0, 2):
-            my_win.tableWidget_GSK.setItem(k, 2, QTableWidgetItem(str(list_referee[k])))
-            my_win.tableWidget_GSK.setItem(k, 3, QTableWidgetItem(str(list_kategory[k])))
-        for n in range(2, int(number_of_referee)): 
-            comboBox_list_post = QComboBox()
-            comboBox_list_category = QComboBox()  
-            comboBox_family_city = QComboBox()
-            referee_list = load_comboBox_referee()
-
-            comboBox_family_city.setPlaceholderText("Введите фамилию судьи")
-            comboBox_family_city.setCurrentIndex(-1)
-            comboBox_family_city.setEditable(True)
-            comboBox_list_category.addItems(category_list)
-            comboBox_list_post.addItems(post_list) 
-            comboBox_family_city.addItems(referee_list)
-
-            my_win.tableWidget_GSK.setCellWidget(n, 1, comboBox_list_category)
-            my_win.tableWidget_GSK.setCellWidget(n, 2, comboBox_family_city)
-            my_win.tableWidget_GSK.setCellWidget(n, 3, comboBox_list_post)   
-
-            # my_win.tableWidget_GSK.itemChanged.connect(change_on_comboBox_referee)
-            my_win.tableWidget_GSK.resizeColumnsToContents()
-            comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)   
-    else:
-        my_win.tableWidget_GSK.hide()
+            my_win.tableWidget.setItem(l, 0, QTableWidgetItem(str(l + 1))) # (номер строки, номер столбца, значения)
+        my_win.tableWidget.resizeColumnsToContents()
+        comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)   
 
 
 def change_on_comboBox_referee(comboBox_family_city):
     """добавляет в базу данных судей если их там нет"""
-    row_cur = my_win.tableWidget_GSK.currentRow()
+    row_cur = my_win.tableWidget.currentRow()
     mark = comboBox_family_city.find("/") # если еще нет фамилии и города
     if mark != 0 and mark != -1:
         add_referee_to_db()
@@ -13476,18 +13302,18 @@ def change_on_comboBox_referee(comboBox_family_city):
         if len(referees) > 0:
             for ref in referees:
                 kategor = ref.category
-                kat = my_win.tableWidget_GSK.cellWidget(row_cur, 3)
+                kat = my_win.tableWidget.cellWidget(row_cur, 3)
                 kat.setCurrentText(kategor)
                 return
     else:
-        kat = my_win.tableWidget_GSK.cellWidget(row_cur, 3)
+        kat = my_win.tableWidget.cellWidget(row_cur, 3)
         kat.setCurrentText("")
 
 
 def add_referee_to_db():
     """добавляет в базу данных новых судей"""
     sender = my_win.sender()
-    count = my_win.tableWidget_GSK.rowCount()
+    count = my_win.tableWidget.rowCount()
     if sender == my_win.comboBox_kategor_ref:
         kat = my_win.comboBox_kategor_ref.currentText()
         item = my_win.comboBox_referee.currentText()
@@ -13498,8 +13324,8 @@ def add_referee_to_db():
         whrite_referee_to_db(kat, item, k=0)
     else:
         for k in range(2, count):
-            item = my_win.tableWidget_GSK.cellWidget(k, 2).currentText()
-            kat = my_win.tableWidget_GSK.cellWidget(k, 3).currentText()
+            item = my_win.tableWidget.cellWidget(k, 2).currentText()
+            kat = my_win.tableWidget.cellWidget(k, 3).currentText()
             whrite_referee_to_db(kat, item, k)
 
 
@@ -13721,6 +13547,7 @@ def made_pdf_list():
     if my_win.radioButton_GSK.isChecked():
         add_referee_to_db()
         list_referee_pdf()
+        my_win.view_referee_list_Action.setEnabled(True)
     elif my_win.radioButton_regions.isChecked():
         list_regions_pdf()
     elif my_win.radioButton_winner.isChecked():
@@ -13822,7 +13649,7 @@ def referee():
             my_win.comboBox_kategor_sec.setCurrentText(category)
     elif sender == my_win.tableWidget.comboBox_family_city: # комбобокс выбора судей гск:
         text = my_win.tableWidget.comboBox_family_city.currentText()
-        index = my_win.tableWidget.comboBox_family_city.findText(text)
+        index = my_win.tableWidgetGSK.comboBox_family_city.findText(text)
         if index != -1:
             my_win.tableWidget.comboBox_family_city.setCurrentIndex(index)
             my_win.tableWidget.comboBox_family_city.lineEdit().setSelection(len(text), len(my_win.tableWidget.comboBox_family_city.currentText()))
@@ -13842,27 +13669,13 @@ def find_referee_in_db(text):
 
 
 def open_close_file(view_file):
-# Введите имя файла для проверки
-# Импортировать модуль os для проверки существования файла
-    # import os
-    # Функция Drfine проверяет, закрыт ли файл или нет
-    # if view_file.closed == False:
-    # # Распечатать сообщение об успешном завершении
-    #     print("Файл открыт для чтения.")
-    # else:
-    # # Распечатать сообщение об ошибке
-    #     print(" Файл закрыт.")
-
-    # Взять имя файла для проверки
     # Проверить, существует
     if os.path.exists(view_file):
-    # Открыть файл для чтения
-        view_file = open(view_file, "r")
-    # Вызвать функцию
-        open_close_file(view_file)
+        flag = True
     else:
-    # Вывести сообщение, если файл не существует
-        print("Файл не существует.")
+        flag = False
+    return flag
+
 
 
 # def proba_pdf():
@@ -14104,7 +13917,7 @@ my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по не
 my_win.checkBox_11.stateChanged.connect(debtor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
-my_win.checkBox_GSK.stateChanged.connect(made_list_GSK)
+# my_win.checkBox_GSK.stateChanged.connect(made_list_GSK)
 # my_win.checkBox_edit_etap.stateChanged.connect(change_player_in_etap )
 # =======  нажатие кнопок =========
 
@@ -14154,7 +13967,7 @@ my_win.Button_made_one_file_pdf.clicked.connect(merdge_pdf_files)
 my_win.Button_up.clicked.connect(move_row_in_tablewidget)
 my_win.Button_down.clicked.connect(move_row_in_tablewidget)
 # my_win.tableWidget.cellClicked.connect(button_move_enabled)
-my_win.Button_list_referee.clicked.connect(made_list_referee)
+my_win.Button_list_referee.clicked.connect(made_list_GSK)
 my_win.Button_list_regions.clicked.connect(made_list_regions)
 my_win.Button_list_winner.clicked.connect(made_list_winners)
 my_win.Button_players_on_alf.clicked.connect(made_list_players_on_alf)
