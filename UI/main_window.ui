@@ -95,7 +95,7 @@
         <x>420</x>
         <y>70</y>
         <width>405</width>
-        <height>121</height>
+        <height>131</height>
        </rect>
       </property>
       <property name="font">
@@ -113,7 +113,7 @@
          <x>10</x>
          <y>21</y>
          <width>391</width>
-         <height>91</height>
+         <height>103</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -290,7 +290,7 @@
          <x>10</x>
          <y>21</y>
          <width>120</width>
-         <height>95</height>
+         <height>105</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_47">
@@ -471,7 +471,7 @@
          <x>10</x>
          <y>20</y>
          <width>231</width>
-         <height>91</height>
+         <height>99</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_48">
@@ -558,6 +558,28 @@
        </layout>
       </widget>
      </widget>
+<<<<<<< HEAD
+=======
+     <widget class="QCheckBox" name="checkBox_GSK">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>210</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>состав ГСК</string>
+      </property>
+     </widget>
+>>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
@@ -637,7 +659,7 @@
         <x>20</x>
         <y>190</y>
         <width>131</width>
-        <height>41</height>
+        <height>48</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_49">
@@ -674,7 +696,7 @@
         <x>160</x>
         <y>190</y>
         <width>251</width>
-        <height>41</height>
+        <height>48</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_35">
@@ -711,6 +733,19 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QPushButton" name="Button_GSK_made">
+      <property name="geometry">
+       <rect>
+        <x>700</x>
+        <y>210</y>
+        <width>121</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Создать ГСК</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_1">
@@ -4357,7 +4392,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4370,7 +4405,11 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
+<<<<<<< HEAD
        <height>484</height>
+=======
+       <height>476</height>
+>>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
       </rect>
      </property>
      <attribute name="label">
@@ -4382,7 +4421,7 @@
         <x>0</x>
         <y>0</y>
         <width>241</width>
-        <height>421</height>
+        <height>439</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -4844,7 +4883,11 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
+<<<<<<< HEAD
        <height>484</height>
+=======
+       <height>476</height>
+>>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
       </rect>
      </property>
      <attribute name="label">
@@ -5164,7 +5207,7 @@
          <x>10</x>
          <y>10</y>
          <width>211</width>
-         <height>82</height>
+         <height>97</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -5236,7 +5279,11 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
+<<<<<<< HEAD
        <height>484</height>
+=======
+       <height>476</height>
+>>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
       </rect>
      </property>
      <attribute name="label">
@@ -5654,7 +5701,11 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
+<<<<<<< HEAD
        <height>484</height>
+=======
+       <height>476</height>
+>>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
       </rect>
      </property>
      <attribute name="label">
@@ -5961,7 +6012,11 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
+<<<<<<< HEAD
        <height>484</height>
+=======
+       <height>476</height>
+>>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
       </rect>
      </property>
      <attribute name="label">
@@ -6369,7 +6424,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6752,7 +6807,11 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
+<<<<<<< HEAD
        <height>484</height>
+=======
+       <height>476</height>
+>>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
       </rect>
      </property>
      <attribute name="label">
@@ -7285,7 +7344,11 @@
       <x>270</x>
       <y>310</y>
       <width>821</width>
+<<<<<<< HEAD
       <height>461</height>
+=======
+      <height>271</height>
+>>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
      </rect>
     </property>
    </widget>
