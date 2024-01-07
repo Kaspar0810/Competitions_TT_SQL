@@ -147,6 +147,7 @@ class System(BaseModel):
     visible_game = BooleanField()
     stage_exit = CharField(15)
     mesta_exit = IntegerField()
+    no_game = CharField(15)
 
     class Meta:
         db_table = "system"

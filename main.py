@@ -34,7 +34,7 @@ import sqlite3
 import pathlib
 from pathlib import Path
 import random
-import time
+# import time
 os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
 # app = QtGui.QApplication(sys.argv)
 # screen_rect = app.desktop().screenGeometry()
@@ -107,10 +107,132 @@ class MyTableModel(QAbstractTableModel):
             return 0
 
     def data(self, index, role):
-        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+        if role == QtCore.Qt.ItemDataRole.DisplayRole and index.column != 2:
             return str(self._data[index.row()][index.column()])
-        return 
-        
+        # else:
+        #     if role == QtCore.Qt.ForegroundRole:
+        #         ng = my_win.comboBox_filter_number_group_final.currentText()
+        #         double_reg = change_choice_group()
+        #         if double_reg is not None:
+        #             double_region = double_reg[ng]
+        #             r = double_region[0]
+        #             if str(self._data[index.row()][index.column()]) == r:
+        #                     return QtGui.QBrush(QtCore.Qt.red)
+                
+            # if role == QtCore.Qt.ForegroundRole:
+            #     if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
+            #         ng = my_win.comboBox_filter_number_group_final.currentText()
+            #         double_reg = change_choice_group()
+            #         double_region = double_reg[ng]
+            #         r = double_region[0]
+            #         if str(self._data[index.row()][index.column()]) == r:
+            #             return QtGui.QBrush(QtCore.Qt.red)
+               
+            # if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
+            #     ng = my_win.comboBox_filter_number_group_final.currentText()
+            #     double_reg = change_choice_group()
+            #     double_region = double_reg[ng]
+            #     r = double_region[0]
+            #     if str(self._data[index.row()][index.column()]) == r:
+            #                 return QtGui.QBrush(QtCore.Qt.red)
+
+
+        # ======
+ 
+        # if role == QtCore.Qt.ForegroundRole:
+        #     # if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
+        #     #     ng = my_win.comboBox_filter_number_group_final.currentText()
+        #     #     double_reg = change_choice_group()
+        #     #     double_region = double_reg[ng]
+        #     #     r = double_region[0]
+        #     try:
+        #         if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
+        #             ng = my_win.comboBox_filter_number_group_final.currentText()
+        #             double_reg = change_choice_group()
+        #             double_region = double_reg[ng]
+        #             r = double_region[0]
+        #             if str(self._data[index.row()][2]) == r:
+        #                 return QtGui.QBrush(QtCore.Qt.red)
+        #             else:
+        #                 return QtGui.QBrush(QtCore.Qt.black)
+        #     except:
+        #         return QtGui.QBrush(QtCore.Qt.black)
+        # ========       
+        # if role == QtCore.Qt.ItemDataRole.DisplayRole:
+        #     if my_win.radioButton_repeat_regions.isChecked():
+        #         if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
+        #             ng = my_win.comboBox_filter_number_group_final.currentText()
+        #             double_reg = change_choice_group()
+        #             double_region = double_reg[ng]
+        #             r = double_region[0]
+        #             if role == QtCore.Qt.ForegroundRole:
+        #                 if str(self._data[index.row()][2]) == r:
+        #                     return QtGui.QBrush(QtCore.Qt.red)
+        #                 else:
+        #                     return QtGui.QBrush(QtCore.Qt.black)
+        #     else:
+        #         return str(self._data[index.row()][index.column()])
+
+        # student_model->item(0, 0)->setForeground(QBrush(QColor(255, 0, 0)));
+
+        # if role == QtCore.Qt.ForegroundRole:
+        #     if my_win.radioButton_repeat_regions.isChecked():
+        #         if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
+        #             ng = my_win.comboBox_filter_number_group_final.currentText()
+        #             double_reg = change_choice_group()
+        #             double_region = double_reg[ng]
+        #             if str(self._data[index.row()][index.column()]) == double_region:
+        #                 return QtGui.QBrush(QtCore.Qt.red)
+        #     else:
+        #         return str(self._data[index.row()][index.column()])
+       
+
+
+        # if role == QtCore.Qt.ItemDataRole.DisplayRole:
+        #     return str(self._data[index.row()][index.column()])
+        # if role == QtCore.Qt.ForegroundRole:
+        #     if my_win.radioButton_repeat_regions.isChecked():
+        #         if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
+        #             ng = my_win.comboBox_filter_number_group_final.currentText()
+        #             double_reg = change_choice_group()
+        #             double_region = double_reg[ng]
+        #             if str(self._data[index.row()][index.column()]) == double_region:
+        #                 return QtGui.QBrush(QtCore.Qt.red)
+        # else:
+        #     return str(self._data[index.row()][index.column()])
+        # if role == QtCore.Qt.ForegroundRole:
+        #     if my_win.radioButton_repeat_regions.isChecked(): # если значения ячеек равны городу выделяет шрифт красным цветом
+        #         ng = my_win.comboBox_filter_number_group_final.currentText()
+        #         double_reg = change_choice_group()
+        #         double_region = double_reg[ng] 
+        #     if str(self._data[index.row()][index.column()]) == double_region:
+        #         return QtGui.QBrush(QtCore.Qt.red)
+            # else:
+            #     return str(self._data[index.row()][index.column()])
+            
+        #     if str(self._data[index.row()][index.column()]) == double_region:
+        #         return QtGui.QBrush(QtCore.Qt.red)
+        #     return str(self._data[index.row()][index.column()])
+        # # ====== выделение кр цветом повторяющиеся регионы =====
+        # if role == QtCore.Qt.ForegroundRole and my_win.radioButton_repeat_regions.isChecked(): # если значения ячеек равны городу выделяет шрифт красным цветом
+        #     # if my_win.radioButton_repeat_regions.isChecked():
+        #     ng = my_win.comboBox_filter_number_group_final.currentText()
+        #     double_reg = change_choice_group()
+        #     double_region = double_reg[ng]
+        #     if str(self._data[index.row()][index.column()]) == double_region:
+        #         return QtGui.QBrush(QtCore.Qt.red)
+            
+        # ng = my_win.comboBox_filter_number_group_final.currentText()
+        # if my_win.radioButton_repeat_regions.isChecked():
+        #     # ng = my_win.comboBox_filter_number_group_final.currentText()
+        #     if my_win.comboBox_filter_number_group_final.currentIndex() != 0:
+        #         double_reg = change_choice_group()
+        #         double_region = double_reg[ng]
+        # # if role == QtCore.Qt.BackgroundRole: # если значения ячеек равны городу выделяет ячейку желтым цветом
+        #         if role == QtCore.Qt.ForegroundRole: # если значения ячеек равны городу выделяет шрифт красным цветом
+        #             if str(self._data[index.row()][index.column()]) == double_region:
+        #                 return QtGui.QBrush(QtCore.Qt.red)
+            
     # def flags(self, index):
     #     if (index.column() == 1) or (index.column() == 2):
     #         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled
@@ -121,30 +243,30 @@ class MyTableModel(QAbstractTableModel):
     #     self.items[index.row()] = text
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class MyColorDelegate(QItemDelegate):
+# class MyColorDelegate(QItemDelegate):
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
 
-    def paint(self, painter, option, index):
-        if index.isValid():
-            color = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
-        # if color.isValid():
-        #     painter.fillRect(option.rect, color)
+#     def paint(self, painter, option, index):
+#         if index.isValid():
+#             color = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
+#         # if color.isValid():
+#         #     painter.fillRect(option.rect, color)
 
-    def createEditor(self, parent, option, index):
-        color_dialog = QColorDialog(parent)
-        color_dialog.setOption(QColorDialog.ShowAlphaChannel, True)
-        return color_dialog
+#     def createEditor(self, parent, option, index):
+#         color_dialog = QColorDialog(parent)
+#         color_dialog.setOption(QColorDialog.ShowAlphaChannel, True)
+#         return color_dialog
 
-    def setEditorData(self, editor, index):
-        value = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
-        if value.isValid():
-            editor.setCurrentColor(value)
+#     def setEditorData(self, editor, index):
+#         value = index.data(QtCore.Qt.ItemDataRole.DisplayRole)
+#         if value.isValid():
+#             editor.setCurrentColor(value)
 
-    def setModelData(self, editor, model, index):
-        value = editor.currentColor()
-        model.setData(index, value, QtCore.Qt.ItemDataRole.DisplayRole)
+#     def setModelData(self, editor, model, index):
+#         value = editor.currentColor()
+#         model.setData(index, value, QtCore.Qt.ItemDataRole.DisplayRole)
 
 
 # =====================================  
@@ -349,7 +471,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_gr_Action.setEnabled(False)
         self.view_pf1_Action.setEnabled(False)
         self.view_pf2_Action.setEnabled(False)
-        # self.v_menu
+ 
         self.view_fin1_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin2_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin3_Action.setEnabled(False)  # делает пункт меню не видимым
@@ -802,7 +924,7 @@ class StartWindow(QMainWindow, Ui_Form):
             db_r(gamer)
             system = System(title_id=title_id, total_athletes=0, total_group=0, max_player=0, stage="", type_table="",
                             page_vid="", label_string="", kol_game_string="", choice_flag=False, score_flag=5,
-                            visible_game=False, stage_exit="", mesta_exit=0).save()
+                            visible_game=False, stage_exit="", mesta_exit=0, no_game="").save()
             self.close()
             tab_enabled(gamer)
             my_win.show()
@@ -1397,12 +1519,12 @@ def system_made():
     if sg == "одна таблица":
         system = System(id=systems, title_id=title_id(), total_athletes=total_athletes, total_group=0,
                         max_player=0, stage=sg, page_vid=page_v, label_string="", kol_game_string="",
-                        choice_flag=False, score_flag=5, visible_game=True).save()
+                        choice_flag=False, score_flag=5, visible_game=True, no_game="").save()
     else:  # предварительный этап
         for i in range(1, count_system + 1):
             system = System(id=systems, title_id=title_id(), total_athletes=total_athletes, total_group=total_group,
                             max_player=max_player, stage=sg, page_vid=page_v, label_string="", kol_game_string="",
-                            choice_flag=False, score_flag=5, visible_game=True).save()
+                            choice_flag=False, score_flag=5, visible_game=True, no_game="").save()
     player_in_table_group_and_write_Game_list_Result()
     my_win.label_33.setText("Всего: 0 игр.")
     my_win.checkBox_2.setChecked(False)
@@ -2364,8 +2486,8 @@ def page():
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 308, 841, 471))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 301))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 305, 841, 465))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 300))
         my_win.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
@@ -2433,7 +2555,6 @@ def page():
         my_win.comboBox_table_11.hide()
 
         my_win.spinBox_kol_group.hide()
-        # my_win.groupBox_SF.setVisible(False)
         stage = []
         table = []
         game = []
@@ -2632,6 +2753,20 @@ def page():
         load_combo()
         visible_field()
         my_win.label_16.hide()
+        # === проверка есть ли 1-й финал и все ли места разыигрываются ===
+        system = System.select().where(System.title_id == title_id())
+        ng = ""
+        for i in system:
+            fin = i.stage
+            if fin == "1-й финал":
+                system_fin = system.select().where(System.stage == "1-й финал").get()
+                ng = system_fin.no_game
+                break
+        znak = ng.find("3")
+        my_win.checkBox_no_play_3.setChecked(True) if znak != -1 else my_win.checkBox_no_play_3.setChecked(False)
+        # znak = ng.find("5")  
+        # my_win.checkBox_no_play_5.setChecked(True) if znak != -1 else my_win.checkBox_no_play_5.setChecked(False)
+
     elif tb == 6: # вкладка -рейтинг-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
@@ -3860,14 +3995,9 @@ def select_player_in_list():
 
 def save_in_db_pay_R():
     """запись в базу данных оплату рейтинга"""
-    # r = my_win.tableWidget.currentRow()
-    # family = my_win.tableWidget.item(r, 1).text()
     idx = my_win.tableView.currentIndex() # номер выделенной строки
     row_num = idx.row()
     pl_id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
-    # player = Player.select().where(Player.title_id == title_id())
-    # plr = player.select().where(Player.player == family).get()
-    # pl_id = plr.id
     comment, ok = QInputDialog.getText(my_win, "Коментарий", "Введите коментарий о месте нахождении квитанции.")
     if ok:
         query = Player.update(pay_rejting="оплачен", comment=comment).where(Player.id == pl_id)
@@ -5304,12 +5434,12 @@ def result_filter_name():
 
 def filter_fin(pl=False):
     """фильтрует таблицу -Result- на вкладке финалы"""
-    msgBox = QMessageBox
-    data_table_tmp = []
-    data_table_list = []
+    # msgBox = QMessageBox
+    # data_table_tmp = []
+    # data_table_list = []
     data = []
-    model = MyTableModel(data)
-    tb = my_win.tabWidget.currentIndex()
+    # model = MyTableModel(data)
+    # tb = my_win.tabWidget.currentIndex()
     # player_selected = player_list.dicts().execute()
 
 
@@ -7436,6 +7566,8 @@ def choice_filter_on_system():
     if stage == "-выберите этап-" and number_group == "все группы" and number_group == "все финалы":
         return
     else:
+        if my_win.radioButton_repeat_regions.isChecked():
+            return
         if stage == "":
             my_win.comboBox_filter_choice_stage.clear()
             etaps_list = [i.stage for i in systems if i.choice_flag is True] # все этапы системы
@@ -7627,8 +7759,10 @@ def etap_made():
 
 def total_game_table(exit_stage, kpt, fin, pv):
     """количество участников и кол-во игр"""
+    msgBox = QMessageBox()
     sender = my_win.sender()
     sum_player = [0]
+    no_game3 = ""
     etap_text = my_win.comboBox_etap.currentText()
     flag_visible = my_win.checkBox_visible_game.isChecked()
     system = System.select().where(System.title_id == title_id()) # находит system id последнего
@@ -7667,6 +7801,14 @@ def total_game_table(exit_stage, kpt, fin, pv):
             elif cur_index == 4:
                 vt = "Круговая таблица на"
                 type_table = "круг"
+        # ======
+            if fin == "1-й финап" and type_table == "сетка":
+                result = msgBox.question(my_win, "Уведомление", "Будет ли разигрываться 3-е место\n в 1-ом финале?"
+                , msgBox.No, msgBox.Ok) 
+                if result == msgBox.Ok:
+                    no_game3 = 3
+                else:
+                    no_game3 = ""
 
             if exit_stage == "1-й полуфинал" or exit_stage == "2-й полуфинал":
                 system_exit = system.select().where(System.stage == exit_stage).get()
@@ -7692,7 +7834,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
 
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=total_gr, kol_game_string=stroka_kol_game,
                         max_player=player_in_final, stage=fin, type_table=type_table, page_vid=pv, label_string=str_setka,
-                        choice_flag=0, score_flag=5, visible_game=flag_visible, stage_exit=exit_stage, mesta_exit=kpt).save()    
+                        choice_flag=0, score_flag=5, visible_game=flag_visible, stage_exit=exit_stage, mesta_exit=kpt, no_game=no_game3).save()    
         
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
 
@@ -10078,10 +10220,7 @@ def setka_16_2_made(fin):
     column_count = column * 11
     # добавить в аргументы функции
     final = fin
-    if sender != my_win.clear_s16_2_Action:
-        first_mesto = mesto_in_final(fin)
-    else:
-        first_mesto = 1  # временный финал для чистой сетки
+    first_mesto = mesto_in_final(fin) if sender != my_win.clear_s16_2_Action else 1
     for i in range(0, 86):
         # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
         list_tmp = column_count.copy()
@@ -10886,7 +11025,7 @@ def write_in_setka(data, fin, first_mesto, table):
         column_last = 11
         row_end = 33
         row_num_win = {1: [3], 2: [7], 3: [11], 4: [15], 5: [19], 6: [23], 7: [27], 8: [31], 9: [5], 10: [13], 11: [21], 12: [29], 13: [9], 14: [25], 15: [17], 
-                       16: [46], 17: [50], 18: [54], 19: [58], 20: [46], 21: [50], 22: [54], 23: [58], 24: [47], 25: [55], 26: [45], 27: [53], 28: [49], 29: [61],
+                       16: [46], 17: [50], 18: [54], 19: [58], 20: [45], 21: [49], 22: [53], 23: [57], 24: [47], 25: [55], 26: [45], 27: [53], 28: [49], 29: [61],
                         30: [67],  31: [62], 32: [66], 33: [64], 34: [73], 35: [74], 36: [78], 37: [76], 38: [79]} 
                  # ======= list mest
         mesta_dict = {15: 17, 28: 49, 29: 61, 33: 64, 30: 67, 34: 73, 37: 76, 38: 79} # номер встречи - номер строки
@@ -10961,21 +11100,33 @@ def write_in_setka(data, fin, first_mesto, table):
         if setka_string == "Сетка (с розыгрышем всех мест) на 8 участников":
             col_first = 0
             row_first = 0
+            place_3rd = 8
+            # place_5th = 11
         elif setka_string == "Сетка (-2) на 8 участников":
             col_first = 0
             row_first = 0
+            place_3rd = 12
+            # place_5th = 13
         elif setka_string == "Сетка (с розыгрышем всех мест) на 16 участников":
             col_first = 2
             row_first = 0
+            place_3rd = 16
+            # place_5th = 19
         elif setka_string == "Сетка (-2) на 16 участников":
             col_first = 0
             row_first = 2
+            place_3rd = 28
+            # place_5th = 30
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
             col_first = 0
             row_first = 2
+            place_3rd = 32
+            # place_5th = 35
         elif setka_string == "Сетка (-2) на 32 участников":
             col_first = 0
             row_first = 2
+            place_3rd = 60
+            # place_5th = 61
         posev_data = setka_player_after_choice(fin) # игроки 1-ого посева
         all_list = setka_data(fin, posev_data)
         id_sh_name = all_list[2] # словарь {Фамилия Имя: id}
@@ -11000,13 +11151,17 @@ def write_in_setka(data, fin, first_mesto, table):
     # ==============
     if flag_clear is False:
         # функция расстановки счетов и сносок игроков
-        dict_setka = score_in_setka(fin)
+        dict_setka = score_in_setka(fin, place_3rd) # список (номер, игрок, счет в партии, номер куда сносится проигравший, его фамилия)
         key_list = []
         mesta_list = []
         for k in dict_setka.keys():
             key_list.append(k)
         for v in mesta_dict.keys():
             mesta_list.append(v)
+        # ======
+        if my_win.checkBox_no_play_3.isChecked():
+            key_list.append(place_3rd)
+        key_list.sort()
         # ============
         for i in key_list: # спиисок встреч которые сыграны
             match = dict_setka[i]
@@ -11024,62 +11179,67 @@ def write_in_setka(data, fin, first_mesto, table):
                 index = mesta_list.index(i)
                 mesto = first_mesto + (index * 2)
                 # записывает места в таблицу -Player-
-                player = Player.get(Player.id == id_win)
-                win = f"{player.player}/{player.city}"
-                player.mesto = mesto
-                player.save()
-                m = 0
-                for n in [id_win, id_los]: # записывает место в сетке в таблицу -choice-
-                    choice_pl = Choice.get(Choice.player_choice_id == n)
-                    choice_pl.mesto_final = mesto + m
-                    choice_pl.save()
-                    m += 1
-                if id_los != "":
-                    player = Player.get(Player.id == id_los)
-                    los = f"{player.player}/{player.city}"
-                    player.mesto = mesto + 1
-                    player.save()
+                if my_win.checkBox_no_play_3.isChecked() and i == place_3rd:
+                    for n in [id_win, id_los]: # записывает место в сетке в таблицу -choice-
+                        choice_pl = Choice.get(Choice.player_choice_id == n)
+                        choice_pl.mesto_final = mesto
+                        choice_pl.save()
+                        player = Player.get(Player.id == n)
+                        player.mesto = mesto
+                        player.save()
                 else:
-                    los = "X"
+                    m = 0
+                    for n in [id_win, id_los]: # записывает место в сетке в таблицу -choice-
+                        choice_pl = Choice.get(Choice.player_choice_id == n)
+                        choice_pl.mesto_final = mesto + m
+                        choice_pl.save()
+                        m += 1
+                    if id_los != "":
+                        player = Player.get(Player.id == id_los)
+                        los = f"{player.player}/{player.city}"
+                        player.mesto = mesto + 1
+                        player.save()
+                    else:
+                        los = "X"
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
             # ========== расстановка для сетки на 16
             if c != 0: #  номер встречи в сетке куда попадает победиель (кроме встреч за места)
-                row_win_list = row_num_win[i]  # номера строк данной встречи в сетке
-                row_win = row_win_list[0]
+                row_win = row_num_win[i][0] # номера строк данной встречи в сетке
                 c1 = []
                 c1_tmp = []
-                c = str(c)
+                # c = str(c)
                 win = match[1]
                 los = match[4]
             elif c == 0:  # встречи за места
                 row_win = mesta_dict[i]
-                c = str(i)
+            c = str(i)
            # цикл создания списков номеров встреч по столбцам новый
             column_dict = {}
-            for cd in range(2, column_last, 2):
-                c1_tmp.clear()
-                for rd in range(0, row_last):
-                    d1 = data[rd][cd]
-                    if d1 != "" and type(d1) == str and int(d1) > 0:
-                        c1_tmp.append(d1)
-                        c1 = c1_tmp.copy()
-                column_dict[cd] = c1    # ключ -номер столбца, значение - список номеров встреч   
-            # =======
-            for k in column_dict.keys():
-                num_game_list = column_dict[k]  
-                if str(i) in num_game_list:
-                    if k == column_last - 1:
-                        col_win = k - 1
-                    else:
-                        col_win = k + 1
-                    break
-            row_los = row_num_los[r]  # строка проигравшего
-            score = match[2]  # счет во встречи
-            row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
-            col_los = row_list_los.index(r) # номер столбца проигравшего            
-            data[row_win][col_win] = win
-            data[row_win + 1][col_win] = score
-            data[row_los][col_los + 1] = los
+            if my_win.checkBox_no_play_3.isChecked() and c != str(place_3rd):
+                for cd in range(2, column_last, 2):
+                    c1_tmp.clear()
+                    for rd in range(0, row_last):
+                        d1 = data[rd][cd]
+                        if d1 != "" and type(d1) == str and int(d1) > 0:
+                            c1_tmp.append(d1)
+                            c1 = c1_tmp.copy()
+                    column_dict[cd] = c1    # ключ -номер столбца, значение - список номеров встреч   
+                        # =======
+                for k in column_dict.keys():
+                    num_game_list = column_dict[k]  
+                    if str(i) in num_game_list:
+                        if k == column_last - 1:
+                            col_win = k - 1
+                        else:
+                            col_win = k + 1
+                        break
+                row_los = row_num_los[r]  # строка проигравшего
+                score = match[2]  # счет во встречи
+                row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
+                col_los = row_list_los.index(r) # номер столбца проигравшего            
+                data[row_win][col_win] = win
+                data[row_win + 1][col_win] = score
+                data[row_los][col_los + 1] = los
         return tds
 
 
@@ -11523,7 +11683,7 @@ def numer_game(num_game, vid_setki):
     return snoska
 
 
-def score_in_setka(fin):
+def score_in_setka(fin, place_3rd):
     """ выставляет счет победителя и сносит на свои места в сетке"""
     dict_setka = {}
     match = []
@@ -11540,13 +11700,13 @@ def score_in_setka(fin):
     for res in result:
         num_game = int(res.tours)
 
-        if res.winner is not None and res.winner != "":
+        if res.winner is not None and res.winner != "": # значит встреча сыграна
             id_pl_win = player.select().where(Player.full_name == res.winner).get()
             id_pl_los = player.select().where(Player.full_name == res.loser).get()
             short_name_win = id_pl_win.player
             short_name_los = id_pl_los.player
 
-            snoska = numer_game(num_game, vid_setki)
+            snoska = numer_game(num_game, vid_setki) # список (номер встречи победителя, номер встречи проигравшего и минус куда идет проигравший в сетке)
             tmp_match.append(snoska[0]) # номер на сетке куда идет победитель
             tmp_match.append(short_name_win)
             if visible_game == 1: # если счет в партиии
@@ -11558,6 +11718,18 @@ def score_in_setka(fin):
             match = tmp_match.copy()
             tmp_match.clear()
             dict_setka[num_game] = match
+        else:
+            if my_win.checkBox_no_play_3.isChecked():
+                res = result.select().where(Result.tours == place_3rd).get()
+                id_pl1 = player.select().where(Player.full_name == res.player1).get()
+                id_pl2 = player.select().where(Player.full_name == res.player2).get()
+                short_name_win1 = id_pl1.player
+                short_name_win2 = id_pl2.player
+                # snoska = numer_game(num_game, vid_setki) # список (номер встречи победителя, номер встречи проигравшего и минус куда идет проигравший в сетке)
+                # tmp_match.append(snoska[0]) # номер на сетке куда идет победитель
+                # tmp_match.append(short_name_win)
+                match = [0, short_name_win1, '', '', short_name_win2]
+                dict_setka[num_game] = match
     return dict_setka
 
 
@@ -11620,7 +11792,7 @@ def rank_in_group(total_score, td, num_gr, stage):
     pg_los = {}
     tr = []
     player_rank_tmp = []
-    # player_rank = []
+
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
     player_rank_group = []    
     sys = System.select().where(System.title_id == title_id())
@@ -12320,7 +12492,7 @@ def change_choice_group():
                 else:
                     reg_tmp.append(reg_n)
             reg_d = reg_tmp.copy()
-            count =len(reg_d)
+            count = len(reg_d)
             if count > 0:
                 double_reg[f"{i} группа"] = reg_d
             reg_tmp.clear()
@@ -12328,9 +12500,14 @@ def change_choice_group():
         dr_count = len(double_reg)
         if dr_count != 0:
             for key in double_reg.keys():
-                gr_key.append(key)     
+                gr_key.append(key)   
+            gr_key.insert(0, "-выберите группу-")  
             my_win.comboBox_filter_choice_stage.clear()
-            my_win.comboBox_filter_choice_stage.addItems(gr_key)
+            my_win.comboBox_filter_number_group_final.clear()
+            stage_list = ["-выбор этапа-", "Предварительный"]
+            my_win.comboBox_filter_choice_stage.addItems(stage_list)
+            my_win.comboBox_filter_number_group_final.addItems(gr_key)
+            return double_reg
         else:
             msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
     else:
@@ -12602,6 +12779,13 @@ def color_mesta(data, first_mesto, table):
     """окрашивает места в красный цвет"""
     b = 0
     style_color = []
+    system = System.select().where(System.title_id == title_id())
+    for i in system:
+        stage = i.stage
+        type_table = i.type_table
+        if stage == "1-й финал" and type_table == "сетка":
+            flag = i.no_game
+            break
     ml = [] # столбец, ряд -1 ого места, ряд 2-ого места + 1, шаг между местами
     f = 0 # количество столбцов
     if table == "setka_32":
@@ -12618,7 +12802,7 @@ def color_mesta(data, first_mesto, table):
         f= 4
     elif table == "setka_8_2":
         f= 4
-
+    k = 0
     for c in range(0, f):
         if c == 0: # 1-2 место
             if table == "setka_32_2":
@@ -12743,14 +12927,18 @@ def color_mesta(data, first_mesto, table):
             ml = [7, 193, 198, 4] 
         elif c == 15: # 31-32 место
             ml = [11, 199, 205, 5]
-            
+
         for i in range(ml[1], ml[2], ml[3]):
             data[i][ml[0]] = str(first_mesto + b) + " Место"
             fn = (('TEXTCOLOR', (ml[0], i), (ml[0], i), colors.red))
             style_color.append(fn)
             fn =  ('ALIGN', (ml[0], i), (ml[0], i), 'CENTER')
             style_color.append(fn)
-            b += 1    
+            if b == 2 and flag == '3':
+                k += 1
+                b = 4 if k == 2 else 2
+            else:
+                b += 1    
     return style_color   
 
 
@@ -13207,8 +13395,10 @@ def move_row_in_tablewidget():
     row_cur = my_win.tableWidget.currentRow()
     if row_cur == 1:
         my_win.Button_up.setEnabled(False)
+        my_win.Button_down.setEnabled(True)
     if row_cur == row_count:
         my_win.Button_down.setEnabled(False)
+        my_win.Button_up.setEnabled(True)
     item_cur = my_win.tableWidget.item(row_cur, 1).text()
     item_cur_name = my_win.tableWidget.item(row_cur, 2).text()
     if sender == my_win.Button_down:
@@ -13405,6 +13595,7 @@ def view_all_page_pdf():
         my_win.tableWidget.setItem(row_count, 2, (QTableWidgetItem(str(item_name))))
         row_count += 1
     my_win.Button_made_one_file_pdf.setEnabled(True)
+    my_win.tableWidget.resizeColumnsToContents()
 
 
 def made_list_regions():
@@ -13514,7 +13705,8 @@ def made_list_winners():
     players = Player.select().where(Player.title_id == title_id())
     winners = players.select().where(Player.mesto < 4).order_by(Player.mesto)
     count = len(winners)
-    
+    if count == 0:
+        return
     n = 0
     for l in winners:
         my_win.tableWidget.setColumnCount(8) # устанавливает колво столбцов
@@ -13653,10 +13845,8 @@ def referee():
         if index != -1:
             my_win.tableWidget.comboBox_family_city.setCurrentIndex(index)
             my_win.tableWidget.comboBox_family_city.lineEdit().setSelection(len(text), len(my_win.tableWidget.comboBox_family_city.currentText()))
-            # category = find_referee_in_db(text)
-            # my_win.comboBox_kategor_sec.setCurrentText(category)
-
-
+            category = find_referee_in_db(text)
+            my_win.comboBox_kategor_sec.setCurrentText(category)
 
 
 def find_referee_in_db(text):
@@ -13743,18 +13933,17 @@ def open_close_file(view_file):
 # =======        
 # def proba():
 # #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
-#     data = my_win.lineEd.text()
-    # my_db = SqliteDatabase('comp_db.db')
-    # migrator = SqliteMigrator(my_db)
-    # multiregion = IntegerField(null=True)
+#     my_db = SqliteDatabase('comp_db.db')
+#     migrator = SqliteMigrator(my_db)
+#     no_game = TextField(default="")
 #     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
 #     # system_id = ForeignKeyField(System, field=System.id, null=True)
 
-    # with db:
+#     with db:
 #         # migrate(migrator.drop_column('referees', 'signature')) # удаление столбца
 # #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
-        # migrate(migrator.add_column('titles', 'multiregion', multiregion)) # Добавление столбца (таблица, столбец, повтор название столбца)
+#         # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
+#         migrate(migrator.add_column('System', 'no_game', no_game)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
@@ -13829,6 +14018,7 @@ my_win.comboBox_region.currentTextChanged.connect(find_city)
 my_win.listWidget.itemDoubleClicked.connect(dclick_in_listwidget)
 # двойной клик по строке игроков в таблице -результаты-, -списки-
 my_win.tableView.doubleClicked.connect(select_player_in_game)
+my_win.tableWidget.doubleClicked.connect(move_row_in_tablewidget)
 
 my_win.tabWidget.currentChanged.connect(tab)
 my_win.toolBox.currentChanged.connect(tool_page)
@@ -13917,6 +14107,7 @@ my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по не
 my_win.checkBox_11.stateChanged.connect(debtor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
+# my_win.checkBox_no_play_game.stateChanged.connect(game_no_play_for_mesto)
 # my_win.checkBox_GSK.stateChanged.connect(made_list_GSK)
 # my_win.checkBox_edit_etap.stateChanged.connect(change_player_in_etap )
 # =======  нажатие кнопок =========
@@ -13934,8 +14125,8 @@ my_win.Button_filter_fin.clicked.connect(filter_fin)
 my_win.Button_filter_sf.clicked.connect(filter_sf)
 my_win.Button_filter_gr.clicked.connect(filter_gr)
 my_win.Button_app.clicked.connect(check_real_player) # отмечает что игрок по заявке
-# рисует таблицы группового этапа и заполняет game_list
-my_win.Button_etap_made.clicked.connect(etap_made)
+
+my_win.Button_etap_made.clicked.connect(etap_made) # кнопка создание этапов системы
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 # записывает в базу или редактирует титул
 my_win.Button_title_made.clicked.connect(title_made)
@@ -13943,7 +14134,7 @@ my_win.Button_title_made.clicked.connect(title_made)
 my_win.Button_Ok_gr.clicked.connect(enter_score)
 my_win.Button_Ok_pf.clicked.connect(enter_score)
 my_win.Button_Ok_fin.clicked.connect(enter_score)
-my_win.Button_del_player.clicked.connect(delete_player)
+my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
 # my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
@@ -13966,7 +14157,7 @@ my_win.Button_made_one_file_pdf.clicked.connect(merdge_pdf_files)
 
 my_win.Button_up.clicked.connect(move_row_in_tablewidget)
 my_win.Button_down.clicked.connect(move_row_in_tablewidget)
-# my_win.tableWidget.cellClicked.connect(button_move_enabled)
+my_win.tableWidget.cellClicked.connect(button_move_enabled)
 my_win.Button_list_referee.clicked.connect(made_list_GSK)
 my_win.Button_list_regions.clicked.connect(made_list_regions)
 my_win.Button_list_winner.clicked.connect(made_list_winners)

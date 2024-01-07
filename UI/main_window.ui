@@ -23,7 +23,7 @@
       <x>260</x>
       <y>20</y>
       <width>841</width>
-      <height>269</height>
+      <height>300</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -558,28 +558,6 @@
        </layout>
       </widget>
      </widget>
-<<<<<<< HEAD
-=======
-     <widget class="QCheckBox" name="checkBox_GSK">
-      <property name="geometry">
-       <rect>
-        <x>590</x>
-        <y>210</y>
-        <width>111</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>состав ГСК</string>
-      </property>
-     </widget>
->>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
@@ -733,19 +711,6 @@
         </widget>
        </item>
       </layout>
-     </widget>
-     <widget class="QPushButton" name="Button_GSK_made">
-      <property name="geometry">
-       <rect>
-        <x>700</x>
-        <y>210</y>
-        <width>121</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Создать ГСК</string>
-      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_1">
@@ -4384,15 +4349,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>476</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4404,12 +4369,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-<<<<<<< HEAD
-       <height>484</height>
-=======
-       <height>476</height>
->>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4882,12 +4843,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-<<<<<<< HEAD
-       <height>484</height>
-=======
-       <height>476</height>
->>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5207,7 +5164,7 @@
          <x>10</x>
          <y>10</y>
          <width>211</width>
-         <height>97</height>
+         <height>82</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -5278,12 +5235,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-<<<<<<< HEAD
-       <height>484</height>
-=======
-       <height>476</height>
->>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5700,12 +5653,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-<<<<<<< HEAD
-       <height>484</height>
-=======
-       <height>476</height>
->>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6012,11 +5961,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-<<<<<<< HEAD
        <height>484</height>
-=======
-       <height>476</height>
->>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
       </rect>
      </property>
      <attribute name="label">
@@ -6417,14 +6362,74 @@
        </property>
       </widget>
      </widget>
+     <widget class="QCheckBox" name="checkBox_no_play_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>396</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>за 3 место</string>
+      </property>
+      <property name="tristate">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="Line" name="line_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>380</y>
+        <width>221</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_61">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>360</y>
+        <width>211</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Встречи за места не разигрываются</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_8">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>476</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6806,12 +6811,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-<<<<<<< HEAD
-       <height>484</height>
-=======
-       <height>476</height>
->>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7061,7 +7062,7 @@
     <property name="geometry">
      <rect>
       <x>470</x>
-      <y>319</y>
+      <y>350</y>
       <width>201</width>
       <height>26</height>
      </rect>
@@ -7078,9 +7079,9 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>359</y>
+      <y>379</y>
       <width>400</width>
-      <height>251</height>
+      <height>231</height>
      </rect>
     </property>
     <property name="font">
@@ -7094,9 +7095,9 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>359</y>
+      <y>379</y>
       <width>400</width>
-      <height>251</height>
+      <height>231</height>
      </rect>
     </property>
     <property name="font">
@@ -7110,7 +7111,7 @@
     <property name="geometry">
      <rect>
       <x>900</x>
-      <y>319</y>
+      <y>350</y>
       <width>201</width>
       <height>26</height>
      </rect>
@@ -7127,7 +7128,7 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>319</y>
+      <y>350</y>
       <width>191</width>
       <height>26</height>
      </rect>
@@ -7152,7 +7153,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>319</y>
+      <y>350</y>
       <width>191</width>
       <height>26</height>
      </rect>
@@ -7171,7 +7172,7 @@
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>295</y>
+      <y>330</y>
       <width>231</width>
       <height>20</height>
      </rect>
@@ -7332,23 +7333,19 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>297</y>
+      <y>327</y>
       <width>842</width>
-      <height>481</height>
+      <height>451</height>
      </rect>
     </property>
    </widget>
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>310</y>
+      <x>260</x>
+      <y>330</y>
       <width>821</width>
-<<<<<<< HEAD
-      <height>461</height>
-=======
-      <height>271</height>
->>>>>>> 4fb8e44e1e6f11dc5681185ce767543cb1078655
+      <height>433</height>
      </rect>
     </property>
    </widget>
