@@ -10988,7 +10988,7 @@ def write_in_setka(data, fin, first_mesto, table):
     "row_num_win - словарь, ключ - номер игры, значение - список(номер строки 1-ого игрока, номер строки 2-ого игрока) и записвает итоговые места в db"
     sender = my_win.sender()
     player = Player.select().where(Player.title_id == title_id())
-    choice = Choice.select().where(Choice.title_id == title_id())
+    # choice = Choice.select().where(Choice.title_id == title_id())
     row_num_los = {}
     row_end = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
     flag_clear = False
@@ -11193,14 +11193,23 @@ def write_in_setka(data, fin, first_mesto, table):
                         choice_pl = Choice.get(Choice.player_choice_id == n)
                         choice_pl.mesto_final = mesto + m
                         choice_pl.save()
-                        m += 1
-                    if id_los != "":
-                        player = Player.get(Player.id == id_los)
-                        los = f"{player.player}/{player.city}"
-                        player.mesto = mesto + 1
+                        player = Player.get(Player.id == n)
+                        if n == id_win:
+                            win = f"{player.player}/{player.city}" 
+                        else:
+                            los = f"{player.player}/{player.city}"
+                        player.mesto = mesto + m
                         player.save()
-                    else:
+                        m += 1
+                    if id_los == "":
                         los = "X"
+                    # if id_los != "":
+                    #     player = Player.get(Player.id == id_los)
+                    #     los = f"{player.player}/{player.city}"
+                        # player.mesto = mesto + 1
+                    #     # player.save()
+                    # else:
+                    #     los = "X"
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
             # ========== расстановка для сетки на 16
             if c != 0: #  номер встречи в сетке куда попадает победиель (кроме встреч за места)
