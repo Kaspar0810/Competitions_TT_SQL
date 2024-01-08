@@ -7805,7 +7805,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
                 vt = "Круговая таблица на"
                 type_table = "круг"
         # ======
-            if fin == "1-й финап" and type_table == "сетка":
+            if fin == "1-й финал" and type_table == "сетка":
                 result = msgBox.question(my_win, "Уведомление", "Будет ли разигрываться 3-е место\n в 1-ом финале?"
                 , msgBox.No, msgBox.Ok) 
                 if result == msgBox.Ok:
@@ -8222,7 +8222,7 @@ def clear_db_before_edit():
         i.delete_instance()
     sys = System(title_id=title_id(), total_athletes=0, total_group=0, max_player=0, stage="", type_table="", page_vid="",
                  label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True,
-                 stage_exit="", mesta_exit="").save()
+                 stage_exit="", mesta_exit="", no_game="").save()
     with db:
         # записывает в таблицу -Title- новые открытые вкладки
         title.tab_enabled = "Титул Участники"
@@ -8346,6 +8346,7 @@ def ready_system():
     all_player_in_final = []
     system = System.select().where(System.title_id == title_id())  # находит system id первого
     count = len(system)
+    flag = False
     if count == 1:
         for k in system:
             stage = k.stage
