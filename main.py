@@ -1190,7 +1190,7 @@ def change_sroki():
         if i != 0:
             comp_data[i - 1] = data_comp_tmp
         i += 1
-        if i == 5 or i == count:
+        if i == 6 or i == count:
             break
     index = fir_window.comboBox.currentIndex()
     data_list = comp_data[index]
@@ -3952,8 +3952,7 @@ def visible_field():
                 my_win.lineEdit_pl1_s1_fin.setFocus()
             else:
                 my_win.lineEdit_pl1_score_total_fin.setFocus()
-    change_status_visible_and_score_game()
- 
+    change_status_visible_and_score_game() 
     return state_visible
 
 
@@ -6966,7 +6965,6 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         reg_list = list(kol_group_free.keys())  # список ключей (регионов)
         last = len(reg_list)  # кол-во остатка посева
         region = reg_list[0]  # номер региона, который сейчас сеется
-        # free_gr = kol_group_free[i]  # кол-во групп куда можно сеять
         free_gr = kol_group_free[region]  # кол-во групп куда можно сеять
         # ==== сделать последний посев по наименшему количеству вариантов посева
  
@@ -6981,13 +6979,22 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
             f = current_region_group[region]  # список номеров групп для посева текущего региона
             temp_list = []
             if free_gr != 1:
-                # f = current_region_group[region]  # список номеров групп для посева текущего региона
-                if len(f) == 0:
-                    # temp_list = []
-                    for i in range(1, 33):
+                if len(f) == 0: # значит во всех группах есть уже данный регион
+                    for i in range(1, end + 1):
                         temp_list.append(i)
                     current_region_group[region] = temp_list
                     f = current_region_group[region]  # список номеров групп для посева текущего региона
+                    # ===== удалить посеянные группы ====
+                    posev[f"{m}_посев"] = posev_tmp
+                    num_gr_posev = []
+                    for p in posev_tmp.keys():
+                        if 0 != posev_tmp[p]:
+                            num_gr_posev.append(p)
+                    for d in num_gr_posev:  # цикл удаления посеянных групп                        
+                        list_group = current_region_group[region]
+                        if d in list_group:  # находит сеяную группу и удаляет ее из списка групп
+                            list_group.remove(d)
+ 
                 if m % 2 != 0:  # в зависимости от четности посева меняет направления посева групп в списке
                      f.sort()
                 else:
@@ -6999,13 +7006,7 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                     g = f[0] # номер группы
                     posev_tmp[g] = region
                     u = g    # присваивает переменной u - номер группы, если она идет не по порядку
-                # else: # во все группах уже есть одинаковое количество регионов и теперь посев снвоа во все группы
-                #     pass
-            
-
-            # f = current_region_group[region]  # список номеров групп для посева текущего региона
-            elif free_gr == 0:
-                # temp_list = []                   
+            elif free_gr == 0:                
                 for i in range (1, len(posev) + 1):
                     gr_dict = posev[f"{m}_посев"]
                     gr = gr_dict[i]
@@ -7034,7 +7035,7 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
             list_group = current_region_group[d]
             if u in list_group:  # находит сеяную группу и удаляет ее из списка групп
                 list_group.remove(u)
-        player_list.remove(p)       
+        player_list.remove(p)  # список id игроков посева (и удаляет игрока -P-, как посеянный)     
         key_reg_current.remove(region)  # удаляет регион из списка как посеянный
         count_in_list = key_reg_current.count(region)
         if count_in_list == 0:  # если в посеве больше одного региона, то пропускает удаление из словаря
@@ -7092,7 +7093,7 @@ def region_player_current(number_poseva, reg_list, group, player_list):
 
 
 def posev_test(posev, group, m):
-    """возвращает словарь предыдущих посевов регион - группы, где они есть"""
+    """возвращает словарь предыдущих посевов регион - группы, где они есть, m - номер посева"""
     uniq_region = []  # уникальный список регионов которые уже посеяны
     tmp_posev = {}
     previous_region_group = {} 
@@ -7110,8 +7111,10 @@ def posev_test(posev, group, m):
         for d in range(1, m):
             for key, value in posev[f"{d}_посев"].items():
                 if val == value:
-                    gr_tmp.append(key)
+                    gr_tmp.append(key) # добавляет в список номер групп для региона val
         gr = gr_tmp.copy()
+        gr_set = set(gr)
+        gr = list(gr_set)
         previous_region_group[val] = gr
         gr_tmp.clear()
     return previous_region_group
@@ -11203,13 +11206,6 @@ def write_in_setka(data, fin, first_mesto, table):
                         m += 1
                     if id_los == "":
                         los = "X"
-                    # if id_los != "":
-                    #     player = Player.get(Player.id == id_los)
-                    #     los = f"{player.player}/{player.city}"
-                        # player.mesto = mesto + 1
-                    #     # player.save()
-                    # else:
-                    #     los = "X"
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
             # ========== расстановка для сетки на 16
             if c != 0: #  номер встречи в сетке куда попадает победиель (кроме встреч за места)
@@ -11734,9 +11730,6 @@ def score_in_setka(fin, place_3rd):
                 id_pl2 = player.select().where(Player.full_name == res.player2).get()
                 short_name_win1 = id_pl1.player
                 short_name_win2 = id_pl2.player
-                # snoska = numer_game(num_game, vid_setki) # список (номер встречи победителя, номер встречи проигравшего и минус куда идет проигравший в сетке)
-                # tmp_match.append(snoska[0]) # номер на сетке куда идет победитель
-                # tmp_match.append(short_name_win)
                 match = [0, short_name_win1, '', '', short_name_win2]
                 dict_setka[num_game] = match
     return dict_setka
