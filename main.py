@@ -1324,13 +1324,10 @@ def enabled_menu_after_choice():
                 my_win.view_one_table_Action.setEnabled(True)
             elif stage == "Предварительный":
                 my_win.view_gr_Action.setEnabled(True)
-                # my_win.ed_gr_Action.setEnabled(True) # включает меню - редакирование жеребьевки групп
             elif stage == "1-й полуфинал":
                 my_win.view_pf1_Action.setEnabled(True)
-                # my_win.ed_pf_Action.setEnabled(True)
             elif stage == "2-й полуфинал":
                 my_win.view_pf2_Action.setEnabled(True)
-                # my_win.ed_pf2_Action.setEnabled(True)
             elif stage == "1-й финал":
                 my_win.view_fin1_Action.setEnabled(True)
             elif stage == "2-й финал":
@@ -2687,10 +2684,11 @@ def page():
 
         my_win.Button_Ok_gr.setEnabled(False)
         player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
-        fill_table(player_list)
+        # fill_table(player_list)
         load_combobox_filter_group()
         load_combo()
         visible_field()
+        fill_table(player_list)
         my_win.label_16.hide()
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
     elif tb == 4:  # вкладка -полуфиналы-
@@ -2764,9 +2762,6 @@ def page():
                 break
         znak = ng.find("3")
         my_win.checkBox_no_play_3.setChecked(True) if znak != -1 else my_win.checkBox_no_play_3.setChecked(False)
-        # znak = ng.find("5")  
-        # my_win.checkBox_no_play_5.setChecked(True) if znak != -1 else my_win.checkBox_no_play_5.setChecked(False)
-
     elif tb == 6: # вкладка -рейтинг-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
@@ -5072,12 +5067,16 @@ def enter_score(none_player=0):
                           my_win.lineEdit_pl1_score_total_pf, my_win.lineEdit_pl2_score_total_pf]
         my_win.checkBox_12.setChecked(False)
         my_win.checkBox_13.setChecked(False)
+        filter_sf()
     elif tab == 5:
         line_edit_list = [my_win.lineEdit_pl1_s1_fin, my_win.lineEdit_pl2_s1_fin, my_win.lineEdit_pl1_s2_fin, my_win.lineEdit_pl2_s2_fin,
                           my_win.lineEdit_pl1_s3_fin, my_win.lineEdit_pl2_s3_fin, my_win.lineEdit_pl1_s4_fin, my_win.lineEdit_pl2_s4_fin,
                           my_win.lineEdit_pl1_s5_fin, my_win.lineEdit_pl2_s5_fin, my_win.lineEdit_pl1_s6_fin, my_win.lineEdit_pl2_s6_fin,
                           my_win.lineEdit_pl1_s7_fin, my_win.lineEdit_pl2_s7_fin, my_win.lineEdit_player1_fin,  my_win.lineEdit_player2_fin,
                           my_win.lineEdit_pl1_score_total_fin, my_win.lineEdit_pl2_score_total_fin]
+        my_win.checkBox_9.setChecked(False)
+        my_win.checkBox_10.setChecked(False)
+        filter_fin()
     for line in line_edit_list:
             line.clear()
 
@@ -5433,16 +5432,6 @@ def result_filter_name():
 
 def filter_fin(pl=False):
     """фильтрует таблицу -Result- на вкладке финалы"""
-    # msgBox = QMessageBox
-    # data_table_tmp = []
-    # data_table_list = []
-    data = []
-    # model = MyTableModel(data)
-    # tb = my_win.tabWidget.currentIndex()
-    # player_selected = player_list.dicts().execute()
-
-
-
     sender = my_win.sender()
     num_game_fin = my_win.lineEdit_num_game_fin.text()
     final = my_win.comboBox_filter_final.currentText()
