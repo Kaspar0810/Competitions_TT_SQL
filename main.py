@@ -867,10 +867,12 @@ class StartWindow(QMainWindow, Ui_Form):
         self.Button_open.clicked.connect(self.open)
         self.Button_new.clicked.connect(self.new)
         self.Button_old.clicked.connect(self.load_old)
+        # self.Button_old.clicked.connect(self.last_competition)
         self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp)
         self.Button_open.setEnabled(False)
-
+        self.comboBox_arhive_year.setEnabled(False)
+        self.comboBox_arhive_year.addItem("-выберите год-")
         self.pb = QProgressBar()
         self.pb.setMinimum(0)
         self.pb.setMaximum(100)
@@ -932,8 +934,8 @@ class StartWindow(QMainWindow, Ui_Form):
             return
 
     def last_competition():
-        """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
-        go_to()
+        """заполняет меню -последние- прошедшими соревнованиями 5 штук"""
+        fir_window.comboBox_arhive_year.setEnabled(True)
     
 
     def r_load(self):
@@ -1267,7 +1269,8 @@ def tab_enabled(gamer):
             old_gamer = tit_id.gamer
             comp = f"{old_comp}.{old_data}.{old_gamer}"
             my_win.go_to_Action.setText(comp)
-            last_competition()
+            # last_competition()
+            fir_window.load_old() # загружает в меню -последние- пять
     my_win.tabWidget.setTabEnabled(1, False)        
     my_win.tabWidget.setTabEnabled(2, False)
     my_win.tabWidget.setTabEnabled(3, False)
@@ -1499,9 +1502,9 @@ def db_select_title():
     return gamer
 
 
-def system_edit():
-    """редактирование системы"""
-    system_made()
+# def system_edit():
+#     """редактирование системы"""
+#     system_made()
 
 
 def system_made():
@@ -1952,9 +1955,7 @@ def fill_table(player_list):
         font.setPointSize(11)
         my_win.tableView.setFont(font)
         my_win.tableView.horizontalHeader().setFont(QFont("Verdana", 13, QFont.Bold)) # делает заголовки жирный и размер 13
-        # y_win.setStyleSheet("#MainWindow{background-color:blue}")
-        # my_win.tableView.horizontalHeader().setStyleSheet("#tableView{background-color:blue}")
-           
+ 
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
         my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
@@ -1975,6 +1976,7 @@ def fill_table(player_list):
             row = 0
             my_win.statusbar.showMessage(
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
+    my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
     my_win.tableView.show()
  
 
@@ -2056,7 +2058,6 @@ def fill_table_results():
     #         QBrush(QColor(0, 0, 0)))  # в черный цвет 2-ого
                     
     fill_table(player_list)
-
 
 
 def fill_table_choice():
@@ -2377,7 +2378,6 @@ def load_combobox_filter_group_semifinal():
     my_win.comboBox_filter_group_sf.addItem("все группы")
     gr_txt = [f"{i} группа" for i in range(1, kg + 1)]
     my_win.comboBox_filter_group_sf.addItems(gr_txt)
-
 
 
 def load_comboBox_filter_rejting():
@@ -5163,12 +5163,12 @@ def setka_type(none_player):
     """сетка ставит очки в зависимости от неявки игрока, встреча состоялась ли пропуск встречи -bye-"""
     sc_total = []
     if my_win.lineEdit_player1_fin.text() == "X" or my_win.lineEdit_player2_fin.text() == "X":
-        if my_win.lineEdit_player1_fin.text() != "X":
-            winner = my_win.lineEdit_player1_fin.text()
-            loser = my_win.lineEdit_player2_fin.text()
-        else:
-            winner = my_win.lineEdit_player2_fin.text()
-            loser = my_win.lineEdit_player1_fin.text()
+        # if my_win.lineEdit_player1_fin.text() != "X":
+        #     winner = my_win.lineEdit_player1_fin.text()
+        #     loser = my_win.lineEdit_player2_fin.text()
+        # else:
+        #     winner = my_win.lineEdit_player2_fin.text()
+        #     loser = my_win.lineEdit_player1_fin.text()
         w = ""
         l = ""
         st1 = ""
@@ -12934,40 +12934,40 @@ def color_mesta(data, first_mesto, table):
     return style_color   
 
 
-def last_competition():
-    """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
-    title = Title.select().order_by(Title.data_start.desc())
-    i = 0
-    for t in title:
-        full_name = t.full_name_comp
-        if i > 5:
-            break
-        if i == 0: 
-            if full_name != "":
-                my_win.first_comp_Action.setText(full_name)
-            else:
-                my_win.first_comp_Action.setText("Пусто")
-        elif i == 1: 
-            if full_name != "":
-                my_win.second_comp_Action.setText(full_name)
-            else:
-                my_win.second_comp_Action.setText("Пусто")
-        elif i == 2: 
-            if full_name != "":
-                my_win.third_comp_Action.setText(full_name)
-            else:
-                my_win.third_comp_Action.setText("Пусто")
-        elif i == 3: 
-            if full_name != "":
-                my_win.fourth_comp_Action.setText(full_name)
-            else:
-                my_win.fourth_comp_Action.setText("Пусто")
-        elif i == 4: 
-            if full_name != "":
-                my_win.fifth_comp_Action.setText(full_name)
-            else:
-                my_win.fifth_comp_Action.setText("Пусто")
-        i += 1
+# def last_competition():
+#     """заполняе меню -последние- прошедшими соревнованиями 5 штук"""
+#     title = Title.select().order_by(Title.data_start.desc())
+#     i = 0
+#     for t in title:
+#         full_name = t.full_name_comp
+#         if i > 5:
+#             break
+#         if i == 0: 
+#             if full_name != "":
+#                 my_win.first_comp_Action.setText(full_name)
+#             else:
+#                 my_win.first_comp_Action.setText("Пусто")
+#         elif i == 1: 
+#             if full_name != "":
+#                 my_win.second_comp_Action.setText(full_name)
+#             else:
+#                 my_win.second_comp_Action.setText("Пусто")
+#         elif i == 2: 
+#             if full_name != "":
+#                 my_win.third_comp_Action.setText(full_name)
+#             else:
+#                 my_win.third_comp_Action.setText("Пусто")
+#         elif i == 3: 
+#             if full_name != "":
+#                 my_win.fourth_comp_Action.setText(full_name)
+#             else:
+#                 my_win.fourth_comp_Action.setText("Пусто")
+#         elif i == 4: 
+#             if full_name != "":
+#                 my_win.fifth_comp_Action.setText(full_name)
+#             else:
+#                 my_win.fifth_comp_Action.setText("Пусто")
+#         i += 1
 
 
 def tours_list(cp):

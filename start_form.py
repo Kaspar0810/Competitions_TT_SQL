@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'start_form.ui'
+# Form implementation generated from reading ui file '/Users/aleksandr/PycharmProjects/Competitions_TT_SQL/UI/start_form.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(743, 245)
+        Form.resize(740, 246)
         Form.setAutoFillBackground(False)
         self.LinkButton = QtWidgets.QCommandLinkButton(Form)
         self.LinkButton.setGeometry(QtCore.QRect(150, 53, 591, 31))
@@ -78,12 +78,12 @@ class Ui_Form(object):
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_2.setObjectName("line_2")
         self.line_3 = QtWidgets.QFrame(Form)
-        self.line_3.setGeometry(QtCore.QRect(10, 180, 723, 16))
+        self.line_3.setGeometry(QtCore.QRect(10, 193, 723, 16))
         self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_3.setObjectName("line_3")
         self.progressBar = QtWidgets.QProgressBar(Form)
-        self.progressBar.setGeometry(QtCore.QRect(10, 200, 717, 24))
+        self.progressBar.setGeometry(QtCore.QRect(10, 215, 717, 24))
         self.progressBar.setProperty("value", 24)
         self.progressBar.setObjectName("progressBar")
         self.layoutWidget = QtWidgets.QWidget(Form)
@@ -126,7 +126,7 @@ class Ui_Form(object):
         self.Button_R.setObjectName("Button_R")
         self.verticalLayout.addWidget(self.Button_R)
         self.layoutWidget1 = QtWidgets.QWidget(Form)
-        self.layoutWidget1.setGeometry(QtCore.QRect(153, 150, 581, 41))
+        self.layoutWidget1.setGeometry(QtCore.QRect(153, 150, 581, 32))
         self.layoutWidget1.setObjectName("layoutWidget1")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.layoutWidget1)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -150,6 +150,9 @@ class Ui_Form(object):
         self.horizontalLayout.addWidget(self.label_4)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
+        self.comboBox_arhive_year = QtWidgets.QComboBox(self.layoutWidget1)
+        self.comboBox_arhive_year.setObjectName("comboBox_arhive_year")
+        self.horizontalLayout.addWidget(self.comboBox_arhive_year)
         self.Button_open = QtWidgets.QPushButton(self.layoutWidget1)
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
@@ -174,4 +177,4 @@ class Ui_Form(object):
         self.Button_new.setText(_translate("Form", "Новые"))
         self.Button_old.setText(_translate("Form", "Архив"))
         self.Button_R.setText(_translate("Form", "Рейтинг"))
-        self.Button_open.setText(_translate("Form", "Открыть"))
+        self.Button_open.setText(_translate("Form", "Показать"))

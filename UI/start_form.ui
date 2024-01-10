@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>743</width>
-    <height>245</height>
+    <width>740</width>
+    <height>246</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -165,7 +165,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>180</y>
+     <y>193</y>
      <width>723</width>
      <height>16</height>
     </rect>
@@ -178,7 +178,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>200</y>
+     <y>215</y>
      <width>717</width>
      <height>24</height>
     </rect>
@@ -269,7 +269,7 @@
      <x>153</x>
      <y>150</y>
      <width>581</width>
-     <height>41</height>
+     <height>32</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -312,6 +312,9 @@
      </spacer>
     </item>
     <item>
+     <widget class="QComboBox" name="comboBox_arhive_year"/>
+    </item>
+    <item>
      <widget class="QPushButton" name="Button_open">
       <property name="font">
        <font>
@@ -323,7 +326,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Открыть</string>
+       <string>Показать</string>
       </property>
      </widget>
     </item>
