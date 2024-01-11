@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>740</width>
-    <height>246</height>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -165,7 +165,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>193</y>
+     <y>187</y>
      <width>723</width>
      <height>16</height>
     </rect>
@@ -178,7 +178,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>215</y>
+     <y>204</y>
      <width>717</width>
      <height>24</height>
     </rect>
@@ -263,23 +263,48 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>153</x>
-     <y>150</y>
-     <width>581</width>
-     <height>32</height>
+     <x>154</x>
+     <y>160</y>
+     <width>71</width>
+     <height>16</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <property name="spacing">
-     <number>0</number>
-    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="font">
+    <font>
+     <family>Times New Roman</family>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <italic>true</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Период</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>213</x>
+     <y>150</y>
+     <width>511</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <widget class="QLabel" name="label_4">
+     <widget class="QComboBox" name="comboBox_arhive_year">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -287,14 +312,8 @@
       <property name="font">
        <font>
         <family>Times New Roman</family>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <italic>true</italic>
-        <bold>true</bold>
+        <pointsize>12</pointsize>
        </font>
-      </property>
-      <property name="text">
-       <string/>
       </property>
      </widget>
     </item>
@@ -312,23 +331,43 @@
      </spacer>
     </item>
     <item>
-     <widget class="QComboBox" name="comboBox_arhive_year"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="Button_open">
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <italic>true</italic>
-        <bold>true</bold>
-       </font>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>1</number>
       </property>
-      <property name="text">
-       <string>Показать</string>
-      </property>
-     </widget>
+      <item>
+       <widget class="QPushButton" name="Button_open">
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <italic>true</italic>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Открыть</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Button_view_pdf">
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <italic>true</italic>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Показать ПДФ</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

@@ -33,6 +33,7 @@ import sys
 import sqlite3
 import pathlib
 from pathlib import Path
+from dateutil.relativedelta import relativedelta
 import random
 # import time
 os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
@@ -871,9 +872,9 @@ class StartWindow(QMainWindow, Ui_Form):
         self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp)
         self.Button_open.setEnabled(False)
+        self.Button_view_pdf.setEnabled(False)
         self.comboBox_arhive_year.setEnabled(False)
         self.comboBox_arhive_year.currentTextChanged.connect(self.choice_competition)
-        # self.comboBox_arhive_year.addItem("-выберите год-")
         self.pb = QProgressBar()
         self.pb.setMinimum(0)
         self.pb.setMaximum(100)
@@ -901,9 +902,10 @@ class StartWindow(QMainWindow, Ui_Form):
         my_win.show()
 
     def open(self):
-        full_name = db_select_title()
+        go_to()
+        # full_name = db_select_title()
         self.close()
-        my_win.setWindowTitle(f"Соревнования по настольному теннису. {full_name}")
+        # my_win.setWindowTitle(f"Соревнования по настольному теннису. {full_name}")
         my_win.show()
 
     def new(self):
@@ -950,19 +952,23 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def choice_competition(self):
         """выбор соревнования из архива"""
+        full_name_list = []
+        fir_window.comboBox.clear()
         index = fir_window.comboBox_arhive_year.currentIndex()
-        data_text = fir_window.comboBox_arhive_year.currentText( )
+        data_text = fir_window.comboBox_arhive_year.currentText()
         if index > 0:
             date_object = datetime.strptime(data_text, '%Y-%B').date()
-            title = Title.select().where((Title.data_start >= date_object) & (Title.data_start < '2023-11-01'))
-            count = len(title)
-            print(date_object)
-            # Person.select().where((Person.birthday > d1940) & (Person.birthday < d1960))
-
+            end_date = date_object + relativedelta(months=1)
+            title = Title.select().where((Title.data_start >= date_object) & (Title.data_start < end_date))
+            for m in title:
+                full_comp = m.full_name_comp
+                full_name_list.append(full_comp)
+            fir_window.comboBox.addItems(full_name_list)
+        fir_window.Button_open.setEnabled(True)
+        fir_window.Button_view_pdf.setEnabled(True)
 
     def r_load(self):
         pass
-
 
     def load_old(self):
         """загружает в комбобокс архивные соревнования"""
@@ -1196,29 +1202,29 @@ fir_window = StartWindow()  # Создаём объект класса ExampleAp
 fir_window.show()  # Показываем окно
 
 
-def change_sroki():
-    """изменение текста label формы стартового окна в зависимости от выбора соревнования"""
-    comp_data = {}
-    data_comp = []
-    data_comp_tmp = []
-    t_id = Title.select().order_by(Title.id.desc())
-    count = len(t_id)
-    i = 0
-    for k in t_id:
-        data_st = k.data_start
-        data_end = k.data_end
-        data_comp.append(data_st)
-        data_comp.append(data_end)
-        data_comp_tmp = data_comp.copy()
-        data_comp.clear()
-        if i != 0:
-            comp_data[i - 1] = data_comp_tmp
-        i += 1
-        if i == 6 or i == count:
-            break
-    index = fir_window.comboBox.currentIndex()
-    data_list = comp_data[index]
-    fir_window.label_4.setText(f"сроки: с {data_list[0]} по {data_list[1]}")
+# def change_sroki():
+#     """изменение текста label формы стартового окна в зависимости от выбора соревнования"""
+#     comp_data = {}
+#     data_comp = []
+#     data_comp_tmp = []
+#     t_id = Title.select().order_by(Title.id.desc())
+#     count = len(t_id)
+#     i = 0
+#     for k in t_id:
+#         data_st = k.data_start
+#         data_end = k.data_end
+#         data_comp.append(data_st)
+#         data_comp.append(data_end)
+#         data_comp_tmp = data_comp.copy()
+#         data_comp.clear()
+#         if i != 0:
+#             comp_data[i - 1] = data_comp_tmp
+#         i += 1
+#         if i == 6 or i == count:
+#             break
+#     index = fir_window.comboBox.currentIndex()
+#     data_list = comp_data[index]
+#     # fir_window.label_4.setText(f"сроки: с {data_list[0]} по {data_list[1]}")
 
 
 #  ==== наполнение комбобоксов ==========
@@ -1426,14 +1432,16 @@ def go_to():
     """переход на предыдущие соревнования и обратно при нажатии меню -перейти к- или из меню -последние-"""
     msgBox = QMessageBox
     sender = my_win.sender()
-    tit = Title.get(Title.id == title_id())
-    name = tit.name
-    data = tit.data_start
-    gamer_current = tit.gamer
+    # full_name = fir_window.comboBox.currentText()
+    # tit = Title.get(Title.full_name_comp == full_name)
+    # name = tit.name
+    # data = tit.data_start
+    # gamer_current = tit.gamer
     # полное название текущих соревнований
-    full_name_current = f"{name}.{data}.{gamer_current}"
-
-    if sender == my_win.first_comp_Action:
+    #  full_name_current = f"{name}.{data}.{gamer_current}"
+    if sender == fir_window.Button_open:
+        full_name = fir_window.comboBox.currentText()
+    elif sender == my_win.first_comp_Action:
         full_name = my_win.first_comp_Action.text()
     elif sender == my_win.second_comp_Action:
         full_name = my_win.second_comp_Action.text()
@@ -1446,13 +1454,14 @@ def go_to():
     elif sender == my_win.go_to_Action:
         full_name = my_win.go_to_Action.text()  # полное название к которым переходим 
         # присваиваем новый текст соревнований в меню -перейти к-
-        my_win.go_to_Action.setText(full_name_current)
+    #     my_win.go_to_Action.setText(full_name_current)
 
-    if full_name == full_name_current:
-        reply = msgBox.information(my_win, 'Уведомление', 'Данные соревнования уже открыты.',
-                                    msgBox.Ok)
+    # if full_name == full_name_current:
+    #     reply = msgBox.information(my_win, 'Уведомление', 'Данные соревнования уже открыты.',
+    #                                 msgBox.Ok)
   
     titles = Title.get(Title.full_name_comp == full_name)
+    id_title = titles.id
     gamer = titles.gamer
     my_win.lineEdit_title_nazvanie.setText(titles.name)
     my_win.lineEdit_title_vozrast.setText(titles.vozrast)
@@ -1466,7 +1475,7 @@ def go_to():
     my_win.lineEdit_title_gamer.setText(titles.gamer)
     my_win.tabWidget.setCurrentIndex(0)  # открывает вкладку титул
     tab_enabled(gamer)
-    player_list = Player.select().where(Player.title_id == title_id())
+    player_list = Player.select().where(Player.title_id == id_title)
     count_player = len(player_list)
     my_win.label_46.setText(f"Всего: {count_player} участников")
     list_player_pdf(player_list)
@@ -1491,7 +1500,7 @@ def db_select_title():
         gamer = title.gamer
     # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
     else:
-        change_sroki()
+        # change_sroki()
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[key +  1:]
@@ -14035,7 +14044,7 @@ my_win.toolBox.currentChanged.connect(tool_page)
 my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 # ======== изменение индекса комбобоксов ===========
 
-fir_window.comboBox.currentTextChanged.connect(change_sroki)
+# fir_window.comboBox.currentTextChanged.connect(change_sroki)
 
 
 my_win.comboBox_table_1.currentTextChanged.connect(kol_player_in_final)
