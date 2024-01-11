@@ -866,13 +866,14 @@ class StartWindow(QMainWindow, Ui_Form):
         self.setWindowIcon(QIcon("CTT.png"))
         self.Button_open.clicked.connect(self.open)
         self.Button_new.clicked.connect(self.new)
-        self.Button_old.clicked.connect(self.load_old)
-        # self.Button_old.clicked.connect(self.last_competition)
+        # self.Button_old.clicked.connect(self.load_old)
+        self.Button_old.clicked.connect(self.last_competition)
         self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp)
         self.Button_open.setEnabled(False)
         self.comboBox_arhive_year.setEnabled(False)
-        self.comboBox_arhive_year.addItem("-выберите год-")
+        self.comboBox_arhive_year.currentTextChanged.connect(self.choice_competition)
+        # self.comboBox_arhive_year.addItem("-выберите год-")
         self.pb = QProgressBar()
         self.pb.setMinimum(0)
         self.pb.setMaximum(100)
@@ -933,10 +934,31 @@ class StartWindow(QMainWindow, Ui_Form):
         else:
             return
 
-    def last_competition():
+    def last_competition(self):
         """заполняет меню -последние- прошедшими соревнованиями 5 штук"""
+        data_list = []
+        fir_window.comboBox_arhive_year.clear()
         fir_window.comboBox_arhive_year.setEnabled(True)
-    
+        titles = Title.select()
+        for t in titles:
+            date_start = t.data_start
+            str_data = date_start.strftime("%Y-%B")
+            if str_data not in data_list:
+                data_list.append(str_data)
+        data_list.insert(0, "-выберите дату-")
+        fir_window.comboBox_arhive_year.addItems(data_list)
+
+    def choice_competition(self):
+        """выбор соревнования из архива"""
+        index = fir_window.comboBox_arhive_year.currentIndex()
+        data_text = fir_window.comboBox_arhive_year.currentText( )
+        if index > 0:
+            date_object = datetime.strptime(data_text, '%Y-%B').date()
+            title = Title.select().where((Title.data_start >= date_object) & (Title.data_start < '2023-11-01'))
+            count = len(title)
+            print(date_object)
+            # Person.select().where((Person.birthday > d1940) & (Person.birthday < d1960))
+
 
     def r_load(self):
         pass
@@ -2397,17 +2419,12 @@ def load_comboBox_filter_rejting():
             r_data = r_data_w[0]
         else:
             r_data = r_data_m[0] 
-        # r_region = r_data.select().where(r_data.r_region == reg_text)
     elif cur_index == 1: # если рейтинг за январь
         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
             r_data = r_data_w[1]
         else:
            r_data = r_data_m[1]
-        # r_region = r_data.select().where(r_data.r1_region == reg_text)
-    # if reg_index == -1 or reg_index == 0:
     player_list = r_data.select()
-    # else:
-    #     player_list = r_region
 
     for k in player_list:
         region = k.r_region
@@ -14020,6 +14037,7 @@ my_win.spinBox_kol_group.textChanged.connect(kol_player_in_group)
 
 fir_window.comboBox.currentTextChanged.connect(change_sroki)
 
+
 my_win.comboBox_table_1.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_2.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_3.currentTextChanged.connect(kol_player_in_final)
@@ -14062,7 +14080,6 @@ my_win.comboBox_referee.currentTextChanged.connect(referee)
 my_win.comboBox_secretary.currentTextChanged.connect(referee)
 my_win.comboBox_kategor_ref.currentTextChanged.connect(add_referee_to_db)
 my_win.comboBox_kategor_sec.currentTextChanged.connect(add_referee_to_db)
-
 
 
 # =======  отслеживание переключение чекбоксов =========
