@@ -27,7 +27,7 @@ from itertools import *
 import os
 import openpyxl as op
 import pandas as pd
-import numpy as np
+# import numpy as np
 import contextlib
 import sys
 import sqlite3
@@ -35,6 +35,7 @@ import pathlib
 from pathlib import Path
 from dateutil.relativedelta import relativedelta
 import random
+from sys import platform
 # import time
 os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
 # app = QtGui.QApplication(sys.argv)
@@ -806,7 +807,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def view(self):
         view()
-    
+
     def vid_edit(self):
         change_page_vid()
 
@@ -867,10 +868,11 @@ class StartWindow(QMainWindow, Ui_Form):
         self.setWindowIcon(QIcon("CTT.png"))
         self.Button_open.clicked.connect(self.open)
         self.Button_new.clicked.connect(self.new)
-        # self.Button_old.clicked.connect(self.load_old)
+        self.Button_view_pdf.clicked.connect(self.view_competition_on_arhive)
         self.Button_old.clicked.connect(self.last_competition)
         self.Button_R.clicked.connect(self.r_load)
         self.LinkButton.clicked.connect(self.last_comp)
+
         self.Button_open.setEnabled(False)
         self.Button_view_pdf.setEnabled(False)
         self.comboBox_arhive_year.setEnabled(False)
@@ -903,7 +905,6 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         go_to()
-        # full_name = db_select_title()
         self.close()
         # my_win.setWindowTitle(f"Соревнования по настольному теннису. {full_name}")
         my_win.show()
@@ -1005,6 +1006,31 @@ class StartWindow(QMainWindow, Ui_Form):
                
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
+
+
+    def view_competition_on_arhive(self):
+        """Просмотр полного соревнования из архива"""
+        msgBox = QMessageBox()
+        full_name = fir_window.comboBox.currentText()
+        t_id = Title.select().where(Title.full_name_comp == full_name).get()
+        catalog = 2
+        change_dir(catalog)
+        view_file = t_id.pdf_comp
+        flag = open_close_file(view_file)
+        if flag is False:
+            result = msgBox.information(my_win, "", "Такой файл не существует.\n"
+                                                    "необходимо его создать!",
+                                        msgBox.Ok)
+            return
+        else:
+            if platform == "linux" or platform == "linux2":  # linux
+                pass
+            elif platform == "darwin":  # OS X
+                os.system(f"open {view_file}")
+            elif platform == "win32":  # Windows...
+                os.system(f"{view_file}")
+            os.chdir("..")
+
 
 class ToolTip(): # создание всплывающих подсказок
     my_win.Button_made_R_file.setToolTip("Создание файла Excel для обсчета рейтинга")
@@ -1432,13 +1458,7 @@ def go_to():
     """переход на предыдущие соревнования и обратно при нажатии меню -перейти к- или из меню -последние-"""
     msgBox = QMessageBox
     sender = my_win.sender()
-    # full_name = fir_window.comboBox.currentText()
-    # tit = Title.get(Title.full_name_comp == full_name)
-    # name = tit.name
-    # data = tit.data_start
-    # gamer_current = tit.gamer
-    # полное название текущих соревнований
-    #  full_name_current = f"{name}.{data}.{gamer_current}"
+
     if sender == fir_window.Button_open:
         full_name = fir_window.comboBox.currentText()
     elif sender == my_win.first_comp_Action:
@@ -2350,6 +2370,7 @@ def load_combobox_filter_final():
     """заполняет комбобокс фильтр финалов для таблицы результаты"""
     my_win.comboBox_filter_final.clear()
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    fin = []
     for sys in system:
         if sys.stage == "Одна таблица":
             if sys.choice_flag is True:
@@ -2772,7 +2793,9 @@ def page():
         my_win.Button_Ok_fin.setEnabled(False)
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(False)
         load_combobox_filter_final()
-        player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Финальный"))
+        count = len(sf)
+        stage = "Одна таблица" if count == 1 else "Финальный"
+        player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
         fill_table(player_list)
         load_combo()
         visible_field()
@@ -3353,8 +3376,6 @@ def view():
     sender = my_win.sender()
     tab = my_win.tabWidget.currentIndex()
     name_file = ""
-    if tab == 3 or tab == 4 or tab == 5: # если просмотр результатов игр
-        made_pdf_table_for_view(sender)
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
 
@@ -3363,6 +3384,8 @@ def view():
         change_dir(catalog)
         view_file = f"{short_name}.pdf"
     else: # просмотр отдельных страниц в каталоге /table_pdf
+        if tab == 3 or tab == 4 or tab == 5: # если просмотр результатов игр
+            made_pdf_table_for_view(sender)
         catalog = 1
         change_dir(catalog)
         if sender == my_win.view_list_Action:
@@ -5518,6 +5541,7 @@ def filter_fin(pl=False):
                 row = 0
                 fl = filter.select().where(Result.system_stage == "Финальный")
                 fltr = fl.select().where((Result.player1 == name)| (Result.player2 == name)) # объединение запросов (отбор по 2-ум столбцам)
+                count = len(fltr)
         # один из финалов встречи которые не сыгранные
         elif final != "все финалы" and played == "не сыгранные" and num_game_fin == "" and round == "":
             fl = filter.select().where(Result.system_id == id_system)
@@ -9568,6 +9592,7 @@ def table_made(pv, stage):
     short_name = t_id.short_name_comp
 
     if stage == "Одна таблица":
+        title = "Финал"
         name_table = f"{short_name}_one_table.pdf"
     elif stage == "Предварительный":
         title = "Предварительный этап"
@@ -13878,6 +13903,7 @@ def find_referee_in_db(text):
 
 def open_close_file(view_file):
     # Проверить, существует
+    # change_dir(catalog)
     if os.path.exists(view_file):
         flag = True
     else:
