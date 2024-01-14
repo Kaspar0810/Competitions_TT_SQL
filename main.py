@@ -18,7 +18,7 @@ from PyQt5 import *
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtGui import QIcon, QBrush, QColor, QFont, QPalette
 from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem, QItemDelegate, QStyledItemDelegate
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem, QLineEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem, QLineEdit, QLabel
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget, QTableView, QColorDialog
 from PyQt5 import QtGui, QtWidgets, QtCore
 from models import *
@@ -906,7 +906,6 @@ class StartWindow(QMainWindow, Ui_Form):
     def open(self):
         go_to()
         self.close()
-        # my_win.setWindowTitle(f"Соревнования по настольному теннису. {full_name}")
         my_win.show()
 
     def new(self):
@@ -1703,7 +1702,7 @@ def title_made():
     with db:
         System.create_table()
         sys = System(id=s, title_id=title, total_athletes=0, total_group=0, max_player=0, stage="", page_vid="",
-                     label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True).save()
+                     label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True, stage_exit="", mesta_exit="", no_game="").save()
 
 
 def data_title_string():
@@ -2153,15 +2152,30 @@ def debtor_R():
     """показывает список должников оплаты рейтинга"""
     player_list = Player.select().where(Player.title_id == title_id())
     player_debitor_R = player_list.select().where(Player.pay_rejting == "долг")
+    dolg = len(player_debitor_R)
+    if dolg == 1:
+        end_word = "к"
+    elif dolg == 2 or dolg == 3 or dolg == 4:
+        end_word = "ка"
+    else:
+        end_word = "ков"    
     if my_win.checkBox_11.isChecked():       
         if len(player_debitor_R) == 0:
             my_win.label_dolg_R.setText("Нет спортсменов без лицензии.")
             my_win.textEdit.setText("Спортсменов, не оплативших регистрационыый взнос за рейтинг нет.")
+            my_win.label_dolg_R.setStyleSheet("color: black")
+        else:
+            my_win.label_dolg_R.setStyleSheet("color: red")
+            my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участник{end_word}.")
         player_list = player_debitor_R
     else:
         my_win.Button_pay_R.setEnabled(False)
         my_win.textEdit.clear()
-    my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участников.")
+    if len(player_debitor_R) > 0:
+        my_win.label_dolg_R.setStyleSheet("color: red")
+    else:
+        my_win.label_dolg_R.setStyleSheet("color: black")
+    my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участник{end_word}.")
     fill_table(player_list)
 
 
@@ -2526,6 +2540,10 @@ def page():
         fill_table(player_list)  # заполняет TableWidget списком игроков
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
+        if count_debitor_R == 0:
+            my_win.label_dolg_R.setStyleSheet("color: black")
+        else:
+            my_win.label_dolg_R.setStyleSheet("color: red")
         my_win.label_dolg_R.setText(f"Без лицензии: {count_debitor_R} {end_word}")
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
@@ -2811,6 +2829,7 @@ def page():
                 break
         znak = ng.find("3")
         my_win.checkBox_no_play_3.setChecked(True) if znak != -1 else my_win.checkBox_no_play_3.setChecked(False)
+        my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
     elif tb == 6: # вкладка -рейтинг-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
@@ -13390,6 +13409,7 @@ def made_file_excel_for_rejting():
     """создание файла Excel для обсчета рейтинга"""
     result = Result.select().where(Result.title_id == title_id())
     player_result = result.select().where(Result.points_loser != 0).order_by(Result.winner)
+
     book = op.Workbook()
     worksheet = book.active
     names_headers = ["Победитель", "Проигравший", "Счет"]
@@ -13400,6 +13420,10 @@ def made_file_excel_for_rejting():
     for l in player_result:
         pl_win = l.winner
         pl_los = l.loser
+        id_win = Player.select().where(Player.full_name == pl_win).get()
+        pl_win = id_win.player
+        id_los =  Player.select().where(Player.full_name == pl_los).get() 
+        pl_los = id_los.player
         score = l.score_in_game
         c1 = worksheet.cell(row = k, column = 1)
         c1.value = pl_win
@@ -13413,7 +13437,9 @@ def made_file_excel_for_rejting():
     short_name = t_id.short_name_comp 
     worksheet.column_dimensions['A'].width = 40
     worksheet.column_dimensions['b'].width = 40
-    book.save(f"{short_name}_report.xlsx")
+    f_name = f"{short_name}_report.xlsx"
+    filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
+    book.save(filename)
     
 
 def button_move_enabled():
@@ -14196,7 +14222,7 @@ my_win.Button_reset_fltr_in_R.clicked.connect(clear_filter_rejting_list)
 my_win.Button_sort_alf_R.clicked.connect(filter_rejting_list)
 my_win.Button_sort_rejting_in_R.clicked.connect(filter_rejting_list)
 my_win.Button_filter_R.clicked.connect(filter_rejting_list)
-my_win.Button_made_R_file.clicked.connect(made_file_excel_for_rejting)
+my_win.Button_made_R_file.clicked.connect(made_file_excel_for_rejting) # создагие excel файла для рейтинга
 my_win.Button_made_one_file_pdf.clicked.connect(merdge_pdf_files)
 
 my_win.Button_up.clicked.connect(move_row_in_tablewidget)
