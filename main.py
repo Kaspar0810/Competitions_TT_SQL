@@ -4461,7 +4461,7 @@ def filter_rejting_list():
     region_txt = my_win.comboBox_filter_region_in_R.currentText()
     city_txt = my_win.comboBox_filter_city_in_R.currentText()
     date_txt = my_win.comboBox_filter_date_in_R.currentText()
-
+ 
     if cur_index == 0:
         r_data = r_data_w[0] if gamer in gamer_w else r_data_m[0] # текущий рейтинг
         rejting_name = r_data.r_fname
@@ -4477,39 +4477,51 @@ def filter_rejting_list():
         rejting_city = r_data.r1_city
         rejting_date = r_data.r1_bithday
 
-    if sender == my_win.Button_sort_rejting_in_R: 
-        if date_txt != "":
-            player_list = r_data.select().where(rejting_date > after_date).order_by(rejting_list.desc())       
-        elif region_txt == "" and city_txt == "":
-            player_list = r_data.select().order_by(rejting_list.desc()) 
-        elif region_txt != "" and city_txt == "":
-            player_list = r_data.select().where(rejting_region == region_txt).order_by(rejting_list.desc())
-        elif region_txt == "" and city_txt != "":
-            player_list = r_data.select().where(rejting_city == city_txt).order_by(rejting_list.desc())
-    elif sender == my_win.Button_sort_alf_R: 
-        if region_txt == "" and city_txt == "":
-            player_list = r_data.select().order_by(rejting_name)
-        elif region_txt != "" and city_txt == "":
-            player_list = r_data.select().where(rejting_region == region_txt).order_by(rejting_name)
-        elif region_txt == "" and city_txt != "":
-            player_list = r_data.select().where(rejting_city == city_txt).order_by(rejting_name)
-    elif date_txt != "":
+    if date_txt != "":
         znak = date_txt.find(" ")
         year_fltr = int(date_txt[znak: znak + 3])
         year_current = int(datetime.today().strftime("%Y")) # текущий год
         year_bday = year_current - year_fltr + 1
         after_date = date(year_bday, 1, 1)
         player_list = r_data.select().where(rejting_date > after_date)
-    else:
-        if region_txt == "" and city_txt == "":
-            player_list = r_data.select()
-        elif region_txt != "" and city_txt != "":
-            player_list = r_data.select().where((rejting_region == region_txt) & (rejting_city == city_txt))
-        elif region_txt != "" and city_txt == "":
-            player_list = r_data.select().where(rejting_region == region_txt)
-        elif region_txt == "" and city_txt != "":
-            player_list = r_data.select().where(rejting_city == city_txt)
 
+    if region_txt == "" and city_txt == "" and date_txt == "":
+        player_list = r_data.select()
+    elif region_txt != "" and city_txt != "" and date_txt == "":
+        player_list = r_data.select().where((rejting_region == region_txt) & (rejting_city == city_txt))
+    elif region_txt != "" and city_txt == "" and date_txt != "":
+        player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt))
+    elif region_txt == "" and city_txt != "" and date_txt != "":
+        player_list = r_data.select().where((rejting_date > after_date) & (rejting_city == city_txt))
+    elif region_txt != "" and city_txt != "" and date_txt != "":
+        player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt) & (rejting_city == city_txt))
+
+    if sender == my_win.Button_sort_rejting_in_R: 
+        if date_txt != "" and region_txt == "" and city_txt == "":
+            player_list = r_data.select().where(rejting_date > after_date).order_by(rejting_list.desc())       
+        elif region_txt == "" and city_txt == "" and date_txt == "":
+            player_list = r_data.select().order_by(rejting_list.desc()) 
+        elif region_txt != "" and city_txt == "" and date_txt == "":
+            player_list = r_data.select().where(rejting_region == region_txt).order_by(rejting_list.desc())
+        elif region_txt != "" and city_txt != "" and date_txt == "":
+            player_list = r_data.select().where((rejting_region == region_txt) & (rejting_city == city_txt)).order_by(rejting_list.desc())  
+        elif region_txt != "" and city_txt == "" and date_txt != "":
+            player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt)).order_by(rejting_list.desc())  
+        elif region_txt != "" and city_txt != "" and date_txt != "":
+            player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt) & (rejting_city == city_txt)).order_by(rejting_list.desc())    
+    elif sender == my_win.Button_sort_alf_R: 
+        if region_txt == "" and city_txt == "" and date_txt == "":
+            player_list = r_data.select().order_by(rejting_name)
+        elif date_txt != "" and region_txt == "" and city_txt == "":
+            player_list = r_data.select().where(rejting_date > after_date).order_by(rejting_name)
+        elif region_txt != "" and city_txt == "" and date_txt == "":
+            player_list = r_data.select().where(rejting_region == region_txt).order_by(rejting_name)
+        elif region_txt != "" and city_txt == "" and date_txt != "":
+            player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt)).order_by(rejting_name)
+        elif region_txt != "" and city_txt != "" and date_txt == "":
+            player_list = r_data.select().where((rejting_region == region_txt) & (rejting_city == city_txt)).order_by(rejting_name)
+        elif region_txt != "" and city_txt != "" and date_txt != "":
+            player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt) & (rejting_city == city_txt)).order_by(rejting_name)
     fill_table(player_list) # заполняет таблицу -tablewidget- списком спортсменов
 
 

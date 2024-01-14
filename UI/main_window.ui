@@ -89,13 +89,13 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>3</x>
         <y>33</y>
         <width>821</width>
-        <height>201</height>
+        <height>206</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -4388,15 +4388,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4878,8 +4878,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5270,8 +5270,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5688,8 +5688,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5995,8 +5995,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6543,7 +6543,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>266</width>
+        <width>221</width>
         <height>104</height>
        </rect>
       </property>
@@ -6846,8 +6846,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
