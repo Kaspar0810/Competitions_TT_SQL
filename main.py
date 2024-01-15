@@ -851,9 +851,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-
+['Breeze', 'Oxygen', 'QtCurve', 'Windows', 'Fusion']
 app = QApplication(sys.argv)
 my_win = MainWindow()
+# app.setStyle('Breeze')
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.setWindowIcon(QIcon("CTT.png"))
 my_win.resize(1390, 804)
@@ -903,7 +904,7 @@ class StartWindow(QMainWindow, Ui_Form):
         tab_enabled(gamer)
         self.close()
         if gamer in sex:
-            my_win.setStyleSheet("#MainWindow{background-color:pink}")
+            my_win.setStyleSheet("#MainWindow{background-color:lightpink}")
         else:
             my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
         my_win.show()
@@ -1460,7 +1461,6 @@ def db_insert_title(title_str):
 
 def go_to():
     """переход на предыдущие соревнования и обратно при нажатии меню -перейти к- или из меню -последние-"""
-    msgBox = QMessageBox
     sender = my_win.sender()
     sex = ["Девочки", "Девушки", "Женщины"]
 
@@ -1482,11 +1482,13 @@ def go_to():
     titles = Title.get(Title.full_name_comp == full_name)
     id_title = titles.id
     gamer = titles.gamer
-    title_last = Title.select().order_by(Title.id)
+    title_last = Title.select().order_by(Title.id.desc()).get()
     id_title_last = title_last.id
+    title = Title.select().order_by(Title.id.desc())
+
     # смена цвета фона формы в зависимости от пола играющих
     if gamer in sex:
-        my_win.setStyleSheet("#MainWindow{background-color:pink}")
+        my_win.setStyleSheet("#MainWindow{background-color:lightpink}")
     else:
         my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
         
@@ -1506,6 +1508,19 @@ def go_to():
     count_player = len(player_list)
     my_win.label_46.setText(f"Всего: {count_player} участников")
     list_player_pdf(player_list)
+    # ==== смена названия в меню -перейти к-
+    if id_title == id_title_last:
+        score = 2
+    else:
+        score = 1
+
+    n = 0
+    for t in title:
+        full_name_current = t.full_name_comp
+        n += 1
+        if n == score:
+            my_win.go_to_Action.setText(full_name_current) 
+            break   
 
 
 def db_select_title():
@@ -1527,7 +1542,6 @@ def db_select_title():
         gamer = title.gamer
     # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
     else:
-        # change_sroki()
         txt = fir_window.comboBox.currentText()
         key = txt.rindex(".")
         gamer = txt[key +  1:]
