@@ -898,9 +898,14 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def last_comp(self):
         """открытие последних соревнований"""
+        sex = ["Девочки", "Девушки", "Женщины"]
         gamer = db_select_title()
         tab_enabled(gamer)
         self.close()
+        if gamer in sex:
+            my_win.setStyleSheet("#MainWindow{background-color:pink}")
+        else:
+            my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
         my_win.show()
 
     def open(self):
@@ -1457,6 +1462,7 @@ def go_to():
     """переход на предыдущие соревнования и обратно при нажатии меню -перейти к- или из меню -последние-"""
     msgBox = QMessageBox
     sender = my_win.sender()
+    sex = ["Девочки", "Девушки", "Женщины"]
 
     if sender == fir_window.Button_open:
         full_name = fir_window.comboBox.currentText()
@@ -1472,16 +1478,18 @@ def go_to():
         full_name = my_win.fifth_comp_Action.text()
     elif sender == my_win.go_to_Action:
         full_name = my_win.go_to_Action.text()  # полное название к которым переходим 
-        # присваиваем новый текст соревнований в меню -перейти к-
-    #     my_win.go_to_Action.setText(full_name_current)
 
-    # if full_name == full_name_current:
-    #     reply = msgBox.information(my_win, 'Уведомление', 'Данные соревнования уже открыты.',
-    #                                 msgBox.Ok)
-  
     titles = Title.get(Title.full_name_comp == full_name)
     id_title = titles.id
     gamer = titles.gamer
+    title_last = Title.select().order_by(Title.id)
+    id_title_last = title_last.id
+    # смена цвета фона формы в зависимости от пола играющих
+    if gamer in sex:
+        my_win.setStyleSheet("#MainWindow{background-color:pink}")
+    else:
+        my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
+        
     my_win.lineEdit_title_nazvanie.setText(titles.name)
     my_win.lineEdit_title_vozrast.setText(titles.vozrast)
     my_win.dateEdit_start.setDate(titles.data_start)
