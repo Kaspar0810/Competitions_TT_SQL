@@ -1012,7 +1012,6 @@ class StartWindow(QMainWindow, Ui_Form):
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
 
-
     def view_competition_on_arhive(self):
         """Просмотр полного соревнования из архива"""
         msgBox = QMessageBox()
@@ -1429,8 +1428,8 @@ def db_insert_title(title_str):
     de = title_str[4]
     ms = title_str[5]
     ref = title_str[6]
-    kr = title_str[7]
-    sek = title_str[8]
+    sek = title_str[7]
+    kr = title_str[8]
     ks = title_str[9]
     gm = title_str[10]
     fn = title_str[11]
@@ -1762,9 +1761,11 @@ def title_update():
     de = title_str[4]
     ms = title_str[5]
     ref = title_str[6]
-    kr = title_str[7]
-    sek = title_str[8]
+    sek = title_str[7]
+    kr = title_str[8]
     ks = title_str[9]
+    gm = title_str[10]
+    fn = title_str[11]
 
     nazv = Title.select().order_by(Title.id.desc()).get()
     nazv.name = nm
@@ -2526,8 +2527,9 @@ def page():
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 275, 841, 552)) # (точка слева, точка сверху, ширина, высота)
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 280, 841, 492)) # (точка слева, точка сверху, ширина, высота)
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 274))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         my_win.comboBox_referee.setPlaceholderText("Введите фамилию судьи")
         my_win.comboBox_referee.setCurrentIndex(-1)
         my_win.comboBox_referee.setEditable(True)
@@ -14247,7 +14249,7 @@ my_win.Button_app.clicked.connect(check_real_player) # отмечает что �
 my_win.Button_etap_made.clicked.connect(etap_made) # кнопка создание этапов системы
 my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет игроков в список и базу
 # записывает в базу или редактирует титул
-my_win.Button_title_made.clicked.connect(title_made)
+my_win.Button_title_made.clicked.connect(title_made) # создание титула
 # записывает в базу счет в партии встречи
 my_win.Button_Ok_gr.clicked.connect(enter_score)
 my_win.Button_Ok_pf.clicked.connect(enter_score)
