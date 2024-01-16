@@ -1502,7 +1502,7 @@ def go_to():
     my_win.comboBox_secretary.setCurrentText(titles.secretary)
     my_win.comboBox_kategor_sec.setCurrentText(titles.kat_sec)
     my_win.lineEdit_title_gamer.setText(titles.gamer)
-    my_win.tabWidget.setCurrentIndex(0)  # открывает вкладку титул
+    my_win.tabWidget.setCurrentIndex(0)  # открывает вкладку списки
     tab_enabled(gamer)
     player_list = Player.select().where(Player.title_id == id_title)
     count_player = len(player_list)
@@ -2526,8 +2526,8 @@ def page():
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 275, 841, 496)) # (точка слева, точка сверху, ширина, высота)
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 271))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 275, 841, 552)) # (точка слева, точка сверху, ширина, высота)
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         my_win.comboBox_referee.setPlaceholderText("Введите фамилию судьи")
         my_win.comboBox_referee.setCurrentIndex(-1)
         my_win.comboBox_referee.setEditable(True)
@@ -7992,9 +7992,6 @@ def control_all_player_in_final(etap):
                                     msgBox.Yes, msgBox.No) 
             if result == msgBox.Yes:
                 flag = True
-            # else:
-            #     flag = False
-            # return flag   
             else:        # ========= 
                 add_open_tab(tab_page="Система")
                 result = msgBox.question(my_win, "", "Система соревнований создана.\n"
@@ -8003,6 +8000,8 @@ def control_all_player_in_final(etap):
                                                             "Хотите ее сделать сейчас?",
                                             msgBox.Ok, msgBox.Cancel)
                 if result == msgBox.Ok:
+                    # проверка что все спортсмены подтвердились
+                    checking_before_the_draw()
                     choice_gr_automat()
                     add_open_tab(tab_page="Группы")
                     tab_enabled(gamer)
@@ -8018,6 +8017,21 @@ def control_all_player_in_final(etap):
         flag = False
     return flag
 
+
+def checking_before_the_draw():
+    """Проверка перед жеребьевкой групп, что все игроки подтверждены"""
+    msgBox = QMessageBox()
+    players = Player.select().where((Player.title_id == title_id()) & (Player.application == "Предварительная"))
+    count = len(player_list)
+    if count > 0:
+        msgBox.information(my_win, "Уведомление", "Есть спортсмены не подтвердившие\n свое участие в соревнованиях!")
+        player_list = players.select().where(Player.application == "Предварительная")
+        my_win.tabWidget.setCurrentIndex(1)
+        fill_table(player_list)
+        return
+    else:
+        msgBox.information(my_win, "Уведомление", "Нет спортсменов не подтвердивших\n свое участие в соревнованиях!")
+    
 
 def combobox_etap_compare(real_list):
     """сравнение и изменение значение комбокса в зависиости от выбора этапа
