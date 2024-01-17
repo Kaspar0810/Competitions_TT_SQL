@@ -9572,7 +9572,8 @@ def table_made(pv, stage):
                      # вставить размер шрифта конкретной ячей под длинную фамилию
                      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                      ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
-                     ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')]  # центрирование текста в ячейках вертикальное
+                     ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')] # центрирование текста в ячейках вертикальное
+                     #('BOTTOMPADDING', (0, 0), (-1, -1), 3)]
                     + tblstyle +
                     [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
                      # цвет шрифта в ячейках
@@ -12898,6 +12899,9 @@ def color_mesta(data, first_mesto, table):
         if stage == "1-й финал" and type_table == "сетка":
             flag = i.no_game
             break
+        else:
+            flag = ""
+
     ml = [] # столбец, ряд -1 ого места, ряд 2-ого места + 1, шаг между местами
     f = 0 # количество столбцов
     if table == "setka_32":
