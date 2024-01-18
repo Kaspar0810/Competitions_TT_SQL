@@ -1910,9 +1910,12 @@ def find_city():
         if (len(c)) == 0:
             my_win.textEdit.setText("Нет такого города в базе")
         else:
+            city_list = []
             for pl in c:
                 full_stroka = f"{pl.city}"
-                my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+                if full_stroka not in city_list:
+                    city_list.append(full_stroka)
+            my_win.listWidget.addItems(city_list) # заполняет лист виджет спортсменами
             return
     else:  # вставляет регион соответсвующий городу
         if city_field != "":
@@ -7074,7 +7077,10 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
             temp_list = []
             if free_gr != 1:
                 if len(f) == 0: # значит во всех группах есть уже данный регион
-                    for i in range(1, end + 1):
+                    # =====
+                    finish = end if end > start else start
+                    # =====
+                    for i in range(1, finish + 1):
                         temp_list.append(i)
                     current_region_group[region] = temp_list
                     f = current_region_group[region]  # список номеров групп для посева текущего региона
@@ -7093,13 +7099,13 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                      f.sort()
                 else:
                     f.sort(reverse = True)
-                if s in f:
+                if s in f: #  присваивает переменной u - номер группы, если она идет по порядку
                     posev_tmp[s] = region
-                    u = s #  присваивает переменной u - номер группы, если она идет по порядку
-                else:
+                    u = s 
+                else:  # присваивает переменной u - номер группы, если она идет не по порядку
                     g = f[0] # номер группы
                     posev_tmp[g] = region
-                    u = g    # присваивает переменной u - номер группы, если она идет не по порядку
+                    u = g   
             elif free_gr == 0:                
                 for i in range (1, len(posev) + 1):
                     gr_dict = posev[f"{m}_посев"]
@@ -7112,13 +7118,13 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
                 f.sort()
             else:
                 f.sort(reverse = True)
-            if s in f:
+            if s in f:  #  присваивает переменной u - номер группы, если она идет по порядку
                 posev_tmp[s] = region
-                u = s #  присваивает переменной u - номер группы, если она идет по порядку
-            else:
+                u = s
+            else:  # присваивает переменной u - номер группы, если она идет не по порядку
                 g = f[0]
                 posev_tmp[g] = region
-                u = g    # присваивает переменной u - номер группы, если она идет не по порядку
+                u = g    
         # ====не правильное соответствие номера региона и номера группы
         index = key_reg_current.index(region)
         p = player_list[index]
@@ -8023,8 +8029,8 @@ def control_all_player_in_final(etap):
 def checking_before_the_draw():
     """Проверка перед жеребьевкой групп, что все игроки подтверждены"""
     msgBox = QMessageBox()
-    players = Player.select().where((Player.title_id == title_id()) & (Player.application == "Предварительная"))
-    count = len(player_list)
+    players = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
+    count = len(players)
     if count > 0:
         msgBox.information(my_win, "Уведомление", "Есть спортсмены не подтвердившие\n свое участие в соревнованиях!")
         player_list = players.select().where(Player.application == "Предварительная")
