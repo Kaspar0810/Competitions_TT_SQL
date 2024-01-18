@@ -23,7 +23,7 @@
       <x>260</x>
       <y>20</y>
       <width>841</width>
-      <height>300</height>
+      <height>331</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -1056,7 +1056,7 @@
         <x>2</x>
         <y>26</y>
         <width>828</width>
-        <height>241</height>
+        <height>263</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -1303,7 +1303,7 @@
          <x>630</x>
          <y>10</y>
          <width>16</width>
-         <height>221</height>
+         <height>241</height>
         </rect>
        </property>
        <property name="orientation">
@@ -2125,6 +2125,94 @@
          <x>571</x>
          <y>219</y>
          <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_112">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>237</y>
+         <width>147</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Этапы соревнования - </string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_table_12">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>238</y>
+         <width>170</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_etap_12">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>240</y>
+         <width>315</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_87">
+       <property name="geometry">
+        <rect>
+         <x>570</x>
+         <y>240</y>
+         <width>70</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_playing_etap12">
+       <property name="geometry">
+        <rect>
+         <x>650</x>
+         <y>240</y>
+         <width>150</width>
          <height>20</height>
         </rect>
        </property>
@@ -4395,8 +4483,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4878,8 +4966,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5270,8 +5358,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5688,8 +5776,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5995,8 +6083,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6846,8 +6934,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>98</width>
-       <height>28</height>
+       <width>241</width>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7368,9 +7456,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>327</y>
+      <y>437</y>
       <width>842</width>
-      <height>451</height>
+      <height>341</height>
      </rect>
     </property>
    </widget>
@@ -7378,9 +7466,9 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>330</y>
+      <y>452</y>
       <width>821</width>
-      <height>433</height>
+      <height>311</height>
      </rect>
     </property>
    </widget>

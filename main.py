@@ -1287,6 +1287,7 @@ my_win.comboBox_table_8.addItems(vid_setki_one_table)
 my_win.comboBox_table_9.addItems(vid_setki_one_table)
 my_win.comboBox_table_10.addItems(vid_setki_one_table)
 my_win.comboBox_table_11.addItems(vid_setki_one_table)
+my_win.comboBox_table_12.addItems(vid_setki_one_table)
 # ставит сегодняшнюю дату в виджете календарь
 my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
@@ -1601,14 +1602,14 @@ def system_made():
     my_win.checkBox_2.setChecked(False)
     my_win.checkBox_3.setChecked(False)
     my_win.Button_system_made.setEnabled(False)
-    my_win.Button_1etap_made.setEnabled(False)
-    my_win.Button_2etap_made.setEnabled(False)
-    my_win.Button_3etap_made.setEnabled(False)
-    my_win.Button_4etap_made.setEnabled(False)
-    my_win.Button_5etap_made.setEnabled(False)
-    my_win.Button_6etap_made.setEnabled(False)
-    my_win.Button_7etap_made.setEnabled(False)
-    my_win.Button_8etap_made.setEnabled(False)
+    # my_win.Button_1etap_made.setEnabled(False)
+    # my_win.Button_2etap_made.setEnabled(False)
+    # my_win.Button_3etap_made.setEnabled(False)
+    # my_win.Button_4etap_made.setEnabled(False)
+    # my_win.Button_5etap_made.setEnabled(False)
+    # my_win.Button_6etap_made.setEnabled(False)
+    # my_win.Button_7etap_made.setEnabled(False)
+    # my_win.Button_8etap_made.setEnabled(False)
 
 
 def r_list_load_tableView():
@@ -2575,8 +2576,8 @@ def page():
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 305, 841, 465))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 300))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 445))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
         my_win.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
@@ -2605,6 +2606,7 @@ def page():
         my_win.label_etap_9.hide()
         my_win.label_etap_10.hide()
         my_win.label_etap_11.hide()
+        my_win.label_etap_12.hide()
         my_win.label_101.hide()
         my_win.label_11.hide()
         my_win.label_12.hide()
@@ -2624,12 +2626,14 @@ def page():
         my_win.label_109.hide()
         my_win.label_110.hide()
         my_win.label_111.hide()
+        my_win.label_112.hide()
         my_win.label_81.hide()
         my_win.label_82.hide()
         my_win.label_83.hide()
         my_win.label_84.hide()
         my_win.label_85.hide()
         my_win.label_86.hide()
+        my_win.label_87.hide()
 
         my_win.comboBox_table_1.hide()
         my_win.comboBox_table_2.hide()
@@ -2642,6 +2646,7 @@ def page():
         my_win.comboBox_table_9.hide()
         my_win.comboBox_table_10.hide()
         my_win.comboBox_table_11.hide()
+        my_win.comboBox_table_12.hide()
 
         my_win.spinBox_kol_group.hide()
         stage = []
@@ -2739,6 +2744,13 @@ def page():
                 my_win.label_111.show()
                 my_win.label_86.show()
                 my_win.label_etap_11.show()
+            elif i == 11:
+                my_win.label_112.setText(stage[11])
+                my_win.label_87.setText(game[11])
+                my_win.label_etap_12.setText(table[11])
+                my_win.label_112.show()
+                my_win.label_87.show()
+                my_win.label_etap_12.show()
 
             total_game = sum(sum_game)
             my_win.comboBox_table_1.hide()
@@ -2902,6 +2914,7 @@ def label_playing_count():
     my_win.label_playing_etap9.hide()
     my_win.label_playing_etap10.hide()
     my_win.label_playing_etap11.hide()
+    my_win.label_playing_etap12.hide()
     for k in system:
         n += 1
         system_id = k.id
@@ -2940,6 +2953,9 @@ def label_playing_count():
         elif n == 11:
             my_win.label_playing_etap11.setText((f"Сыграно: {count_playing} игр."))
             my_win.label_playing_etap11.show()
+        elif n == 12:
+            my_win.label_playing_etap12.setText((f"Сыграно: {count_playing} игр."))
+            my_win.label_playing_etap12.show()
 
 
 def add_city():
@@ -3224,6 +3240,7 @@ def system_competition():
         my_win.label_84.hide()
         my_win.label_85.hide()
         my_win.label_86.hide()
+        my_win.label_87.hide()
  
         my_win.tabWidget.setTabEnabled(2, True)
 
@@ -7963,7 +7980,9 @@ def current_index_combobox_table(sender):
     elif sender == my_win.comboBox_table_10:
         cur_index = my_win.comboBox_table_10.currentIndex() 
     elif sender == my_win.comboBox_table_11:
-        cur_index = my_win.comboBox_table_11.currentIndex()      
+        cur_index = my_win.comboBox_table_11.currentIndex()  
+    elif sender == my_win.comboBox_table_12:
+        cur_index = my_win.comboBox_table_12.currentIndex()    
     return cur_index
 
 
@@ -8035,7 +8054,7 @@ def checking_before_the_draw():
         msgBox.information(my_win, "Уведомление", "Есть спортсмены не подтвердившие\n свое участие в соревнованиях!")
         player_list = players.select().where(Player.application == "Предварительная")
         my_win.tabWidget.setCurrentIndex(1)
-        fill_table(player_list)
+        # fill_table(player_list)
         return
     else:
         msgBox.information(my_win, "Уведомление", "Нет спортсменов не подтвердивших\n свое участие в соревнованиях!")
@@ -8061,10 +8080,10 @@ def made_system_load_combobox_etap():
     sender = my_win.sender()
     ct = my_win.comboBox_etap.currentText()
     label_etap_list = [my_win.label_101, my_win.label_102, my_win.label_103, my_win.label_104, my_win.label_105, my_win.label_106,
-                       my_win.label_107, my_win.label_108, my_win.label_109, my_win.label_110,  my_win.label_111]
+                       my_win.label_107, my_win.label_108, my_win.label_109, my_win.label_110,  my_win.label_111, my_win.label_112]
     combobox_etap_list = [my_win.comboBox_table_1, my_win.comboBox_table_2, my_win.comboBox_table_3, my_win.comboBox_table_4, 
                           my_win.comboBox_table_5, my_win.comboBox_table_6, my_win.comboBox_table_7, my_win.comboBox_table_8,
-                          my_win.comboBox_table_9, my_win.comboBox_table_10, my_win.comboBox_table_11]
+                          my_win.comboBox_table_9, my_win.comboBox_table_10, my_win.comboBox_table_11, my_win.comboBox_table_12]
     label_text = my_win.label_10.text() # номер текущего этапа
     real_list = []
  # после выбора из комбобокса соответственно этапу включает label   
@@ -8133,6 +8152,11 @@ def made_system_load_combobox_etap():
             combobox_etap_compare(real_list)
             my_win.label_111.show()
             my_win.label_10.setText("11-й этап")
+        elif  label_text == "11-й этап": 
+            real_list = ["-выбор этапа-", "Финальный", "Суперфинал"]
+            combobox_etap_compare(real_list)
+            my_win.label_112.show()
+            my_win.label_10.setText("12-й этап")
         my_win.comboBox_etap.setCurrentText("-выбор этапа-")   
     else:   # выбор значения из комбобокса создания этапов
         if ct == "Одна таблица":
@@ -8226,6 +8250,13 @@ def made_system_load_combobox_etap():
                 final = f"{fin + 1}-й финал"    
                 my_win.label_111.setText(final)
                 my_win.comboBox_table_11.show()
+            elif label_text == "12-й этап":
+                txt = my_win.label_111.text()
+                znak = txt.find("-") 
+                fin = int(txt[:znak])
+                final = f"{fin + 1}-й финал"    
+                my_win.label_112.setText(final)
+                my_win.comboBox_table_12.show()
             else:
                 mark = label_text.find("-")
                 fin = int(txt[:mark])
@@ -8736,7 +8767,7 @@ def max_player_and_exit_stage(etap):
             exit_stage = "1-й полуфинал" if "1-й полуфинал" in total_stage else "Предварительный"
         max_pl = dict_etap[exit_stage]
     elif (number_etap == 4 or number_etap == 5 or number_etap == 6 or number_etap == 7
-        or number_etap == 8 or number_etap == 9 or number_etap == 10 or number_etap == 11):
+        or number_etap == 8 or number_etap == 9 or number_etap == 10 or number_etap == 11 or number_etap == 12):
         fin = number_final(last_etap) # текущий этап
         if "2-й полуфинал" in total_stage:
             if dict_etap["1-й полуфинал"] == 0 and dict_etap["2-й полуфинал"] != 0:
@@ -8902,6 +8933,12 @@ def kol_player_in_final():
             my_win.label_etap_11.setText(list_pl_final[0])
             my_win.label_etap_11.show()
             my_win.comboBox_table_11.hide()
+        elif label_text == "12-й этап":
+            my_win.label_87.setText(list_pl_final[3])
+            my_win.label_87.show()
+            my_win.label_etap_12.setText(list_pl_final[0])
+            my_win.label_etap_12.show()
+            my_win.comboBox_table_12.hide()
         my_win.Button_etap_made.setEnabled(True)
         my_win.comboBox_page_vid.setEnabled(True)
         my_win.Button_etap_made.setFocus(True)
@@ -14170,6 +14207,7 @@ my_win.comboBox_table_8.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_9.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_10.currentTextChanged.connect(kol_player_in_final)
 my_win.comboBox_table_11.currentTextChanged.connect(kol_player_in_final)
+my_win.comboBox_table_12.currentTextChanged.connect(kol_player_in_final)
 
 my_win.comboBox_etap.currentTextChanged.connect(made_system_load_combobox_etap)
 
