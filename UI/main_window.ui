@@ -95,7 +95,7 @@
         <x>3</x>
         <y>33</y>
         <width>821</width>
-        <height>206</height>
+        <height>216</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -4483,8 +4483,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4496,8 +4496,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4568,7 +4568,7 @@
         <x>2</x>
         <y>2</y>
         <width>231</width>
-        <height>411</height>
+        <height>432</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_36">
@@ -4966,8 +4966,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5287,7 +5287,7 @@
          <x>10</x>
          <y>10</y>
          <width>211</width>
-         <height>82</height>
+         <height>97</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -5358,8 +5358,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5776,8 +5776,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6083,8 +6083,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6552,7 +6552,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6631,7 +6631,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>221</width>
+        <width>266</width>
         <height>104</height>
        </rect>
       </property>
@@ -6915,27 +6915,14 @@
        </item>
       </layout>
      </widget>
-     <widget class="QProgressBar" name="progressBar">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>450</y>
-        <width>221</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="value">
-       <number>24</number>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="page_7">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>484</height>
+       <width>100</width>
+       <height>30</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7470,6 +7457,19 @@
       <width>821</width>
       <height>311</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="progressBar">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>780</y>
+      <width>691</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>24</number>
     </property>
    </widget>
   </widget>

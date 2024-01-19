@@ -621,6 +621,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     load_combobox_filter_final()
             add_open_tab(tab_page="Финалы")
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
+            checking_before_the_draw()
             flag_real = check_real_player()
             if flag_real is True:
                 reply = msg.information(my_win, 'Уведомление',
@@ -3858,7 +3859,7 @@ def change_status_visible_and_score_game():
     count = len(system)    
     if tab == 3:
         system_stage = system.select().where(System.stage == "Предварительный").get()
-        match_db = system_stage.score_flag
+        match_db = system_stage.score_flag # из сколь партий играть записано в DB по умолчанию из 5
         state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
         my_win.checkBox_4.setEnabled(state_visible)
         match_current = match_db
@@ -4004,7 +4005,11 @@ def change_status_visible_and_score_game():
             my_win.checkBox_5.setChecked(False)
             my_win.lineEdit_pl1_score_total_fin.setFocus(True)
         my_win.label_22.setVisible(False)
-
+    system_id = system_stage.id
+    systems = system.select().where(System.id == system_id).get()
+    with db:
+        systems.score_flag = match_current
+        systems.save()
     return state_visible
 
 
@@ -8037,6 +8042,10 @@ def control_all_player_in_final(etap):
                         system_stage.save()
                         flag = True
                 else:
+                    with db:
+                        system_stage.choice_flag = True
+                        system_stage.save()
+                        flag = True
                     return    
     elif t >= 3: # продолжает создание системы
         flag = True
