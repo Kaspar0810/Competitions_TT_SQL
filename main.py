@@ -621,15 +621,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     load_combobox_filter_final()
             add_open_tab(tab_page="Финалы")
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
-            checking_before_the_draw()
-            flag_real = check_real_player()
-            if flag_real is True:
-                reply = msg.information(my_win, 'Уведомление',
-                                                "В списке присутствуют спортсмены,\nиз предварительной заявке"
-                                                "\nне подтвержденые о своем участии!",
-                                        msg.Ok)
-                if reply == msg.Ok:
-                    my_win.tabWidget.setCurrentIndex(2)                                                        
+            flag_checking = checking_before_the_draw()
+            if flag_checking is False:
+                return
+            # flag_real = check_real_player()
+            # if flag_real is True:
+            #     reply = msg.information(my_win, 'Уведомление',
+            #                                     "В списке присутствуют спортсмены,\nиз предварительной заявке"
+            #                                     "\nне подтвержденые о своем участии!",
+            #                             msg.Ok)
+            #     if reply == msg.Ok:
+            #         my_win.tabWidget.setCurrentIndex(2) 
+            #         return                                                       
             for stage_sys in system:
                 stage = stage_sys.stage
                 if stage == "Предварительный":
@@ -2296,7 +2299,6 @@ def add_player():
     my_win.lineEdit_R.clear()
     my_win.lineEdit_city_list.clear()
     my_win.lineEdit_coach.clear()
-    # check_rejting_pay(pl)
     if txt == "Редактировать":
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.Button_del_player.setEnabled(False) 
@@ -2543,10 +2545,13 @@ def page():
         my_win.comboBox_secretary.setEditable(True)
         db_select_title()
         my_win.tableWidget.hide()
+        # my_win.progressBar.hide()
     elif tb == 1:  # -список участников-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        # my_win.progressBar.hide()
         load_comboBox_filter()
         region()
         my_win.Button_app.setEnabled(False)
@@ -2577,8 +2582,12 @@ def page():
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 445))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 430))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        # progressBar = QProgressBar(my_win.tabWidget)
+        # my_win.progressBar.setGeometry(QtCore.QRect(260, 745, 841, 40))
+        # my_win.progressBar.show()
         my_win.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
@@ -2587,7 +2596,7 @@ def page():
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
         my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
-        label_playing_count() # пишет сколько игр сыграно в каждо этапе
+        label_playing_count() # пишет сколько игр сыграно в каждом этапе
         my_win.comboBox_filter_number_group_final.setEnabled(False)
         for k in sf:
             stage = k.stage
@@ -2778,7 +2787,8 @@ def page():
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
-
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        # my_win.progressBar.hide()
         system_stage = sf.select().where(System.stage == "Предварительный").get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -2805,6 +2815,8 @@ def page():
         Button_view_semifinal.show()
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        # my_win.progressBar.hide()
         system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -2842,6 +2854,8 @@ def page():
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        # my_win.progressBar.hide()
         my_win.checkBox_5.setEnabled(False)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
@@ -2874,6 +2888,8 @@ def page():
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        # my_win.progressBar.hide()
         my_win.comboBox_choice_R.clear()
         my_win.comboBox_filter_date_in_R.clear()
         rejting_month = ["За текуший месяц", "За январь месяц"]
@@ -2884,6 +2900,8 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 525))
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
+        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        # my_win.progressBar.hide()
 
         my_win.Button_made_page_pdf.setEnabled(False)
         my_win.Button_up.setEnabled(False)
@@ -4269,8 +4287,9 @@ def delete_player():
                                          f" {player_del} город {player_city_del}?",
                              msgBox.Ok, msgBox.Cancel)
     if question == msgBox.Ok:
-        systems = system.select().where(System.stage == "Предварительный").get()
-        choice_flag = systems.choice_flag
+        choice_flag = ready_system()
+        # systems = system.select().where(System.stage == "Предварительный").get()
+        # choice_flag = systems.choice_flag
         if choice_flag is True:
             question = msgBox.information(my_win, "", f"Уже была произведена жеребьевка!\n"
                                             f" {player_del} город {player_city_del}\n"
@@ -5946,12 +5965,13 @@ def choice_gr_automat():
     start = 0
     end = 1
     step = 0
+    step_bar = 0
     stage = "Предварительный"
     sys = System.select().where(System.title_id == title_id())
     sys_id = sys.select().where(System.stage == stage).get()
     group = sys_id.total_group
-    max_player = sys_id.max_player  # максимальное число игроков в группе, оно же число посевов
     total_player = sys_id.total_athletes
+    max_player = sys_id.max_player  # максимальное число игроков в группе, оно же число посевов
     for b in range(1,max_player + 1):  # цикл создания словарей (номер посева, списки списков(номер группы и 0 вместо номера регионов))
         for x in range(1, group + 1):
             posev_group[x] = 0
@@ -6024,6 +6044,9 @@ def choice_gr_automat():
             sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
             current.clear()
             number_poseva = number_poseva + sv
+            # sp = 100 / (total_player)
+            # step_bar += sp
+            # progress_bar(step_bar)
         if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканчания
             if number_poseva == group * m:  # смена направления посева
                 if m % 2 != 0:
@@ -6046,15 +6069,15 @@ def choice_gr_automat():
         group_list.clear()
 
 
-def progress_bar(step):
-    """прогресс бар""" 
-    msgBox = QMessageBox 
-    my_win.progressBar.setValue(step)
-    if step >= 99:
-       result = msgBox.information(my_win, "Уведомление", "Жеребьевка завершена, проверьте ее результаты!", msgBox.Ok)
-       if result == msgBox.Ok:
-            my_win.progressBar.setValue(0)
-    return step
+# def progress_bar(step_bar):
+#     """прогресс бар""" 
+#     msgBox = QMessageBox 
+#     my_win.progressBar.setValue(step_bar)
+#     if step_bar >= 99:
+#        result = msgBox.information(my_win, "Уведомление", "Жеребьевка завершена, проверьте ее результаты!", msgBox.Ok)
+#        if result == msgBox.Ok:
+#             my_win.progressBar.setValue(0)
+#     return step_bar
 
 
 def check_one_region_in_choice(fin):
@@ -8033,7 +8056,9 @@ def control_all_player_in_final(etap):
                                             msgBox.Ok, msgBox.Cancel)
                 if result == msgBox.Ok:
                     # проверка что все спортсмены подтвердились
-                    checking_before_the_draw()
+                    flag_checking = checking_before_the_draw()
+                    if flag_checking is False:
+                        return
                     choice_gr_automat()
                     add_open_tab(tab_page="Группы")
                     tab_enabled(gamer)
@@ -8056,18 +8081,24 @@ def control_all_player_in_final(etap):
 
 def checking_before_the_draw():
     """Проверка перед жеребьевкой групп, что все игроки подтверждены"""
+    checking_flag = False
     msgBox = QMessageBox()
     players = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
     count = len(players)
     if count > 0:
-        msgBox.information(my_win, "Уведомление", "Есть спортсмены не подтвердившие\n свое участие в соревнованиях!")
+        msgBox.information(my_win, 'Уведомление',
+                                                "В списке присутствуют спортсмены,\nиз предварительной заявке"
+                                                "\nне подтвержденые о своем участии!",
+                                        msgBox.Ok)
         player_list = players.select().where(Player.application == "Предварительная")
         my_win.tabWidget.setCurrentIndex(1)
-        # fill_table(player_list)
-        return
+        fill_table(player_list)
+        checking_flag = False
     else:
         msgBox.information(my_win, "Уведомление", "Нет спортсменов не подтвердивших\n свое участие в соревнованиях!")
-    
+        checking_flag = True
+    return checking_flag
+
 
 def combobox_etap_compare(real_list):
     """сравнение и изменение значение комбокса в зависиости от выбора этапа

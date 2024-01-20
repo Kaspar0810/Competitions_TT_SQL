@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>20</y>
+      <y>10</y>
       <width>841</width>
       <height>331</height>
      </rect>
@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -339,7 +339,7 @@
                   <property name="font">
                    <font>
                     <family>Times New Roman</family>
-                    <pointsize>14</pointsize>
+                    <pointsize>12</pointsize>
                     <italic>true</italic>
                    </font>
                   </property>
@@ -409,7 +409,7 @@
                   <property name="font">
                    <font>
                     <family>Times New Roman</family>
-                    <pointsize>14</pointsize>
+                    <pointsize>12</pointsize>
                     <italic>true</italic>
                    </font>
                   </property>
@@ -4442,7 +4442,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
+      <y>10</y>
       <width>243</width>
       <height>758</height>
      </rect>
@@ -4476,15 +4476,15 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>241</width>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4496,8 +4496,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>241</width>
+       <height>484</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4568,7 +4568,7 @@
         <x>2</x>
         <y>2</y>
         <width>231</width>
-        <height>432</height>
+        <height>411</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_36">
@@ -4966,8 +4966,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5358,8 +5358,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5776,8 +5776,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6083,8 +6083,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6551,8 +6551,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>241</width>
-       <height>476</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6631,7 +6631,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>266</width>
+        <width>221</width>
         <height>104</height>
        </rect>
       </property>
@@ -6921,8 +6921,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>100</width>
-       <height>30</height>
+       <width>98</width>
+       <height>28</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7457,19 +7457,6 @@
       <width>821</width>
       <height>311</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="progressBar">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>780</y>
-      <width>691</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>24</number>
     </property>
    </widget>
   </widget>
