@@ -623,20 +623,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif sender == self.choice_gr_Action:  # нажат подменю жеребъевка групп
             flag_checking = checking_before_the_draw()
             if flag_checking is False:
-                return
-            # flag_real = check_real_player()
-            # if flag_real is True:
-            #     reply = msg.information(my_win, 'Уведомление',
-            #                                     "В списке присутствуют спортсмены,\nиз предварительной заявке"
-            #                                     "\nне подтвержденые о своем участии!",
-            #                             msg.Ok)
-            #     if reply == msg.Ok:
-            #         my_win.tabWidget.setCurrentIndex(2) 
-            #         return                                                       
+                return             
             for stage_sys in system:
                 stage = stage_sys.stage
                 if stage == "Предварительный":
-                    if stage_sys.choice_flag == True:
+                    fin = stage
+                    check_flag = check_choice(fin)
+                    if check_flag == True:
                         reply = msg.information(my_win, 'Уведомление',
                                                         "Жеребъевка была произведена,\nесли хотите сделать "
                                                         "повторно\nнажмите -ОК-, если нет то - Cancel-",
@@ -655,7 +648,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             return
                     else:
                         my_win.tabWidget.setCurrentIndex(2)
+
                         choice_gr_automat()
+                        add_open_tab(tab_page="Группы")
+                        my_win.tabWidget.setCurrentIndex(3)
+                        my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                        return
         elif sender == self.choice_pf_Action: # подменю полуфиналы            
             stage = select_choice_semifinal()
             system_stage = system.select().where(System.stage == stage).get()
@@ -1606,14 +1604,6 @@ def system_made():
     my_win.checkBox_2.setChecked(False)
     my_win.checkBox_3.setChecked(False)
     my_win.Button_system_made.setEnabled(False)
-    # my_win.Button_1etap_made.setEnabled(False)
-    # my_win.Button_2etap_made.setEnabled(False)
-    # my_win.Button_3etap_made.setEnabled(False)
-    # my_win.Button_4etap_made.setEnabled(False)
-    # my_win.Button_5etap_made.setEnabled(False)
-    # my_win.Button_6etap_made.setEnabled(False)
-    # my_win.Button_7etap_made.setEnabled(False)
-    # my_win.Button_8etap_made.setEnabled(False)
 
 
 def r_list_load_tableView():
@@ -2212,6 +2202,7 @@ def debtor_R():
 
 def add_player(): 
     """добавляет игрока в список и базу данных"""
+    msgBox = QMessageBox()
     flag = False
     player_list = Player.select().where(Player.title_id == title_id())
     txt = my_win.Button_add_edit_player.text()
@@ -2286,8 +2277,47 @@ def add_player():
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting=debt, comment="", 
                                 coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
+            # =========
+            system = System.select().where(System.title_id == title_id())
+            system_flag = ready_system() # проверка была создана система
+            if system_flag is True:
+                result = msgBox.information(my_win, "", "Колличество спортсменов изменилось.\n"
+                        "Чтоб изменить число спортсменов в группах nнажмите -ОК-,\nесли обновить систему нажмите -Cancel-",
+                                            msgBox.Ok, msgBox.Cancel)
+                if result == msgBox.Ok:
+                    system_stage = system.select().where(System.stage == "Предварительный").get()
+                    system_id = system_stage.id
+                    kg = system_stage.total_group
+                    player_list = Player.select().where(Player.title_id == title_id())
+                    count = len(player_list)  # количество записей в базе
+                    # остаток отделения, если 0, то участники равно делится на группы
+                    e1 = count % int(kg)
+                    # если количество участников равно делится на группы (кол-во групп)
+                    p = count // int(kg)
+                    g1 = int(kg) - e1  # кол-во групп, где наименьшее кол-во спортсменов
+                    g2 = int(p + 1)  # кол-во человек в группе с наибольшим их количеством
+                    if e1 == 0:  # то в группах равное количество человек -e1-
+                        stroka_kol_group = f"{kg} группы по {str(p)} чел."
+                    else:
+                        stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(g2)} чел."
+                    System.update(label_string=stroka_kol_group).where(System.id == system_id).execute()
+                    # ====
+                    choice_tbl_made()
+                else: # обновление системы
+                    pass
+                n = 0
+                for sys in system:
+                    n += 1
+                    count = len(system)
+                    system_id = sys.id
+                    athlet = sys.total_athletes
+                    System.update(total_athletes=athlet + 1).where(System.title_id == title_id()).execute()
+                    if n == count:
+                        System.update(max_player=System.max_player + 1).where((System.id == system_id) & (System.title_id == title_id())).execute()
+
         pl_id = Player.select().order_by(Player.id.desc()).get() # id нового игрока
         player_id = pl_id.id
+
         # ======== попробовать вставить одну строку в tableView
     player_list = Player.select().where(Player.title_id == title_id())
     fill_table(player_list)
@@ -2321,7 +2351,6 @@ def check_rejting_pay(pl):
         plr = Player.select().where(Player.title_id == title_id())
         player_id = plr.select().where(Player.player == pl).get()
         with db:
-                # player_id = plr.select().where(Player.player == pl).get()
             player_id.pay_rejting = "долг"
             player_id.comment = ""
             player_id.save()
@@ -3369,10 +3398,12 @@ def one_table(fin, group):
                     posev_data = player_choice_in_setka(fin)
                     player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
                 add_open_tab(tab_page="Финалы")
+                flag_choice = True
             else:
+                flag_choice = False
                 return
         sys_m.stage = fin
-        sys_m.choice_flag = 1 # запись о том что сделана жеребьевка
+        sys_m.choice_flag = flag_choice # запись о том что сделана жеребьевка
         sys_m.save()
 
 
@@ -4287,10 +4318,15 @@ def delete_player():
                                          f" {player_del} город {player_city_del}?",
                              msgBox.Ok, msgBox.Cancel)
     if question == msgBox.Ok:
-        choice_flag = ready_system()
-        # systems = system.select().where(System.stage == "Предварительный").get()
-        # choice_flag = systems.choice_flag
-        if choice_flag is True:
+        system_flag = ready_system() # проверка была создана система
+        if system_flag is True:
+            count = len(system)
+            for sys in system:
+                athlet = sys.total_athletes
+                System.update(total_athletes=athlet - 1).where(System.title_id == title_id()).execute()
+        fin = "Предварительный"
+        check_flag = check_choice(fin)
+        if check_flag is True:
             question = msgBox.information(my_win, "", f"Уже была произведена жеребьевка!\n"
                                             f" {player_del} город {player_city_del}\n"
                                             "будет удален(а) из посева.",
@@ -5965,7 +6001,7 @@ def choice_gr_automat():
     start = 0
     end = 1
     step = 0
-    step_bar = 0
+    # step_bar = 0
     stage = "Предварительный"
     sys = System.select().where(System.title_id == title_id())
     sys_id = sys.select().where(System.stage == stage).get()
@@ -8067,8 +8103,9 @@ def control_all_player_in_final(etap):
                         system_stage.save()
                         flag = True
                 else:
+                    my_win.choice_gr_Action.setEnabled(True)
                     with db:
-                        system_stage.choice_flag = True
+                        system_stage.choice_flag = False
                         system_stage.save()
                         flag = True
                     return    
