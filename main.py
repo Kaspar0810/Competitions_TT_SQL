@@ -2298,9 +2298,13 @@ def add_player():
                     g2 = int(p + 1)  # кол-во человек в группе с наибольшим их количеством
                     if e1 == 0:  # то в группах равное количество человек -e1-
                         stroka_kol_group = f"{kg} группы по {str(p)} чел."
+                        skg = int((p * (p - 1) / 2) * int(kg))
                     else:
                         stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(g2)} чел."
-                    System.update(label_string=stroka_kol_group).where(System.id == system_id).execute()
+                        skg = int((((p * (p - 1)) / 2 * g1) + ((g2 * (g2 - 1)) / 2 * e1))) # общее количество игр в группах
+                    stroka_kol_game = f"{skg} игр"
+                    my_win.label_19.setText(stroka_kol_game)
+                    System.update(label_string=stroka_kol_group, kol_game_string=stroka_kol_game).where(System.id == system_id).execute()
                     # ====
                     choice_tbl_made()
                 else: # обновление системы
@@ -4755,7 +4759,7 @@ def focus():
         sf = sys.score_flag  # флаг из скольки партий играется матч
         mark_index = mark_list_gr.index(sender)
         mark = mark_list_gr[mark_index].text()
-        flag_mistake = control_mark_in_score(mark)
+        flag_mistake = control_mark_in_score(mark, sf)
         if flag_mistake is True:
             return
         if mark_index % 2 == 1:
@@ -4782,7 +4786,9 @@ def focus():
         sf = sys.score_flag  # флаг из скольки партий играется матч
         mark_index = mark_list_sf.index(sender)
         mark = mark_list_sf[mark_index].text()
-        control_mark_in_score(mark)
+        flag_mistake = control_mark_in_score(mark, sf)
+        if flag_mistake is True:
+            return
         if mark_index % 2 == 1:
             if mark_index >= sf:
                 sum_total_game = score_in_game()  # подсчет очков в партии
@@ -4802,7 +4808,9 @@ def focus():
         sf = sys.score_flag  # флаг из скольки партий играется матч
         mark_index = mark_list_fin.index(sender)
         mark = mark_list_fin[mark_index].text()
-        control_mark_in_score(mark)
+        flag_mistake = control_mark_in_score(mark, sf)
+        if flag_mistake is True:
+            return
         if mark_index % 2 == 1:
             if mark_index >= sf:
                 sum_total_game = score_in_game()  # подсчет очков в партии
@@ -4816,12 +4824,11 @@ def focus():
             mark_list_fin[mark_index + 1].setFocus()
 
 
-def control_mark_in_score(mark):
+def control_mark_in_score(mark, sf):
     """проверка ввода счета в ячейку """
     msgBox = QMessageBox
     tab = my_win.tabWidget.currentIndex()
-
-    sf = 5
+   #     system = 
     if tab == 3:
         score_list = [my_win.lineEdit_pl1_score_total_gr.text(), my_win.lineEdit_pl2_score_total_gr.text()] # список общий счет в партии
     elif tab == 4:
@@ -4850,7 +4857,8 @@ def control_mark_in_score(mark):
                         msgBox.critical(my_win, "", "Ошибка при вводе счета!\nпроверьте правильность ввода")
                         flag_mistake = True
                         return flag_mistake
-
+                flag_mistake = False
+                return flag_mistake 
 
 def score_in_game():
     """считает общий счет в партиях"""
@@ -7329,8 +7337,12 @@ def select_stage_for_edit():
     etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     if sender == my_win.comboBox_edit_etap1:
         my_win.comboBox_first_group.clear()
+        my_win.lineEdit_change_pl1.clear()
+        my_win.lineEdit_change_pl1_2.clear()
     else:
         my_win.comboBox_second_group.clear()
+        my_win.lineEdit_change_pl2
+        my_win.lineEdit_change_pl2_2.clear()
 
     systems = System.select().where(System.title_id == title_id())
     players = Player.select().where(Player.title_id == title_id())
@@ -8674,10 +8686,17 @@ def manual_choice_setka(fin, count_exit, mesto_first_poseva):
 
 def check_choice(fin):
     """Проверяет перед жеребьевкой финалов, была ли она произведена ранее или еще нет"""
+    stage_list = []
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    system_final = system.select().where(System.stage == fin).get() # получаем запись конкретного финала
-    check_flag = system_final.choice_flag
- 
+    for st in system:
+        system_stage = st.stage
+        flag = st.choice_flag
+        if system_stage != "" and flag is True:
+            stage_list.append(system_stage)
+        else:
+            check_flag = False
+    if fin in stage_list:
+        check_flag = True
     return check_flag
 
 
@@ -14202,15 +14221,6 @@ my_win.lineEdit_pl2_s4_gr.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5_gr.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_gr.returnPressed.connect(focus)
 # ===== проверка правильность ввода цифр
-my_win.lineEdit_pl1_s1_gr.textChanged.connect(control_mark_in_score)
-my_win.lineEdit_pl2_s1_gr.textChanged.connect(control_mark_in_score)
-my_win.lineEdit_pl1_s2_gr.textChanged.connect(control_mark_in_score)
-my_win.lineEdit_pl2_s2_gr.textChanged.connect(control_mark_in_score)
-my_win.lineEdit_pl1_s3_gr.textChanged.connect(control_mark_in_score)
-my_win.lineEdit_pl2_s3_gr.textChanged.connect(control_mark_in_score)
-my_win.lineEdit_pl2_s4_gr.textChanged.connect(control_mark_in_score)
-my_win.lineEdit_pl1_s5_gr.textChanged.connect(control_mark_in_score)
-my_win.lineEdit_pl2_s5_gr.textChanged.connect(control_mark_in_score)
 # ===== переводит фокус на поле ввода счета в партии вкладки -полуфиналы-
 my_win.lineEdit_pl1_s1_pf.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s1_pf.returnPressed.connect(focus)
