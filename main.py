@@ -4390,6 +4390,7 @@ def delete_player():
 
         player = Player.delete().where(Player.id == player_id)
         player.execute()
+        my_win.lineEdit_id.clear()
         my_win.lineEdit_Family_name.clear()
         my_win.lineEdit_bday.clear()
         my_win.lineEdit_R.clear()
