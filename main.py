@@ -687,11 +687,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     return
             else:
                 # проверяет все или игры в группе сыграны
-                result_all = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
-                all_game = len(result_all)
-                result_gameing = Result.select().where((Result.title_id == title_id()) & (Result.winner != ""))
-                playing_games = len(result_gameing)
-                remains = all_game - playing_games
+                # result_all = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
+                # all_game = len(result_all)
+                # result_gameing = Result.select().where((Result.title_id == title_id()) & (Result.winner != ""))
+                # playing_games = len(result_gameing)
+                # remains = all_game - playing_games
+                remains = 0
                 if remains == 0:
                     choice_semifinal_automat(stage)
                     reply = msg.information(my_win, 'Уведомление', f"Хотите заполнить {stage} результатами "
@@ -2850,7 +2851,9 @@ def page():
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         # my_win.progressBar.hide()
-        system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
+        # system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
+        system_stage = sf.select().where(System.stage == "1-й полуфинал").get()
+
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
         my_win.checkBox_7.setEnabled(False)
@@ -5784,7 +5787,9 @@ def filter_sf():
             pl2_query = fltr_id.select().where((Result.system_stage == semifinal) & (Result.player2 == name)) 
         fltr = pl1_query | pl2_query # объдиняет два запроса в один
     elif group == "все группы" and played == "все игры":
-        fltr = fltr_id.select().where(Result.system_stage.in_(sf))
+        filter_sf = fltr_id.select().where((Result.system_stage == semifinal) & (Result.title_id == title_id()))
+        fltr = filter_sf.select().where(Result.system_stage.in_(sf))
+        # fltr = fltr_id.select().where(Result.system_stage.in_(sf))
     elif group == "все группы" and played == "завершенные":
         if semifinal == "-все полуфиналы-":
             fltr = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.points_win == 2))
@@ -5809,7 +5814,7 @@ def filter_sf():
             fltr = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.number_group == group))
         else:
             fltr = fltr_id.select().where((Result.system_stage == semifinal) & (Result.number_group == group))
-
+    count = len(fltr)
     result_list = fltr.dicts().execute()
     row_count = len(result_list)  # кол-во строк в таблице
     if row_count != 0:
@@ -5980,7 +5985,8 @@ def choice_semifinal_automat(stage):
         choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == f"{k} группа"))
         p = 0 if k <= total_group // 2 else mesta_exit
         n = k if k <= total_group // 2 else total_group - k + 1
-        for i in range(mesto_first, mesta_exit + 1):
+        # for i in range(mesto_first, mesta_exit + 1):
+        for i in range(mesto_first, mesta_exit + mesto_first):
             p += 1
             choice_mesta = choices.select().where(Choice.mesto_group == i).get()
             with db: # записывает в db номер полуфинала
@@ -8706,6 +8712,8 @@ def checking_possibility_choice(fin):
     msg = QMessageBox
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     system_final = system.select().where(System.stage == fin).get() # получаем запись конкретного финала
+    check_flag = False
+    
     if fin == "Одна таблица":
         check_flag = system_final.choice_flag
     else:    
@@ -9053,13 +9061,13 @@ def max_exit_player_out_in_group(exit_stage):
 
 def no_play():
     """победа по неявке соперника"""
-    tb = my_win.tabWidget.currentIndex()
+    tb = my_win.tabWidget.currentIndex() 
     check_gr_pl1 = my_win.checkBox_7.isChecked() 
     check_gr_pl2 = my_win.checkBox_8.isChecked()
-    check_sf_pl1 = my_win.checkBox_9.isChecked() 
-    check_sf_pl2 = my_win.checkBox_10.isChecked()
-    check_fin_pl1 = my_win.checkBox_11.isChecked() 
-    check_fin_pl2 = my_win.checkBox_12.isChecked()
+    check_sf_pl1 = my_win.checkBox_12.isChecked() 
+    check_sf_pl2 = my_win.checkBox_13.isChecked()
+    check_fin_pl1 = my_win.checkBox_9.isChecked() 
+    check_fin_pl2 = my_win.checkBox_10.isChecked()
     if tb == 3:
         if check_gr_pl1 is False and check_gr_pl2 is False:
             return
@@ -9109,6 +9117,11 @@ def title_id():
         t_id = Title.select().order_by(Title.id.desc()).get()
         title_id = t_id.id
     return title_id
+
+
+def system_id(etap_system):
+    """получения id системы данного этапа"""
+    pass
 
 
 def func_zagolovok(canvas, doc):
@@ -11471,31 +11484,33 @@ def write_in_setka(data, fin, first_mesto, table):
             c = str(i)
            # цикл создания списков номеров встреч по столбцам новый
             column_dict = {}
-            if my_win.checkBox_no_play_3.isChecked() and c != str(place_3rd):
-                for cd in range(2, column_last, 2):
-                    c1_tmp.clear()
-                    for rd in range(0, row_last):
-                        d1 = data[rd][cd]
-                        if d1 != "" and type(d1) == str and int(d1) > 0:
-                            c1_tmp.append(d1)
-                            c1 = c1_tmp.copy()
-                    column_dict[cd] = c1    # ключ -номер столбца, значение - список номеров встреч   
-                        # =======
-                for k in column_dict.keys():
-                    num_game_list = column_dict[k]  
-                    if str(i) in num_game_list:
-                        if k == column_last - 1:
-                            col_win = k - 1
-                        else:
-                            col_win = k + 1
-                        break
-                row_los = row_num_los[r]  # строка проигравшего
-                score = match[2]  # счет во встречи
-                row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
-                col_los = row_list_los.index(r) # номер столбца проигравшего            
-                data[row_win][col_win] = win
-                data[row_win + 1][col_win] = score
-                data[row_los][col_los + 1] = los
+            # if my_win.checkBox_no_play_3.not isChecked() and c != str(place_3rd):
+            # check = my_win.checkBox_no_play_3.isChecked():
+            # if check is False:
+            for cd in range(2, column_last, 2):
+                c1_tmp.clear()
+                for rd in range(0, row_last):
+                    d1 = data[rd][cd]
+                    if d1 != "" and type(d1) == str and int(d1) > 0:
+                        c1_tmp.append(d1)
+                        c1 = c1_tmp.copy()
+                column_dict[cd] = c1    # ключ -номер столбца, значение - список номеров встреч   
+                            # =======
+            for k in column_dict.keys():
+                num_game_list = column_dict[k]  
+                if str(i) in num_game_list:
+                    if k == column_last - 1:
+                        col_win = k - 1
+                    else:
+                        col_win = k + 1
+                    break
+            row_los = row_num_los[r]  # строка проигравшего
+            score = match[2]  # счет во встречи
+            row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
+            col_los = row_list_los.index(r) # номер столбца проигравшего            
+            data[row_win][col_win] = win
+            data[row_win + 1][col_win] = score
+            data[row_los][col_los + 1] = los
         return tds
 
 
@@ -11533,7 +11548,7 @@ def kol_player(stage):
 
 
 def  table_data(stage, kg):
-    """циклом создаем список участников каждой группы или финалов если играют по кругу"""
+    """циклом создаем список участников каждой группы или финалов по кругу"""
     tdt_all = []  # список списков [tdt_new] и [tdt_color]
     tdt_color = []
     tdt_new = []
@@ -11736,7 +11751,9 @@ def score_in_table(td, num_gr):
         mp = ta.max_player
         stage = ta.stage
     elif tab == 4:
-        ta = system.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()  # находит system id последнего
+        stage = my_win.comboBox_filter_semifinal.currentText()
+        ta = system.select().where(System.stage == stage).get()
+        # ta = system.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()  # находит system id последнего
         stage = ta.stage
         mp = len(gamelist.select().where((Game_list.system_id == ta) & (Game_list.number_group == num_gr)))
         r = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
@@ -12114,12 +12131,13 @@ def rank_in_group(total_score, td, num_gr, stage):
     res = [key for key, values in rev_dict.items() if len(values) > 1] # список очки, которых более одного
 
     # отдельно составляет список ключей (номера участников группы)
-    val_list = list(total_score.values())  # отдельно составляет список значений (очки каждого игрока)
-    # ======== новый вариант =========
-    # получает словарь(ключ - номер участника, значение - очки)
-    ds = {index: value for index, value in enumerate(val_list)}  
-    # сортирует словарь по убыванию соот
-    sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}
+    # val_list = list(total_score.values())  # отдельно составляет список значений (очки каждого игрока)
+    # # ======== новый вариант =========
+    # # получает словарь(ключ - номер участника, значение - очки)
+    # ds = {index: value for index, value in enumerate(val_list)}  
+    # сортирует словарь по убыванию очков
+    sorted_tuple = {k: total_score[k] for k in sorted(total_score, key=total_score.get, reverse=True)}
+    # sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}
     valuesList = list(sorted_tuple.values())  # список очков по убыванию
     unique_numbers = list(set(valuesList))  # множество уникальных очков
     unique_numbers.sort(reverse=True)  # список уникальных очков по убыванию
@@ -12127,30 +12145,34 @@ def rank_in_group(total_score, td, num_gr, stage):
 
     for f in unique_numbers:  # проходим циклом по уник. значениям
         num_player = rev_dict.get(f)
-        for x in num_player:
-            tr.append(str(x))  # создает список (встречи игроков)
+        # for x in num_player:
+        #     tr.append(str(x))  # создает список (встречи игроков)
+        for pl in num_player:
+            tr.append(str(pl))  # создает список (встречи игроков)
         m_new = valuesList.count(f)  # подсчитываем сколько раз оно встречается
 
         if m_new == 1:  # если кол-во очков у одного спортсмена
-            p1 = x
+            # p1 = x
             # записывает место победителю
-            td[p1 * 2 - 2][max_person + 4] = mesto
-            player_rank_tmp.append([p1, mesto])
+            # td[p1 * 2 - 2][max_person + 4] = mesto
+            td[pl * 2 - 2][max_person + 4] = mesto
+            # player_rank_tmp.append([p1, mesto])
+            player_rank_tmp.append([pl, mesto])
         elif m_new == 2:  # если кол-во очков у двух спортсмена (определение мест по игре между собой)
             player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr)
         elif m_new == 3: # если кол-во очков у трех спортсмена
             men_of_circle = m_new
             # получает список 1-й уникальные
-            u = summa_points_person(men_of_circle, tr, tr_all, pp, pg_win, pg_los, num_gr, stage)
+            u = summa_points_person(tr, tr_all, num_gr, stage, id_system)
             # значения очков и список значения очков и у скольких спортсменов они есть
             z = u[1]  # список списков кол-во очков и у сколько игроков они есть
             points_person = z[0] # список [колво очко, у скольки игроков они есть]
             player_rank_tmp = circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
                     pg_win, pg_los, pp, pps, stage)
         elif m_new > 3:  # если кол-во очков у более трех спортсменов (крутиловка)
-            m_circle = m_new
-            men_of_circle = m_new
-            player_rank_tmp = circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle, stage)
+            # m_circle = m_new
+            # men_of_circle = m_new
+            player_rank_tmp = circle(tr, num_gr, td, max_person, mesto, stage, id_system)
         tr.clear()
 
         for i in player_rank_tmp:
@@ -12173,7 +12195,7 @@ def get_unique_numbers(pp_all):
     return unique
 
 
-def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle, stage):
+def circle(tr, num_gr, td, max_person, mesto, stage, id_system):
     """выставляет места в крутиловке -tour- встречи игроков, p1, p2 фамилии, num_gr номер группы
     -tr- список всех туров (номеров) участников в крутиловке men_of_circle кол-во игроков с одинаковым кол-вом очков,
     max_person общее кол-во игроков в группе player_rank - список (номер игроков и их места)"""
@@ -12183,19 +12205,20 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle, stage):
     ps = []
     pps = []
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
-    pp = {}  # ключ - игрок, значение его очки
-    pg_win = {}
-    pg_los = {}
+    # pp = {}  # ключ - игрок, значение его очки
+    # pg_win = {}
+    # pg_los = {}
 
     # получает список 1-й уникальные
-    u = summa_points_person(tr, tr_all, pp, pg_win, pg_los, num_gr, stage)
+    u = summa_points_person(tr, tr_all, num_gr, stage, id_system)
     # значения очков и список значения очков и у скольких спортсменов они есть
     unique_numbers = u[0]
     tr.clear()
-    sort_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}
-    for key, value in sort_tuple.items():
-        rev_dict.setdefault(value, set()).add(key)
-
+    # ====
+    # sort_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}
+    # for key, value in sort_tuple.items():
+    #     rev_dict.setdefault(value, set()).add(key)
+    # ====
     for f in unique_numbers:  # проходим циклом по уник. значениям, очки в крутиловке
         m_new = 0
         num_player = rev_dict.get(f)
@@ -12219,8 +12242,10 @@ def circle(men_of_circle, tr, num_gr, td, max_person, mesto, m_circle, stage):
             for x in num_player:
                 tr.append(str(x))  # создает список (встречи игроков)
                 m_new += 1
+            # player_rank_tmp = circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point,
+            #                                    player_rank_tmp, tr_all, pp, pg_win, pg_los, x, pps, ps)
             player_rank_tmp = circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point,
-                                               player_rank_tmp, tr_all, pp, pg_win, pg_los, x, pps, ps)
+                                               player_rank_tmp, tr_all, x, pps, ps)
         mesto = mesto + m_new
         tr.clear()
 
@@ -12246,7 +12271,7 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
     elif m_new == 3:
         # men_of_circle = m_new
         # получает список 1-й уникальные
-        u = summa_points_person(tr, tr_all, pp, pg_win, pg_los, num_gr, stage)
+        u = summa_points_person(tr, tr_all, num_gr, stage, id_system)
         # значения очков и список значения очков и у скольких спортсменов они есть
         z = u[1]
         points_person = z[0]
@@ -12319,7 +12344,7 @@ def tour_circle(pp, per_circ, circ):
     return tr_new
 
 
-def summa_points_person(men_od_circle, tr, tr_all, pp, pg_win, pg_los, num_gr, stage):
+def summa_points_person(tr, tr_all, num_gr, stage, id_system):
     """подсчитывает сумму очков у спортсменов в крутиловке 
     -tr- номера игроков в группе, у которых крутиловка
     -tr_all- все варианты встреч в крутиловке
@@ -12327,6 +12352,9 @@ def summa_points_person(men_od_circle, tr, tr_all, pp, pg_win, pg_los, num_gr, s
     -pg_win- словарь (номер игрока: список (кол-во выйгранных партий)"""
     pp_all = []
     u = []
+    pp = {}  # ключ - игрок, значение его очки
+    pg_win = {}
+    pg_los = {}
     tr_all.clear()
     pg_win.clear()
     pg_los.clear()
@@ -12340,14 +12368,14 @@ def summa_points_person(men_od_circle, tr, tr_all, pp, pg_win, pg_los, num_gr, s
     for i in combinations(tr, 2):  # получает список с парами игроков в крутиловке
         i = list(i)
         tr_all.append(i)
-    count_game_circle = len(tr_all)
+    count_game_circle = len(tr_all) # число игр в крутиловки
 
     for n in range(0, count_game_circle):
         tour = "-".join(tr_all[n])  # получает строку встреча в туре
         ki1 = int(tr_all[n][0])  # 1-й игрок в туре
         ki2 = int(tr_all[n][1])  # 2-й игрок в туре
 
-        sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage)  # сумма очков игрока
+        sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage, id_system)  # сумма очков игрока
 
     for i in tr:  # суммирует очки каждого игрока
         i = int(i)
@@ -12372,8 +12400,76 @@ def summa_points_person(men_od_circle, tr, tr_all, pp, pg_win, pg_los, num_gr, s
     return u # список списков 1-й кол-во игроков 2-й очки выйигранные и проигранные
 
 
+# def circle_2_player(tr, td, max_person, mesto, num_gr):
+#     """крутиловка из 2-ух человек"""
+#     sender = my_win.sender()
+#     tab = my_win.tabWidget.currentIndex()
+#     if sender == my_win.view_fin1_Action:
+#         system_stage = "1-й финал"
+    
+#     # if tab == 3:
+#     #     system_stage = "Предварительный"
+#     # elif tab == 4:
+#     #     system_stage = my_win.comboBox_filter_semifinal.currentText()
+#     # elif tab == 5:
+#     #     system_stage = my_win.comboBox_filter_final.currentText()
+
+#     result = Result.select().where(Result.title_id == title_id())
+#     player_rank_tmp = []
+#     tour = "-".join(tr)  # делает строку встреча в туре
+#     # =====приводит туры к читаемому виду (1-й игрок меньше 2-ого)
+#     znak = tour.find("-")
+#     p1 = int(tour[:znak])  # игрок под номером в группе
+#     p2 = int(tour[znak + 1:])  # игрок под номером в группе
+#     if p1 > p2:  # меняет последовательность игроков в туре на обратную, чтоб у 1-ого игрока был номер меньше
+#         p_tmp = p1
+#         p1 = p2
+#         p2 = p_tmp
+#         tour = f"{p1}-{p2}"
+#     if num_gr != "Одна таблица":
+#         # result_stage = result.select().where(Result.system_stage == system_stage)
+#         c = result.select().where((Result.number_group == num_gr) &
+#                                   (Result.tours == tour)).get()  # ищет в базе
+#     # строчку номер группы и тур по двум столбцам
+#     else:
+#         c = result.select().where((Result.system_stage == num_gr) &
+#                                   (Result.tours == tour)).get()  # ищет в базе
+#         # строчку номер группы и тур по двум столбцам
+#     if c.winner == c.player1:
+#         points_p1 = c.points_win  # очки во встрече победителя
+#         points_p2 = c.points_loser  # очки во встрече проигравшего
+#         td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
+#         td[p2 * 2 - 2][max_person + 4] = mesto + 1  # записывает место проигравшему
+#         player_rank_tmp.append([p1, mesto])
+#         player_rank_tmp.append([p2, mesto + 1])
+#     else:
+#         points_p1 = c.points_loser
+#         points_p2 = c.points_win
+#         td[p1 * 2 - 2][max_person + 4] = mesto + 1  # записывает место победителю
+#         td[p2 * 2 - 2][max_person + 4] = mesto  # записывает место проигравшему
+#         player_rank_tmp.append([p1, mesto + 1])
+#         player_rank_tmp.append([p2, mesto])
+#     td[p1 * 2 - 2][max_person + 3] = points_p1  # очки во встрече победителя
+#     td[p2 * 2 - 2][max_person + 3] = points_p2  # очки во встрече проигравшего
+
+#     return player_rank_tmp
+
+# =======
+
 def circle_2_player(tr, td, max_person, mesto, num_gr):
     """крутиловка из 2-ух человек"""
+    # sender = my_win.sender()
+    # tab = my_win.tabWidget.currentIndex()
+    # if sender == my_win.view_fin1_Action:
+    #     system_stage = "1-й финал"
+    
+    # if tab == 3:
+    #     system_stage = "Предварительный"
+    # elif tab == 4:
+    #     system_stage = my_win.comboBox_filter_semifinal.currentText()
+    # elif tab == 5:
+    #     system_stage = my_win.comboBox_filter_final.currentText()
+
     result = Result.select().where(Result.title_id == title_id())
     player_rank_tmp = []
     tour = "-".join(tr)  # делает строку встреча в туре
@@ -12387,6 +12483,7 @@ def circle_2_player(tr, td, max_person, mesto, num_gr):
         p2 = p_tmp
         tour = f"{p1}-{p2}"
     if num_gr != "Одна таблица":
+        # result_stage = result.select().where(Result.system_stage == system_stage)
         c = result.select().where((Result.number_group == num_gr) &
                                   (Result.tours == tour)).get()  # ищет в базе
     # строчку номер группы и тур по двум столбцам
@@ -12412,6 +12509,7 @@ def circle_2_player(tr, td, max_person, mesto, num_gr):
     td[p2 * 2 - 2][max_person + 3] = points_p2  # очки во встрече проигравшего
 
     return player_rank_tmp
+# =====
 
 
 def circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
@@ -12504,7 +12602,7 @@ def circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, pla
     return player_rank_tmp
 
 
-def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage):
+def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage, id_system):
     """сумма очков каждого игрока в крутиловке"""
     
     # # =====приводит туры к читаемому виду (1-й игрок меньше 2-ого)
@@ -12518,11 +12616,11 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage):
         ki2 = p1
     result = Result.select().where(Result.title_id == title_id())
     if num_gr == "Одна таблица":
-        res = result.select().where(Result.system_stage == num_gr)
+        res = result.select().where(Result.system_id == id_system)
     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-        res = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
+        res = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
     else:
-        res = result.select().where(Result.number_group == num_gr)
+        res = result.select().where(Result.system_id == id_system)
     c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу c - id - встречи в таблице Result
  
     if c.winner == c.player1:  # победил 1-й игрок
@@ -13601,7 +13699,9 @@ def load_playing_game_in_table_for_final(fin):
 
 def made_file_excel_for_rejting():
     """создание файла Excel для обсчета рейтинга"""
+    msgBox = QMessageBox()
     result = Result.select().where(Result.title_id == title_id())
+    players = Player.select().where(Player.title_id == title_id())
     player_result = result.select().where(Result.points_loser != 0).order_by(Result.winner)
 
     book = op.Workbook()
@@ -13611,12 +13711,13 @@ def made_file_excel_for_rejting():
         c =  worksheet.cell(row = 1, column = m)
         c.value = names_headers[m - 1]
     k = 2
+    
     for l in player_result:
         pl_win = l.winner
         pl_los = l.loser
-        id_win = Player.select().where(Player.full_name == pl_win).get()
+        id_win = players.select().where(Player.full_name == pl_win).get()
         pl_win = id_win.player
-        id_los =  Player.select().where(Player.full_name == pl_los).get() 
+        id_los =  players.select().where(Player.full_name == pl_los).get()
         pl_los = id_los.player
         score = l.score_in_game
         c1 = worksheet.cell(row = k, column = 1)
