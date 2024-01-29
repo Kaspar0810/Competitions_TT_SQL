@@ -5279,8 +5279,9 @@ def enter_score(none_player=0):
 
 def made_pdf_table_for_view(sender):
     """вызов функции заполнения таблицы pdf группы сыгранными играми"""
+    group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     tab = my_win.tabWidget.currentIndex()
-    sys = System.select().where(System.title_id == title_id())
+    # sys = System.select().where(System.title_id == title_id())
     if sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
         stage = "Предварительный"
         my_win.tabWidget.setCurrentIndex(3)
@@ -5325,27 +5326,31 @@ def made_pdf_table_for_view(sender):
         stage = "2-й полуфинал"
         my_win.tabWidget.setCurrentIndex(4)
 
-    system = sys.select().where(System.stage == stage).get()
+    # system = sys.select().where(System.stage == stage).get()
     # etap_stage = system.stage 
-    # # ==== новый вариант с использованием system id
+    # ==== новый вариант с использованием system id
     # etap_stage = stage
-    # system_id = system_id(etap_stage)
-    # # ========
+    id_system = system_id(stage)
+    systems = System.select().where(System.id == id_system).get()
+    pv = systems.page_vid
+    type_table = systems.type_table
+    system_table = systems.label_string
+    # ========
     # pv = system.page_vid
     # table_made(pv, stage)
-    if system.stage == "Предварительный":
-        pv = system.page_vid
+    if stage in group_list:
+        # pv = id_system.page_vid
         table_made(pv, stage)
-    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-        pv = system.page_vid
-        table_made(pv, stage)
-    elif system.stage == "Одна таблица" or system.stage == fin:
-        if system.type_table == "круг":
-            pv = system.page_vid
+    # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+    #     # pv = id_system.page_vid
+    #     table_made(pv, stage)
+    elif stage == "Одна таблица" or stage == fin:
+        if type_table == "круг":
+            # pv = id_system.page_vid
             table_made(pv, stage)
         else:
-            system_table = system.label_string
-            pv = system.page_vid
+            # system_table = id_system.label_string
+            # pv = id_system.page_vid
             if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
                 setka_8_full_made(fin)
             elif system_table == "Сетка (-2) на 8 участников":
@@ -9633,8 +9638,7 @@ def table_made(pv, stage):
     # start_time = time.time()
     from reportlab.platypus import Table
      # ==== новый вариант с использованием system id
-    etap_stage = stage
-    id_system = system_id(etap_stage)
+    id_system = system_id(stage)
     # ========
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
     # system = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()  # находит system id последнего
@@ -11796,34 +11800,44 @@ def score_in_table(td, num_gr):
     -td- список строки таблицы, куда пишут счет"""
     td_color = []
     total_score = {}  # словарь, где ключ - номер участника группы, а значение - очки
+    sender = my_win.sender()
     tab = my_win.tabWidget.currentIndex()
-    system = System.select().where(System.title_id == title_id())
+    # system = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     gamelist = Game_list.select().where(Game_list.title_id == title_id())
     if tab == 7: # открыта вкладка для редактирования групп
         stage = my_win.comboBox_edit_etap1.currentText()
-        system_id = system.select().where(System.stage == stage).get()
-        mp = len(gamelist.select().where((Game_list.system_id == system_id) & (Game_list.number_group == num_gr)))
-        r = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
+        id_system = system_id(stage)
+        mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
+        r = result.select().where((Result.system_stage_id == id_system) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
     elif tab == 3:
-        ta = system.select().where(System.stage == "Предварительный").get()  # находит system id последнего
-        r = result.select().where((Result.system_stage == "Предварительный") & (Result.number_group == num_gr))
+        stage = "Предварительный"
+        id_system = system_id(stage)   
+        ta = System.select().where(System.id == id_system).get()  # находит system id последнего
+        r = result.select().where((Result.system_id== id_system) & (Result.number_group == num_gr))
         ch = choice.select().where(Choice.group == num_gr)  # фильтрует по группе
         mp = ta.max_player
         stage = ta.stage
     elif tab == 4:
-        stage = my_win.comboBox_filter_semifinal.currentText()
-        ta = system.select().where(System.stage == stage).get()
-        # ta = system.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()  # находит system id последнего
-        stage = ta.stage
-        mp = len(gamelist.select().where((Game_list.system_id == ta) & (Game_list.number_group == num_gr)))
-        r = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
+        if sender == my_win.view_pf1_Action:
+            stage = "1-й полуфинал"
+        elif sender == my_win.view_pf2_Action:
+            stage = "2-й полуфинал"
+        else:
+            stage = my_win.comboBox_filter_semifinal.currentText()
+        id_system = system_id(stage) # получает id системы из комбобокса
+        # ta = system.select().where(System.stage == stage).get()
+        # # ta = system.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()  # находит system id последнего
+        # stage = ta.stage
+        mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
+        r = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
     elif tab == 5:
-        system_id = system.select().where(System.stage == num_gr).get()
-        id_system = system_id.id
+        stage = num_gr
+        # system_id = system.select().where(System.stage == num_gr).get()
+        id_system = system_id(stage)
         r = result.select().where(Result.system_id == id_system)
         if num_gr == "Одна таблица":
             stage = "Одна таблица"
@@ -11916,11 +11930,11 @@ def score_in_table(td, num_gr):
     # ===== если сыграны все игры группе то выставляет места =========
     count_game = (count_player * (count_player - 1)) // 2
     if num_gr == "Одна таблица":
-        results = result.select().where(Result.system_stage == num_gr)
+        results = result.select().where((Result.system_id == id_system) & (Result.system_stage == num_gr))
     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-        results = r.select().where(Result.number_group == num_gr)
+        results = r.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
     else:
-        results = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
+        results = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
 
     results_playing = results.select().where(Result.points_win == 2)
     a = len(results_playing) # кол-во сыгранных игр
