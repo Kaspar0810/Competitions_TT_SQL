@@ -8667,10 +8667,6 @@ def select_choice_final():
 def select_choice_semifinal():
     """выбор жеребьевки полуфинала"""
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-     # ==== новый вариант с использованием system id
-    etap_stage = stage
-    system_id = system_id(etap_stage)
-    # ========
     semifinal = []
     for sys in system:
         if sys.stage == "1-й полуфинал" or sys.stage == "2-й полуфинал":
@@ -12260,7 +12256,7 @@ def rank_in_group(total_score, td, num_gr, stage):
         elif m_new == 3: # если кол-во очков у трех спортсмена
             men_of_circle = m_new
             # получает список 1-й уникальные
-            u = summa_points_person(tr, tr_all, num_gr, stage, id_system)
+            u = summa_points_person(tr, tr_all, num_gr, pg_win, pg_los, pp, stage, id_system)
             # значения очков и список значения очков и у скольких спортсменов они есть
             z = u[1]  # список списков кол-во очков и у сколько игроков они есть
             points_person = z[0] # список [колво очко, у скольки игроков они есть]
@@ -12302,12 +12298,12 @@ def circle(tr, num_gr, td, max_person, mesto, stage, id_system):
     ps = []
     pps = []
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
-    # pp = {}  # ключ - игрок, значение его очки
-    # pg_win = {}
-    # pg_los = {}
+    pp = {}  # ключ - игрок, значение его очки
+    pg_win = {}
+    pg_los = {}
 
     # получает список 1-й уникальные
-    u = summa_points_person(tr, tr_all, num_gr, stage, id_system)
+    u = summa_points_person(tr, tr_all, num_gr, pg_win, pg_los, pp, stage, id_system)
     # значения очков и список значения очков и у скольких спортсменов они есть
     unique_numbers = u[0]
     tr.clear()
@@ -12358,6 +12354,7 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
                      tr_all, pp, pg_win, pg_los, x, pps, ps, stage):
     """крутиловка в крутиловке"""
     num_player = []
+    id_system = system_id(stage)
     if m_new == 1:
         p1 = x
         td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
@@ -12368,7 +12365,7 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
     elif m_new == 3:
         # men_of_circle = m_new
         # получает список 1-й уникальные
-        u = summa_points_person(tr, tr_all, num_gr, stage, id_system)
+        u = summa_points_person(tr, tr_all, num_gr, pg_win, pg_los, pp, stage, id_system)
         # значения очков и список значения очков и у скольких спортсменов они есть
         z = u[1]
         points_person = z[0]
@@ -12441,7 +12438,7 @@ def tour_circle(pp, per_circ, circ):
     return tr_new
 
 
-def summa_points_person(tr, tr_all, num_gr, stage, id_system):
+def summa_points_person(tr, tr_all, num_gr, pg_win, pg_los, pp, stage, id_system):
     """подсчитывает сумму очков у спортсменов в крутиловке 
     -tr- номера игроков в группе, у которых крутиловка
     -tr_all- все варианты встреч в крутиловке
@@ -12449,9 +12446,9 @@ def summa_points_person(tr, tr_all, num_gr, stage, id_system):
     -pg_win- словарь (номер игрока: список (кол-во выйгранных партий)"""
     pp_all = []
     u = []
-    pp = {}  # ключ - игрок, значение его очки
-    pg_win = {}
-    pg_los = {}
+    # pp = {}  # ключ - игрок, значение его очки
+    # pg_win = {}
+    # pg_los = {}
     tr_all.clear()
     pg_win.clear()
     pg_los.clear()
