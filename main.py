@@ -5338,33 +5338,30 @@ def made_pdf_table_for_view(sender):
     # ========
     # pv = system.page_vid
     # table_made(pv, stage)
-    if stage in group_list:
+    if type_table == "круг":
+    # if stage in group_list:
         # pv = id_system.page_vid
         table_made(pv, stage)
-    # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-    #     # pv = id_system.page_vid
-    #     table_made(pv, stage)
-    elif stage == "Одна таблица" or stage == fin:
-        if type_table == "круг":
-            # pv = id_system.page_vid
-            table_made(pv, stage)
-        else:
-            # system_table = id_system.label_string
-            # pv = id_system.page_vid
-            if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
-                setka_8_full_made(fin)
-            elif system_table == "Сетка (-2) на 8 участников":
-                setka_8_2_made(fin)
-            elif system_table == "Сетка (с розыгрышем всех мест) на 16 участников":
-                setka_16_full_made(fin)
-            elif system_table == "Сетка (-2) на 16 участников":
-                setka_16_2_made(fin)
-            elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
-                setka_32_full_made(fin)
-            elif system_table == "Сетка (-2) на 32 участников":
-                setka_32_2_made(fin)
-            elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
-                setka_32_made(fin)    
+    else:
+
+    # elif stage == "Одна таблица" or stage == fin:
+    #     if type_table == "круг":
+    #         # pv = id_system.page_vid
+    #         table_made(pv, stage)
+        if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
+            setka_8_full_made(fin)
+        elif system_table == "Сетка (-2) на 8 участников":
+            setka_8_2_made(fin)
+        elif system_table == "Сетка (с розыгрышем всех мест) на 16 участников":
+            setka_16_full_made(fin)
+        elif system_table == "Сетка (-2) на 16 участников":
+            setka_16_2_made(fin)
+        elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
+            setka_32_full_made(fin)
+        elif system_table == "Сетка (-2) на 32 участников":
+            setka_32_2_made(fin)
+        elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
+            setka_32_made(fin)    
 
 
 def setka_type(none_player):
@@ -11274,11 +11271,12 @@ def mesto_in_final(fin):
     return first_mesto
 
 
-def write_in_setka(data, fin, first_mesto, table):
+def write_in_setka(data, stage, first_mesto, table):
     """функция заполнения сетки результатами встреч data поступает чистая только номера в сетке, дальше идет заполнение игроками и счетом"""
     "row_num_win - словарь, ключ - номер игры, значение - список(номер строки 1-ого игрока, номер строки 2-ого игрока) и записвает итоговые места в db"
     sender = my_win.sender()
     player = Player.select().where(Player.title_id == title_id())
+    id_system = system_id(stage)
     # choice = Choice.select().where(Choice.title_id == title_id())
     row_num_los = {}
     row_end = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
@@ -11360,33 +11358,33 @@ def write_in_setka(data, fin, first_mesto, table):
                         64: 168, 67: 174, 68: 182, 75: 185, 76: 194, 79: 199, 80: 201}
     
     if sender == my_win.clear_s32_Action or sender == my_win.clear_s32_full_Action or sender == my_win.clear_s32_2_Action:
-        all_list = setka_data_clear(fin, table)  # печать чистой сетки
+        all_list = setka_data_clear(stage, table)  # печать чистой сетки
         col_first = 0
         row_first = 2
         flag_clear = True
     elif sender == my_win.clear_s16_Action:
-        all_list = setka_data_clear(fin, table)  # печать чистой сетки
+        all_list = setka_data_clear(stage, table)  # печать чистой сетки
         col_first = 2
         row_first = 0
         flag_clear = True
     elif sender == my_win.clear_s16_2_Action:
-        all_list = setka_data_clear(fin, table)  # печать чистой сетки
+        all_list = setka_data_clear(stage, table)  # печать чистой сетки
         col_first = 2
         row_first = 2
         flag_clear = True
     elif sender == my_win.clear_s8_full_Action:
-        all_list = setka_data_clear(fin, table)  # печать чистой сетки
+        all_list = setka_data_clear(stage, table)  # печать чистой сетки
         col_first = 2
         row_first = 2
         flag_clear = True
     elif sender == my_win.clear_s8_2_Action:
-        all_list = setka_data_clear(fin, table)  # печать чистой сетки
+        all_list = setka_data_clear(stage, table)  # печать чистой сетки
         col_first = 2
         row_first = 2
         flag_clear = True
     else:
         sys = System.select().where(System.title_id == title_id())
-        system = sys.select().where(System.stage == fin).get()
+        system = sys.select().where(System.id == id_system).get()
         setka_string = system.label_string
         if setka_string == "Сетка (с розыгрышем всех мест) на 8 участников":
             col_first = 0
@@ -11418,8 +11416,8 @@ def write_in_setka(data, fin, first_mesto, table):
             row_first = 2
             place_3rd = 60
             # place_5th = 61
-        posev_data = setka_player_after_choice(fin) # игроки 1-ого посева
-        all_list = setka_data(fin, posev_data)
+        posev_data = setka_player_after_choice(stage) # игроки 1-ого посева
+        all_list = setka_data(stage, posev_data)
         id_sh_name = all_list[2] # словарь {Фамилия Имя: id}
     tds = []
     tds.append(all_list[0]) # список фамилия/ город 1-ого посева
@@ -11685,13 +11683,14 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     return tdt_tmp
 
 
-def setka_player_after_choice(fin):
+def setka_player_after_choice(stage):
     """список игроков сетки после жеребьевки"""
     p_data = {}
     posev_data = []
+    id_system = system_id(stage)
     player = Player.select().where(Player.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
-    pl_list = game_list.select().where(Game_list.number_group == fin).order_by(Game_list.rank_num_player)
+    pl_list = game_list.select().where(Game_list.system_id == id_system).order_by(Game_list.rank_num_player)
     for i in pl_list:
         p_data['посев'] = i.rank_num_player
         txt = i.player_group_id
@@ -11708,15 +11707,15 @@ def setka_player_after_choice(fin):
     return posev_data
 
 
-def setka_data(fin, posev_data):
+def setka_data(stage, posev_data):
     """данные сетки"""
     id_ful_name = {}
     id_name = {}
     tds = []
     fam_name_city = []
     all_list = []
-
-    system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()  # находит system id последнего
+    id_system = system_id(stage)
+    system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
 
     mp = system.max_player
     for i in range(1, mp * 2 + 1, 2):
@@ -12762,6 +12761,7 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage, id_syst
 
 def score_in_circle(tr_all, men_of_circle, num_gr, tr, stage):
     """подсчитывает счет по партиям в крутиловке"""
+    id_system = system_id(stage)
     result = Result.select().where(Result.title_id == title_id())
     plr_win = {0: [], 1: [], 2: []}
     plr_los = {0: [], 1: [], 2: []}
@@ -12773,7 +12773,7 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr, stage):
         p2 = int(tour[znak + 1:])  # игрок под номером в группе
         if p1 > p2:  # меняет последовательность игроков в туре на обратную, чтоб у 1-ого игрока был номер меньше
             tour = f"{p2}-{p1}"
-        c_res = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
+        c_res = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
         c = c_res.select().where(Result.tours == tour).get()
         k1 = tr_all[n][0]  # 1-й игрок в туре
         k2 = tr_all[n][1]  # 2-й игрок в туре
