@@ -723,7 +723,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 title = Title.get(Title.id == title_id())
                 tab_str = title.tab_enabled       
             # ======
-            sys = system.select().where(System.stage == fin).get()
+            stage = fin
+            id_system = system_id(stage)
+            sys = system.select().where(System.id == id_system).get()
             type = sys.type_table
             kol_player_exit = sys.mesta_exit
             etap_exit = sys.stage_exit
@@ -733,7 +735,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 etap_replacing = etap_exit + "е"
             fin_replacing = fin.replace("й", "ого") + "а"
             if fin is not None:
-                checking_flag = checking_possibility_choice(fin) # флаг жеребьевки этапа, если True значит все игры предварительного или полуфиналов сыграны
+                checking_flag = checking_possibility_choice(stage) # флаг жеребьевки этапа, если True значит все игры предварительного или полуфиналов сыграны
                 if checking_flag is False:
                     return
                 check_flag = check_choice(fin) # была ли сделана жеребьевка
@@ -3688,14 +3690,13 @@ def player_fin_on_circle(fin):
      td - список списков данных из групп"""
     fin_dict = {}
     fin_list = []
- 
+    stage = fin
+    id_system = system_id(stage)
     players = Player.select().where(Player.title_id == title_id())
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
     choice = Choice.select().order_by(Choice.group).where(Choice.title_id == title_id())
+    system = System.select().where(System.id == id_system).get()  # находит system id последнего
 
-    system_id = system.select().where(System.stage == fin).get()
-    id_system = system_id.id
-    stage_exit = system_id.stage_exit
+    stage_exit = system.stage_exit
     st = "Финальный"
 
     nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
@@ -6150,8 +6151,10 @@ def check_one_region_in_choice(fin):
 
 def rank_mesto_out_in_group_or_semifinal_to_final(fin):
     """определение мест, выходящих из группы или полуфинала в финал"""
+    stage = fin
+    id_system = system_id(stage)
     systems_stage = System.select().where(System.title_id == title_id())
-    system = System.select().where((System.title_id == title_id()) & (System.stage == fin)).get()
+    # system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
     # stage_out = system.stage_exit # откуда вышли в финал
     # how_many_out_in_stage = system.mesta_exit # сколько игроков вышло из этапа в финал
     # == словарь этап число игроков в группе или полуфинале
@@ -6190,9 +6193,13 @@ def rank_mesto_out_in_group_or_semifinal_to_final(fin):
             del list_mest[:player_out_sf2]
         else:
             system_fin = System.select().where((System.title_id == title_id()) & (System.stage == etap)).get()
-            etap_out_fin = system_fin.stage_exit
-            pl_out = system_fin.mesta_exit
+            # system_fin = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
+            etap_out_fin = system_fin.stage_exit # из какого этапа выходят в финал
+            pl_out = system_fin.mesta_exit # сколько мест
             list_mest = etap_out_and_player[etap_out_fin]
+            # del list_mest[pl_out:]
+            # nums = list_mest
+            # break
             if fin != etap:
                 del list_mest[:pl_out]
                 player_in_stage[etap] = etap_out_and_player[etap_out_fin]
@@ -8557,18 +8564,20 @@ def clear_db_before_choice(stage):
 
 def clear_db_before_choice_final(fin):
     """очищает базу данных -Game_list- и -Result- перед повторной жеребьевкой финалов"""
-    gamelist = Game_list.select().where(Game_list.title_id == title_id())
-    gl = gamelist.select().where(Game_list.number_group == fin)
-    for i in gl:
+    stage = fin
+    id_system = system_id(stage)
+    gamelist = Game_list.select().where((Game_list.title_id == title_id()) & (Game_list.system_id == id_system))
+    # gl = gamelist.select().where(Game_list.system_id == id_system)
+    for i in gamelist:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
-    results = Result.select().where(Result.title_id == title_id())
-    rs = results.select().where(Result.number_group == fin)
-    for i in rs:
+    results = Result.select().where((Result.title_id == title_id()) & (Result.system_id == id_system))
+    # rs = results.select().where(Result.number_group == fin)
+    for i in results:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
     choice = Choice.select().where(Choice.title_id == title_id())
-    ch = choice.select().where(Choice.final == fin)
+    ch = choice.select().where(Choice.final == stage)
     for i in ch:
         ch_d = Choice.get(Choice.id == i)
         ch_d.posev_final = ""
@@ -8700,30 +8709,35 @@ def manual_choice_setka(fin, count_exit, mesto_first_poseva):
             choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
 
 
-def check_choice(fin):
+def check_choice(stage):
     """Проверяет перед жеребьевкой финалов, была ли она произведена ранее или еще нет"""
     stage_list = []
-    system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    for st in system:
-        system_stage = st.stage
-        flag = st.choice_flag
-        if system_stage != "" and flag is True:
-            stage_list.append(system_stage)
-        else:
-            check_flag = False
-    if fin in stage_list:
-        check_flag = True
+    id_system = system_id(stage)
+    system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
+    check_flag = system.choice_flag
+    # if fla
+    # system = System.select().where(System.title_id == title_id())  # находит system id последнего
+    # for st in system:
+    #     system_stage = st.stage
+    #     flag = st.choice_flag
+    #     if system_stage != "" and flag is True:
+    #         stage_list.append(system_stage)
+    #     else:
+    #         check_flag = False
+    # if fin in stage_list:
+    #     check_flag = True
     return check_flag
 
 
-def checking_possibility_choice(fin):
+def checking_possibility_choice(stage):
     """Проверяет перед жеребьевкой финалов, сыграны ли все партиии в группах или полуфиналах"""
     msg = QMessageBox
+    id_system = system_id(stage)
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    system_final = system.select().where(System.stage == fin).get() # получаем запись конкретного финала
+    system_final = system.select().where(System.id == id_system).get() # получаем запись конкретного финала
     check_flag = False
     
-    if fin == "Одна таблица":
+    if stage == "Одна таблица":
         check_flag = system_final.choice_flag
     else:    
         exit = system_final.stage_exit  # запись откуда идет выход в финал
@@ -9629,6 +9643,7 @@ def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
     # start_time = time.time()
+    stage_list_sf = ["1-й полуфинал", "2-й полуфинал"]
     from reportlab.platypus import Table
      # ==== новый вариант с использованием system id
     id_system = system_id(stage)
@@ -9654,16 +9669,26 @@ def table_made(pv, stage):
     # c.save()
 
     # ==========
- 
-    if (stage == "Одна таблица" and type_tbl == "круг") or (stage != "Одна таблица" and type_tbl == "круг"):
+    if stage in stage_list_sf: # если этап полуфинал
+        kg = system.total_group  # кол-во групп
+        max_pl = system.max_player // kg 
+    elif stage == "Предварительный":
+        kg = system.total_group  # кол-во групп
+        max_pl = system.max_player
+    else: # игры в финале по кругу или одна круговая таблица
         kg = 1
         max_pl = system.max_player
-    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-        kg = system.total_group  # кол-во групп
-        max_pl = system.max_player // kg
-    else:  # групповые игры
-        kg = system.total_group  # кол-во групп
-        max_pl = system.max_player
+
+    # if stage == "Одна таблица":
+    # # if (stage == "Одна таблица" and type_tbl == "круг") or (stage != "Одна таблица" and type_tbl == "круг"):
+    #     kg = 1
+    #     max_pl = system.max_player
+    # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+    #     kg = system.total_group  # кол-во групп
+    #     max_pl = system.max_player // kg
+    # else:  # групповые игры
+    #     kg = system.total_group  # кол-во групп
+    #     max_pl = system.max_player
         
     family_col = 3.2
     if pv == "альбомная":  # альбомная ориентация стр
@@ -11440,7 +11465,7 @@ def write_in_setka(data, stage, first_mesto, table):
     # ==============
     if flag_clear is False:
         # функция расстановки счетов и сносок игроков
-        dict_setka = score_in_setka(fin, place_3rd) # список (номер, игрок, счет в партии, номер куда сносится проигравший, его фамилия)
+        dict_setka = score_in_setka(stage, place_3rd) # список (номер, игрок, счет в партии, номер куда сносится проигравший, его фамилия)
         key_list = []
         mesta_list = []
         for k in dict_setka.keys():
@@ -11553,7 +11578,8 @@ def setka_data_clear(fin, table):
 
 def kol_player(stage):
     """выводит максимальное количество человек в группе t если все группы равны, а g2 если разное количество"""
-    system = System.select().where((System.title_id == title_id()) & (System.stage == stage)).get()
+    id_system = system_id(stage)
+    system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
     if stage == "Предварительный":
         all_players = system.total_athletes
         all_group = system.total_group
@@ -11615,7 +11641,7 @@ def  table_data(stage, kg):
     tdt_color = []
     tdt_new = []
     result = Result.select().where(Result.title_id == title_id())  # находит system id последнего
-    system = System.select().where(System.title_id == title_id())
+    # system = System.select().where(System.title_id == title_id())
     # system_id = system.select().where(System.stage == stage).get()
     # id_system = system_id.id
     if kg == 1:  # система одна таблица круг или финалу по кругу
@@ -11797,7 +11823,6 @@ def score_in_table(td, num_gr):
     total_score = {}  # словарь, где ключ - номер участника группы, а значение - очки
     sender = my_win.sender()
     tab = my_win.tabWidget.currentIndex()
-    # system = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     gamelist = Game_list.select().where(Game_list.title_id == title_id())
@@ -11805,13 +11830,13 @@ def score_in_table(td, num_gr):
         stage = my_win.comboBox_edit_etap1.currentText()
         id_system = system_id(stage)
         mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
-        r = result.select().where((Result.system_stage_id == id_system) & (Result.number_group == num_gr))
+        results = result.select().where((Result.system_stage_id == id_system) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
     elif tab == 3:
         stage = "Предварительный"
         id_system = system_id(stage)   
         ta = System.select().where(System.id == id_system).get()  # находит system id последнего
-        r = result.select().where((Result.system_id== id_system) & (Result.number_group == num_gr))
+        results = result.select().where((Result.system_id== id_system) & (Result.number_group == num_gr))
         ch = choice.select().where(Choice.group == num_gr)  # фильтрует по группе
         mp = ta.max_player
         stage = ta.stage
@@ -11823,28 +11848,23 @@ def score_in_table(td, num_gr):
         else:
             stage = my_win.comboBox_filter_semifinal.currentText()
         id_system = system_id(stage) # получает id системы из комбобокса
-        # ta = system.select().where(System.stage == stage).get()
-        # # ta = system.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()  # находит system id последнего
-        # stage = ta.stage
         mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
-        r = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
+        results = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
     elif tab == 5:
         stage = num_gr
-        # system_id = system.select().where(System.stage == num_gr).get()
         id_system = system_id(stage)
-        r = result.select().where(Result.system_id == id_system)
+        results = result.select().where(Result.system_id == id_system)
         if num_gr == "Одна таблица":
             stage = "Одна таблица"
             ch = choice.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
-        else:
-            stage = "Финальный"
+        else: # игры в финале по кругу
             ch = choice.select().where(Choice.final == num_gr)
         mp = len(gamelist.select().where(Game_list.system_id == id_system))
 
-    count = len(r)  # сколько игр в группе
+    count = len(results)  # сколько игр в группе
     count_player = len(ch)  # определяет сколько игроков в группе
-    result_list = r.dicts().execute()
+    result_list = results.dicts().execute()
     for s in range(1, count_player + 1):
         total_score[s] = 0
     for i in range(0, count):
@@ -11924,12 +11944,6 @@ def score_in_table(td, num_gr):
         td[t * 2][mp + 2] = total_score[t + 1]
     # ===== если сыграны все игры группе то выставляет места =========
     count_game = (count_player * (count_player - 1)) // 2
-    if num_gr == "Одна таблица":
-        results = result.select().where((Result.system_id == id_system) & (Result.system_stage == num_gr))
-    elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-        results = r.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
-    else:
-        results = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
 
     results_playing = results.select().where(Result.points_win == 2)
     a = len(results_playing) # кол-во сыгранных игр
@@ -12028,19 +12042,18 @@ def numer_game(num_game, vid_setki):
     return snoska
 
 
-def score_in_setka(fin, place_3rd):
+def score_in_setka(stage, place_3rd):
     """ выставляет счет победителя и сносит на свои места в сетке"""
     dict_setka = {}
     match = []
     tmp_match = []
-    sys = System.select().where(System.title_id == title_id())
-    system = sys.select().where(System.stage == fin).get()
-    system_id = system.id
+    id_system = system_id(stage)
+    system = sys.select().where(System.id == id_system).get()
     vid_setki = system.label_string
     visible_game = system.visible_game
     # получение id последнего соревнования
     player = Player.select().where(Player.title_id == title_id())
-    result = Result.select().where(Result.system_id == system_id)
+    result = Result.select().where(Result.system_id == id_system)
  
     for res in result:
         num_game = int(res.tours)
@@ -12128,7 +12141,8 @@ def rank_in_group(total_score, td, num_gr, stage):
     -player_group - кол-во участников в группе"""
     tr_all = []
     pps = []
- 
+    group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
+    no_final_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
     pp = {}  # ключ - игрок, значение его очки
     pg_win = {}
     pg_los = {}
@@ -12137,57 +12151,22 @@ def rank_in_group(total_score, td, num_gr, stage):
 
     rev_dict = {}  # словарь, где в качестве ключа очки, а значения - номера групп
     player_rank_group = []    
-    # sys = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     # ========
-    id_system = system_id(stage)
-    # max_person = id_system.max_player
-    
+    id_system = system_id(stage)    
     game_list_group = game_list.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr))
-    # max_person = len(game_list_group)
-    if stage == "Одна таблица":
+    if stage == "Одна таблица" or stage not in group_list:
         game_max = result.select().where(Result.system_id == id_system)  # сколько всего игр в группе
         game_list_group = game_list.select().where(Game_list.system_id == id_system)
         max_person = len(game_list_group)
     else:
         if stage == "Предварительный":
             max_person = id_system.max_player
-            # game_max = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
         elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
             game_list_group = game_list.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr))
             max_person = len(game_list_group)
         game_max = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))  # сколько всего игр в группе
-            
-   
-    # ========
-    # if stage == "Предварительный":
-    #     # system = sys.select().where(System.stage == stage).get()
-    #     max_person = id_system.max_player
-    #     game_max = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))
-    # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-    #     # system = sys.select().where(System.stage == stage).get()
-    #     # system_id = system.id
-    #     game_list_group = game_list.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr))
-    #     game_max = result.select().where((Result.system_stage == stage) & (Result.number_group == num_gr))  # сколько всего игр в группе
-    #     max_person = len(game_list_group)
-    # else:
-    #     # system = sys.select().where(System.stage == num_gr).get()
-    #     # id_system = system.id
-    #     game_max = result.select().where(Result.system_id == id_system)  # сколько всего игр в группе
-    #     game_list_group = game_list.select().where(Game_list.system_id == id_system)
-    #     max_person = len(game_list_group)
-    # elif num_gr == "Одна таблица":
-    #     system = sys.select().where(System.stage == stage).get()
-    #     id_system = system.id
-    #     game_max = result.select().where(Result.system_id == id_system)  # сколько всего игр в группе
-
-    # else:
-    #     system = sys.select().where(System.stage == num_gr).get()
-    #     id_system = system.id
-    #     game_list_group = game_list.select().where(Game_list.system_id == id_system)
-    #     game_max = result.select().where(Result.system_id == system_id)  # сколько всего игр в финале по кругу
-    #     max_person = len(game_list_group)
     # ======== проверка на неявку ======
     fio_no_player = []
     game_not_player = game_max.select().where(Result.points_loser == 0)
@@ -12208,8 +12187,8 @@ def rank_in_group(total_score, td, num_gr, stage):
             if count_fio_loser >= game_one_person: # игры по неявке более 50%
                 game_id_not_player = game_not_player.select().where(Result.loser == fio)
                 for game_id in game_id_not_player:
-                    game_id.points_win = ""
-                    game_id.points_loser = ""
+                    game_id.points_win = 0
+                    game_id.points_loser = 0
                     game_id.save()
      # ===========================================
     # 1-й запрос на выборку с группой
@@ -12229,26 +12208,32 @@ def rank_in_group(total_score, td, num_gr, stage):
     # ds = {index: value for index, value in enumerate(val_list)}  
     # сортирует словарь по убыванию очков
     sorted_tuple = {k: total_score[k] for k in sorted(total_score, key=total_score.get, reverse=True)}
-    # sorted_tuple = {k: ds[k] for k in sorted(ds, key=ds.get, reverse=True)}
     valuesList = list(sorted_tuple.values())  # список очков по убыванию
     unique_numbers = list(set(valuesList))  # множество уникальных очков
     unique_numbers.sort(reverse=True)  # список уникальных очков по убыванию
     mesto = 1
+    # +++++ вариант начального места в финале
+    if stage not in group_list or stage != "Одна таблица":
+        mesta_list = []
+        systems = System.select().where(System.title_id == title_id())
+        for k in systems:
+            if k.stage not in no_final_list:
+                player_in_final = k.max_player
+                if k.stage != stage:
+                    mesta_list.append(player_in_final)
+                else:
+                    break
+        mesto = 1 + sum(mesta_list)
 
     for f in unique_numbers:  # проходим циклом по уник. значениям
         num_player = rev_dict.get(f)
-        # for x in num_player:
-        #     tr.append(str(x))  # создает список (встречи игроков)
         for pl in num_player:
             tr.append(str(pl))  # создает список (встречи игроков)
         m_new = valuesList.count(f)  # подсчитываем сколько раз оно встречается
 
         if m_new == 1:  # если кол-во очков у одного спортсмена
-            # p1 = x
             # записывает место победителю
-            # td[p1 * 2 - 2][max_person + 4] = mesto
             td[pl * 2 - 2][max_person + 4] = mesto
-            # player_rank_tmp.append([p1, mesto])
             player_rank_tmp.append([pl, mesto])
         elif m_new == 2:  # если кол-во очков у двух спортсмена (определение мест по игре между собой)
             player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr)
@@ -12308,8 +12293,8 @@ def circle(tr, num_gr, td, max_person, mesto, stage, id_system):
     tr.clear()
     # ====
     # sort_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}
-    # for key, value in sort_tuple.items():
-    #     rev_dict.setdefault(value, set()).add(key)
+    for key, value in pp.items(): # сортируем словарь PP по уменьшению значений (очков)
+        rev_dict.setdefault(value, set()).add(key)
     # ====
     for f in unique_numbers:  # проходим циклом по уник. значениям, очки в крутиловке
         m_new = 0
