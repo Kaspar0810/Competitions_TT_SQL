@@ -3724,7 +3724,7 @@ def player_fin_on_circle(fin):
                 fin_dict[nt] = player_id
                 nt += 1
 
-    player_in_final = system_id.max_player # количество игроков в финале
+    player_in_final = system.max_player # количество игроков в финале
     cp = player_in_final - 3
     tour = tours_list(cp)
     kol_tours = len(tour)  # кол-во туров
@@ -3746,7 +3746,7 @@ def player_fin_on_circle(fin):
     # for nt in number_tours:
     for nt in range(1, player_in_final + 1):
         fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
-        game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=system_id,
+        game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=id_system,
                             title_id=title_id())
         game_list.save()
   
@@ -3787,8 +3787,8 @@ def player_fin_on_circle(fin):
                 results = Result(number_group=fin, system_stage=st, player1=full_pl1, player2=full_pl2,
                                 tours=match, title_id=title_id(), round=round, system_id=id_system).save()
     with db:
-        system_id.choice_flag = True
-        system_id.save()    
+        system.choice_flag = True
+        system.save()    
     title = Title.select().where(Title.id == title_id()).get()
     page_title = title.tab_enabled
     if "Финалы" not in page_title:
@@ -3798,7 +3798,7 @@ def player_fin_on_circle(fin):
         title.tab_enabled = page_title
         title.save()
     tab_enabled(gamer)
-    pv = system_id.page_vid
+    pv = system.page_vid
     stage = fin
     table_made(pv, stage)
 
@@ -8567,21 +8567,16 @@ def clear_db_before_choice_final(fin):
     stage = fin
     id_system = system_id(stage)
     gamelist = Game_list.select().where((Game_list.title_id == title_id()) & (Game_list.system_id == id_system))
-    # gl = gamelist.select().where(Game_list.system_id == id_system)
     for i in gamelist:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
     results = Result.select().where((Result.title_id == title_id()) & (Result.system_id == id_system))
-    # rs = results.select().where(Result.number_group == fin)
     for i in results:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
-    choice = Choice.select().where(Choice.title_id == title_id())
-    ch = choice.select().where(Choice.final == stage)
-    for i in ch:
-        ch_d = Choice.get(Choice.id == i)
-        ch_d.posev_final = ""
-        ch_d.save()
+    choice = Choice.select().where((Choice.title_id == title_id()) & (Choice.final == stage))
+    for i in choice:
+        Choice.update(posev_final="").where(Choice.id == i).execute()
 
 
 def clear_db_before_choice_semifinal(stage):
@@ -11641,9 +11636,6 @@ def  table_data(stage, kg):
     tdt_color = []
     tdt_new = []
     result = Result.select().where(Result.title_id == title_id())  # находит system id последнего
-    # system = System.select().where(System.title_id == title_id())
-    # system_id = system.select().where(System.stage == stage).get()
-    # id_system = system_id.id
     if kg == 1:  # система одна таблица круг или финалу по кругу
         # список словарей участник и его регион
         result_fin = result.select().where(Result.system_id == system_id(stage))
@@ -11674,6 +11666,7 @@ def  table_data(stage, kg):
             tdt_all.append(tdt_new)
             tdt_all.append(tdt_color)
     return tdt_all
+
 
 def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     tdt_tmp = []
