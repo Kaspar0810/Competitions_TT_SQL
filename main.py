@@ -3693,7 +3693,7 @@ def player_fin_on_circle(fin):
     stage = fin
     id_system = system_id(stage)
     players = Player.select().where(Player.title_id == title_id())
-    choice = Choice.select().order_by(Choice.group).where(Choice.title_id == title_id())
+    choice = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.group)
     system = System.select().where(System.id == id_system).get()  # находит system id последнего
 
     stage_exit = system.stage_exit
@@ -11844,16 +11844,23 @@ def score_in_table(td, num_gr):
         mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
         results = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
-    elif tab == 5:
+    elif tab == 5 or my_win.choice_fin_Action:
         stage = num_gr
         id_system = system_id(stage)
+        systems = System.select().where(System.id == id_system).get()
+        etap_exit = systems.stage_exit # этап откуда выходят в данный финал
         results = result.select().where(Result.system_id == id_system)
         if num_gr == "Одна таблица":
             stage = "Одна таблица"
             ch = choice.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
         else: # игры в финале по кругу
-            ch = choice.select().where(Choice.final == num_gr)
+            # определить в каком столбце фильтровать выход в финал
+            ch = choice.select().where((Choice.final == num_gr) & (Choice.semi_final == etap_exit))
         mp = len(gamelist.select().where(Game_list.system_id == id_system))
+    # else: # если из повторной жеребьевки
+    #     stage = num_gr
+    #     id_system = system_id(stage)
+    #     results = result.select().where(Result.system_id == id_system)
 
     count = len(results)  # сколько игр в группе
     count_player = len(ch)  # определяет сколько игроков в группе
@@ -12833,6 +12840,7 @@ def player_choice_in_group(num_gr):
 
 def player_choice_one_table(stage):
     """список спортсменов одной таблицы"""
+
     posev_data = []
     choices = Choice.select().where(Choice.title_id == title_id())
     players = Player.select().where(Player.title_id == title_id())
@@ -12840,6 +12848,7 @@ def player_choice_one_table(stage):
         choice = choices.select().where(Choice.basic == "Одна таблица")
     else:
         choice = choices.select().order_by(Choice.posev_final).where(Choice.final == stage)
+        
     for posev in choice:
         pl = players.select().where(Player.id == posev.player_choice_id).get()
         city = pl.city
