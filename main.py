@@ -3713,10 +3713,10 @@ def player_fin_on_circle(fin):
                 fin_dict[nt] = player_id
                 nt += 1
     else:
-        choices_fin = choice.select().where(Choice.mesto_semi_final.in_(nums))
+        # choices_fin = choice.select().where(Choice.mesto_semi_final.in_(nums))
         nt = 1
         for b in nums:
-            choices_fin = choice.select().where(Choice.mesto_semi_final == b)
+            choices_fin = choice.select().where((Choice.mesto_semi_final == b) & (Choice.semi_final == stage_exit))
             for n in choices_fin:
                 player = n.family
                 pl_id = n.player_choice_id
@@ -5282,7 +5282,6 @@ def made_pdf_table_for_view(sender):
     """вызов функции заполнения таблицы pdf группы сыгранными играми"""
     group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     tab = my_win.tabWidget.currentIndex()
-    # sys = System.select().where(System.title_id == title_id())
     if sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
         stage = "Предварительный"
         my_win.tabWidget.setCurrentIndex(3)
@@ -5326,29 +5325,16 @@ def made_pdf_table_for_view(sender):
     elif sender == my_win.view_pf2_Action:
         stage = "2-й полуфинал"
         my_win.tabWidget.setCurrentIndex(4)
-
-    # system = sys.select().where(System.stage == stage).get()
-    # etap_stage = system.stage 
     # ==== новый вариант с использованием system id
-    # etap_stage = stage
     id_system = system_id(stage)
     systems = System.select().where(System.id == id_system).get()
     pv = systems.page_vid
     type_table = systems.type_table
     system_table = systems.label_string
     # ========
-    # pv = system.page_vid
-    # table_made(pv, stage)
-    if type_table == "круг":
-    # if stage in group_list:
-        # pv = id_system.page_vid
+    if type_table == "круг" or type_table == "группы":
         table_made(pv, stage)
     else:
-
-    # elif stage == "Одна таблица" or stage == fin:
-    #     if type_table == "круг":
-    #         # pv = id_system.page_vid
-    #         table_made(pv, stage)
         if system_table == "Сетка (с розыгрышем всех мест) на 8 участников":
             setka_8_full_made(fin)
         elif system_table == "Сетка (-2) на 8 участников":
@@ -12213,7 +12199,9 @@ def rank_in_group(total_score, td, num_gr, stage):
     unique_numbers.sort(reverse=True)  # список уникальных очков по убыванию
     mesto = 1
     # +++++ вариант начального места в финале
-    if stage not in group_list or stage != "Одна таблица":
+    if stage in no_final_list:
+        mesto = 1
+    else:
         mesta_list = []
         systems = System.select().where(System.title_id == title_id())
         for k in systems:
@@ -12847,7 +12835,7 @@ def player_choice_one_table(stage):
     if stage == "Одна таблица":
         choice = choices.select().where(Choice.basic == "Одна таблица")
     else:
-        choice = choices.select().order_by(Choice.posev_final).where(Choice.final == stage)
+        choice = choices.select().where(Choice.final == stage).order_by(Choice.posev_final)
         
     for posev in choice:
         pl = players.select().where(Player.id == posev.player_choice_id).get()
@@ -12862,9 +12850,9 @@ def player_choice_one_table(stage):
 def player_choice_semifinal(stage, num_gr):
     """список спортсменов полуфиналов"""
     posev_data = []
-    choice = Choice.select().where(Choice.title_id == title_id())
-    choice_pf = choice.select().where(Choice.semi_final == stage)
-    choice_group_pf = choice_pf.select().order_by(Choice.posev_sf).where(Choice.sf_group == num_gr)
+    choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.semi_final == stage))
+    # choice_pf = choice.select().where(Choice.semi_final == stage)
+    choice_group_pf = choices.select().where(Choice.sf_group == num_gr).order_by(Choice.posev_sf)
     players = Player.select().where(Player.title_id == title_id())
     for posev in choice_group_pf:
         pl = players.select().where(Player.id == posev.player_choice_id).get()
