@@ -13801,7 +13801,64 @@ def made_file_excel_for_rejting():
     f_name = f"{short_name}_report.xlsx"
     filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
     book.save(filename)
-    
+
+
+def made_file_excel_list_player():
+    """Создание списка участников в excel файле"""
+    players = Player.select().where(Player.title_id == title_id())
+
+    book = op.Workbook()
+    worksheet = book.active
+    names_headers = ["№", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Субъект РФ", "Разряд", "Тренеры"]
+    for m in range(1, 9):
+        c =  worksheet.cell(row = 1, column = m)
+        c.value = names_headers[m - 1]
+
+    k = 2    
+    for pl in players:
+        fio = pl.player
+        dr = pl.bday
+        r = pl.rank
+        gorod = pl.city
+        obl = pl.region
+        raz = pl.razryad
+        id_coach = pl.coach_id
+        coachs = Coach.get(Coach.id == id_coach)
+        fio_coach = coachs.coach
+        n = k - 1
+        c1 = worksheet.cell(row = k, column = 1)
+        c1.value = n
+        c2 = worksheet.cell(row = k, column = 2)
+        c2.value = fio
+        c3 = worksheet.cell(row = k, column = 3)
+        c3.value = dr
+        c4 = worksheet.cell(row = k, column = 4)
+        c4.value = r
+        c5 = worksheet.cell(row = k, column = 5)
+        c5.value = gorod
+        c6 = worksheet.cell(row = k, column = 6)
+        c6.value = obl
+        c7 = worksheet.cell(row = k, column = 7)
+        c7.value = raz
+        c8 = worksheet.cell(row = k, column = 8)
+        c8.value = fio_coach 
+        k += 1
+
+    t_id = Title.get(Title.id == title_id())
+
+    worksheet.column_dimensions['A'].width = 8
+    worksheet.column_dimensions['B'].width = 25
+    worksheet.column_dimensions['C'].width = 12
+    worksheet.column_dimensions['D'].width = 10
+    worksheet.column_dimensions['E'].width = 20
+    worksheet.column_dimensions['F'].width = 20
+    worksheet.column_dimensions['G'].width = 10
+    worksheet.column_dimensions['H'].width = 40
+    sex = t_id.gamer
+    f_name = f"{sex}_списки.xlsx"
+    filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
+    book.save(filename)
+
 
 def button_move_enabled():
     """включает или выключает кнопки перемещения по таблице в зависимости от выделенной строки"""
@@ -14576,6 +14633,7 @@ my_win.Button_sort_alf_R.clicked.connect(filter_rejting_list)
 my_win.Button_sort_rejting_in_R.clicked.connect(filter_rejting_list)
 my_win.Button_filter_R.clicked.connect(filter_rejting_list)
 my_win.Button_made_R_file.clicked.connect(made_file_excel_for_rejting) # создагие excel файла для рейтинга
+my_win.Button_made_player_list_excel.clicked.connect(made_file_excel_list_player) # создагие excel файла для рейтинга
 my_win.Button_made_one_file_pdf.clicked.connect(merdge_pdf_files)
 
 my_win.Button_up.clicked.connect(move_row_in_tablewidget)
