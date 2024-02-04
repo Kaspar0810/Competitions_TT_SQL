@@ -3923,7 +3923,7 @@
         <x>700</x>
         <y>10</y>
         <width>121</width>
-        <height>61</height>
+        <height>50</height>
        </rect>
       </property>
       <property name="font">
@@ -4420,9 +4420,9 @@
       <property name="geometry">
        <rect>
         <x>700</x>
-        <y>70</y>
+        <y>60</y>
         <width>121</width>
-        <height>51</height>
+        <height>50</height>
        </rect>
       </property>
       <property name="font">
@@ -4440,9 +4440,9 @@
       <property name="geometry">
        <rect>
         <x>700</x>
-        <y>120</y>
+        <y>110</y>
         <width>121</width>
-        <height>61</height>
+        <height>50</height>
        </rect>
       </property>
       <property name="font">
@@ -4454,6 +4454,38 @@
       <property name="text">
        <string>Создание excel
  списка игроков</string>
+      </property>
+      <property name="shortcut">
+       <string/>
+      </property>
+      <property name="autoRepeat">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Button_made_protokol">
+      <property name="geometry">
+       <rect>
+        <x>700</x>
+        <y>160</y>
+        <width>121</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <italic>true</italic>
+       </font>
+      </property>
+      <property name="text">
+       <string>Создание
+протокола</string>
       </property>
       <property name="shortcut">
        <string/>

@@ -707,7 +707,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     my_win.tabWidget.setCurrentIndex(4)
                     my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
         elif sender == self.choice_fin_Action:  # нажат подменю жеребьевка финалов
-
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
                 return
@@ -8172,7 +8171,7 @@ def checking_before_the_draw():
         fill_table(player_list)
         checking_flag = False
     else:
-        msgBox.information(my_win, "Уведомление", "Нет спортсменов не подтвердивших\n свое участие в соревнованиях!")
+        # msgBox.information(my_win, "Уведомление", "Нет спортсменов не подтвердивших\n свое участие в соревнованиях!")
         checking_flag = True
     return checking_flag
 
@@ -9291,8 +9290,11 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     systems = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
     # ==== новый вариант с использованием system id
-    etap_stage = stage
-    system_id = system_id(etap_stage)
+    # etap_stage = stage
+    # system_id = system_id(etap_stage)
+
+    # etap_stage = stage
+    id_system = system_id(stage)
     # ========
     if stage != "Финальный":
         system = systems.select().where(System.stage == stage).get()
@@ -9313,12 +9315,12 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
         result_group = result_all.select().where(Result.winner.is_null())
     else:    
         if number_group == "все" and tours == "все":
-            result_group = result.select().where(Result.system_stage == stage)
+            result_group = result.select().where(Result.system_id == id_system)
         elif number_group == "все" and tours == "диапазон":
-            result_group = result.select().where((Result.system_stage == stage) & (Result.round.in_(list_tours)))
+            result_group = result.select().where((Result.system_id == id_system) & (Result.round.in_(list_tours)))
         elif number_group != "все" and tours == "все":
             if stage == "1-й полуфинал" or stage == "2-й полуфинал":
-                result_group = result.select().where((Result.system_stage == stage) & (Result.number_group == number_group))
+                result_group = result.select().where((Result.system_id == id_system) & (Result.number_group == number_group))
             else:
                 result_group = result.select().where(Result.number_group == number_group)
         elif number_group != "все" and tours == "диапазон":
@@ -9382,6 +9384,167 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     stiker.append(dict_tbl)
     stiker.append(game)
     return stiker
+
+
+# def tbl_protokol(ts, stage, list_tours):
+#     """данные таблицы и применение стиля и добавления заголовка столбцов
+#     tdt_new - [[[участник],[регион счет в партиях]]]"""
+#     from reportlab.platypus import Table
+#     story = []  # Список данных таблицы участников
+#     elements = []  # Список Заголовки столбцов таблицы
+#     titles = Title.select().where(Title.id == title_id()).get()
+#     result_list = Result.select().where(Result.title_id == title_id()).order_by(Player.player)
+#     # short_name = tit.short_name_comp
+#     gamer = titles.gamer
+#     count = len(result_list)  # количество записей в базе
+#     kp = count + 1
+#     n = 0
+#     for l in result_list:
+#         n += 1
+#         p = l.player
+#         b = l.bday
+#         r = l.rank
+#         c = l.city
+#         g = l.region
+#         z = l.razryad
+#         coach_id = l.coach_id
+#         t = coach_id.coach
+#         m = l.mesto
+#         data = [n, p, b, r, c, g, z, t, m]
+
+#         elements.append(data)
+#     elements.insert(0, ["№", "Тур", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Счет"])
+#     t = Table(elements, colWidths=(0.6 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, rowHeights=None, repeatRows=1)) # ширина столбцов, если None-автоматическая
+#     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+#                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
+#                            # Использую импортированный шрифта размер
+#                            ('FONTSIZE', (0, 0), (-1, -1), 7),
+#                            # межстрочный верхний инервал
+#                            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+#                            # межстрочный нижний инервал
+#                            ('TOPPADDING', (0, 0), (-1, -1), 1),
+#                            # вериткальное выравнивание в ячейке заголовка
+#                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+#                            # горизонтальное выравнивание в ячейке
+#                            ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
+#                            ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+#                            ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+#                            ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+#                            # цвет и толщину внутренних линий
+#                            ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
+#                            # внешние границы таблицы
+#                            ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
+#                            ]))
+
+
+#     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+#             firstLineIndent=-20, textColor="green")  # стиль параграфа
+#     h3.spaceAfter = 10  # промежуток после заголовка
+#     story.append(Paragraph(f'Список участников. {gamer}', h3))
+#     story.append(t)
+
+#     doc = SimpleDocTemplate(f"{short_name}_player_list_alf.pdf", pagesize=A4)
+#     catalog = 1
+#     change_dir(catalog)
+#     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+#     os.chdir("..")
+#     # ========
+#     stiker = []
+#     final_type = "круг"
+#     from reportlab.platypus import Table
+#     systems = System.select().where(System.title_id == title_id())
+#     result = Result.select().where(Result.title_id == title_id())
+#     # ==== новый вариант с использованием system id
+#     id_system = system_id(stage)
+#     # ========
+#     if stage != "Финальный":
+#         system = systems.select().where(System.id == id_system).get()
+#     # else:
+#     #     system = systems.select().where(System.stage == number_group).get()
+#     #     final_type = system.type_table
+#      # # кол-во столбцов в таблице и их ширина
+#     cW = (1.6 * cm)
+#     rH = (0.6 * cm, 0.9 * cm, 1 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm,
+#            0.5 * cm, 0.5 * cm)
+#     dict_tbl = {}
+#     tdt_new_tmp = []
+
+#     # if final_type == "сетка":
+#     #     result_setka = result.select().where(Result.number_group == number_group)
+#     #     result_all = result_setka.select().where((Result.player1 != "") & (Result.player2 != ""))
+#     #     result_group = result_all.select().where(Result.winner.is_null())
+#     # else:    
+#     #     if number_group == "все" and tours == "все":
+#     #         result_group = result.select().where(Result.system_id == id_system)
+#     #     elif number_group == "все" and tours == "диапазон":
+#     #         result_group = result.select().where((Result.system_id == id_system) & (Result.round.in_(list_tours)))
+#     #     elif number_group != "все" and tours == "все":
+#     #         if stage == "1-й полуфинал" or stage == "2-й полуфинал":
+#     #             result_group = result.select().where((Result.system_id == id_system) & (Result.number_group == number_group))
+#     #         else:
+#     #             result_group = result.select().where(Result.number_group == number_group)
+#     #     elif number_group != "все" and tours == "диапазон":
+#     #         result_group = result.select().where((Result.number_group == number_group) & (Result.round.in_(list_tours)))
+ 
+#     shot_stage = ""
+#     # result_group = result.select().where((Result.number_group == number_group) & (Result.round.in_(list_tours)))
+#     result_group = result.select().where(Result.system_id == id_system)
+#     for res_id in result_group:
+#         tours = res_id.tours # номера игроков в туре
+#         pl1 = res_id.player1 # 1-й игроков и его город в туре
+#         pl2 = res_id.player2 # 2-й игроков и его город в туре
+#         st = res_id.number_group # этап
+#         n_gr = ""
+#         # if stage == "Предварительный":
+#         #     shot_stage = "ПР"
+#         #     mark = st.find(" ")
+#         #     gr = st[:mark]
+#         #     sys_stage = f"{shot_stage}"
+#         #     n_gr = f"{gr}гр"
+#         # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+#         #     shot_stage = "ПФ"
+#         #     mark = st.find(" ")
+#         #     gr = st[:mark]
+#         #     sys_stage = f"{shot_stage}"
+#         #     n_gr = f"{gr}гр"
+#         if stage == "Финальный":
+#             shot_stage = "Ф"
+#             mark = st.find("-")
+#             sys_stage = f"{st[:mark]}{shot_stage}"
+
+#         round = res_id.round # раунд
+#         s1 = pl1.find("/")  
+#         s2 = pl2.find("/")   
+#         player1 = pl1[:s1]
+#         city1 = pl1[s1 + 1:]
+#         player2 = pl2[:s2]
+#         city2 = pl2[s2 + 1:]
+#         pl1 = f"{player1}\n{city1}" # делает фамилия и город на разнызх строчках
+#         pl2 = f"{player2}\n{city2}"
+#             # список строк бегунка
+#         d_tmp = [[n_gr, 'тур', 'вст', 'стол'],
+#                 [sys_stage, round, tours, ''],
+#                 [pl1, '', pl2, ''],
+#                 ['', '', '', ''],
+#                 ['', '', '', ''],
+#                 ['', '', '', ''],
+#                 ['', '', '', ''],
+#                 ['', '', '', ''],
+#                 ['общ счет:', '', '', ''],
+#                 ['Победитель', '', '', '']]
+#         tdt_temp = d_tmp.copy()
+#         d_tmp.clear()
+#         tdt_new_temp = tdt_temp.copy()
+#         tdt_new_tmp.append(tdt_new_temp)
+#         tdt_temp.clear()
+#     game = len(tdt_new_tmp)
+#         # ===========================
+#     for i in range(0, game):      
+#         dict_tbl[i] = Table(tdt_new_tmp[i], colWidths=cW, rowHeights=rH)
+#         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
+#     stiker.append(dict_tbl)
+#     stiker.append(game)
+#     return stiker
 
 
 def begunki_made():
@@ -10014,6 +10177,88 @@ def list_winners_pdf():
     catalog = 1
     change_dir(catalog)
     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+    os.chdir("..")
+
+
+def protokol_pdf():
+    """Судейский протокол для таблицы в круг"""
+    from sys import platform
+    from reportlab.platypus import Table
+    # msgBox = QMessageBox
+    fin_list = []
+    stage_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
+    systems = System.select().where(System.title_id == title_id())
+    for k in systems:
+        stage_system = k.stage
+        system_string = k.label_string
+        if stage_system not in stage_list and system_string == "Круговая таблица на 16 участников":
+            fin_list.append(stage_system)
+
+    stage, ok = QInputDialog.getItem(my_win, "Финалы", "Выберите финал по кругу для\n"
+                                        "создания судейского протокола", fin_list)
+    fin = f'{stage[:1]}-fin'
+    id_system = system_id(stage)
+    #========
+    story = []  # Список данных таблицы участников
+    elements = []  # Список Заголовки столбцов таблицы
+    result_list = Result.select().where((Result.title_id == title_id()) & (Result.system_id == id_system))
+    titles = Title.get(Title.id == title_id())
+    short_name = titles.short_name_comp
+    gamer = titles.gamer
+    count = len(result_list)  # количество записей в базе
+    kp = count + 1
+    n = 0
+    for l in result_list:
+        n += 1
+        round = l.round
+        randevy = l.tours
+        player_1 = l.player1
+        player_2 = l.player2
+        win_pl = l.winner
+  
+        data = [n, round, randevy, player_1, player_2, win_pl]
+
+        elements.append(data)
+    elements.insert(0, ["№", "Тур", "Встреча", "Игрок-1", "Игрок-2", "Победитель", "Счет"])
+    t = Table(elements,
+              colWidths=(1.0 * cm, 0.9 * cm, 1.2 * cm, 5.7 * cm, 5.7 * cm, 3.5 * cm, 1.5 * cm),
+              rowHeights=(0.43 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                            ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
+                           # Использую импортированный шрифта размер
+                           ('FONTSIZE', (0, 0), (-1, -1), 7),
+                           # межстрочный верхний инервал
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                           # межстрочный нижний инервал
+                           ('TOPPADDING', (0, 0), (-1, -1), 1),
+                           # вериткальное выравнивание в ячейке заголовка
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           # горизонтальное выравнивание в ячейке
+                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
+                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                           # цвет и толщину внутренних линий
+                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
+                           # внешние границы таблицы
+                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
+                           ]))
+
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+            firstLineIndent=-20, textColor="green")  # стиль параграфа
+    h3.spaceAfter = 5  # промежуток после заголовка
+    story.append(Paragraph(f'Протокол. {gamer}-{stage}', h3))
+    story.append(t)
+    
+    doc = SimpleDocTemplate(f"{short_name}_protokol_{fin}.pdf", pagesize=A4, rightMargin=1*cm, leftMargin=1*cm, topMargin=0.8*cm, bottomMargin=0.8*cm)
+    catalog = 1
+    change_dir(catalog)
+    doc.build(story)
+    view_file = f"{short_name}_protokol_{fin}.pdf"
+    if platform == "darwin":  # OS X
+        os.system(f"open {view_file}")
+    elif platform == "win32":  # Windows...
+        os.system(f"{view_file}")
     os.chdir("..")
 
 
@@ -14632,8 +14877,9 @@ my_win.Button_reset_fltr_in_R.clicked.connect(clear_filter_rejting_list)
 my_win.Button_sort_alf_R.clicked.connect(filter_rejting_list)
 my_win.Button_sort_rejting_in_R.clicked.connect(filter_rejting_list)
 my_win.Button_filter_R.clicked.connect(filter_rejting_list)
-my_win.Button_made_R_file.clicked.connect(made_file_excel_for_rejting) # создагие excel файла для рейтинга
-my_win.Button_made_player_list_excel.clicked.connect(made_file_excel_list_player) # создагие excel файла для рейтинга
+my_win.Button_made_R_file.clicked.connect(made_file_excel_for_rejting) # создание excel файла для рейтинга
+my_win.Button_made_player_list_excel.clicked.connect(made_file_excel_list_player) # создание excel файла списка
+my_win.Button_made_protokol.clicked.connect(protokol_pdf) # создание файла протокола
 my_win.Button_made_one_file_pdf.clicked.connect(merdge_pdf_files)
 
 my_win.Button_up.clicked.connect(move_row_in_tablewidget)
