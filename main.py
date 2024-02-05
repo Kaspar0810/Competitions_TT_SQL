@@ -3258,7 +3258,20 @@ def system_competition():
                 flag_system = False # ставит флаг, что система еще не создана
                 stage = ""
             elif ret == msgBox.No:
-                pass
+                system_etap_list = []
+                systems = System.select().where(System.title_id == title_id())
+                for p in systems:
+                    etap = p.stage
+                    system_etap_list.append(etap)
+                stage, ok = QInputDialog.getItem(
+                    my_win, "Системные этапы", "Выберите этап для редактирования", system_etap_list, 0, False)
+                id_system = system_id(stage)
+                system_exit = systems.select().where(System.stage_exit == stage)
+                for m in system_exit:
+                    id_sys = m.id
+                    System.update(stage_exit="Предварительный", mesta_exit=1).where(System.id == id_sys).execute()
+                sys = System.delete().where(System.id == id_system)
+                sys.execute()
             else:
                 return
         elif sender == my_win.system_made_Action: # создание системы из меню
@@ -8578,15 +8591,14 @@ def clear_db_before_choice_final(fin):
 
 def clear_db_before_choice_semifinal(stage):
     """очищает базу данных -Game_list- и -Result- перед повторной жеребьевкой полуфиналов"""
-    system = System.select().where(System.title_id == title_id()) 
-    system_id = system.select().where(System.stage == stage).get()
+    id_system = system_id(stage)
     gamelist = Game_list.select().where(Game_list.title_id == title_id())
-    gl = gamelist.select().where(Game_list.system_id == system_id)
+    gl = gamelist.select().where(Game_list.system_id == id_system)
     for i in gl:
         gl_d = Game_list.get(Game_list.id == i)
         gl_d.delete_instance()
     results = Result.select().where(Result.title_id == title_id())
-    rs = results.select().where(Result.system_stage == stage)
+    rs = results.select().where(Result.system_id == id_system)
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
@@ -8633,11 +8645,11 @@ def ready_system():
 def ready_choice(stage):
     """проверка на готовность жеребьевки групп"""
     sys = System.select().where(System.title_id == title_id())
+    id_system = system_id(stage)
     greb_flag = False
     if stage != "":
-        system = sys.select().where(System.stage == stage).get()
-        greb_flag = system.choice_flag
-    
+        system = sys.select().where(System.id == id_system).get()
+        greb_flag = system.choice_flag   
     if greb_flag is True:
         my_win.statusbar.showMessage("Жеребьевка сделана", 5000)
         flag = True
