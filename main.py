@@ -9285,23 +9285,16 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
     stiker = []
+    group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     final_type = "круг"
     from reportlab.platypus import Table
     systems = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
-    # ==== новый вариант с использованием system id
-    # etap_stage = stage
-    # system_id = system_id(etap_stage)
-
-    # etap_stage = stage
-    id_system = system_id(stage)
+    # ==== новый вариант с использованием system id   
+    id_system = system_id(stage=number_group) if stage == "Финальный" else system_id(stage)
     # ========
-    if stage != "Финальный":
-        system = systems.select().where(System.stage == stage).get()
-        # total_group = system.total_group
-    else:
-        system = systems.select().where(System.stage == number_group).get()
-        final_type = system.type_table
+    system = systems.select().where(System.id == id_system).get()
+    final_type = system.type_table
      # # кол-во столбцов в таблице и их ширина
     cW = (1.6 * cm)
     rH = (0.6 * cm, 0.9 * cm, 1 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm,
@@ -9319,10 +9312,10 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
         elif number_group == "все" and tours == "диапазон":
             result_group = result.select().where((Result.system_id == id_system) & (Result.round.in_(list_tours)))
         elif number_group != "все" and tours == "все":
-            if stage == "1-й полуфинал" or stage == "2-й полуфинал":
+            if stage in group_list:
                 result_group = result.select().where((Result.system_id == id_system) & (Result.number_group == number_group))
             else:
-                result_group = result.select().where(Result.number_group == number_group)
+                result_group = result.select().where(Result.system_id == id_system)
         elif number_group != "все" and tours == "диапазон":
             result_group = result.select().where((Result.number_group == number_group) & (Result.round.in_(list_tours)))
  
@@ -9341,7 +9334,7 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
             sys_stage = f"{shot_stage}"
             n_gr = f"{gr}гр"
         elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-            shot_stage = "ПФ"
+            shot_stage = "ПФ1" if stage == "1-й полуфинал" else "ПФ2"
             mark = st.find(" ")
             gr = st[:mark]
             sys_stage = f"{shot_stage}"
@@ -9557,6 +9550,9 @@ def begunki_made():
     number_group = my_win.comboBox_select_group_begunki.currentText()
     stage = my_win.comboBox_select_stage_begunki.currentText()
     tours = my_win.comboBox_select_tours.currentText()
+    # if stage == "Финальный":
+    #     stage = number_group
+    id_system = system_id(stage=number_group) if stage == "Финальный" else system_id(stage)
     elements = []
     ts = []
     tblstyle = []
@@ -9584,10 +9580,11 @@ def begunki_made():
                         ('VALIGN', (0, 0), (0, 0), 'MIDDLE'),
                         ('ALIGN',(0, 0), (0, 0),'CENTER')])
     #  ========= формирование диапазона печати бегунков ==========
-    if stage == "Финальный":
-        sys = system.select().where(System.stage == number_group).get()
-    elif stage == "Предварительный":
-        sys = system.select().where(System.stage == stage).get()
+    sys = system.select().where(System.id == id_system).get()
+    # if stage == "Финальный":
+    #     sys = system.select().where(System.stage == number_group).get()
+    # elif stage == "Предварительный":
+    #     sys = system.select().where(System.stage == stage).get()
 
     final_type = sys.type_table
     list_tours = []
@@ -9619,9 +9616,9 @@ def begunki_made():
         else:
             if number_group != "все":
                 if stage == "1-й полуфинал" or stage == "2-й полуфинал":
-                    result_group = result.select().where((Result.system_stage == stage) & (Result.number_group == number_group))
+                    result_group = result.select().where((Result.system_id == id_system) & (Result.number_group == number_group))
                 else:   
-                    result_group = result.select().where(Result.number_group == number_group)
+                    result_group = result.select().where(Result.system_id == id_system)
                 for i in result_group:
                     r = int(i.round)
                     if r not in list_tours:
@@ -9686,16 +9683,17 @@ def begunki_made():
 
 def select_stage_for_begunki():
     """выбор финалов или номеров групп для печати бегунков"""
+    group_etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     my_win.comboBox_select_group_begunki.clear()
     if my_win.comboBox_select_stage_begunki.currentIndex() != 0:
         my_win.Button_print_begunki.setEnabled(True)
     systems = System.select().where(System.title_id == title_id())
     group_list = ["все"]
     stage = my_win.comboBox_select_stage_begunki.currentText()
-    if stage == "-Выбор этапа-":
-        pass
-    elif stage == "Предварительный" or stage == "1-й полуфинал" or stage == "2-й полуфинал":
-        sys_id = systems.select().where(System.stage == stage).get()
+
+    if stage in group_etap_list:
+        id_system = system_id(stage)
+        sys_id = systems.select().where(System.id == id_system).get()
         group = sys_id.total_group
         group_list = [f"{i} группа" for i in range(1, group + 1)] # генератор списка
         group_list.insert(0, "все")
@@ -9703,13 +9701,13 @@ def select_stage_for_begunki():
         pass
     else:
         for k in systems:
-            if k.stage == "Предварительный":
-                pass
-            elif k.stage == "Полуфинал":
-                pass
-            else:
+            if k.stage not in group_etap_list:
                 group_list.append(k.stage)
     my_win.comboBox_select_group_begunki.addItems(group_list)
+    if  stage in group_etap_list or stage == "-Выбор спортсменов-":
+        my_win.comboBox_select_group_begunki.setCurrentIndex(0)
+    else:
+        my_win.comboBox_select_group_begunki.setCurrentIndex(1)
 
         
 def select_tour_for_begunki():
