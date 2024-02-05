@@ -3234,7 +3234,7 @@ def exit_comp():
 
 def system_competition():
     """выбор системы проведения при изменении строки в комбобокс этап или мз меню"""
-    msgBox = QMessageBox
+    msgBox = QMessageBox()
     sender = my_win.sender()
     tit = Title.get(Title.id == title_id())
     gamer = tit.gamer
@@ -3243,15 +3243,22 @@ def system_competition():
         if sender == my_win.system_edit_Action: # редактирование системы из меню
             sb = "Изменение системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
-            result = msgBox.question(my_win, "", "Вы хотите изменить систему соревнований?",
-                                    msgBox.Ok, msgBox.Cancel)
-            if result == msgBox.Ok:
+            # ======
+            msgBox.setIcon(QMessageBox.Question)
+            msgBox.setText("Вы хотите изменить систему соревнований?")
+            msgBox.setInformativeText("Если изменить всю систему нажмите -Yes-\nЕсли отдельные этапы нажмите -No-")
+            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+            msgBox.setDefaultButton(QMessageBox.Yes)
+            ret = msgBox.exec()
+            if ret == msgBox.Ok:
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
                 tab_enabled(gamer)  # показывает вкладки по новому
                 choice_tbl_made()  # заполняет db жеребьевка
                 flag_system = False # ставит флаг, что система еще не создана
                 stage = ""
+            elif ret == msgBox.No:
+                pass
             else:
                 return
         elif sender == my_win.system_made_Action: # создание системы из меню
@@ -3259,6 +3266,7 @@ def system_competition():
             my_win.statusbar.showMessage(sb)
             result = msgBox.question(my_win, "", "Вы хотите создать систему соревнований?",
                                 msgBox.Ok, msgBox.Cancel)
+
             if result == msgBox.Ok:
                 choice_tbl_made()  # заполняет db жеребьевка
             else:
@@ -7166,21 +7174,6 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         last = len(reg_list)  # кол-во остатка посева
         region = key_reg_current[0]
         free_gr = kol_group_free[region]  # кол-во групп куда можно сеять
-        # =====
-        # for i in key_reg_current:  # получение словаря (регион и кол-во мест (групп) куда можно сеять)
-        #     kol_reg = len(current_region_group[i]) # колво регионов (посевов)
-        #     # kol_reg = len(tmp)  # колво регионов (посевов)
-        #     kol_group_free[i] = kol_reg
-        # # =====
-        # # sorted_tuple = sorted(kol_group_free.items(), key=lambda x: x[1])
-        # # kol_group_free = dict(sorted_tuple)
-        # # =====
-        # free_list = list(kol_group_free.values())  # список кол-во свободных групп, куда можно сеять
-        # reg_list = list(kol_group_free.keys())  # список ключей (регионов)
-
-        # last = len(reg_list)  # кол-во остатка посева
-        # region = reg_list[0]  # номер региона, который сейчас сеется
-        # free_gr = kol_group_free[region]  # кол-во групп куда можно сеять
         # ==== сделать последний посев по наименшему количеству вариантов посева
  
         if 1 in free_list and last > 1 or last == 1 and free_gr == 1 :  # проверка есть ли группа где осталось только одно места для посева
