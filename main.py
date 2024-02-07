@@ -7812,8 +7812,9 @@ def choice_filter_on_system():
             etaps.insert(0, "-выберите этап-")
             my_win.comboBox_filter_choice_stage.addItems(etaps)
         elif stage in group_list:
+            id_system = system_id(stage)
             my_win.comboBox_filter_number_group_final.clear()
-            systems_sf = systems.select().where(System.stage == stage).get()
+            systems_sf = systems.select().where(System.id == id_system).get()
             kg = int(systems_sf.total_group)  # количество групп
             gr_txt = [f"{i} группа" for i in range(1, kg + 1)]
             gr_txt.insert(0, "все группы")

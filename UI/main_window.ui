@@ -4540,7 +4540,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -5345,75 +5345,76 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>10</y>
          <width>211</width>
-         <height>97</height>
+         <height>101</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_32">
+       <layout class="QVBoxLayout" name="verticalLayout_52">
         <property name="spacing">
          <number>1</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_50">
-          <property name="font">
-           <font>
-            <family>Times New Roman</family>
-            <pointsize>12</pointsize>
-            <italic>true</italic>
-           </font>
+         <layout class="QVBoxLayout" name="verticalLayout_32">
+          <property name="spacing">
+           <number>1</number>
           </property>
+          <item>
+           <widget class="QLabel" name="label_50">
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Выбор этапа</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_filter_choice_stage">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_60">
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Выбор группы / финала</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_filter_number_group_final">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_repeat_regions">
           <property name="text">
-           <string>Выбор этапа</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_filter_choice_stage">
-          <property name="editable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_60">
-          <property name="font">
-           <font>
-            <family>Times New Roman</family>
-            <pointsize>12</pointsize>
-            <italic>true</italic>
-           </font>
-          </property>
-          <property name="text">
-           <string>Выбор группы / финала</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_filter_number_group_final">
-          <property name="editable">
-           <bool>true</bool>
+           <string>Повтор регионов</string>
           </property>
          </widget>
         </item>
        </layout>
-      </widget>
-      <widget class="QRadioButton" name="radioButton_repeat_regions">
-       <property name="geometry">
-        <rect>
-         <x>13</x>
-         <y>97</y>
-         <width>141</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Повтор регионов</string>
-       </property>
       </widget>
      </widget>
     </widget>
