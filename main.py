@@ -1458,6 +1458,9 @@ def db_insert_title(title_str):
                                           "играет.")
     if ok:
         # получение последней записи в таблице
+        # == создание папки соревнования === новое ===
+        # os.mkdir(f"{short_name}")
+        # =====
         t = Title.select().order_by(Title.id.desc()).get()
         title = Title(id=t, name=nm, sredi=sr, vozrast=vz, data_start=ds, data_end=de, mesto=ms, referee=ref,
                      kat_ref=kr, secretary=sek, kat_sec=ks, gamer=gm, full_name_comp=fn, pdf_comp="",
@@ -1839,7 +1842,6 @@ def find_in_rlist():
                 player_list = r_data.select().where(r_data.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
             else:
                 player_list = r_data.select().where(r_data.r1_fname ** f'{txt}%')  # like поиск в текущем рейтинге
-            # fill_table(player_list)
         else:
             for r_list in r_data:
                 p = r_list.select()
@@ -2892,6 +2894,12 @@ def page():
         Button_view_final.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
         Button_view_final.setText("Просмотр финалов")
         Button_view_final.show()
+        index_combo = my_win.comboBox_filter_final.currentIndex()
+        # if  index_combo == -1:
+        #     Button_view_final.setEnabled(False) 
+        # else:
+        #     Button_view_final.setEnabled(True)
+        Button_view_final.clicked.connect(view)
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
@@ -3271,12 +3279,21 @@ def system_competition():
                     my_win, "Системные этапы", "Выберите этап для редактирования", system_etap_list, 0, False)
                 id_system = system_id(stage)
                 system_exit = systems.select().where(System.stage_exit == stage)
-                for m in system_exit:
-                    id_sys = m.id
-                    System.update(stage_exit="Предварительный", mesta_exit=1).where(System.id == id_sys).execute()
-                sys = System.delete().where(System.id == id_system)
-                sys.execute()
-                return
+                msgBox.setIcon(QMessageBox.Question)
+                msgBox.setText("Изменение системы!")
+                msgBox.setInformativeText("Если удалить выбранный этап нажмите -Yes-")
+                msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+                msgBox.setDefaultButton(QMessageBox.Cancel)
+                ret_1 = msgBox.exec()
+                if ret_1 == msgBox.Ok:
+                    for m in system_exit:
+                        id_sys = m.id
+                        System.update(stage_exit="Предварительный", mesta_exit=1).where(System.id == id_sys).execute()
+                    sys = System.delete().where(System.id == id_system)
+                    sys.execute()
+                    return
+                elif ret == msgBox.Cancel:
+                        return
             else:
                 return
         elif sender == my_win.system_made_Action: # создание системы из меню
@@ -3525,7 +3542,6 @@ def view():
     name_file = ""
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
-
     if sender == my_win.view_all_comp_Action: # просмотр полных соревнований в каталоге /competition_pdf
         catalog = 2
         change_dir(catalog)
@@ -4234,6 +4250,7 @@ def select_player_in_game():
     tab = my_win.tabWidget.currentIndex()
     row_num= my_win.tableView.currentIndex().row() # определиние номера строки
     numer_game = my_win.tableView.model().index(row_num, 3).data()
+    # tour = my_win.tableView.model().index(row_num, 10).data()
     if tab == 1:
         select_player_in_list()
     elif tab ==2:
@@ -5318,6 +5335,7 @@ def made_pdf_table_for_view(sender):
     """вызов функции заполнения таблицы pdf группы сыгранными играми"""
     group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     tab = my_win.tabWidget.currentIndex()
+    fin_filter = my_win.comboBox_filter_final.currentText()
     if sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
         stage = "Предварительный"
         my_win.tabWidget.setCurrentIndex(3)
@@ -5351,6 +5369,10 @@ def made_pdf_table_for_view(sender):
         fin = stage
     elif sender == my_win.view_fin8_Action:
         stage = "8-й финал"
+        my_win.tabWidget.setCurrentIndex(5)
+        fin = stage
+    elif sender == my_win.view_fin9_Action:
+        stage = "9-й финал"
         my_win.tabWidget.setCurrentIndex(5)
         fin = stage
     elif sender == my_win.view_one_table_Action:
@@ -5657,21 +5679,22 @@ def filter_fin(pl=False):
     sender = my_win.sender()
     num_game_fin = my_win.lineEdit_num_game_fin.text()
     final = my_win.comboBox_filter_final.currentText()
-    if final == "":
-        final = "все финалы"
+    # if final != "все финалы":
+    #     my_win.tabWidget.Button_view_final.setEnabled(True)
+    # else:
+    #     my_win.tabWidget.Button_view_final.setEnabled(False)
     name = my_win.comboBox_find_name_fin.currentText()
     round = my_win.lineEdit_tour.text()
     played = my_win.comboBox_filter_played_fin.currentText()
     system = System.select().where(System.title_id == title_id())  # находит system id последнего
     filter = Result.select().where(Result.title_id == title_id())
-                                  
+    count = 0                             
     if sender == my_win.lineEdit_num_game_fin:
         fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.tours == num_game_fin))
         count = len(fltr)
         my_win.label_38.setText(f'Всего в {final} {count} игры')
     if final != "все финалы":
-        systems = system.select().where(System.stage == final).get()
-        id_system = systems.id # получаем ид системы финала
+        id_system = system_id(stage=final)
         fltr = filter.select().where(Result.system_id == id_system)
     fin = []
     if final == "Одна таблица":
@@ -9191,7 +9214,7 @@ def func_zagolovok(canvas, doc):
     canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
     canvas.drawRightString(width - 1 * cm, height - 1.9 * cm, f"г. {ms}")  # город
     canvas.drawString(0.8 * cm, height - 1.9 * cm, data_comp)  # дата начала
-
+    # ==== текст судейская коллегия
     canvas.setFont("DejaVuSerif-Italic", 11)
     canvas.setFillColor(blue)  # меняет цвет шрифта списка судейской коллеги
     if pv == landscape(A4):
@@ -12387,7 +12410,8 @@ def rank_in_group(total_score, td, num_gr, stage):
         max_person = len(game_list_group)
     else:
         if stage == "Предварительный":
-            max_person = id_system.max_player
+            systems = System.get(System.id == id_system)
+            max_person = systems.max_player
         elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
             game_list_group = game_list.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr))
             max_person = len(game_list_group)
@@ -14287,6 +14311,7 @@ def view_all_page_pdf():
                    "6-final.pdf": "6-й финал",
                    "7-final.pdf": "7-й финал",
                    "8-final.pdf": "8-й финал",
+                   "9-final.pdf": "9-й финал",
                    "one_table.pdf": "одна таблица"}
     short_name = title.short_name_comp
     count_mark = len(short_name)
