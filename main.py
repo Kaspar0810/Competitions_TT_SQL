@@ -403,6 +403,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         v_Menu.addAction(self.view_fin6_Action)
         v_Menu.addAction(self.view_fin7_Action)
         v_Menu.addAction(self.view_fin8_Action)
+        v_Menu.addAction(self.view_fin9_Action)
 
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
@@ -461,6 +462,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin6_Action = QAction("6-финал")
         self.view_fin7_Action = QAction("7-финал")
         self.view_fin8_Action = QAction("8-финал")
+        self.view_fin9_Action = QAction("9-финал")
         # выключает пункты меню пока не создана система
         self.choice_one_table_Action.setEnabled(False)
         self.choice_gr_Action.setEnabled(False)
@@ -482,6 +484,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin6_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin7_Action.setEnabled(False)  # делает пункт меню не видимым
         self.view_fin8_Action.setEnabled(False)  # делает пункт меню не видимым
+        self.view_fin9_Action.setEnabled(False)  # делает пункт меню не видимым
         # пункты меню редактирование жеребьевки
         self.ed_one_table_Action.setEnabled(False)  # делает пункт меню не видимым
         self.ed_etap_Action.setEnabled(False)  # делает пункт меню не видимым
@@ -516,6 +519,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.view_fin6_Action.triggered.connect(self.view)
         self.view_fin7_Action.triggered.connect(self.view)
         self.view_fin8_Action.triggered.connect(self.view)
+        self.view_fin9_Action.triggered.connect(self.view)
         self.clear_s8_full_Action.triggered.connect(self.print_clear)
         self.clear_s8_2_Action.triggered.connect(self.print_clear)
         self.clear_s16_Action.triggered.connect(self.print_clear)
@@ -2829,7 +2833,6 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        # my_win.progressBar.hide()
         system_stage = sf.select().where(System.stage == "Предварительный").get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -2840,7 +2843,6 @@ def page():
 
         my_win.Button_Ok_gr.setEnabled(False)
         player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
-        # fill_table(player_list)
         load_combobox_filter_group()
         load_combo()
         visible_field()
@@ -2848,12 +2850,14 @@ def page():
         my_win.label_16.hide()
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
     elif tb == 4:  # вкладка -полуфиналы-
-        my_win.resize(1270, 825)
         Button_view_semifinal = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
         Button_view_semifinal.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
         Button_view_semifinal.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        Button_view_semifinal.setText("Просмотр полуфиналов")
+        Button_view_semifinal.setText("Просмотр\nполуфиналов")
         Button_view_semifinal.show()
+        Button_view_semifinal.clicked.connect(view)
+
+        my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
@@ -2894,7 +2898,7 @@ def page():
         Button_view_final.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
         Button_view_final.setText("Просмотр финалов")
         Button_view_final.show()
-        index_combo = my_win.comboBox_filter_final.currentIndex()
+        # index_combo = my_win.comboBox_filter_final.currentIndex()
         # if  index_combo == -1:
         #     Button_view_final.setEnabled(False) 
         # else:
@@ -3548,7 +3552,7 @@ def view():
         view_file = f"{short_name}.pdf"
     else: # просмотр отдельных страниц в каталоге /table_pdf
         if tab == 3 or tab == 4 or tab == 5: # если просмотр результатов игр
-            made_pdf_table_for_view(sender)
+            view_file = made_pdf_table_for_view(sender)
         catalog = 1
         change_dir(catalog)
         if sender == my_win.view_list_Action:
@@ -3593,6 +3597,8 @@ def view():
             view_file = f"{short_name}_7-final.pdf"
         elif sender == my_win.view_fin8_Action:
             view_file = f"{short_name}_8-final.pdf"
+        elif sender == my_win.view_fin9_Action:
+            view_file = f"{short_name}_9-final.pdf"
         elif sender == my_win.view_one_table_Action:
             view_file = f"{short_name}_one_table.pdf"
         elif sender == my_win.view_pf1_Action:
@@ -5335,7 +5341,21 @@ def made_pdf_table_for_view(sender):
     """вызов функции заполнения таблицы pdf группы сыгранными играми"""
     group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     tab = my_win.tabWidget.currentIndex()
-    fin_filter = my_win.comboBox_filter_final.currentText()
+    text_button = my_win.sender().text()
+    t_id = Title.get(Title.id == title_id())
+    short_name = t_id.short_name_comp
+    if text_button == "Просмотр финалов":
+        stage = my_win.tableView.model().index(0, 2).data() # данные ячейки tableView номер финала для просмотра в пдф пот нажатию кнопки
+        n_fin = stage[:1]
+        view_file = f"{short_name}_{n_fin}-final.pdf"
+        fin = stage
+    elif text_button == "Просмотр полуфиналов":
+        stage = my_win.comboBox_filter_semifinal.currentText()
+        n_fin = stage[:1]
+        view_file = f"{short_name}_{n_fin}-semifinal.pdf"
+    else:
+        view_file = f"{short_name}_table_group.pdf"
+
     if sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
         stage = "Предварительный"
         my_win.tabWidget.setCurrentIndex(3)
@@ -5406,8 +5426,8 @@ def made_pdf_table_for_view(sender):
         elif system_table == "Сетка (-2) на 32 участников":
             setka_32_2_made(fin)
         elif system_table == "Сетка (с розыгрышем всех мест) на 32 участников":
-            setka_32_made(fin)    
-
+            setka_32_made(fin)  
+    return view_file
 
 def setka_type(none_player):
     """сетка ставит очки в зависимости от неявки игрока, встреча состоялась ли пропуск встречи -bye-"""
@@ -5679,10 +5699,7 @@ def filter_fin(pl=False):
     sender = my_win.sender()
     num_game_fin = my_win.lineEdit_num_game_fin.text()
     final = my_win.comboBox_filter_final.currentText()
-    # if final != "все финалы":
-    #     my_win.tabWidget.Button_view_final.setEnabled(True)
-    # else:
-    #     my_win.tabWidget.Button_view_final.setEnabled(False)
+
     name = my_win.comboBox_find_name_fin.currentText()
     round = my_win.lineEdit_tour.text()
     played = my_win.comboBox_filter_played_fin.currentText()
