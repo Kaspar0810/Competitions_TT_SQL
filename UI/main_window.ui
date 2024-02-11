@@ -94,8 +94,8 @@
        <rect>
         <x>3</x>
         <y>33</y>
-        <width>821</width>
-        <height>216</height>
+        <width>831</width>
+        <height>201</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -3917,38 +3917,6 @@
      <attribute name="title">
       <string>Дополнительно</string>
      </attribute>
-     <widget class="QPushButton" name="Button_made_R_file">
-      <property name="geometry">
-       <rect>
-        <x>700</x>
-        <y>10</y>
-        <width>121</width>
-        <height>50</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>Создание файла
- для рейтинга</string>
-      </property>
-      <property name="shortcut">
-       <string/>
-      </property>
-      <property name="autoRepeat">
-       <bool>false</bool>
-      </property>
-      <property name="default">
-       <bool>false</bool>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-     </widget>
      <widget class="Line" name="line_6">
       <property name="geometry">
        <rect>
@@ -4416,89 +4384,138 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QPushButton" name="Button_pay">
+     <widget class="QWidget" name="">
       <property name="geometry">
        <rect>
         <x>700</x>
-        <y>60</y>
-        <width>121</width>
-        <height>50</height>
+        <y>10</y>
+        <width>139</width>
+        <height>201</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>Список 
+      <layout class="QVBoxLayout" name="verticalLayout_53">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="Button_made_R_file">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Создание файла
+ для рейтинга</string>
+         </property>
+         <property name="shortcut">
+          <string/>
+         </property>
+         <property name="autoRepeat">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Button_pay">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Список 
 для взносов</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Button_made_player_list_excel">
-      <property name="geometry">
-       <rect>
-        <x>700</x>
-        <y>110</y>
-        <width>121</width>
-        <height>50</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>Создание excel
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Button_made_player_list_excel">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Создание excel
  списка игроков</string>
-      </property>
-      <property name="shortcut">
-       <string/>
-      </property>
-      <property name="autoRepeat">
-       <bool>false</bool>
-      </property>
-      <property name="default">
-       <bool>false</bool>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Button_made_protokol">
-      <property name="geometry">
-       <rect>
-        <x>700</x>
-        <y>160</y>
-        <width>121</width>
-        <height>50</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string>Создание
+         </property>
+         <property name="shortcut">
+          <string/>
+         </property>
+         <property name="autoRepeat">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Button_made_protokol">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Создание
 протокола</string>
-      </property>
-      <property name="shortcut">
-       <string/>
-      </property>
-      <property name="autoRepeat">
-       <bool>false</bool>
-      </property>
-      <property name="default">
-       <bool>false</bool>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
+         </property>
+         <property name="shortcut">
+          <string/>
+         </property>
+         <property name="autoRepeat">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Button_randevy">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Порядок
+встреч</string>
+         </property>
+         <property name="shortcut">
+          <string/>
+         </property>
+         <property name="autoRepeat">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </widget>
@@ -5345,13 +5362,13 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>10</y>
          <width>211</width>
-         <height>101</height>
+         <height>103</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_52">

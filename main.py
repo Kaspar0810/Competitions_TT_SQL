@@ -2825,7 +2825,7 @@ def page():
         Button_view_group = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
         Button_view_group.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
         Button_view_group.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        Button_view_group.setText("Просмотр групп")
+        Button_view_group.setText("Просмотр\nгрупп")
         Button_view_group.show()
         Button_view_group.clicked.connect(view)
 
@@ -2891,18 +2891,15 @@ def page():
             load_combo()
             visible_field()
             my_win.label_16.hide()
+            my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
     elif tb == 5: # вкладка -финалы-
         my_win.resize(1270, 825)
         Button_view_final = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
         Button_view_final.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
         Button_view_final.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        Button_view_final.setText("Просмотр финалов")
+        Button_view_final.setText("Просмотр\nфиналов")
         Button_view_final.show()
-        # index_combo = my_win.comboBox_filter_final.currentIndex()
-        # if  index_combo == -1:
-        #     Button_view_final.setEnabled(False) 
-        # else:
-        #     Button_view_final.setEnabled(True)
+    
         Button_view_final.clicked.connect(view)
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
@@ -14046,7 +14043,6 @@ def load_playing_game_in_table_for_final(fin):
 
 def made_file_excel_for_rejting():
     """создание файла Excel для обсчета рейтинга"""
-    msgBox = QMessageBox()
     result = Result.select().where(Result.title_id == title_id())
     players = Player.select().where(Player.title_id == title_id())
     player_result = result.select().where(Result.points_loser != 0).order_by(Result.winner)
@@ -14080,6 +14076,119 @@ def made_file_excel_for_rejting():
     worksheet.column_dimensions['A'].width = 40
     worksheet.column_dimensions['b'].width = 40
     f_name = f"{short_name}_report.xlsx"
+    filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
+    book.save(filename)
+
+
+def randevy_list():
+    """Порядок встреч по кругу"""
+    from openpyxl.styles import (
+                        PatternFill, Border, Side, 
+                        Alignment, Font, GradientFill
+                        )
+    group_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
+    fin_circle_list = []
+    t_id = Title.get(Title.id == title_id())  
+    systems = System.select().where(System.title_id == title_id())
+    name = t_id.name
+    gamer = t_id.gamer
+    for k in systems:
+        stage_system = k.stage
+        system_string = k.label_string
+        if stage_system not in group_list and system_string == "Круговая таблица на 16 участников":
+            fin_circle_list.append(stage_system)
+
+    stage, ok = QInputDialog.getItem(my_win, "Финалы", "Выберите финал по кругу для\n"
+                                        "создания порядка встреч", fin_circle_list)
+    fin = f'{stage[:1]}-fin'
+    id_system = system_id(stage)
+    #========
+    result_list = Result.select().where((Result.title_id == title_id()) & (Result.system_id == id_system))
+    
+
+    book = op.Workbook()
+    worksheet = book.active
+    thins = Side(border_style="medium", color="0000ff")
+    double = Side(border_style="dashDot", color="ff0000")
+    dDD = Side(border_style="double", color="0000ff")
+
+    names_headers = ["№", "Тур", "Встреча", "Спортсмен", "Спортсмен", "№", "Тур", "Встреча", "Спортсмен", "Спортсмен"]
+
+    for m in range(1, 11):
+        c =  worksheet.cell(row = 4, column = m)
+        с_title = worksheet.cell(row = 1, column = m)
+        c.border  = Border(top=thins, bottom=thins, left=thins, right=thins)
+        с_title.border  = Border(top=dDD, bottom=dDD, left=dDD, right=dDD)
+        c.alignment = Alignment(horizontal='center')
+        c.font = Font(italic = True, bold = True, name='Times New Roman', size=12)
+        c.value = names_headers[m - 1]
+    worksheet.merge_cells('A1:J2')
+    worksheet.merge_cells('A3:J3')
+    megre_cell_a1 = worksheet['A1']
+    megre_cell_a3 = worksheet['A3']
+    megre_cell_a1.alignment = Alignment(horizontal='center', vertical='center') 
+    megre_cell_a3.alignment = Alignment(horizontal='center')
+    megre_cell_a1.font = Font(bold = True, name='Times New Roman', size=18)
+    megre_cell_a3.font = Font(italic = True, bold = True, name='Times New Roman', size=16)
+    megre_cell_a1.value = f'{name}.{gamer}'
+    megre_cell_a3.value =f'ПОРЯДОК ВСТРЕЧ {stage}'
+
+
+    border_1 = Border(top=double, bottom=double, left=thins, right=thins)
+    border_2 = Border(top=double, bottom=dDD, left=thins, right=thins)
+    k = 0 
+    l = 5 
+    b = 1  
+    for p in result_list:
+        round = int(p.round)
+        tour = p.tours
+        pl1 = p.player1
+        pl2 = p.player2
+        zn1 = pl1.find("/")
+        fio_1 = pl1[:zn1]
+        zn2 = pl2.find("/")
+        fio_2 = pl2[:zn2]
+
+        t = 8 * round
+
+        c1 = worksheet.cell(row = l, column = (1 + k))
+        c1.alignment = Alignment(horizontal='center')
+        c1.border = border_1 if b < t else border_2
+        c1.value = b
+        c2 = worksheet.cell(row = l, column = (2 + k))
+        c2.alignment = Alignment(horizontal='center')
+        c2.border = border_1 if b < t else border_2
+        c2.value = round
+        c3 = worksheet.cell(row = l, column = (3 + k))
+        c3.alignment = Alignment(horizontal='center')
+        c3.border = border_1 if b < t else border_2
+        c3.value = tour
+        c4 = worksheet.cell(row = l, column = (4 + k))
+        c4.border = border_1 if b < t else border_2
+        c4.value = fio_1
+        c5 = worksheet.cell(row = l, column = (5 + k))
+        c5.border = border_1 if b < t else border_2
+        c5.value = fio_2
+        l += 1
+        b += 1
+        if l > 68 and k == 0:
+            k = 5
+            l = 5
+        
+    t_id = Title.get(Title.id == title_id())
+
+    worksheet.column_dimensions['A'].width = 5
+    worksheet.column_dimensions['B'].width = 5
+    worksheet.column_dimensions['C'].width = 8
+    worksheet.column_dimensions['D'].width = 20
+    worksheet.column_dimensions['E'].width = 20
+    worksheet.column_dimensions['F'].width = 5
+    worksheet.column_dimensions['G'].width = 5
+    worksheet.column_dimensions['H'].width = 8
+    worksheet.column_dimensions['I'].width = 20
+    worksheet.column_dimensions['J'].width = 20
+    sex = t_id.gamer
+    f_name = f"{sex}_порядок_встреч.xlsx"
     filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
     book.save(filename)
 
@@ -14928,6 +15037,7 @@ my_win.Button_list_winner.clicked.connect(made_list_winners)
 my_win.Button_players_on_alf.clicked.connect(made_list_players_on_alf)
 my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 my_win.Button_view_page_pdf.clicked.connect(view_all_page_pdf)
+my_win.Button_randevy.clicked.connect(randevy_list)
 
 my_win.Button_pay.clicked.connect(check_pay)
 sys.exit(app.exec())
