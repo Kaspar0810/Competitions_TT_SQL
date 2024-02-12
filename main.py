@@ -1898,6 +1898,7 @@ def next_field():
 
 def find_city():
     """Поиск городов и область"""
+    city_list = []
     sender = my_win.sender()
     my_win.listWidget.clear()
     txt = my_win.label_63.text()
@@ -1915,8 +1916,7 @@ def find_city():
     if sender != my_win.comboBox_region:
         if (len(c)) == 0:
             my_win.textEdit.setText("Нет такого города в базе")
-        else:
-            city_list = []
+        else:           
             for pl in c:
                 full_stroka = f"{pl.city}"
                 if full_stroka not in city_list:
@@ -1925,11 +1925,13 @@ def find_city():
             return
     else:  # вставляет регион соответсвующий городу
         if city_field != "":
-            ir = my_win.comboBox_region.currentIndex()
-            ir = ir + 1
-            ct = my_win.lineEdit_city_list.text()
-            with db:
-                city = City(city=ct, region_id=ir).save()
+            citys = c.select().where(City.city == city_field)
+            if len(citys) == 0:
+                ir = my_win.comboBox_region.currentIndex()
+                ir = ir + 1
+                ct = my_win.lineEdit_city_list.text()
+                with db:
+                    city = City(city=ct, region_id=ir).save()
 
 
 def fill_table(player_list):
@@ -2241,7 +2243,7 @@ def add_player():
     num = count + 1
     fn = f"{pl}/{ct}"
     if txt != "Редактировать":
-        if flag is True:
+        if flag is True: # если такой игрок присутствует очищает поля 
             my_win.lineEdit_Family_name.clear()
             my_win.lineEdit_bday.clear()
             my_win.lineEdit_R.clear()
@@ -2478,10 +2480,11 @@ def dclick_in_listwidget():
         if txt_tmp == "Поиск в январском рейтинге.":
             pl = fam_name
             check_rejting_pay(pl)
-        c = City.select()  # находит город и соответсвующий ему регион
-        c = c.where(City.city ** f'{ci}')  # like
+        c = City.select().where(City.city == ci)  # находит город и соответсвующий ему регион
+        # c = c.where(City.city ** f'{ci}')  # like
         if (len(c)) == 0:
             my_win.textEdit.setText("Нет такого города в базе, выберите регион где находится населенный пункт.")
+            my_win.textEdit.setStyleSheet("Color: black")
             my_win.comboBox_region.setCurrentText("")
         else:  # вставляет регион соответсвующий городу
             cr = City.get(City.city == ci)
