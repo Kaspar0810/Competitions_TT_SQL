@@ -14112,9 +14112,9 @@ def randevy_list():
     double = Side(border_style="dashDot", color="ff0000")
     dDD = Side(border_style="double", color="0000ff")
 
-    names_headers = ["№", "Тур", "Встреча", "Спортсмен", "Спортсмен", "№", "Тур", "Встреча", "Спортсмен", "Спортсмен"]
+    names_headers = ["Тур", "Встреча", "Спортсмен", "Спортсмен", "Тур", "Встреча", "Спортсмен", "Спортсмен"]
 
-    for m in range(1, 11):
+    for m in range(1, 9):
         c =  worksheet.cell(row = 4, column = m)
         с_title = worksheet.cell(row = 1, column = m)
         c.border  = Border(top=thins, bottom=thins, left=thins, right=thins)
@@ -14122,8 +14122,8 @@ def randevy_list():
         c.alignment = Alignment(horizontal='center')
         c.font = Font(italic = True, bold = True, name='Times New Roman', size=12)
         c.value = names_headers[m - 1]
-    worksheet.merge_cells('A1:J2')
-    worksheet.merge_cells('A3:J3')
+    worksheet.merge_cells('A1:H2')
+    worksheet.merge_cells('A3:H3')
     megre_cell_a1 = worksheet['A1']
     megre_cell_a3 = worksheet['A3']
     megre_cell_a1.alignment = Alignment(horizontal='center', vertical='center') 
@@ -14154,39 +14154,37 @@ def randevy_list():
         c1 = worksheet.cell(row = l, column = (1 + k))
         c1.alignment = Alignment(horizontal='center')
         c1.border = border_1 if b < t else border_2
-        c1.value = b
+        c1.value = round
         c2 = worksheet.cell(row = l, column = (2 + k))
         c2.alignment = Alignment(horizontal='center')
         c2.border = border_1 if b < t else border_2
-        c2.value = round
+        c2.value = tour
         c3 = worksheet.cell(row = l, column = (3 + k))
-        c3.alignment = Alignment(horizontal='center')
+        c3.font = Font(name="Arial", size=12)
         c3.border = border_1 if b < t else border_2
-        c3.value = tour
+        c3.value = fio_1
         c4 = worksheet.cell(row = l, column = (4 + k))
+        c4.font = Font(name="Arial", size=12)
         c4.border = border_1 if b < t else border_2
-        c4.value = fio_1
-        c5 = worksheet.cell(row = l, column = (5 + k))
-        c5.border = border_1 if b < t else border_2
-        c5.value = fio_2
+        c4.value = fio_2
+   
         l += 1
         b += 1
         if l > 68 and k == 0:
-            k = 5
+            k = 4
             l = 5
         
     t_id = Title.get(Title.id == title_id())
 
     worksheet.column_dimensions['A'].width = 5
-    worksheet.column_dimensions['B'].width = 5
-    worksheet.column_dimensions['C'].width = 8
-    worksheet.column_dimensions['D'].width = 20
-    worksheet.column_dimensions['E'].width = 20
-    worksheet.column_dimensions['F'].width = 5
-    worksheet.column_dimensions['G'].width = 5
-    worksheet.column_dimensions['H'].width = 8
-    worksheet.column_dimensions['I'].width = 20
-    worksheet.column_dimensions['J'].width = 20
+    worksheet.column_dimensions['B'].width =8
+    worksheet.column_dimensions['C'].width = 28
+    worksheet.column_dimensions['D'].width = 28
+    worksheet.column_dimensions['E'].width = 5
+    worksheet.column_dimensions['F'].width = 8
+    worksheet.column_dimensions['G'].width = 28
+    worksheet.column_dimensions['H'].width = 28
+
     sex = t_id.gamer
     f_name = f"{sex}_порядок_встреч.xlsx"
     filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
