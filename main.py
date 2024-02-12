@@ -2199,7 +2199,7 @@ def debtor_R():
             my_win.label_dolg_R.setStyleSheet("color: black")
         else:
             my_win.label_dolg_R.setStyleSheet("color: red")
-            my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участник{end_word}.")
+            my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участни{end_word}.")
         player_list = player_debitor_R
     else:
         my_win.Button_pay_R.setEnabled(False)
@@ -2208,7 +2208,7 @@ def debtor_R():
         my_win.label_dolg_R.setStyleSheet("color: red")
     else:
         my_win.label_dolg_R.setStyleSheet("color: black")
-    my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участник{end_word}.")
+    my_win.label_dolg_R.setText(f"Без лицензии: {len(player_debitor_R)} участни{end_word}.")
     fill_table(player_list)
 
 
@@ -2227,6 +2227,10 @@ def add_player():
     rg = my_win.comboBox_region.currentText()
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
+    # ===== проверка на возраст
+    znak = bd.find(".")
+    check_age_player(znak, bd)
+    # =========
     if pl_id == "": # добавляет нового игрока
         flag = check_repeat_player(pl, bd) # проверка повторного ввода игрока
     else:
@@ -2289,6 +2293,8 @@ def add_player():
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting=debt, comment="", 
                                 coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
+            if debt == "долг":
+                debtor_R()            
             # =========
             system = System.select().where(System.title_id == title_id())
             system_flag = ready_system() # проверка была создана система
@@ -2363,6 +2369,7 @@ def check_rejting_pay(pl):
         raznica = date_current - year_player
         if raznica > 11:
             my_win.textEdit.setText("Спортсмену необходимо оплатить рейтинг!")
+            my_win.textEdit.setStyleSheet("Color: red")
     elif txt_edit == "Спортсмену необходимо оплатить рейтинг!":
         plr = Player.select().where(Player.title_id == title_id())
         player_id = plr.select().where(Player.player == pl).get()
@@ -2371,6 +2378,36 @@ def check_rejting_pay(pl):
             player_id.comment = ""
             player_id.save()
 
+
+def check_age_player(znak, dr):
+    """Проеврка возраста участника"""
+    msgBox = QMessageBox()
+    title = Title.get(Title.id == title_id())
+    vozrast_text = title.vozrast
+    if vozrast_text != "": # если играют не мужчины или женщины то проверка на соответсвия возраста
+        text_1 = vozrast_text.rfind("моложе")
+        text_date = vozrast_text[:2]
+        if text_1 == -1 and text_date == "до":
+            mark = vozrast_text.find(" ")
+            total_old = int(vozrast_text[mark + 1:5])
+            year_current = int(datetime.today().strftime("%Y")) # текущий год
+            year_bday = year_current - total_old + 1
+        elif text_1 > -1: # если возраст г.р и моложе
+            year_bday = int(vozrast_text[:4])
+            year_current = int(datetime.today().strftime("%Y")) # текущий год
+        after_date = date(year_bday, 1, 1)
+        if znak != -1:
+            date_object = datetime.strptime(dr,"%d.%m.%Y")
+        else:                    
+            date_object = datetime.strptime(dr,"%Y-%m-%d")
+        dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
+        current_date = date(dr_year, 1, 1)
+        if after_date > current_date: # сравниваем две даты
+            result = msgBox.information(my_win, "", "Возраст спортсмена не соответсвует\nвозрастной категории соревнования.\n"
+                        "Или возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
+                                            msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
+                return    
 
 def dclick_in_listwidget():
     """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""
@@ -2397,43 +2434,44 @@ def dclick_in_listwidget():
         name = fam_name[znak + 1:]
         name = name.capitalize()
         r = text[sz + 2:sz1]
-        dr = text[sz1 + 2:sz2]
-        znak = dr.find(".")
+        bd = text[sz1 + 2:sz2]
+        znak = bd.find(".")
         # ==== проверка правильность даты для участия в турнире
-        title = Title.get(Title.id == title_id())
-        vozrast_text = title.vozrast
-        if vozrast_text != "": # если играют не мужчины или женщины то проверка на соответсвия возраста
-            text_1 = vozrast_text.rfind("моложе")
-            text_date = vozrast_text[:2]
-            if text_1 == -1 and text_date == "до":
-                mark = vozrast_text.find(" ")
-                total_old = int(vozrast_text[mark + 1:5])
-                year_current = int(datetime.today().strftime("%Y")) # текущий год
-                year_bday = year_current - total_old + 1
-            elif text_1 > -1: # если возраст г.р и моложе
-                year_bday = int(vozrast_text[:4])
-                year_current = int(datetime.today().strftime("%Y")) # текущий год
-            after_date = date(year_bday, 1, 1)
-            if znak != -1:
-                date_object = datetime.strptime(dr,"%d.%m.%Y")
-            else:                    
-                date_object = datetime.strptime(dr,"%Y-%m-%d")
-            dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
-            current_date = date(dr_year, 1, 1)
-            if after_date > current_date: # сравниваем две даты
-                result = msgBox.information(my_win, "", "Возраст спортсмена не соответсвует\nвозрастной категории соревнования.\n"
-                        "Или возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
-                                            msgBox.Ok, msgBox.Cancel)
-                if result == msgBox.Ok:
-                    return
+        check_age_player(znak, bd)
+        # title = Title.get(Title.id == title_id())
+        # vozrast_text = title.vozrast
+        # if vozrast_text != "": # если играют не мужчины или женщины то проверка на соответсвия возраста
+        #     text_1 = vozrast_text.rfind("моложе")
+        #     text_date = vozrast_text[:2]
+        #     if text_1 == -1 and text_date == "до":
+        #         mark = vozrast_text.find(" ")
+        #         total_old = int(vozrast_text[mark + 1:5])
+        #         year_current = int(datetime.today().strftime("%Y")) # текущий год
+        #         year_bday = year_current - total_old + 1
+        #     elif text_1 > -1: # если возраст г.р и моложе
+        #         year_bday = int(vozrast_text[:4])
+        #         year_current = int(datetime.today().strftime("%Y")) # текущий год
+        #     after_date = date(year_bday, 1, 1)
+        #     if znak != -1:
+        #         date_object = datetime.strptime(dr,"%d.%m.%Y")
+        #     else:                    
+        #         date_object = datetime.strptime(dr,"%Y-%m-%d")
+        #     dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
+        #     current_date = date(dr_year, 1, 1)
+        #     if after_date > current_date: # сравниваем две даты
+        #         result = msgBox.information(my_win, "", "Возраст спортсмена не соответсвует\nвозрастной категории соревнования.\n"
+        #                 "Или возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
+        #                                     msgBox.Ok, msgBox.Cancel)
+        #         if result == msgBox.Ok:
+        #             return
         # ==== переводит строку с датой из базы даннных в строку к обычному виду
         if znak == -1:
-            date_object = datetime.strptime(dr,"%Y-%m-%d")
-            dr = date_object.strftime('%d.%m.%Y')
+            date_object = datetime.strptime(bd,"%Y-%m-%d")
+            bd = date_object.strftime('%d.%m.%Y')
         #=====
         ci = text[sz2 + 2:ds] # город
         my_win.lineEdit_Family_name.setText(f"{fam} {name}")
-        my_win.lineEdit_bday.setText(dr)
+        my_win.lineEdit_bday.setText(bd)
         my_win.lineEdit_R.setText(r)
         my_win.lineEdit_city_list.setText(ci)
          # ======= проверка на рейтинг ====
