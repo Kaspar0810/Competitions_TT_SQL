@@ -2364,7 +2364,7 @@ def check_rejting_pay(pl):
     """Проверка игрока на оплату рейтинга и запись в базу данных"""
     txt_edit = my_win.textEdit.toPlainText()
     txt_tmp = my_win.label_63.text()
-    if txt_tmp == "Поиск в январском рейтинге.":
+    if txt_tmp == "Поиск в январском рейтинге." or txt_edit == "":
         b_day = my_win.lineEdit_bday.text()
         year_player = int(b_day[6:])
         date_current = int(datetime.today().strftime("%Y"))
