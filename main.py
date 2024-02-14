@@ -344,6 +344,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         editMenu = menuBar.addMenu("Редактировать")  # основное
         # меню Печать
         printMenu = menuBar.addMenu("Печать") # основное
+        printMenu.addAction(self.print_list_debtor_R_Action)
 
         # ============ создание подменю
 
@@ -378,6 +379,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print_Menu.addAction(self.clear_s32_Action)
         print_Menu.addAction(self.clear_s32_full_Action)
         print_Menu.addAction(self.clear_s32_2_Action)
+
 
         # меню просмотр (последовательность вида в меню)
         view_Menu = menuBar.addMenu("Просмотр")
@@ -423,6 +425,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fourth_comp_Action = QAction("пусто")
         self.fifth_comp_Action = QAction("пусто")
         self.ed_one_table_Action = QAction("Редакитровать таблицу")
+        self.print_list_debtor_R_Action = QAction("Список должников R")
 
         self.ed_etap_Action = QAction("Редактирование этапов")  # подменю редактор
         self.vid_edit_Action = QAction("Вид страницы этапов")
@@ -541,7 +544,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
 
+        self.print_list_debtor_R_Action.triggered.connect(self.check_debtor_R)
+
         self.copy_db_Action.triggered.connect(self.import_db)
+
+    def check_debtor_R():
+        check_player_whitout_R()
 
     def newFile(self):
         # Logic for creating a new file goes here...
@@ -2190,7 +2198,7 @@ def progressbar(count):
 def debtor_R():
     """показывает список должников оплаты рейтинга"""
     player_list = Player.select().where(Player.title_id == title_id())
-    player_debitor_R = player_list.select().where(Player.pay_rejting == "долг")
+    player_debitor_R = player_list.select().where(Player.pay_rejting == "долг").order_by(Player.player)
     dolg = len(player_debitor_R)
     if dolg == 1:
         end_word = "к"
@@ -14639,6 +14647,78 @@ def made_pdf_list():
     elif my_win.radioButton_winner.isChecked():
         list_winners_pdf()
     my_win.Button_made_page_pdf.setEnabled(False)
+
+
+def check_player_whitout_R():
+    """Список участников для отметки кто оплатил лицензию за рейтинг"""
+    from reportlab.platypus import Table
+    from sys import platform
+    elements = []
+    story = []
+    tit = Title.get(Title.id == title_id())
+    view_sort = ["По алфавиту", "По региону"]
+    view_sort, ok = QInputDialog.getItem(
+                            my_win, "Сортировка", "Выберите вид сортировки,\n просмотра списка участников.", view_sort, 0, False)
+    if view_sort == "По алфавиту": 
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алф
+    elif view_sort == "По региону":
+        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.region)  # сортировка по региону
+
+    short_name = tit.short_name_comp
+    gamer = tit.gamer
+    count = len(player_list)  # количество записей в базе
+    kp = count + 1
+    n = 0
+    for l in player_list:
+        n += 1
+        p = l.player
+        c = l.city
+        g = l.region
+        coach_id = l.coach_id
+        t = coach_id.coach
+
+        data = [n, p, c, g, t]
+        elements.append(data)
+
+    elements.insert(0, ["№", "Фамилия, Имя", "Город", "Регион", "Тренер(ы)"])
+    t = Table(elements, colWidths=(0.7 * cm, 5.0 * cm, 3.5 * cm, 4.5 * cm, 5.9 * cm), rowHeights=(0.6 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
+                            # ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
+                           # Использую импортированный шрифта размер
+                           ('FONTSIZE', (0, 0), (-1, -1), 10),
+                           # межстрочный верхний инервал
+                           ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+                           # межстрочный нижний инервал
+                           ('TOPPADDING', (0, 0), (-1, -1), 1),
+                           # вериткальное выравнивание в ячейке заголовка
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           # горизонтальное выравнивание в ячейке
+                           ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
+                           ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
+                           ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
+                           ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
+                           # цвет и толщину внутренних линий
+                           ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
+                           # внешние границы таблицы
+                           ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
+                           ]))
+
+    h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
+            firstLineIndent=-20, textColor="green")  # стиль параграфа
+    h3.spaceAfter = 10  # промежуток после заголовка
+    story.append(Paragraph(f'Список участников. {gamer}', h3))
+    story.append(t)
+    doc = SimpleDocTemplate(f"{short_name}_player_list_payment.pdf", pagesize=A4, 
+                            rightMargin=1*cm, leftMargin=1*cm, topMargin=1.5*cm, bottomMargin=1*cm) # название, вид страницы, размер полей
+    view_file = f"{short_name}_player_list_payment.pdf"
+    catalog = 1
+    change_dir(catalog)
+    doc.build(story, onFirstPage=func_zagolovok)
+    if platform == "darwin":  # OS X
+        os.system(f"open {view_file}")
+    elif platform == "win32":  # Windows...
+        os.system(f"{view_file}")
+    change_dir(catalog)
 
 
 def check_pay():
