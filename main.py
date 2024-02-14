@@ -1915,7 +1915,11 @@ def find_city():
     c = c.where(City.city ** f'{city_field}%')  # like
     if sender != my_win.comboBox_region:
         if (len(c)) == 0:
-            my_win.textEdit.setText("Нет такого города в базе")
+            my_win.textEdit.setText("Нет такого города в базе, выберите регион где находится населенный пункт.")
+            my_win.textEdit.setStyleSheet("Color: black")
+            my_win.comboBox_region.setCurrentText("")
+            return
+            # my_win.textEdit.setText("Нет такого города в базе")
         else:           
             for pl in c:
                 full_stroka = f"{pl.city}"
@@ -2440,32 +2444,6 @@ def dclick_in_listwidget():
         znak = bd.find(".")
         # ==== проверка правильность даты для участия в турнире
         check_age_player(znak, bd)
-        # title = Title.get(Title.id == title_id())
-        # vozrast_text = title.vozrast
-        # if vozrast_text != "": # если играют не мужчины или женщины то проверка на соответсвия возраста
-        #     text_1 = vozrast_text.rfind("моложе")
-        #     text_date = vozrast_text[:2]
-        #     if text_1 == -1 and text_date == "до":
-        #         mark = vozrast_text.find(" ")
-        #         total_old = int(vozrast_text[mark + 1:5])
-        #         year_current = int(datetime.today().strftime("%Y")) # текущий год
-        #         year_bday = year_current - total_old + 1
-        #     elif text_1 > -1: # если возраст г.р и моложе
-        #         year_bday = int(vozrast_text[:4])
-        #         year_current = int(datetime.today().strftime("%Y")) # текущий год
-        #     after_date = date(year_bday, 1, 1)
-        #     if znak != -1:
-        #         date_object = datetime.strptime(dr,"%d.%m.%Y")
-        #     else:                    
-        #         date_object = datetime.strptime(dr,"%Y-%m-%d")
-        #     dr_year = int(date_object.strftime('%Y')) # получаем только год рождения в числовом формате
-        #     current_date = date(dr_year, 1, 1)
-        #     if after_date > current_date: # сравниваем две даты
-        #         result = msgBox.information(my_win, "", "Возраст спортсмена не соответсвует\nвозрастной категории соревнования.\n"
-        #                 "Или возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
-        #                                     msgBox.Ok, msgBox.Cancel)
-        #         if result == msgBox.Ok:
-        #             return
         # ==== переводит строку с датой из базы даннных в строку к обычному виду
         if znak == -1:
             date_object = datetime.strptime(bd,"%Y-%m-%d")
@@ -2479,18 +2457,17 @@ def dclick_in_listwidget():
          # ======= проверка на рейтинг ====
         if txt_tmp == "Поиск в январском рейтинге.":
             pl = fam_name
-            check_rejting_pay(pl)
+            check_rejting_pay(pl) # Если flag is False значит надо оплачивать рейтинг
         c = City.select().where(City.city == ci)  # находит город и соответсвующий ему регион
-        # c = c.where(City.city ** f'{ci}')  # like
         if (len(c)) == 0:
-            my_win.textEdit.setText("Нет такого города в базе, выберите регион где находится населенный пункт.")
-            my_win.textEdit.setStyleSheet("Color: black")
-            my_win.comboBox_region.setCurrentText("")
+            result = msgBox.information(my_win, "", "Выберите регион\nв котором находится город.",
+                                            msgBox.Ok)
         else:  # вставляет регион соответсвующий городу
             cr = City.get(City.city == ci)
             rg = Region.get(Region.id == cr.region_id)
             my_win.comboBox_region.setCurrentText(rg.region)
             my_win.listWidget.clear()
+          # ======= проверка на рейтинг ====
     else:  # идет заполнение поля "тренер" из listWidget
         my_win.lineEdit_coach.setText(text)
         my_win.listWidget.clear()
