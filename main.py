@@ -548,7 +548,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.copy_db_Action.triggered.connect(self.import_db)
 
-    def check_debtor_R():
+    def check_debtor_R(self):
         check_player_whitout_R()
 
     def newFile(self):
@@ -14656,13 +14656,8 @@ def check_player_whitout_R():
     elements = []
     story = []
     tit = Title.get(Title.id == title_id())
-    view_sort = ["По алфавиту", "По региону"]
-    view_sort, ok = QInputDialog.getItem(
-                            my_win, "Сортировка", "Выберите вид сортировки,\n просмотра списка участников.", view_sort, 0, False)
-    if view_sort == "По алфавиту": 
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алф
-    elif view_sort == "По региону":
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.region)  # сортировка по региону
+   
+    player_list = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг")).order_by(Player.city)  # сортировка по региону
 
     short_name = tit.short_name_comp
     gamer = tit.gamer
@@ -14673,19 +14668,19 @@ def check_player_whitout_R():
         n += 1
         p = l.player
         c = l.city
-        g = l.region
         coach_id = l.coach_id
         t = coach_id.coach
-
-        data = [n, p, c, g, t]
+        t = chop_line(t)
+        app = l.comment
+        data = [n, p, c, t, app]
         elements.append(data)
 
-    elements.insert(0, ["№", "Фамилия, Имя", "Город", "Регион", "Тренер(ы)"])
-    t = Table(elements, colWidths=(0.7 * cm, 5.0 * cm, 3.5 * cm, 4.5 * cm, 5.9 * cm), rowHeights=(0.6 * cm), repeatRows=1)  # ширина столбцов, если None-автоматическая
+    elements.insert(0, ["№", "Фамилия, Имя", "Город", "Тренер(ы)", "Примечание"])
+    t = Table(elements, colWidths=(0.7 * cm, 5.0 * cm, 3.5 * cm, 6.5 * cm, 3.9 * cm), rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             # ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
                            # Использую импортированный шрифта размер
-                           ('FONTSIZE', (0, 0), (-1, -1), 10),
+                           ('FONTSIZE', (0, 0), (-1, -1), 9),
                            # межстрочный верхний инервал
                            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
                            # межстрочный нижний инервал
@@ -14706,14 +14701,14 @@ def check_player_whitout_R():
     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
             firstLineIndent=-20, textColor="green")  # стиль параграфа
     h3.spaceAfter = 10  # промежуток после заголовка
-    story.append(Paragraph(f'Список участников. {gamer}', h3))
+    story.append(Paragraph(f'Список должников оплаты лицензий за R. {gamer}', h3))
     story.append(t)
-    doc = SimpleDocTemplate(f"{short_name}_player_list_payment.pdf", pagesize=A4, 
+    doc = SimpleDocTemplate(f"{short_name}_player_list_debtor.pdf", pagesize=A4, 
                             rightMargin=1*cm, leftMargin=1*cm, topMargin=1.5*cm, bottomMargin=1*cm) # название, вид страницы, размер полей
-    view_file = f"{short_name}_player_list_payment.pdf"
+    view_file = f"{short_name}_player_list_debtor.pdf"
     catalog = 1
     change_dir(catalog)
-    doc.build(story, onFirstPage=func_zagolovok)
+    doc.build(story)
     if platform == "darwin":  # OS X
         os.system(f"open {view_file}")
     elif platform == "win32":  # Windows...
