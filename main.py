@@ -544,11 +544,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
 
-        self.print_list_debtor_R_Action.triggered.connect(self.check_debtor_R)
+        self.print_list_debtor_R_Action.triggered.connect(self.check_debitor_R)
 
         self.copy_db_Action.triggered.connect(self.import_db)
 
-    def check_debtor_R(self):
+    def check_debitor_R(self):
         check_player_whitout_R()
 
     def newFile(self):
@@ -972,6 +972,7 @@ class StartWindow(QMainWindow, Ui_Form):
             str_data = date_start.strftime("%Y-%B")
             if str_data not in data_list:
                 data_list.append(str_data)
+        data_list.sort(reverse=True)
         data_list.insert(0, "-выберите дату-")
         fir_window.comboBox_arhive_year.addItems(data_list)
 
@@ -4279,7 +4280,6 @@ def select_player_in_game():
     tab = my_win.tabWidget.currentIndex()
     row_num= my_win.tableView.currentIndex().row() # определиние номера строки
     numer_game = my_win.tableView.model().index(row_num, 3).data()
-    # tour = my_win.tableView.model().index(row_num, 10).data()
     if tab == 1:
         select_player_in_list()
     elif tab ==2:
@@ -4588,9 +4588,14 @@ def filter_player_list(sender):
         if my_win.checkBox_15.isChecked():
             my_win.Button_app.setEnabled(True)
             player_list = player.select().where(Player.application == "предварительная")
+            count = len(player_list)
+            # my_win.label_dolg_R.setText(f"Спортсменов по предзаявке {count} чел.")
+            # my_win.label_dolg_R.setStyleSheet("color: black")
         else:
             my_win.Button_app.setEnabled(False)
             player_list = Player.select().where(Player.title_id == title_id())
+            my_win.label_dolg_R.setText(f"Спортсменов по предзаявке {count} чел.")
+            my_win.label_dolg_R.setStyleSheet("color: black")
     elif sender == my_win.Button_reset_fltr_list:
         player_list = Player.select().where(Player.title_id == title_id())
         my_win.comboBox_fltr_region.setCurrentIndex(0)
@@ -4620,6 +4625,7 @@ def find_in_player_rejting_list():
     r_data_w = [R_list_d, R1_list_d]
     gamer_w = ["Девочки", "Девушки", "Женщины"]
     id_title = Title.select().where(Title.id == title_id()).get()
+
     gamer = id_title.gamer
     txt_r = ""
     cur_index = my_win.comboBox_choice_R.currentIndex()
@@ -14703,9 +14709,9 @@ def check_player_whitout_R():
     h3.spaceAfter = 10  # промежуток после заголовка
     story.append(Paragraph(f'Список должников оплаты лицензий за R. {gamer}', h3))
     story.append(t)
-    doc = SimpleDocTemplate(f"{short_name}_player_list_debtor.pdf", pagesize=A4, 
+    doc = SimpleDocTemplate(f"{short_name}_player_list_debitor.pdf", pagesize=A4, 
                             rightMargin=1*cm, leftMargin=1*cm, topMargin=1.5*cm, bottomMargin=1*cm) # название, вид страницы, размер полей
-    view_file = f"{short_name}_player_list_debtor.pdf"
+    view_file = f"{short_name}_player_list_debitor.pdf"
     catalog = 1
     change_dir(catalog)
     doc.build(story)
