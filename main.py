@@ -2195,7 +2195,7 @@ def progressbar(count):
     # m = int(count / 100)
     # for i in range(m, count, m):
     #     progress.setValue(100)
-def debtor_R():
+def debitor_R():
     """показывает список должников оплаты рейтинга"""
     player_list = Player.select().where(Player.title_id == title_id())
     player_debitor_R = player_list.select().where(Player.pay_rejting == "долг").order_by(Player.player)
@@ -2308,7 +2308,7 @@ def add_player():
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting=debt, comment="", 
                                 coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
             if debt == "долг":
-                debtor_R()            
+                debitor_R()            
             # =========
             system = System.select().where(System.title_id == title_id())
             system_flag = ready_system() # проверка была создана система
@@ -4251,7 +4251,7 @@ def save_in_db_pay_R():
         query.execute()
     else:
         return
-    debtor_R()
+    debitor_R()
 
 
 def check_repeat_player(pl, bd):
@@ -15066,7 +15066,7 @@ my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по не�
 my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке игрок 2 пф
 my_win.checkBox_12.stateChanged.connect(no_play)  # поражение по неявке игрок 1 финал
 my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по неявке игрок 2 финал
-my_win.checkBox_11.stateChanged.connect(debtor_R) # должники рейтинга оплаты
+my_win.checkBox_11.stateChanged.connect(debitor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
 # my_win.checkBox_no_play_game.stateChanged.connect(game_no_play_for_mesto)
