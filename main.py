@@ -2655,7 +2655,7 @@ def page():
         else:
             my_win.label_dolg_R.setStyleSheet("color: red")
         my_win.label_dolg_R.setText(f"Без лицензии: {count_debitor_R} {end_word}")
-        my_win.label_predzayavka.setText(f"Спортсменов по заявке: {count_pred} чел.")
+        my_win.label_predzayavka.setText(f"Спортсменов по предзаявке: {count_pred} чел.")
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
