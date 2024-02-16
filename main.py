@@ -660,11 +660,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             return
                     else:
                         my_win.tabWidget.setCurrentIndex(2)
-
                         choice_gr_automat()
                         add_open_tab(tab_page="Группы")
                         my_win.tabWidget.setCurrentIndex(3)
                         my_win.ed_etap_Action.setEnabled(True) # включает меню - редактирование жеребьеввки групп
+                        enabled_menu_after_choice()
                         return
         elif sender == self.choice_pf_Action: # подменю полуфиналы            
             stage = select_choice_semifinal()
@@ -1426,6 +1426,8 @@ def enabled_menu_after_choice():
                 my_win.view_fin7_Action.setEnabled(True)
             elif stage == "8-й финал":
                 my_win.view_fin8_Action.setEnabled(True)
+            elif stage == "9-й финал":
+                my_win.view_fin9_Action.setEnabled(True)
             my_win.ed_etap_Action.setEnabled(True)
         stage = k.stage
 
@@ -2634,7 +2636,9 @@ def page():
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
         player_list = Player.select().where(Player.title_id == title_id())
         player_debitor_R = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг"))
+        player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
         count_debitor_R = len(player_debitor_R)
+        count_pred = len(player_predzayavka)
         num_debitor_1 = [1]
         num_debitor_2 = [2, 3, 4]
         if count_debitor_R in num_debitor_1:
@@ -2651,6 +2655,7 @@ def page():
         else:
             my_win.label_dolg_R.setStyleSheet("color: red")
         my_win.label_dolg_R.setText(f"Без лицензии: {count_debitor_R} {end_word}")
+        my_win.label_predzayavka.setText(f"Спортсменов по заявке: {count_pred} чел.")
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
@@ -4589,19 +4594,19 @@ def filter_player_list(sender):
             my_win.Button_app.setEnabled(True)
             player_list = player.select().where(Player.application == "предварительная")
             count = len(player_list)
-            # my_win.label_dolg_R.setText(f"Спортсменов по предзаявке {count} чел.")
-            # my_win.label_dolg_R.setStyleSheet("color: black")
         else:
             my_win.Button_app.setEnabled(False)
+            player_list_pred = player.select().where(Player.application == "предварительная")
+            count = len(player_list_pred)
             player_list = Player.select().where(Player.title_id == title_id())
-            my_win.label_dolg_R.setText(f"Спортсменов по предзаявке {count} чел.")
-            my_win.label_dolg_R.setStyleSheet("color: black")
     elif sender == my_win.Button_reset_fltr_list:
         player_list = Player.select().where(Player.title_id == title_id())
         my_win.comboBox_fltr_region.setCurrentIndex(0)
         my_win.comboBox_fltr_city.setCurrentIndex(0) 
         my_win.checkBox_15.setChecked(False)      
         load_comboBox_filter()
+    my_win.label_predzayavka.setText(f"Спортсменов по предзаявке {count} чел.")
+    my_win.label_predzayavka.setStyleSheet("color: black")
     fill_table(player_list)
 
 
@@ -8044,14 +8049,22 @@ def etap_made():
         with db:
             systems.visible_game = state_visible
             systems.save()
-        # суммирует все игры этапов    
+        # суммирует все игры этапов  
+    group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]  
+    player_in_final = []
     for k in system:
+        stage = k.stage
+        pl_final = k.max_player
+        if stage not in group_list:
+            player_in_final.append(pl_final)
         kol_game_str = k.kol_game_string
         zn = kol_game_str.find(" ")
         number = int(kol_game_str[:zn])
         sum_game.append(number)
     all_sum_game = sum(sum_game)
+    all_sum_player_final = sum(player_in_final)
     my_win.label_33.setText(f"Всего:{all_sum_game} игр.")
+    my_win.label_52.setText(f"Посеяно {all_sum_player_final} чел.")
     my_win.checkBox_visible_game.setChecked(True)
     flag = control_all_player_in_final(etap) # проверяет все ли игроки распределены по финалам
     if flag is True: # продолжает выбор этапа
@@ -8533,12 +8546,26 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             elif player_in_final == 32:
                 total_games = 94
         elif cur_index == 2:  # прогрессивная сетка
-            if player_in_final == 8:
+            if player_in_final <= 8:
                 total_games = 12
             elif player_in_final == 16:
                 total_games = 32
-            elif player_in_final == 32:
-                total_games = 80
+            elif player_in_final > 8 and player_in_final < 16:
+                tours = 4
+                free = 16 - player_in_final
+                if free == 1:
+                    total_games = 32 - free * tours
+                elif free > 1:
+                    total_games = 32 - (free * tours - 1)
+            elif player_in_final == 32: 
+                 total_games = 80  
+            elif player_in_final > 16 and player_in_final < 32:
+                tours = 5
+                free = 32 - player_in_final
+                if free == 1:
+                    total_games = 80 - free * tours
+                elif free > 1:
+                    total_games = 80 - (free * tours - 1)
             else:
                 total_games= 80
         elif cur_index == 3:  # сетка с розыгрышем призовых мест

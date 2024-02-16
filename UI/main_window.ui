@@ -4384,7 +4384,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>700</x>
@@ -4557,7 +4557,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4610,7 +4610,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>448</y>
+        <y>465</y>
         <width>231</width>
         <height>18</height>
        </rect>
@@ -4634,7 +4634,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>434</y>
+        <y>454</y>
         <width>232</width>
         <height>16</height>
        </rect>
@@ -5040,6 +5040,28 @@
         </layout>
        </item>
       </layout>
+     </widget>
+     <widget class="QLabel" name="label_predzayavka">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>436</y>
+        <width>221</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Игроков по предзаяке:</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_6">
