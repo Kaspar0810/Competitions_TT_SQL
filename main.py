@@ -2273,10 +2273,11 @@ def add_player():
     title = Title.select().where(Title.id == title_id()).get()
     data_start = title.data_start
     date_current = date.today()
-    if  date_current < data_start:
-        zayavka = "предварительная"
-    else:
-        zayavka = "основная"
+    zayavka = "предварительная" if date_current < data_start else "основная"
+    # if  date_current < data_start:
+    #     zayavka = "предварительная"
+    # else:
+    #     zayavka = "основная"
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         with db:
@@ -2310,6 +2311,9 @@ def add_player():
                 player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting=debt, comment="", 
                                 coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
+            player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
+            count_pred = len(player_predzayavka)
+            my_win.label_predzayavka.setText(f"Спортсменов по предзаявке: {count_pred} чел.")
             if debt == "долг":
                 debitor_R()            
             # =========
@@ -2619,13 +2623,11 @@ def page():
         my_win.comboBox_secretary.setEditable(True)
         db_select_title()
         my_win.tableWidget.hide()
-        # my_win.progressBar.hide()
     elif tb == 1:  # -список участников-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        # my_win.progressBar.hide()
         load_comboBox_filter()
         region()
         my_win.Button_app.setEnabled(False)
