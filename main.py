@@ -11635,7 +11635,9 @@ def write_in_setka(data, stage, first_mesto, table):
     "row_num_win - словарь, ключ - номер игры, значение - список(номер строки 1-ого игрока, номер строки 2-ого игрока) и записвает итоговые места в db"
     sender = my_win.sender()
     player = Player.select().where(Player.title_id == title_id())
-    id_system = system_id(stage)
+    system_flag = ready_system() # проверка была создана система
+    if system_flag is True: 
+        id_system = system_id(stage)
     # choice = Choice.select().where(Choice.title_id == title_id())
     row_num_los = {}
     row_end = 0  # кол-во строк для начальной расстоновки игроков в зависимости от таблицы
