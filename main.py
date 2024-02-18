@@ -6150,7 +6150,12 @@ def choice_gr_automat():
         p += 1
         if number_poseva == 0 or number_poseva % group == 0 :
             group_list = list(range(1, group + 1))  # получение списка групп с помощью функции range
-
+        #  +++ вариант с упорядовычинем списка групп в реверси
+            if m % 2 == 0:
+                group_list.sort(reverse = True)
+            else:
+                group_list.sort(reverse = False)
+        # +++++++++++++
         region_id = reg_list[number_poseva]
         pl_id = player_list[number_poseva]
         posev_tmp = posev[f"{m}_посев"]
@@ -6188,6 +6193,10 @@ def choice_gr_automat():
                 else:
                     gr_del = previous_region_group[z]  # список групп где уже есть этот регион
                     group_list_tmp = list((Counter(group_list) - Counter(gr_del)).elements()) # удаляет из списка номера групп где уже есть регионы
+                    if m % 2 == 0:
+                        group_list_tmp.sort(reverse = True)
+                    else:
+                        group_list_tmp.sort(reverse = False)
                     r = len(group_list_tmp)
                     if r == 0:  # если во всех группах уже есть, то начинает опять полный список групп
                         current_region_group[z] = group_list  # получает словарь со списком групп куда сеять
@@ -7279,30 +7288,33 @@ def add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m,
         else:
             f = current_region_group[region]  # список номеров групп для посева текущего региона
             temp_list = []
-            if m % 2 != 0:  # в зависимости от четности посева меняет направления посева групп в списке
-                f.sort()
-            else:
-                f.sort(reverse = True)
-
             if free_gr != 1:
                 if len(f) == 0: # значит во всех группах есть уже данный регион
-                    # =====
-                    finish = end if end > start else start
-                    # =====
-                    for i in range(1, finish + 1):
-                        temp_list.append(i)
+                    posev[f"{m}_посев"] = posev_tmp
+                    for p in posev_tmp.keys():
+                        if 0 == posev_tmp[p]:
+                            temp_list.append(p)
+                    # # =====
+                    # finish = end if end > start else start
+                    # # =====
+                    # for i in range(1, finish + 1):
+                    #     temp_list.append(i)
+                    if m % 2 != 0:  # в зависимости от четности посева меняет направления посева групп в списке
+                        temp_list.sort()
+                    else:
+                        temp_list.sort(reverse = True)   
                     current_region_group[region] = temp_list
                     f = current_region_group[region]  # список номеров групп для посева текущего региона
                     # ===== удалить посеянные группы ====
-                    posev[f"{m}_посев"] = posev_tmp
-                    num_gr_posev = []
-                    for p in posev_tmp.keys():
-                        if 0 != posev_tmp[p]:
-                            num_gr_posev.append(p)
-                    for d in num_gr_posev:  # цикл удаления посеянных групп                        
-                        list_group = current_region_group[region]
-                        if d in list_group:  # находит сеяную группу и удаляет ее из списка групп
-                            list_group.remove(d)
+                    # posev[f"{m}_посев"] = posev_tmp
+                    # num_gr_posev = []
+                    # for p in posev_tmp.keys():
+                    #     if 0 != posev_tmp[p]:
+                    #         num_gr_posev.append(p)
+                    # for d in num_gr_posev:  # цикл удаления посеянных групп                        
+                    #     list_group = current_region_group[region]
+                    #     if d in list_group:  # находит сеяную группу и удаляет ее из списка групп
+                    #         list_group.remove(d)
 
                 if s in f: #  присваивает переменной u - номер группы, если она идет по порядку
                     posev_tmp[s] = region
@@ -8557,8 +8569,10 @@ def numbers_of_games(cur_index, player_in_final, kpt):
                 free = 16 - player_in_final
                 if free == 1:
                     total_games = 32 - free * tours
-                elif free > 1:
+                elif free == 2:
                     total_games = 32 - (free * tours - 1)
+                else:
+                    total_games = 32 - (free * 2 + 4)
             elif player_in_final == 32: 
                  total_games = 80  
             elif player_in_final > 16 and player_in_final < 32:
@@ -9969,7 +9983,7 @@ def table_made(pv, stage):
     elements = []
 
     # кол-во столбцов в таблице и их ширина
-    cW = ((0.4 * cm, family_col * cm) + col + (1 * cm, 1 * cm, 1 * cm))
+    cW = ((0.4 * cm, family_col * cm) + col + (0.8 * cm, 1 * cm, 1 * cm))
     if kg == 1:
         rH = (0.45 * cm)  # высота строки
     else:
@@ -10084,7 +10098,7 @@ def table_made(pv, stage):
                 elements.append(Paragraph(text, h2))
                 elements.append(shell_table[l][0])
                 # =======
-        else:  # страница книжная, то таблицы размещаются обе в столбец
+        else:  # страница книжная, то таблицы размещаются в столбец
             for k in range(1, kg // 2 + 1):
                 for i in range(0, kg):
                     data_tmp.append(dict_table[i])  
@@ -10132,7 +10146,9 @@ def table_made(pv, stage):
     catalog = 1
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
-    doc.bottomMargin = 1.6 * cm
+    doc.bottomMargin = 1.5 * cm
+    doc.leftMargin = 0.0 * cm
+    doc.righttMargin = 0.0 * cm
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
@@ -13283,14 +13299,15 @@ def change_page_vid():
         sys.append(stage)
     stage, ok = QInputDialog.getItem(my_win, "Таблицы", "Выберите таблицы из списка для\n"
                                         "смены ориентации страницы", sys)
+    id_system = system_id(stage)
     if ok:                                   
-        sys = system.select().where(System.stage == stage).get()
+        sys = system.select().where(System.id == id_system).get()
         vid = sys.page_vid
-        vid_ed = "альбомная"
-        if vid == "альбомная":
-            vid_ed = "книжная"
-        else:
-            vid_ed = "альбомная"
+        # vid_ed = "альбомная"
+        vid_ed = "книжная" if vid == "альбомная" else "альбомная"
+        #     vid_ed = "книжная"
+        # else:
+        #     vid_ed = "альбомная"
         ok = msgBox.question(my_win, "Таблицы", "Текущая ориентация страницы\n"
                                             f"-{stage}-: {vid},\n"
                                             "Хотите ее изменить на:" f"{vid_ed}?", msgBox.Ok, msgBox.Cancel)
