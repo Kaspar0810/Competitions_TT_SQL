@@ -4607,6 +4607,8 @@ def filter_player_list(sender):
         my_win.comboBox_fltr_city.setCurrentIndex(0) 
         my_win.checkBox_15.setChecked(False)      
         load_comboBox_filter()
+    player_list_pred = player.select().where(Player.application == "предварительная")
+    count = len(player_list_pred)    
     my_win.label_predzayavka.setText(f"Спортсменов по предзаявке {count} чел.")
     my_win.label_predzayavka.setStyleSheet("color: black")
     fill_table(player_list)
@@ -10152,25 +10154,6 @@ def table_made(pv, stage):
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-
-    # end_time = time.time()
-    # execution_time = end_time - start_time
-    # print(f"Время выполнения: {execution_time} секунд")
- # ========
-# def create_report():
-#     doc = SimpleDocTemplate("sample_report.pdf")
-     
-#     styles = getSampleStyleSheet()
-#     title_style = styles['Title']
-#     title_style.textColor = colors.red
-#     title_style.fontSize = 24
-     
-#     story = []
-#     title = Paragraph("Пример отчета", styles['Title'])
-#     story.append(title)
-     
-#     doc.build(story)
-# # ===========
 
 
 def list_regions_pdf():
