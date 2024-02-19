@@ -668,7 +668,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         return
         elif sender == self.choice_pf_Action: # подменю полуфиналы            
             stage = select_choice_semifinal()
-            system_stage = system.select().where(System.stage == stage).get()
+            # +++ new
+            id_system = system_id(stage)
+            system_stage = system.select().where(System.id == id_system).get()
+            # ======
+            # system_stage = system.select().where(System.stage == stage).get()
             choice_flag = system_stage.choice_flag
             if stage is None: # если отмена при выборе жеребьевки
                 return
@@ -2313,7 +2317,7 @@ def add_player():
                                 coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
             player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
             count_pred = len(player_predzayavka)
-            my_win.label_predzayavka.setText(f"Спортсменов по предзаявке: {count_pred} чел.")
+            my_win.label_predzayavka.setText(f"По предзаявке: {count_pred} чел.")
             if debt == "долг":
                 debitor_R()            
             # =========
@@ -2657,7 +2661,7 @@ def page():
         else:
             my_win.label_dolg_R.setStyleSheet("color: red")
         my_win.label_dolg_R.setText(f"Без лицензии: {count_debitor_R} {end_word}")
-        my_win.label_predzayavka.setText(f"Спортсменов по предзаявке: {count_pred} чел.")
+        my_win.label_predzayavka.setText(f"По предзаявке: {count_pred} чел.")
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
@@ -4419,60 +4423,60 @@ def delete_player():
             for sys in system:
                 athlet = sys.total_athletes
                 System.update(total_athletes=athlet - 1).where(System.title_id == title_id()).execute()
-        fin = "Предварительный"
-        check_flag = check_choice(fin)
-        if check_flag is True:
-            question = msgBox.information(my_win, "", f"Уже была произведена жеребьевка!\n"
-                                            f" {player_del} город {player_city_del}\n"
-                                            "будет удален(а) из посева.",
-                                msgBox.Ok)
-            sys = system.select().where(System.stage == "Предварительный").get()
-            system_id = sys.id # id системы -Предварительного этапа-
-            
-            choices = Choice.delete().where(Choice.player_choice_id == player_id)
-            choices.execute()
-            game_lists = game_list.select().where(Game_list.player_group_id == player_del).get()
-            posev = game_lists.rank_num_player
-            number_group = game_lists.number_group
-            # === изменяет номера посева, если удаляемый игрок не в последний посев ==
-            g_list = game_list.select().where((Game_list.system_id == system_id) & 
-                                            (Game_list.number_group == number_group))
-            for k in g_list:
-                gl_id = k.id
-                ps = k.rank_num_player # посев игрока
-                if posev < ps:
-                    rank_in_group = ps - 1
-                    gl = Game_list.update(rank_num_player=rank_in_group).where(Game_list.id == gl_id)
-                    gl.execute()
-                elif posev == ps:
-            # === удаляет игрока из Game_list ===
-                    gl = Game_list.delete().where(Game_list.id == gl_id)
-                    gl.execute()
-            # ==== заменяет туры (удаляет встречи с удаленным игроком)
-            result_game = result.select().where((Result.system_id == system_id) & 
-                                                    (Result.number_group == number_group))
-            fam_city_del = f"{player_del}/{player_city_del}"
-            for k in result_game:
-                pl1 = k.player1
-                pl2 = k.player2
-                if pl1 == fam_city_del or pl2 == fam_city_del:
-                    res = Result.delete().where(Result.id == k)
+            fin = "Предварительный"
+            check_flag = check_choice(fin)
+            if check_flag is True:
+                question = msgBox.information(my_win, "", f"Уже была произведена жеребьевка!\n"
+                                                f" {player_del} город {player_city_del}\n"
+                                                "будет удален(а) из посева.",
+                                    msgBox.Ok)
+                sys = system.select().where(System.stage == "Предварительный").get()
+                system_id = sys.id # id системы -Предварительного этапа-
+                
+                choices = Choice.delete().where(Choice.player_choice_id == player_id)
+                choices.execute()
+                game_lists = game_list.select().where(Game_list.player_group_id == player_del).get()
+                posev = game_lists.rank_num_player
+                number_group = game_lists.number_group
+                # === изменяет номера посева, если удаляемый игрок не в последний посев ==
+                g_list = game_list.select().where((Game_list.system_id == system_id) & 
+                                                (Game_list.number_group == number_group))
+                for k in g_list:
+                    gl_id = k.id
+                    ps = k.rank_num_player # посев игрока
+                    if posev < ps:
+                        rank_in_group = ps - 1
+                        gl = Game_list.update(rank_num_player=rank_in_group).where(Game_list.id == gl_id)
+                        gl.execute()
+                    elif posev == ps:
+                # === удаляет игрока из Game_list ===
+                        gl = Game_list.delete().where(Game_list.id == gl_id)
+                        gl.execute()
+                # ==== заменяет туры (удаляет встречи с удаленным игроком)
+                result_game = result.select().where((Result.system_id == system_id) & 
+                                                        (Result.number_group == number_group))
+                fam_city_del = f"{player_del}/{player_city_del}"
+                for k in result_game:
+                    pl1 = k.player1
+                    pl2 = k.player2
+                    if pl1 == fam_city_del or pl2 == fam_city_del:
+                        res = Result.delete().where(Result.id == k)
+                        res.execute()
+                for k in result_game:
+                    tour = k.tours
+                    znak = tour.find("-")
+                    p1 = int(tour[:znak])  # игрок под номером в группе
+                    p2 = int(tour[znak + 1:])  # игрок под номером в группе
+                    if p1 > posev and p2 > posev:
+                        p1 -= 1
+                        p2 -= 1
+                    elif p1 > posev:
+                        p1 -= 1
+                    elif p2 > posev:
+                        p2 -= 1
+                    new_tour = f"{p1}-{p2}"
+                    res = Result.update(tours=new_tour).where(Result.id == k)
                     res.execute()
-            for k in result_game:
-                tour = k.tours
-                znak = tour.find("-")
-                p1 = int(tour[:znak])  # игрок под номером в группе
-                p2 = int(tour[znak + 1:])  # игрок под номером в группе
-                if p1 > posev and p2 > posev:
-                    p1 -= 1
-                    p2 -= 1
-                elif p1 > posev:
-                    p1 -= 1
-                elif p2 > posev:
-                    p2 -= 1
-                new_tour = f"{p1}-{p2}"
-                res = Result.update(tours=new_tour).where(Result.id == k)
-                res.execute()
         else: # записывает в таблицу -Удаленные-
             with db: 
                 del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
@@ -4487,6 +4491,10 @@ def delete_player():
         my_win.lineEdit_R.clear()
         my_win.lineEdit_city_list.clear()
         my_win.lineEdit_coach.clear()
+        player_list_pred = player.select().where(Player.application == "предварительная")
+        count = len(player_list_pred)    
+        my_win.label_predzayavka.setText(f"По предзаявке {count} чел.")
+        my_win.label_predzayavka.setStyleSheet("color: black")
         player_list = Player.select().where(Player.title_id == title_id())
         count = len(player_list)
         my_win.label_46.setText(f"Всего: {count} участников")
@@ -4609,7 +4617,7 @@ def filter_player_list(sender):
         load_comboBox_filter()
     player_list_pred = player.select().where(Player.application == "предварительная")
     count = len(player_list_pred)    
-    my_win.label_predzayavka.setText(f"Спортсменов по предзаявке {count} чел.")
+    my_win.label_predzayavka.setText(f"По предзаявке {count} чел.")
     my_win.label_predzayavka.setStyleSheet("color: black")
     fill_table(player_list)
 
@@ -6070,12 +6078,15 @@ def reset_filter():
 def choice_semifinal_automat(stage):
     """жеребьевка полуфиналов"""
     mesto_first = 0
-
     system = System.select().where(System.title_id == title_id())
     systems = system.select().where(System.stage == "Предварительный").get()
     total_group = systems.total_group
-    system_stage = system.select().where(System.stage == stage).get()
-    sys_id = system_stage.id
+    # ===== new
+    id_system = system_id(stage)
+    system_stage = system.select().where(System.id == id_system).get()
+
+    # system_stage = system.select().where(System.stage == stage).get()
+    # sys_id = system_stage.id
     mesta_exit = system_stage.mesta_exit
 
     if stage == "1-й полуфинал":
@@ -6089,7 +6100,6 @@ def choice_semifinal_automat(stage):
         choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == f"{k} группа"))
         p = 0 if k <= total_group // 2 else mesta_exit
         n = k if k <= total_group // 2 else total_group - k + 1
-        # for i in range(mesto_first, mesta_exit + 1):
         for i in range(mesto_first, mesta_exit + mesto_first):
             p += 1
             choice_mesta = choices.select().where(Choice.mesto_group == i).get()
@@ -6099,7 +6109,7 @@ def choice_semifinal_automat(stage):
                 choice_mesta.posev_sf = p # номер посева
                 choice_mesta.save()
     with db:  # записывает в систему, что произведена жеребъевка
-        system = System.get(System.id == sys_id)
+        system = System.get(System.id == id_system)
         system.choice_flag = True
         system.save()
     player_in_table_group_and_write_Game_list_Result(stage)
@@ -8828,7 +8838,7 @@ def manual_choice_setka(fin, count_exit, mesto_first_poseva):
         if fin == "1-й финал":
             choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n)
         else:
-            choice_posev = choice.select().order_by(Choice.rank).where(Choice.mesto_group == mesto_first_poseva + n)
+            choice_posev = choice.select().where(Choice.mesto_group == mesto_first_poseva + n).order_by(Choice.rank)
 
 
 def check_choice(stage):
@@ -8837,17 +8847,6 @@ def check_choice(stage):
     id_system = system_id(stage)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
     check_flag = system.choice_flag
-    # if fla
-    # system = System.select().where(System.title_id == title_id())  # находит system id последнего
-    # for st in system:
-    #     system_stage = st.stage
-    #     flag = st.choice_flag
-    #     if system_stage != "" and flag is True:
-    #         stage_list.append(system_stage)
-    #     else:
-    #         check_flag = False
-    # if fin in stage_list:
-    #     check_flag = True
     return check_flag
 
 
@@ -8889,11 +8888,9 @@ def del_player_table():
         if count == 0:
             my_win.statusbar.showMessage(
                 "Удаленных участников соревнований нет", 10000)
-            # return
             fill_table(player_list)
         else:
             my_win.tableView.hideColumn(8)
-            # my_win.tableView.hideColumn(9)
             my_win.tableView.hideColumn(10)
             my_win.tableView.hideColumn(11)
             my_win.tableView.hideColumn(12)
@@ -8958,7 +8955,8 @@ def remains_in_group(etap_system, etap_system_dict):
                 stage_dict[etap_system] = number_player_pf2
             elif (etap_system == "1-й финал" or etap_system == "2-й финал" or etap_system == "3-й финал" or
                 etap_system == "4-й финал" or etap_system == "5-й финал" or etap_system == "6-й финал" or
-                etap_system == "7-й финал" or etap_system == "8-й финал" or etap_system == "9-й финал"):
+                etap_system == "7-й финал" or etap_system == "8-й финал" or etap_system == "9-й финал" or
+                etap_system == "10-й финал"):
                 if m == 1:
                     systems = system.select().where(System.stage == etap_system).get()
                     exit_stage = systems.stage_exit # откуда выходят в финал
@@ -9104,8 +9102,6 @@ def kol_player_in_final():
         elif exit_stage == "2-й полуфинал":
             exit_stroka = "2-ого полуфинала" 
     else:
-        # systems = System.select().where(System.title_id == title_id())
- 
         fin = "Суперфинал"
         exit_stage = "1-й финал"
         exit_stroka = "1-ого финала"
