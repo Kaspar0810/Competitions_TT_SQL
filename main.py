@@ -8122,8 +8122,14 @@ def total_game_table(exit_stage, kpt, fin, pv):
         if etap_text == "Полуфиналы":
             vt = "группы"
             type_table = "группы"
+            # +++ вариант с полуфиналом с выходом из 1-ого пф
+            # if exit_stage == "Предварительный":
+            #     gr_pf = total_gr // 2
+            #     # player_in_final = gr_pf * kpt * 2 # колво участников в полуфинале
+            # elif exit_stage == "1-й полуфинал":
+            #     gr_pf = total_gr // 4
             gr_pf = total_gr // 2
-            player_in_final = gr_pf * kpt * 2 # колво участников в полуфинале
+            player_in_final = gr_pf * kpt * 2 # колво участников в полуфинале    
             cur_index = 0
         elif etap_text == "Финальный" or etap_text == "Суперфинал":
             cur_index = current_index_combobox_table(sender)
@@ -9009,6 +9015,11 @@ def max_player_and_exit_stage(etap):
     elif number_etap == 3:
         if etap == "Полуфиналы":
             fin = "2-й полуфинал"
+            # ++++ вариант выбора выхода в 2-й полуфинал (из группы или 1-щ=ого пф)
+            # group_list = ["-выбор этапа", "Предварительный", "1-й полуфинал"]
+            # exit_stage, ok = QInputDialog.getItem(my_win, "Полуфиналы", "Выберите этап откуда\n"
+            #                             "выходят во 2-й полуфинал", group_list)
+            # +++++++                                
             exit_stage = "Предварительный"
         elif etap == "Финальный":
             fin = "1-й финал" if "1-й полуфинал" in total_stage else "2-й финал"
