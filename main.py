@@ -5756,7 +5756,9 @@ def filter_fin(pl=False):
         fltr = filter.select().where((Result.system_stage == "Финальный") & (Result.tours == num_game_fin))
         count = len(fltr)
         my_win.label_38.setText(f'Всего в {final} {count} игры')
-    if final != "все финалы":
+    if final == "":
+        return
+    elif final != "все финалы":
         id_system = system_id(stage=final)
         fltr = filter.select().where(Result.system_id == id_system)
     fin = []
