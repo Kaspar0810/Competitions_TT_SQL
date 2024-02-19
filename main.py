@@ -4491,7 +4491,7 @@ def delete_player():
         my_win.lineEdit_R.clear()
         my_win.lineEdit_city_list.clear()
         my_win.lineEdit_coach.clear()
-        player_list_pred = player.select().where(Player.application == "предварительная")
+        player_list_pred = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
         count = len(player_list_pred)    
         my_win.label_predzayavka.setText(f"По предзаявке {count} чел.")
         my_win.label_predzayavka.setStyleSheet("color: black")
@@ -9985,14 +9985,18 @@ def table_made(pv, stage):
         if max_pl < 7:
             family_col = 4.0
             wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
+            wcells = round(wcells, 2)
         else:
             family_col = 3.8
             wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
+            wcells = round(wcells, 2)
+
     col = ((wcells * cm,) * max_pl)
     elements = []
 
     # кол-во столбцов в таблице и их ширина
     cW = ((0.4 * cm, family_col * cm) + col + (0.8 * cm, 1 * cm, 1 * cm))
+
     if kg == 1:
         rH = (0.45 * cm)  # высота строки
     else:
@@ -10156,8 +10160,7 @@ def table_made(pv, stage):
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
     doc.bottomMargin = 1.5 * cm
-    doc.leftMargin = 0.0 * cm
-    doc.righttMargin = 0.0 * cm
+  
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
