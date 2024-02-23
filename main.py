@@ -2923,6 +2923,9 @@ def page():
             my_win.tabWidget.setCurrentIndex(3)
         else:  # жеребьевка сделана
             my_win.Button_Ok_pf.setEnabled(False)
+            # query_1 = Result.select().where(Result.system_stage == "1-й полуфинал")
+            # query_2 = Result.select().where(Result.system_stage == "2-й полуфинал")
+            # player_list = query_1 | query_2
             player_list = Result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
             fill_table(player_list)
             load_combobox_filter_group_semifinal()
@@ -4601,8 +4604,12 @@ def filter_player_list(sender):
             player_list = player.select().where(Player.region == region)
     elif sender == my_win.checkBox_15: # отмечен чекбокс предзаявка
         if my_win.checkBox_15.isChecked():
+            region = my_win.comboBox_fltr_region.currentText()
             my_win.Button_app.setEnabled(True)
-            player_list = player.select().where(Player.application == "предварительная")
+            if region != "":
+                player_list = player.select().where((Player.application == "предварительная") & (Player.region == region))
+            else:
+                player_list = player.select().where(Player.application == "предварительная")
             count = len(player_list)
         else:
             my_win.Button_app.setEnabled(False)
@@ -5390,12 +5397,12 @@ def made_pdf_table_for_view(sender):
     text_button = my_win.sender().text()
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
-    if text_button == "Просмотр финалов":
+    if text_button == "Просмотр\nфиналов":
         stage = my_win.tableView.model().index(0, 2).data() # данные ячейки tableView номер финала для просмотра в пдф пот нажатию кнопки
         n_fin = stage[:1]
         view_file = f"{short_name}_{n_fin}-final.pdf"
         fin = stage
-    elif text_button == "Просмотр полуфиналов":
+    elif text_button == "Просмотр\nполуфиналов":
         stage = my_win.comboBox_filter_semifinal.currentText()
         n_fin = stage[:1]
         view_file = f"{short_name}_{n_fin}-semifinal.pdf"
@@ -6342,6 +6349,7 @@ def choice_setka_automat(fin, flag, count_exit):
     id_system = system_id(stage=fin)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
     choice = Choice.select().where(Choice.title_id == title_id())
+
     max_player = system.max_player
     stage_exit = system.stage_exit
   
@@ -6392,6 +6400,7 @@ def choice_setka_automat(fin, flag, count_exit):
                     num.append(nums[k])
                 nums = num.copy()
                 choice_posev = choice.select().where(Choice.mesto_group == nums[n])
+                cou = len(choice_posev)
                 real_all_player_in_final = len(choice.select().where(Choice.mesto_group.in_(nums))) # реальное число игроков в сетке
             elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
                 choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final == nums[n]))
@@ -11722,7 +11731,7 @@ def write_in_setka(data, stage, first_mesto, table):
         13: [51], 14: [55], 15: [59], 16: [63], 17: [5], 18: [13], 19: [21], 20: [29], 21: [37], 22: [45], 23: [53], 24: [61],
         25: [9], 26: [25], 27: [41], 28: [57], 29: [17], 30:[49], 31: [33], 32: [61], 33: [72], 34: [76], 35: [74], 36: [84], 37: [89],
         38: [93], 39: [97], 40: [101], 41: [91], 42: [99], 43: [95], 44: [106], 45: [114], 46: [118], 47: [116], 48: [126],  49: [140],
-        50: [144], 51: [148], 52: [152], 53: [156], 54: [158], 55: [162], 56: [166], 57: [142], 58: [150], 59: [158], 60: [166], 61: [146],
+        50: [144], 51: [148], 52: [152], 53: [156], 54: [160], 55: [164], 56: [168], 57: [142], 58: [150], 59: [158], 60: [166], 61: [146],
         62: [162], 63: [154], 64: [168], 65: [172], 66: [176], 67: [174], 68: [182], 69: [179], 70: [183], 71: [187], 72: [191], 73: [181],
         74: [189], 75: [185], 76: [194], 77: [197], 78: [201], 79: [199]}
                  # ======= dict mest
@@ -11870,7 +11879,6 @@ def write_in_setka(data, stage, first_mesto, table):
                 row_win = row_num_win[i][0] # номера строк данной встречи в сетке
                 c1 = []
                 c1_tmp = []
-                # c = str(c)
                 win = match[1]
                 los = match[4]
             elif c == 0:  # встречи за места
@@ -11893,11 +11901,15 @@ def write_in_setka(data, stage, first_mesto, table):
             for k in column_dict.keys():
                 num_game_list = column_dict[k]  
                 if str(i) in num_game_list:
-                    if k == column_last - 1:
-                        col_win = k - 1
-                    else:
-                        col_win = k + 1
+                    col_win = k + 1
                     break
+                # выяснить номер стоблца по сетка 32 минус 2
+                    # if k == column_last - 1:
+                    #     # col_win = k - 1
+                    #     col_win = k + 1
+                    # else:
+                    #     col_win = k + 1
+                    # break
             row_los = row_num_los[r]  # строка проигравшего
             score = match[2]  # счет во встречи
             row_list_los = data[row_los]  # получаем список строки, где ищет номер куда сносится проигравший
@@ -13036,7 +13048,7 @@ def sum_points_circle(num_gr, tour, ki1, ki2, pg_win, pg_los, pp, stage, id_syst
     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
         res = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
     else:
-        res = result.select().where(Result.system_id == id_system)
+        res = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
     c = res.select().where(Result.tours == tour).get()  # ищет в базе  данную встречу c - id - встречи в таблице Result
  
     if c.winner == c.player1:  # победил 1-й игрок
