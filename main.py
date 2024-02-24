@@ -12290,7 +12290,7 @@ def score_in_table(td, num_gr):
     # ===== если сыграны все игры группе то выставляет места =========
     count_game = (count_player * (count_player - 1)) // 2
 
-    results_playing = results.select().where(Result.points_win == 2)
+    results_playing = results.select().where((Result.points_win == 2) | (Result.points_win == 0))
     a = len(results_playing) # кол-во сыгранных игр
 
     if a == count_game:
@@ -12440,6 +12440,8 @@ def result_rank_group_in_choice(num_gr, player_rank_group, stage):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
     tab = my_win.tabWidget.currentIndex()
+    # ===
+    # id_system = system_id(stage)
     chc = Choice.select().where(Choice.title_id == title_id())
     if len(player_rank_group) > 0:
         if tab == 3:
@@ -12641,7 +12643,6 @@ def circle(tr, num_gr, td, max_person, mesto, stage, id_system):
     unique_numbers = u[0]
     tr.clear()
     # ====
-    # sort_tuple = {k: pp[k] for k in sorted(pp, key=pp.get, reverse=True)}
     for key, value in pp.items(): # сортируем словарь PP по уменьшению значений (очков)
         rev_dict.setdefault(value, set()).add(key)
     # ====
@@ -12668,13 +12669,10 @@ def circle(tr, num_gr, td, max_person, mesto, stage, id_system):
             for x in num_player:
                 tr.append(str(x))  # создает список (встречи игроков)
                 m_new += 1
-            # player_rank_tmp = circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point,
-            #                                    player_rank_tmp, tr_all, pp, pg_win, pg_los, x, pps, ps)
             player_rank_tmp = circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point,
-                                               player_rank_tmp, tr_all, x, pps, ps)
+                                               player_rank_tmp, tr_all, pp, pg_win, pg_los, x, pps, ps)
         mesto = mesto + m_new
         tr.clear()
-
         # заменяет список (места еще не проставлены) на новый с правильными местами
         for i in player_rank_tmp:
             pl_rank_tmp.append(i)
@@ -12696,7 +12694,6 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
     elif m_new == 2:
         player_rank_tmp = circle_2_player(tr, td, max_person, mesto, num_gr, id_system)
     elif m_new == 3:
-        # men_of_circle = m_new
         # получает список 1-й уникальные
         u = summa_points_person(tr, tr_all, num_gr, pg_win, pg_los, pp, stage, id_system)
         # значения очков и список значения очков и у скольких спортсменов они есть
