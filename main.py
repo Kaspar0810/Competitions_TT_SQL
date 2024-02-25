@@ -9951,7 +9951,7 @@ def table_made(pv, stage):
     id_system = system_id(stage)
     # ========
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
-    type_tbl = system.type_table
+    # type_tbl = system.type_table
     titles = Title.select().where(Title.id == title_id()).get()
     sex = titles.gamer
   
@@ -10171,6 +10171,8 @@ def table_made(pv, stage):
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
     doc.bottomMargin = 1.5 * cm
+    doc.leftMargin = 0.5 * cm
+    doc.righttMargin = 0.5 * cm
   
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -12440,8 +12442,7 @@ def result_rank_group_in_choice(num_gr, player_rank_group, stage):
     """записывает места из группы в таблицу -Choice-, а если одна таблица в финале по кругу то в список
     player_rank_group список списков 1-е число номер игрок в группе, 2-е его место"""
     tab = my_win.tabWidget.currentIndex()
-    # ===
-    # id_system = system_id(stage)
+
     chc = Choice.select().where(Choice.title_id == title_id())
     if len(player_rank_group) > 0:
         if tab == 3:
@@ -12452,7 +12453,8 @@ def result_rank_group_in_choice(num_gr, player_rank_group, stage):
             if num_gr == "Одна таблица":
                 choice = chc.select().where(Choice.basic == "Одна таблица")
             else:
-                choice = chc.select().where(Choice.final == num_gr)
+                choice = chc.select().where(Choice.final == num_gr).order_by(Choice.posev_final)
+                # choice = chc.select().where(Choice.final == num_gr)
         count = len(choice)
         n = 0
         for ch in choice:
@@ -12530,13 +12532,15 @@ def rank_in_group(total_score, td, num_gr, stage):
                 if player_no not in fio_no_player:
                     fio_no_player.append(player_no)
                     
-        for fio in fio_no_player:
+        for fio in fio_no_player:           
             fio_loser = game_not_player.select().where(Result.loser == fio)
             count_fio_loser = len(fio_loser)
 
             game_one_person = max_person // 2
             if count_fio_loser >= game_one_person: # игры по неявке более 50%
-                game_id_not_player = game_not_player.select().where(Result.loser == fio)
+                result_no = result.select().where(Result.system_id == id_system)
+                game_id_not_player = result_no.select().where((Result.player1 == fio) | (Result.player2 == fio))
+                cou = len(game_id_not_player)
                 for game_id in game_id_not_player:
                     game_id.points_win = 0
                     game_id.points_loser = 0
@@ -14614,6 +14618,7 @@ def made_list_players_on_alf():
         coach_id = l.coach_id
         t = coach_id.coach
         m = l.mesto
+        t = chop_line(t)
         data = [n, p, b, r, c, g, z, t, m]
 
         elements.append(data)
