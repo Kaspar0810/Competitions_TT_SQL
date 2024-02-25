@@ -12106,13 +12106,18 @@ def setka_data(stage, posev_data):
     for i in range(1, mp * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         family = posev['фамилия'] # фамилия имя / город
-        # id_f_name = full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
         name_list = full_player_id(family) # словарь {name: фамилия/город, id: номер игрока}, {name: фамилия, id: номер мгрока}
         id_f_n = name_list[0] # словарь name: фамилия/город, id: номер игрока
         id_s_n = name_list[1] # {name: фамилия, id: номер игрока}
             # словарь ключ - полное имя/ город, значение - id
-        id_ful_name[id_f_n["name"]] = id_f_n["id"]
-        id_name[id_s_n["name"]] = id_s_n["id"]
+        fn = id_f_n["name"]
+        i_fn = id_f_n["id"]
+        id_ful_name[fn] = i_fn
+        # id_ful_name[id_f_n["name"]] = id_f_n["id"]
+        sn = id_s_n["name"]
+        i_sn = id_s_n["id"]
+        id_name[sn] = i_sn
+        # id_name[id_s_n["name"]] = id_s_n["id"]
             # =================
         if family != "X":
             # находит пробел отделяющий имя от фамилии
@@ -12227,11 +12232,7 @@ def score_in_table(td, num_gr):
 
         win = str(list(result_list[i].values())[6])
         player1 = str(list(result_list[i].values())[4])
-        # ==== убираю город из фамилии, чтоб сравнивать игроков 
-        # znak_player1 = player1.find("/") # если игрок с городом, то удаляет название города
-        # if znak_player1 != -1:
-        #     player1 = player1[:znak_player1]
-        # ==============
+
         if win != "" and win != "None":  # если нет сыгранной встречи данного тура
             if win == player1:  # если победитель игрок под первым номером в туре
                 # очки 1-ого игрока
@@ -14731,15 +14732,16 @@ def check_player_whitout_R():
         n += 1
         p = l.player
         c = l.city
+        d = l.bday
         coach_id = l.coach_id
         t = coach_id.coach
         t = chop_line(t)
         app = l.comment
-        data = [n, p, c, t, app]
+        data = [n, p, c, d, t, app]
         elements.append(data)
 
-    elements.insert(0, ["№", "Фамилия, Имя", "Город", "Тренер(ы)", "Примечание"])
-    t = Table(elements, colWidths=(0.7 * cm, 5.0 * cm, 3.5 * cm, 6.5 * cm, 3.9 * cm), rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
+    elements.insert(0, ["№", "Фамилия, Имя", "Город", "Дата рожд", "Тренер(ы)", "Примечание"])
+    t = Table(elements, colWidths=(0.7 * cm, 4.5 * cm, 3.2 * cm, 2.0 * cm, 6.0 * cm, 3.4 * cm), rowHeights=None, repeatRows=1)  # ширина столбцов, если None-автоматическая
     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
                             # ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
                            # Использую импортированный шрифта размер
