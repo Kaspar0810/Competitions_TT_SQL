@@ -1591,6 +1591,7 @@ def db_select_title():
         my_win.dateEdit_start.setDate(title.data_start)
         my_win.dateEdit_end.setDate(title.data_end)
         my_win.lineEdit_city_title.setText(title.mesto)
+        my_win.comboBox_sredi.setCurrentText(title.sredi)
         my_win.comboBox_referee.setCurrentText(title.referee)
         my_win.comboBox_kategor_ref.setCurrentText(title.kat_ref)
         my_win.comboBox_secretary.setCurrentText(title.secretary)
@@ -2278,10 +2279,7 @@ def add_player():
     data_start = title.data_start
     date_current = date.today()
     zayavka = "предварительная" if date_current < data_start else "основная"
-    # if  date_current < data_start:
-    #     zayavka = "предварительная"
-    # else:
-    #     zayavka = "основная"
+
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         with db:
@@ -2342,12 +2340,14 @@ def add_player():
                     if e1 == 0:  # то в группах равное количество человек -e1-
                         stroka_kol_group = f"{kg} группы по {str(p)} чел."
                         skg = int((p * (p - 1) / 2) * int(kg))
+                        mp = p
                     else:
                         stroka_kol_group = f"{str(g1)} групп(а) по {str(p)} чел. и {str(e1)} групп(а) по {str(g2)} чел."
                         skg = int((((p * (p - 1)) / 2 * g1) + ((g2 * (g2 - 1)) / 2 * e1))) # общее количество игр в группах
+                        mp = g2
                     stroka_kol_game = f"{skg} игр"
                     my_win.label_19.setText(stroka_kol_game)
-                    System.update(label_string=stroka_kol_group, kol_game_string=stroka_kol_game).where(System.id == system_id).execute()
+                    System.update(max_player=mp, label_string=stroka_kol_group, kol_game_string=stroka_kol_game).where(System.id == system_id).execute()
                     # ====
                     choice_tbl_made()
                 else: # обновление системы
@@ -4427,6 +4427,7 @@ def delete_player():
             for sys in system:
                 athlet = sys.total_athletes
                 System.update(total_athletes=athlet - 1).where(System.title_id == title_id()).execute()
+
             fin = "Предварительный"
             check_flag = check_choice(fin)
             if check_flag is True:
@@ -5895,6 +5896,7 @@ def filter_sf():
     model = MyTableModel(data)
     sf = ['1-й полуфинал', '2-й полуфинал']
     semifinal = my_win.comboBox_filter_semifinal.currentText()
+    id_system = system_id(stage=semifinal)
     group = my_win.comboBox_filter_group_sf.currentText()
     name = my_win.comboBox_find_name_sf.currentText()
     played = my_win.comboBox_filter_played_sf.currentText()
@@ -5911,7 +5913,6 @@ def filter_sf():
     elif group == "все группы" and played == "все игры":
         filter_sf = fltr_id.select().where((Result.system_stage == semifinal) & (Result.title_id == title_id()))
         fltr = filter_sf.select().where(Result.system_stage.in_(sf))
-        # fltr = fltr_id.select().where(Result.system_stage.in_(sf))
     elif group == "все группы" and played == "завершенные":
         if semifinal == "-все полуфиналы-":
             fltr = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.points_win == 2))
@@ -5930,7 +5931,8 @@ def filter_sf():
             fl = fltr_id.select().where((Result.system_stage == semifinal) & (Result.number_group == group))
         fltr = fl.select().where(Result.points_win == None)
     elif group == "все группы" and played == "не сыгранные":
-        fltr = fltr_id.select().where(Result.points_win != 2 and Result.points_win == None)
+        filter_sf = fltr_id.select().where(Result.system_id == id_system)
+        fltr = filter_sf.select().where(Result.points_win != 2 and Result.points_win == None)
     elif group != "все группы" and played == "все игры":
         if semifinal == "-все полуфиналы-":
             fltr = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.number_group == group))
@@ -5944,7 +5946,7 @@ def filter_sf():
     if played == "завершенные":
         my_win.label_17.setText(f"сыграно {row_count} встреч")
     elif played == "не сыгранные":
-        my_win.label_17.setText(f"не сыграно еще {row_count} встреч(а)")
+        my_win.label_17.setText(f"не сыграно {row_count} встреч(а)")
     else:
         my_win.label_17.setText(f"всего {row_count} встреч(а)")
     my_win.label_17.show()
@@ -12111,14 +12113,8 @@ def setka_data(stage, posev_data):
         id_f_n = name_list[0] # словарь name: фамилия/город, id: номер игрока
         id_s_n = name_list[1] # {name: фамилия, id: номер игрока}
             # словарь ключ - полное имя/ город, значение - id
-        fn = id_f_n["name"]
-        i_fn = id_f_n["id"]
-        id_ful_name[fn] = i_fn
-        # id_ful_name[id_f_n["name"]] = id_f_n["id"]
-        sn = id_s_n["name"]
-        i_sn = id_s_n["id"]
-        id_name[sn] = i_sn
-        # id_name[id_s_n["name"]] = id_s_n["id"]
+        id_ful_name[id_f_n["name"]] = id_f_n["id"]
+        id_name[id_s_n["name"]] = id_s_n["id"]
             # =================
         if family != "X":
             # находит пробел отделяющий имя от фамилии
@@ -12456,7 +12452,6 @@ def result_rank_group_in_choice(num_gr, player_rank_group, stage):
                 choice = chc.select().where(Choice.basic == "Одна таблица")
             else:
                 choice = chc.select().where(Choice.final == num_gr).order_by(Choice.posev_final)
-                # choice = chc.select().where(Choice.final == num_gr)
         count = len(choice)
         n = 0
         for ch in choice:
