@@ -3701,7 +3701,8 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
         game = 32
     # создание сетки со спортсменами согласно жеребьевки
     all_list = setka_data(fin, posev_data)
-    tds = all_list[1]
+    tds = all_list[0]
+    # tds = all_list[1]
     tds_full_name_city = all_list[3]
     k = 0
     for r in tds:
@@ -12127,11 +12128,11 @@ def setka_data(stage, posev_data):
             # получает отдельно фамилия и первую букву имени
             family_slice = family[:space + 2]
             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
-            tds.append(family_city)
-            fam_name_city.append(family)
-        else:
-            tds.append(family)
-            fam_name_city.append(family)
+        #     tds.append(family_city)
+        #     fam_name_city.append(family)
+        # else:
+        tds.append(family)
+        fam_name_city.append(family)
     all_list.append(tds)
     all_list.append(id_ful_name)
     all_list.append(id_name)
