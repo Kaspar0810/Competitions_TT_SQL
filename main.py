@@ -10471,6 +10471,8 @@ def setka_8_full_made(fin):
     column_count = column * 10
     # добавить в аргументы функции
     final = fin
+    titles = Title.select().where(Title.id == title_id()).get()
+    gamer = titles.gamer
     if sender != my_win.clear_s8_full_Action:
         first_mesto = mesto_in_final(fin)
     else:
@@ -10558,7 +10560,7 @@ def setka_8_full_made(fin):
 # === надпись финала
     h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(fin, h2))
+    elements.append(Paragraph(f"{fin}. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -10599,6 +10601,8 @@ def setka_8_2_made(fin):
     column_count = column * 10
     # добавить в аргументы функции
     final = fin
+    titles = Title.select().where(Title.id == title_id()).get()
+    gamer = titles.gamer
     if sender != my_win.clear_s8_2_Action:
         first_mesto = mesto_in_final(fin)
     else:
@@ -10690,7 +10694,7 @@ def setka_8_2_made(fin):
 # === надпись финала
     h2 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(fin, h2))
+    elements.append(Paragraph(f"{fin}. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -10731,6 +10735,8 @@ def setka_16_full_made(fin):
     column_count = column * 11
     # добавить в аргументы функции
     final = fin
+    titles = Title.select().where(Title.id == title_id()).get()
+    gamer = titles.gamer
     if sender != my_win.clear_s16_Action:
         first_mesto = mesto_in_final(fin)
     else:
@@ -10851,7 +10857,7 @@ def setka_16_full_made(fin):
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(fin, h2))
+    elements.append(Paragraph(f"{fin}. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -10892,6 +10898,8 @@ def setka_16_2_made(fin):
     column_count = column * 11
     # добавить в аргументы функции
     final = fin
+    titles = Title.select().where(Title.id == title_id()).get()
+    gamer = titles.gamer
     first_mesto = mesto_in_final(fin) if sender != my_win.clear_s16_2_Action else 1
     for i in range(0, 86):
         # column_count[10] = i  # нумерация 10 столбца для удобного просмотра таблицы
@@ -11019,7 +11027,7 @@ def setka_16_2_made(fin):
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(fin, h2))
+    elements.append(Paragraph(f"{fin}. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -11059,6 +11067,8 @@ def setka_32_made(fin):
     column = ['']
     column_count = column * 13
     final = fin
+    titles = Title.select().where(Title.id == title_id()).get()
+    gamer = titles.gamer
     if sender != my_win.clear_s32_Action:
         first_mesto = mesto_in_final(fin)
     else:
@@ -11145,7 +11155,7 @@ def setka_32_made(fin):
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(fin, h2))
+    elements.append(Paragraph(f"{fin}. {gamer}", h2))
 # ====                         
     elements.append(t)
     pv = A4
@@ -11182,6 +11192,8 @@ def setka_32_full_made(fin):
     column = ['']
     column_count = column * 13
     final = fin
+    titles = Title.select().where(Title.id == title_id()).get()
+    gamer = titles.gamer
     #===== выбор чистая
     if sender != my_win.clear_s32_full_Action:
         first_mesto = mesto_in_final(fin)
@@ -11363,7 +11375,7 @@ def setka_32_full_made(fin):
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(fin, h2))
+    elements.append(Paragraph(f"{fin}. {gamer}", h2))
 # ====
     elements.append(t)
     pv = A4
@@ -11400,6 +11412,8 @@ def setka_32_2_made(fin):
     column = ['']
     column_count = column * 15
     final = fin
+    titles = Title.select().where(Title.id == title_id()).get()
+    gamer = titles.gamer
     if sender != my_win.clear_s32_2_Action:
         first_mesto = mesto_in_final(fin)
     else:
@@ -11602,7 +11616,7 @@ def setka_32_2_made(fin):
 # === надпись финала
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
             leftIndent=200, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-    elements.append(Paragraph(fin, h2))
+    elements.append(Paragraph(f"{fin}. {gamer}", h2))
 # ====                       
     elements.append(t)
     pv = A4
