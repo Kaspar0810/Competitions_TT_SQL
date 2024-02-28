@@ -5229,6 +5229,8 @@ def enter_score(none_player=0):
     id = my_win.tableView.model().index(row_num, 0).data() # данные ячейки tableView
     fin = my_win.tableView.model().index(row_num, 2).data() # данные ячейки tableView
     num_game = my_win.tableView.model().index(row_num, 3).data() # данные ячейки tableView
+    if row_num == -1: # значит не выбрана ни одна строка и нажат ентер
+        return
 
     sys = System.select().where(System.title_id == title_id())   
     if tab == 3: # группы
@@ -9434,6 +9436,9 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     from reportlab.platypus import Table
     systems = System.select().where(System.title_id == title_id())
     result = Result.select().where(Result.title_id == title_id())
+    titles = Title.select().where(Title.id == title_id()).get()
+    gamer_txt = titles.gamer
+    gm = gamer_txt[:1]
     # ==== новый вариант с использованием system id   
     id_system = system_id(stage=number_group) if stage == "Финальный" else system_id(stage)
     # ========
@@ -9484,6 +9489,7 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
             sys_stage = f"{shot_stage}"
             n_gr = f"{gr}гр"
         elif stage == "Финальный":
+            n_gr = gm
             shot_stage = "Ф"
             mark = st.find("-")
             sys_stage = f"{st[:mark]}{shot_stage}"
@@ -9694,8 +9700,7 @@ def begunki_made():
     number_group = my_win.comboBox_select_group_begunki.currentText()
     stage = my_win.comboBox_select_stage_begunki.currentText()
     tours = my_win.comboBox_select_tours.currentText()
-    # if stage == "Финальный":
-    #     stage = number_group
+
     id_system = system_id(stage=number_group) if stage == "Финальный" else system_id(stage)
     elements = []
     ts = []
@@ -9725,15 +9730,10 @@ def begunki_made():
                         ('ALIGN',(0, 0), (0, 0),'CENTER')])
     #  ========= формирование диапазона печати бегунков ==========
     sys = system.select().where(System.id == id_system).get()
-    # if stage == "Финальный":
-    #     sys = system.select().where(System.stage == number_group).get()
-    # elif stage == "Предварительный":
-    #     sys = system.select().where(System.stage == stage).get()
-
     final_type = sys.type_table
     list_tours = []
     if final_type == "сетка":
-        list_tours.append("несыгранные")
+        # list_tours.append("несыгранные")
         result_setka = result.select().where(Result.number_group == number_group)
         result_all = result_setka.select().where((Result.player1 != "") & (Result.player2 != ""))
         result_fin = result_all.select().where(Result.winner.is_null())
@@ -9857,7 +9857,7 @@ def select_stage_for_begunki():
 def select_tour_for_begunki():
     """выбор номеров тура или диапазона туров""" 
     my_win.comboBox_select_tours.clear()
-    tour_list = ["все", "диапазон"]
+    tour_list = ["все", "несыгранные", "диапазон"]
     my_win.comboBox_select_tours.addItems(tour_list)
     index = my_win.comboBox_select_tours.currentIndex()
     if index != 0:
@@ -9868,11 +9868,11 @@ def select_diapazon():
     """показывает поле для ввода дмапазона туров"""
     my_win.lineEdit_range_tours.clear()
     index = my_win.comboBox_select_tours.currentIndex()
-    if index != 0:
+    if index == 0 or index == 1:
+        my_win.lineEdit_range_tours.hide()
+    else:
         my_win.lineEdit_range_tours.show()
         my_win.lineEdit_range_tours.setFocus()
-    else:
-        my_win.lineEdit_range_tours.hide()
 
 
 def enter_print_begunki():
@@ -14134,8 +14134,8 @@ def made_file_excel_for_rejting():
 
     book = op.Workbook()
     worksheet = book.active
-    names_headers = ["Победитель", "Проигравший", "Счет"]
-    for m in range(1, 4):
+    names_headers = ["Победитель", "День рождения", "Проигравший", "День рождения", "Счет"]
+    for m in range(1, 6):
         c =  worksheet.cell(row = 1, column = m)
         c.value = names_headers[m - 1]
     k = 2
@@ -14145,21 +14145,29 @@ def made_file_excel_for_rejting():
         pl_los = l.loser
         id_win = players.select().where(Player.full_name == pl_win).get()
         pl_win = id_win.player
+        bd_win = id_win.bday
         id_los =  players.select().where(Player.full_name == pl_los).get()
         pl_los = id_los.player
+        bd_los = id_los.bday
         score = l.score_in_game
         c1 = worksheet.cell(row = k, column = 1)
         c1.value = pl_win
         c2 = worksheet.cell(row = k, column = 2)
-        c2.value = pl_los
+        c2.value = bd_win
         c3 = worksheet.cell(row = k, column = 3)
-        c3.value = score
+        c3.value = pl_los
+        c4 = worksheet.cell(row = k, column = 4)
+        c4.value = bd_los
+        c5 = worksheet.cell(row = k, column = 5)
+        c5.value = score
         k += 1
 
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp 
-    worksheet.column_dimensions['A'].width = 40
-    worksheet.column_dimensions['b'].width = 40
+    worksheet.column_dimensions['A'].width = 30
+    worksheet.column_dimensions['b'].width = 15
+    worksheet.column_dimensions['c'].width = 30
+    worksheet.column_dimensions['d'].width = 15
     f_name = f"{short_name}_report.xlsx"
     filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
     book.save(filename)
