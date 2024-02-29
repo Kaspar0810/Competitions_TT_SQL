@@ -5486,6 +5486,7 @@ def made_pdf_table_for_view(sender):
             setka_32_made(fin)  
     return view_file
 
+
 def setka_type(none_player):
     """сетка ставит очки в зависимости от неявки игрока, встреча состоялась ли пропуск встречи -bye-"""
     sc_total = []
