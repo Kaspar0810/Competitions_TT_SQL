@@ -6519,7 +6519,16 @@ def choice_setka_automat(fin, flag, count_exit):
                             # === выбор ручная или автомат ====
                             if flag is True: # автоматичекая
                                 if len(num_set) == 0:
-                                    msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась, повторите снова.")
+                                    result = msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась.\n"
+                                    "Если хотите повторите снова.\nНажмите -ОК-\n"
+                                    "Если хотите изменить значение мультирегиональность\nНажмите -NO-\n"
+                                    "Если отменить жеребьевку\nНажмите -Cancel", msgBox.Ok, msgBox.No, msgBox.Cancel)
+                                    if result == msgBox.Ok:
+                                        pass
+                                    elif result == msgBox.No:
+                                        Title.update(multiregion=1).where(Title.id == title_id()).execute()
+                                    elif result == msgBox.Cancel:
+                                        return
                                     sorted_tuple = sorted(num_id_player.items(), key=lambda x: x[0])
                                     dict(sorted_tuple)                                    
                                     player_choice_in_setka(fin)
