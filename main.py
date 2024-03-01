@@ -9919,6 +9919,7 @@ def merdge_pdf_files():
     with contextlib.ExitStack() as stack:
         files = [stack.enter_context(open(pdf, 'rb')) for pdf in pdf_files_list]
         for f in files:
+            sign_referee_on_page(f)
             pdf_merger.append(f)
         os.chdir("..")
         catalog = 2
@@ -9928,6 +9929,50 @@ def merdge_pdf_files():
             title.pdf_comp = f'{short_name}.pdf'
             title.save()
     my_win.tableWidget.show()
+
+
+def sign_referee_on_page(f):
+    """создание подписи судей на листах соревнований в PDF"""
+    title = Title.select().where(Title.id == title_id()).get()
+    short_name = title.short_name_comp
+    name_f = f.name
+    pv = "книжная"
+
+    from PyPDF2 import PdfFileWriter, PdfFileReader
+    import io
+ 
+    in_pdf_file = 'multipage.pdf'
+    out_pdf_file = 'with_image.pdf'
+    img_file = '../../static/img/code_maven_440x440.png'
+ 
+    packet = io.BytesIO()
+    can = canvas.Canvas(packet)
+    #can.drawString(10, 100, "Hello world")
+    x_start = 0
+    y_start = 0
+    can.drawImage(img_file, x_start, y_start, width=120, preserveAspectRatio=True, mask='auto')
+    can.showPage()
+    can.showPage()
+    can.showPage()
+    can.save()
+ 
+    #move to the beginning of the StringIO buffer
+    packet.seek(0)
+ 
+    new_pdf = PdfFileReader(packet)
+ 
+    # read the existing PDF
+    existing_pdf = PdfFileReader(open(in_pdf_file, "rb"))
+    output = PdfFileWriter()
+ 
+    for i in range(len(existing_pdf.pages)):
+        page = existing_pdf.getPage(i)
+        page.mergePage(new_pdf.getPage(i))
+        output.addPage(page)
+ 
+    outputStream = open(out_pdf_file, "wb")
+    output.write(outputStream)
+    outputStream.close()
 
 
 def load_name_net_after_choice_for_wiev(fin):
@@ -14535,6 +14580,7 @@ def view_all_page_pdf():
     title = Title.get(Title.id == title_id())
     pdf_files_list = []
     rus_name_list = []
+    pdf_file_canot_in_comp_list = ["player_list_payment.pdf", "player_list_debitor.pdf"]
     stage_dict = {"table_group.pdf": "Предварительный",
                    "player_list.pdf": "Список участников",
                    "winners_list.pdf": "Список победителей и призеров",
@@ -14553,6 +14599,7 @@ def view_all_page_pdf():
                    "7-final.pdf": "7-й финал",
                    "8-final.pdf": "8-й финал",
                    "9-final.pdf": "9-й финал",
+                   "10-final.pdf": "10-й финал",
                    "one_table.pdf": "одна таблица"}
     short_name = title.short_name_comp
     count_mark = len(short_name)
@@ -14560,7 +14607,7 @@ def view_all_page_pdf():
     for name_files in all_pdf_files_list:
         text = name_files.find(short_name)
         text_stage = name_files[count_mark + 1:]
-        if text == 0 and text_stage != "player_list_payment.pdf":
+        if text == 0 and text_stage not in pdf_file_canot_in_comp_list:
             pdf_files_list.append(name_files)
             for latin_name in stage_dict.keys():
                 if text_stage == latin_name:
