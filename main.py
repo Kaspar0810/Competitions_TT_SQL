@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, Q
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem, QLineEdit, QLabel
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget, QTableView, QColorDialog
 from PyQt5 import QtGui, QtWidgets, QtCore
+
 from models import *
 from collections import Counter
 from itertools import *
@@ -48,6 +49,8 @@ if not os.path.isdir("table_pdf"):  # создает папку
     os.mkdir("table_pdf")
 if not os.path.isdir("competition_pdf"):  # создает папку 
     os.mkdir("competition_pdf")
+if not os.path.isdir("sign"):  # создает папку 
+    os.mkdir("sign")
 
 
 def print_hi(name):
@@ -3502,14 +3505,19 @@ def one_table(fin, group):
 
 def selection_of_the_draw_mode():
     """Выбор режима жеребьевки сетки -автомат- или -ручной-"""
-    vid = ["Автоматическая", "Ручная"]
+    vid = ["Автоматическая", "Полуавтоматическая", "Ручная"]
     vid, ok = QInputDialog.getItem(
                     my_win, "Жеребьевка", "Выберите режим жеребьевки сетки.", vid, 0, False)
     if vid == "Автоматическая":
-        flag = True
+        flag = 1
         my_win.tableView_net.hide()
-    else:
-        flag = False
+    elif vid == "Полувтоматическая":
+        flag = 2
+        my_win.resize(1440, 804)
+        my_win.tableView_net.show()
+        my_win.tableView_net.setGeometry(QtCore.QRect(1110, 9, 321, 749)) # от лев края, от вверха, ширина и высота)
+    elif vid == "Ручная":
+        flag = 3
         my_win.resize(1440, 804)
         my_win.tableView_net.show()
         my_win.tableView_net.setGeometry(QtCore.QRect(1110, 9, 321, 749)) # от лев края, от вверха, ширина и высота)
@@ -6406,7 +6414,6 @@ def choice_setka_automat(fin, flag, count_exit):
                     num.append(nums[k])
                 nums = num.copy()
                 choice_posev = choice.select().where(Choice.mesto_group == nums[n])
-                cou = len(choice_posev)
                 real_all_player_in_final = len(choice.select().where(Choice.mesto_group.in_(nums))) # реальное число игроков в сетке
             elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
                 choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final == nums[n]))
@@ -6508,8 +6515,7 @@ def choice_setka_automat(fin, flag, count_exit):
                             reg_last.append(v[1]) # список уже посеянных регионов
                             group_last.append(v[2]) # список номеров групп уже посеянных
                         if n != 0 or (n == 0 and l > 1):
-                # =========== определения кол-во возможны вариантов посева у каждого региона
-                            # possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net)   
+                # =========== определения кол-во возможны вариантов посева у каждого региона 
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net, count_exit)                        
 
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
@@ -6518,7 +6524,7 @@ def choice_setka_automat(fin, flag, count_exit):
                             l = list(possible_number.keys())[0]
                             num_set = possible_number[l] # номер куда можно сеять
                             # === выбор ручная или автомат ====
-                            if flag is True: # автоматичекая
+                            if flag == 1: # автоматичекая
                                 if len(num_set) == 0:
                                     result = msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась.\n"
                                     "Если хотите повторите снова.\nНажмите -ОК-\n"
@@ -6538,7 +6544,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                     num_set = random_generator(num_set)
                                 elif len(num_set) == 1: # остался только один номер
                                     num_set = num_set[0]
-                            else: # manual
+                            elif flag == 2: # полуавтомат
                                 my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
                                 player_list = []
                                 player_list_tmp = []
@@ -6553,6 +6559,83 @@ def choice_setka_automat(fin, flag, count_exit):
                                     player_list_tmp.append(pn)   
                                     player_list.append(player_list_tmp.copy())
                                     player_list_tmp.clear()
+                                txt_tmp = []
+    
+                                for g in player_list:
+                                    if len(num_id_player) == 2:
+                                        fam_city = ""
+                                        number_net = ""
+                                        view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
+                                    t_str = str(g[2])
+                                    txt_str = f"{g[0]} - {g[1]} номера: {t_str}" 
+                                    txt_tmp.append(txt_str)
+                                text_str = (',\n'.join(txt_tmp))
+                                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"
+                                txt = (','.join(list(map(str, num_set))))
+                                while True:
+                                    try:
+                                        number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
+                                        znak = text_str.find(":")
+                                        fam_city = text_str[:znak - 7]
+                                        if not ok:
+                                            number_net = random.choice(num_set)
+                                        msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер: {number_net}")
+                                        number_net = int(number_net)
+                                        view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
+                                    except ValueError:
+                                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
+                                        continue
+                                    else:
+                                        if number_net in num_set:
+                                            num_set = number_net
+                                            break
+                                        else:
+                                            msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
+                            elif flag == 3: # ручная жеребьевка
+                                txt_tmp = []
+                                my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
+                                player_list = []
+                                player_list_tmp = []
+                                for k in range(len(full_posev)):
+                                    posev_list = full_posev[k]
+                                    pl = posev_list[1] # фамилия
+                                    reg = posev_list[2] # регион
+                                    r = posev_list[5] # рейтинг
+                                    player_list_tmp.append(pl)
+                                    player_list_tmp.append(reg)
+                                    player_list_tmp.append(r)   
+                                    player_list.append(player_list_tmp.copy())
+                                    player_list_tmp.clear()
+                                player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
+                                m = 0
+                                for l in player_list:
+                                    if len(num_id_player) == 2:
+                                        fam_city = ""
+                                        number_net = ""
+                                        view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
+                                    text_str = (',\n'.join(txt_tmp))
+                                    pl = l[0]
+                                    region = l[1]
+                                    pl_reg = f"{pl}/ {reg}"
+                                txt_tmp.append(pl_reg)
+                                n_poseva = number_last[m]  
+                                text_str = (',\n'.join(txt_tmp))
+                                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"  
+                                number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_poseva}', tx)                            
+                                # number_net, ok = QInputDialog.getText(my_win, f"Игрок посева,\n {pl_reg}.\nВозможные номера: {n_poseva}', tx)
+                                # view_sort, ok = QInputDialog.getText(my_win, "Жеребьевка", f"Игрок посева,\n {pl_reg}.", n_poseva, 0, False)
+                                m += 1
+
+                                # for j in possible_number.keys():
+                                #     posev_list = full_posev[j]
+                                #     pl = posev_list[1] # фамилия
+                                #     reg = posev_list[2] # регион
+                                #     pn = possible_number[j] # возможные номера посева
+                                #     player_list_tmp.append(pl)
+                                #     player_list_tmp.append(reg)
+                                #     player_list_tmp.append(pn)   
+                                #     player_list.append(player_list_tmp.copy())
+                                #     player_list_tmp.clear()
                                 txt_tmp = []
     
                                 for g in player_list:
@@ -9919,7 +10002,7 @@ def merdge_pdf_files():
     with contextlib.ExitStack() as stack:
         files = [stack.enter_context(open(pdf, 'rb')) for pdf in pdf_files_list]
         for f in files:
-            sign_referee_on_page(f)
+            # sign_referee_on_page(f)
             pdf_merger.append(f)
         os.chdir("..")
         catalog = 2
@@ -9931,48 +10014,59 @@ def merdge_pdf_files():
     my_win.tableWidget.show()
 
 
-def sign_referee_on_page(f):
-    """создание подписи судей на листах соревнований в PDF"""
-    title = Title.select().where(Title.id == title_id()).get()
-    short_name = title.short_name_comp
-    name_f = f.name
-    pv = "книжная"
+# def sign_referee_on_page(f):
+#     """создание подписи судей на листах соревнований в PDF"""
+#     title = Title.select().where(Title.id == title_id()).get()
+#     # short_name = title.short_name_comp
+#     name_f = f.name
 
-    from PyPDF2 import PdfFileWriter, PdfFileReader
-    import io
+#     can = Canvas(name_f)
  
-    in_pdf_file = 'multipage.pdf'
-    out_pdf_file = 'with_image.pdf'
-    img_file = '../../static/img/code_maven_440x440.png'
+#     from PyPDF2 import PdfFileWriter, PdfFileReader
+#     import io
  
-    packet = io.BytesIO()
-    can = canvas.Canvas(packet)
-    #can.drawString(10, 100, "Hello world")
-    x_start = 0
-    y_start = 0
-    can.drawImage(img_file, x_start, y_start, width=120, preserveAspectRatio=True, mask='auto')
-    can.showPage()
-    can.showPage()
-    can.showPage()
-    can.save()
+#     in_pdf_file = name_f
+#     out_pdf_file = 'with_image.pdf'
+#     fname = QFileDialog.getOpenFileName(
+#         my_win, "Выбрать файл подписи", "", "Image files(*.jpg)")
+#     # canvas = Canvas(f"{name_f}", pagesize=A4)
+#     filepatch = str(fname[0])
+#     # img_file = '../../static/img/code_maven_440x440.png'
  
-    #move to the beginning of the StringIO buffer
-    packet.seek(0)
+#     packet = io.BytesIO()
+#     can = Canvas(packet)
+#     #can.drawString(10, 100, "Hello world")
+#     x_start = 0
+#     y_start = 0
+#     can.drawImage(filepatch, x_start, y_start, width=120, preserveAspectRatio=True, mask='auto')
+#     can.showPage()
+#     # can.showPage()
+#     # can.showPage()
+#     can.save()
  
-    new_pdf = PdfFileReader(packet)
+#     # #move to the beginning of the StringIO buffer
+#     # packet.seek(0)
  
-    # read the existing PDF
-    existing_pdf = PdfFileReader(open(in_pdf_file, "rb"))
-    output = PdfFileWriter()
+#     # # new_pdf = PdfFileReader(packet)
  
-    for i in range(len(existing_pdf.pages)):
-        page = existing_pdf.getPage(i)
-        page.mergePage(new_pdf.getPage(i))
-        output.addPage(page)
+#     # # read the existing PDF
+#     # existing_pdf = PdfFileReader(open(in_pdf_file, "rb"))
+#     # output = PdfFileWriter()
  
-    outputStream = open(out_pdf_file, "wb")
-    output.write(outputStream)
-    outputStream.close()
+#     # # for i in range(len(existing_pdf.pages)):
+#     # #     page = existing_pdf.getPage(i)
+#     # #     page.mergePage(new_pdf.getPage(i))
+#     # #     output.addPage(page)
+ 
+#     # outputStream = open(out_pdf_file, "wb")
+#     # output.write(outputStream)
+#     # outputStream.close()
+ 
+ 
+# # create_pdf(f)
+# # add_image()
+# # ==========
+
 
 
 def load_name_net_after_choice_for_wiev(fin):
