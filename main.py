@@ -6592,89 +6592,56 @@ def choice_setka_automat(fin, flag, count_exit):
                                         else:
                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
                             elif flag == 3: # ручная жеребьевка
+                                num_id_player.clear()
                                 txt_tmp = []
                                 my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
-                                player_list = []
-                                player_list_tmp = []
-                                for k in range(len(full_posev)):
-                                    posev_list = full_posev[k]
-                                    pl = posev_list[1] # фамилия
-                                    reg = posev_list[2] # регион
-                                    r = posev_list[5] # рейтинг
-                                    player_list_tmp.append(pl)
-                                    player_list_tmp.append(reg)
-                                    player_list_tmp.append(r)   
-                                    player_list.append(player_list_tmp.copy())
-                                    player_list_tmp.clear()
-                                player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
-                                m = 0
-                                for l in player_list:
-                                    if len(num_id_player) == 2:
-                                        fam_city = ""
-                                        number_net = ""
-                                        view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
-                                    text_str = (',\n'.join(txt_tmp))
-                                    pl = l[0]
-                                    region = l[1]
-                                    pl_reg = f"{pl}/ {reg}"
-                                txt_tmp.append(pl_reg)
-                                n_poseva = number_last[m]  
-                                text_str = (',\n'.join(txt_tmp))
-                                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"  
-                                number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_poseva}', tx)                            
-                                # number_net, ok = QInputDialog.getText(my_win, f"Игрок посева,\n {pl_reg}.\nВозможные номера: {n_poseva}', tx)
-                                # view_sort, ok = QInputDialog.getText(my_win, "Жеребьевка", f"Игрок посева,\n {pl_reg}.", n_poseva, 0, False)
-                                m += 1
-
-                                # for j in possible_number.keys():
-                                #     posev_list = full_posev[j]
+                                # ===========
+                                fam_city = "" 
+                                numder_net = ""
+                                view_table_choice(fam_city, number_net, num_id_player)
+                                # ======
+                                # player_list = []
+                                # pl_id_list = []
+                                # player_list_tmp = []
+                                # for k in range(len(full_posev)):
+                                #     posev_list = full_posev[k]
+                                #     id_pl = posev_list[0] # id игрока
                                 #     pl = posev_list[1] # фамилия
                                 #     reg = posev_list[2] # регион
-                                #     pn = possible_number[j] # возможные номера посева
-                                #     player_list_tmp.append(pl)
-                                #     player_list_tmp.append(reg)
-                                #     player_list_tmp.append(pn)   
+                                #     gr = posev_list[3]
+                                #     r = posev_list[5] # рейтинг
+                                #     player_list_tmp = [pl, reg, r]
                                 #     player_list.append(player_list_tmp.copy())
+                                #     pl_id_list_tmp = [id_pl, region, gr] 
+                                #     pl_id_list.append(pl_id_list_tmp.copy())
                                 #     player_list_tmp.clear()
-                                txt_tmp = []
-    
-                                for g in player_list:
-                                    if len(num_id_player) == 2:
-                                        fam_city = ""
-                                        number_net = ""
-                                        view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
-                                    t_str = str(g[2])
-                                    txt_str = f"{g[0]} - {g[1]} номера: {t_str}" 
-                                    txt_tmp.append(txt_str)
-                                text_str = (',\n'.join(txt_tmp))
-                                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК - если выбрали сами или - Cancel - если хотите выбор случайный"
-                                txt = (','.join(list(map(str, num_set))))
-                                while True:
-                                    try:
-                                        number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {txt}', tx)
-                                        znak = text_str.find(":")
-                                        fam_city = text_str[:znak - 7]
-                                        if not ok:
-                                            number_net = random.choice(num_set)
-                                        msgBox.information(my_win, "Жеребьевка участников", f"{fam_city} идет на номер: {number_net}")
-                                        number_net = int(number_net)
-                                        view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки
-                                    except ValueError:
-                                        msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
-                                        continue
-                                    else:
-                                        if number_net in num_set:
-                                            num_set = number_net
-                                            break
-                                        else:
-                                            msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
+                                #     pl_id_list_tmp.clear()
+                                # pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
+                                # player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
+                                # m = 0
+                                # for l in player_list:
+                                #     text_str = (',\n'.join(txt_tmp))
+                                #     pl = l[0]
+                                #     region = l[1]
+                                #     pl_reg = f"{pl}/ {region}"
+                                #     txt_tmp.append(pl_reg)
+                                # n_poseva = number_last[m]  
+                                # text_str = (',\n'.join(txt_tmp))
+                                # tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК -"  
+                                # number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_poseva}', tx) 
+                                # fam_city = "" 
+                                # num_id_player[int(number_net)] = pl_id_list[0]
+                                # view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки                         
+                                # # number_net, ok = QInputDialog.getText(my_win, f"Игрок посева,\n {pl_reg}.\nВозможные номера: {n_poseva}', tx)
+                                # # view_sort, ok = QInputDialog.getText(my_win, "Жеребьевка", f"Игрок посева,\n {pl_reg}.", n_poseva, 0, False)
+                                # m += 1
+
+
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
                 gr = full_posev[l][3]  
                 id_region = []
-                id_region.append(id_player)
-                id_region.append(region)
-                id_region.append(gr)
+                id_region = [id_player, region, gr]
                 num_id_player[num_set] = id_region
             # ======== модуль удаления посеянных номеров =========
                 if count_sev > 1:
