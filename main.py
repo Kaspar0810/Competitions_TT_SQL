@@ -886,12 +886,12 @@ my_win.setWindowIcon(QIcon("CTT.png"))
 my_win.resize(1390, 804)
 my_win.center()
 
-class ChoiceWindow(QMainWindow, Ui_Form):
-    """Окно ручной жеребьевки"""
-    def __init__(self):
-        super(ChoiceWindow, self).__init__()
-        self.setupUI(self)
-        self.setWindowTitle('Ручная жеребьевка сетки')
+# class ChoiceWindow(QMainWindow, Ui_Form):
+#     """Окно ручной жеребьевки"""
+#     def __init__(self):
+#         super(ChoiceWindow, self).__init__()
+#         self.setupUi(self)
+#         self.setWindowTitle('Ручная жеребьевка сетки')
         
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
@@ -6486,22 +6486,22 @@ def choice_setka_automat(fin, flag, count_exit):
 
         count_posev = len(posev)
         # ==========
-        if flag == 3:
-            # choice_form.show()
-            txt_tmp = []
-            data = []
-            my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
-            # ===========
-            for k in range(1, player_net + 1):
-                txt_tmp = [k, "-", "-"]
-                data.append(txt_tmp.copy()) # список списков
-                txt_tmp.clear()
-            model = MyTableModel(data)
-            my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-            my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
-            my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
-            my_win.tableView_net.setModel(model)
-            my_win.tableView_net.show()
+        # if flag == 3:
+        #     # choice_form.show()
+        #     txt_tmp = []
+        #     data = []
+        #     my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
+        #     # ===========
+        #     for k in range(1, player_net + 1):
+        #         txt_tmp = [k, "-", "-"]
+        #         data.append(txt_tmp.copy()) # список списков
+        #         txt_tmp.clear()
+        #     model = MyTableModel(data)
+        #     my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        #     my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
+        #     my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
+        #     my_win.tableView_net.setModel(model)
+        #     my_win.tableView_net.show()
 
             # view_table_choice(fam_city, number_net, num_id_player) 
         # ==========
@@ -6621,14 +6621,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                         else:
                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
                             elif flag == 3: # ручная жеребьевка
-                                # num_id_player.clear()
-                                # txt_tmp = []
-                                # my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
-                                # # ===========
-                                # fam_city = "" 
-                                # number_net = ""
-                                # view_table_choice(fam_city, number_net, num_id_player)
-                                # ======
+                                txt_tmp = []
                                 player_list = []
                                 pl_id_list = []
                                 player_list_tmp = []
@@ -6641,7 +6634,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                     r = posev_list[5] # рейтинг
                                     player_list_tmp = [pl, reg, r]
                                     player_list.append(player_list_tmp.copy())
-                                    pl_id_list_tmp = [id_pl, region, gr] 
+                                    pl_id_list_tmp = [id_pl, reg, gr] 
                                     pl_id_list.append(pl_id_list_tmp.copy())
                                     player_list_tmp.clear()
                                     pl_id_list_tmp.clear()
@@ -6657,7 +6650,9 @@ def choice_setka_automat(fin, flag, count_exit):
                                 n_poseva = number_last[m]  
                                 text_str = (',\n'.join(txt_tmp))
                                 tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК -"  
-                                number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_poseva}', tx, QLineEdit.Normal, txt_tmp[0]) 
+                                number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_poseva}', tx, QLineEdit.Normal) 
+                                fam_city = ""
+                                view_table_choice(fam_city, number_net, num_id_player)
                                 # fam_city = "" 
                                 # num_id_player[int(number_net)] = pl_id_list[0]
                                 # view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки                         
