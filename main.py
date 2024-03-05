@@ -886,6 +886,13 @@ my_win.setWindowIcon(QIcon("CTT.png"))
 my_win.resize(1390, 804)
 my_win.center()
 
+class ChoiceWindow(QMainWindow, Ui_Form):
+    """Окно ручной жеребьевки"""
+    def __init__(self):
+        super(ChoiceWindow, self).__init__()
+        self.setupUI(self)
+        self.setWindowTitle('Ручная жеребьевка сетки')
+        
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
     def __init__(self):
@@ -5290,16 +5297,20 @@ def enter_score(none_player=0):
             pl2 = my_win.lineEdit_player2_fin.text()
     # ======= 
         if none_player == 0: # встреча состоялась
-            if st1 > st2:
-                winner = pl1
-                loser = pl2
-                ts_winner = f"{st1} : {st2}"
-                ts_loser = f"{st2} : {st1}"
-            else:
-                winner = pl2
-                loser = pl1
-                ts_winner = f"{st2} : {st1}"
-                ts_loser = f"{st1} : {st2}"
+            winner = pl1 if st1 > st2 else pl2
+            loser = pl2 if st1 > st2 else pl1
+            ts_winner = f"{st1} : {st2}" if st1 > st2 else f"{st2} : {st1}"
+            ts_loser = f"{st2} : {st1}" if st1 > st2 else f"{st1} : {st2}"
+            # if st1 > st2:
+            #     winner = pl1
+            #     loser = pl2
+            #     ts_winner = f"{st1} : {st2}"
+            #     ts_loser = f"{st2} : {st1}"
+            # else:
+            #     winner = pl2
+            #     loser = pl1
+            #     ts_winner = f"{st2} : {st1}"
+            #     ts_loser = f"{st1} : {st2}"
             winner_string = string_score_game()  # пишет счет в партии
         elif none_player == 1: # не явился 1-й игрок
             winner = pl2
@@ -6474,6 +6485,26 @@ def choice_setka_automat(fin, flag, count_exit):
             posev = posev_4
 
         count_posev = len(posev)
+        # ==========
+        if flag == 3:
+            # choice_form.show()
+            txt_tmp = []
+            data = []
+            my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
+            # ===========
+            for k in range(1, player_net + 1):
+                txt_tmp = [k, "-", "-"]
+                data.append(txt_tmp.copy()) # список списков
+                txt_tmp.clear()
+            model = MyTableModel(data)
+            my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+            my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
+            my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
+            my_win.tableView_net.setModel(model)
+            my_win.tableView_net.show()
+
+            # view_table_choice(fam_city, number_net, num_id_player) 
+        # ==========
         for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
             current_region_posev.clear()
             sev_tmp = posev[i].copy()
@@ -6554,9 +6585,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                     pl = posev_list[1] # фамилия
                                     reg = posev_list[2] # регион
                                     pn = possible_number[j] # возможные номера посева
-                                    player_list_tmp.append(pl)
-                                    player_list_tmp.append(reg)
-                                    player_list_tmp.append(pn)   
+                                    player_list_tmp = [pl, reg, pn]
                                     player_list.append(player_list_tmp.copy())
                                     player_list_tmp.clear()
                                 txt_tmp = []
@@ -6592,43 +6621,43 @@ def choice_setka_automat(fin, flag, count_exit):
                                         else:
                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
                             elif flag == 3: # ручная жеребьевка
-                                num_id_player.clear()
-                                txt_tmp = []
-                                my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
-                                # ===========
-                                fam_city = "" 
-                                numder_net = ""
-                                view_table_choice(fam_city, number_net, num_id_player)
+                                # num_id_player.clear()
+                                # txt_tmp = []
+                                # my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
+                                # # ===========
+                                # fam_city = "" 
+                                # number_net = ""
+                                # view_table_choice(fam_city, number_net, num_id_player)
                                 # ======
-                                # player_list = []
-                                # pl_id_list = []
-                                # player_list_tmp = []
-                                # for k in range(len(full_posev)):
-                                #     posev_list = full_posev[k]
-                                #     id_pl = posev_list[0] # id игрока
-                                #     pl = posev_list[1] # фамилия
-                                #     reg = posev_list[2] # регион
-                                #     gr = posev_list[3]
-                                #     r = posev_list[5] # рейтинг
-                                #     player_list_tmp = [pl, reg, r]
-                                #     player_list.append(player_list_tmp.copy())
-                                #     pl_id_list_tmp = [id_pl, region, gr] 
-                                #     pl_id_list.append(pl_id_list_tmp.copy())
-                                #     player_list_tmp.clear()
-                                #     pl_id_list_tmp.clear()
-                                # pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
-                                # player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
-                                # m = 0
-                                # for l in player_list:
-                                #     text_str = (',\n'.join(txt_tmp))
-                                #     pl = l[0]
-                                #     region = l[1]
-                                #     pl_reg = f"{pl}/ {region}"
-                                #     txt_tmp.append(pl_reg)
-                                # n_poseva = number_last[m]  
-                                # text_str = (',\n'.join(txt_tmp))
-                                # tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК -"  
-                                # number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_poseva}', tx) 
+                                player_list = []
+                                pl_id_list = []
+                                player_list_tmp = []
+                                for k in range(len(full_posev)):
+                                    posev_list = full_posev[k]
+                                    id_pl = posev_list[0] # id игрока
+                                    pl = posev_list[1] # фамилия
+                                    reg = posev_list[2] # регион
+                                    gr = posev_list[3]
+                                    r = posev_list[5] # рейтинг
+                                    player_list_tmp = [pl, reg, r]
+                                    player_list.append(player_list_tmp.copy())
+                                    pl_id_list_tmp = [id_pl, region, gr] 
+                                    pl_id_list.append(pl_id_list_tmp.copy())
+                                    player_list_tmp.clear()
+                                    pl_id_list_tmp.clear()
+                                pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
+                                player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
+                                m = 0
+                                for l in player_list:
+                                    text_str = (',\n'.join(txt_tmp))
+                                    pl = l[0]
+                                    region = l[1]
+                                    pl_reg = f"{pl}/ {region}"
+                                    txt_tmp.append(pl_reg)
+                                n_poseva = number_last[m]  
+                                text_str = (',\n'.join(txt_tmp))
+                                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК -"  
+                                number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_poseva}', tx, QLineEdit.Normal, txt_tmp[0]) 
                                 # fam_city = "" 
                                 # num_id_player[int(number_net)] = pl_id_list[0]
                                 # view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки                         
