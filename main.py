@@ -6485,26 +6485,7 @@ def choice_setka_automat(fin, flag, count_exit):
             posev = posev_4
 
         count_posev = len(posev)
-        # ==========
-        # if flag == 3:
-        #     # choice_form.show()
-        #     txt_tmp = []
-        #     data = []
-        #     my_win.tableView.setGeometry(QtCore.QRect(260, 241, 841, 540))
-        #     # ===========
-        #     for k in range(1, player_net + 1):
-        #         txt_tmp = [k, "-", "-"]
-        #         data.append(txt_tmp.copy()) # список списков
-        #         txt_tmp.clear()
-        #     model = MyTableModel(data)
-        #     my_win.tableView_net.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        #     my_win.tableView_net.verticalHeader().setDefaultSectionSize(15)
-        #     my_win.tableView_net.setGridStyle(QtCore.Qt.DashDotLine) # вид линии сетки 
-        #     my_win.tableView_net.setModel(model)
-        #     my_win.tableView_net.show()
 
-            # view_table_choice(fam_city, number_net, num_id_player) 
-        # ==========
         for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
             current_region_posev.clear()
             sev_tmp = posev[i].copy()
@@ -6621,6 +6602,8 @@ def choice_setka_automat(fin, flag, count_exit):
                                         else:
                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
                             elif flag == 3: # ручная жеребьевка
+                                my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 274))
+                                my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 430))
                                 txt_tmp = []
                                 player_list = []
                                 pl_id_list = []
@@ -6640,31 +6623,41 @@ def choice_setka_automat(fin, flag, count_exit):
                                     pl_id_list_tmp.clear()
                                 pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
                                 player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
-                                m = 0
-                                for l in player_list:
+                                del_player = []
+                                for i in range(0, count_posev):
+                                    for l in player_list:
+                                        pl = l[0]
+                                        region = l[1]
+                                        pl_reg = f"{pl}/ {region}"
+                                        txt_tmp.append(pl_reg)
+                                    n_poseva = posev[i]  
                                     text_str = (',\n'.join(txt_tmp))
-                                    pl = l[0]
-                                    region = l[1]
-                                    pl_reg = f"{pl}/ {region}"
-                                    txt_tmp.append(pl_reg)
-                                n_poseva = number_last[m]  
-                                text_str = (',\n'.join(txt_tmp))
-                                tx = f"Список спортсменов в порядке посева:\n\n{text_str}\n\n" + "Выберите один из номеров и нажмите\n - ОК -"  
-                                number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_poseva}', tx, QLineEdit.Normal) 
-                                fam_city = ""
-                                view_table_choice(fam_city, number_net, num_id_player)
-                                # fam_city = "" 
-                                # num_id_player[int(number_net)] = pl_id_list[0]
-                                # view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки                         
-                                # # number_net, ok = QInputDialog.getText(my_win, f"Игрок посева,\n {pl_reg}.\nВозможные номера: {n_poseva}', tx)
-                                # # view_sort, ok = QInputDialog.getText(my_win, "Жеребьевка", f"Игрок посева,\n {pl_reg}.", n_poseva, 0, False)
-                                # m += 1
-
-
+                                    m = 0
+                                    if i > 0:
+                                        for n in range(0, count_sev):
+                                            full_posev.pop(n)
+                                    for k in full_posev.copy():
+                                        if m == count_sev:
+                                            break
+                                        else:
+                                            id_player = k[0]
+                                            region = k[2]
+                                            gr = k[3]  
+                                            id_region = [id_player, region, gr]
+                                            n_sev = n_poseva[m] 
+                                            f_text = txt_tmp[0]                                  
+                                            tx = f"Сеятся игрок:\n{f_text}\n\nСписок спортсменов в порядке посева:\n\n{text_str}\n\n"\
+                                                "Выберите один из номеров и нажмите - ОК -"  
+                                            number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_sev}', tx, QLineEdit.Normal) 
+                                            fam_city = ""
+                                            num_id_player[int(number_net)] = id_region
+                                            view_table_choice(fam_city, number_net, num_id_player)
+                                            txt_tmp.remove(f_text)
+                                            text_str = (',\n'.join(txt_tmp))
+                                            m += 1
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
                 gr = full_posev[l][3]  
-                id_region = []
                 id_region = [id_player, region, gr]
                 num_id_player[num_set] = id_region
             # ======== модуль удаления посеянных номеров =========
