@@ -6623,19 +6623,18 @@ def choice_setka_automat(fin, flag, count_exit):
                                     pl_id_list_tmp.clear()
                                 pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
                                 player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
-                                del_player = []
+
                                 for i in range(0, count_posev):
-                                    for l in player_list:
-                                        pl = l[0]
-                                        region = l[1]
-                                        pl_reg = f"{pl}/ {region}"
-                                        txt_tmp.append(pl_reg)
-                                    n_poseva = posev[i]  
-                                    text_str = (',\n'.join(txt_tmp))
+                                    n_poseva = posev[i] 
+                                    count_sev = len(n_poseva)
+                                    if i == 0: 
+                                        for l in player_list:
+                                            pl = l[0]
+                                            region = l[1]
+                                            pl_reg = f"{pl}/ {region}"
+                                            txt_tmp.append(pl_reg)
+                                        text_str = (',\n'.join(txt_tmp))
                                     m = 0
-                                    if i > 0:
-                                        for n in range(0, count_sev):
-                                            full_posev.pop(n)
                                     for k in full_posev.copy():
                                         if m == count_sev:
                                             break
@@ -6644,7 +6643,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                             region = k[2]
                                             gr = k[3]  
                                             id_region = [id_player, region, gr]
-                                            n_sev = n_poseva[m] 
+                                            n_sev = n_poseva
                                             f_text = txt_tmp[0]                                  
                                             tx = f"Сеятся игрок:\n{f_text}\n\nСписок спортсменов в порядке посева:\n\n{text_str}\n\n"\
                                                 "Выберите один из номеров и нажмите - ОК -"  
@@ -6654,6 +6653,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                             view_table_choice(fam_city, number_net, num_id_player)
                                             txt_tmp.remove(f_text)
                                             text_str = (',\n'.join(txt_tmp))
+                                            full_posev.pop(0)
                                             m += 1
                 id_player = full_posev[l][0]
                 region = full_posev[l][2]
