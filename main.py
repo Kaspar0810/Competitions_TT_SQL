@@ -6602,6 +6602,8 @@ def choice_setka_automat(fin, flag, count_exit):
                                         else:
                                             msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.") 
                             elif flag == 3: # ручная жеребьевка
+                                q = 1
+                                num_list = "-"
                                 my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 274))
                                 my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 430))
                                 txt_tmp = []
@@ -6621,6 +6623,8 @@ def choice_setka_automat(fin, flag, count_exit):
                                     pl_id_list.append(pl_id_list_tmp.copy())
                                     player_list_tmp.clear()
                                     pl_id_list_tmp.clear()
+                                    num_id_player[q] = num_list
+                                    q += 1
                                 pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
                                 player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
 
@@ -6649,6 +6653,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                                 "Выберите один из номеров и нажмите - ОК -"  
                                             number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_sev}', tx, QLineEdit.Normal) 
                                             fam_city = ""
+                                            old = num_id_player[int(number_net)]
                                             num_id_player[int(number_net)] = id_region
                                             view_table_choice(fam_city, number_net, num_id_player)
                                             txt_tmp.remove(f_text)
