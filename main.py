@@ -729,7 +729,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             fin = select_choice_final()
             if fin is None: # если отмена при выборе жеребьевки
                 return
-            # ======
             fin_list = []
             stage_list = ["Одна таблица", "Предварительный", "1-й полуфинал", "2-й полуфинал"]
             for k in system:
@@ -739,8 +738,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             count_fin = len(fin_list) 
             if count_fin == 1:
                 title = Title.get(Title.id == title_id())
-                tab_str = title.tab_enabled       
-            # ======
+                # tab_str = title.tab_enabled       
             stage = fin
             id_system = system_id(stage)
             sys = system.select().where(System.id == id_system).get()
@@ -786,9 +784,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             load_combobox_filter_final()
                             add_open_tab(tab_page="Финалы")
                             load_name_net_after_choice_for_wiev(fin)
+
                             my_win.statusbar.showMessage(
                 f"Жеребъевка {fin} завершена успешно", 5000)
-                            # my_win.tabWidget.setCurrentIndex(5) 
                     else:
                         return
                 else:
@@ -3757,8 +3755,7 @@ def player_in_one_table(fin):
     players = Player.select().where(Player.title_id == title_id())
     choice = Choice.select().where(Choice.title_id == title_id())
     system = System.select().where(System.title_id == title_id())
-    # sys_id = system.select().where(System.stage == fin).get()
-    # system_id = sys_id.id
+   
     k = 0
     for p in choice:  # цикл заполнения db таблиц -game list-
         k += 1
@@ -6370,6 +6367,7 @@ def choice_setka_automat(fin, flag, count_exit):
     posev_data = {} # окончательные посев номер в сетке - игрок/ город
     num_id_player = {} # словарь номер сетки - id игрока
     possible_number = {}
+    flag_stop_manual_choice = 0 # флаг окончания ручной жеребьевки
     #===================================
     id_system = system_id(stage=fin)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
@@ -6487,6 +6485,8 @@ def choice_setka_automat(fin, flag, count_exit):
         count_posev = len(posev)
 
         for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
+            if flag_stop_manual_choice == 1: # выход из цикла если окончена ручная жеребьевка
+                break
             current_region_posev.clear()
             sev_tmp = posev[i].copy()
             sev = sev_tmp.copy()
@@ -6527,7 +6527,7 @@ def choice_setka_automat(fin, flag, count_exit):
                             reg_last.append(v[1]) # список уже посеянных регионов
                             group_last.append(v[2]) # список номеров групп уже посеянных
                         if n != 0 or (n == 0 and l > 1):
-                # =========== определения кол-во возможны вариантов посева у каждого региона 
+                        # =========== определения кол-во возможны вариантов посева у каждого региона 
                             possible_number = possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net, count_exit)                        
 
                             if i != 0 or n != 0: # отсортирововаем список по увеличению кол-ва возможных вариантов
@@ -6639,7 +6639,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                             txt_tmp.append(pl_reg)
                                         text_str = (',\n'.join(txt_tmp))
                                     m = 0
-                                    for k in full_posev.copy():
+                                    for k in list(full_posev):
                                         if m == count_sev:
                                             break
                                         else:
@@ -6654,47 +6654,65 @@ def choice_setka_automat(fin, flag, count_exit):
                                             number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_sev}', tx, QLineEdit.Normal) 
                                             fam_city = ""
                                             old = num_id_player[int(number_net)]
+
                                             num_id_player[int(number_net)] = id_region
                                             view_table_choice(fam_city, number_net, num_id_player)
                                             txt_tmp.remove(f_text)
                                             text_str = (',\n'.join(txt_tmp))
                                             full_posev.pop(0)
-                                            m += 1
-                id_player = full_posev[l][0]
-                region = full_posev[l][2]
-                gr = full_posev[l][3]  
-                id_region = [id_player, region, gr]
-                num_id_player[num_set] = id_region
-            # ======== модуль удаления посеянных номеров =========
-                if count_sev > 1:
-                    c = len(current_region_posev)
-                    if c != 0:
-                        del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
-                        del current_region_posev[l] # удаляет из словаря текущий посеянный регион
-                        if num_set in sev: # проверяет посеянный номер в посеве
-                            sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
-                        for z in possible_number.keys():
-                            possible_tmp = possible_number[z]
-                            #=====
-                            if flag is False and len(possible_number) == 1:
-                                # number_net = possible_tmp[0]
-                                number_net = sev[0]
-                                fam_city = f"{pl}/{reg}"
-                                view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки 
-                            #======
-                            if num_set in possible_tmp: # проверяет посеянный номер в возможных номерах
-                                possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
-                elif count_sev == 1: # удаляет последний номер в посеве
-                    sev.clear()
-                    possible_number.clear()
-                number_posev.remove(l)
-                if i != 0:
-                    num_posev.remove(l)
 
-                sp = 100 / (real_all_player_in_final)
-                step += sp
-                # progress_bar(step)
-        if step > 99:    
+                                            if old != "-":
+                                                id_old = old[0]
+                                                players = Player.select().where(Player.id == id_old).get()
+                                                fio = players.player
+                                                city = players.city
+                                                old_player = f"{fio}/{city}"
+                                                number_net, ok = QInputDialog.getText(my_win,'Замена игрока', f'На какой номер в сетке\nпереместить игрока:\n {old_player}', QLineEdit.Normal) 
+                                                num_id_player[int(number_net)] = old
+                                                fam_city = ""
+                                                view_table_choice(fam_city, number_net, num_id_player)
+                                            m += 1
+                                        end -= 1 
+                                        if end == 0:
+                                            flag_stop_manual_choice = 1
+                                            step = 100
+                if flag_stop_manual_choice == 0:                      
+                    id_player = full_posev[l][0]
+                    region = full_posev[l][2]
+                    gr = full_posev[l][3]  
+                    id_region = [id_player, region, gr]
+                    num_id_player[num_set] = id_region
+                    # ======== модуль удаления посеянных номеров =========
+                    if count_sev > 1:
+                        c = len(current_region_posev)
+                        if c != 0:
+                            del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
+                            del current_region_posev[l] # удаляет из словаря текущий посеянный регион
+                            if num_set in sev: # проверяет посеянный номер в посеве
+                                sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
+                            for z in possible_number.keys():
+                                possible_tmp = possible_number[z]
+                                #=====
+                                if flag is False and len(possible_number) == 1:
+                                    # number_net = possible_tmp[0]
+                                    number_net = sev[0]
+                                    fam_city = f"{pl}/{reg}"
+                                    view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки 
+                                #======
+                                if num_set in possible_tmp: # проверяет посеянный номер в возможных номерах
+                                    possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
+                    elif count_sev == 1: # удаляет последний номер в посеве
+                        sev.clear()
+                        possible_number.clear()
+                    number_posev.remove(l)
+                    if i != 0:
+                        num_posev.remove(l)
+
+                    sp = 100 / (real_all_player_in_final)
+                    step += sp
+                else:
+                    break
+        if step > 99:  
             for i in num_id_player.keys():
                 tmp_list = list(num_id_player[i])
                 id = tmp_list[0]
@@ -6714,21 +6732,6 @@ def choice_setka_automat(fin, flag, count_exit):
             for h in free_number:
                 posev_data[h] = "X"
     return posev_data
-
-
-
-# def delete_free_seats(current_region_posev, possible_number, num_set, sev, l):
-#     """удаляет из возможных посевов номера отсутствующих игроков"""
-#     # c = len(current_region_posev)
-#     # if c != 0:
-#     del possible_number[l] # удаляет из словаря возможных номеров посеянный порядковый номер
-#     del current_region_posev[l] # удаляет из словаря текущий посеянный регион
-#     if num_set in sev: # проверяет посеянный номер в посеве
-#         sev.remove(num_set)  # удаляет посеянный номер из всех номеров этого посева
-#     for z in possible_number.keys():
-#         possible_tmp = possible_number[z]
-#         if num_set in possible_tmp: # проверяет посеянный номер в возможных номерах
-#             possible_tmp.remove(num_set) # удаляет посеянный номер из возможных номеров
 
 
 def view_table_choice(fam_city, number_net, num_id_player):
@@ -6857,171 +6860,6 @@ def free_place_in_setka(max_player, real_all_player_in_final):
         free_num.append(k)
     return free_num
     
-
-# def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net):
-#     """возможные номера посева"""
-#     possible_number = {}
-#     proba_possible = {} 
-#     num_tmp = []
-#     reg_tmp = []
-# 
-#     current_region = list(current_region_posev.values())
-#     y = 0
-#     for reg in current_region_posev.keys():
-#         cur_reg = current_region[y][0] # текущий регион посева
-#         cur_gr = current_region[y][1] # номер группы, которая сеятся
-
-#         if n == 0:
-#             if cur_reg in reg_last: # если регион который сеятся есть в уже посеянных областях
-#                 reg_tuple = tuple(reg_last)
-#                 count = reg_tuple.count(cur_reg) # количество регионов уже посеянных 
-#                 if count == 1: # значит только один регион в посеве
-#                     cur_gr = current_region[y][1]
-#                     number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net)
-#                     possible_number[reg] = number_posev
-#                 else: # если есть уже областей более двух
-#                     number_tmp = []
-#                     num_tmp.clear()
-#                     start = 0
-#                     for k in reg_last: # получаем список номеров сетки областей в той половине куда идет сев
-#                         if k == cur_reg:
-#                             index = reg_last.index(k, start)
-#                             set_number = number_last[index] # номер где уже посеянна такая же область
-#                             num_tmp.append(set_number)
-#                         start += 1
-#                     if count % 2 == 0: # если число четное
-#                         if count == 2: # посеяны 2 области разводит по четвертям
-#                             for h in num_tmp:
-#                                 if h <= player_net // 4: # если номер в сетке вверху, то наде сеять вниз
-#                                     f = [i for i in sev if i >= player_net // 4 + 1 and i <= player_net // 2] # отсеивает в списке номера 9-16
-#                                 elif h > player_net // 4 and h <= player_net // 2: 
-#                                     f = [i for i in sev if i <= player_net // 4] # отсеивает в списке номера 1-8
-#                                 elif h >= player_net // 2 + 1 and h <= int(player_net * 3 / 4): 
-#                                     f = [i for i in sev if i > player_net * 3 / 4] # отсеивает в списке номера 25-32
-#                                 elif h > player_net * 3 / 4: 
-#                                     f = [i for i in sev if i >= player_net // 2 + 1 and i <= int(player_net * 3 / 4)] # отсеивает в списке номера 17-24
-#                                 number_tmp += f
-#                         elif count == 4: # посеяны 4 области разводит по восьмушкам
-#                             if player_net == 16:
-#                                 for h in num_tmp:
-#                                     if h <= 2: # если номер в сетке 1-2
-#                                         f = [i for i in sev if i >= 3 and i <= 4] # отсеивает в списке номера 3-4 ()
-#                                     elif h >= 3 and h <= 4: # если номер в сетке 3-4
-#                                         f = [i for i in sev if i < 3] # отсеивает в списке номера 1-2 ()
-#                                     elif h >= 5 and h <= 6: # если номер в сетке 5-6
-#                                         f = [i for i in sev if i >= 7 and i <= 8] # отсеивает в списке номера 25-32
-#                                     elif h >= 7 and h <= 8: # если номер в сетке 7-8
-#                                         f = [i for i in sev if i >= 5 and i <= 6] # отсеивает в списке номера 17-24
-#                                     elif h >= 9 and h <= 10: # если номер в сетке вверху, то наде сеять вниз
-#                                         f = [i for i in sev if i >= 11 and i <= 12] # отсеивает в списке номера 9-16
-#                                     elif h >= 11 and h <= 12: 
-#                                         f = [i for i in sev if i <= 9 and i <= 10] # отсеивает в списке номера 1-8
-#                                     elif h >= 13 and h <= 14: 
-#                                         f = [i for i in sev if i > 14] # отсеивает в списке номера 25-32
-#                                     elif h > 14: 
-#                                         f = [i for i in sev if i >= 12 and i <= 13] # отсеивает в списке номера 17-24    
-#                                     number_tmp += f
-#                             elif player_net == 32:
-#                                 for h in num_tmp:
-#                                     if h <= player_net // 8: # если номер в сетке вверху, то наде сеять вниз
-#                                         f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 3-4 ()
-#                                     elif h >= 5 and h <= 8: 
-#                                         f = [i for i in sev if i < 5] # отсеивает в списке номера 1-2 ()
-#                                     elif h >= 9 and h <= 12: 
-#                                         f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
-#                                     elif h >= 13 and h <= 16: 
-#                                         f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
-#                                     elif h >= 17 and h <= 20: # если номер в сетке вверху, то наде сеять вниз
-#                                         f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
-#                                     elif h >= 21 and h <= 24: 
-#                                         f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
-#                                     elif h >= 25 and h <= 28: 
-#                                         f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
-#                                     elif h > 28: 
-#                                         f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
-#                                     number_tmp += f
-#                     elif count > 2:
-#                         # number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net, count_exit)
-#                         # if 
-#                         number_posev = sev
-#                         number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev)
-                       
-#                     number_posev = number_tmp.copy()
-#                     possible_number[reg] = number_posev
-#             else: # все номера в той части куда можно сеять
-#                 possible_number[reg] = sev
-#         else: # 2-й посев и последующие 
-#             number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net) # возможные номера после ухода от своей группы без учета регионов
-#             number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
-#             reg_tmp.clear()
-#             # ======
-#             if n > 1:
-#                 for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
-#                     d = number_last.index(k)
-#                     reg_tmp.append(reg_last[d]) # список регионов     
-#                 if cur_reg in reg_tmp: # если сеянная область есть в прошлом посеве конкретной половины
-#                     num_tmp = [] # список номеров сетки где есть такой же регион (в той половине или четверти с номером который сеятся)
-#                     for d in number_posev_old: # номер в сетке в предыдущем посеве
-#                         posev_tmp = num_id_player[d]
-#                         if cur_reg in posev_tmp:
-#                             num_tmp.append(d) # список номеров в сетке, где уже есть такой же регион
-#                     count = len(num_tmp) # количество областей в той части сетки, куде сеятся регион
-#                 # ======== отбирает номера из -number_posev- , где учитывается регион ======
-#                     if count == 1 and n == 1: # есть только одна область в той же половине другой четверти (1 место и 2-е место в группе)
-#                         if num_tmp[0] <= player_net // 4: # в первой четверти (1-8)
-#                             number_posev = [i for i in number_posev if i > player_net // 4 and i <= player_net // 2] # номера 8-16
-#                         elif num_tmp[0] >= (player_net // 4 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (9-16)
-#                             number_posev = [i for i in number_posev if i < 9] # номера 1-8
-#                         elif num_tmp[0] >= (player_net // 2 + 1) and num_tmp[0] <= player_net // 4 * 3: # в первой четверти (16-24)
-#                             number_posev = [i for i in number_posev if i > player_net // 4 * 3] # номера 25-32
-#                         elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net: # в первой четверти (25-32)
-#                             number_posev = [i for i in number_posev if i > player_net // 2 and i < (player_net // 4 * 3 + 1)] # номера 17-24
-#                     elif (count == 1 and n == 2):
-#                         if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
-#                             number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
-#                         elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
-#                             number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
-#                         elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
-#                             number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
-#                         elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
-#                             number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
-#                         elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
-#                             number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
-#                         elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
-#                             number_posev = [i for i in number_posev if i >(player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
-#                         elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
-#                             number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
-#                         elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
-#                             number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
-#                     elif n == 3:
-#                         if count == 1 and len(number_posev) != 1:
-#                             if num_tmp[0] <= player_net // 8: # в первой четверти (1-4)
-#                                 number_posev = [i for i in number_posev if i > player_net // 8 and i <= player_net // 4] # номера 5-8
-#                             elif num_tmp[0] >= player_net // 8 + 1 and num_tmp[0] <= player_net // 4: # в первой четверти (5-8)
-#                                 number_posev = [i for i in number_posev if i < player_net // 8 + 1] # номера 1-4
-#                             elif num_tmp[0] >= player_net // 4 + 1 and num_tmp[0] <= player_net // 8 * 3: # в первой четверти (9-12)
-#                                 number_posev = [i for i in number_posev if i > player_net // 8 * 3 and i <= player_net // 2] # номера 13-16
-#                             elif num_tmp[0] >= (player_net // 8 * 3 + 1) and num_tmp[0] <= player_net // 2: # в первой четверти (13-16)
-#                                 number_posev = [i for i in number_posev if i >= player_net // 4 + 1 and i <= player_net // 8 * 3] # номера 9-12
-#                             elif num_tmp[0] >= player_net // 2 + 1 and num_tmp[0] <= player_net // 8 * 5: # в первой четверти (17-20)
-#                                 number_posev = [i for i in number_posev if i > player_net // 8 * 5 and i <= player_net // 4 * 3] # номера 21-24
-#                             elif num_tmp[0] >= player_net // 8 * 5 and num_tmp[0] <= (player_net // 4 * 3): # в первой четверти (21-24)
-#                                 number_posev = [i for i in number_posev if i >= (player_net // 2 + 1) and i <= player_net // 8 * 5] # номера 17-20
-#                             elif num_tmp[0] >= (player_net // 4 * 3 + 1) and num_tmp[0] <= player_net // 8 * 7: # в первой четверти (25-28)
-#                                 number_posev = [i for i in number_posev if i > player_net  // 8 * 7 + 1] # номера 29-32
-#                             elif num_tmp[0] >= player_net // 8 * 7 + 1: # в первой четверти (29-32)
-#                                 number_posev = [i for i in number_posev if i >= player_net // 4 * 3 + 1 and i <= player_net  // 8 * 7] # номера 25-28
-#                     else:  
-#                         number_tmp = alignment_in_half(player_net, num_tmp, sev, count, number_posev) # номер (а)куда можно сеять
-#                         number_posev.clear()
-#                         number_posev = number_tmp.copy()         
-
-#             possible_number[reg] = number_posev
-#             proba_possible[cur_gr] = number_posev
-#         y += 1
-#     return possible_number
-
-
 
 def possible_draw_numbers(current_region_posev, reg_last, number_last, group_last, n, sev, num_id_player, player_net, count_exit):
     """возможные номера посева new"""
@@ -12249,11 +12087,11 @@ def setka_player_after_choice(stage):
 
 def setka_data(stage, posev_data):
     """данные сетки"""
-    id_ful_name = {}
+    id_full_name = {}
     id_name = {}
     tds = []
     fam_name_city = []
-    all_list = []
+    # all_list = []
     id_system = system_id(stage)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
 
@@ -12265,9 +12103,8 @@ def setka_data(stage, posev_data):
         id_f_n = name_list[0] # словарь name: фамилия/город, id: номер игрока
         id_s_n = name_list[1] # {name: фамилия, id: номер игрока}
             # словарь ключ - полное имя/ город, значение - id
-        id_ful_name[id_f_n["name"]] = id_f_n["id"]
+        id_full_name[id_f_n["name"]] = id_f_n["id"]
         id_name[id_s_n["name"]] = id_s_n["id"]
-            # =================
         if family != "X":
             # находит пробел отделяющий имя от фамилии
             space = family.find(" ")
@@ -12276,15 +12113,10 @@ def setka_data(stage, posev_data):
             # получает отдельно фамилия и первую букву имени
             family_slice = family[:space + 2]
             family_city = f'{family_slice}.{city_slice}'   # все это соединяет
-        #     tds.append(family_city)
-        #     fam_name_city.append(family)
-        # else:
         tds.append(family)
         fam_name_city.append(family)
-    all_list.append(tds)
-    all_list.append(id_ful_name)
-    all_list.append(id_name)
-    all_list.append(fam_name_city)
+    all_list = [tds, id_full_name, id_name, fam_name_city]
+
     return all_list
 
 
@@ -12704,12 +12536,6 @@ def rank_in_group(total_score, td, num_gr, stage):
     for key, value in total_score.items():
         rev_dict.setdefault(value, set()).add(key) # словарь (число очков, номера участников группы у которых они есть)
     res = [key for key, values in rev_dict.items() if len(values) > 1] # список очки, которых более одного
-
-    # отдельно составляет список ключей (номера участников группы)
-    # val_list = list(total_score.values())  # отдельно составляет список значений (очки каждого игрока)
-    # # ======== новый вариант =========
-    # # получает словарь(ключ - номер участника, значение - очки)
-    # ds = {index: value for index, value in enumerate(val_list)}  
     # сортирует словарь по убыванию очков
     sorted_tuple = {k: total_score[k] for k in sorted(total_score, key=total_score.get, reverse=True)}
     valuesList = list(sorted_tuple.values())  # список очков по убыванию
@@ -12977,76 +12803,8 @@ def summa_points_person(tr, tr_all, num_gr, pg_win, pg_los, pp, stage, id_system
     return u # список списков 1-й кол-во игроков 2-й очки выйигранные и проигранные
 
 
-# def circle_2_player(tr, td, max_person, mesto, num_gr):
-#     """крутиловка из 2-ух человек"""
-#     sender = my_win.sender()
-#     tab = my_win.tabWidget.currentIndex()
-#     if sender == my_win.view_fin1_Action:
-#         system_stage = "1-й финал"
-    
-#     # if tab == 3:
-#     #     system_stage = "Предварительный"
-#     # elif tab == 4:
-#     #     system_stage = my_win.comboBox_filter_semifinal.currentText()
-#     # elif tab == 5:
-#     #     system_stage = my_win.comboBox_filter_final.currentText()
-
-#     result = Result.select().where(Result.title_id == title_id())
-#     player_rank_tmp = []
-#     tour = "-".join(tr)  # делает строку встреча в туре
-#     # =====приводит туры к читаемому виду (1-й игрок меньше 2-ого)
-#     znak = tour.find("-")
-#     p1 = int(tour[:znak])  # игрок под номером в группе
-#     p2 = int(tour[znak + 1:])  # игрок под номером в группе
-#     if p1 > p2:  # меняет последовательность игроков в туре на обратную, чтоб у 1-ого игрока был номер меньше
-#         p_tmp = p1
-#         p1 = p2
-#         p2 = p_tmp
-#         tour = f"{p1}-{p2}"
-#     if num_gr != "Одна таблица":
-#         # result_stage = result.select().where(Result.system_stage == system_stage)
-#         c = result.select().where((Result.number_group == num_gr) &
-#                                   (Result.tours == tour)).get()  # ищет в базе
-#     # строчку номер группы и тур по двум столбцам
-#     else:
-#         c = result.select().where((Result.system_stage == num_gr) &
-#                                   (Result.tours == tour)).get()  # ищет в базе
-#         # строчку номер группы и тур по двум столбцам
-#     if c.winner == c.player1:
-#         points_p1 = c.points_win  # очки во встрече победителя
-#         points_p2 = c.points_loser  # очки во встрече проигравшего
-#         td[p1 * 2 - 2][max_person + 4] = mesto  # записывает место победителю
-#         td[p2 * 2 - 2][max_person + 4] = mesto + 1  # записывает место проигравшему
-#         player_rank_tmp.append([p1, mesto])
-#         player_rank_tmp.append([p2, mesto + 1])
-#     else:
-#         points_p1 = c.points_loser
-#         points_p2 = c.points_win
-#         td[p1 * 2 - 2][max_person + 4] = mesto + 1  # записывает место победителю
-#         td[p2 * 2 - 2][max_person + 4] = mesto  # записывает место проигравшему
-#         player_rank_tmp.append([p1, mesto + 1])
-#         player_rank_tmp.append([p2, mesto])
-#     td[p1 * 2 - 2][max_person + 3] = points_p1  # очки во встрече победителя
-#     td[p2 * 2 - 2][max_person + 3] = points_p2  # очки во встрече проигравшего
-
-#     return player_rank_tmp
-
-# =======
-
 def circle_2_player(tr, td, max_person, mesto, num_gr, id_system):
     """крутиловка из 2-ух человек"""
-    # sender = my_win.sender()
-    # tab = my_win.tabWidget.currentIndex()
-    # if sender == my_win.view_fin1_Action:
-    #     system_stage = "1-й финал"
-    
-    # if tab == 3:
-    #     system_stage = "Предварительный"
-    # elif tab == 4:
-    #     system_stage = my_win.comboBox_filter_semifinal.currentText()
-    # elif tab == 5:
-    #     system_stage = my_win.comboBox_filter_final.currentText()
-
     result = Result.select().where((Result.title_id == title_id()) & (Result.system_id == id_system))
     player_rank_tmp = []
     tour = "-".join(tr)  # делает строку встреча в туре
@@ -13060,7 +12818,6 @@ def circle_2_player(tr, td, max_person, mesto, num_gr, id_system):
         p2 = p_tmp
         tour = f"{p1}-{p2}"
     if num_gr != "Одна таблица":
-        # result_stage = result.select().where(Result.system_stage == system_stage)
         c = result.select().where((Result.number_group == num_gr) &
                                   (Result.tours == tour)).get()  # ищет в базе
     # строчку номер группы и тур по двум столбцам
@@ -13394,6 +13151,11 @@ def player_choice_in_setka(fin):
     with db:  # записывает в db, что жеребьевка произведена
         systems.choice_flag = True
         systems.save()
+    if flag == 3: # если ручная жеребьевка, то закрывает сетку 
+        my_win.tableView_net.hide()
+        my_win.resize(1270, 825)
+        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
     return posev_data
 
 
