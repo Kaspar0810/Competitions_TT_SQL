@@ -19,7 +19,7 @@ from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtGui import QIcon, QBrush, QColor, QFont, QPalette
 from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem, QItemDelegate, QStyledItemDelegate
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem, QLineEdit, QLabel
-from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressBar, QAction, QDesktopWidget, QTableView, QColorDialog
+from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressDialog, QAction, QDesktopWidget, QTableView, QColorDialog
 from PyQt5 import QtGui, QtWidgets, QtCore
 
 from models import *
@@ -884,12 +884,6 @@ my_win.setWindowIcon(QIcon("CTT.png"))
 my_win.resize(1390, 804)
 my_win.center()
 
-# class ChoiceWindow(QMainWindow, Ui_Form):
-#     """Окно ручной жеребьевки"""
-#     def __init__(self):
-#         super(ChoiceWindow, self).__init__()
-#         self.setupUi(self)
-#         self.setWindowTitle('Ручная жеребьевка сетки')
         
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
@@ -909,9 +903,9 @@ class StartWindow(QMainWindow, Ui_Form):
         self.Button_view_pdf.setEnabled(False)
         self.comboBox_arhive_year.setEnabled(False)
         self.comboBox_arhive_year.currentTextChanged.connect(self.choice_competition)
-        self.pb = QProgressBar()
-        self.pb.setMinimum(0)
-        self.pb.setMaximum(100)
+        # self.pb = QProgressDialog()
+        # self.pb.setMinimum(0)
+        # self.pb.setMaximum(100)
 
         dbase()
         count = len(Title.select())
@@ -1099,16 +1093,19 @@ class ToolTip(): # создание всплывающих подсказок
 #         self.fir_window.progressBar.setValue(value)
 
 
-    # def progress_bar_start_form(step):
-    #     """Прогресс бар стартового окна"""
-    #     # msgBox = QMessageBox
-    #     # fir_window.activate()
-    #     fir_window.pb.setValue(step)
-    #     # if step >= 99:
-    #     #     result = fir_window.msgBox.information(my_win, "Уведомление", "Загрузка рейтинг листа завершена.", msgBox.Ok)
-    #     #     if result == fir_window.msgBox.Ok:
-    #     #             fir_window.pb.setValue(0)
-    #     return step
+def progressbar(row_count):
+    """Прогресс бар диаоговое окно"""
+    text = "Загрузка текущего рейтинг листа"
+    my_win.progress = QProgressDialog(text, None, 0, 100)
+    my_win.progress.setCancelButton(None)  # Remove cancel button
+    my_win.progress.setModal(True)
+    my_win.progress.show() # Set as a modal dialog
+    my_win.progress.setWindowTitle("Загрузка рейтинг листа")
+    for i in range(0, row_count):
+        my_win.progress.setValue(i)
+    my_win.progress.setAutoReset(True)
+    my_win.progress.setAutoClose(True) 
+
 
 def dbase():
     """Создание DB и таблиц"""
@@ -1262,33 +1259,6 @@ def region():
 
 fir_window = StartWindow()  # Создаём объект класса ExampleApp
 fir_window.show()  # Показываем окно
-
-
-# def change_sroki():
-#     """изменение текста label формы стартового окна в зависимости от выбора соревнования"""
-#     comp_data = {}
-#     data_comp = []
-#     data_comp_tmp = []
-#     t_id = Title.select().order_by(Title.id.desc())
-#     count = len(t_id)
-#     i = 0
-#     for k in t_id:
-#         data_st = k.data_start
-#         data_end = k.data_end
-#         data_comp.append(data_st)
-#         data_comp.append(data_end)
-#         data_comp_tmp = data_comp.copy()
-#         data_comp.clear()
-#         if i != 0:
-#             comp_data[i - 1] = data_comp_tmp
-#         i += 1
-#         if i == 6 or i == count:
-#             break
-#     index = fir_window.comboBox.currentIndex()
-#     data_list = comp_data[index]
-#     # fir_window.label_4.setText(f"сроки: с {data_list[0]} по {data_list[1]}")
-
-
 #  ==== наполнение комбобоксов ==========
 page_orient = ("альбомная", "книжная")
 kategoria_list = ("-выбор категории-", "2-я кат.", "1-я кат.", " ССВК")
@@ -1610,11 +1580,6 @@ def db_select_title():
     tab_enabled(gamer)
 
     return gamer
-
-
-# def system_edit():
-#     """редактирование системы"""
-#     system_made()
 
 
 def system_made():
@@ -2103,6 +2068,7 @@ def fill_table_R_list():
     # вставляет в таблицу необходимое кол-во строк
     row_count = len(player_list)
     my_win.label_78.setText(f"Всего {row_count} записей.")
+    progressbar(row_count)    
     fill_table(player_list)
 
 
@@ -2202,15 +2168,6 @@ def fill_table_after_choice():
     fill_table(player_list)
 
 
-def progressbar(count):
-    pass
-    # progress = QtWidgets.QProgressBar()
-    # progress.setValue(100)
-    # progress.setMinimum(0)
-    # progress.setMaximum(100)
-    # m = int(count / 100)
-    # for i in range(m, count, m):
-    #     progress.setValue(100)
 def debitor_R():
     """показывает список должников оплаты рейтинга"""
     player_list = Player.select().where(Player.title_id == title_id())
@@ -6161,7 +6118,7 @@ def choice_gr_automat():
     start = 0
     end = 1
     step = 0
-    # step_bar = 0
+    step_bar = 0
     stage = "Предварительный"
     sys = System.select().where(System.title_id == title_id())
     sys_id = sys.select().where(System.stage == stage).get()
@@ -6249,9 +6206,9 @@ def choice_gr_automat():
             sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
             current.clear()
             number_poseva = number_poseva + sv
-            # sp = 100 / (total_player)
-            # step_bar += sp
-            # progress_bar(step_bar)
+            sp = 100 / (total_player)
+            step_bar += sp
+            progressbar(step_bar)
         if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканчания
             if number_poseva == group * m:  # смена направления посева
                 if m % 2 != 0:
