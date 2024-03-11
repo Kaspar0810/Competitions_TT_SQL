@@ -1093,18 +1093,18 @@ class ToolTip(): # создание всплывающих подсказок
 #         self.fir_window.progressBar.setValue(value)
 
 
-def progressbar(row_count):
-    """Прогресс бар диаоговое окно"""
-    text = "Загрузка текущего рейтинг листа"
-    my_win.progress = QProgressDialog(text, None, 0, 100)
-    my_win.progress.setCancelButton(None)  # Remove cancel button
-    my_win.progress.setModal(True)
-    my_win.progress.show() # Set as a modal dialog
-    my_win.progress.setWindowTitle("Загрузка рейтинг листа")
-    for i in range(0, row_count):
-        my_win.progress.setValue(i)
-    my_win.progress.setAutoReset(True)
-    my_win.progress.setAutoClose(True) 
+# def progressbar(row_count):
+#     """Прогресс бар диаоговое окно"""
+#     text = "Загрузка текущего рейтинг листа"
+#     my_win.progress = QProgressDialog(text, None, 0, 100)
+#     my_win.progress.setCancelButton(None)  # Remove cancel button
+#     my_win.progress.setModal(True)
+#     my_win.progress.show() # Set as a modal dialog
+#     my_win.progress.setWindowTitle("Загрузка рейтинг листа")
+#     for i in range(0, row_count):
+#         my_win.progress.setValue(i)
+#     my_win.progress.setAutoReset(True)
+#     my_win.progress.setAutoClose(True) 
 
 
 def dbase():
@@ -1816,9 +1816,9 @@ def find_in_rlist():
             txt = txt.capitalize()  # Переводит первую букву в заглавную
         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
             if tb == 6 and cur_index == 0:
-                r_data = r_data_w[0]
+                r_data = r_data_w[0] # текущий рейтинг
             elif tb == 6 and cur_index == 1:
-                r_data = r_data_w[1]
+                r_data = r_data_w[1] # январский рейтинг
             else:
                 r_data = r_data_w
         else:
@@ -1830,15 +1830,15 @@ def find_in_rlist():
                 r_data = r_data_m
         
         r = 0
-        if tb == 6:
+        if tb == 6: # вкладка рейтинг
             if cur_index == 0:
                 player_list = r_data.select().where(r_data.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
             else:
-                player_list = r_data.select().where(r_data.r1_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+                player_list = r_data.select().where(r_data.r1_fname ** f'{txt}%')  # like поиск в январском рейтинге
         else:
             for r_list in r_data:
                 p = r_list.select()
-                if r == 0:
+                if r == 0 :
                     my_win.label_63.setText("Поиск в текущем рейтинг листе.")
                     p = p.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
                     if r == 0  and len(p) != 0:
@@ -1869,11 +1869,27 @@ def input_player():
     family = text[:zn]
     name = text[zn + 1:]
     family = family.capitalize()
-    name = name.capitalize()  # Переводит первую букву в заглавную  
-    family = family.upper()
-    my_win.lineEdit_Family_name.setText(f"{family} {name}")
-    my_win.lineEdit_bday.setFocus()
-    my_win.lineEdit_bday.setInputMask('00.00.0000')
+    name = name.capitalize()  # Переводит первую букву в заглавную
+    f_name = f"{family} {name}"
+    # повторная проверка игрока в январском рейтинге если два однофамильца и одинаковые имена 
+    titles = Title.select().where(Title.id == title_id()).get()
+    sex = titles.gamer
+    woman_list = ["Девочки", "Девушки", "Женщины"]
+    r_data = R1_list_d if sex in woman_list else R1_list_m
+    p = r_data.select().where(r_data.r1_fname == f_name)  # like поиск в январском рейтинге
+    if len(p) > 0:
+        my_win.listWidget.clear()
+        my_win.label_63.setText("Поиск в январском рейтинге.")
+        for pl in p:
+            full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
+            my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+    else:
+        full_stroka = ""
+        my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
+        family = family.upper()
+        my_win.lineEdit_Family_name.setText(f"{family} {name}")
+        my_win.lineEdit_bday.setFocus()
+        my_win.lineEdit_bday.setInputMask('00.00.0000')
 
 
 def next_field():
@@ -1908,7 +1924,6 @@ def find_city():
             my_win.textEdit.setStyleSheet("Color: black")
             my_win.comboBox_region.setCurrentText("")
             return
-            # my_win.textEdit.setText("Нет такого города в базе")
         else:           
             for pl in c:
                 full_stroka = f"{pl.city}"
@@ -2068,7 +2083,7 @@ def fill_table_R_list():
     # вставляет в таблицу необходимое кол-во строк
     row_count = len(player_list)
     my_win.label_78.setText(f"Всего {row_count} записей.")
-    progressbar(row_count)    
+    # progressbar(row_count)    
     fill_table(player_list)
 
 
@@ -2202,6 +2217,7 @@ def debitor_R():
 def add_player(): 
     """добавляет игрока в список и базу данных"""
     msgBox = QMessageBox()
+     
     flag = False
     player_list = Player.select().where(Player.title_id == title_id())
     txt = my_win.Button_add_edit_player.text()
@@ -2214,6 +2230,12 @@ def add_player():
     rg = my_win.comboBox_region.currentText()
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
+    player_data_list = [pl, bd, rn, ct, rg, rz, ch]
+    for i in player_data_list:
+        if i == "":
+            result = msgBox.information(my_win, "", "Вы заполнили не все поля данными игрока.",
+                                            msgBox.Ok)
+            return 
     # ===== проверка на возраст
     znak = bd.find(".")
     check_age_player(znak, bd)
@@ -6118,7 +6140,6 @@ def choice_gr_automat():
     start = 0
     end = 1
     step = 0
-    step_bar = 0
     stage = "Предварительный"
     sys = System.select().where(System.title_id == title_id())
     sys_id = sys.select().where(System.stage == stage).get()
@@ -6206,9 +6227,10 @@ def choice_gr_automat():
             sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
             current.clear()
             number_poseva = number_poseva + sv
-            sp = 100 / (total_player)
-            step_bar += sp
-            progressbar(step_bar)
+            # sp = int(100 / (total_player))
+            # step_bar += sp
+            # row_count = p
+            # progressbar(row_count)
         if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканчания
             if number_poseva == group * m:  # смена направления посева
                 if m % 2 != 0:
