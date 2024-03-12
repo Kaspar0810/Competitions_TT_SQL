@@ -1864,7 +1864,6 @@ def find_in_rlist():
 
 def input_player():
     """Ввод нового игрока если его нет в рейтинг листе текущем и январском"""
-    msgBox = QMessageBox()
     text = my_win.lineEdit_Family_name.text()
     zn = text.find(" ")
     family = text[:zn]
@@ -1884,16 +1883,7 @@ def input_player():
         for pl in p:
             full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
             my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-        reply = msgBox.question(my_win, 'Уведомление', "Если игрока нет в январском рейтинге\nнажмите -Yes-\nили нажмите -No-",
-                                                  msgBox.Yes,
-                                                  msgBox.No)
-        if reply == msgBox.Yes:
-            full_stroka = ""
-            my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-            family = family.upper()
-            my_win.lineEdit_Family_name.setText(f"{family} {name}")
-            my_win.lineEdit_bday.setFocus()
-            my_win.lineEdit_bday.setInputMask('00.00.0000')
+            
     else:
         full_stroka = ""
         my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
