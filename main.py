@@ -1884,9 +1884,10 @@ def input_player():
         for pl in p:
             full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
             my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
-        reply = msgBox.question(my_win, 'Уведомление', "Если игрока нет в январском рейтинге\nнажмите -Yes-\nили нажмите -No-",
+        reply = msgBox.question(my_win, 'Уведомление', "Если это новый игрок\nнажмите -Yes-\n"
+        "и заполните его данные,\nа если он появился\nв январском рейтинге\n нажмите -Cancel-",
                                                   msgBox.Yes,
-                                                  msgBox.No)
+                                                  msgBox.Cancel)
         if reply == msgBox.Yes:
             full_stroka = ""
             my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
