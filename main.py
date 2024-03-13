@@ -2030,7 +2030,7 @@ def fill_table(player_list):
                     item_10 = str(list(player_selected[row].values())[num_columns[9]])
                     data_table_tmp = [item_8, item_9, item_10]
                 data_table_list.extend(data_table_tmp) 
-            elif tb ==2:
+            elif tb == 2:
                 if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
                     item_8 = str(list(player_selected[row].values())[num_columns[7]])
                     item_9 = str(list(player_selected[row].values())[num_columns[8]])
@@ -2631,6 +2631,7 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        load_coach_to_combo()
         load_comboBox_filter()
         region()
         my_win.Button_app.setEnabled(False)
@@ -4600,6 +4601,7 @@ def filter_player_list(sender):
     if sender == my_win.Button_fltr_list:
         region = my_win.comboBox_fltr_region.currentText()
         city = my_win.comboBox_fltr_city.currentText()
+        coach = my_win.comboBox_fltr_coach.currentText()
         if region != "" and city != "":
             player_list = player.select().where(Player.region == region)
             player_list = player.select().where(Player.city == city)
@@ -4607,6 +4609,13 @@ def filter_player_list(sender):
             player_list = player.select().where(Player.city == city)
         elif region != "" and city == "":
             player_list = player.select().where(Player.region == region)
+        else:
+            pl_id_list = []
+            player_coach_list = Choice.select().where((Choice.title_id == title_id()) & (Choice.coach.contains(f'{coach}')))  # like
+            for k in player_coach_list:
+                pl_id = k.player_choice_id
+                pl_id_list.append(pl_id)
+            player_list = player.select().where(Player.id.in_(pl_id_list))
     elif sender == my_win.checkBox_15: # отмечен чекбокс предзаявка
         if my_win.checkBox_15.isChecked():
             region = my_win.comboBox_fltr_region.currentText()
@@ -4624,7 +4633,8 @@ def filter_player_list(sender):
     elif sender == my_win.Button_reset_fltr_list:
         player_list = Player.select().where(Player.title_id == title_id())
         my_win.comboBox_fltr_region.setCurrentIndex(0)
-        my_win.comboBox_fltr_city.setCurrentIndex(0) 
+        my_win.comboBox_fltr_city.setCurrentIndex(0)
+        my_win.comboBox_fltr_coach.setCurrentIndex(0) 
         my_win.checkBox_15.setChecked(False)      
         load_comboBox_filter()
     player_list_pred = player.select().where(Player.application == "предварительная")
@@ -7885,6 +7895,51 @@ def duplicat_coach_in_group(coach_list):
         duplicat = [x for i, x in enumerate(tmp_list) if i != tmp_list.index(x)]
         return duplicat
 
+
+def load_coach_to_combo():
+    """загружает список тренеров в комбобокс для фильтра на странце участники"""
+    coach_list = []
+    my_win.comboBox_fltr_coach.clear()
+    players = Player.select().where(Player.title_id == title_id())
+    for k in players:
+        coachs_id = k.coach_id
+        coachs = Coach.select().where(Coach.id == coachs_id).get()
+        coach_family = coachs.coach
+        if coach_family not in coach_list:
+            coach_list.append(coach_family)
+    # =====
+    tmp_list = []
+    for i in coach_list:
+        znak = i.find(",")
+        if znak == -1: # один тренер
+            if i not in tmp_list:
+                tmp_list.append(i)
+        else:
+            coach_1 = i[:znak]
+            if coach_1 not in tmp_list:
+                tmp_list.append(coach_1)
+            znak_1 = i.find(",", znak + 1)
+            if znak_1 == -1:
+                coach_2 = i[znak + 2:]
+                if coach_2 not in tmp_list:
+                    coach_2.rstrip()
+                    tmp_list.append(coach_2)
+            else: # три тренера
+                coach_2 = i[znak + 2: znak_1]
+                if coach_2 not in tmp_list:
+                    tmp_list.append(coach_2)
+                coach_3 = i[znak_1 + 2:]   
+                if coach_3 not in tmp_list:
+                    coach_3.rstrip()
+                    tmp_list.append(coach_3)
+    tmp_list.sort() 
+    tmp_list.insert(0, "")
+    my_win.comboBox_fltr_coach.addItems(tmp_list)            
+    # count_list = len(tmp_list)
+    # count_uniq = len(set(tmp_list)) 
+    # if count_list > count_uniq:
+    #     duplicat = [x for i, x in enumerate(tmp_list) if i != tmp_list.index(x)]
+    #     return duplicat
 
 # def color_coach_in_tablewidget(duplicat, coach_list):
 #     """окаршиваает в красный цвет повторяющиеся фамилия тренеров"""
