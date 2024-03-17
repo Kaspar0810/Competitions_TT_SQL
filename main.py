@@ -4556,21 +4556,25 @@ def change_city_from_region_in_R():
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
     cur_index = my_win.comboBox_choice_R.currentIndex()
+    flag = 0
     if cur_index == 0: # если выбран текущий рейтинг
         if gamer in gamer_w:
             r_data = r_data_w[0]
         else:
             r_data = r_data_m[0]
         r_region = r_data.select().where(r_data.r_region == region)
+        flag = 0        
     elif cur_index == 1: # если рейтинг за январь
         if gamer in gamer_w:
             r_data = r_data_w[1]
         else:
            r_data = r_data_m[1]
-        r_region = r_data.select().where(r_data.r1_region == region)    
+        r_region = r_data.select().where(r_data.r1_region == region) 
+        flag = 1
     for pl_reg in r_region:
-        if pl_reg.r_city not in gorod:
-            gorod.append(pl_reg.r_city)
+        r_gorod = pl_reg.r_city if flag == 0 else pl_reg.r1_city 
+        if r_gorod not in gorod:
+                gorod.append(r_gorod)
     gorod.sort(key=sortByAlphabet)
     gorod.insert(0, "")
     my_win.comboBox_filter_city_in_R.addItems(gorod)
