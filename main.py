@@ -6609,6 +6609,8 @@ def choice_setka_automat(fin, flag, count_exit):
                             elif flag == 3: # ручная жеребьевка
                                 q = 1
                                 num_list = "-"
+                                for l in range(1, max_player + 1 ):
+                                    num_id_player[l] = num_list
                                 my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 274))
                                 my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 430))
                                 txt_tmp = []
@@ -6628,7 +6630,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                     pl_id_list.append(pl_id_list_tmp.copy())
                                     player_list_tmp.clear()
                                     pl_id_list_tmp.clear()
-                                    num_id_player[q] = num_list
+                                    # num_id_player[q] = num_list
                                     q += 1
                                 pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
                                 player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
@@ -6678,7 +6680,8 @@ def choice_setka_automat(fin, flag, count_exit):
                                                 view_table_choice(fam_city, number_net, num_id_player)
                                             m += 1
                                         end -= 1 
-                                        if end == 0:
+                                        if end == 0 or real_all_player_in_final == (len(num_id_player) - len(free_num)):
+
                                             flag_stop_manual_choice = 1
                                             step = 100
                 if flag_stop_manual_choice == 0:                      
@@ -6717,18 +6720,25 @@ def choice_setka_automat(fin, flag, count_exit):
                     step += sp
                 else:
                     break
-        if step > 99:  
+        if step > 99:
+            del_num_list = []  
             for i in num_id_player.keys():
                 tmp_list = list(num_id_player[i])
-                id = tmp_list[0]
-                pl_id = Player.get(Player.id == id)
-                family_city = pl_id.full_name
-                posev_data[i] = family_city
-                with db:
-                    choice_final = choice.select().where(Choice.player_choice_id == pl_id).get()
-                    choice_final.final = fin
-                    choice_final.posev_final = i
-                    choice_final.save()
+                if len(tmp_list) == 1:
+                    del_num_list.append(i)                    
+                else:
+                    id = tmp_list[0]
+                    pl_id = Player.get(Player.id == id)
+                    family_city = pl_id.full_name
+                    posev_data[i] = family_city
+                    with db:
+                        choice_final = choice.select().where(Choice.player_choice_id == pl_id).get()
+                        choice_final.final = fin
+                        choice_final.posev_final = i
+                        choice_final.save()
+            if len(del_num_list) > 0:
+                for e in del_num_list:
+                    del num_id_player[e]
             key_set = set(num_id_player.keys()) # получаем сет всех ключей (номеров сетки)
             for j in range(1, player_net + 1):
                 free_num.append(j)

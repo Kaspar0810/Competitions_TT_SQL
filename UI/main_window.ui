@@ -95,7 +95,7 @@
         <x>3</x>
         <y>33</y>
         <width>831</width>
-        <height>201</height>
+        <height>211</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -4390,7 +4390,7 @@
         <x>700</x>
         <y>10</y>
         <width>139</width>
-        <height>201</height>
+        <height>221</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_53">
@@ -4557,7 +4557,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4565,7 +4565,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4578,7 +4578,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5212,7 +5212,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5221,8 +5221,8 @@
      <widget class="QLabel" name="label_20">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>220</y>
+        <x>21</x>
+        <y>187</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -5240,153 +5240,6 @@
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Фильтр по жеребьевке&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
-     </widget>
-     <widget class="QFrame" name="frame_2">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>23</y>
-        <width>230</width>
-        <height>193</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_12">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_10">
-         <property name="spacing">
-          <number>1</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_10">
-           <property name="font">
-            <font>
-             <family>Times New Roman</family>
-             <pointsize>12</pointsize>
-             <italic>true</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>Выбор этапа</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_etap">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <italic>true</italic>
-            </font>
-           </property>
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>4</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_visible_game">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Запись счета в партии</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>4</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_11">
-         <property name="spacing">
-          <number>1</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_13">
-           <property name="font">
-            <font>
-             <family>Times New Roman</family>
-             <pointsize>12</pointsize>
-             <italic>true</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>Вид страницы</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_page_vid">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="Button_etap_made">
-           <property name="font">
-            <font>
-             <family>Times New Roman</family>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Создать</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
      </widget>
      <widget class="QLabel" name="label_18">
       <property name="geometry">
@@ -5415,7 +5268,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>440</y>
+        <y>425</y>
         <width>211</width>
         <height>20</height>
        </rect>
@@ -5436,10 +5289,10 @@
      <widget class="QLineEdit" name="lineEdit_find_player_in_system">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>460</y>
-        <width>221</width>
-        <height>21</height>
+        <x>8</x>
+        <y>450</y>
+        <width>225</width>
+        <height>24</height>
        </rect>
       </property>
      </widget>
@@ -5447,7 +5300,7 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>390</y>
+        <y>375</y>
         <width>230</width>
         <height>45</height>
        </rect>
@@ -5491,8 +5344,8 @@
      <widget class="QLabel" name="label_28">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>364</y>
+        <x>22</x>
+        <y>350</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -5515,9 +5368,9 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>240</y>
-        <width>230</width>
-        <height>121</height>
+        <y>207</y>
+        <width>234</width>
+        <height>141</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -5529,15 +5382,18 @@
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>0</x>
          <y>10</y>
-         <width>211</width>
-         <height>103</height>
+         <width>231</width>
+         <height>121</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_52">
         <property name="spacing">
          <number>1</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
         </property>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -5598,6 +5454,174 @@
        </layout>
       </widget>
      </widget>
+     <widget class="QFrame" name="frame_2">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>20</y>
+        <width>235</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_12">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Выбор этапа</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_etap">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>4</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_visible_game">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>12</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>Запись счета в партии</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>4</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_11">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_13">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Вид страницы</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_page_vid">
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_etap_made">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Создать</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="page_3">
      <property name="geometry">
@@ -5605,7 +5629,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6023,7 +6047,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6330,7 +6354,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6798,7 +6822,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6877,7 +6901,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>221</width>
+        <width>266</width>
         <height>104</height>
        </rect>
       </property>
@@ -7168,7 +7192,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>484</height>
+       <height>476</height>
       </rect>
      </property>
      <attribute name="label">
