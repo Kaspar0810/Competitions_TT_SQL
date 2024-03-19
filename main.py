@@ -6630,11 +6630,9 @@ def choice_setka_automat(fin, flag, count_exit):
                                     pl_id_list.append(pl_id_list_tmp.copy())
                                     player_list_tmp.clear()
                                     pl_id_list_tmp.clear()
-                                    # num_id_player[q] = num_list
                                     q += 1
                                 pl_id_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
                                 player_list.sort(key=lambda x: x[2], reverse=True) # отсортировывает списки списков по 3-му элементу
-
                                 for i in range(0, count_posev):
                                     n_poseva = posev[i] 
                                     count_sev = len(n_poseva)
@@ -6657,8 +6655,11 @@ def choice_setka_automat(fin, flag, count_exit):
                                             n_sev = n_poseva
                                             f_text = txt_tmp[0]                                  
                                             tx = f"Сеятся игрок:\n{f_text}\n\nСписок спортсменов в порядке посева:\n\n{text_str}\n\n"\
-                                                "Выберите один из номеров и нажмите - ОК -"  
+                                                "Выберите один из номеров и нажмите - ОК -" 
                                             number_net, ok = QInputDialog.getText(my_win, f'Возможные номера посева: {n_sev}', tx, QLineEdit.Normal) 
+                                            if number_net == '' or int(number_net) not in [j for j in range(1, player_net + 1)]:
+                                                msgBox.information(my_win, "Уведомление", "Вы не правильно ввели номер, повторите снова.")
+                                                break
                                             fam_city = ""
                                             old = num_id_player[int(number_net)]
 
@@ -6702,7 +6703,6 @@ def choice_setka_automat(fin, flag, count_exit):
                                 possible_tmp = possible_number[z]
                                 #=====
                                 if flag is False and len(possible_number) == 1:
-                                    # number_net = possible_tmp[0]
                                     number_net = sev[0]
                                     fam_city = f"{pl}/{reg}"
                                     view_table_choice(fam_city, number_net, num_id_player) # функция реального просмотра жеребьевки 
@@ -6740,9 +6740,8 @@ def choice_setka_automat(fin, flag, count_exit):
                 for e in del_num_list:
                     del num_id_player[e]
             key_set = set(num_id_player.keys()) # получаем сет всех ключей (номеров сетки)
-            for j in range(1, player_net + 1):
-                free_num.append(j)
-            free_number = set((free_num))
+            all_num_set = [j for j in range(1, player_net + 1)]
+            free_number = set((all_num_set))
             free_number.difference_update(key_set) # вычитаем из всех номеров те которые посеяны и остается номера -X-
             for h in free_number:
                 posev_data[h] = "X"
