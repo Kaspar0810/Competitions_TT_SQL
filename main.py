@@ -2665,7 +2665,7 @@ def page():
         list_player_pdf(player_list)
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 430))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         # progressBar = QProgressBar(my_win.tabWidget)
@@ -2868,7 +2868,7 @@ def page():
         Button_view_group.clicked.connect(view)
 
         my_win.resize(1270, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         system_stage = sf.select().where(System.stage == "Предварительный").get()
@@ -2896,7 +2896,7 @@ def page():
         Button_view_semifinal.clicked.connect(view)
 
         my_win.resize(1270, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         # my_win.progressBar.hide()
@@ -2943,7 +2943,7 @@ def page():
     
         Button_view_final.clicked.connect(view)
         my_win.resize(1270, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 626))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         # my_win.progressBar.hide()
