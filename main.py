@@ -112,26 +112,33 @@ class MyTableModel(QAbstractTableModel):
             return 0
 
     def data(self, index, role):
-        if role == QtCore.Qt.ItemDataRole.DisplayRole and index.column != 2:
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
         # else:
-        #     if role == QtCore.Qt.ForegroundRole:
-        #         ng = my_win.comboBox_filter_number_group_final.currentText()
-        #         double_reg = change_choice_group()
-        #         if double_reg is not None:
-        #             double_region = double_reg[ng]
-        #             r = double_region[0]
-        #             if str(self._data[index.row()][index.column()]) == r:
-        #                     return QtGui.QBrush(QtCore.Qt.red)
-                
+        #     val = self._data[index.row()][index.column()]
+        #     if int(val.value) > 150:
+        #         return QtGui.QBrush(QtCore.Qt.red)
             # if role == QtCore.Qt.ForegroundRole:
-            #     if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
-            #         ng = my_win.comboBox_filter_number_group_final.currentText()
-            #         double_reg = change_choice_group()
+            #     ng = my_win.comboBox_filter_number_group_final.currentText()
+            #     double_reg = change_choice_group()
+            #     if double_reg is not None:
             #         double_region = double_reg[ng]
             #         r = double_region[0]
             #         if str(self._data[index.row()][index.column()]) == r:
-            #             return QtGui.QBrush(QtCore.Qt.red)
+            #                 return QtGui.QBrush(QtCore.Qt.red)
+                
+        #     if role == QtCore.Qt.ForegroundRole:
+        #         tab = my_win.tabWidget.currentIndex()
+        #         if tab == 1:
+        #            if str(self._data[index.row()][index.column()]) == 73:
+        #                 return QtGui.QBrush(QtCore.Qt.red) 
+                # if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
+                #     ng = my_win.comboBox_filter_number_group_final.currentText()
+                #     double_reg = change_choice_group()
+                #     double_region = double_reg[ng]
+                #     r = double_region[0]
+                #     if str(self._data[index.row()][index.column()]) == r:
+                #         return QtGui.QBrush(QtCore.Qt.red)
                
             # if my_win.comboBox_filter_number_group_final.currentIndex()!= 0:
             #     ng = my_win.comboBox_filter_number_group_final.currentText()
@@ -4614,12 +4621,13 @@ def filter_player_list(sender):
         elif region != "" and city == "":
             player_list = player.select().where(Player.region == region)
         else:
-            pl_id_list = []
-            player_coach_list = Choice.select().where((Choice.title_id == title_id()) & (Choice.coach.contains(f'{coach}')))  # like
-            for k in player_coach_list:
-                pl_id = k.player_choice_id
-                pl_id_list.append(pl_id)
-            player_list = player.select().where(Player.id.in_(pl_id_list))
+            coach_id_list = []
+            ch = Coach.select().where(Coach.coach.contains(f'{coach}')) # поиск по части предложения
+            for j in ch:
+                id_ch = j.id
+                if id_ch not in coach_id_list:
+                    coach_id_list.append(id_ch)
+            player_list = Player.select().where((Player.title_id == title_id()) & (Player.coach_id.in_(coach_id_list)))
     elif sender == my_win.checkBox_15: # отмечен чекбокс предзаявка
         if my_win.checkBox_15.isChecked():
             region = my_win.comboBox_fltr_region.currentText()
@@ -4735,6 +4743,8 @@ def filter_rejting_list():
         player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt))
     elif region_txt == "" and city_txt != "" and date_txt != "":
         player_list = r_data.select().where((rejting_date > after_date) & (rejting_city == city_txt))
+    elif region_txt == "" and city_txt != "" and date_txt == "":
+        player_list = r_data.select().where(rejting_city == city_txt)
     elif region_txt != "" and city_txt != "" and date_txt != "":
         player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt) & (rejting_city == city_txt))
 
