@@ -111,9 +111,23 @@ class MyTableModel(QAbstractTableModel):
         else:
             return 0
 
+    # def dolg_R():
+    #     dolg_R_list = []
+    #     dolg_player = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг"))
+    #     for k in dolg_player:
+    #         family = k.player
+    #         dolg_R_list.append(family)
+    #     return dolg_R_list
+
     def data(self, index, role):
+        # dolg_R_list = dolg_R()
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
+        # elif role == QtCore.Qt.ForegroundRole: # выделяет фамилию красным цветом
+        #     val = self._data[index.row()][index.column()]
+        #     if val in dolg_R_list:      
+        #         return QtGui.QBrush(QtCore.Qt.red)
+
         # else:
         #     val = self._data[index.row()][index.column()]
         #     if int(val.value) > 150:
