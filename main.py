@@ -2239,6 +2239,12 @@ def debitor_R():
     else:
         my_win.Button_pay_R.setEnabled(False)
         my_win.textEdit.clear()
+        my_win.lineEdit_Family_name.clear()
+        my_win.lineEdit_bday.clear()
+        my_win.lineEdit_R.clear()
+        my_win.lineEdit_city_list.clear()
+        my_win.lineEdit_coach.clear()
+        my_win.lineEdit_id.clear()
     if len(player_debitor_R) > 0:
         my_win.label_dolg_R.setStyleSheet("color: red")
     else:
