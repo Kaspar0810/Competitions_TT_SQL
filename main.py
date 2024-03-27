@@ -368,8 +368,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         editMenu = menuBar.addMenu("Редактировать")  # основное
         # меню Печать
         printMenu = menuBar.addMenu("Печать") # основное
-        printMenu.addAction(self.print_list_debtor_R_Action)
-
+     
         # ============ создание подменю
 
         go_to.addAction(self.go_to_Action)  # подменю выбора соревнования
@@ -403,7 +402,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print_Menu.addAction(self.clear_s32_Action)
         print_Menu.addAction(self.clear_s32_full_Action)
         print_Menu.addAction(self.clear_s32_2_Action)
-
+        print_Menu = printMenu.addMenu("Должники за R")
+        print_Menu.addAction(self.print_list_nopay_R_Action)
+        print_Menu.addAction(self.print_list_pay_R_Action)
 
         # меню просмотр (последовательность вида в меню)
         view_Menu = menuBar.addMenu("Просмотр")
@@ -449,7 +450,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fourth_comp_Action = QAction("пусто")
         self.fifth_comp_Action = QAction("пусто")
         self.ed_one_table_Action = QAction("Редакитровать таблицу")
-        self.print_list_debtor_R_Action = QAction("Список должников R")
+
+        self.print_list_nopay_R_Action = QAction("Список, неоплативших R")
+        self.print_list_pay_R_Action = QAction("Список, оплативших R")
 
         self.ed_etap_Action = QAction("Редактирование этапов")  # подменю редактор
         self.vid_edit_Action = QAction("Вид страницы этапов")
@@ -568,7 +571,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.rAction.triggered.connect(self.r_File)
         self.r1Action.triggered.connect(self.r1_File)
 
-        self.print_list_debtor_R_Action.triggered.connect(self.check_debitor_R)
+        self.print_list_nopay_R_Action.triggered.connect(self.check_debitor_R)
+        self.print_list_pay_R_Action.triggered.connect(self.check_debitor_R)
 
         self.copy_db_Action.triggered.connect(self.import_db)
 
@@ -2320,6 +2324,8 @@ def add_player():
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
         if txt == "Редактировать":
+            # редактирует фамилии тренеров
+            Coach.update(coach = ch).where(Coach.id == idc).execute()
             with db:
                 plr =  player_list.select().where(Player.id == pl_id).get()
                 plr.player = pl
@@ -2328,7 +2334,6 @@ def add_player():
                 plr.city = ct
                 plr.region = rg
                 plr.razryad = rz
-                plr.coach_id = idc
                 plr.full_name = fn
                 plr.pay_rejting = pay_R
                 plr.comment = comment
@@ -3535,7 +3540,7 @@ def selection_of_the_draw_mode():
     if vid == "Автоматическая":
         flag = 1
         my_win.tableView_net.hide()
-    elif vid == "Полувтоматическая":
+    elif vid == "Полуавтоматическая":
         flag = 2
         my_win.resize(1440, 804)
         my_win.tableView_net.show()
@@ -3808,6 +3813,7 @@ def player_fin_on_circle(fin):
      td - список списков данных из групп"""
     fin_dict = {}
     fin_list = []
+    group_dict = {}
     stage = fin
     id_system = system_id(stage)
     players = Player.select().where(Player.title_id == title_id())
@@ -3823,18 +3829,33 @@ def player_fin_on_circle(fin):
         nt = 1
         for b in nums:
             choices_fin = choice.select().where(Choice.mesto_group == b)
-            for n in choices_fin:
+            # =====
+            for m in choices_fin:
+                num_group_text = m.group
+                znak = num_group_text.find(" ")
+                num_gr_int = int(num_group_text[:znak])
+                group_dict[m] = num_gr_int
+                grouplist = sorted(group_dict.items(), key=lambda x: x[1])
+                sortdict = dict(grouplist)
+                choices_fin_sort_by_group = sortdict.keys()
+            # ========
+            for n in choices_fin_sort_by_group:
                 player = n.family
                 pl_id = n.player_choice_id
                 player_id = f"{player}/{pl_id}"
                 fin_dict[nt] = player_id
                 nt += 1
+            # for n in choices_fin:
+            #     player = n.family
+            #     pl_id = n.player_choice_id
+            #     player_id = f"{player}/{pl_id}"
+            #     fin_dict[nt] = player_id
+            #     nt += 1
     else:
         nt = 1
         for b in nums:
             choices_fin = choice.select().where((Choice.mesto_semi_final == b) & (Choice.semi_final == stage_exit))
             # ==== вариант перевести текст группы в число а потом отсортировать по группам
-            group_dict = {}
             for m in choices_fin:
                 num_group_text = m.sf_group
                 znak = num_group_text.find(" ")
@@ -4629,7 +4650,7 @@ def filter_player_list(sender):
     """фильтрация списка участников по областям, тренерам, городам"""
     sender = my_win.sender()
     player = Player.select().where(Player.title_id == title_id())
-    if sender == my_win.Button_fltr_list:
+    if sender == my_win.Button_fltr_list: # кнопка применить 
         region = my_win.comboBox_fltr_region.currentText()
         city = my_win.comboBox_fltr_city.currentText()
         coach = my_win.comboBox_fltr_coach.currentText()
@@ -4654,11 +4675,14 @@ def filter_player_list(sender):
             my_win.Button_app.setEnabled(True)
             if region != "":
                 player_list = player.select().where((Player.application == "предварительная") & (Player.region == region))
+            # elif city != "":
+            #     player_list = player.select().where((Player.application == "предварительная") & (Player.city == city))
             else:
                 player_list = player.select().where(Player.application == "предварительная")
             count = len(player_list)
         else:
             my_win.Button_app.setEnabled(False)
+            my_win.textEdit.clear()
             player_list_pred = player.select().where(Player.application == "предварительная")
             count = len(player_list_pred)
             player_list = Player.select().where(Player.title_id == title_id())
@@ -6498,6 +6522,8 @@ def choice_setka_automat(fin, flag, count_exit):
 
         if count_exit == 1 or fin == "Одна таблица":
             full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
+        elif count_exit != 1 or fin != "1-й финал":
+            full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
         else:
             full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
 
@@ -6575,11 +6601,11 @@ def choice_setka_automat(fin, flag, count_exit):
                                 if len(num_set) == 0:
                                     result = msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась.\n"
                                     "Если хотите повторите снова.\nНажмите -ОК-\n"
-                                    "Если хотите изменить значение мультирегиональность\nНажмите -NO-\n"
-                                    "Если отменить жеребьевку\nНажмите -Cancel", msgBox.Ok, msgBox.No, msgBox.Cancel)
+                                    "Если хотите изменить значение мультирегиональность\nНажмите -OK-\n"
+                                    "Если отменить жеребьевку\nНажмите -Cancel", msgBox.Ok, msgBox.Cancel)
                                     if result == msgBox.Ok:
-                                        pass
-                                    elif result == msgBox.No:
+                                    #     pass
+                                    # elif result == msgBox.No:
                                         Title.update(multiregion=1).where(Title.id == title_id()).execute()
                                     elif result == msgBox.Cancel:
                                         return
@@ -8792,7 +8818,7 @@ def ready_system():
                 tot_player = k.max_player
                 all_player_in_final.append(tot_player)
             all_player = sum(all_player_in_final)
-            if all_player > total_player:
+            if all_player >= total_player:
                 my_win.statusbar.showMessage("Система соревнований создана", 5000)
                 flag = True
             else:
@@ -10062,7 +10088,7 @@ def table_made(pv, stage):
         pv = A4
         center_stage = 150 # откуда начинается надпись -предварительный этап-
         if max_pl < 7:
-            family_col = 4.0
+            family_col = 3.8
             wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
             wcells = round(wcells, 2)
         else:
@@ -10238,9 +10264,9 @@ def table_made(pv, stage):
     catalog = 1
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
-    doc.bottomMargin = 1.5 * cm
-    doc.leftMargin = 0.5 * cm
-    doc.righttMargin = 0.5 * cm
+    # doc.bottomMargin = 1.5 * cm
+    # doc.leftMargin = 0.5 * cm
+    # doc.righttMargin = 0.5 * cm
   
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -14726,12 +14752,14 @@ def check_player_whitout_R():
     """Список участников для отметки кто оплатил лицензию за рейтинг"""
     from reportlab.platypus import Table
     from sys import platform
+    sender = my_win.sender()
     elements = []
     story = []
     tit = Title.get(Title.id == title_id())
-   
-    player_list = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг")).order_by(Player.city)  # сортировка по региону
-
+    if sender == my_win.print_list_nopay_R_Action:
+        player_list = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг")).order_by(Player.city)  # сортировка по региону
+    elif sender == my_win.print_list_pay_R_Action:
+        player_list = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "оплачен")).order_by(Player.city)
     short_name = tit.short_name_comp
     gamer = tit.gamer
     count = len(player_list)  # количество записей в базе
