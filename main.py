@@ -5896,7 +5896,7 @@ def filter_fin(pl=False):
             fltr = fl.select().where(Result.points_win == None)
             count = len(fltr)
             my_win.label_38.setText(
-                f'Всего в {final} не сыгранно {count} игры')
+                f'Всего в {final}\nне сыгранно {count} игры')
         elif final != "все финалы" and played == "завершенные" and num_game_fin == "" and round == "":
             fltr = filter.select().where((Result.system_id == id_system) & (Result.points_win == 2))
             count_pl = len(fltr)
@@ -6493,6 +6493,7 @@ def choice_setka_automat(fin, flag, count_exit):
             free_num = free_place_in_setka(max_player, real_all_player_in_final)
             del_num = 1 # флаг, что есть свободные номера
         elif count_player_in_final != max_player // count_exit and count_exit > 1:
+            free_num = free_place_in_setka(max_player, real_all_player_in_final)
             del_num = 1 # флаг, что есть свободные номера
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
@@ -6606,7 +6607,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                     if result == msgBox.Ok:
                                     #     pass
                                     # elif result == msgBox.No:
-                                        Title.update(multiregion=1).where(Title.id == title_id()).execute()
+                                        Title.update(multiregion=0).where(Title.id == title_id()).execute()
                                     elif result == msgBox.Cancel:
                                         return
                                     sorted_tuple = sorted(num_id_player.items(), key=lambda x: x[0])
@@ -8229,9 +8230,19 @@ def total_game_table(exit_stage, kpt, fin, pv):
             total_gr = 0
  
         stroka_kol_game = f"{total_games} игр"
-
+        # заполняет max_player в зависиости от кол игроков
+        if type_table == "круг": # если финал по кругу
+            m_pl = player_in_final
+        else: # если финал сетка
+            if player_in_final <= 8:
+                m_pl = 8
+            elif player_in_final > 8 and player_in_final <= 16:
+                m_pl = 16
+            elif player_in_final > 16 and player_in_final <= 32:
+                m_pl = 32 
+        # ======
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=total_gr, kol_game_string=stroka_kol_game,
-                        max_player=player_in_final, stage=fin, type_table=type_table, page_vid=pv, label_string=str_setka,
+                        max_player=m_pl, stage=fin, type_table=type_table, page_vid=pv, label_string=str_setka,
                         choice_flag=0, score_flag=5, visible_game=flag_visible, stage_exit=exit_stage, mesta_exit=kpt, no_game=no_game3).save()    
         
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
@@ -11764,8 +11775,9 @@ def write_in_setka(data, stage, first_mesto, table):
     """функция заполнения сетки результатами встреч data поступает чистая только номера в сетке, дальше идет заполнение игроками и счетом"""
     "row_num_win - словарь, ключ - номер игры, значение - список(номер строки 1-ого игрока, номер строки 2-ого игрока) и записвает итоговые места в db"
     sender = my_win.sender()
-    player = Player.select().where(Player.title_id == title_id())
-    system_flag = ready_system() # проверка была создана система
+    player = Player.select().where(Player.title_id == title_id())    
+    # system_flag = ready_system() # проверка была создана система
+    system_flag = True
     if system_flag is True: 
         id_system = system_id(stage)
     # choice = Choice.select().where(Choice.title_id == title_id())
@@ -11970,17 +11982,18 @@ def write_in_setka(data, stage, first_mesto, table):
                 else:
                     m = 0
                     for n in [id_win, id_los]: # записывает место в сетке в таблицу -choice-
-                        choice_pl = Choice.get(Choice.player_choice_id == n)
-                        choice_pl.mesto_final = mesto + m
-                        choice_pl.save()
-                        player = Player.get(Player.id == n)
-                        if n == id_win:
-                            win = f"{player.player}/{player.city}" 
-                        else:
-                            los = f"{player.player}/{player.city}"
-                        player.mesto = mesto + m
-                        player.save()
-                        m += 1
+                        if n != "":
+                            choice_pl = Choice.get(Choice.player_choice_id == n)
+                            choice_pl.mesto_final = mesto + m
+                            choice_pl.save()
+                            player = Player.get(Player.id == n)
+                            if n == id_win:
+                                win = f"{player.player}/{player.city}" 
+                            else:
+                                los = f"{player.player}/{player.city}"
+                            player.mesto = mesto + m
+                            player.save()
+                            m += 1
                     if id_los == "":
                         los = "X"
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
@@ -12306,8 +12319,10 @@ def score_in_table(td, num_gr):
             stage = "Одна таблица"
             ch = choice.select().where(Choice.basic == "Одна таблица")  # фильтрует по одной таблице
         else: # игры в финале по кругу
-            # определить в каком столбце фильтровать выход в финал
-            ch = choice.select().where((Choice.final == num_gr) & (Choice.semi_final == etap_exit))
+            if etap_exit == "Предварительный":
+                ch = choice.select().where(Choice.final == num_gr)
+            else:
+                ch = choice.select().where((Choice.final == num_gr) & (Choice.semi_final == etap_exit))
         mp = len(gamelist.select().where(Game_list.system_id == id_system))
     
     count = len(results)  # сколько игр в группе
@@ -12503,13 +12518,17 @@ def score_in_setka(stage, place_3rd):
         num_game = int(res.tours)
 
         if res.winner is not None and res.winner != "": # значит встреча сыграна
-            id_pl_win = player.select().where(Player.full_name == res.winner).get()
-            short_name_win = id_pl_win.player
-            if res.loser == "X":
-               short_name_los = "X"
-            else: 
-                id_pl_los = player.select().where(Player.full_name == res.loser).get()
-                short_name_los = id_pl_los.player
+            if res.winner != "X":
+                id_pl_win = player.select().where(Player.full_name == res.winner).get()
+                short_name_win = id_pl_win.player
+                if res.loser == "X":
+                    short_name_los = "X"
+                else: 
+                    id_pl_los = player.select().where(Player.full_name == res.loser).get()
+                    short_name_los = id_pl_los.player
+            else:
+                short_name_win = "X"
+                short_name_los = "X"
 
             snoska = numer_game(num_game, vid_setki) # список (номер встречи победителя, номер встречи проигравшего и минус куда идет проигравший в сетке)
             tmp_match.append(snoska[0]) # номер на сетке куда идет победитель
