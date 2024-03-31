@@ -6110,6 +6110,9 @@ def load_comboBox_referee():
 def load_combo():
     """загружает комбобокс поиска спортсмена на вкладке группы, пф и финалы фамилиями спортсменов"""
     text = []
+    my_win.comboBox_find_name.clear()
+    my_win.comboBox_find_name_sf.clear()
+    my_win.comboBox_find_name_fin.clear()
     players = Player.select().where(Player.title_id == title_id())
     for i in players:  # цикл по таблице базы данных (I это id строк)
         family = i.player
@@ -11965,6 +11968,10 @@ def write_in_setka(data, stage, first_mesto, table):
                 id_los = id_sh_name[pl_los]
             else:
                 id_los = ""
+            # вариант с двумя крестами ===
+            if pl_win == "X" and pl_los == "X":
+                id_win = ""
+                id_los = ""
             r = str(match[3]) # сноска проигравшего
             # ===== определение итоговых мест и запись в db
             if i in mesta_list: # i - номер данной встречи
@@ -11996,6 +12003,9 @@ def write_in_setka(data, stage, first_mesto, table):
                             m += 1
                     if id_los == "":
                         los = "X"
+                    # вариант с двумя крестами
+                    if id_win == "":
+                        win = "X"
             c = match[0] # номер встречи, куда попадают победитель данной встречи (i)
             # ========== расстановка для сетки на 16
             if c != 0: #  номер встречи в сетке куда попадает победиель (кроме встреч за места)
@@ -14189,7 +14199,10 @@ def made_file_excel_for_rejting():
     k = 2
     
     for l in player_result:
-        pl_win = l.winner
+        point_winner = l.points_win
+        if point_winner == "":
+            continue
+        pl_win = l.winner       
         pl_los = l.loser
         id_win = players.select().where(Player.full_name == pl_win).get()
         pl_win = id_win.player
