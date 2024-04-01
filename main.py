@@ -2599,8 +2599,8 @@ def load_comboBox_filter_rejting():
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
     cur_index = my_win.comboBox_choice_R.currentIndex() # комбобокс выбора рейтинга
-    reg_index = my_win.comboBox_filter_region_in_R.currentIndex()
-    reg_text = my_win.comboBox_filter_region_in_R.currentText() # 
+    # reg_index = my_win.comboBox_filter_region_in_R.currentIndex()
+    # reg_text = my_win.comboBox_filter_region_in_R.currentText() # 
     if cur_index == 0: # если выбран текущий рейтинг
         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
             r_data = r_data_w[0]
@@ -6496,7 +6496,7 @@ def choice_setka_automat(fin, flag, count_exit):
             free_num = free_place_in_setka(max_player, real_all_player_in_final)
             del_num = 1 # флаг, что есть свободные номера
         elif count_player_in_final != max_player // count_exit and count_exit > 1:
-            free_num = free_place_in_setka(max_player, real_all_player_in_final)
+            # free_num = free_place_in_setka(max_player, real_all_player_in_final)
             del_num = 1 # флаг, что есть свободные номера
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
@@ -6558,10 +6558,13 @@ def choice_setka_automat(fin, flag, count_exit):
             sev_tmp.clear()
             count = len(posev[i]) # всего количество номеров в посеве
             if del_num == 1 and i == count_posev - 1:
-                for h in free_num:
-                    sev.remove(h)
-                free_seats = len(free_num) # сколько свободных мест в сетке
-                count = len(posev[i]) - free_seats
+                if count_exit > 1:
+                    count = count_player_in_final
+                else:
+                    for h in free_num:
+                        sev.remove(h)
+                    free_seats = len(free_num) # сколько свободных мест в сетке
+                    count = len(posev[i]) - free_seats
                 del_num = 0
             for w in range(0, count): # внутренний цикл посева
                 l = number_posev[0] # общий список всего посева (порядковый номер посева)
@@ -6571,7 +6574,10 @@ def choice_setka_automat(fin, flag, count_exit):
                     count_sev = len(sev) # количество номеров в посеве
                 else:
                     num_set = sev[0] # проверить
-                    count_sev = len(sev) # конкретное число оставшихся в посеве минус свободных мест(если они есть)
+                    if len(posev[i]) > count_player_in_final and count_exit > 1:
+                        count_sev = count_player_in_final
+                    else:
+                        count_sev = len(sev) # конкретное число оставшихся в посеве минус свободных мест(если они есть)
                     if count_sev > 1: # если сеющихся номеров больше одного
                         if w == 0: # 1-й основной посев
                             gr_region_tmp = []
@@ -7005,24 +7011,27 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                                             f = [i for i in sev if i >= 12 and i <= 13] # отсеивает в списке номера 17-24    
                                         number_tmp += f
                                 elif player_net == 32:
-                                    for h in num_tmp:
-                                        if h <= player_net // 8: # если номер в сетке вверху, то наде сеять вниз
-                                            f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 3-4 ()
-                                        elif h >= 5 and h <= 8: 
-                                            f = [i for i in sev if i < 5] # отсеивает в списке номера 1-2 ()
-                                        elif h >= 9 and h <= 12: 
-                                            f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
-                                        elif h >= 13 and h <= 16: 
-                                            f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
-                                        elif h >= 17 and h <= 20: # если номер в сетке вверху, то наде сеять вниз
-                                            f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
-                                        elif h >= 21 and h <= 24: 
-                                            f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
-                                        elif h >= 25 and h <= 28: 
-                                            f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
-                                        elif h > 28: 
-                                            f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
-                                        number_tmp += f
+                                    # ==== новый вариант где уже 4 области разведены
+                                    number_tmp = sev
+                                    # =======
+                                    # for h in num_tmp:
+                                    #     if h <= player_net // 8: # если номер в сетке вверху, то наде сеять вниз
+                                    #         f = [i for i in sev if i >= 5 and i <= 8] # отсеивает в списке номера 3-4 ()
+                                    #     elif h >= 5 and h <= 8: 
+                                    #         f = [i for i in sev if i < 5] # отсеивает в списке номера 1-2 ()
+                                    #     elif h >= 9 and h <= 12: 
+                                    #         f = [i for i in sev if i >= 13 and i <= 16] # отсеивает в списке номера 25-32
+                                    #     elif h >= 13 and h <= 16: 
+                                    #         f = [i for i in sev if i >= 9 and i <= 12] # отсеивает в списке номера 17-24
+                                    #     elif h >= 17 and h <= 20: # если номер в сетке вверху, то наде сеять вниз
+                                    #         f = [i for i in sev if i >= 21 and i <= 24] # отсеивает в списке номера 9-16
+                                    #     elif h >= 21 and h <= 24: 
+                                    #         f = [i for i in sev if i >= 17 and i <= 20] # отсеивает в списке номера 1-8
+                                    #     elif h >= 25 and h <= 28: 
+                                    #         f = [i for i in sev if i >= 29] # отсеивает в списке номера 25-32
+                                    #     elif h > 28: 
+                                    #         f = [i for i in sev if i >= 25 and i <= 28] # отсеивает в списке номера 17-24    
+                                    #     number_tmp += f
                         elif count > 2:
                             # number_posev = number_setka_posev(cur_gr, group_last, reg_last, number_last, n, cur_reg, sev, player_net, count_exit)
                             # if 
@@ -14188,8 +14197,7 @@ def made_file_excel_for_rejting():
     """создание файла Excel для обсчета рейтинга"""
     result = Result.select().where(Result.title_id == title_id())
     players = Player.select().where(Player.title_id == title_id())
-    player_result = result.select().where(Result.points_loser != 0).order_by(Result.winner)
-
+    player_result = result.select().where((Result.points_loser != 0) | (Result.score_in_game != "В : П")).order_by(Result.winner)
     book = op.Workbook()
     worksheet = book.active
     names_headers = ["Победитель", "День рождения", "Проигравший", "День рождения", "Счет"]
