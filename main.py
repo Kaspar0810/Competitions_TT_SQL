@@ -6591,7 +6591,17 @@ def choice_setka_automat(fin, flag, count_exit):
                                 gr_region_tmp.clear()
                         number_last.clear()
                         number_last = list(num_id_player.keys()) # список уже посеянных номеров в сетке
+                        # ==== вариант  с сорт по кол ву регионов начиная с 5 по 8 посев
+                        if l > 4 and l < 9:
+                            m = 0
+                            sum_reg = {}
+                            for r in current_region_posev.values():
+                                reg_list = r[0]
+                                x = current_region_posev.setdefault(reg_list, m) 
+                                sum_reg[reg_list] = x + 1
 
+                            full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу 
+                        # =====
                         reg_last.clear()
                         group_last.clear()
                         for v in num_id_player.values():
