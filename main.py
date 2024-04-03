@@ -6601,6 +6601,11 @@ def choice_setka_automat(fin, flag, count_exit):
                                 sum_reg[reg_list] = x + 1
                             marklist = sorted(sum_reg.items(), key=lambda x: x[1], reverse=True)
                             sortdict = dict(marklist)
+                            for y in sortdict.keys():
+                                for r in current_region_posev.values():
+                                    reg_list = r[0]
+                                    if y == reg_list:
+                                        
                             # full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу 
                         # =====
                         reg_last.clear()
