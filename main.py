@@ -6599,14 +6599,12 @@ def choice_setka_automat(fin, flag, count_exit):
                                 reg_list = r[0]
                                 x = sum_reg.setdefault(reg_list, m) 
                                 sum_reg[reg_list] = x + 1
-                            marklist = sorted(sum_reg.items(), key=lambda x: x[1], reverse=True)
-                            sortdict = dict(marklist)
-                            for y in sortdict.keys():
-                                for r in current_region_posev.values():
-                                    reg_list = r[0]
-                                    if y == reg_list:
-                                        
-                            # full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу 
+                            for r in current_region_posev.values():
+                                reg_n = r[0]
+                                z = sum_reg[reg_n]
+                                r.append(z)                                    
+                            marklist = sorted(current_region_posev.items(), key=sortkey, reverse=False)
+                            current_region_posev = dict(marklist) 
                         # =====
                         reg_last.clear()
                         group_last.clear()
@@ -6828,6 +6826,10 @@ def choice_setka_automat(fin, flag, count_exit):
             for h in free_number:
                 posev_data[h] = "X"
     return posev_data
+
+
+def sortkey(e):
+    return e[1]
 
 
 def view_table_choice(fam_city, number_net, num_id_player):
@@ -7130,7 +7132,7 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
 
                 possible_number[reg] = number_posev
                 proba_possible[cur_gr] = number_posev
-            y += 1
+        y += 1
     return possible_number
 
 
