@@ -6592,19 +6592,8 @@ def choice_setka_automat(fin, flag, count_exit):
                         number_last.clear()
                         number_last = list(num_id_player.keys()) # список уже посеянных номеров в сетке
                         # ==== вариант  с сорт по кол ву регионов начиная с 5 по 8 посев
-                        if l > 3 and l < 8:
-                            m = 0
-                            sum_reg = {}
-                            for r in current_region_posev.values():
-                                reg_list = r[0]
-                                x = sum_reg.setdefault(reg_list, m) 
-                                sum_reg[reg_list] = x + 1
-                            for r in current_region_posev.values():
-                                reg_n = r[0]
-                                z = sum_reg[reg_n]
-                                r.append(z)                                    
-                            marklist = sorted(current_region_posev.items(), key=sortkey, reverse=False)
-                            current_region_posev = dict(marklist) 
+                        if l > 3 and l < 15:
+                            current_region_posev = sort_region(current_region_posev)
                         # =====
                         reg_last.clear()
                         group_last.clear()
@@ -6619,7 +6608,7 @@ def choice_setka_automat(fin, flag, count_exit):
                                 possible_number = {k:v for k,v in sorted(possible_number.items(), key=lambda x:len(x[1]))}
                                 num_posev = list(possible_number.keys())   
                             l = list(possible_number.keys())[0]
-                            num_set = possible_number[l] # номер куда можно сеять
+                            num_set = possible_number[l] # номера куда можно сеять
                             # === выбор ручная или автомат ====
                             if flag == 1: # автоматичекая
                                 if len(num_set) == 0:
@@ -6628,8 +6617,9 @@ def choice_setka_automat(fin, flag, count_exit):
                                     "Если хотите изменить значение мультирегиональность\nНажмите -OK-\n"
                                     "Если отменить жеребьевку\nНажмите -Cancel", msgBox.Ok, msgBox.Cancel)
                                     if result == msgBox.Ok:
-                                    #     pass
-                                    # elif result == msgBox.No:
+                                        flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
+                                        choice_setka_automat(fin, flag, count_exit)
+                                    elif result == msgBox.No:
                                         Title.update(multiregion=0).where(Title.id == title_id()).execute()
                                     elif result == msgBox.Cancel:
                                         return
@@ -6828,6 +6818,28 @@ def choice_setka_automat(fin, flag, count_exit):
     return posev_data
 
 
+def sort_region(current_region_posev):
+    """сортировка регионов по их количеству в посеве"""
+    m = 0
+    sum_reg = {}
+    for r in current_region_posev.values():
+        reg_list = r[0]
+        x = sum_reg.setdefault(reg_list, m) 
+        sum_reg[reg_list] = x + 1
+    for y in sum_reg.keys():
+        for d in current_region_posev.values():
+            if y == d[0]:
+                zn = sum_reg[y]
+                d.append(zn)
+    marklist = sorted(current_region_posev.items(), key=lambda item: item[0], reverse=True)
+    current_region_posev = dict(marklist)
+    for r in current_region_posev.values():
+        reg_list = r[0]
+        r.pop()
+        sum_reg[reg_list] = r
+    return current_region_posev
+
+
 def sortkey(e):
     return e[1]
 
@@ -6975,7 +6987,8 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
         cur_reg = current_region[y][0] # текущий регион посева
         cur_gr = current_region[y][1] # номер группы, которая сеятся
         #=======
-        if multi_reg == 0 or (len(num_id_player) >= player_net // 2 and count_exit == 1): # если спортсмены одного региона нет рассеивания
+        # if multi_reg == 0 or (len(num_id_player) >= player_net // 2 and count_exit == 1): # если спортсмены одного региона нет рассеивания
+        if multi_reg == 0: # если спортсмены одного региона нет рассеивания
             possible_number[reg] = sev
         else:
             if n == 0:
