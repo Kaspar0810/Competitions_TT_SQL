@@ -760,10 +760,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 stage = k.stage
                 if stage not in stage_list:
                     fin_list.append(stage)
-            count_fin = len(fin_list) 
-            if count_fin == 1:
-                title = Title.get(Title.id == title_id())
-                # tab_str = title.tab_enabled       
+            # count_fin = len(fin_list) 
+            # if count_fin == 1:
+            #     title = Title.get(Title.id == title_id())
+            #     # tab_str = title.tab_enabled       
             stage = fin
             id_system = system_id(stage)
             sys = system.select().where(System.id == id_system).get()
@@ -6613,10 +6613,10 @@ def choice_setka_automat(fin, flag, count_exit):
                             if flag == 1: # автоматичекая
                                 if len(num_set) == 0:
                                     result = msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась.\n"
-                                    "Если хотите повторите снова.\nНажмите -ОК-\n"
+                                    "Если хотите повторите снова.\nНажмите -RETRY-\n"
                                     "Если хотите изменить значение мультирегиональность\nНажмите -OK-\n"
-                                    "Если отменить жеребьевку\nНажмите -Cancel", msgBox.Ok, msgBox.Cancel)
-                                    if result == msgBox.Ok:
+                                    "Если отменить жеребьевку\nНажмите -Cancel", msgBox.Retry, msgBox.Ok, msgBox.Cancel)
+                                    if result == msgBox.Retry:
                                         flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
                                         choice_setka_automat(fin, flag, count_exit)
                                     elif result == msgBox.No:
@@ -6831,7 +6831,7 @@ def sort_region(current_region_posev):
             if y == d[0]:
                 zn = sum_reg[y]
                 d.append(zn)
-    marklist = sorted(current_region_posev.items(), key=lambda item: item[0], reverse=True)
+    marklist = sorted(current_region_posev.items(), key=lambda item: item[1][2], reverse=True)
     current_region_posev = dict(marklist)
     for r in current_region_posev.values():
         reg_list = r[0]
@@ -10101,12 +10101,9 @@ def table_made(pv, stage):
     from reportlab.platypus import Table
      # ==== новый вариант с использованием system id
     id_system = system_id(stage)
-    # ========
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
-    # type_tbl = system.type_table
     titles = Title.select().where(Title.id == title_id()).get()
-    sex = titles.gamer
-  
+    sex = titles.gamer 
     # =========
     # styles = getSampleStyleSheet()
     # styleN = styles['Normal']
@@ -10322,9 +10319,10 @@ def table_made(pv, stage):
     catalog = 1
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
+    # doc.leftPadding = 0
     # doc.bottomMargin = 1.5 * cm
-    # doc.leftMargin = 0.5 * cm
-    # doc.righttMargin = 0.5 * cm
+    doc.leftMargin = 0
+    doc.righttMargin = 0
   
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -10365,7 +10363,7 @@ def list_regions_pdf():
                            # межстрочный верхний инервал
                            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
                            # межстрочный нижний инервал
-                           ('TOPPADDING', (0, 0), (-1, -1), 1),
+                           ('TOPPADDING', (0, 0), (-1, -1), 2),
                            # вериткальное выравнивание в ячейке заголовка
                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                            # горизонтальное выравнивание в ячейке
@@ -12943,9 +12941,6 @@ def summa_points_person(tr, tr_all, num_gr, pg_win, pg_los, pp, stage, id_system
     -pg_win- словарь (номер игрока: список (кол-во выйгранных партий)"""
     pp_all = []
     u = []
-    # pp = {}  # ключ - игрок, значение его очки
-    # pg_win = {}
-    # pg_los = {}
     tr_all.clear()
     pg_win.clear()
     pg_los.clear()
@@ -13410,11 +13405,7 @@ def change_page_vid():
     if ok:                                   
         sys = system.select().where(System.id == id_system).get()
         vid = sys.page_vid
-        # vid_ed = "альбомная"
         vid_ed = "книжная" if vid == "альбомная" else "альбомная"
-        #     vid_ed = "книжная"
-        # else:
-        #     vid_ed = "альбомная"
         ok = msgBox.question(my_win, "Таблицы", "Текущая ориентация страницы\n"
                                             f"-{stage}-: {vid},\n"
                                             "Хотите ее изменить на:" f"{vid_ed}?", msgBox.Ok, msgBox.Cancel)
