@@ -3024,7 +3024,6 @@ def page():
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        # my_win.progressBar.hide()
 
         my_win.Button_made_page_pdf.setEnabled(False)
         my_win.Button_up.setEnabled(False)
@@ -4011,6 +4010,12 @@ def player_in_table_group_and_write_Game_list_Result(stage):
                     with db:
                         results = Result(number_group=number_group, system_stage=stage, player1=full_pl1, player2=full_pl2,
                                          tours=match, title_id=title_id(), round=round, system_id=system_id).save()
+
+
+def player_in_setka_and_write_Game_list_Result(stage, posev_list, group_list, player_dict):
+    """менят игроков в сетке на новые места в посеве"""
+    id_system = system_id(stage)
+    query = Game_list.update(posev_final=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice                   
 
 
 def chop_line(t, maxline=31):
@@ -7613,6 +7618,7 @@ def edit_group_after_draw():
 def add_item_listwidget():
     """добавление элементов в листвиджет"""
     flag_combo = 0
+    flag_fin = 0
     sender = my_win.sender()
     choices = Choice.select().where(Choice.title_id == title_id())
     my_win.tableView.setVisible(False)
@@ -7634,8 +7640,9 @@ def add_item_listwidget():
             elif my_win.comboBox_edit_etap1.currentText() == "1-й полуфинал":
                 group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf)
             else: # финалы
+                flag_fin = 1
                 final = my_win.comboBox_first_group.currentText()
-                group = choices.select().where(Choice.final == final)
+                group = choices.select().where(Choice.final == final).order_by(Choice.posev_final)
                
         else:
             if my_win.comboBox_edit_etap2.currentText() == "Предварительный":
@@ -7643,12 +7650,17 @@ def add_item_listwidget():
             elif my_win.comboBox_edit_etap2.currentText() == "1-й полуфинал":
                 group = choices.select().where(Choice.sf_group == gr).order_by(Choice.posev_sf) 
             else: # финалы
+                flag_fin = 1
                 final = my_win.comboBox_second_group.currentText()
-                group = choices.select().where(Choice.final == final)
+                group = choices.select().where(Choice.final == final).order_by(Choice.posev_final)
+
         n = 0
         for k in group:
             item = QListWidgetItem()
-            n += 1
+            if flag_fin == 1:
+                n = k.posev_final # нумерация посева в сетке
+            else:
+                n += 1
             family = k.family
             region = k.region
             coach = k.coach
@@ -7737,10 +7749,11 @@ def change_player_between_group_after_draw():
     player2 = my_win.lineEdit_change_pl2.text()
     player1_2 = my_win.lineEdit_change_pl1_2.text() # 2-й игрок из группы для смены в ПФ
     player2_2 = my_win.lineEdit_change_pl2_2.text() # 2-й игрок из группы для смены в ПФ
-    gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы
-    gr_pl2 = my_win.comboBox_second_group.currentText() # номер группы
+    gr_pl1 = my_win.comboBox_first_group.currentText() # номер группы (финал)
+    gr_pl2 = my_win.comboBox_second_group.currentText() # номер группы (финал)
     group_list = [gr_pl1, gr_pl2]
-    etap_list = [etap_1, etap_2]
+    # etap_list = [etap_1, etap_2]
+    posev_list = []
     player_list = [player1, player2, player1_2, player2_2]
     #  === получаем full_name для определения id игроков
     full_name_list = []
@@ -7750,6 +7763,7 @@ def change_player_between_group_after_draw():
             znak1 = pl.find("/") 
             znak2 = pl.rfind("/")
             family_name = pl[znak + 1:znak1]
+            # posev_number = pl[:znak]
             if znak == -1:
                 player_id = players.select().where(Player.full_name == pl).get()               
             else:
@@ -7829,17 +7843,20 @@ def change_player_between_group_after_draw():
                 if pl != "":
                     znak = pl.find(":")
                     posev = int(pl[:znak]) 
-                    break
+                    posev_list.append(posev)
+                    # break
             n = 0      
             for pl in full_name_list:
                 pl_id = player_dict[pl]
                 gr = group_list[1 - n]
+                posev = posev_list[1 - n]
                 if stage == "Предварительный":
                     query = Choice.update(group=gr, posev_group=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice  
                 elif stage == "1-й полуфинал" or  stage == "2-й полуфинал":
                     query = Choice.update(semi_final=stage, sf_group=gr, posev_sf=posev).where(Choice.player_choice_id == pl_id) 
                 elif stage == "Финальный":
-                    query = Choice.update(final=gr, posev_final=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice            
+                    flag_change_i
+                    query = Choice.update(final=gr, posev_final=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice                    
                 query.execute()
                 n += 1
         else: # игроки из разных этапов соревнования для исправления ошибок
@@ -7877,6 +7894,7 @@ def change_player_between_group_after_draw():
                 n += 1
         # =====================
     player_in_table_group_and_write_Game_list_Result(stage) 
+    player_in_setka_and_write_Game_list_Result(stage, posev_list, group_list, player_dict)
     if element_count == 4:   
         load_playing_game_in_table_for_semifinal(stage)  
         # ========
