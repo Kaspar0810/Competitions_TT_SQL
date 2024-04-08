@@ -4012,10 +4012,18 @@ def player_in_table_group_and_write_Game_list_Result(stage):
                                          tours=match, title_id=title_id(), round=round, system_id=system_id).save()
 
 
-def player_in_setka_and_write_Game_list_Result(stage, posev_list, group_list, player_dict):
+def player_in_setka_and_write_Game_list_Result(stage, posev_list):
     """менят игроков в сетке на новые места в посеве"""
+    gl_id_list = []
     id_system = system_id(stage)
-    query = Game_list.update(posev_final=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice                   
+    n = 0
+    for k in posev_list:
+        gl_id = Game_list.select().where((Game_list.rank_num_player == k) & (Game_list.system_id == id_system)).get()
+        gl_id_list.append(gl_id)
+    for m in gl_id_list:
+        Game_list.update(rank_num_player=posev_list[1-n]).where(Game_list.id == m).execute()
+        n += 1
+    # query = Game_list.update(posev_final=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice                   
 
 
 def chop_line(t, maxline=31):
@@ -7855,7 +7863,7 @@ def change_player_between_group_after_draw():
                 elif stage == "1-й полуфинал" or  stage == "2-й полуфинал":
                     query = Choice.update(semi_final=stage, sf_group=gr, posev_sf=posev).where(Choice.player_choice_id == pl_id) 
                 elif stage == "Финальный":
-                    flag_change_i
+                    flag_change = 1
                     query = Choice.update(final=gr, posev_final=posev).where(Choice.player_choice_id == pl_id) # обновляет запись в Choice                    
                 query.execute()
                 n += 1
@@ -7893,8 +7901,12 @@ def change_player_between_group_after_draw():
                 query.execute()
                 n += 1
         # =====================
-    player_in_table_group_and_write_Game_list_Result(stage) 
-    player_in_setka_and_write_Game_list_Result(stage, posev_list, group_list, player_dict)
+    # player_in_table_group_and_write_Game_list_Result(stage) 
+    if flag_change == 1:
+        player_in_setka_and_write_Game_list_Result(gr, posev_list)
+    else:
+        player_in_table_group_and_write_Game_list_Result(stage) 
+
     if element_count == 4:   
         load_playing_game_in_table_for_semifinal(stage)  
         # ========
