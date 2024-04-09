@@ -4012,11 +4012,23 @@ def player_in_table_group_and_write_Game_list_Result(stage):
                                          tours=match, title_id=title_id(), round=round, system_id=system_id).save()
 
 
-def player_in_setka_and_write_Game_list_Result(stage, posev_list):
+def player_in_setka_and_write_Game_list_Result(stage, posev_list, full_name_list):
     """менят игроков в сетке на новые места в посеве"""
     gl_id_list = []
+    res_id_list = []
     id_system = system_id(stage)
+    results = Result.select().where((Result.title_id == title_id()) & (Result.system_id == id_system))
     n = 0
+    for g in full_name_list:
+        res = results.select().where((Result.player1 == g) | (Result.player2 == g)).get()
+        res_id_list.append(res.id)
+    b = 0
+    for k in full_name_list:
+        if res.player1 == k:
+            Result.update(player1=full_name_list[1 - b]).where(Result.id == res_id_list[b]).execute()
+        else:
+            Result.update(player2=full_name_list[1 - b]).where(Result.id == res_id_list[b]).execute()
+        b += 1   
     for k in posev_list:
         gl_id = Game_list.select().where((Game_list.rank_num_player == k) & (Game_list.system_id == id_system)).get()
         gl_id_list.append(gl_id)
@@ -7903,7 +7915,7 @@ def change_player_between_group_after_draw():
         # =====================
     # player_in_table_group_and_write_Game_list_Result(stage) 
     if flag_change == 1:
-        player_in_setka_and_write_Game_list_Result(gr, posev_list)
+        player_in_setka_and_write_Game_list_Result(gr, posev_list, full_name_list)
     else:
         player_in_table_group_and_write_Game_list_Result(stage) 
 
