@@ -4023,11 +4023,13 @@ def player_in_setka_and_write_Game_list_Result(stage, posev_list, full_name_list
         res = results.select().where((Result.player1 == g) | (Result.player2 == g)).get()
         res_id_list.append(res.id)
     b = 0
-    for k in full_name_list:
-        if res.player1 == k:
-            Result.update(player1=full_name_list[1 - b]).where(Result.id == res_id_list[b]).execute()
+    for k in res_id_list:
+        rt = results.select().where(Result.id == k).get()
+        pl1 = rt.player1
+        if pl1 == full_name_list[b]:
+            Result.update(player1=full_name_list[1 - b]).where(Result.id == k).execute()
         else:
-            Result.update(player2=full_name_list[1 - b]).where(Result.id == res_id_list[b]).execute()
+            Result.update(player2=full_name_list[1 - b]).where(Result.id == k).execute()
         b += 1   
     for k in posev_list:
         gl_id = Game_list.select().where((Game_list.rank_num_player == k) & (Game_list.system_id == id_system)).get()
