@@ -119,14 +119,14 @@ class MyTableModel(QAbstractTableModel):
     #         dolg_R_list.append(family)
     #     return dolg_R_list
 
-    def data(self, index, role):
+    def data(self, index, role, dolg_R_list):
         # dolg_R_list = dolg_R()
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
-        # elif role == QtCore.Qt.ForegroundRole: # выделяет фамилию красным цветом
-        #     val = self._data[index.row()][index.column()]
-        #     if val in dolg_R_list:      
-        #         return QtGui.QBrush(QtCore.Qt.red)
+        elif role == QtCore.Qt.ForegroundRole: # выделяет фамилию красным цветом
+            val = self._data[index.row()][index.column()]
+            if val in dolg_R_list:      
+                return QtGui.QBrush(QtCore.Qt.red)
 
         # else:
         #     val = self._data[index.row()][index.column()]
@@ -2079,12 +2079,13 @@ def fill_table(player_list):
           
 
             data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
+        
         my_win.tableView.setModel(model)
         font = my_win.tableView.font()
         font.setPointSize(11)
         my_win.tableView.setFont(font)
         my_win.tableView.horizontalHeader().setFont(QFont("Verdana", 13, QFont.Bold)) # делает заголовки жирный и размер 13
- 
+        dolg_R_list = dolg_R()
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
         my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
