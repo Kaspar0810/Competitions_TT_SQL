@@ -121,17 +121,17 @@ class MyTableModel(QAbstractTableModel):
                 dolg_R_list = dolg_R() 
                 if val in dolg_R_list:     
                     return QtGui.QBrush(QtCore.Qt.red)
-            elif index.column() == 2 and tb == 2:
-                if my_win.radioButton_repeat_regions.isChecked():
-                    ind = my_win.comboBox_filter_number_group_final.currentIndex()
-                    if ind > 0:
-                        ng = my_win.comboBox_filter_number_group_final.currentText()
-                        double_reg = change_choice_group()
-                        double_region = double_reg[ng]
-                        if val in double_region:     
-                            return QtGui.QBrush(QtCore.Qt.blue)
-                       else:
-                            return QtGui.QBrush(QtCore.Qt.black)
+            # elif index.column() == 2 and tb == 2:
+            #     if my_win.radioButton_repeat_regions.isChecked():
+            #         ind = my_win.comboBox_filter_number_group_final.currentIndex()
+            #         if ind > 0:
+            #             ng = my_win.comboBox_filter_number_group_final.currentText()
+            #             double_reg = change_choice_group()
+            #             double_region = double_reg[ng]
+            #             if val in double_region:     
+            #                 return QtGui.QBrush(QtCore.Qt.blue)
+            #            else:
+            #                 return QtGui.QBrush(QtCore.Qt.black)
 
 
 
