@@ -111,22 +111,29 @@ class MyTableModel(QAbstractTableModel):
         else:
             return 0
 
-    # def dolg_R():
-    #     dolg_R_list = []
-    #     dolg_player = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг"))
-    #     for k in dolg_player:
-    #         family = k.player
-    #         dolg_R_list.append(family)
-    #     return dolg_R_list
-
-    def data(self, index, role, dolg_R_list):
-        # dolg_R_list = dolg_R()
+    def data(self, index, role):
+        tb = my_win.tabWidget.currentIndex()
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
         elif role == QtCore.Qt.ForegroundRole: # выделяет фамилию красным цветом
             val = self._data[index.row()][index.column()]
-            if val in dolg_R_list:      
-                return QtGui.QBrush(QtCore.Qt.red)
+            if index.column() == 1 and tb == 1: # создание списка должников и если находит окрашывает фамилии красным   
+                dolg_R_list = dolg_R() 
+                if val in dolg_R_list:     
+                    return QtGui.QBrush(QtCore.Qt.red)
+            # elif index.column() == 2 and tb == 2:
+            #     if my_win.radioButton_repeat_regions.isChecked():
+            #         ind = my_win.comboBox_filter_number_group_final.currentIndex()
+            #         if ind > 0:
+            #             ng = my_win.comboBox_filter_number_group_final.currentText()
+            #             double_reg = change_choice_group()
+            #             double_region = double_reg[ng]
+            #             if val in double_region:     
+            #                 return QtGui.QBrush(QtCore.Qt.blue)
+            #            else:
+            #                 return QtGui.QBrush(QtCore.Qt.black)
+
+
 
         # else:
         #     val = self._data[index.row()][index.column()]
@@ -1978,6 +1985,14 @@ def find_city():
                 with db:
                     city = City(city=ct, region_id=ir).save()
 
+def dolg_R():
+    dolg_R_list = []
+    dolg_player = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг"))
+    for k in dolg_player:
+        family = k.player
+        dolg_R_list.append(family)
+    return dolg_R_list
+
 
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
@@ -2085,7 +2100,6 @@ def fill_table(player_list):
         font.setPointSize(11)
         my_win.tableView.setFont(font)
         my_win.tableView.horizontalHeader().setFont(QFont("Verdana", 13, QFont.Bold)) # делает заголовки жирный и размер 13
-        dolg_R_list = dolg_R()
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
         my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
