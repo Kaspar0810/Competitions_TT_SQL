@@ -130,7 +130,8 @@ class MyTableModel(QAbstractTableModel):
                         # double_coach = duplicat_coach_in_group(coach_list)
                         # # double_reg = change_choice_group()
                         # double_region = double_reg[ng]
-                        if {val} & {"Глухов Ю.А."} is True:     
+                        # if {val} & {"Глухов Ю.А., Котихина И.В."} is True: 
+                        if    {val}.issubset({"Глухов Ю.А., Котихина И.В."}) is True:    
                             return QtGui.QBrush(QtCore.Qt.blue)
                         else:
                             return QtGui.QBrush(QtCore.Qt.black)
@@ -7895,7 +7896,7 @@ def duplicat_coach_in_group(coach_list):
     count = len(coach_list)
     for i in coach_list:
         znak = i.find(",")
-        if znak == -1:
+        if znak == -1: # один тренер
             tmp_list.append(i)
         else:
             coach_1 = i[:znak]
@@ -7906,7 +7907,14 @@ def duplicat_coach_in_group(coach_list):
                 tmp_list.append(coach_2)
             else:
                 coach_2 = i[znak + 2:]
-                tmp_list.append(coach_2)
+                znak_1 = i.find(",", znak + 1)
+                if i.find(",", znak_1) == -1:
+                    tmp_list.append(coach_2)
+                else:
+                    coach_2 = i[znak + 2:znak_1]
+                    tmp_list.append(coach_2)
+                    coach_3 = i[znak_1 + 2:]
+                    tmp_list.append(coach_3)
     count_list = len(tmp_list)
     count_uniq = len(set(tmp_list)) 
     if count_list > count_uniq:
