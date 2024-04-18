@@ -114,6 +114,25 @@ class MyTableModel(QAbstractTableModel):
     def data(self, index, role):
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
+        elif role == QtCore.Qt.ForegroundRole: # выделяет фамилию красным цветом
+            val = self._data[index.row()][index.column()]
+            if index.column() == 1 and tb == 1: # создание списка должников и если находит окрашывает фамилии красным   
+                dolg_R_list = dolg_R() 
+                if val in dolg_R_list:     
+                    return QtGui.QBrush(QtCore.Qt.red)
+            elif index.column() == 3 and tb == 2:
+                if my_win.radioButton_repeat_regions.isChecked():
+                    ind = my_win.comboBox_filter_number_group_final.currentIndex()
+                    if ind > 0:
+                        ng = my_win.comboBox_filter_number_group_final.currentText()
+                        coach_list = dup_coach(player_list)
+                        double_coach = duplicat_coach_in_group(coach_list)
+            #             # double_reg = change_choice_group()
+            #             double_region = double_reg[ng]
+            #             if val in double_region:     
+            #                 return QtGui.QBrush(QtCore.Qt.blue)
+            #             else:
+            #                 return QtGui.QBrush(QtCore.Qt.black)
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -1803,6 +1822,15 @@ def find_city():
                     city = City(city=ct, region_id=ir).save()
 
 
+def dupl_coach(player_list):
+    """получает список тренеров в группе"""
+    coach_list = []
+    for k in player_list:
+        coach = k.coach
+        coach_list.append(coach)
+    return coach_list
+
+
 def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     data = []
@@ -1824,6 +1852,7 @@ def fill_table(player_list):
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
     elif tb == 2:
         stage = my_win.comboBox_filter_choice_stage.currentText()
+        dupl_coach(player_list)
         if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
             num_columns = [0, 2, 3, 4, 7, 9, 10, 11, 13, 14, 16]
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Тренер', 'Группа', 'Место гр',
