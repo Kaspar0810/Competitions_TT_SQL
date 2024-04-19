@@ -125,16 +125,39 @@ class MyTableModel(QAbstractTableModel):
                 if my_win.radioButton_repeat_regions.isChecked():
                     ind = my_win.comboBox_filter_number_group_final.currentIndex()
                     if ind > 0:
+                        tmp_list = []
+                        znak = val.find(",")
+                        if znak == -1: # один тренер
+                            tmp_list.append(val)
+                        else:
+                            coach_1 = val[:znak]
+                            tmp_list.append(coach_1)
+                            if val.find(",", znak) == -1:
+                                znak_1 = val.find(",", znak + 1)
+                                coach_2 = val[znak: znak_1]
+                                tmp_list.append(coach_2)
+                            else:
+                                coach_2 = val[znak + 2:]
+                                znak_1 = val.find(",", znak + 1)
+                                if val.find(",", znak_1) == -1:
+                                    tmp_list.append(coach_2)
+                                else:
+                                    coach_2 = val[znak + 2:znak_1]
+                                    tmp_list.append(coach_2)
+                                    coach_3 = val[znak_1 + 2:]
+                                    tmp_list.append(coach_3)
+                        for k in tmp_list:
+                            val_set = set(k)
                         # ng = my_win.comboBox_filter_number_group_final.currentText()
                         # coach_list = dupl_coach(player_list)
                         # double_coach = duplicat_coach_in_group(coach_list)
                         # # double_reg = change_choice_group()
                         # double_region = double_reg[ng]
                         # if {val} & {"Глухов Ю.А., Котихина И.В."} is True: 
-                        if    {val}.issubset({"Глухов Ю.А., Котихина И.В."}) is True:    
-                            return QtGui.QBrush(QtCore.Qt.blue)
-                        else:
-                            return QtGui.QBrush(QtCore.Qt.black)
+                            if  {val_set}.issubset({"Глухов Ю.А., Котихина И.В."}) is True:    
+                                return QtGui.QBrush(QtCore.Qt.blue)
+                            else:
+                                return QtGui.QBrush(QtCore.Qt.black)
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
