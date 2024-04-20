@@ -112,6 +112,8 @@ class MyTableModel(QAbstractTableModel):
             return 0
 
     def data(self, index, role):
+        coach_tmp_list = []
+        region_tmp_list = []
         tb = my_win.tabWidget.currentIndex()
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
@@ -121,44 +123,52 @@ class MyTableModel(QAbstractTableModel):
                 dolg_R_list = dolg_R() 
                 if val in dolg_R_list:     
                     return QtGui.QBrush(QtCore.Qt.red)
-            elif index.column() == 3 and tb == 2:
-                if my_win.radioButton_repeat_regions.isChecked():
+            elif index.column() == 3 and tb == 2: # выделяет повторяющиеся фамилии тренеров
+                if my_win.radioButton_repeat_regions.isChecked(): # отмечен чекбокс проверки повтора регионов в группе
                     ind = my_win.comboBox_filter_number_group_final.currentIndex()
-                    if ind > 0:
-                        tmp_list = []
+                    if ind > 0: # значит выбран номер группы
+                        n_gr = my_win.comboBox_filter_number_group_final.currentText()
+                        group_coach_list = dupl_coach(n_gr) # список всех тренеров группы                        
                         znak = val.find(",")
                         if znak == -1: # один тренер
-                            tmp_list.append(val)
-                        else:
+                            coach_tmp_list.append(val)
+                        else: # у игрока не один тренер и делает из них список тренеров
                             coach_1 = val[:znak]
-                            tmp_list.append(coach_1)
+                            coach_tmp_list.append(coach_1)
                             if val.find(",", znak) == -1:
                                 znak_1 = val.find(",", znak + 1)
                                 coach_2 = val[znak: znak_1]
-                                tmp_list.append(coach_2)
+                                coach_tmp_list.append(coach_2)
                             else:
                                 coach_2 = val[znak + 2:]
                                 znak_1 = val.find(",", znak + 1)
                                 if val.find(",", znak_1) == -1:
-                                    tmp_list.append(coach_2)
+                                    coach_tmp_list.append(coach_2)
                                 else:
                                     coach_2 = val[znak + 2:znak_1]
-                                    tmp_list.append(coach_2)
+                                    coach_tmp_list.append(coach_2)
                                     coach_3 = val[znak_1 + 2:]
-                                    tmp_list.append(coach_3)
-                        for k in tmp_list:
-                            val_set = set(k)
-                        # ng = my_win.comboBox_filter_number_group_final.currentText()
-                        # coach_list = dupl_coach(player_list)
-                        # double_coach = duplicat_coach_in_group(coach_list)
-                        # # double_reg = change_choice_group()
-                        # double_region = double_reg[ng]
-                        # if {val} & {"Глухов Ю.А., Котихина И.В."} is True: 
-                            if  {val_set}.issubset({"Глухов Ю.А., Котихина И.В."}) is True:    
-                                return QtGui.QBrush(QtCore.Qt.blue)
-                            else:
-                                return QtGui.QBrush(QtCore.Qt.black)
-
+                                    coach_tmp_list.append(coach_3)
+                        val_set = set(coach_tmp_list)
+                        group_set = set(group_coach_list)
+                        if val_set == group_set:    
+                            return QtGui.QBrush(QtCore.Qt.blue)
+                        else:
+                            return QtGui.QBrush(QtCore.Qt.black)
+            elif index.column() == 2 and tb == 2: # выделяет совпадающие регионы
+                if my_win.radioButton_repeat_regions.isChecked(): # отмечен чекбокс проверки повтора регионов в группе
+                    ind = my_win.comboBox_filter_number_group_final.currentIndex()
+                    if ind > 0: # значит выбран номер группы
+                        n_gr = my_win.comboBox_filter_number_group_final.currentText()
+                        region_group_list = dupl_regions(n_gr)
+                        p = 0
+                        for l in region_group_list:
+                            if val == l:
+                                p += 1
+                        if p > 1:    
+                            return QtGui.QBrush(QtCore.Qt.darkGreen)
+                        else:
+                            return QtGui.QBrush(QtCore.Qt.black)
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None, *args, **kwargs) -> object:
@@ -1847,13 +1857,24 @@ def find_city():
                     city = City(city=ct, region_id=ir).save()
 
 
-def dupl_coach(player_list):
+def dupl_coach(n_gr):
     """получает список тренеров в группе"""
     coach_list = []
-    for k in player_list:
+    choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == n_gr))
+    for k in choices:
         coach = k.coach
         coach_list.append(coach)
     return coach_list
+
+
+def dupl_regions(n_gr):
+    """получает список регионов в группе"""
+    region_list = []
+    choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == n_gr))
+    for k in choices:
+        region = k.region
+        region_list.append(region)
+    return region_list
 
 
 def fill_table(player_list):
@@ -1877,8 +1898,8 @@ def fill_table(player_list):
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
     elif tb == 2:
         stage = my_win.comboBox_filter_choice_stage.currentText()
-        coach_list = dupl_coach(player_list)
-        double_coach = duplicat_coach_in_group(coach_list)
+        # coach_list = dupl_coach(player_list)
+        # double_coach = duplicat_coach_in_group(coach_list)
         if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
             num_columns = [0, 2, 3, 4, 7, 9, 10, 11, 13, 14, 16]
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Тренер', 'Группа', 'Место гр',
