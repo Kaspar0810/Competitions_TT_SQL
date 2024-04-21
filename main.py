@@ -123,8 +123,13 @@ class MyTableModel(QAbstractTableModel):
                 dolg_R_list = dolg_R() 
                 if val in dolg_R_list:     
                     return QtGui.QBrush(QtCore.Qt.red)
+            elif index.column() == 4 and tb == 1: # создание списка должников и если находит окрашывает фамилии красным 
+                city_dict = unconfirmed_city()
+                val_player = self._data[index.row()][1]
+                if val_player in city_dict.keys():     
+                    return QtGui.QBrush(QtCore.Qt.blue)
             elif index.column() == 3 and tb == 2: # выделяет повторяющиеся фамилии тренеров
-                if my_win.radioButton_repeat_regions.isChecked(): # отмечен чекбокс проверки повтора регионов в группе
+                if my_win.checkBox_repeat_regions.isChecked(): # отмечен чекбокс проверки повтора регионов в группе
                     ind = my_win.comboBox_filter_number_group_final.currentIndex()
                     if ind > 0: # значит выбран номер группы
                         n_gr = my_win.comboBox_filter_number_group_final.currentText()
@@ -156,7 +161,7 @@ class MyTableModel(QAbstractTableModel):
                         else:
                             return QtGui.QBrush(QtCore.Qt.black)
             elif index.column() == 2 and tb == 2: # выделяет совпадающие регионы
-                if my_win.radioButton_repeat_regions.isChecked(): # отмечен чекбокс проверки повтора регионов в группе
+                if my_win.checkBox_repeat_regions.isChecked(): # отмечен чекбокс проверки повтора регионов в группе
                     ind = my_win.comboBox_filter_number_group_final.currentIndex()
                     if ind > 0: # значит выбран номер группы
                         n_gr = my_win.comboBox_filter_number_group_final.currentText()
@@ -787,7 +792,19 @@ def dolg_R():
     for k in dolg_player:
         family = k.player
         dolg_R_list.append(family)
-    return dolg_R_list       
+    return dolg_R_list  
+
+
+def unconfirmed_city():
+    """список городов которые еще не подтвердились"""
+    player_city_dict = {}
+    city_player = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
+    for k in city_player:
+        city = k.city
+        player = k.player
+        player_city_dict[player] = city
+    return player_city_dict 
+
 class StartWindow(QMainWindow, Ui_Form):
     """Стартовое окно приветствия"""
     def __init__(self):
@@ -1898,8 +1915,6 @@ def fill_table(player_list):
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
     elif tb == 2:
         stage = my_win.comboBox_filter_choice_stage.currentText()
-        # coach_list = dupl_coach(player_list)
-        # double_coach = duplicat_coach_in_group(coach_list)
         if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
             num_columns = [0, 2, 3, 4, 7, 9, 10, 11, 13, 14, 16]
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Тренер', 'Группа', 'Место гр',
@@ -1985,6 +2000,8 @@ def fill_table(player_list):
         font.setPointSize(11)
         my_win.tableView.setFont(font)
         my_win.tableView.horizontalHeader().setFont(QFont("Verdana", 13, QFont.Bold)) # делает заголовки жирный и размер 13
+        my_win.tableView.horizontalHeader().setStyleSheet("background-color:lightblue;") # делает фон заголовков светлоголубой
+
  
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
@@ -2602,6 +2619,7 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+        my_win.checkBox_repeat_regions.setChecked(False)
         # progressBar = QProgressBar(my_win.tabWidget)
         # my_win.progressBar.setGeometry(QtCore.QRect(260, 745, 841, 40))
         # my_win.progressBar.show()
@@ -7898,7 +7916,7 @@ def choice_filter_on_system():
     if stage == "-выберите этап-" and number_group == "все группы" and number_group == "все финалы":
         return
     else:
-        if my_win.radioButton_repeat_regions.isChecked():
+        if my_win.checkBox_repeat_regions.isChecked():
             return
         if stage == "":
             my_win.comboBox_filter_choice_stage.clear()
@@ -13299,7 +13317,7 @@ def change_choice_group():
     """Смена жеребьевки групп если в группе 2 и более одинаковых регион чтоб развести тренеров"""
     msg = QMessageBox
     sender = my_win.sender()
-    if my_win.radioButton_repeat_regions.isChecked():
+    if my_win.checkBox_repeat_regions.isChecked():
         reg = []
         reg_d = []
         gr_key = []
@@ -13340,6 +13358,7 @@ def change_choice_group():
         else:
             msg.information(my_win, "Уведомление", "Нет групп с повторяющимися регионами.")
     else:
+        my_win.comboBox_filter_choice_stage.setCurrentIndex(0)
         return
 
 
@@ -15168,7 +15187,7 @@ my_win.radioButton_match_4.toggled.connect(change_status_visible_and_score_game)
 my_win.radioButton_match_6.toggled.connect(change_status_visible_and_score_game)
 my_win.radioButton_match_8.toggled.connect(change_status_visible_and_score_game)
 
-my_win.radioButton_repeat_regions.toggled.connect(change_choice_group) 
+my_win.checkBox_repeat_regions.stateChanged.connect(change_choice_group) 
 
 
 # при изменении чекбокса активирует кнопку создать

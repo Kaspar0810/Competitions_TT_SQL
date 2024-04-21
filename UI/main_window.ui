@@ -4557,7 +4557,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>5</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -5464,9 +5464,9 @@
            </layout>
           </item>
           <item>
-           <widget class="QRadioButton" name="radioButton_repeat_regions">
+           <widget class="QCheckBox" name="checkBox_repeat_regions">
             <property name="text">
-             <string>Повтор регионов</string>
+             <string>Повторяющиеся регионы</string>
             </property>
            </widget>
           </item>

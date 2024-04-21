@@ -2422,9 +2422,9 @@ class Ui_MainWindow(object):
         self.comboBox_filter_number_group_final.setObjectName("comboBox_filter_number_group_final")
         self.verticalLayout_32.addWidget(self.comboBox_filter_number_group_final)
         self.verticalLayout_12.addLayout(self.verticalLayout_32)
-        self.radioButton_repeat_regions = QtWidgets.QRadioButton(self.frame_2)
-        self.radioButton_repeat_regions.setObjectName("radioButton_repeat_regions")
-        self.verticalLayout_12.addWidget(self.radioButton_repeat_regions)
+        self.checkBox_repeat_regions = QtWidgets.QCheckBox(self.frame_2)
+        self.checkBox_repeat_regions.setObjectName("checkBox_repeat_regions")
+        self.verticalLayout_12.addWidget(self.checkBox_repeat_regions)
         self.label_28 = QtWidgets.QLabel(self.frame_2)
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
@@ -3504,7 +3504,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(2)
-        self.toolBox.setCurrentIndex(5)
+        self.toolBox.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -3676,7 +3676,7 @@ class Ui_MainWindow(object):
         self.label_20.setText(_translate("MainWindow", "<html><head/><body><p>Фильтр по жеребьевке</p></body></html>"))
         self.label_50.setText(_translate("MainWindow", "Выбор этапа"))
         self.label_60.setText(_translate("MainWindow", "Выбор группы / финала"))
-        self.radioButton_repeat_regions.setText(_translate("MainWindow", "Повтор регионов"))
+        self.checkBox_repeat_regions.setText(_translate("MainWindow", "Повторяющиеся регионы"))
         self.label_28.setText(_translate("MainWindow", "<html><head/><body><p>Сортировка по месту</p></body></html>"))
         self.radioButton_gr_sort.setText(_translate("MainWindow", "Группы"))
         self.radioButton_sf_sort.setText(_translate("MainWindow", "Полуфиналы"))
