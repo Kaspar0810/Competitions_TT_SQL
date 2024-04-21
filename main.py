@@ -1904,7 +1904,6 @@ def fill_table(player_list):
     player_selected = player_list.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
     num_columns = [0, 1, 2, 3, 4, 5, 6]
-    # dolg_R_list = dolg_R()
     # кол-во наваний должно совпадать со списком столбцов
     if tb == 1:
         if my_win.checkBox_6.isChecked():
@@ -1999,8 +1998,8 @@ def fill_table(player_list):
         font = my_win.tableView.font()
         font.setPointSize(11)
         my_win.tableView.setFont(font)
-        my_win.tableView.horizontalHeader().setFont(QFont("Verdana", 13, QFont.Bold)) # делает заголовки жирный и размер 13
-        my_win.tableView.horizontalHeader().setStyleSheet("background-color:lightblue;") # делает фон заголовков светлоголубой
+        my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
+        my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
 
  
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
