@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>7</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -4387,9 +4387,9 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>700</x>
+        <x>698</x>
         <y>10</y>
-        <width>139</width>
+        <width>132</width>
         <height>221</height>
        </rect>
       </property>
@@ -4565,7 +4565,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>477</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5558,7 +5558,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>477</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5968,7 +5968,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>477</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6267,7 +6267,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>477</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6726,7 +6726,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>477</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7354,174 +7354,177 @@
      <enum>Qt::DashDotLine</enum>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox_first_group">
+   <widget class="QTableView" name="tableView">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>260</x>
+      <y>351</y>
+      <width>841</width>
+      <height>431</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
       <y>350</y>
-      <width>201</width>
-      <height>26</height>
+      <width>841</width>
+      <height>401</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>12</pointsize>
-      <italic>true</italic>
-     </font>
-    </property>
-   </widget>
-   <widget class="QListWidget" name="listWidget_first_group">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>379</y>
-      <width>400</width>
-      <height>231</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>11</pointsize>
-     </font>
-    </property>
-   </widget>
-   <widget class="QListWidget" name="listWidget_second_group">
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>379</y>
-      <width>400</width>
-      <height>231</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>11</pointsize>
-     </font>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox_second_group">
-    <property name="geometry">
-     <rect>
-      <x>900</x>
-      <y>350</y>
-      <width>201</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>12</pointsize>
-      <italic>true</italic>
-     </font>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox_edit_etap1">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>350</y>
-      <width>191</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>12</pointsize>
-      <weight>75</weight>
-      <italic>true</italic>
-      <bold>true</bold>
-     </font>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBox_edit_etap2">
-    <property name="geometry">
-     <rect>
-      <x>700</x>
-      <y>350</y>
-      <width>191</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>12</pointsize>
-      <weight>75</weight>
-      <italic>true</italic>
-      <bold>true</bold>
-     </font>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_57">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>330</y>
-      <width>231</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>14</pointsize>
-      <weight>75</weight>
-      <italic>true</italic>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>Редактирование этапов</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>271</x>
-      <y>620</y>
-      <width>831</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <layout class="QVBoxLayout" name="verticalLayout_10">
      <property name="spacing">
-      <number>0</number>
+      <number>1</number>
+     </property>
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_13">
-       <property name="spacing">
-        <number>1</number>
+      <widget class="QLabel" name="label_57">
+       <property name="font">
+        <font>
+         <family>Times New Roman</family>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <italic>true</italic>
+         <bold>true</bold>
+        </font>
        </property>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_change_pl1">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>11</pointsize>
-           <italic>true</italic>
-          </font>
+       <property name="text">
+        <string>Редактирование этапов</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="gridLayout_6">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QComboBox" name="comboBox_edit_etap1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <weight>75</weight>
+             <italic>true</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="comboBox_first_group">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QListWidget" name="listWidget_first_group">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="1">
+          <widget class="QComboBox" name="comboBox_second_group">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <italic>true</italic>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QListWidget" name="listWidget_second_group">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QComboBox" name="comboBox_edit_etap2">
+           <property name="font">
+            <font>
+             <family>Times New Roman</family>
+             <pointsize>12</pointsize>
+             <weight>75</weight>
+             <italic>true</italic>
+             <bold>true</bold>
+            </font>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="horizontalSpacing">
+        <number>10</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>0</number>
+       </property>
+       <item row="1" column="1" rowspan="2">
+        <widget class="QPushButton" name="Button_change_player">
+         <property name="text">
+          <string>&lt;     &gt;</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="1" column="0">
         <widget class="QLineEdit" name="lineEdit_change_pl1_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -7538,18 +7541,72 @@
          </property>
         </widget>
        </item>
-       <item>
+       <item row="2" column="2">
+        <widget class="QPushButton" name="Button_add_pl2">
+         <property name="text">
+          <string>Добавить игрока 2- ой группы</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
         <widget class="QPushButton" name="Button_add_pl1">
          <property name="text">
           <string>Добавить игрока 1-ой группы</string>
          </property>
         </widget>
        </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_43">
-       <item>
+       <item row="1" column="2">
+        <widget class="QLineEdit" name="lineEdit_change_pl2_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>11</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLineEdit" name="lineEdit_change_pl2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>11</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLineEdit" name="lineEdit_change_pl1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>11</pointsize>
+           <italic>true</italic>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
         <widget class="QLabel" name="label_59">
          <property name="font">
           <font>
@@ -7565,82 +7622,16 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="Button_change_player">
-         <property name="text">
-          <string>&lt;     &gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_42">
-       <property name="spacing">
-        <number>1</number>
-       </property>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_change_pl2">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>11</pointsize>
-           <italic>true</italic>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_change_pl2_2">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>11</pointsize>
-           <italic>true</italic>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="Button_add_pl2">
-         <property name="text">
-          <string>Добавить игрока 2- ой группы</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
-   </widget>
-   <widget class="QTableView" name="tableView">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>747</y>
-      <width>842</width>
-      <height>31</height>
-     </rect>
-    </property>
    </widget>
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>352</y>
-      <width>842</width>
+      <y>350</y>
+      <width>841</width>
       <height>431</height>
      </rect>
     </property>

@@ -727,6 +727,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.comboBox_first_group.clear()
         my_win.comboBox_second_group.clear()
         my_win.tableView.hide()
+        my_win.widget.show()
 
     def open(self):
         go_to()
@@ -2562,7 +2563,7 @@ def page():
     msgBox = QMessageBox()
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
-    if tb == 0: # -титул-
+    if tb == 0: # -титул-    
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 280, 841, 492)) # (точка слева, точка сверху, ширина, высота)
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 274))
@@ -2574,7 +2575,9 @@ def page():
         my_win.comboBox_secretary.setCurrentIndex(-1)
         my_win.comboBox_secretary.setEditable(True)
         db_select_title()
+        my_win.tableView.hide()
         my_win.tableWidget.hide()
+        my_win.widget.hide()
     elif tb == 1:  # -список участников-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
