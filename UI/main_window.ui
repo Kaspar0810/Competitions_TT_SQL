@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>10</y>
+      <y>0</y>
       <width>841</width>
       <height>331</height>
      </rect>
@@ -4390,7 +4390,7 @@
         <x>698</x>
         <y>10</y>
         <width>132</width>
-        <height>221</height>
+        <height>211</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_53">
@@ -4557,7 +4557,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -5250,113 +5250,244 @@
         <x>0</x>
         <y>40</y>
         <width>241</width>
-        <height>361</height>
+        <height>397</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_57" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_57" stretch="0,0,0,0,0,0,0,0,0,0,0,0">
        <property name="spacing">
         <number>3</number>
        </property>
        <property name="sizeConstraint">
         <enum>QLayout::SetNoConstraint</enum>
        </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>3</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QLabel" name="label_10">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <widget class="QFrame" name="frame_2">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
          </property>
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-           <italic>true</italic>
-           <underline>true</underline>
-          </font>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
          </property>
-         <property name="text">
-          <string>Выбор этапа</string>
+         <property name="lineWidth">
+          <number>2</number>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="comboBox_etap">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="editable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_visible_game">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Запись счета в партии</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_13">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Вид страницы</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="comboBox_page_vid">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="Button_etap_made">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Создать</string>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <property name="leftMargin">
+           <number>1</number>
+          </property>
+          <property name="topMargin">
+           <number>1</number>
+          </property>
+          <property name="rightMargin">
+           <number>1</number>
+          </property>
+          <property name="bottomMargin">
+           <number>1</number>
+          </property>
+          <property name="spacing">
+           <number>1</number>
+          </property>
+          <item row="2" column="0" colspan="2">
+           <widget class="QComboBox" name="comboBox_etap">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_62">
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Кол-во партий</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="Line" name="line_13">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QComboBox" name="comboBox_page_vid">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Выбор этапа</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QSpinBox" name="spinBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="minimum">
+             <number>3</number>
+            </property>
+            <property name="maximum">
+             <number>7</number>
+            </property>
+            <property name="singleStep">
+             <number>2</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Вид страницы</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1" rowspan="2">
+           <widget class="QPushButton" name="Button_etap_made">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Создать
+этап</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <property name="default">
+             <bool>false</bool>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" rowspan="2">
+           <widget class="QCheckBox" name="checkBox_visible_game">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="text">
+             <string>Счет в 
+партии</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -5387,66 +5518,101 @@
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Фильтр по жеребьевке&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_50">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Выбор этапа</string>
-         </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="comboBox_filter_choice_stage">
-         <property name="editable">
-          <bool>true</bool>
+        <widget class="QFrame" name="frame_3">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_60">
-         <property name="font">
-          <font>
-           <family>Times New Roman</family>
-           <pointsize>12</pointsize>
-           <italic>true</italic>
-          </font>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
          </property>
-         <property name="text">
-          <string>Выбор группы / финала</string>
+         <property name="lineWidth">
+          <number>2</number>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="comboBox_filter_number_group_final">
-         <property name="editable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_repeat_regions">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Повторяющиеся регионы</string>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_8">
+          <property name="leftMargin">
+           <number>1</number>
+          </property>
+          <property name="topMargin">
+           <number>1</number>
+          </property>
+          <property name="rightMargin">
+           <number>1</number>
+          </property>
+          <property name="bottomMargin">
+           <number>1</number>
+          </property>
+          <property name="spacing">
+           <number>1</number>
+          </property>
+          <item row="1" column="0">
+           <widget class="QComboBox" name="comboBox_filter_choice_stage">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QComboBox" name="comboBox_filter_number_group_final">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_60">
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Выбор группы / финала</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_50">
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Выбор этапа</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="checkBox_repeat_regions">
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>14</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Повторяющиеся регионы</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -5456,6 +5622,19 @@
          </property>
          <property name="sizeType">
           <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -5480,6 +5659,9 @@
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Сортировка по месту&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
         </widget>
        </item>
        <item>
@@ -5487,33 +5669,6 @@
          <property name="spacing">
           <number>1</number>
          </property>
-         <item>
-          <widget class="QRadioButton" name="radioButton_gr_sort">
-           <property name="font">
-            <font>
-             <italic>true</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>Группы</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="radioButton_sf_sort">
-           <property name="font">
-            <font>
-             <italic>true</italic>
-            </font>
-           </property>
-           <property name="text">
-            <string>Полуфиналы</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
@@ -5530,6 +5685,52 @@
         </spacer>
        </item>
        <item>
+        <widget class="QFrame" name="frame_4">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
+         </property>
+         <property name="lineWidth">
+          <number>2</number>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="radioButton_gr_sort">
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Группы</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QRadioButton" name="radioButton_sf_sort">
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Полуфиналы</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_49">
          <property name="font">
           <font>
@@ -5543,6 +5744,9 @@
          </property>
          <property name="text">
           <string>Поиск спортсмена</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
