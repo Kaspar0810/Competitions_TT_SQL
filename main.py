@@ -2616,6 +2616,7 @@ def page():
         my_win.label_dolg_R.setText(f"Без лицензии: {count_debitor_R} {end_word}")
         my_win.label_predzayavka.setText(f"По предзаявке: {count_pred} чел.")
         list_player_pdf(player_list)
+        my_win.widget.hide()
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
@@ -2812,6 +2813,7 @@ def page():
         elif my_win.radioButton_sf_sort.isChecked():
             player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_semifinal_group, Choice.sf_group)
         fill_table(player_list)
+        my_win.widget.hide()
     elif tb == 3:  # вкладка -группы-
         stage = "Предварительный"
         Button_view_group = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
@@ -2820,7 +2822,7 @@ def page():
         Button_view_group.setText("Просмотр\nгрупп")
         Button_view_group.show()
         Button_view_group.clicked.connect(view)
-
+        my_win.widget.hide()
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
@@ -2848,7 +2850,7 @@ def page():
         Button_view_semifinal.setText("Просмотр\nполуфиналов")
         Button_view_semifinal.show()
         Button_view_semifinal.clicked.connect(view)
-
+        my_win.widget.hide()
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
@@ -2894,7 +2896,7 @@ def page():
         Button_view_final.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
         Button_view_final.setText("Просмотр\nфиналов")
         Button_view_final.show()
-    
+        my_win.widget.hide()
         Button_view_final.clicked.connect(view)
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
@@ -2934,7 +2936,7 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 71))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        # my_win.progressBar.hide()
+        my_win.widget.hide()
         my_win.comboBox_choice_R.clear()
         my_win.comboBox_filter_date_in_R.clear()
         rejting_month = ["За текуший месяц", "За январь месяц"]
