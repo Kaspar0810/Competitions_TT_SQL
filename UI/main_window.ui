@@ -46,7 +46,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideLeft</enum>
@@ -93,9 +93,9 @@
       <property name="geometry">
        <rect>
         <x>3</x>
-        <y>33</y>
+        <y>43</y>
         <width>831</width>
-        <height>211</height>
+        <height>201</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -103,9 +103,9 @@
         <number>1</number>
        </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_5">
+        <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,1,0">
          <property name="horizontalSpacing">
-          <number>15</number>
+          <number>24</number>
          </property>
          <property name="verticalSpacing">
           <number>1</number>
@@ -123,23 +123,10 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="checkBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="2">
           <widget class="QPushButton" name="Button_title_made">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -165,10 +152,33 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="checkBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="Line" name="line_16">
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item row="1" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1,2">
+        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0,1,0,2">
          <property name="spacing">
           <number>4</number>
          </property>
@@ -187,21 +197,24 @@
            <property name="title">
             <string>Участники</string>
            </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_46">
             <property name="spacing">
              <number>1</number>
             </property>
             <property name="leftMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_48">
@@ -291,6 +304,16 @@
           </widget>
          </item>
          <item>
+          <widget class="Line" name="line_14">
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QGroupBox" name="groupBox_7">
            <property name="font">
             <font>
@@ -302,21 +325,24 @@
            <property name="title">
             <string>Сроки проведения</string>
            </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_49">
             <property name="spacing">
              <number>1</number>
             </property>
             <property name="leftMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_47">
@@ -475,6 +501,16 @@
           </widget>
          </item>
          <item>
+          <widget class="Line" name="line_15">
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QGroupBox" name="groupBox_6">
            <property name="font">
             <font>
@@ -485,26 +521,29 @@
            <property name="title">
             <string>Главная судейская коллегия</string>
            </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_50">
             <property name="spacing">
              <number>1</number>
             </property>
             <property name="leftMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
-             <number>4</number>
+             <number>0</number>
             </property>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout">
               <property name="spacing">
-               <number>1</number>
+               <number>0</number>
               </property>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_21">
@@ -661,7 +700,16 @@
           <number>4</number>
          </property>
          <property name="leftMargin">
-          <number>8</number>
+          <number>1</number>
+         </property>
+         <property name="topMargin">
+          <number>1</number>
+         </property>
+         <property name="rightMargin">
+          <number>1</number>
+         </property>
+         <property name="bottomMargin">
+          <number>1</number>
          </property>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_37">
@@ -738,6 +786,9 @@
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -5264,7 +5315,7 @@
         <number>0</number>
        </property>
        <property name="topMargin">
-        <number>3</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
         <number>0</number>
@@ -5351,27 +5402,6 @@
              <font>
               <pointsize>12</pointsize>
              </font>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <family>Times New Roman</family>
-              <pointsize>12</pointsize>
-              <italic>true</italic>
-              <underline>true</underline>
-             </font>
-            </property>
-            <property name="text">
-             <string>Выбор этапа</string>
             </property>
            </widget>
           </item>
@@ -5484,6 +5514,27 @@
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Times New Roman</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+              <underline>true</underline>
+             </font>
+            </property>
+            <property name="text">
+             <string>Выбор этапа</string>
             </property>
            </widget>
           </item>
@@ -5736,9 +5787,9 @@
           <font>
            <family>Times New Roman</family>
            <pointsize>14</pointsize>
-           <weight>75</weight>
+           <weight>50</weight>
            <italic>true</italic>
-           <bold>true</bold>
+           <bold>false</bold>
            <underline>true</underline>
           </font>
          </property>
