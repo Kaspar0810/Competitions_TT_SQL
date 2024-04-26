@@ -2623,6 +2623,7 @@ def page():
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         my_win.checkBox_repeat_regions.setChecked(False)
+        
         # progressBar = QProgressBar(my_win.tabWidget)
         # my_win.progressBar.setGeometry(QtCore.QRect(260, 745, 841, 40))
         # my_win.progressBar.show()
@@ -3481,6 +3482,7 @@ def kol_player_in_group():
     sender = my_win.sender()  # сигнал от кнопки
     flag_visible = my_win.checkBox_visible_game.isChecked()
     kg = my_win.spinBox_kol_group.text()  # количество групп
+    score_match = my_win.spinBox.currentText()
     player_list = Player.select().where(Player.title_id == title_id())
     type_table = "группы"
     count = len(player_list)  # количество записей в базе
@@ -3521,6 +3523,7 @@ def kol_player_in_group():
         system.page_vid = my_win.comboBox_page_vid.currentText()
         system.label_string = stroka_kol_group
         system.kol_game_string = stroka_kol_game
+        system.score_flag = score_match
         system.visible_game = flag_visible
         system.save()
     load_combobox_filter_group()
@@ -8379,7 +8382,6 @@ def checking_before_the_draw():
         fill_table(player_list)
         checking_flag = False
     else:
-        # msgBox.information(my_win, "Уведомление", "Нет спортсменов не подтвердивших\n свое участие в соревнованиях!")
         checking_flag = True
     return checking_flag
 
