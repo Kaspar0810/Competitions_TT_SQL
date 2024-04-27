@@ -8187,7 +8187,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
     systems = system.select().where(System.stage == "Предварительный").get()
     total_athletes = systems.total_athletes
     total_gr = systems.total_group
-
+    score_match = my_win.spinBox.currentValue()
     for sys in system:
         fin_type = sys.type_table
         if fin_type == "круг" or fin_type == "сетка":
@@ -8268,7 +8268,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
         # ======
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=total_gr, kol_game_string=stroka_kol_game,
                         max_player=m_pl, stage=fin, type_table=type_table, page_vid=pv, label_string=str_setka,
-                        choice_flag=0, score_flag=5, visible_game=flag_visible, stage_exit=exit_stage, mesta_exit=kpt, no_game=no_game3).save()    
+                        choice_flag=0, score_flag=score_match, visible_game=flag_visible, stage_exit=exit_stage, mesta_exit=kpt, no_game=no_game3).save()    
         
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
 
@@ -8488,7 +8488,9 @@ def made_system_load_combobox_etap():
         if ct == "Одна таблица":
             my_win.comboBox_table_1.show()
             my_win.spinBox_kol_group.hide()
-            my_win.label_11.hide()
+            # my_win.label_11.hide()
+            my_win.label_11.setText("Одна таблица")
+            my_win.label_11.show()
             my_win.label_101.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
@@ -9165,7 +9167,7 @@ def kol_player_in_final():
                 my_win.label_etap_1.show()
                 my_win.label_19.show()
                 my_win.label_101.show()
-                my_win.label_101.setText(my_win.comboBox_etap_1.currentText())
+                my_win.label_101.setText(my_win.comboBox_etap.currentText())
                 my_win.label_19.setText(f"{kol_game} игр.")
                 my_win.label_33.setText(f"Всего: {kol_game} игр.")
                 my_win.label_etap_1.setText(f"{count} человек по круговой системе.")
@@ -9185,6 +9187,7 @@ def kol_player_in_final():
                 my_win.label_33.setText(f"Всего: {total_game} игр.")
                 my_win.label_etap_1.setText(f"{count} человек в сетке.")
                 my_win.comboBox_table_1.hide()
+            flag_one_table = True
         else:
             etap = my_win.comboBox_etap.currentText()
             exit_player_stage = max_player_and_exit_stage(etap)
@@ -9203,9 +9206,11 @@ def kol_player_in_final():
         exit_stage = "1-й финал"
         exit_stroka = "1-ого финала"
         max_exit_group = 12
-    
-    kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников, выходящих\n "
+    if flag_one_table is False:
+        kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников, выходящих\n "
                                                                     f"из {exit_stroka} в {fin}", min=1, max=max_exit_group)
+    else:
+        kpt = count
                     
             # возвращает из функции несколько значения в списке
     list_pl_final = total_game_table(exit_stage, kpt, fin, pv)
