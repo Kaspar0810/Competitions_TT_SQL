@@ -3382,11 +3382,11 @@ def system_competition():
 def one_table(fin, group):
     """система соревнований из одной таблицы запись в System, Game_list, Result"""
     msgBox = QMessageBox()
-    system = System.select().where(System.title_id == title_id())
     ch = Choice.select().where(Choice.title_id == title_id())
     count = len(Player.select().where(Player.title_id == title_id()))
+    visible_game = 1 if my_win.checkBox_visible_game.isChecked() else 0
     # в зависмости сетка или круг
-    cur_index = my_win.comboBox_table.currentIndex()
+    cur_index = my_win.comboBox_table_1.currentIndex()
     if fin == "Одна таблица":
         if cur_index == 1:
             vt = "Сетка (-2) на"
@@ -3416,7 +3416,7 @@ def one_table(fin, group):
         flag_ready_system = ready_system()
         if flag_ready_system is False:
             sys_m = System.select().where(System.title_id == title_id()).get()
-            total_game = numbers_of_games(cur_index, player_in_final=count)
+            total_game = numbers_of_games(cur_index, player_in_final=count, kpt=0)
 
             sys_m.max_player = count
             sys_m.total_athletes = total_athletes
@@ -3426,6 +3426,8 @@ def one_table(fin, group):
             sys_m.page_vid = my_win.comboBox_page_vid.currentText()
             sys_m.label_string = f"{vt} {total_athletes} участников"
             sys_m.kol_game_string =f"{total_game} игр"
+            sys_m.visible_game = visible_game
+            sys_m.score_flag = my_win.spinBox.text()
             sys_m.save()
 
             my_win.Button_etap_made.setEnabled(False)
@@ -3482,7 +3484,7 @@ def kol_player_in_group():
     sender = my_win.sender()  # сигнал от кнопки
     flag_visible = my_win.checkBox_visible_game.isChecked()
     kg = my_win.spinBox_kol_group.text()  # количество групп
-    score_match = my_win.spinBox.currentText()
+    score_match = my_win.spinBox.text()
     player_list = Player.select().where(Player.title_id == title_id())
     type_table = "группы"
     count = len(player_list)  # количество записей в базе
@@ -3730,7 +3732,7 @@ def player_in_one_table(fin):
             pl1 = one_table[first - 1]
             pl2 = one_table[second - 1]
             results = Result(number_group=fin, system_stage="Одна таблица", player1=pl1, player2=pl2,
-                             tours=match, title_id=title_id(), round=round)
+                             tours=match, title_id=title_id(), round=round, system_id=id_system)
             results.save()    
 
 
@@ -4105,10 +4107,12 @@ def change_status_visible_and_score_game():
                 stage = "Одна таблица"
             else:
                 stage = my_win.tableView.model().index(row_num, 2).data() #  данные ячейки (из какого финала играют встречу)
+            # id_system = system_id(stage)
+            # system_stage = system.select().where(System.id == id_system).get()
             system_stage = system.select().where(System.stage == stage).get()
             match_db = system_stage.score_flag
             state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
-            # state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
+            state_visible_db = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
             match_current = match_db    
         #=========
 
@@ -4949,11 +4953,11 @@ def focus():
         sys = system.select().where(System.stage == final).get()
         sf = sys.score_flag  # флаг из скольки партий играется матч
         mark_index = mark_list_fin.index(sender)
-        mark = mark_list_fin[mark_index].text()
+        mark = mark_list_fin[mark_index].text() # счет в партии в текстовом формате
         flag_mistake = control_mark_in_score(mark, sf)
         if flag_mistake is True:
             return
-        if mark_index % 2 == 1:
+        if mark_index % 2 == 1: # если счет вторго игрока (проверяет все ли партии сыграны)
             if mark_index >= sf:
                 sum_total_game = score_in_game()  # подсчет очков в партии
                 if sum_total_game[0] != sum_total_game[1]:
@@ -5311,16 +5315,6 @@ def enter_score(none_player=0):
             loser = pl2 if st1 > st2 else pl1
             ts_winner = f"{st1} : {st2}" if st1 > st2 else f"{st2} : {st1}"
             ts_loser = f"{st2} : {st1}" if st1 > st2 else f"{st1} : {st2}"
-            # if st1 > st2:
-            #     winner = pl1
-            #     loser = pl2
-            #     ts_winner = f"{st1} : {st2}"
-            #     ts_loser = f"{st2} : {st1}"
-            # else:
-            #     winner = pl2
-            #     loser = pl1
-            #     ts_winner = f"{st2} : {st1}"
-            #     ts_loser = f"{st1} : {st2}"
             winner_string = string_score_game()  # пишет счет в партии
         elif none_player == 1: # не явился 1-й игрок
             winner = pl2
@@ -5432,8 +5426,11 @@ def made_pdf_table_for_view(sender):
     short_name = t_id.short_name_comp
     if text_button == "Просмотр\nфиналов":
         stage = my_win.tableView.model().index(0, 2).data() # данные ячейки tableView номер финала для просмотра в пдф пот нажатию кнопки
-        n_fin = stage[:1]
-        view_file = f"{short_name}_{n_fin}-final.pdf"
+        if stage == "Одна таблица":
+            view_file = f"{short_name}_one_table.pdf"
+        else:
+            n_fin = stage[:1]
+            view_file = f"{short_name}_{n_fin}-final.pdf"
         fin = stage
     elif text_button == "Просмотр\nполуфиналов":
         stage = my_win.comboBox_filter_semifinal.currentText()
@@ -5649,6 +5646,10 @@ def string_score_game():
         s24 = my_win.lineEdit_pl2_s4_gr.text()
         s15 = my_win.lineEdit_pl1_s5_gr.text()
         s25 = my_win.lineEdit_pl2_s5_gr.text()
+        s16 = my_win.lineEdit_pl1_s6_gr.text()
+        s26 = my_win.lineEdit_pl2_s6_gr.text()
+        s17 = my_win.lineEdit_pl1_s7_gr.text()
+        s27 = my_win.lineEdit_pl2_s7_gr.text()
     elif tab == 4:
         st1 = int(my_win.lineEdit_pl1_score_total_pf.text())
         st2 = int(my_win.lineEdit_pl2_score_total_pf.text())
@@ -5662,6 +5663,10 @@ def string_score_game():
         s24 = my_win.lineEdit_pl2_s4_pf.text()
         s15 = my_win.lineEdit_pl1_s5_pf.text()
         s25 = my_win.lineEdit_pl2_s5_pf.text()
+        s16 = my_win.lineEdit_pl1_s6_pf.text()
+        s26 = my_win.lineEdit_pl2_s6_pf.text()
+        s17 = my_win.lineEdit_pl1_s7_pf.text()
+        s27 = my_win.lineEdit_pl2_s7_pf.text()
     elif tab == 5:
         st1 = int(my_win.lineEdit_pl1_score_total_fin.text())
         st2 = int(my_win.lineEdit_pl2_score_total_fin.text())
@@ -5675,6 +5680,10 @@ def string_score_game():
         s24 = my_win.lineEdit_pl2_s4_fin.text()
         s15 = my_win.lineEdit_pl1_s5_fin.text()
         s25 = my_win.lineEdit_pl2_s5_fin.text()
+        s16 = my_win.lineEdit_pl1_s6_fin.text()
+        s26 = my_win.lineEdit_pl2_s6_fin.text()
+        s17 = my_win.lineEdit_pl1_s7_fin.text()
+        s27 = my_win.lineEdit_pl2_s7_fin.text()
     # создание строки счета победителя
     if st1 > st2:
         if visible_flag is True:
@@ -5682,41 +5691,56 @@ def string_score_game():
                 n1 = s21
             else:
                 n1 = str(f"-{s11}")
+
             if int(s12) > int(s22):  # 2-й сет
                 n2 = s22
             else:
                 n2 = str(f"-{s12}")
-            if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st2 == 0 and st1 == 2):  # из 3-х партий 2-0
+            if (g == 2 and st1 == 2 and st2 == 0):  # из 3-х партий 2-0
                 winner_string = f"({n1},{n2})"
                 return winner_string
+            
             if int(s13) > int(s23):  # 3-й сет
                 n3 = s23
             else:
                 n3 = str(f"-{s13}")
-            if (g == 2 and st1 == 2 and st2 == 1) or (g == 2 and st2 == 2 and st1 == 1) or \
-                    (g == 3 and st1 == 3 and st2 == 0) or (g == 3 and st1 == 0 and st2 == 3):  # из 3-х  2-1 или из 5-и 3-0
+            if (g == 2 and st2 == 2 and st1 == 1) or (g == 3 and st1 == 3 and st2 == 0):  # из 3-х  2-1 или из 5-и 3-0
                 winner_string = f"({n1},{n2},{n3})"
                 return winner_string
+            
             if int(s14) > int(s24):  # 4-й сет
                 n4 = s24
             else:
                 n4 = str(f"-{s14}")
-            if (g == 4 and st1 == 4 and st2 == 0) or (g == 4 and st1 == 0 and st2 == 4) or \
-                    (g == 3 and st1 == 3 and st2 == 1) or (g == 3 and st1 == 1 and st2 == 3):  # из 5-и 3-1 или из 7-и 4-0
+            if (g == 4 and st1 == 4 and st2 == 0) or (g == 3 and st1 == 3 and st2 == 1):  # из 5-и 3-1 или из 7-и 4-0
                 winner_string = f"({n1},{n2},{n3},{n4})"
                 return winner_string
+
             if int(s15) > int(s25):  # 5-й сет
                 n5 = s25
             else:
                 n5 = str(f"-{s15}")
-            if (g == 4 and st1 == 4 and st2 == 1) or (g == 4 and st1 == 1 and st2 == 4) or \
-                    (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
+            if (g == 4 and st1 == 4 and st2 == 1) or (g == 3 and st1 == 3 and st2 == 2):  # из 5-и 3-2 или из 7-и 4-1
                 winner_string = f"({n1},{n2},{n3},{n4},{n5})"
+
+            if int(s16) > int(s26):  # 6-й сет
+                n6= s26
+            else:
+                n6 = str(f"-{s16}")
+            if (g == 4 and st1 == 4 and st2 == 2):  # из 7-и 4-2
+                winner_string = f"({n1},{n2},{n3},{n4},{n5},{n6})"
+
+            if int(s17) > int(s27):  # 7-й сет
+                n7= s27
+            else:
+                n7 = str(f"-{s17}")
+            if (g == 4 and st1 == 4 and st2 == 3):  # из 7-и 4-3
+                winner_string = f"({n1},{n2},{n3},{n4},{n5},{n6},{n7})"
         else:
             if visible_flag is True:
                 winner_string = f"({st1} : {st2})" 
-            else:
-                winner_string = f"{st1} : {st2}"      
+            # else:
+            #     winner_string = f"{st1} : {st2}"      
         return winner_string
     else:
         if visible_flag is True:
@@ -5728,37 +5752,52 @@ def string_score_game():
                 n2 = s12
             else:
                 n2 = str(f"-{s22}")
-            if (g == 2 and st1 == 2 and st2 == 0) or (g == 2 and st1 == 0 and st2 == 2):  # из 3-х партий 2-0
+            if (g == 2 and st1 == 2 and st2 == 0):  # из 3-х партий 2-0
                 winner_string = f"({n1},{n2})"
                 return winner_string
+            
             if int(s13) < int(s23):  # 3-й сет
                 n3 = s13
             else:
                 n3 = str(f"-{s23}")
-            if (g == 2 and st1 == 2 and st2 == 1) or (g == 2 and st2 == 2 and st1 == 1) or \
-                    (g == 3 and st1 == 3 and st2 == 0) or (g == 3 and st1 == 0 and st2 == 3):  # из 3-х  2-1 или из 5-и 3-0
+            if (g == 2 and st1 == 1 and st2 == 2) or (g == 3 and st1 == 0 and st2 == 3):  # из 3-х  2-1 или из 5-и 3-0
                 winner_string = f"({n1},{n2},{n3})"
                 return winner_string
+            
             if int(s14) < int(s24):  # 4-й сет
                 n4 = s14
             else:
                 n4 = str(f"-{s24}")
-            if (g == 4 and st1 == 4 and st2 == 0) or (g == 4 and st1 == 0 and st2 == 4) or \
-                    (g == 3 and st1 == 3 and st2 == 1) or (g == 3 and st1 == 1 and st2 == 3):  # из 5-и 3-1 или из 7-и 4-0
+            if (g == 4 and st1 == 0 and st2 == 4) or (g == 3 and st1 == 1 and st2 == 3):  # из 5-и 3-1 или из 7-и 4-0
                 winner_string = f"({n1},{n2},{n3},{n4})"
                 return winner_string
+            
             if int(s15) < int(s25):  # 5-й сет
                 n5 = s15
             else:
                 n5 = str(f"-{s25}")
-            if (g == 4 and st1 == 4 and st2 == 1) or (g == 4 and st1 == 1 and st2 == 4) or \
-                    (g == 3 and st1 == 3 and st2 == 2) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
+            if  (g == 4 and st1 == 1 and st2 == 4) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
                 winner_string = f"({n1},{n2},{n3},{n4},{n5})"
+
+            if int(s16) < int(s26):  # 6-й сет
+                n6 = s16
+            else:
+                n6 = str(f"-{s26}")
+            if (g == 4 and st1 == 2 and st2 == 4):  # из 7-и 4-2
+                winner_string = f"({n1},{n2},{n3},{n4},{n5},{n6})"
+
+            if int(s17) < int(s27):  # 7-й сет
+                n7 = s17
+            else:
+                n7 = str(f"-{s27}")
+            if (g == 4 and st1 == 3 and st2 == 4):  # из 7-и 4-3
+                winner_string = f"({n1},{n2},{n3},{n4},{n5},{n6},{n7})"
+            
         else:
             if visible_flag is True:
                 winner_string = f"({st2} : {st1})"
-            else:
-                winner_string = f"{st2} : {st1}"
+            # else:
+            #     winner_string = f"{st2} : {st1}"
         return winner_string
 
 
@@ -8187,7 +8226,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
     systems = system.select().where(System.stage == "Предварительный").get()
     total_athletes = systems.total_athletes
     total_gr = systems.total_group
-    score_match = my_win.spinBox.currentValue()
+    score_match = my_win.spinBox.text()
     for sys in system:
         fin_type = sys.type_table
         if fin_type == "круг" or fin_type == "сетка":
@@ -8489,9 +8528,10 @@ def made_system_load_combobox_etap():
             my_win.comboBox_table_1.show()
             my_win.spinBox_kol_group.hide()
             # my_win.label_11.hide()
-            my_win.label_11.setText("Одна таблица")
+            my_win.label_101.show()
+            my_win.label_101.setText("Одна таблица")
             my_win.label_11.show()
-            my_win.label_101.hide()
+            # my_win.label_101.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
             my_win.comboBox_table_1.hide()
@@ -8635,12 +8675,13 @@ def total_games_in_final_with_group_games(player_in_final, gr_pf, kpt):
 
 
 def numbers_of_games(cur_index, player_in_final, kpt):
-    """подсчет количество игр в зависимости от системы (пока сетки на 16)"""
+    """подсчет количество игр в зависимости от системы"""
     systems = System.select().where(System.title_id == title_id())
-    system = systems.select().where(System.stage == "Предварительный").get()
-    system_etap = my_win.comboBox_etap.currentText() #
-    gr = system.total_group
-    if system_etap == "Полуфиналы":
+    system_etap = my_win.comboBox_etap.currentText() 
+    if system_etap == "Предварительный":
+        system = systems.select().where(System.stage == "Предварительный").get()
+        gr = system.total_group
+    elif system_etap == "Полуфиналы":
         gr_pf = gr // 2
         total_games = total_games_in_final_with_group_games(player_in_final, gr_pf, kpt)
     else:
@@ -8698,6 +8739,9 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             elif player_in_final == 32:
                 total_games = 32
         elif cur_index == 4: # игры в круг
+            if system_etap == "Одна таблица":
+                gr = 1 
+                # kpt = 0
             total_games = total_games_in_final_without_group_games(player_in_final, gr, kpt)
 
     return total_games
@@ -9167,6 +9211,7 @@ def kol_player_in_final():
                 my_win.label_etap_1.show()
                 my_win.label_19.show()
                 my_win.label_101.show()
+                my_win.label_11.hide()
                 my_win.label_101.setText(my_win.comboBox_etap.currentText())
                 my_win.label_19.setText(f"{kol_game} игр.")
                 my_win.label_33.setText(f"Всего: {kol_game} игр.")
@@ -9180,7 +9225,7 @@ def kol_player_in_final():
                 total_game = 0
                 if cur_index != 0:
                     player_in_final = count
-                    total_game = numbers_of_games(cur_index, player_in_final)
+                    total_game = numbers_of_games(cur_index, player_in_final, kpt)
                 my_win.label_etap_1.show()
                 my_win.label_19.show()
                 my_win.label_19.setText(f"{total_game} игр.")
@@ -9209,12 +9254,14 @@ def kol_player_in_final():
     if flag_one_table is False:
         kpt, ok = QInputDialog.getInt(my_win, "Число участников", "Введите число участников, выходящих\n "
                                                                     f"из {exit_stroka} в {fin}", min=1, max=max_exit_group)
+                                                                            # возвращает из функции несколько значения в списке
+        list_pl_final = total_game_table(exit_stage, kpt, fin, pv)
     else:
-        kpt = count
+        list_pl_final = ['', count, '', pv]
+        my_win.Button_etap_made.setEnabled(True)
+        return
                     
-            # возвращает из функции несколько значения в списке
-    list_pl_final = total_game_table(exit_stage, kpt, fin, pv)
-
+  
     if ok is True: # заполняет этапы значениями (label)
         if label_text == "1-й этап":
             my_win.label_19.show()
@@ -12157,9 +12204,10 @@ def  table_data(stage, kg):
     tdt_color = []
     tdt_new = []
     result = Result.select().where(Result.title_id == title_id())  # находит system id последнего
+    id_system = system_id(stage)
     if kg == 1:  # система одна таблица круг или финалу по кругу
         # список словарей участник и его регион
-        result_fin = result.select().where(Result.system_id == system_id(stage))
+        result_fin = result.select().where(Result.system_id == id_system)
         tr = len(result_fin)  # общее кол-во игр в финалах или одной таблице
         posev_data = player_choice_one_table(stage) # posev_data (фамилия/ id)
         count_player_group = len(posev_data)
@@ -12172,7 +12220,7 @@ def  table_data(stage, kg):
         tdt_all.append(tdt_color)
     else:
         max_gamer = kol_player(stage)
-        result_stage = result.select().where(Result.system_id == system_id(stage))
+        result_stage = result.select().where(Result.system_id == id_system)
         tr = len(result_stage)  # общее кол-во игр в группах
         for p in range(0, kg):
             num_gr = f"{p + 1} группа"
@@ -15078,6 +15126,10 @@ my_win.lineEdit_pl1_s4_gr.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4_gr.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5_gr.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s6_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s6_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s7_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s7_gr.returnPressed.connect(focus)
 # ===== проверка правильность ввода цифр
 # ===== переводит фокус на поле ввода счета в партии вкладки -полуфиналы-
 my_win.lineEdit_pl1_s1_pf.returnPressed.connect(focus)
@@ -15090,6 +15142,10 @@ my_win.lineEdit_pl1_s4_pf.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4_pf.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5_pf.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s6_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s6_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s7_pf.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s7_pf.returnPressed.connect(focus)
 # ===== переводит фокус на полее ввода счета в партии вкладки -финалы-
 my_win.lineEdit_pl1_s1_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s1_fin.returnPressed.connect(focus)
@@ -15101,6 +15157,10 @@ my_win.lineEdit_pl1_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
 my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s6_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s6_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s7_fin.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s7_fin.returnPressed.connect(focus)
 
 my_win.lineEdit_range_tours.returnPressed.connect(enter_print_begunki)
 my_win.lineEdit_num_game_fin.returnPressed.connect(filter_fin)
