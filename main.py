@@ -2517,8 +2517,6 @@ def load_comboBox_filter_rejting():
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
     cur_index = my_win.comboBox_choice_R.currentIndex() # комбобокс выбора рейтинга
-    # reg_index = my_win.comboBox_filter_region_in_R.currentIndex()
-    # reg_text = my_win.comboBox_filter_region_in_R.currentText() # 
     if cur_index == 0: # если выбран текущий рейтинг
         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
             r_data = r_data_w[0]
@@ -2903,7 +2901,6 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        # my_win.progressBar.hide()
         my_win.checkBox_5.setEnabled(False)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
@@ -3104,12 +3101,12 @@ def find_player_on_tab_system():
 def sort():
     """сортировка таблицы QtableView (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
-    r_data_m = [R_list_m, R1_list_m]
-    r_data_w = [R_list_d, R1_list_d]
+    # r_data_m = [R_list_m, R1_list_m]
+    # r_data_w = [R_list_d, R1_list_d]
     signal_button_list = [my_win.Button_sort_R, my_win.Button_sort_Name, my_win.Button_sort_mesto]
     id_title = Title.select().where(Title.id == title_id()).get()
-    gamer = id_title.gamer
-    cur_index = my_win.comboBox_choice_R.currentIndex()
+    # gamer = id_title.gamer
+    # cur_index = my_win.comboBox_choice_R.currentIndex()
     # if cur_index == 0: # если выбран текущий рейтинг
     #         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
     #             r_data = r_data_w[0]
@@ -3130,10 +3127,6 @@ def sort():
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алфавиту
     elif sender == my_win.Button_sort_mesto:
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
-    # elif sender == my_win.Button_sort_alf_R:
-    #     player_list = r_data.select().order_by(rejting_name)
-    # elif sender == my_win.Button_sort_rejting_in_R:
-    #     player_list = r_data.select().order_by(rejting_list.desc())
 
     fill_table(player_list)
     if sender in signal_button_list:
@@ -8290,7 +8283,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
             str_setka = f"{gr_pf} {vt} по {kpt * 2} участника"
             total_gr = gr_pf
         else:
-            str_setka = f"{vt} {player_in_final} участников"
+            str_setka = f"{vt} {player_in_final_full} участников"
             total_gr = 0
  
         stroka_kol_game = f"{total_games} игр"
@@ -9204,6 +9197,7 @@ def kol_player_in_final():
     fin = ""
     exit_stage = ""
     label_text = my_win.label_10.text()
+    flag_one_table = False
     if etap != "Суперфинал":
         if my_win.comboBox_etap.currentText() == "Одна таблица":
             if my_win.comboBox_table_1.currentText() == "Круговая система":
