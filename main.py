@@ -8283,7 +8283,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
             str_setka = f"{gr_pf} {vt} по {kpt * 2} участника"
             total_gr = gr_pf
         else:
-            str_setka = f"{vt} {player_in_final_full} участников"
+            str_setka = f"{vt} {player_in_final_full} участников" # пишет в базе данных полное кол-во игроков сетке
             total_gr = 0
  
         stroka_kol_game = f"{total_games} игр"
@@ -10116,6 +10116,228 @@ def load_name_net_after_choice_for_wiev(fin):
         setka_32_made(fin)
 
 
+# def table_made(pv, stage):
+#     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
+#      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
+#     stage_list_sf = ["1-й полуфинал", "2-й полуфинал"]
+#     from reportlab.platypus import Table
+#     # ==== новый вариант с использованием system id
+#     id_system = system_id(stage)
+#     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
+#     titles = Title.select().where(Title.id == title_id()).get()
+#     sex = titles.gamer 
+#     # ==========
+#     if stage in stage_list_sf: # если этап полуфинал
+#         kg = system.total_group  # кол-во групп
+#         max_pl = system.max_player // kg 
+#     elif stage == "Предварительный":
+#         kg = system.total_group  # кол-во групп
+#         max_pl = system.max_player
+#     else: # игры в финале по кругу или одна круговая таблица
+#         kg = 1
+#         max_pl = system.max_player
+        
+#     family_col = 3.2
+#     if pv == "альбомная":  # альбомная ориентация стр
+#         pv = landscape(A4)
+#         center_stage = 300 # откуда начинается надпись -предварительный этап-
+#         if kg == 1 or max_pl in [10, 11, 12, 13, 14, 15, 16]:
+#             # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
+#             wcells = 21.4 / max_pl
+#         else:
+#             # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
+#             wcells = 7.4 / max_pl
+#     else:  # книжная ориентация стр
+#         pv = A4
+#         center_stage = 150 # откуда начинается надпись -предварительный этап-
+#         family_col = 3.8
+#         if max_pl < 7:
+#             # family_col = 3.8
+#             wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
+#             # wcells = round(wcells, 2)
+#         else:
+#             # family_col = 3.8
+#             wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
+#         wcells = round(wcells, 2)
+
+#     col = ((wcells * cm,) * max_pl)
+#     elements = []
+
+#     # кол-во столбцов в таблице и их ширина
+#     cW = ((0.4 * cm, family_col * cm) + col + (0.8 * cm, 1 * cm, 1 * cm))
+#     if kg == 1:
+#         rH = (0.45 * cm)  # высота строки
+#     else:
+#         if max_pl < 5:
+#             rH = (0.34 * cm)  # высота строки
+#         else:
+#             rH = (0.31 * cm)  # высота строки
+#     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
+
+#     for i in range(max_pl):
+#         i += 1
+#         i = str(i)
+#         num_columns.append(i)
+#     zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
+
+#     tblstyle = []
+#     # =========  цикл создания стиля таблицы ================
+#     for q in range(1, max_pl + 1):  # город участника делает курсивом
+#         # город участника делает курсивом
+#         fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
+#         tblstyle.append(fn)
+#         fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1),
+#               "DejaVuSerif-Bold")  # участника делает жирным шрифтом
+#         tblstyle.append(fn)
+#         # центрирование текста в ячейках)
+#         fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')
+#         tblstyle.append(fn)
+#         # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
+#         fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))
+#         tblstyle.append(fn)
+#         # объединяет клетки очки
+#         fn = ('SPAN', (max_pl + 2, q * 2 - 1), (max_pl + 2, q * 2))
+#         tblstyle.append(fn)
+#         # объединяет клетки соот
+#         fn = ('SPAN', (max_pl + 3, q * 2 - 1), (max_pl + 3, q * 2))
+#         tblstyle.append(fn)
+#         # объединяет клетки  место
+#         fn = ('SPAN', (max_pl + 4, q * 2 - 1), (max_pl + 4, q * 2))
+#         tblstyle.append(fn)
+#         # объединяет диагональные клетки
+#         fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
+#         tblstyle.append(fn)
+#         fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
+#               colors.lightgreen)  # заливает диагональные клетки
+#         tblstyle.append(fn)
+
+#     ts = []
+#     ts.append(tblstyle)
+#     # ============= полный стиль таблицы ======================
+#     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
+#                      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+#                      ('FONTSIZE', (0, 0), (-1, -1), 6),
+#                      # вставить размер шрифта конкретной ячей под длинную фамилию
+#                      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+#                      ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
+#                      ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')] # центрирование текста в ячейках вертикальное
+#                      #('BOTTOMPADDING', (0, 0), (-1, -1), 3)]
+#                     + tblstyle +
+#                     [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
+#                      # цвет шрифта в ячейках
+#                      ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
+#                      ('LINEABOVE', (0, 0), (-1, 1), 1,
+#                       colors.black),  # цвет линий нижней
+#                      # цвет и толщину внутренних линий
+#                      ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+#                      ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
+
+#     #  ============ создание таблиц и вставка данных =================
+#     h1 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
+#             leftIndent=center_stage, spacebefore=10, textColor="green")  # стиль параграфа ()
+
+#     # styles = getSampleStyleSheet()
+#     # title_style = styles['Title']
+#     # title_style.textColor = colors.red
+#     # title_style.fontSize = 24
+#     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
+#             leftIndent=300, spacebefore=20, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+#             #========
+#     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
+#     if kg == 1:  # одна таблицу
+#         data = [[dict_table[0]]]
+#         shell_table = Table(data, colWidths=["*"])
+#         text = ""
+#         elements.append(Paragraph(text, h2))
+#         elements.append(shell_table)
+#     else:
+#         data_tmp = []
+#         data_temp = []
+#         tmp = []
+#         temp = []
+#         data = []
+#         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
+#             for k in range(1, kg // 2 + 1):
+#                 for i in range(0, 2):
+#                     data_tmp.append(dict_table[(k * 2 - 2) + i])  
+#                 # tmp = data_tmp.copy()
+#                 # data_temp.append(tmp) 
+#                 # temp = data_temp.copy()
+#                 data.append(data_tmp.copy())
+#                 # tmp.clear()
+#                 data_tmp.clear()
+#             shell_table = []
+#             s_tmp = []
+#             for l in range(0, kg // 2): 
+#                 shell_tmp = Table(data[l], colWidths=["*"])
+#                 # s_tmp.append(shell_tmp)
+#                 # tmp_copy = s_tmp.copy()
+#                 shell_table.append(shell_tmp.copy())
+#                 shell_tmp.clear()
+#                 text = f'группа {l * 2 + 1} группа {l * 2 + 2}'
+#                 elements.append(Paragraph(text, h2))
+#                 elements.append(shell_table[l][0])
+#                 # =======
+#         else:  # страница книжная, то таблицы размещаются в столбец
+#             for k in range(1, kg // 2 + 1):
+#                 for i in range(0, kg):
+#                     data_tmp.append(dict_table[i])  
+#                     tmp = data_tmp.copy()
+#                     # data_temp.append(tmp) 
+#                     # temp = data_temp.copy()
+#                     # data.append(temp)
+#                     data.append(tmp)
+#                     data_tmp.clear()
+#                     # data_temp.clear()
+#             shell_table = []
+#             s_tmp = []
+#             for l in range(0, kg): 
+#                 shell_tmp = Table(data[l], colWidths=["*"])
+#                 s_tmp.append(shell_tmp)
+#                 tmp_copy = s_tmp.copy()
+#                 shell_table.append(tmp_copy)
+#                 s_tmp.clear()
+#                 elements.append(Paragraph(f'группа {l + 1}', h2))
+#                 elements.append(shell_table[l][0])
+
+#     if pv == A4:
+#         pv = A4
+#     else:
+#         pv = landscape(A4)
+#     t_id = Title.get(Title.id == title_id())
+#     short_name = t_id.short_name_comp
+
+#     if stage == "Одна таблица":
+#         title = "Финал"
+#         name_table = f"{short_name}_one_table.pdf"
+#     elif stage == "Предварительный":
+#         title = "Предварительный этап"
+#         name_table = f"{short_name}_table_group.pdf"
+#     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+#         txt = stage.rfind("-")
+#         number_fin = stage[:txt]
+#         title = stage
+#         name_table = f"{short_name}_{number_fin}-semifinal.pdf"
+#     else:
+#         txt = stage.rfind("-")
+#         number_fin = stage[:txt]
+#         title = stage
+#         name_table = f"{short_name}_{number_fin}-final.pdf"
+#     doc = SimpleDocTemplate(name_table, pagesize=pv)
+#     catalog = 1
+#     change_dir(catalog)
+#     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
+#     # doc.leftPadding = 0
+#     # doc.bottomMargin = 1.5 * cm
+#     doc.leftMargin = 0.5
+#     # doc.righttMargin = 0
+  
+#     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
+#     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
+#     os.chdir("..")
+
+
+
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
@@ -10350,6 +10572,9 @@ def table_made(pv, stage):
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
+
+
+
 
 
 def list_regions_pdf():
@@ -11961,32 +12186,26 @@ def write_in_setka(data, stage, first_mesto, table):
             col_first = 0
             row_first = 0
             place_3rd = 8
-            # place_5th = 11
         elif setka_string == "Сетка (-2) на 8 участников":
             col_first = 0
             row_first = 0
             place_3rd = 12
-            # place_5th = 13
         elif setka_string == "Сетка (с розыгрышем всех мест) на 16 участников":
             col_first = 2
             row_first = 0
             place_3rd = 16
-            # place_5th = 19
         elif setka_string == "Сетка (-2) на 16 участников":
             col_first = 0
             row_first = 2
             place_3rd = 28
-            # place_5th = 30
         elif setka_string == "Сетка (с розыгрышем всех мест) на 32 участников":
             col_first = 0
             row_first = 2
             place_3rd = 32
-            # place_5th = 35
         elif setka_string == "Сетка (-2) на 32 участников":
             col_first = 0
             row_first = 2
             place_3rd = 60
-            # place_5th = 61
         posev_data = setka_player_after_choice(stage) # игроки 1-ого посева
         all_list = setka_data(stage, posev_data)
         id_sh_name = all_list[2] # словарь {Фамилия Имя: id}
@@ -13050,7 +13269,6 @@ def circle_2_player(tr, td, max_person, mesto, num_gr, id_system):
     td[p2 * 2 - 2][max_person + 3] = points_p2  # очки во встрече проигравшего
 
     return player_rank_tmp
-# =====
 
 
 def circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
