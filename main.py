@@ -5697,7 +5697,7 @@ def string_score_game():
                 n3 = s23
             else:
                 n3 = str(f"-{s13}")
-            if (g == 2 and st2 == 2 and st1 == 1) or (g == 3 and st1 == 3 and st2 == 0):  # из 3-х  2-1 или из 5-и 3-0
+            if (g == 2 and st1 == 2 and st2 == 1) or (g == 3 and st1 == 3 and st2 == 0):  # из 3-х  2-1 или из 5-и 3-0
                 winner_string = f"({n1},{n2},{n3})"
                 return winner_string
             
@@ -5745,7 +5745,7 @@ def string_score_game():
                 n2 = s12
             else:
                 n2 = str(f"-{s22}")
-            if (g == 2 and st1 == 2 and st2 == 0):  # из 3-х партий 2-0
+            if (g == 2 and st1 == 0 and st2 == 2):  # из 3-х партий 2-0
                 winner_string = f"({n1},{n2})"
                 return winner_string
             
@@ -10408,7 +10408,7 @@ def table_made(pv, stage):
         if max_pl < 5:
             rH = (0.34 * cm)  # высота строки
         else:
-            rH = (0.32 * cm)  # высота строки
+            rH = (0.3 * cm)  # высота строки
     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
 
     for i in range(max_pl):
@@ -10454,7 +10454,7 @@ def table_made(pv, stage):
     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                      ('FONTSIZE', (0, 0), (-1, -1), 6),
-                     # вставить размер шрифта конкретной ячей под длинную фамилию
+                     # вставить размер шрифта конкретной ячейки под длинную фамилию
                      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                      ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
                      ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')] # центрирование текста в ячейках вертикальное
@@ -10497,7 +10497,7 @@ def table_made(pv, stage):
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
             for k in range(1, kg // 2 + 1):
                 for i in range(0, 2):
-                    data_tmp.append(dict_table[(k * 2 - 2) + i])  
+                    data_tmp.append(dict_table[(k * 2 - 2) + i]) 
                 tmp = data_tmp.copy()
                 data_temp.append(tmp) 
                 temp = data_temp.copy()
@@ -10507,7 +10507,7 @@ def table_made(pv, stage):
             shell_table = []
             s_tmp = []
             for l in range(0, kg // 2): 
-                shell_tmp = Table(data[l], colWidths=["*"])
+                shell_tmp = Table(data[l], colWidths=["*"], hAlign="CENTER")
                 s_tmp.append(shell_tmp)
                 tmp_copy = s_tmp.copy()
                 shell_table.append(tmp_copy)
@@ -10566,8 +10566,8 @@ def table_made(pv, stage):
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
     # doc.leftPadding = 0
     # doc.bottomMargin = 1.5 * cm
-    doc.leftMargin = 0
-    doc.righttMargin = 0
+    # doc.leftMargin = 0
+    # doc.righttMargin = 0
   
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
