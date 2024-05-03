@@ -10453,18 +10453,18 @@ def table_made(pv, stage):
     # ============= полный стиль таблицы ======================
     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                    #  ('VALIGN', (0, 0), (-1, -1), 'TOP'),
                      ('FONTSIZE', (0, 0), (-1, -1), 6),
                      # вставить размер шрифта конкретной ячейки под длинную фамилию
                      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                      ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
-                     ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')] # центрирование текста в ячейках вертикальное
-                     #('BOTTOMPADDING', (0, 0), (-1, -1), 3)]
+                     ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE'), # центрирование текста в ячейках вертикальное
+                     ('BOTTOMPADDING', (0, 0), (-1, -1), 0)]
                     + tblstyle +
                     [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
                      # цвет шрифта в ячейках
                      ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
-                     ('LINEABOVE', (0, 0), (-1, 1), 1,
-                      colors.black),  # цвет линий нижней
+                     ('LINEABOVE', (0, 0), (-1, 1), 1, colors.black),  # цвет линий нижней
                      # цвет и толщину внутренних линий
                      ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
                      ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
