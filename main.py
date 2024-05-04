@@ -10453,7 +10453,6 @@ def table_made(pv, stage):
     # ============= полный стиль таблицы ======================
     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
                      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-                    #  ('VALIGN', (0, 0), (-1, -1), 'TOP'),
                      ('FONTSIZE', (0, 0), (-1, -1), 6),
                      # вставить размер шрифта конкретной ячейки под длинную фамилию
                      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -10473,12 +10472,8 @@ def table_made(pv, stage):
     h1 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
             leftIndent=center_stage, spacebefore=10, textColor="green")  # стиль параграфа ()
 
-    # styles = getSampleStyleSheet()
-    # title_style = styles['Title']
-    # title_style.textColor = colors.red
-    # title_style.fontSize = 24
     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-            leftIndent=300, spacebefore=20, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
+            leftIndent=290, spacebefore=20, textColor="brown")  # стиль параграфа (номера таблиц)
             #========
     
     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
@@ -10496,8 +10491,7 @@ def table_made(pv, stage):
         data = []
         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
             for k in range(1, kg // 2 + 1):
-                for i in range(0, 2):
-                    data_tmp.append(dict_table[(k * 2 - 2) + i]) 
+                data_tmp = [dict_table[(k * 2 - 2) + 0], dict_table[(k * 2 - 2) + 1]]
                 tmp = data_tmp.copy()
                 data_temp.append(tmp) 
                 temp = data_temp.copy()
@@ -10507,15 +10501,17 @@ def table_made(pv, stage):
             shell_table = []
             s_tmp = []
             for l in range(0, kg // 2): 
-                shell_tmp = Table(data[l], colWidths=["*"], hAlign="CENTER")
+                shell_tmp = Table(data[l], [410, 410])
+                shell_tmp.setStyle(TableStyle([('VALIGN',(0, 0), (-1, -1), 'TOP')]))
+                gr_1 = f'группа {l * 2 + 1}'
+                gr_2 = f'группа {l * 2 + 2}'
                 s_tmp.append(shell_tmp)
                 tmp_copy = s_tmp.copy()
                 shell_table.append(tmp_copy)
                 s_tmp.clear()
-                text = f'группа {l * 2 + 1} группа {l * 2 + 2}'
+                text = gr_1 + (' ' * 10) + gr_2
                 elements.append(Paragraph(text, h2))
                 elements.append(shell_table[l][0])
-                # =======
         else:  # страница книжная, то таблицы размещаются в столбец
             for k in range(1, kg // 2 + 1):
                 for i in range(0, kg):
