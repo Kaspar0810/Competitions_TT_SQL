@@ -9,6 +9,7 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
+from reportlab.lib.enums import TA_CENTER
 from reportlab.pdfgen.canvas import Canvas
 from PyPDF2 import PdfMerger
 from main_window import Ui_MainWindow
@@ -9645,167 +9646,6 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
     return stiker
 
 
-# def tbl_protokol(ts, stage, list_tours):
-#     """данные таблицы и применение стиля и добавления заголовка столбцов
-#     tdt_new - [[[участник],[регион счет в партиях]]]"""
-#     from reportlab.platypus import Table
-#     story = []  # Список данных таблицы участников
-#     elements = []  # Список Заголовки столбцов таблицы
-#     titles = Title.select().where(Title.id == title_id()).get()
-#     result_list = Result.select().where(Result.title_id == title_id()).order_by(Player.player)
-#     # short_name = tit.short_name_comp
-#     gamer = titles.gamer
-#     count = len(result_list)  # количество записей в базе
-#     kp = count + 1
-#     n = 0
-#     for l in result_list:
-#         n += 1
-#         p = l.player
-#         b = l.bday
-#         r = l.rank
-#         c = l.city
-#         g = l.region
-#         z = l.razryad
-#         coach_id = l.coach_id
-#         t = coach_id.coach
-#         m = l.mesto
-#         data = [n, p, b, r, c, g, z, t, m]
-
-#         elements.append(data)
-#     elements.insert(0, ["№", "Тур", "Встреча", "Игрок_1", "Игрок_2", "Победитель", "Счет"])
-#     t = Table(elements, colWidths=(0.6 * cm, 3.9 * cm, 1.7 * cm, 1.2 * cm, 2.5 * cm, 3.1 * cm, 1.2 * cm, rowHeights=None, repeatRows=1)) # ширина столбцов, если None-автоматическая
-#     t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),  # Использую импортированный шрифт
-#                             ('FONTNAME', (1, 1), (1, kp), "DejaVuSerif-Bold"),
-#                            # Использую импортированный шрифта размер
-#                            ('FONTSIZE', (0, 0), (-1, -1), 7),
-#                            # межстрочный верхний инервал
-#                            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
-#                            # межстрочный нижний инервал
-#                            ('TOPPADDING', (0, 0), (-1, -1), 1),
-#                            # вериткальное выравнивание в ячейке заголовка
-#                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-#                            # горизонтальное выравнивание в ячейке
-#                            ('ALIGN', (0, 0), (-1, kp * -1), 'CENTER'),
-#                            ('BACKGROUND', (0, 0), (8, 0), colors.yellow),
-#                            ('TEXTCOLOR', (0, 0), (8, 0), colors.darkblue),
-#                            ('LINEABOVE', (0, 0), (-1, kp * -1), 1, colors.blue),
-#                            # цвет и толщину внутренних линий
-#                            ('INNERGRID', (0, 0), (-1, -1), 0.02, colors.grey),
-#                            # внешние границы таблицы
-#                            ('BOX', (0, 0), (-1, -1), 0.5, colors.black)
-#                            ]))
-
-
-#     h3 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic", leftIndent=150,
-#             firstLineIndent=-20, textColor="green")  # стиль параграфа
-#     h3.spaceAfter = 10  # промежуток после заголовка
-#     story.append(Paragraph(f'Список участников. {gamer}', h3))
-#     story.append(t)
-
-#     doc = SimpleDocTemplate(f"{short_name}_player_list_alf.pdf", pagesize=A4)
-#     catalog = 1
-#     change_dir(catalog)
-#     doc.build(story, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-#     os.chdir("..")
-#     # ========
-#     stiker = []
-#     final_type = "круг"
-#     from reportlab.platypus import Table
-#     systems = System.select().where(System.title_id == title_id())
-#     result = Result.select().where(Result.title_id == title_id())
-#     # ==== новый вариант с использованием system id
-#     id_system = system_id(stage)
-#     # ========
-#     if stage != "Финальный":
-#         system = systems.select().where(System.id == id_system).get()
-#     # else:
-#     #     system = systems.select().where(System.stage == number_group).get()
-#     #     final_type = system.type_table
-#      # # кол-во столбцов в таблице и их ширина
-#     cW = (1.6 * cm)
-#     rH = (0.6 * cm, 0.9 * cm, 1 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm, 0.6 * cm,
-#            0.5 * cm, 0.5 * cm)
-#     dict_tbl = {}
-#     tdt_new_tmp = []
-
-#     # if final_type == "сетка":
-#     #     result_setka = result.select().where(Result.number_group == number_group)
-#     #     result_all = result_setka.select().where((Result.player1 != "") & (Result.player2 != ""))
-#     #     result_group = result_all.select().where(Result.winner.is_null())
-#     # else:    
-#     #     if number_group == "все" and tours == "все":
-#     #         result_group = result.select().where(Result.system_id == id_system)
-#     #     elif number_group == "все" and tours == "диапазон":
-#     #         result_group = result.select().where((Result.system_id == id_system) & (Result.round.in_(list_tours)))
-#     #     elif number_group != "все" and tours == "все":
-#     #         if stage == "1-й полуфинал" or stage == "2-й полуфинал":
-#     #             result_group = result.select().where((Result.system_id == id_system) & (Result.number_group == number_group))
-#     #         else:
-#     #             result_group = result.select().where(Result.number_group == number_group)
-#     #     elif number_group != "все" and tours == "диапазон":
-#     #         result_group = result.select().where((Result.number_group == number_group) & (Result.round.in_(list_tours)))
- 
-#     shot_stage = ""
-#     # result_group = result.select().where((Result.number_group == number_group) & (Result.round.in_(list_tours)))
-#     result_group = result.select().where(Result.system_id == id_system)
-#     for res_id in result_group:
-#         tours = res_id.tours # номера игроков в туре
-#         pl1 = res_id.player1 # 1-й игроков и его город в туре
-#         pl2 = res_id.player2 # 2-й игроков и его город в туре
-#         st = res_id.number_group # этап
-#         n_gr = ""
-#         # if stage == "Предварительный":
-#         #     shot_stage = "ПР"
-#         #     mark = st.find(" ")
-#         #     gr = st[:mark]
-#         #     sys_stage = f"{shot_stage}"
-#         #     n_gr = f"{gr}гр"
-#         # elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-#         #     shot_stage = "ПФ"
-#         #     mark = st.find(" ")
-#         #     gr = st[:mark]
-#         #     sys_stage = f"{shot_stage}"
-#         #     n_gr = f"{gr}гр"
-#         if stage == "Финальный":
-#             shot_stage = "Ф"
-#             mark = st.find("-")
-#             sys_stage = f"{st[:mark]}{shot_stage}"
-
-#         round = res_id.round # раунд
-#         s1 = pl1.find("/")  
-#         s2 = pl2.find("/")   
-#         player1 = pl1[:s1]
-#         city1 = pl1[s1 + 1:]
-#         player2 = pl2[:s2]
-#         city2 = pl2[s2 + 1:]
-#         pl1 = f"{player1}\n{city1}" # делает фамилия и город на разнызх строчках
-#         pl2 = f"{player2}\n{city2}"
-#             # список строк бегунка
-#         d_tmp = [[n_gr, 'тур', 'вст', 'стол'],
-#                 [sys_stage, round, tours, ''],
-#                 [pl1, '', pl2, ''],
-#                 ['', '', '', ''],
-#                 ['', '', '', ''],
-#                 ['', '', '', ''],
-#                 ['', '', '', ''],
-#                 ['', '', '', ''],
-#                 ['общ счет:', '', '', ''],
-#                 ['Победитель', '', '', '']]
-#         tdt_temp = d_tmp.copy()
-#         d_tmp.clear()
-#         tdt_new_temp = tdt_temp.copy()
-#         tdt_new_tmp.append(tdt_new_temp)
-#         tdt_temp.clear()
-#     game = len(tdt_new_tmp)
-#         # ===========================
-#     for i in range(0, game):      
-#         dict_tbl[i] = Table(tdt_new_tmp[i], colWidths=cW, rowHeights=rH)
-#         dict_tbl[i].setStyle(ts)  # применяет стиль к таблице данных
-#     stiker.append(dict_tbl)
-#     stiker.append(game)
-#     return stiker
-
-
 def begunki_made():
     """создание бегунков"""
     from sys import platform
@@ -10116,228 +9956,6 @@ def load_name_net_after_choice_for_wiev(fin):
         setka_32_made(fin)
 
 
-# def table_made(pv, stage):
-#     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
-#      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
-#     stage_list_sf = ["1-й полуфинал", "2-й полуфинал"]
-#     from reportlab.platypus import Table
-#     # ==== новый вариант с использованием system id
-#     id_system = system_id(stage)
-#     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
-#     titles = Title.select().where(Title.id == title_id()).get()
-#     sex = titles.gamer 
-#     # ==========
-#     if stage in stage_list_sf: # если этап полуфинал
-#         kg = system.total_group  # кол-во групп
-#         max_pl = system.max_player // kg 
-#     elif stage == "Предварительный":
-#         kg = system.total_group  # кол-во групп
-#         max_pl = system.max_player
-#     else: # игры в финале по кругу или одна круговая таблица
-#         kg = 1
-#         max_pl = system.max_player
-        
-#     family_col = 3.2
-#     if pv == "альбомная":  # альбомная ориентация стр
-#         pv = landscape(A4)
-#         center_stage = 300 # откуда начинается надпись -предварительный этап-
-#         if kg == 1 or max_pl in [10, 11, 12, 13, 14, 15, 16]:
-#             # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
-#             wcells = 21.4 / max_pl
-#         else:
-#             # ширина столбцов таблицы в зависимости от кол-во чел (2-ух в ряд)
-#             wcells = 7.4 / max_pl
-#     else:  # книжная ориентация стр
-#         pv = A4
-#         center_stage = 150 # откуда начинается надпись -предварительный этап-
-#         family_col = 3.8
-#         if max_pl < 7:
-#             # family_col = 3.8
-#             wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
-#             # wcells = round(wcells, 2)
-#         else:
-#             # family_col = 3.8
-#             wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
-#         wcells = round(wcells, 2)
-
-#     col = ((wcells * cm,) * max_pl)
-#     elements = []
-
-#     # кол-во столбцов в таблице и их ширина
-#     cW = ((0.4 * cm, family_col * cm) + col + (0.8 * cm, 1 * cm, 1 * cm))
-#     if kg == 1:
-#         rH = (0.45 * cm)  # высота строки
-#     else:
-#         if max_pl < 5:
-#             rH = (0.34 * cm)  # высота строки
-#         else:
-#             rH = (0.31 * cm)  # высота строки
-#     num_columns = []  # заголовки столбцов и их нумерация в зависимости от кол-во участников
-
-#     for i in range(max_pl):
-#         i += 1
-#         i = str(i)
-#         num_columns.append(i)
-#     zagolovok = (['№', 'Участники/ Город'] + num_columns + ['Очки', 'Соот', 'Место'])
-
-#     tblstyle = []
-#     # =========  цикл создания стиля таблицы ================
-#     for q in range(1, max_pl + 1):  # город участника делает курсивом
-#         # город участника делает курсивом
-#         fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
-#         tblstyle.append(fn)
-#         fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1),
-#               "DejaVuSerif-Bold")  # участника делает жирным шрифтом
-#         tblstyle.append(fn)
-#         # центрирование текста в ячейках)
-#         fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')
-#         tblstyle.append(fn)
-#         # объединяет 1-2, 3-4, 5-6, 7-8 ячейки 1 столбца
-#         fn = ('SPAN', (0, q * 2 - 1), (0, q * 2))
-#         tblstyle.append(fn)
-#         # объединяет клетки очки
-#         fn = ('SPAN', (max_pl + 2, q * 2 - 1), (max_pl + 2, q * 2))
-#         tblstyle.append(fn)
-#         # объединяет клетки соот
-#         fn = ('SPAN', (max_pl + 3, q * 2 - 1), (max_pl + 3, q * 2))
-#         tblstyle.append(fn)
-#         # объединяет клетки  место
-#         fn = ('SPAN', (max_pl + 4, q * 2 - 1), (max_pl + 4, q * 2))
-#         tblstyle.append(fn)
-#         # объединяет диагональные клетки
-#         fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
-#         tblstyle.append(fn)
-#         fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
-#               colors.lightgreen)  # заливает диагональные клетки
-#         tblstyle.append(fn)
-
-#     ts = []
-#     ts.append(tblstyle)
-#     # ============= полный стиль таблицы ======================
-#     ts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "DejaVuSerif"),
-#                      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-#                      ('FONTSIZE', (0, 0), (-1, -1), 6),
-#                      # вставить размер шрифта конкретной ячей под длинную фамилию
-#                      ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-#                      ('FONTNAME', (0, 0), (max_pl + 5, 0), "DejaVuSerif-Bold"),
-#                      ('VALIGN', (0, 0), (max_pl + 5, 0), 'MIDDLE')] # центрирование текста в ячейках вертикальное
-#                      #('BOTTOMPADDING', (0, 0), (-1, -1), 3)]
-#                     + tblstyle +
-#                     [('BACKGROUND', (0, 0), (max_pl + 5, 0), colors.yellow),
-#                      # цвет шрифта в ячейках
-#                      ('TEXTCOLOR', (0, 0), (-1, -1), colors.darkblue),
-#                      ('LINEABOVE', (0, 0), (-1, 1), 1,
-#                       colors.black),  # цвет линий нижней
-#                      # цвет и толщину внутренних линий
-#                      ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-#                      ('BOX', (0, 0), (-1, -1), 2, colors.black)])  # внешние границы таблицы
-
-#     #  ============ создание таблиц и вставка данных =================
-#     h1 = PS("normal", fontSize=12, fontName="DejaVuSerif-Italic",
-#             leftIndent=center_stage, spacebefore=10, textColor="green")  # стиль параграфа ()
-
-#     # styles = getSampleStyleSheet()
-#     # title_style = styles['Title']
-#     # title_style.textColor = colors.red
-#     # title_style.fontSize = 24
-#     h2 = PS("normal", fontSize=10, fontName="DejaVuSerif-Italic",
-#             leftIndent=300, spacebefore=20, textColor=Color(1, 0, 1, 1))  # стиль параграфа (номера таблиц)
-#             #========
-#     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
-#     if kg == 1:  # одна таблицу
-#         data = [[dict_table[0]]]
-#         shell_table = Table(data, colWidths=["*"])
-#         text = ""
-#         elements.append(Paragraph(text, h2))
-#         elements.append(shell_table)
-#     else:
-#         data_tmp = []
-#         data_temp = []
-#         tmp = []
-#         temp = []
-#         data = []
-#         if pv == landscape(A4):  # страница альбомная, то таблицы размещаются обе в ряд
-#             for k in range(1, kg // 2 + 1):
-#                 for i in range(0, 2):
-#                     data_tmp.append(dict_table[(k * 2 - 2) + i])  
-#                 # tmp = data_tmp.copy()
-#                 # data_temp.append(tmp) 
-#                 # temp = data_temp.copy()
-#                 data.append(data_tmp.copy())
-#                 # tmp.clear()
-#                 data_tmp.clear()
-#             shell_table = []
-#             s_tmp = []
-#             for l in range(0, kg // 2): 
-#                 shell_tmp = Table(data[l], colWidths=["*"])
-#                 # s_tmp.append(shell_tmp)
-#                 # tmp_copy = s_tmp.copy()
-#                 shell_table.append(shell_tmp.copy())
-#                 shell_tmp.clear()
-#                 text = f'группа {l * 2 + 1} группа {l * 2 + 2}'
-#                 elements.append(Paragraph(text, h2))
-#                 elements.append(shell_table[l][0])
-#                 # =======
-#         else:  # страница книжная, то таблицы размещаются в столбец
-#             for k in range(1, kg // 2 + 1):
-#                 for i in range(0, kg):
-#                     data_tmp.append(dict_table[i])  
-#                     tmp = data_tmp.copy()
-#                     # data_temp.append(tmp) 
-#                     # temp = data_temp.copy()
-#                     # data.append(temp)
-#                     data.append(tmp)
-#                     data_tmp.clear()
-#                     # data_temp.clear()
-#             shell_table = []
-#             s_tmp = []
-#             for l in range(0, kg): 
-#                 shell_tmp = Table(data[l], colWidths=["*"])
-#                 s_tmp.append(shell_tmp)
-#                 tmp_copy = s_tmp.copy()
-#                 shell_table.append(tmp_copy)
-#                 s_tmp.clear()
-#                 elements.append(Paragraph(f'группа {l + 1}', h2))
-#                 elements.append(shell_table[l][0])
-
-#     if pv == A4:
-#         pv = A4
-#     else:
-#         pv = landscape(A4)
-#     t_id = Title.get(Title.id == title_id())
-#     short_name = t_id.short_name_comp
-
-#     if stage == "Одна таблица":
-#         title = "Финал"
-#         name_table = f"{short_name}_one_table.pdf"
-#     elif stage == "Предварительный":
-#         title = "Предварительный этап"
-#         name_table = f"{short_name}_table_group.pdf"
-#     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-#         txt = stage.rfind("-")
-#         number_fin = stage[:txt]
-#         title = stage
-#         name_table = f"{short_name}_{number_fin}-semifinal.pdf"
-#     else:
-#         txt = stage.rfind("-")
-#         number_fin = stage[:txt]
-#         title = stage
-#         name_table = f"{short_name}_{number_fin}-final.pdf"
-#     doc = SimpleDocTemplate(name_table, pagesize=pv)
-#     catalog = 1
-#     change_dir(catalog)
-#     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
-#     # doc.leftPadding = 0
-#     # doc.bottomMargin = 1.5 * cm
-#     doc.leftMargin = 0.5
-#     # doc.righttMargin = 0
-  
-#     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
-#     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
-#     os.chdir("..")
-
-
-
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
@@ -10349,21 +9967,7 @@ def table_made(pv, stage):
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()  # находит system id последнего
     titles = Title.select().where(Title.id == title_id()).get()
     sex = titles.gamer 
-    # =========
-    # styles = getSampleStyleSheet()
-    # styleN = styles['Normal']
-    # styleH = styles['Heading1']
-    # story = []
-    #     #add some flowables
-    # story.append(Paragraph("This is a Heading",styleH))
-    # story.append(Paragraph("This is a paragraph in <i>Normal</i> style.",
-    #        styleN))
-    # canvas  = Canvas('mydoc.pdf', pagesize=landscape(A4))
-    # f = Frame(5* cm, 3 * cm, 6 * cm, 25 * cm, showBoundary=0) # высота прямоугольника  6 Х 25, showBoundary = 1, рамка 0- нет
-    # f.addFromList(story,c)
-    # c.save()
 
-    # ==========
     if stage in stage_list_sf: # если этап полуфинал
         kg = system.total_group  # кол-во групп
         max_pl = system.max_player // kg 
@@ -10377,7 +9981,7 @@ def table_made(pv, stage):
     family_col = 3.2
     if pv == "альбомная":  # альбомная ориентация стр
         pv = landscape(A4)
-        center_stage = 300 # откуда начинается надпись -предварительный этап-
+        center_stage = 210 # откуда начинается надпись -предварительный этап-
         if kg == 1 or max_pl in [10, 11, 12, 13, 14, 15, 16]:
             # ширина столбцов таблицы в зависимости от кол-во чел (1 таблица)
             wcells = 21.4 / max_pl
@@ -10386,7 +9990,7 @@ def table_made(pv, stage):
             wcells = 7.4 / max_pl
     else:  # книжная ориентация стр
         pv = A4
-        center_stage = 150 # откуда начинается надпись -предварительный этап-
+        center_stage = 140 # откуда начинается надпись -предварительный этап-
         if max_pl < 7:
             family_col = 3.8
             wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
@@ -12801,13 +12405,14 @@ def score_in_setka(stage, place_3rd):
     system = System.select().where(System.id == id_system).get()
     vid_setki = system.label_string
     visible_game = system.visible_game
+    pl_in_fin = system.max_player
     # получение id последнего соревнования
     player = Player.select().where(Player.title_id == title_id())
     result = Result.select().where(Result.system_id == id_system)
- 
+    first_tour_list = [i for i in range(1, (pl_in_fin // 2) + 1)]
+    n = 0
     for res in result:
         num_game = int(res.tours)
-
         if res.winner is not None and res.winner != "": # значит встреча сыграна
             if res.winner != "X":
                 id_pl_win = player.select().where(Player.full_name == res.winner).get()
@@ -12834,7 +12439,9 @@ def score_in_setka(stage, place_3rd):
             tmp_match.clear()
             dict_setka[num_game] = match
         else:
-            if my_win.checkBox_no_play_3.isChecked():
+            if num_game in first_tour_list:
+                n += 1
+            elif my_win.checkBox_no_play_3.isChecked() and n < pl_in_fin // 2:
                 res = result.select().where(Result.tours == place_3rd).get()
                 id_pl1 = player.select().where(Player.full_name == res.player1).get()
                 id_pl2 = player.select().where(Player.full_name == res.player2).get()
