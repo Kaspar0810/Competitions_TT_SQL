@@ -4165,6 +4165,7 @@ def change_status_visible_and_score_game():
     systems = system.select().where(System.id == system_id).get()
     with db:
         systems.score_flag = match_current
+        systems.visible_game = state_visible
         systems.save()
     return state_visible
 
@@ -11838,8 +11839,8 @@ def write_in_setka(data, stage, first_mesto, table):
         for v in mesta_dict.keys():
             mesta_list.append(v)
         # ======
-        if my_win.checkBox_no_play_3.isChecked():
-            key_list.append(place_3rd)
+        # if my_win.checkBox_no_play_3.isChecked():
+        #     key_list.append(place_3rd)
         key_list.sort()
         # ============
         for i in key_list: # спиисок встреч которые сыграны
@@ -12405,16 +12406,23 @@ def score_in_setka(stage, place_3rd):
     system = System.select().where(System.id == id_system).get()
     vid_setki = system.label_string
     visible_game = system.visible_game
-    pl_in_fin = system.max_player
     # получение id последнего соревнования
     player = Player.select().where(Player.title_id == title_id())
     result = Result.select().where(Result.system_id == id_system)
-    first_tour_list = [i for i in range(1, (pl_in_fin // 2) + 1)]
-    n = 0
     for res in result:
         num_game = int(res.tours)
+        
         if res.winner is not None and res.winner != "": # значит встреча сыграна
-            if res.winner != "X":
+            if num_game == place_3rd and my_win.checkBox_no_play_3.isChecked():
+                if res.player1 != "" and res.player2 != "":
+                    res = result.select().where(Result.tours == place_3rd).get()
+                    id_pl1 = player.select().where(Player.full_name == res.player1).get()
+                    id_pl2 = player.select().where(Player.full_name == res.player2).get()
+                    short_name_win1 = id_pl1.player
+                    short_name_win2 = id_pl2.player
+                    match = [0, short_name_win1, '', '', short_name_win2]
+                    dict_setka[num_game] = match
+            elif res.winner != "X":
                 id_pl_win = player.select().where(Player.full_name == res.winner).get()
                 short_name_win = id_pl_win.player
                 if res.loser == "X":
@@ -12438,17 +12446,16 @@ def score_in_setka(stage, place_3rd):
             match = tmp_match.copy()
             tmp_match.clear()
             dict_setka[num_game] = match
-        else:
-            if num_game in first_tour_list:
-                n += 1
-            elif my_win.checkBox_no_play_3.isChecked() and n < pl_in_fin // 2:
-                res = result.select().where(Result.tours == place_3rd).get()
-                id_pl1 = player.select().where(Player.full_name == res.player1).get()
-                id_pl2 = player.select().where(Player.full_name == res.player2).get()
-                short_name_win1 = id_pl1.player
-                short_name_win2 = id_pl2.player
-                match = [0, short_name_win1, '', '', short_name_win2]
-                dict_setka[num_game] = match
+        # else:
+        #     if num_game == place_3rd and my_win.checkBox_no_play_3.isChecked():
+        #         if res.player1 != "" and res.player2 != "":
+        #             res = result.select().where(Result.tours == place_3rd).get()
+        #             id_pl1 = player.select().where(Player.full_name == res.player1).get()
+        #             id_pl2 = player.select().where(Player.full_name == res.player2).get()
+        #             short_name_win1 = id_pl1.player
+        #             short_name_win2 = id_pl2.player
+        #             match = [0, short_name_win1, '', '', short_name_win2]
+        #             dict_setka[num_game] = match
     return dict_setka
 
 
