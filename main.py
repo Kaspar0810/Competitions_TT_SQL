@@ -3254,7 +3254,7 @@ def system_competition():
             msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
             msgBox.setDefaultButton(QMessageBox.Yes)
             ret = msgBox.exec()
-            if ret == msgBox.Ok:
+            if ret == msgBox.Yes:
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
                 tab_enabled(gamer)  # показывает вкладки по новому
@@ -8180,10 +8180,13 @@ def etap_made():
     if etap == "Предварительный":    
         kol_player_in_group() # кол-во участников в группах
     elif etap == "Финальный":
-        total_game_table(exit_stage="", kpt=0, fin="", pv="") # сколько игр в финале или пф 
         systems = system.select().order_by(System.id.desc()).get()
+        stage = systems.stage
+        total_game_table(exit_stage="", kpt=0, fin=stage, pv="") # сколько игр в финале или пф 
+        kol_game = my_win.spinBox.text()
         state_visible = my_win.checkBox_5.isChecked() # записывает в DB измененный статус видимости
         with db:
+            systems.score_flag = kol_game
             systems.visible_game = state_visible
             systems.save()
         # суммирует все игры этапов  
@@ -8343,14 +8346,13 @@ def control_all_player_in_final(etap):
     system_stage = system.select().where(System.stage == "Предварительный").get()
     total_player = system_stage.total_athletes
     system_id = system.select().where(System.stage ** '% финал')
-    tot_fin = len(system_id) # если 0, значит финалы еще не созданы или этап -одна таблица-
+    # tot_fin = len(system_id) # если 0, значит финалы еще не созданы или этап -одна таблица-
     sum_final = []
 
     for i in system_id:
         if i.stage != "Предварительный" and i.stage != "1-й полуфинал" and i.stage != "2-й полуфинал":
             player_in_etap = i.max_player
             sum_final.append(player_in_etap)
-
     total_final = sum(sum_final)
     t = total_player - total_final # оставшиеся не распределенные участники по финалам
     txt = ""
@@ -9995,11 +9997,11 @@ def table_made(pv, stage):
         if max_pl < 7:
             family_col = 3.8
             wcells = 12.0 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
-            wcells = round(wcells, 2)
+            # wcells = round(wcells, 2)
         else:
             family_col = 3.8
             wcells = 12.8 / max_pl  # ширина столбцов таблицы в зависимости от кол-во чел
-            wcells = round(wcells, 2)
+        wcells = round(wcells, 2)
 
     col = ((wcells * cm,) * max_pl)
     elements = []
@@ -10167,15 +10169,12 @@ def table_made(pv, stage):
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
     # doc.leftPadding = 0
     # doc.bottomMargin = 1.5 * cm
-    # doc.leftMargin = 0
+    doc.leftMargin = 0.5
     # doc.righttMargin = 0
   
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
     os.chdir("..")
-
-
-
 
 
 def list_regions_pdf():
@@ -11133,8 +11132,8 @@ def setka_32_made(fin):
         # центрирование номеров встреч
         fn = ('ALIGN', (i, 0), (i, strok), 'CENTER')
         style.append(fn)
-    # fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
-    # style.append(fn)
+    fn = ('INNERGRID', (0, 0), (-1, -1), 0.01, colors.grey)  # временное отображение сетки
+    style.append(fn)
     ts = style   # стиль таблицы (список оформления строк и шрифта)
     for b in style_color:
         ts.append(b)
@@ -11972,46 +11971,6 @@ def kol_player(stage):
     return max_gamer
 
 
-# def  table_data(stage, kg):
-#     """циклом создаем список участников каждой группы или финалов по кругу"""
-#     tdt_all = []  # список списков [tdt_new] и [tdt_color]
-#     tdt_color = []
-#     tdt_new = []
-#     result = Result.select().where(Result.title_id == title_id())  # находит system id последнего
-#     system = System.select().where(System.title_id == title_id())
-#     system_id = system.select().where(System.stage == stage).get()
-#     id_system = system_id.id
-#     if kg == 1:  # система одна таблица круг или финалу по кругу
-#         # список словарей участник и его регион
-#         result_fin = result.select().where(Result.system_id == id_system)
-#         tr = len(result_fin)  # общее кол-во игр в финалах или одной таблице
-#         posev_data = player_choice_one_table(stage) # posev_data (фамилия/ id)
-#         count_player_group = len(posev_data)
-#         max_gamer = count_player_group
-#         num_gr = stage
-#         tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
-#         tdt_new.append(tdt_tmp[0])
-#         tdt_color.append(tdt_tmp[1])
-#         tdt_all.append(tdt_new)
-#         tdt_all.append(tdt_color)
-#     else:
-#         max_gamer = kol_player(stage)
-#         result_stage = result.select().where(Result.system_id == id_system)
-#         tr = len(result_stage)  # общее кол-во игр в группах
-#         for p in range(0, kg):
-#             num_gr = f"{p + 1} группа"
-#             if stage == "Предварительный":
-#                 posev_data = player_choice_in_group(num_gr) # словарь фамилия:игрок/id регион: область
-#             else:
-#                 posev_data = player_choice_semifinal(stage, num_gr)
-#             count_player_group = len(posev_data)
-#             tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
-#             tdt_new.append(tdt_tmp[0])
-#             tdt_color.append(tdt_tmp[1])
-#             tdt_all.append(tdt_new)
-#             tdt_all.append(tdt_color)
-#     return tdt_all
-
 def  table_data(stage, kg):
     """циклом создаем список участников каждой группы или финалов по кругу"""
     tdt_all = []  # список списков [tdt_new] и [tdt_color]
@@ -12446,16 +12405,7 @@ def score_in_setka(stage, place_3rd):
             match = tmp_match.copy()
             tmp_match.clear()
             dict_setka[num_game] = match
-        # else:
-        #     if num_game == place_3rd and my_win.checkBox_no_play_3.isChecked():
-        #         if res.player1 != "" and res.player2 != "":
-        #             res = result.select().where(Result.tours == place_3rd).get()
-        #             id_pl1 = player.select().where(Player.full_name == res.player1).get()
-        #             id_pl2 = player.select().where(Player.full_name == res.player2).get()
-        #             short_name_win1 = id_pl1.player
-        #             short_name_win2 = id_pl2.player
-        #             match = [0, short_name_win1, '', '', short_name_win2]
-        #             dict_setka[num_game] = match
+
     return dict_setka
 
 
@@ -13537,7 +13487,8 @@ def color_mesta(data, first_mesto, table):
             if table == "setka_32_2":
                 ml = [13, 31, 54, 22] 
             elif table == "setka_16_full":
-                ml = [10, 15, 26, 10] 
+                # ml = [10, 15, 26, 10] 
+                ml = [10, 14, 25, 10]
             elif table == "setka_16_2":
                 ml = [9, 15, 33, 17]
             elif table == "setka_8_full":
@@ -13552,7 +13503,8 @@ def color_mesta(data, first_mesto, table):
             if table == "setka_32_2":
                 ml = [13, 80, 97, 16]  
             elif table == "setka_16_full":
-                ml = [10, 29, 32, 2] 
+                # ml = [10, 29, 32, 2] 
+                ml = [10, 28, 31, 2] 
             elif table == "setka_16_2":
                 ml = [9, 48, 56, 7] 
             elif table == "setka_8_full":
@@ -13567,7 +13519,8 @@ def color_mesta(data, first_mesto, table):
             if table == "setka_32_2":
                 ml = [13, 101, 106, 4]  
             elif table == "setka_16_full":
-                ml = [10, 34, 38, 3] 
+                # ml = [10, 34, 38, 3] 
+                ml = [10, 33, 37, 3] 
             elif table == "setka_16_2":
                 ml = [9, 60, 64, 3] 
             elif table == "setka_8_full":
@@ -13580,9 +13533,10 @@ def color_mesta(data, first_mesto, table):
             if table == "setka_32_2":
                 ml = [13, 109, 114, 4]  
             elif table == "setka_16_full":
-                ml = [10, 39, 42, 2] 
+                # ml = [10, 39, 42, 2] 
+                ml = [10, 38, 41, 2]
             elif table == "setka_16_2":
-                ml = [9, 66, 70, 3] 
+                ml = [9, 66, 70, 3]
             elif table == "setka_8_full":
                 ml = [8, 28, 31, 2] 
             elif table == "setka_8_2": 
@@ -13593,7 +13547,8 @@ def color_mesta(data, first_mesto, table):
             if table == "setka_32_2":
                 ml = [5, 113, 118, 4]  
             elif table == "setka_16_full":
-                ml = [10, 47, 53, 5] 
+                # ml = [10, 47, 53, 5] 
+                ml = [10, 46, 52, 5] 
             elif table == "setka_16_2":
                 ml = [5, 63, 70, 6] 
             else:
@@ -13602,7 +13557,8 @@ def color_mesta(data, first_mesto, table):
             if table == "setka_32_2":
                 ml = [11, 119, 124, 4]  
             elif table == "setka_16_full":
-                ml = [10, 55, 58, 2] 
+                # ml = [10, 55, 58, 2] 
+                ml = [10, 54, 57, 2]
             elif table == "setka_16_2":
                 ml = [9, 72, 76, 3] 
             else:
@@ -13611,7 +13567,8 @@ def color_mesta(data, first_mesto, table):
             if table == "setka_32_2":
                 ml = [5, 125, 130, 4]  
             elif table == "setka_16_full":
-                ml = [10, 60, 64, 3]
+                # ml = [10, 60, 64, 3]
+                ml = [10, 59, 63, 3]
             elif table == "setka_16_2":
                 ml = [5, 75, 82, 6]  
             else:
@@ -13620,7 +13577,8 @@ def color_mesta(data, first_mesto, table):
             if table == "setka_32_2":
                 ml = [11, 127, 132, 4] 
             elif table == "setka_16_full":
-                ml = [10, 65, 68, 2]
+                # ml = [10, 65, 68, 2]
+                ml = [10, 64, 67, 2]
             elif table == "setka_16_2":
                 ml = [9, 78, 82, 3]  
             else:
