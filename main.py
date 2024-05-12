@@ -9962,7 +9962,6 @@ def load_name_net_after_choice_for_wiev(fin):
 def table_made(pv, stage):
     """создание таблиц kg - количество групп(таблиц), g2 - наибольшое кол-во участников в группе
      pv - ориентация страницы, е - если участников четно группам, т - их количество"""
-    # start_time = time.time()
     stage_list_sf = ["1-й полуфинал", "2-й полуфинал"]
     from reportlab.platypus import Table
      # ==== новый вариант с использованием system id
@@ -10030,8 +10029,7 @@ def table_made(pv, stage):
         # город участника делает курсивом
         fn = ('FONTNAME', (1, q * 2), (1, q * 2), "DejaVuSerif-Italic")
         tblstyle.append(fn)
-        fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1),
-              "DejaVuSerif-Bold")  # участника делает жирным шрифтом
+        fn = ('FONTNAME', (1, q * 2 - 1), (1, q * 2 - 1), "DejaVuSerif-Bold")  # участника делает жирным шрифтом
         tblstyle.append(fn)
         # центрирование текста в ячейках)
         fn = ('ALIGN', (1, q * 2 - 1), (1, q * 2 - 1), 'LEFT')
@@ -10051,8 +10049,7 @@ def table_made(pv, stage):
         # объединяет диагональные клетки
         fn = ('SPAN', (q + 1, q * 2 - 1), (q + 1, q * 2))
         tblstyle.append(fn)
-        fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2),
-              colors.lightgreen)  # заливает диагональные клетки
+        fn = ('BACKGROUND', (q + 1, q * 2 - 1), (q + 1, q * 2), colors.lightgreen)  # заливает диагональные клетки
         tblstyle.append(fn)
 
     ts = []
