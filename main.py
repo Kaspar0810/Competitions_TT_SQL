@@ -67,27 +67,31 @@ registerFontFamily('DejaVuSerif', normal='DejaVuSerif',
                    bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
 enc = 'UTF-8'
 
-TTFSearchPath = (
-    'c:/winnt/fonts',
-    'c:/windows/fonts',
-    '%(REPORTLAB_DIR)s/fonts',  # special
-    '%(REPORTLAB_DIR)s/../fonts',  # special
-    '%(REPORTLAB_DIR)s/../../fonts',  # special
-    '%(CWD)s/fonts',  # special
-    '~/fonts',
-    '~/.fonts',
-    '%(XDG_DATA_HOME)s/fonts',
-    '~/.local/share/fonts',
-    # mac os X - from
-    '~/Library/Fonts',
-    '/Library/Fonts',
-    '/System/Library/Fonts',
-)
-pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf', enc))
-pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf', enc))
-pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf', enc))
-pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf', enc))
-pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf', enc))
+outpath = os.path.join(os.getcwd(), 'font')
+
+
+# TTFSearchPath = (
+#     'c:/winnt/fonts',
+#     'c:/windows/fonts',
+#     '%(REPORTLAB_DIR)s/fonts',  # special
+#     '%(REPORTLAB_DIR)s/../fonts',  # special
+#     '%(REPORTLAB_DIR)s/../../fonts',  # special
+#     '%(CWD)s/fonts',  # special
+#     '~/fonts',
+#     '~/.fonts',
+#     '%(XDG_DATA_HOME)s/fonts',
+#     '~/.local/share/fonts',
+#     # mac os X - from
+#     '~/Library/Fonts',
+#     '/Library/Fonts',
+#     '/System/Library/Fonts',
+# )
+# pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf', enc))
+pdfmetrics.registerFont(TTFont('DejaVuSans', os.path.join(outpath, 'DejaVuSans.ttf', enc)))
+pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', os.path.join(outpath, 'DejaVuSans-Bold.ttf', enc)))
+pdfmetrics.registerFont(TTFont('DejaVuSerif', os.path.join(outpath, 'DejaVuSerif.ttf', enc)))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', os.path.join(outpath, 'DejaVuSerif-Bold.ttf', enc)))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', os.path.join(outpath, 'DejaVuSerif-Italic.ttf', enc)))
 
 class MyTableModel(QAbstractTableModel):
     def __init__(self, data):
