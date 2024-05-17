@@ -66,7 +66,6 @@ if __name__ == '__main__':
 registerFontFamily('DejaVuSerif', normal='DejaVuSerif',
                    bold='DejaVuSerif-Bold', italic='DejaVuSerif-Italic')
 outpath = os.path.join(os.getcwd(), 'font')
-
 pdfmetrics.registerFont(TTFont('DejaVuSans', os.path.join(outpath, 'DejaVuSans.ttf')))
 pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', os.path.join(outpath, 'DejaVuSans-Bold.ttf')))
 pdfmetrics.registerFont(TTFont('DejaVuSerif', os.path.join(outpath, 'DejaVuSerif.ttf')))
