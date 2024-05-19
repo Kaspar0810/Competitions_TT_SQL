@@ -296,6 +296,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
         help_Menu.addAction(self.copy_db_Action)
+        help_Menu.addAction(self.stat_Action)
     #  создание действий меню
 
     def _createAction(self):
@@ -381,6 +382,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_etap_Action.setEnabled(False)  # делает пункт меню не видимым
 
         self.copy_db_Action = QAction("Импорт из базы данных")
+        self.stat_Action = QAction("Статистика встреч")
 
     def _connectActions(self):
         # Connect File actions
@@ -436,6 +438,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.print_list_pay_R_Action.triggered.connect(self.check_debitor_R)
 
         self.copy_db_Action.triggered.connect(self.import_db)
+        self.stat_Action.triggered.connect(self.statistika)
 
     def check_debitor_R(self):
         check_player_whitout_R()
@@ -482,6 +485,61 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if (db_backup):
                 db_backup.close()
                 my_win.activateWindow()
+
+    def statistika(self):
+        """статистика встреч для точного обсчета рейтинга"""
+        my_win.tableWidget.clear()
+        my_win.tableWidget.show()
+        sf_list = ["1-й полуфинал", "2-й полуфинал"]
+        sf_game_list = []
+        my_win.tableWidget.setColumnCount(3) # устанавливает колво столбцов
+        my_win.tableWidget.setRowCount(10)
+        systems = System.select().where(System.title_id == title_id())
+        for i in systems:
+            if i.stage in sf_list:
+                pl_exit = i.mesta_exit
+                group_sf = i.total_group
+                game_in_group = (pl_exit * (pl_exit - 1))
+                sf_game = game_in_group * group_sf
+                sf_game_list.append(sf_game)
+        sum_game_sf = sum(sf_game_list)
+        column_label = ["Стадия", "Колчество встреч"]
+        my_win.tableWidget.resizeColumnsToContents()
+        for i in range(0, 2):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+            my_win.tableWidget.showColumn(i)
+            item = QtWidgets.QTableWidgetItem()
+            brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
+            brush.setStyle(QtCore.Qt.SolidPattern)
+            item.setForeground(brush)
+            my_win.tableWidget.setHorizontalHeaderItem(i, item)
+        my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+        
+ 
+        my_win.tableWidget.setItem(0, 0, QTableWidgetItem("Общее число игр в турнире"))
+        my_win.tableWidget.setItem(1, 0, QTableWidgetItem("Встречи по неявке"))
+        my_win.tableWidget.setItem(2, 0, QTableWidgetItem("Встречи в сетке с X"))
+        my_win.tableWidget.setItem(3, 0, QTableWidgetItem("Встречи в ПФ, попавшие в финалы"))
+        my_win.tableWidget.setItem(4, 0, QTableWidgetItem("Всего встреч для обсчета рейтинга"))
+
+        all_game_result = Result.select().where(Result.title_id == title_id())               
+        game_no_playing = all_game_result.select().where(Result.score_in_game == "В : П")        
+        game_no = all_game_result.select().where(Result.loser == "X")
+
+
+        all_game = len(all_game_result)
+        no_playing = len( game_no_playing)
+        no_game = len( game_no)
+        sum_game_no_playing = no_playing + no_game + sum_game_sf
+        sum_game_rejting = all_game - sum_game_no_playing
+
+        my_win.tableWidget.setItem(0, 1, QTableWidgetItem(str(all_game)))
+        my_win.tableWidget.setItem(1, 1, QTableWidgetItem(str(no_playing)))
+        my_win.tableWidget.setItem(2, 1, QTableWidgetItem(str(no_game)))
+        my_win.tableWidget.setItem(3, 1, QTableWidgetItem(str(sum_game_sf)))
+        my_win.tableWidget.setItem(4, 1, QTableWidgetItem(str(sum_game_rejting)))
+   
+        my_win.tableWidget.resizeColumnsToContents()
+        #     comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)   
 
     def exit(self):
         exit_comp()
@@ -808,9 +866,6 @@ class StartWindow(QMainWindow, Ui_Form):
         self.Button_view_pdf.setEnabled(False)
         self.comboBox_arhive_year.setEnabled(False)
         self.comboBox_arhive_year.currentTextChanged.connect(self.choice_competition)
-        # self.pb = QProgressDialog()
-        # self.pb.setMinimum(0)
-        # self.pb.setMaximum(100)
 
         dbase()
         count = len(Title.select())
@@ -2806,6 +2861,7 @@ def page():
         Button_view_group.show()
         Button_view_group.clicked.connect(view)
         my_win.widget.hide()
+        my_win.tableWidget.hide()
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
@@ -2834,6 +2890,7 @@ def page():
         Button_view_semifinal.show()
         Button_view_semifinal.clicked.connect(view)
         my_win.widget.hide()
+        my_win.tableWidget.hide()
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
@@ -2880,6 +2937,7 @@ def page():
         Button_view_final.setText("Просмотр\nфиналов")
         Button_view_final.show()
         my_win.widget.hide()
+        my_win.tableWidget.hide()
         Button_view_final.clicked.connect(view)
         my_win.resize(1270, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
@@ -13472,9 +13530,9 @@ def color_mesta(data, first_mesto, table):
             elif table == "setka_16_2":
                 ml = [9, 15, 33, 17]
             elif table == "setka_8_full":
-                ml = [8, 7, 14, 6]
+                ml = [8, 6, 13, 6]
             elif table == "setka_8_2":
-                ml = [8, 7, 14, 6]
+                ml = [8, 6, 13, 6]
             elif table == "setka_32_full":
                 ml = [11, 31, 54, 22] 
             elif table == "setka_32":
@@ -13488,9 +13546,9 @@ def color_mesta(data, first_mesto, table):
             elif table == "setka_16_2":
                 ml = [9, 48, 56, 7] 
             elif table == "setka_8_full":
-                ml = [8, 16, 19, 2]
+                ml = [8, 15, 18, 2]
             elif table == "setka_8_2": 
-                ml = [8, 18, 23, 4]
+                ml = [8, 17, 22, 4]
             elif table == "setka_32_full":               
                 ml = [11, 59, 65, 5] 
             elif table == "setka_32":               
@@ -13504,9 +13562,9 @@ def color_mesta(data, first_mesto, table):
             elif table == "setka_16_2":
                 ml = [9, 60, 64, 3] 
             elif table == "setka_8_full":
-                ml = [8, 22, 26, 3]
+                ml = [8, 21, 25, 3]
             elif table == "setka_8_2": 
-                ml = [8, 25, 29, 3] 
+                ml = [8, 24, 28, 3] 
             else:
                 ml = [11, 72, 92, 5]
         elif c == 3: # 7-8 место
@@ -13518,9 +13576,9 @@ def color_mesta(data, first_mesto, table):
             elif table == "setka_16_2":
                 ml = [9, 66, 70, 3]
             elif table == "setka_8_full":
-                ml = [8, 28, 31, 2] 
+                ml = [8, 27, 30, 2] 
             elif table == "setka_8_2": 
-                ml = [8, 31, 35, 3]
+                ml = [8, 30, 34, 3]
             else:
                 ml = [11, 94, 95, 1]
         elif c == 4: # 9-10 место
