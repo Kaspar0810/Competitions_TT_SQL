@@ -297,6 +297,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         help_Menu = menuBar.addMenu("Помощь")  # основное
         help_Menu.addAction(self.copy_db_Action)
         help_Menu.addAction(self.stat_Action)
+        help_Menu.addAction(self.player_stat_Action)
     #  создание действий меню
 
     def _createAction(self):
@@ -382,7 +383,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_etap_Action.setEnabled(False)  # делает пункт меню не видимым
 
         self.copy_db_Action = QAction("Импорт из базы данных")
-        self.stat_Action = QAction("Статистика встреч")
+        self.stat_Action = QAction("Чило встреч для R отчета")
+        self.player_stat_Action = QAction("Статистика игрока")
 
     def _connectActions(self):
         # Connect File actions
@@ -439,6 +441,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.copy_db_Action.triggered.connect(self.import_db)
         self.stat_Action.triggered.connect(self.statistika)
+        self.player_stat_Action.triggered.connect(self.player_stat)
 
     def check_debitor_R(self):
         check_player_whitout_R()
@@ -490,10 +493,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """статистика встреч для точного обсчета рейтинга"""
         my_win.tableWidget.clear()
         my_win.tableWidget.show()
+        my_win.tabWidget.setCurrentIndex(7)
         sf_list = ["1-й полуфинал", "2-й полуфинал"]
         sf_game_list = []
-        my_win.tableWidget.setColumnCount(3) # устанавливает колво столбцов
-        my_win.tableWidget.setRowCount(10)
+        my_win.tableWidget.setColumnCount(2) # устанавливает колво столбцов
+        my_win.tableWidget.setRowCount(5)
         systems = System.select().where(System.title_id == title_id())
         for i in systems:
             if i.stage in sf_list:
@@ -538,8 +542,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.tableWidget.setItem(3, 1, QTableWidgetItem(str(sum_game_sf)))
         my_win.tableWidget.setItem(4, 1, QTableWidgetItem(str(sum_game_rejting)))
    
-        my_win.tableWidget.resizeColumnsToContents()
-        #     comboBox_family_city.currentTextChanged.connect(change_on_comboBox_referee)   
+        my_win.tableWidget.resizeColumnsToContents() 
+
+    def player_stat(self):
+        """статистика встреч игрока"""
+        pass
 
     def exit(self):
         exit_comp()
@@ -2654,6 +2661,7 @@ def page():
         my_win.label_predzayavka.setText(f"По предзаявке: {count_pred} чел.")
         list_player_pdf(player_list)
         my_win.widget.hide()
+        my_win.tableWidget.hide()
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
@@ -2852,6 +2860,7 @@ def page():
             player_list = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.mesto_semifinal_group, Choice.sf_group)
         fill_table(player_list)
         my_win.widget.hide()
+        my_win.tableWidget.hide()
     elif tb == 3:  # вкладка -группы-
         stage = "Предварительный"
         Button_view_group = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
