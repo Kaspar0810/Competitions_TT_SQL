@@ -546,7 +546,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def player_stat(self):
         """статистика встреч игрока"""
-        pass
+        my_win.tabWidget.setCurrentIndex(7)
+        my_win.groupBox_4.hide()
+        my_win.tableView.show()
 
     def exit(self):
         exit_comp()
@@ -1979,6 +1981,9 @@ def fill_table(player_list):
         model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) 
     elif tb == 6:
         model.setHorizontalHeaderLabels(['id',' Место', ' R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
+    elif tb == 7:
+        model.setHorizontalHeaderLabels(['id',' Место', ' R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
+
     if tb == 1:
         if my_win.checkBox_15.isChecked():
             my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
@@ -2992,6 +2997,7 @@ def page():
         my_win.comboBox_choice_R.addItems(rejting_month)
         load_comboBox_filter_rejting()
     elif tb == 7: # вкладка -дополнительно-
+        my_win.groupBox_4.show()
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 525))
         my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
