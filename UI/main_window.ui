@@ -95,7 +95,7 @@
         <x>3</x>
         <y>43</y>
         <width>831</width>
-        <height>201</height>
+        <height>207</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -4441,7 +4441,7 @@
         <x>698</x>
         <y>10</y>
         <width>132</width>
-        <height>201</height>
+        <height>221</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_53">
@@ -4616,7 +4616,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4629,7 +4629,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5263,7 +5263,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5301,7 +5301,7 @@
         <x>0</x>
         <y>40</y>
         <width>241</width>
-        <height>411</height>
+        <height>467</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_57" stretch="0,0,0,0,0,0,0,0,0,0,0,0">
@@ -5827,7 +5827,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6237,7 +6237,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6536,7 +6536,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6995,7 +6995,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7365,7 +7365,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7656,7 +7656,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="comboBox"/>
+        <widget class="QLineEdit" name="lineEdit_find_player_stat"/>
        </item>
        <item>
         <widget class="QPushButton" name="Button_player_stat">

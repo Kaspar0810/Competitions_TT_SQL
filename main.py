@@ -1980,9 +1980,10 @@ def fill_table(player_list):
         num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) 
     elif tb == 6:
-        model.setHorizontalHeaderLabels(['id',' Место', ' R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
+        model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
     elif tb == 7:
-        model.setHorizontalHeaderLabels(['id',' Место', ' R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
+        num_columns = [0, 1, 2, 3, 4, 5, 6, 7]
+        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']) 
 
     if tb == 1:
         if my_win.checkBox_15.isChecked():
@@ -1990,7 +1991,7 @@ def fill_table(player_list):
         else:
             my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) 
-    elif tb == 3 or tb == 4 or tb == 5:
+    elif tb == 3 or tb == 4 or tb == 5 or tb == 7:
         my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) # 
     else:
@@ -2042,6 +2043,10 @@ def fill_table(player_list):
                 item_9 = str(list(player_selected[row].values())[num_columns[8]])
                 item_10 = str(list(player_selected[row].values())[num_columns[9]])
                 data_table_tmp = [item_8, item_9, item_10]
+                data_table_list.extend(data_table_tmp)
+            elif tb == 7:
+                item_8 = str(list(player_selected[row].values())[num_columns[7]])
+                data_table_tmp = [item_8]
                 data_table_list.extend(data_table_tmp)
           
 
@@ -3145,10 +3150,24 @@ def find_player():
 
 def find_player_on_tab_system():
     """выделяет строку в tablewidget при поиске фамилии на вкладке -система_"""
+    sender = my_win.sender()
+    flag_stat = 0
     choice = Choice.select().where(Choice.title_id == title_id())
-    txt = my_win.lineEdit_find_player_in_system.text()
+    if sender == my_win.lineEdit_find_player_in_system:
+        txt = my_win.lineEdit_find_player_in_system.text()
+        flag_stat = 0
+    elif sender == my_win.lineEdit_find_player_stat:
+        txt = my_win.lineEdit_find_player_stat.text()
+        flag_stat = 1
     txt = txt.upper()
-    player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
+    # player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
+    # count = len(player_list)
+    # if count == 1:
+    #     pass
+    if flag_stat == 0:
+        player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
+    else:
+        player_list = Player.select().where((Player.title_id == title_id()) & (Player.player ** f'{txt}%'))  # like поиск в текущем рейтинге
     count = len(player_list)
     if count == 1:
         pass
@@ -15010,6 +15029,7 @@ my_win.lineEdit_bday.returnPressed.connect(next_field)
 my_win.lineEdit_city_list.returnPressed.connect(add_city)
 # ====== отслеживание изменения текста в полях ============
 my_win.lineEdit_find_player_in_system.textChanged.connect(find_player_on_tab_system)
+my_win.lineEdit_find_player_stat.textChanged.connect(find_player_on_tab_system)
 my_win.lineEdit_Family_name.textChanged.connect(find_in_rlist)  # в поле поиска и вызов функции
 my_win.lineEdit_find_player_in_R.textChanged.connect(find_in_player_rejting_list)
 my_win.lineEdit_coach.textChanged.connect(find_coach)
