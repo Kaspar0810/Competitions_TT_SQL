@@ -383,7 +383,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ed_etap_Action.setEnabled(False)  # делает пункт меню не видимым
 
         self.copy_db_Action = QAction("Импорт из базы данных")
-        self.stat_Action = QAction("Чило встреч для R отчета")
+        self.stat_Action = QAction("Число встреч для R отчета")
         self.player_stat_Action = QAction("Статистика игрока")
 
     def _connectActions(self):
@@ -1948,6 +1948,7 @@ def fill_table(player_list):
     data = []
     data_table_tmp = []
     data_table_list = []
+    sender = my_win.sender()
     model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
@@ -1982,8 +1983,12 @@ def fill_table(player_list):
     elif tb == 6:
         model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
     elif tb == 7:
-        num_columns = [0, 1, 2, 3, 4, 5, 6, 7]
-        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']) 
+        if sender == my_win.lineEdit_find_player_stat:
+            num_columns = [0, 1, 2, 3, 4, 5, 6, 7]
+            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']) 
+        else:
+            num_columns = [0, 1, 4, 5, 6, 7, 8]
+            model.setHorizontalHeaderLabels(['id','Этап', 'Город', 'Регион', 'Разряд', 'Тренер', 'проба'])
 
     if tb == 1:
         if my_win.checkBox_15.isChecked():
@@ -2045,11 +2050,12 @@ def fill_table(player_list):
                 data_table_tmp = [item_8, item_9, item_10]
                 data_table_list.extend(data_table_tmp)
             elif tb == 7:
-                item_8 = str(list(player_selected[row].values())[num_columns[7]])
-                data_table_tmp = [item_8]
-                data_table_list.extend(data_table_tmp)
-          
-
+                if sender == my_win.lineEdit_find_player_stat:
+                    coach_id = str(list(player_selected[row].values())[num_columns[7]])
+                    coach = Coach.get(Coach.id == coach_id)
+                    item_8 = coach.coach
+                    data_table_tmp = [item_8]
+                    data_table_list.extend(data_table_tmp)
             data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
         my_win.tableView.setModel(model)
         font = my_win.tableView.font()
@@ -4396,6 +4402,14 @@ def select_player_in_game():
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
         my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
+    elif tab == 7:
+        player_id = my_win.tableView.model().index(row_num, 0).data()
+        players = Player.select().where(Player.id == player_id).get()
+        player = players.full_name
+
+        player_list = Result.select().where(((Result.player1 == player) | (Result.player2 == player)) & (Result.title_id == title_id()))
+        count = len(player_list)
+        fill_table(player_list)
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
         state_visible = change_status_visible_and_score_game()
