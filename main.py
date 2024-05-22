@@ -1948,6 +1948,7 @@ def fill_table(player_list):
     data = []
     data_table_tmp = []
     data_table_list = []
+    sender = my_win.sender()
     model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
@@ -1982,8 +1983,12 @@ def fill_table(player_list):
     elif tb == 6:
         model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
     elif tb == 7:
-        num_columns = [0, 1, 2, 3, 4, 5, 6, 7]
-        model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']) 
+        if sender == my_win.lineEdit_find_player_stat:
+            num_columns = [0, 1, 2, 3, 4, 5, 6, 7]
+            model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']) 
+        else:
+            num_columns = [0, 1, 4, 5, 6, 7, 8]
+            model.setHorizontalHeaderLabels(['id','Этап', 'Игрок-1', 'Игрок-2', 'Победитель', 'Тренер', ''])
 
     if tb == 1:
         if my_win.checkBox_15.isChecked():
@@ -2045,10 +2050,11 @@ def fill_table(player_list):
                 data_table_tmp = [item_8, item_9, item_10]
                 data_table_list.extend(data_table_tmp)
             elif tb == 7:
-                coach_id = str(list(player_selected[row].values())[num_columns[7]])
-                coach = Coach.get(Coach.id == coach_id)
-                item_8 = coach.coach
-                data_table_tmp = [item_8]
+                if sender != my_win.lineEdit_find_player_stat:
+                    coach_id = str(list(player_selected[row].values())[num_columns[7]])
+                    coach = Coach.get(Coach.id == coach_id)
+                    item_8 = coach.coach
+                    data_table_tmp = [item_8]
                 data_table_list.extend(data_table_tmp)
             data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
         my_win.tableView.setModel(model)
@@ -3160,10 +3166,7 @@ def find_player_on_tab_system():
         txt = my_win.lineEdit_find_player_stat.text()
         flag_stat = 1
     txt = txt.upper()
-    # player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
-    # count = len(player_list)
-    # if count == 1:
-    #     pass
+ 
     if flag_stat == 0:
         player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
     else:
@@ -3181,22 +3184,7 @@ def sort():
     # r_data_w = [R_list_d, R1_list_d]
     signal_button_list = [my_win.Button_sort_R, my_win.Button_sort_Name, my_win.Button_sort_mesto]
     id_title = Title.select().where(Title.id == title_id()).get()
-    # gamer = id_title.gamer
-    # cur_index = my_win.comboBox_choice_R.currentIndex()
-    # if cur_index == 0: # если выбран текущий рейтинг
-    #         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-    #             r_data = r_data_w[0]
-    #         else:
-    #             r_data = r_data_m[0]
-    #         rejting_name = r_data.r_fname
-    #         rejting_list = r_data.r_list
-    # elif cur_index == 1: # если рейтинг за январь
-    #         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-    #             r_data = r_data_w[1]
-    #         else:
-    #             r_data = r_data_m[1] 
-    #         rejting_name = r_data.r1_fname
-    #         rejting_list = r_data.r1_list
+   
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
     elif sender == my_win.Button_sort_Name:
