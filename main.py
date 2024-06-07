@@ -244,7 +244,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         last_comp.addAction(self.second_comp_Action)
         last_comp.addAction(self.third_comp_Action)
         last_comp.addAction(self.fourth_comp_Action)
-        last_comp.addAction(self.fifth_comp_Action)
+        # last_comp.addAction(self.fifth_comp_Action)
         ed_Menu = editMenu.addMenu("Жеребьевка")
         ed_Menu.addAction(self.ed_one_table_Action)
         ed_Menu.addAction(self.ed_etap_Action)
@@ -311,7 +311,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.second_comp_Action = QAction("пусто")
         self.third_comp_Action = QAction("пусто")
         self.fourth_comp_Action = QAction("пусто")
-        self.fifth_comp_Action = QAction("пусто")
+        # self.fifth_comp_Action = QAction("пусто")
         self.ed_one_table_Action = QAction("Редакитровать таблицу")
 
         self.print_list_nopay_R_Action = QAction("Список, неоплативших R")
@@ -384,6 +384,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.copy_db_Action = QAction("Импорт из базы данных")
         self.stat_Action = QAction("Число встреч для R отчета")
+        self.stat_Action = QAction("Число встреч для R отчета")
         self.player_stat_Action = QAction("Статистика игрока")
 
     def _connectActions(self):
@@ -427,7 +428,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.second_comp_Action.triggered.connect(self.last)
         self.third_comp_Action.triggered.connect(self.last)
         self.fourth_comp_Action.triggered.connect(self.last)
-        self.fifth_comp_Action.triggered.connect(self.last)
+        # self.fifth_comp_Action.triggered.connect(self.last)
 
         self.ed_etap_Action.triggered.connect(self.edit_etap)
 
@@ -820,8 +821,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             go_to()
         elif sender == self.fourth_comp_Action:
             go_to()
-        elif sender == self.fifth_comp_Action:
-            go_to()
+        # elif sender == self.fifth_comp_Action:
+        #     go_to()
 
     def center(self):
         qr = self.frameGeometry()
@@ -975,34 +976,40 @@ class StartWindow(QMainWindow, Ui_Form):
         """загружает в комбобокс архивные соревнования"""
         self.label_4.show()
         comp_list = []
+        # ==== получение записи текущего соревнования
+        id_current = Title.select().where(Title.id == title_id()).get()
+        full_name_current = f"{id_current.full_name_comp} {id_current.vozrast}"
+
         # получение последней записи в таблице
         t_id = Title.select().order_by(Title.id.desc())
         count = len(t_id)
-        n = 7
+        n = 4
         if count != 0: 
             for i in t_id:
-                n -= 1
                 if n == 0:
                     break
-                elif  n < 6:                   
+                else:                  
                     old_comp = i.name
                     gamer = i.gamer
+                    age = i.vozrast
+                    full_name = f"{i.full_name_comp} {age}"
+
                     if old_comp != "":
-                        name_comp = f"{old_comp}.{gamer}"
+                        name_comp = f"{old_comp}.{gamer} {age}"
                         self.comboBox.addItem(name_comp)
-                        full_name = i.full_name_comp
+                        if full_name_current == full_name:
+                            full_name = "Активно"
                     else:
                         full_name = "пусто"
                     comp_list.append(full_name)
+                n -= 1
  
         else:       
             print("нет соревнований")
-            
-        my_win.first_comp_Action.setText(comp_list[0])   
+        my_win.first_comp_Action.setText(comp_list[0]) 
         my_win.second_comp_Action.setText(comp_list[1])
         my_win.third_comp_Action.setText(comp_list[2])
         my_win.fourth_comp_Action.setText(comp_list[3])
-        my_win.fifth_comp_Action.setText(comp_list[4])
                
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
@@ -1275,9 +1282,10 @@ def tab_enabled(gamer):
     tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
     titles = Title.select().order_by(Title.id.desc())  # получает все title.id по убыванию
     title = Title.get(Title.id == title_id()) # текущий title
+    vozrast = title.vozrast
     n = 2
     for k in titles:
-        if n != 0: 
+        if n != 0:  
             title_list.append(k.id)
             n -= 1
         else:
@@ -1287,7 +1295,7 @@ def tab_enabled(gamer):
     title_id_last = title_list[1]# последний ид соревнования
  
     if count_title > 0: # если соревнования не первые
-        my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer}")
+        my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer} {vozrast}")
         if sender == fir_window.LinkButton or sender == my_win.toolBox:  # если переход со стартового окна последение соревнование
             title_current = title.id
             if title_current == title_id_current:
@@ -1297,7 +1305,8 @@ def tab_enabled(gamer):
             old_comp = tit_id.name
             old_data = tit_id.data_start
             old_gamer = tit_id.gamer
-            comp = f"{old_comp}.{old_data}.{old_gamer}"
+            old_age = tit_id.vozrast
+            comp = f"{old_comp}.{old_data}.{old_gamer} {old_age}"
             my_win.go_to_Action.setText(comp)
             # last_competition()
             fir_window.load_old() # загружает в меню -последние- пять
@@ -1441,19 +1450,20 @@ def go_to():
     sex = ["Девочки", "Девушки", "Женщины"]
 
     if sender == fir_window.Button_open:
-        full_name = fir_window.comboBox.currentText()
+        full_name_with_age = fir_window.comboBox.currentText()
     elif sender == my_win.first_comp_Action:
-        full_name = my_win.first_comp_Action.text()
+        full_name_with_age = my_win.first_comp_Action.text()
     elif sender == my_win.second_comp_Action:
-        full_name = my_win.second_comp_Action.text()
+        full_name_with_age = my_win.second_comp_Action.text()
     elif sender == my_win.third_comp_Action:
-        full_name = my_win.third_comp_Action.text()
+        full_name_with_age = my_win.third_comp_Action.text()
     elif sender == my_win.fourth_comp_Action:
-        full_name = my_win.fourth_comp_Action.text()
-    elif sender == my_win.fifth_comp_Action:
-        full_name = my_win.fifth_comp_Action.text()
+        full_name_with_age = my_win.fourth_comp_Action.text()
     elif sender == my_win.go_to_Action:
-        full_name = my_win.go_to_Action.text()  # полное название к которым переходим 
+        full_name_with_age = my_win.go_to_Action.text()  # полное название к которым переходим
+
+    mark = full_name_with_age.find("до")  
+    full_name = full_name_with_age[:mark - 1] if mark > 0 else full_name_with_age
 
     titles = Title.get(Title.full_name_comp == full_name)
     id_title = titles.id
@@ -1497,6 +1507,7 @@ def go_to():
         if n == score:
             my_win.go_to_Action.setText(full_name_current) 
             break   
+    fir_window.load_old()
 
 
 def db_select_title():
@@ -1988,7 +1999,7 @@ def fill_table(player_list):
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']) 
         else:
             num_columns = [0, 1, 4, 5, 6, 7, 8]
-            model.setHorizontalHeaderLabels(['id','Этап', 'Город', 'Регион', 'Разряд', 'Тренер', 'проба'])
+            model.setHorizontalHeaderLabels(['id','Этап', 'Игрок-1', 'Игрок-2', 'Победитель', 'Тренер', ''])
 
     if tb == 1:
         if my_win.checkBox_15.isChecked():
@@ -2050,12 +2061,12 @@ def fill_table(player_list):
                 data_table_tmp = [item_8, item_9, item_10]
                 data_table_list.extend(data_table_tmp)
             elif tb == 7:
-                if sender == my_win.lineEdit_find_player_stat:
+                if sender != my_win.lineEdit_find_player_stat:
                     coach_id = str(list(player_selected[row].values())[num_columns[7]])
                     coach = Coach.get(Coach.id == coach_id)
                     item_8 = coach.coach
                     data_table_tmp = [item_8]
-                    data_table_list.extend(data_table_tmp)
+                data_table_list.extend(data_table_tmp)
             data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
         my_win.tableView.setModel(model)
         font = my_win.tableView.font()
@@ -2626,7 +2637,7 @@ def page():
     if tb == 0: # -титул-    
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 280, 841, 492)) # (точка слева, точка сверху, ширина, высота)
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 274))
+        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 280))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         my_win.comboBox_referee.setPlaceholderText("Введите фамилию судьи")
         my_win.comboBox_referee.setCurrentIndex(-1)
@@ -3166,10 +3177,7 @@ def find_player_on_tab_system():
         txt = my_win.lineEdit_find_player_stat.text()
         flag_stat = 1
     txt = txt.upper()
-    # player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
-    # count = len(player_list)
-    # if count == 1:
-    #     pass
+ 
     if flag_stat == 0:
         player_list = choice.select().where(Choice.family ** f'{txt}%')  # like поиск в текущем рейтинге
     else:
@@ -3187,22 +3195,7 @@ def sort():
     # r_data_w = [R_list_d, R1_list_d]
     signal_button_list = [my_win.Button_sort_R, my_win.Button_sort_Name, my_win.Button_sort_mesto]
     id_title = Title.select().where(Title.id == title_id()).get()
-    # gamer = id_title.gamer
-    # cur_index = my_win.comboBox_choice_R.currentIndex()
-    # if cur_index == 0: # если выбран текущий рейтинг
-    #         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-    #             r_data = r_data_w[0]
-    #         else:
-    #             r_data = r_data_m[0]
-    #         rejting_name = r_data.r_fname
-    #         rejting_list = r_data.r_list
-    # elif cur_index == 1: # если рейтинг за январь
-    #         if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
-    #             r_data = r_data_w[1]
-    #         else:
-    #             r_data = r_data_m[1] 
-    #         rejting_name = r_data.r1_fname
-    #         rejting_list = r_data.r1_list
+   
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
         player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
     elif sender == my_win.Button_sort_Name:
