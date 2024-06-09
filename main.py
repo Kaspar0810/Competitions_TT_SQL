@@ -895,8 +895,14 @@ class StartWindow(QMainWindow, Ui_Form):
     def last_comp(self):
         """открытие последних соревнований"""
         sex = ["Девочки", "Девушки", "Женщины"]
-        gamer = db_select_title()
-        tab_enabled(gamer)
+        # gamer = db_select_title()
+        # tab_enabled(gamer)
+        # ======= new
+        id_title = db_select_title()
+        tab_enabled(id_title)
+        title_new = Title.select().where(Title.id == id_title).get()
+        gamer = title_new.gamer
+        #========
         self.close()
         if gamer in sex:
             my_win.setStyleSheet("#MainWindow{background-color:lightpink}")
@@ -925,14 +931,15 @@ class StartWindow(QMainWindow, Ui_Form):
                           short_name_comp="", tab_enabled="Титул", multiregion="").save()
             # получение последней записи в таблице
             t_id = Title.select().order_by(Title.id.desc()).get()
-            title_id = t_id.id
+            id_title = t_id.id
             my_win.lineEdit_title_gamer.setText(gamer)
             db_r(gamer)
-            system = System(title_id=title_id, total_athletes=0, total_group=0, max_player=0, stage="", type_table="",
+            system = System(title_id=id_title, total_athletes=0, total_group=0, max_player=0, stage="", type_table="",
                             page_vid="", label_string="", kol_game_string="", choice_flag=False, score_flag=5,
                             visible_game=False, stage_exit="", mesta_exit=0, no_game="").save()
             self.close()
-            tab_enabled(gamer)
+            # tab_enabled(gamer)
+            tab_enabled(id_title)
             my_win.show()
         else:
             return
@@ -964,7 +971,8 @@ class StartWindow(QMainWindow, Ui_Form):
             title = Title.select().where((Title.data_start >= date_object) & (Title.data_start < end_date))
             for m in title:
                 full_comp = m.full_name_comp
-                full_name_list.append(full_comp)
+                age = m.vozrast
+                full_name_list.append(f"{full_comp} {age}")
             fir_window.comboBox.addItems(full_name_list)
         fir_window.Button_open.setEnabled(True)
         fir_window.Button_view_pdf.setEnabled(True)
@@ -978,8 +986,7 @@ class StartWindow(QMainWindow, Ui_Form):
         comp_list = []
         # ==== получение записи текущего соревнования
         id_current = Title.select().where(Title.id == title_id()).get()
-        full_name_current = f"{id_current.full_name_comp} {id_current.vozrast}"
-
+        full_name_current = f"{id_current.full_name_comp} {id_current.vozrast}" # текущие соревнования
         # получение последней записи в таблице
         t_id = Title.select().order_by(Title.id.desc())
         count = len(t_id)
@@ -992,7 +999,7 @@ class StartWindow(QMainWindow, Ui_Form):
                     old_comp = i.name
                     gamer = i.gamer
                     age = i.vozrast
-                    full_name = f"{i.full_name_comp} {age}"
+                    full_name = f"{i.full_name_comp} {age}" # соревнования, на которые переходит из меню
 
                     if old_comp != "":
                         name_comp = f"{old_comp}.{gamer} {age}"
@@ -1271,7 +1278,7 @@ my_win.dateEdit_start.setDate(date.today())
 my_win.dateEdit_end.setDate(date.today())
 
 
-def tab_enabled(gamer):
+def tab_enabled(id_title):
     """Включает вкладки в зависимости от создании системы и жеребьевки"""
     # включает вкладки меню системы
     title_list = []
@@ -1281,35 +1288,51 @@ def tab_enabled(gamer):
     sender = my_win.sender()
     tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
     titles = Title.select().order_by(Title.id.desc())  # получает все title.id по убыванию
-    title = Title.get(Title.id == title_id()) # текущий title
-    vozrast = title.vozrast
+    title_new = Title.select().where(Title.id == id_title).get()
+    vozrast = title_new.vozrast
+    gamer = title_new.gamer
+    name = title_new.name
+    date_comp = title_new.data_start
+    #=== сделать вариант с списком соревнований дев и юн
     n = 2
-    for k in titles:
-        if n != 0:  
-            title_list.append(k.id)
-            n -= 1
-        else:
-            break
+    t_name = titles.select().where((Title.name == name) & (Title.data_start == date_comp))
+    t_age = t_name.select().where(Title.vozrast == vozrast)
+    count = len(t_age)
+    if count == 2:
+        for k in t_age:
+            if n != 0:  
+                if gamer == k.gamer:
+                    title_list.insert(0, k.id)
+                else:
+                    title_list.insert(1, k.id)
+                n -= 1
+            else:
+                break
+    else:
+        for k in titles:
+            if n != 0:  
+                title_list.append(k.id)
+                n -= 1
+            else:
+                break
+
     count_title = len(Title.select())
-    title_id_current = title_list[0]
+    title_id_current = title_list[0] # текущие соревнования
     title_id_last = title_list[1]# последний ид соревнования
  
     if count_title > 0: # если соревнования не первые
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer} {vozrast}")
-        if sender == fir_window.LinkButton or sender == my_win.toolBox:  # если переход со стартового окна последение соревнование
-            title_current = title.id
-            if title_current == title_id_current:
-                tit_id = Title.get(Title.id == title_id_last)
-            else:
-                tit_id = Title.get(Title.id == title_id_current)
-            old_comp = tit_id.name
-            old_data = tit_id.data_start
-            old_gamer = tit_id.gamer
-            old_age = tit_id.vozrast
-            comp = f"{old_comp}.{old_data}.{old_gamer} {old_age}"
-            my_win.go_to_Action.setText(comp)
-            # last_competition()
-            fir_window.load_old() # загружает в меню -последние- пять
+        # === new ===
+        title_current = id_title
+        tit_id = Title.get(Title.id == title_id_last) if title_current == title_id_current else Title.get(Title.id == title_id_current)
+        old_comp = tit_id.name
+        old_data = tit_id.data_start
+        old_gamer = tit_id.gamer
+        old_age = tit_id.vozrast
+        comp = f"{old_comp}.{old_data}.{old_gamer} {old_age}" # соревнования предыдущие
+        my_win.go_to_Action.setText(comp) # пункт меню -перейти к- соревнования предыдущие
+        fir_window.load_old() # загружает в меню -последние- пять
+
     my_win.tabWidget.setTabEnabled(1, False)        
     my_win.tabWidget.setTabEnabled(2, False)
     my_win.tabWidget.setTabEnabled(3, False)
@@ -1318,7 +1341,7 @@ def tab_enabled(gamer):
     my_win.tabWidget.setTabEnabled(6, False)
     my_win.tabWidget.setTabEnabled(7, True)
 # включает вкладки записаные в Титул
-    tab_str = title.tab_enabled
+    tab_str = title_new.tab_enabled
     tab_list = tab_str.split(" ")
     for k in tab_list:
         ind = tab_index.index(k)
@@ -1333,6 +1356,70 @@ def tab_enabled(gamer):
     else:
         my_win.system_made_Action.setEnabled(False) # делает меню - создать- не видиммым
     enabled_menu_after_choice()
+
+
+# def tab_enabled(gamer):
+#     """Включает вкладки в зависимости от создании системы и жеребьевки"""
+#     # включает вкладки меню системы
+#     title_list = []
+#     my_win.system_edit_Action.setEnabled(True) # делает меню  -редактировать- видиммым
+#     my_win.system_made_Action.setEnabled(True) # делает меню  -редактировать- видиммым
+
+#     sender = my_win.sender()
+#     tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
+#     titles = Title.select().order_by(Title.id.desc())  # получает все title.id по убыванию
+#     title = Title.get(Title.id == title_id()) # текущий title
+#     vozrast = title.vozrast
+#     n = 2
+#     for k in titles:
+#         if n != 0:  
+#             title_list.append(k.id)
+#             n -= 1
+#         else:
+#             break
+#     count_title = len(Title.select())
+#     title_id_current = title_list[0]
+#     title_id_last = title_list[1]# последний ид соревнования
+ 
+#     if count_title > 0: # если соревнования не первые
+#         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer} {vozrast}")
+#         if sender == fir_window.LinkButton or sender == my_win.toolBox:  # если переход со стартового окна последение соревнование
+#             title_current = title.id
+#             if title_current == title_id_current:
+#                 tit_id = Title.get(Title.id == title_id_last)
+#             else:
+#                 tit_id = Title.get(Title.id == title_id_current)
+#             old_comp = tit_id.name
+#             old_data = tit_id.data_start
+#             old_gamer = tit_id.gamer
+#             old_age = tit_id.vozrast
+#             comp = f"{old_comp}.{old_data}.{old_gamer} {old_age}"
+#             my_win.go_to_Action.setText(comp)
+#             # last_competition()
+#             fir_window.load_old() # загружает в меню -последние- пять
+#     my_win.tabWidget.setTabEnabled(1, False)        
+#     my_win.tabWidget.setTabEnabled(2, False)
+#     my_win.tabWidget.setTabEnabled(3, False)
+#     my_win.tabWidget.setTabEnabled(4, False)
+#     my_win.tabWidget.setTabEnabled(5, False)
+#     my_win.tabWidget.setTabEnabled(6, False)
+#     my_win.tabWidget.setTabEnabled(7, True)
+# # включает вкладки записаные в Титул
+#     tab_str = title.tab_enabled
+#     tab_list = tab_str.split(" ")
+#     for k in tab_list:
+#         ind = tab_index.index(k)
+#         my_win.tabWidget.setTabEnabled(ind, True)
+#         my_win.toolBox.setItemEnabled(ind, True)
+#     if gamer == "":
+#         gamer = my_win.lineEdit_title_gamer.text()
+#     my_win.toolBox.setCurrentIndex(0) # включает toolbox вкладку титул
+#     # Скрывает подменю системы в зависимости от созданной системы или нет
+#     if "Система" not in tab_list:
+#         my_win.system_edit_Action.setEnabled(False) # делает меню  -редактировать- не видиммым
+#     else:
+#         my_win.system_made_Action.setEnabled(False) # делает меню - создать- не видиммым
+#     enabled_menu_after_choice()
 
 
 def add_open_tab(tab_page):
@@ -1449,6 +1536,12 @@ def go_to():
     sender = my_win.sender()
     sex = ["Девочки", "Девушки", "Женщины"]
 
+     # ==== смена названия в меню -перейти к-
+    t = Title.select().where(Title.id == title_id()).get()
+    full_name_current = t.full_name_comp
+    age_current = t.vozrast
+    my_win.go_to_Action.setText(f"{full_name_current} {age_current}") # надпись на меню -перейти к- соревнования которые были
+
     if sender == fir_window.Button_open:
         full_name_with_age = fir_window.comboBox.currentText()
     elif sender == my_win.first_comp_Action:
@@ -1462,16 +1555,17 @@ def go_to():
     elif sender == my_win.go_to_Action:
         full_name_with_age = my_win.go_to_Action.text()  # полное название к которым переходим
 
-    mark = full_name_with_age.find("до")  
-    full_name = full_name_with_age[:mark - 1] if mark > 0 else full_name_with_age
+    mark = full_name_with_age.find("до") 
+    if mark > 0: 
+        full_name = full_name_with_age[:mark - 1]
+        age = full_name_with_age[mark:]
+    else:
+        full_name = full_name_with_age
+        age = ""
 
-    titles = Title.get(Title.full_name_comp == full_name)
-    id_title = titles.id
+    titles = Title.get((Title.full_name_comp == full_name) & (Title.vozrast == age)) 
+    id_title = titles.id # id соревнования на которое переходим
     gamer = titles.gamer
-    title_last = Title.select().order_by(Title.id.desc()).get()
-    id_title_last = title_last.id
-    title = Title.select().order_by(Title.id.desc())
-
     # смена цвета фона формы в зависимости от пола играющих
     if gamer in sex:
         my_win.setStyleSheet("#MainWindow{background-color:lightpink}")
@@ -1489,24 +1583,35 @@ def go_to():
     my_win.comboBox_kategor_sec.setCurrentText(titles.kat_sec)
     my_win.lineEdit_title_gamer.setText(titles.gamer)
     my_win.tabWidget.setCurrentIndex(0)  # открывает вкладку списки
-    tab_enabled(gamer)
+     #===== new
+    id_t = title_id()
+    tab_enabled(id_title)
+    # tab_enabled(gamer)
     player_list = Player.select().where(Player.title_id == id_title)
     count_player = len(player_list)
     my_win.label_46.setText(f"Всего: {count_player} участников")
-    list_player_pdf(player_list)
-    # ==== смена названия в меню -перейти к-
-    if id_title == id_title_last:
-        score = 2
-    else:
-        score = 1
+    
+    
 
-    n = 0
-    for t in title:
-        full_name_current = t.full_name_comp
-        n += 1
-        if n == score:
-            my_win.go_to_Action.setText(full_name_current) 
-            break   
+    list_player_pdf(player_list)
+    # # ==== смена названия в меню -перейти к-
+    # t = Title.select().where(Title.id == title_id()).get()
+    # # t = Title.select().where(Title.id == id_title_last).get()
+    # full_name_current = t.full_name_comp
+    # my_win.go_to_Action.setText(full_name_current)
+
+    # if id_title == id_title_last:
+    #     score = 2
+    # else:
+    #     score = 1
+
+    # n = 0
+    # for t in title:
+    #     full_name_current = t.full_name_comp
+    #     n += 1
+    #     if n == score:
+    #         my_win.go_to_Action.setText(full_name_current) 
+    #         break   
     fir_window.load_old()
 
 
@@ -1518,15 +1623,19 @@ def db_select_title():
         name = title.name
         data = title.data_start
         gamer_current = title.gamer
+        # === вариант с ид титула =====
+        id_title = title_id()
         # полное название текущих соревнований
         full_name_current = f"{name}.{data}.{gamer_current}"
         # присваиваем новый текст соревнований в меню -перейти к-
         my_win.go_to_Action.setText(full_name_current)
         gamer = title.gamer
-    elif sender == my_win.toolBox or sender.text() != "Открыть":
+    elif sender == my_win.toolBox or sender.text() != "Открыть":# переход от последнего соревнования в окне приветствия
         title = Title.get(Title.id == title_id())
         name = title.name
         gamer = title.gamer
+        # === вариант с ид титула =====
+        id_title = title_id()
     # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
     else:
         txt = fir_window.comboBox.currentText()
@@ -1557,9 +1666,12 @@ def db_select_title():
         my_win.lineEdit_title_gamer.setText(title.gamer)
     else:
         load_comboBox_referee()
-    tab_enabled(gamer)
+    # ========
+    # tab_enabled(gamer)
+    tab_enabled(id_title)
 
-    return gamer
+    # return gamer
+    return id_title
 
 
 def system_made():
@@ -2663,6 +2775,7 @@ def page():
         my_win.Button_pay_R.setEnabled(False)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
+        # t = title_id()
         player_list = Player.select().where(Player.title_id == title_id())
         player_debitor_R = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг"))
         player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
@@ -3316,6 +3429,7 @@ def system_competition():
     sender = my_win.sender()
     tit = Title.get(Title.id == title_id())
     gamer = tit.gamer
+    id_title = tit.id
     flag_system = ready_system() # False система еще не создана 
     if sender != my_win.comboBox_etap:
         if sender == my_win.system_edit_Action: # редактирование системы из меню
@@ -3331,7 +3445,8 @@ def system_competition():
             if ret == msgBox.Yes:
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
-                tab_enabled(gamer)  # показывает вкладки по новому
+                # tab_enabled(gamer)  # показывает вкладки по новому
+                tab_enabled(id_title)  # показывает вкладки по новому
                 choice_tbl_made()  # заполняет db жеребьевка
                 flag_system = False # ставит флаг, что система еще не создана
                 stage = ""
@@ -3934,13 +4049,15 @@ def player_fin_on_circle(fin):
         system.save()    
     title = Title.select().where(Title.id == title_id()).get()
     page_title = title.tab_enabled
+    id_title = title.id
     if "Финалы" not in page_title:
         page_title = f"{page_title} Финалы"
     gamer = title.gamer
     with db:
         title.tab_enabled = page_title
         title.save()
-    tab_enabled(gamer)
+    # tab_enabled(gamer)
+    tab_enabled(id_title)
     pv = system.page_vid
     stage = fin
     table_made(pv, stage)
@@ -8250,6 +8367,8 @@ def hide_show_columns(tb):
 
 def etap_made():
     """создание этапов соревнований"""
+    titles = Title.select().where(Title.id == title_id()).get()
+    id_title = titles.id
     system = System.select().where(System.title_id == title_id())
     sum_game = []
     etap = my_win.comboBox_etap.currentText()
@@ -8257,7 +8376,8 @@ def etap_made():
         fin = my_win.comboBox_etap.currentText()
         one_table(fin, group=1)
         gamer = my_win.lineEdit_title_gamer.text()
-        tab_enabled(gamer)
+        # tab_enabled(gamer)
+        tab_enabled(id_title)
         return
     if etap == "Предварительный":    
         kol_player_in_group() # кол-во участников в группах
@@ -8424,6 +8544,8 @@ def control_all_player_in_final(etap):
      # титул id и стадия содержит слово финал (1 и 2 заменяет %)
     msgBox = QMessageBox
     gamer = my_win.lineEdit_title_gamer.text()
+    titles = Title.select().where(Title.id == title_id()).get()
+    id_title = titles.id
     system = System.select().order_by(System.id).where(System.title_id == title_id())
     system_stage = system.select().where(System.stage == "Предварительный").get()
     total_player = system_stage.total_athletes
@@ -8465,7 +8587,8 @@ def control_all_player_in_final(etap):
                         return
                     choice_gr_automat()
                     add_open_tab(tab_page="Группы")
-                    tab_enabled(gamer)
+                    # tab_enabled(gamer)
+                    tab_enabled(id_title)
                     with db:
                         system_stage.choice_flag = True
                         system_stage.save()
@@ -9479,8 +9602,9 @@ def title_id():
     if name != "":       
         data = my_win.dateEdit_start.text()
         gamer = my_win.lineEdit_title_gamer.text()
+        age = my_win.lineEdit_title_vozrast.text()
         titles_data = Title.select().where((Title.name == name) & (Title.gamer == gamer)) # получает эту строку в db
-        titles = titles_data.select().where(Title.data_start == data).get()
+        titles = titles_data.select().where((Title.data_start == data) & (Title.vozrast == age)).get()
         title_id = titles.id
     else:
         # получение последней записи в таблице
