@@ -1536,12 +1536,6 @@ def go_to():
     sender = my_win.sender()
     sex = ["Девочки", "Девушки", "Женщины"]
 
-     # ==== смена названия в меню -перейти к-
-    t = Title.select().where(Title.id == title_id()).get()
-    full_name_current = t.full_name_comp
-    age_current = t.vozrast
-    my_win.go_to_Action.setText(f"{full_name_current} {age_current}") # надпись на меню -перейти к- соревнования которые были
-
     if sender == fir_window.Button_open:
         full_name_with_age = fir_window.comboBox.currentText()
     elif sender == my_win.first_comp_Action:
@@ -1554,6 +1548,11 @@ def go_to():
         full_name_with_age = my_win.fourth_comp_Action.text()
     elif sender == my_win.go_to_Action:
         full_name_with_age = my_win.go_to_Action.text()  # полное название к которым переходим
+      # ==== смена названия в меню -перейти к-
+    t = Title.select().where(Title.id == title_id()).get()
+    full_name_current = t.full_name_comp
+    age_current = t.vozrast
+    my_win.go_to_Action.setText(f"{full_name_current} {age_current}") # надпись на меню -перейти к- соревнования которые были
 
     mark = full_name_with_age.find("до") 
     if mark > 0: 
@@ -1584,9 +1583,7 @@ def go_to():
     my_win.lineEdit_title_gamer.setText(titles.gamer)
     my_win.tabWidget.setCurrentIndex(0)  # открывает вкладку списки
      #===== new
-    id_t = title_id()
     tab_enabled(id_title)
-    # tab_enabled(gamer)
     player_list = Player.select().where(Player.title_id == id_title)
     count_player = len(player_list)
     my_win.label_46.setText(f"Всего: {count_player} участников")
