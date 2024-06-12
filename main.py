@@ -2560,10 +2560,13 @@ def check_age_player(znak, dr):
         current_date = date(dr_year, 1, 1)
         if after_date > current_date: # сравниваем две даты
             result = msgBox.information(my_win, "", "Возраст спортсмена не соответсвует\nвозрастной категории соревнования.\n"
-                        "Или возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
+                        "Возможно в рейтинге указана\nне правильная дата рождения.\nЕсли дата правильная нажмите -ОК-, или -Cancel-",
                                             msgBox.Ok, msgBox.Cancel)
             if result == msgBox.Ok:
-                return    
+                my_win.lineEdit_Family_name.setText("")               
+                return   
+           
+
 
 def dclick_in_listwidget():
     """Находит фамилию спортсмена в рейтинге или фамилию тренера и заполняет соответсвующие поля списка"""

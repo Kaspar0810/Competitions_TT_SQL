@@ -103,7 +103,7 @@
         <number>1</number>
        </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,1,0">
+        <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0,0">
          <property name="horizontalSpacing">
           <number>24</number>
          </property>
@@ -120,48 +120,6 @@
            </property>
            <property name="layoutDirection">
             <enum>Qt::LeftToRight</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="Button_title_made">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <family>Courier New</family>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Создать</string>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-           <property name="default">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="checkBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string/>
            </property>
           </widget>
          </item>
@@ -695,9 +653,9 @@
         </layout>
        </item>
        <item row="2" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2,1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,2,0,0,0">
          <property name="spacing">
-          <number>4</number>
+          <number>8</number>
          </property>
          <property name="leftMargin">
           <number>1</number>
@@ -783,12 +741,12 @@
           </layout>
          </item>
          <item>
-          <spacer name="horizontalSpacer_2">
+          <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
+            <enum>QSizePolicy::Minimum</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -797,6 +755,48 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Button_title_made">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Courier New</family>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Создать</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -4616,7 +4616,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>479</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4629,7 +4629,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>479</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5263,7 +5263,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>479</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5827,7 +5827,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>479</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6237,7 +6237,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>479</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6536,7 +6536,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>479</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6995,7 +6995,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>479</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7365,7 +7365,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>479</height>
+       <height>487</height>
       </rect>
      </property>
      <attribute name="label">
