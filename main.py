@@ -4929,7 +4929,7 @@ def filter_rejting_list():
         year_current = int(datetime.today().strftime("%Y")) # текущий год
         year_bday = year_current - year_fltr + 1
         after_date = date(year_bday, 1, 1)
-        player_list = r_data.select().where(rejting_date > after_date)
+        player_list = r_data.select().where(rejting_date > after_date).order_by(rejting_list.desc())
 
     if region_txt == "" and city_txt == "" and date_txt == "":
         player_list = r_data.select()

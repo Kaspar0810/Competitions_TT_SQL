@@ -103,7 +103,7 @@
         <number>1</number>
        </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0,0">
+        <layout class="QGridLayout" name="gridLayout_5" columnstretch="0">
          <property name="horizontalSpacing">
           <number>24</number>
          </property>
@@ -4608,7 +4608,7 @@
      <enum>QFrame::StyledPanel</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>6</number>
     </property>
     <widget class="QWidget" name="page">
      <property name="geometry">
@@ -4616,7 +4616,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -4629,7 +4629,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5263,7 +5263,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -5827,7 +5827,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6237,7 +6237,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6536,7 +6536,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -6995,7 +6995,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
@@ -7074,7 +7074,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>266</width>
+        <width>221</width>
         <height>104</height>
        </rect>
       </property>
@@ -7131,9 +7131,10 @@
            <property name="font">
             <font>
              <family>Times New Roman</family>
-             <weight>75</weight>
+             <pointsize>11</pointsize>
+             <weight>50</weight>
              <italic>true</italic>
-             <bold>true</bold>
+             <bold>false</bold>
             </font>
            </property>
            <property name="text">
@@ -7365,7 +7366,7 @@
        <x>0</x>
        <y>0</y>
        <width>241</width>
-       <height>487</height>
+       <height>479</height>
       </rect>
      </property>
      <attribute name="label">
