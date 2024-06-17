@@ -2359,8 +2359,7 @@ def debitor_R():
 
 def add_player(): 
     """добавляет игрока в список и базу данных"""
-    msgBox = QMessageBox()
-     
+    msgBox = QMessageBox()    
     flag = False
     player_list = Player.select().where(Player.title_id == title_id())
     txt = my_win.Button_add_edit_player.text()
