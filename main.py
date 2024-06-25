@@ -1,4 +1,4 @@
-
+# 
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.lib import colors
@@ -8883,6 +8883,8 @@ def numbers_of_games(cur_index, player_in_final, kpt):
         system = systems.select().where(System.stage == "Предварительный").get()
         gr = system.total_group
     elif system_etap == "Полуфиналы":
+        system = systems.select().where(System.stage == "Предварительный").get()
+        gr = system.total_group
         gr_pf = gr // 2
         total_games = total_games_in_final_with_group_games(player_in_final, gr_pf, kpt)
     else:
@@ -8942,6 +8944,10 @@ def numbers_of_games(cur_index, player_in_final, kpt):
         elif cur_index == 4: # игры в круг
             if system_etap == "Одна таблица":
                 gr = 1 
+            else:
+                system = systems.select().where(System.stage == "Предварительный").get()
+                gr = system.total_group
+                gr = gr // 2
                 # kpt = 0
             total_games = total_games_in_final_without_group_games(player_in_final, gr, kpt)
 
