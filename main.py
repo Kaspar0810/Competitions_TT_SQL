@@ -7918,6 +7918,7 @@ def list_player_in_group_after_draw():
 def change_player_between_group_after_draw():
     """Смена игроков в группах после жеребьевки при отметки в listwidget при редакитровании"""
     msgBox = QMessageBox
+    flag_change = 0
     player_dict = {}
     game_list = Game_list.select().where(Game_list.title_id == title_id())
     choices = Choice.select().where(Choice.title_id == title_id())
