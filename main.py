@@ -3133,8 +3133,8 @@ def page():
     elif tb == 7: # вкладка -дополнительно-
         my_win.groupBox_4.show()
         my_win.resize(1110, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 525))
-        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 525))
+        my_win.tableView.setGeometry(QtCore.QRect(260, 250, 841, 400))
+        my_win.tableWidget.setGeometry(QtCore.QRect(260, 250, 841, 400))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 248))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
 
