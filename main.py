@@ -3975,12 +3975,12 @@ def player_fin_on_circle(fin):
                 sortdict = dict(grouplist)
                 choices_fin_sort_by_group = sortdict.keys()
             # ========
-            for n in choices_fin_sort_by_group:
-                player = n.family
-                pl_id = n.player_choice_id
-                player_id = f"{player}/{pl_id}"
-                fin_dict[nt] = player_id
-                nt += 1
+        for n in choices_fin_sort_by_group:
+            player = n.family
+            pl_id = n.player_choice_id
+            player_id = f"{player}/{pl_id}"
+            fin_dict[nt] = player_id
+            nt += 1
 
     player_in_final = system.max_player # количество игроков в финале
     cp = player_in_final - 3
@@ -4000,11 +4000,21 @@ def player_fin_on_circle(fin):
         z = n.find("-")
         num = int(n[z + 1:])
         number_tours.append(num)
-
+ # ====== new
+    # for n in first_tour:
+    #     z = n.find("-")
+    #     num = int(n[:z])
+    #     number_tours.append(num)
+    #     num = int(n[z + 1:])
+    #     number_tours.append(num)
+#========        
     for nt in range(1, player_in_final + 1):
         fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
+        # fin_list.append()
         game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=id_system,
                             title_id=title_id())
+        # game_list = Game_list(number_group=fin, rank_num_player=number_tours[nt - 1], player_group=fin_dict[nt], system_id=id_system,
+        #                     title_id=title_id())
         game_list.save()
   
     # === запись в db игроков которые попали в финал из группы
@@ -5916,8 +5926,11 @@ def string_score_game():
             if (g == 4 and st1 == 4 and st2 == 1) or (g == 3 and st1 == 3 and st2 == 2):  # из 5-и 3-2 или из 7-и 4-1
                 winner_string = f"({n1},{n2},{n3},{n4},{n5})"
 
+            if s16 == "" and s26 == "":
+                return winner_string
+             
             if int(s16) > int(s26):  # 6-й сет
-                n6= s26
+                n6 = s26
             else:
                 n6 = str(f"-{s16}")
             if (g == 4 and st1 == 4 and st2 == 2):  # из 7-и 4-2
@@ -5972,6 +5985,9 @@ def string_score_game():
             if  (g == 4 and st1 == 1 and st2 == 4) or (g == 3 and st1 == 2 and st2 == 3):  # из 5-и 3-2 или из 7-и 4-1
                 winner_string = f"({n1},{n2},{n3},{n4},{n5})"
 
+            if s16 == "" and s26 == "":
+                return winner_string
+
             if int(s16) < int(s26):  # 6-й сет
                 n6 = s16
             else:
@@ -5989,8 +6005,7 @@ def string_score_game():
         else:
             if visible_flag is True:
                 winner_string = f"({st2} : {st1})"
-            # else:
-            #     winner_string = f"{st2} : {st1}"
+
         return winner_string
 
 
@@ -8497,6 +8512,8 @@ def total_game_table(exit_stage, kpt, fin, pv):
         # заполняет max_player в зависиости от кол игроков
         if type_table == "круг": # если финал по кругу
             m_pl = player_in_final
+        elif type_table == "группы": # если ПФ
+            m_pl = player_in_final
         else: # если финал сетка
             if player_in_final <= 8:
                 m_pl = 8
@@ -10378,7 +10395,7 @@ def table_made(pv, stage):
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
     # doc.leftPadding = 0
     # doc.bottomMargin = 1.5 * cm
-    doc.leftMargin = 0.5
+    # doc.leftMargin = 0.5
     # doc.righttMargin = 0
   
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
@@ -15089,13 +15106,14 @@ def open_close_file(view_file):
     # f.addFromList(story, c)
     # c.save()
 # =======        
-# def proba():
-# #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
-#     my_db = SqliteDatabase('comp_db.db')
-#     migrator = SqliteMigrator(my_db)
-#     no_game = TextField(default="")
-#     # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
-#     # system_id = ForeignKeyField(System, field=System.id, null=True)
+def proba():
+    Game_list.update(player_group_id="СИЗОВ Андрей/2419").where(Game_list.id == 5325).execute()
+#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+    # my_db = SqliteDatabase('comp_db.db')
+    # migrator = SqliteMigrator(my_db)
+    # no_game = TextField(default="")
+    # system_id = IntegerField(null=False)  # новый столбец, его поле и значение по умолчанию
+    # system_id = ForeignKeyField(System, field=System.id, null=True)
 
 #     with db:
 #         # migrate(migrator.drop_column('referees', 'signature')) # удаление столбца
@@ -15300,7 +15318,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
