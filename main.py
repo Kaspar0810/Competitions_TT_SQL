@@ -3934,6 +3934,25 @@ def player_fin_on_circle(fin):
 
     nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
     count_exit = len(nums) # количество игроков, выходящих в финал
+    # ==== new variant ===
+    player_in_final = system.max_player # количество игроков в финале
+    cp = player_in_final - 3
+    tour = tours_list(cp)
+    kol_tours = len(tour)  # кол-во туров
+    game = len(tour[0])  # кол-во игр в туре
+    # ===== получение списка номеров игроков в порядке 1-ого тура
+    k = 0
+    number_tours = []
+    first_tour = tour[0].copy()
+    first_tour.sort()
+
+    for n in first_tour:
+        z = n.find("-")
+        num = int(n[:z])
+        number_tours.append(num)
+        num = int(n[z + 1:])
+        number_tours.append(num)
+    # =======
     if stage_exit == "Предварительный":
         choices_fin = choice.select().where(Choice.mesto_group.in_(nums))
         nt = 1
@@ -3973,34 +3992,35 @@ def player_fin_on_circle(fin):
             player = n.family
             pl_id = n.player_choice_id
             player_id = f"{player}/{pl_id}"
-            fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+            # fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+            fin_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
             nt += 1
 
-    player_in_final = system.max_player # количество игроков в финале
-    cp = player_in_final - 3
-    tour = tours_list(cp)
-    kol_tours = len(tour)  # кол-во туров
-    game = len(tour[0])  # кол-во игр в туре
-    # ===== получение списка номеров игроков в порядке 1-ого тура
-    k = 0
-    number_tours = []
-    first_tour = tour[0].copy()
-    first_tour.sort()
-    # for n in first_tour:
-    #     z = n.find("-")
-    #     num = int(n[:z])
-    #     number_tours.append(num)
-    # for n in first_tour:
-    #     z = n.find("-")
-    #     num = int(n[z + 1:])
-    #     number_tours.append(num)
- # ====== new пр выходе в финал 2 человека
-    for n in first_tour:
-        z = n.find("-")
-        num = int(n[:z])
-        number_tours.append(num)
-        num = int(n[z + 1:])
-        number_tours.append(num)
+#     player_in_final = system.max_player # количество игроков в финале
+#     cp = player_in_final - 3
+#     tour = tours_list(cp)
+#     kol_tours = len(tour)  # кол-во туров
+#     game = len(tour[0])  # кол-во игр в туре
+#     # ===== получение списка номеров игроков в порядке 1-ого тура
+#     k = 0
+#     number_tours = []
+#     first_tour = tour[0].copy()
+#     first_tour.sort()
+#     # for n in first_tour:
+#     #     z = n.find("-")
+#     #     num = int(n[:z])
+#     #     number_tours.append(num)
+#     # for n in first_tour:
+#     #     z = n.find("-")
+#     #     num = int(n[z + 1:])
+#     #     number_tours.append(num)
+#  # ====== new пр выходе в финал 2 человека
+#     for n in first_tour:
+#         z = n.find("-")
+#         num = int(n[:z])
+#         number_tours.append(num)
+#         num = int(n[z + 1:])
+#         number_tours.append(num)
 #========        
     for nt in range(1, player_in_final + 1):
         fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
