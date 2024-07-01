@@ -3933,7 +3933,7 @@ def player_fin_on_circle(fin):
     stage_exit = system.stage_exit # откуда выходят в финал
 
     nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
-
+    count_exit = len(nums) # количество игроков, выходящих в финал
     if stage_exit == "Предварительный":
         choices_fin = choice.select().where(Choice.mesto_group.in_(nums))
         nt = 1
@@ -3955,31 +3955,25 @@ def player_fin_on_circle(fin):
                 player_id = f"{player}/{pl_id}"
                 fin_dict[nt] = player_id
                 nt += 1
-            # for n in choices_fin:
-            #     player = n.family
-            #     pl_id = n.player_choice_id
-            #     player_id = f"{player}/{pl_id}"
-            #     fin_dict[nt] = player_id
-            #     nt += 1
-    else:
+    else: # если выход в финал по кругу из ПФ
         nt = 1
         for b in nums:
             choices_fin = choice.select().where((Choice.mesto_semi_final == b) & (Choice.semi_final == stage_exit))
-            # ==== вариант перевести текст группы в число а потом отсортировать по группам
+            # ==== вариант перевести текст группы в число а потом отсортировать по группам (выход 1 человек из группы)
             for m in choices_fin:
                 num_group_text = m.sf_group
                 znak = num_group_text.find(" ")
                 num_gr_int = int(num_group_text[:znak])
                 group_dict[m] = num_gr_int
                 grouplist = sorted(group_dict.items(), key=lambda x: x[1])
-                sortdict = dict(grouplist)
+                sortdict = dict(grouplist) # словарь id игрока в choice - номер группы по возрастанию
                 choices_fin_sort_by_group = sortdict.keys()
             # ========
         for n in choices_fin_sort_by_group:
             player = n.family
             pl_id = n.player_choice_id
             player_id = f"{player}/{pl_id}"
-            fin_dict[nt] = player_id
+            fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
             nt += 1
 
     player_in_final = system.max_player # количество игроков в финале
@@ -3992,40 +3986,43 @@ def player_fin_on_circle(fin):
     number_tours = []
     first_tour = tour[0].copy()
     first_tour.sort()
-    for n in first_tour:
-        z = n.find("-")
-        num = int(n[:z])
-        number_tours.append(num)
-    for n in first_tour:
-        z = n.find("-")
-        num = int(n[z + 1:])
-        number_tours.append(num)
- # ====== new
     # for n in first_tour:
     #     z = n.find("-")
     #     num = int(n[:z])
     #     number_tours.append(num)
+    # for n in first_tour:
+    #     z = n.find("-")
     #     num = int(n[z + 1:])
     #     number_tours.append(num)
+ # ====== new пр выходе в финал 2 человека
+    for n in first_tour:
+        z = n.find("-")
+        num = int(n[:z])
+        number_tours.append(num)
+        num = int(n[z + 1:])
+        number_tours.append(num)
 #========        
     for nt in range(1, player_in_final + 1):
         fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
         # fin_list.append()
-        game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=id_system,
-                            title_id=title_id())
-        # game_list = Game_list(number_group=fin, rank_num_player=number_tours[nt - 1], player_group=fin_dict[nt], system_id=id_system,
+        # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=id_system,
         #                     title_id=title_id())
+        game_list = Game_list(number_group=fin, rank_num_player=number_tours[nt - 1], player_group=fin_dict[nt], system_id=id_system,
+                            title_id=title_id())
         game_list.save()
   
     # === запись в db игроков которые попали в финал из группы
-    ps_final = 1
+    # ps_final = 0
+    k = 1
     for l in fin_list:
+        ps_final = k if count_exit == 1 else number_tours[k - 1] # если выход 1 то по порядку, если более то из списка туров
         id_pl = int(l[l.find("/") + 1:])
         choices = choice.select().where(Choice.player_choice_id == id_pl).get()
         choices.final = fin
         choices.posev_final = ps_final
         choices.save()
-        ps_final += 1
+        k += 1
+        # ps_final += 1
     # исправить если из группы выходят больше 2-ух игроков
     for r in range(0, kol_tours):
         round = r + 1
