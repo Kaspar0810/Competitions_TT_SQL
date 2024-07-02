@@ -10333,7 +10333,8 @@ def table_made(pv, stage):
     dict_table = tbl(stage, kg, ts, zagolovok, cW, rH)
     if kg == 1:  # одна таблицу
         data = [[dict_table[0]]]
-        shell_table = Table(data, colWidths=["*"])
+        # shell_table = Table(data, colWidths=["*"])
+        shell_table = Table(data, colWidths=[28 * cm])
         text = ""
         elements.append(Paragraph(text, h2))
         elements.append(shell_table)
