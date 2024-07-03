@@ -3426,7 +3426,14 @@ def system_competition():
     """выбор системы проведения при изменении строки в комбобокс этап или мз меню"""
     msgBox = QMessageBox()
     sender = my_win.sender()
+    system_etap_list = []
+    all_system_etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
+                            "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     tit = Title.get(Title.id == title_id())
+    systems = System.select().where(System.title_id == title_id())
+    for p in systems:
+        etap = p.stage
+        system_etap_list.append(etap)
     gamer = tit.gamer
     id_title = tit.id
     flag_system = ready_system() # False система еще не создана 
@@ -3437,6 +3444,57 @@ def system_competition():
             # ======
             msgBox.setIcon(QMessageBox.Question)
             msgBox.setText("Вы хотите изменить систему соревнований?")
+            # ========
+            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+            msgBox.setDefaultButton(QMessageBox.Cancel)
+            ret = msgBox.exec()
+            made_list = ["Изменить всю систему", "Отдельные этапы", "Добавить этап", "Удалить этап"]
+            if ret == msgBox.Yes:
+               item_selected, ok = QInputDialog.getItem(
+                    my_win, "Системные этапы", "Выберите действия для редактирования", made_list, 0, False) 
+            if item_selected == "Изменить всю систему":
+                # очищает таблицы перед новой системой соревнования (system, choice)
+                clear_db_before_edit()
+                tab_enabled(id_title)  # показывает вкладки по новому
+                choice_tbl_made()  # заполняет db жеребьевка
+                flag_system = False # ставит флаг, что система еще не создана
+                stage = ""
+            elif item_selected == "Отдельные этапы":               
+                # systems = System.select().where(System.title_id == title_id())
+                # for p in systems:
+                #     etap = p.stage
+                #     system_etap_list.append(etap)
+                stage, ok = QInputDialog.getItem(
+                    my_win, "Системные этапы", "Выберите этап для редактирования", system_etap_list, 0, False)
+                id_system = system_id(stage)
+                system_exit = systems.select().where(System.stage_exit == stage)
+                msgBox.setIcon(QMessageBox.Question)
+                msgBox.setText("Изменение системы!")
+                msgBox.setInformativeText("Если удалить выбранный этап нажмите -Yes-")
+                msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+                msgBox.setDefaultButton(QMessageBox.Cancel)
+                ret_1 = msgBox.exec()
+                if ret_1 == msgBox.Ok:
+                    for m in system_exit:
+                        id_sys = m.id
+                        System.update(stage_exit="Предварительный", mesta_exit=1).where(System.id == id_sys).execute()
+                    sys = System.delete().where(System.id == id_system)
+                    sys.execute()
+                    return
+                elif ret == msgBox.Cancel:
+                        return
+            elif item_selected == "Добавить этап":
+                add_system_etap_list = []
+                for k in all_system_etap_list:
+                    if k not in system_etap_list:
+                        add_system_etap_list.append(k)
+
+                stage, ok = QInputDialog.getItem(
+                    my_win, "Системные этапы", "Выберите этап для добавления", add_system_etap_list, 0, False)
+                 
+            else:
+                return
+            # =========
             msgBox.setInformativeText("Если изменить всю систему нажмите -Yes-\nЕсли отдельные этапы нажмите -No-")
             msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
             msgBox.setDefaultButton(QMessageBox.Yes)
