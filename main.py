@@ -3067,9 +3067,6 @@ def page():
             my_win.tabWidget.setCurrentIndex(3)
         else:  # жеребьевка сделана
             my_win.Button_Ok_pf.setEnabled(False)
-            # query_1 = Result.select().where(Result.system_stage == "1-й полуфинал")
-            # query_2 = Result.select().where(Result.system_stage == "2-й полуфинал")
-            # player_list = query_1 | query_2
             player_list = Result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
             fill_table(player_list)
             load_combobox_filter_group_semifinal()
@@ -3303,8 +3300,6 @@ def find_player_on_tab_system():
 def sort():
     """сортировка таблицы QtableView (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
-    # r_data_m = [R_list_m, R1_list_m]
-    # r_data_w = [R_list_d, R1_list_d]
     signal_button_list = [my_win.Button_sort_R, my_win.Button_sort_Name, my_win.Button_sort_mesto]
     id_title = Title.select().where(Title.id == title_id()).get()
    
@@ -3422,12 +3417,44 @@ def exit_comp():
         pass
 
 
+def add_etap_after_chicoe(stage):
+    """добавление этапа после жеребьевки"""
+    system = System.select().where(System.title_id == title_id())
+    for k in system:
+        mp = k.max_player
+        ta = k.total_athletes
+        tg = k.total_group
+    system = System.get(System.id == s)
+    pv = "альбомная"
+    score_fl = 5
+    type_tbl = "группы"
+    visible_game = 1
+
+    with db: 
+        systems = System(max_player=mp, total_athletes=ta, total_group=tg,
+                            stage=stage, type_table=type_tbl, page_vid=pv, kol_game_string=f,
+                            score_flag=score_fl, visible_game=visible_game, title_id=title_id()).save()
+
+    system.max_player = mp
+    system.total_athletes = count
+    system.total_group = kg
+    system.stage = my_win.comboBox_etap.currentText()
+    system.type_table = type_table
+    system.page_vid = my_win.comboBox_page_vid.currentText()
+    system.label_string = stroka_kol_group
+    system.kol_game_string = stroka_kol_game
+    system.score_flag = score_match
+    system.visible_game = flag_visible
+    system.save()    
+
+
 def system_competition():
     """выбор системы проведения при изменении строки в комбобокс этап или мз меню"""
     msgBox = QMessageBox()
     sender = my_win.sender()
     system_etap_list = []
-    all_system_etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
+    semifinal_etap_list = ["1-й полуфинал", "2-й полуфинал"]
+    fin_etap_list = ["1-й финал", "2-й финал", "3-й финал", "4-й финал",
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     tit = Title.get(Title.id == title_id())
     systems = System.select().where(System.title_id == title_id())
@@ -3460,10 +3487,6 @@ def system_competition():
                 flag_system = False # ставит флаг, что система еще не создана
                 stage = ""
             elif item_selected == "Отдельные этапы":               
-                # systems = System.select().where(System.title_id == title_id())
-                # for p in systems:
-                #     etap = p.stage
-                #     system_etap_list.append(etap)
                 stage, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите этап для редактирования", system_etap_list, 0, False)
                 id_system = system_id(stage)
@@ -3481,17 +3504,23 @@ def system_competition():
                     sys = System.delete().where(System.id == id_system)
                     sys.execute()
                     return
-                elif ret == msgBox.Cancel:
+                elif ret_1 == msgBox.Cancel:
                         return
             elif item_selected == "Добавить этап":
+                # содает список этапов, которые можно добавить в систем
                 add_system_etap_list = []
-                for k in all_system_etap_list:
+                for k in semifinal_etap_list:
                     if k not in system_etap_list:
                         add_system_etap_list.append(k)
-
+                for k in fin_etap_list:
+                    if k not in system_etap_list:
+                        add_system_etap_list.append(k)
+                        if "Суперфинал" not in system_etap_list:
+                            add_system_etap_list.append("Суперфинал")
+                            break
                 stage, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите этап для добавления", add_system_etap_list, 0, False)
-                 
+                add_etap_after_chicoe(stage)
             else:
                 return
             # =========
@@ -3502,7 +3531,6 @@ def system_competition():
             if ret == msgBox.Yes:
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
-                # tab_enabled(gamer)  # показывает вкладки по новому
                 tab_enabled(id_title)  # показывает вкладки по новому
                 choice_tbl_made()  # заполняет db жеребьевка
                 flag_system = False # ставит флаг, что система еще не создана
@@ -8459,18 +8487,18 @@ def hide_show_columns(tb):
 
 
 
-def etap_made():
+def etap_made(stage):
     """создание этапов соревнований"""
     titles = Title.select().where(Title.id == title_id()).get()
     id_title = titles.id
     system = System.select().where(System.title_id == title_id())
     sum_game = []
+    etap = my_win.comboBox_etap.currentText() if stage == "" else stage
     etap = my_win.comboBox_etap.currentText()
     if etap == "Одна таблица":
         fin = my_win.comboBox_etap.currentText()
         one_table(fin, group=1)
         gamer = my_win.lineEdit_title_gamer.text()
-        # tab_enabled(gamer)
         tab_enabled(id_title)
         return
     if etap == "Предварительный":    
@@ -8825,11 +8853,9 @@ def made_system_load_combobox_etap():
         if ct == "Одна таблица":
             my_win.comboBox_table_1.show()
             my_win.spinBox_kol_group.hide()
-            # my_win.label_11.hide()
             my_win.label_101.show()
             my_win.label_101.setText("Одна таблица")
             my_win.label_11.show()
-            # my_win.label_101.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
             my_win.comboBox_table_1.hide()
