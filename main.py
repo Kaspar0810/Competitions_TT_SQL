@@ -3419,6 +3419,9 @@ def exit_comp():
 
 def add_etap_after_chicoe(stage):
     """добавление этапа после жеребьевки"""
+    if stage == "2-й полуфинал":
+        kol_player_in_final()
+        
     system = System.select().where(System.title_id == title_id())
     for k in system:
         mp = k.max_player
@@ -3521,6 +3524,7 @@ def system_competition():
                 stage, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите этап для добавления", add_system_etap_list, 0, False)
                 add_etap_after_chicoe(stage)
+                # etap_made(stage)
             else:
                 return
             # =========
@@ -8493,15 +8497,15 @@ def etap_made(stage):
     id_title = titles.id
     system = System.select().where(System.title_id == title_id())
     sum_game = []
-    etap = my_win.comboBox_etap.currentText() if stage == "" else stage
-    etap = my_win.comboBox_etap.currentText()
+    etap = my_win.comboBox_etap.currentText() if stage == "" or stage is False else stage
+    # etap = my_win.comboBox_etap.currentText()
     if etap == "Одна таблица":
         fin = my_win.comboBox_etap.currentText()
         one_table(fin, group=1)
         gamer = my_win.lineEdit_title_gamer.text()
         tab_enabled(id_title)
         return
-    if etap == "Предварительный":    
+    elif etap == "Предварительный":    
         kol_player_in_group() # кол-во участников в группах
     elif etap == "Финальный":
         systems = system.select().order_by(System.id.desc()).get()
@@ -9565,7 +9569,6 @@ def kol_player_in_final():
                 my_win.comboBox_table_1.hide()
             flag_one_table = True
         else:
-            etap = my_win.comboBox_etap.currentText()
             exit_player_stage = max_player_and_exit_stage(etap)
             max_exit_group = exit_player_stage[0]
             exit_stage = exit_player_stage[1]
@@ -9704,7 +9707,6 @@ def no_play():
 
 def backup():
     """резервное копирование базы данных"""
-    # time_date = date.today()
     try:
         db = sqlite3.connect('comp_db.db')
         db_backup = sqlite3.connect(f'comp_db_backup.db')
