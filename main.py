@@ -3419,24 +3419,30 @@ def exit_comp():
 
 def add_etap_after_chicoe(stage):
     """добавление этапа после жеребьевки"""
-    if stage == "2-й полуфинал":
-        kol_player_in_final()
-        
+    etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
+                            "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
+    p = 0
+    for l in etap_list:
+        p += 1
+        if l == stage:
+            after_etap = etap_list[p - 2] # получение этапа после которого вставить новый этап
+            break
     system = System.select().where(System.title_id == title_id())
-    for k in system:
-        mp = k.max_player
-        ta = k.total_athletes
-        tg = k.total_group
-    system = System.get(System.id == s)
-    pv = "альбомная"
-    score_fl = 5
-    type_tbl = "группы"
-    visible_game = 1
+    m = 0
+    etap_dict = {}
+    id_list = []
+    for k in system: # получение словаря этапов и списка их id
+        stage_system = k.stage 
+        id_s = k.id
+        id_list.append(id_s)
+        etap_dict[m] = stage_system
+        m += 1
+    ind = [keys for keys, values in etap_dict.items() if values == after_etap] # список ключа по значению 
+    for l in range (len(id_list)):
+        if l > ind[0]: # удаляет все что ниже вставляемого этапа
+            s_d = System.delete().where(System.id == id_list[l])
+            s_d.execute()
 
-    with db: 
-        systems = System(max_player=mp, total_athletes=ta, total_group=tg,
-                            stage=stage, type_table=type_tbl, page_vid=pv, kol_game_string=f,
-                            score_flag=score_fl, visible_game=visible_game, title_id=title_id()).save()
 
     system.max_player = mp
     system.total_athletes = count
