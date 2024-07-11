@@ -3443,18 +3443,24 @@ def add_etap_after_chicoe(stage):
             s_d = System.delete().where(System.id == id_list[l])
             s_d.execute()
 
+    my_win.comboBox_etap.show()
+    my_win.comboBox_table_1.hide()
+    my_win.label_10.show()
+    my_win.label_10.setText("1-й этап")
+    my_win.Button_etap_made.setEnabled(False)
+    my_win.comboBox_page_vid.setEnabled(True)
 
-    system.max_player = mp
-    system.total_athletes = count
-    system.total_group = kg
-    system.stage = my_win.comboBox_etap.currentText()
-    system.type_table = type_table
-    system.page_vid = my_win.comboBox_page_vid.currentText()
-    system.label_string = stroka_kol_group
-    system.kol_game_string = stroka_kol_game
-    system.score_flag = score_match
-    system.visible_game = flag_visible
-    system.save()    
+    # system.max_player = mp
+    # system.total_athletes = count
+    # system.total_group = kg
+    # system.stage = my_win.comboBox_etap.currentText()
+    # system.type_table = type_table
+    # system.page_vid = my_win.comboBox_page_vid.currentText()
+    # system.label_string = stroka_kol_group
+    # system.kol_game_string = stroka_kol_game
+    # system.score_flag = score_match
+    # system.visible_game = flag_visible
+    # system.save()    
 
 
 def system_competition():
