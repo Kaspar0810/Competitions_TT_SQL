@@ -3419,6 +3419,8 @@ def exit_comp():
 
 def add_etap_after_chicoe(stage):
     """добавление этапа после жеребьевки"""
+    # etap_label_list = [my_win.label_101, my_win.label_102, my_win.label_103, my_win.label_104, my_win.label_105, my_win.label_106,
+    #                    my_win.label_107, my_win.label_108, my_win.label_109, my_win.label_110, my_win.label_111, my_win.label_112]
     etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     p = 0
@@ -3442,25 +3444,20 @@ def add_etap_after_chicoe(stage):
         if l > ind[0]: # удаляет все что ниже вставляемого этапа
             s_d = System.delete().where(System.id == id_list[l])
             s_d.execute()
-
+    count_etap = len(system)
+    sb = "Выбор системы проведения соревнования."
+    my_win.statusbar.showMessage(sb)
+    my_win.spinBox_kol_group.hide()
+    my_win.comboBox_etap.clear()
     my_win.comboBox_etap.show()
     my_win.comboBox_table_1.hide()
     my_win.label_10.show()
-    my_win.label_10.setText("1-й этап")
-    my_win.Button_etap_made.setEnabled(False)
-    my_win.comboBox_page_vid.setEnabled(True)
+    my_win.label_10.setText(f"{count_etap + 1}-й этап")
 
-    # system.max_player = mp
-    # system.total_athletes = count
-    # system.total_group = kg
-    # system.stage = my_win.comboBox_etap.currentText()
-    # system.type_table = type_table
-    # system.page_vid = my_win.comboBox_page_vid.currentText()
-    # system.label_string = stroka_kol_group
-    # system.kol_game_string = stroka_kol_game
-    # system.score_flag = score_match
-    # system.visible_game = flag_visible
-    # system.save()    
+    # my_win.Button_etap_made.setEnabled(True)
+    my_win.comboBox_page_vid.setEnabled(True)
+    my_win.comboBox_etap.setCurrentText("Полуфиналы")
+    my_win.tabWidget.setCurrentIndex(2)
 
 
 def system_competition():
@@ -3523,6 +3520,7 @@ def system_competition():
                         return
             elif item_selected == "Добавить этап":
                 # содает список этапов, которые можно добавить в систем
+                my_win.tabWidget.setTabEnabled(2, True)
                 add_system_etap_list = []
                 for k in semifinal_etap_list:
                     if k not in system_etap_list:
@@ -3536,7 +3534,8 @@ def system_competition():
                 stage, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите этап для добавления", add_system_etap_list, 0, False)
                 add_etap_after_chicoe(stage)
-                # etap_made(stage)
+
+                return
             else:
                 return
             # =========
