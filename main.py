@@ -3088,7 +3088,7 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        my_win.checkBox_5.setEnabled(False)
+        my_win.checkBox_visible_game.setEnabled(False)
         my_win.checkBox_9.setChecked(False)
         my_win.checkBox_10.setChecked(False)
         my_win.checkBox_9.setEnabled(False)
@@ -3417,10 +3417,8 @@ def exit_comp():
         pass
 
 
-def add_etap_after_chicoe(stage):
+def add_etap_after_choice(stage):
     """добавление этапа после жеребьевки"""
-    # etap_label_list = [my_win.label_101, my_win.label_102, my_win.label_103, my_win.label_104, my_win.label_105, my_win.label_106,
-    #                    my_win.label_107, my_win.label_108, my_win.label_109, my_win.label_110, my_win.label_111, my_win.label_112]
     etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     p = 0
@@ -3444,20 +3442,21 @@ def add_etap_after_chicoe(stage):
         if l > ind[0]: # удаляет все что ниже вставляемого этапа
             s_d = System.delete().where(System.id == id_list[l])
             s_d.execute()
-    count_etap = len(system)
+    system_upd = System.select().where(System.title_id == title_id())
+    count_etap = len(system_upd)
     sb = "Выбор системы проведения соревнования."
     my_win.statusbar.showMessage(sb)
     my_win.spinBox_kol_group.hide()
     my_win.comboBox_etap.clear()
     my_win.comboBox_etap.show()
-    my_win.comboBox_table_1.hide()
     my_win.label_10.show()
     my_win.label_10.setText(f"{count_etap + 1}-й этап")
 
-    # my_win.Button_etap_made.setEnabled(True)
+    my_win.Button_etap_made.setEnabled(True)
+    my_win.tabWidget.setTabEnabled(2, True)
+    my_win.tabWidget.setCurrentIndex(2)
     my_win.comboBox_page_vid.setEnabled(True)
     my_win.comboBox_etap.setCurrentText("Полуфиналы")
-    my_win.tabWidget.setCurrentIndex(2)
 
 
 def system_competition():
@@ -3519,8 +3518,6 @@ def system_competition():
                 elif ret_1 == msgBox.Cancel:
                         return
             elif item_selected == "Добавить этап":
-                # содает список этапов, которые можно добавить в систем
-                my_win.tabWidget.setTabEnabled(2, True)
                 add_system_etap_list = []
                 for k in semifinal_etap_list:
                     if k not in system_etap_list:
@@ -3533,50 +3530,11 @@ def system_competition():
                             break
                 stage, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите этап для добавления", add_system_etap_list, 0, False)
-                add_etap_after_chicoe(stage)
-
+                add_etap_after_choice(stage)
                 return
             else:
                 return
             # =========
-            # msgBox.setInformativeText("Если изменить всю систему нажмите -Yes-\nЕсли отдельные этапы нажмите -No-")
-            # msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
-            # msgBox.setDefaultButton(QMessageBox.Yes)
-            # ret = msgBox.exec()
-            # if ret == msgBox.Yes:
-            #     # очищает таблицы перед новой системой соревнования (system, choice)
-            #     clear_db_before_edit()
-            #     tab_enabled(id_title)  # показывает вкладки по новому
-            #     choice_tbl_made()  # заполняет db жеребьевка
-            #     flag_system = False # ставит флаг, что система еще не создана
-            #     stage = ""
-            # elif ret == msgBox.No:
-            #     system_etap_list = []
-            #     systems = System.select().where(System.title_id == title_id())
-            #     for p in systems:
-            #         etap = p.stage
-            #         system_etap_list.append(etap)
-            #     stage, ok = QInputDialog.getItem(
-            #         my_win, "Системные этапы", "Выберите этап для редактирования", system_etap_list, 0, False)
-            #     id_system = system_id(stage)
-            #     system_exit = systems.select().where(System.stage_exit == stage)
-            #     msgBox.setIcon(QMessageBox.Question)
-            #     msgBox.setText("Изменение системы!")
-            #     msgBox.setInformativeText("Если удалить выбранный этап нажмите -Yes-")
-            #     msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-            #     msgBox.setDefaultButton(QMessageBox.Cancel)
-            #     ret_1 = msgBox.exec()
-            #     if ret_1 == msgBox.Ok:
-            #         for m in system_exit:
-            #             id_sys = m.id
-            #             System.update(stage_exit="Предварительный", mesta_exit=1).where(System.id == id_sys).execute()
-            #         sys = System.delete().where(System.id == id_system)
-            #         sys.execute()
-            #         return
-            #     elif ret == msgBox.Cancel:
-            #             return
-            # else:
-            #     return
         elif sender == my_win.system_made_Action: # создание системы из меню
             sb = "Создание системы проведения соревнования."
             my_win.statusbar.showMessage(sb)
@@ -3622,7 +3580,7 @@ def system_competition():
         my_win.label_86.hide()
         my_win.label_87.hide()
  
-        my_win.tabWidget.setTabEnabled(2, True)
+        my_win.tabWidget.setTabEnabled(2, True) # включает вкладку
 
         if flag_system is True:
             flag_choice = ready_choice(stage)
@@ -4433,12 +4391,12 @@ def change_status_visible_and_score_game():
         #=========
 
         #  ==== изменение состояние =====
-        if sender == my_win.checkBox_5:
+        if sender == my_win.checkBox_visible_game:
             for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
                 if i.isChecked():
                     match_current = int(i.text())
                     break
-            state_visible = my_win.checkBox_5.isChecked()
+            state_visible = my_win.checkBox_visible_game.isChecked()
         elif (sender == my_win.radioButton_match_4 or 
             sender == my_win.radioButton_match_6 or sender == my_win.radioButton_match_8):
             for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
@@ -4480,7 +4438,7 @@ def change_status_visible_and_score_game():
         else:
             for k in frame_fin_list:
                 k.setVisible(False)
-            my_win.checkBox_5.setChecked(False)
+            my_win.checkBox_visible_game.setChecked(False)
             my_win.lineEdit_pl1_score_total_fin.setFocus(True)
         my_win.label_22.setVisible(False)
     system_id = system_stage.id
@@ -4514,7 +4472,7 @@ def visible_field():
     else:
             # устанавливает начальное значение - со счетом ищ 5-ти партий
         if row_num == -1:
-            my_win.checkBox_5.setChecked(True)
+            my_win.checkBox_visible_game.setChecked(True)
             my_win.radioButton_match_6.setChecked(True)
             state_visible = True
             match_db = 5
@@ -4524,7 +4482,7 @@ def visible_field():
             match_db = system_stage.score_flag
             state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
         # ======= записывает изменение в базу данных
-    if sender == my_win.checkBox_4 or sender == my_win.checkBox_14 or sender == my_win.checkBox_5: # изменяет состояние чекбокса игра со счетом или нет
+    if sender == my_win.checkBox_4 or sender == my_win.checkBox_14 or sender == my_win.checkBox_visible_game: # изменяет состояние чекбокса игра со счетом или нет
         if tab == 3:
             state_visible = my_win.checkBox_4.isChecked()
             if state_visible is True:
@@ -4538,7 +4496,7 @@ def visible_field():
             else:
                 my_win.lineEdit_pl1_pf_score_total.setFocus()
         else:
-            state_visible = my_win.checkBox_5.isChecked()
+            state_visible = my_win.checkBox_visible_game.isChecked()
             if state_visible is True:
                 my_win.lineEdit_pl1_s1_fin.setFocus()
             else:
@@ -4715,7 +4673,7 @@ def select_player_in_game():
                 else:
                     my_win.lineEdit_pl1_score_total_pf.setFocus()
             elif tab == 5:
-                my_win.checkBox_5.setEnabled(True)
+                my_win.checkBox_visible_game.setEnabled(True)
                 my_win.lineEdit_player1_fin.setText(pl1)
                 my_win.lineEdit_player2_fin.setText(pl2)
                 if pl1 == "X" or pl2 == "X":
@@ -5952,7 +5910,7 @@ def string_score_game():
                 g = (int(i.text()) + 1) // 2 # число, максимальное кол-во партий для победы
                 break
     else:
-        visible_flag = my_win.checkBox_5.isChecked()
+        visible_flag = my_win.checkBox_visible_game.isChecked()
         for i in my_win.groupBox_kolvo_vstrech_fin.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
             if i.isChecked():
                 g = (int(i.text()) + 1) // 2
@@ -6500,12 +6458,9 @@ def choice_semifinal_automat(stage):
     # ===== new
     id_system = system_id(stage)
     system_stage = system.select().where(System.id == id_system).get()
-
-    # system_stage = system.select().where(System.stage == stage).get()
-    # sys_id = system_stage.id
     mesta_exit = system_stage.mesta_exit
-
-    if stage == "1-й полуфинал":
+    # определение мест в ПФ, выходящих из группы
+    if stage == "1-й полуфинал": 
         mesto_first = 1
     else:
         system_stage = system.select().where(System.stage == "1-й полуфинал").get()
@@ -6518,8 +6473,12 @@ def choice_semifinal_automat(stage):
         n = k if k <= total_group // 2 else total_group - k + 1
         for i in range(mesto_first, mesta_exit + mesto_first):
             p += 1
-            choice_mesta = choices.select().where(Choice.mesto_group == i).get()
-            with db: # записывает в db номер полуфинала
+            choice_mesta = choices.select().where(Choice.mesto_group == i)
+            count = len(choice_mesta)
+            if count == 0:
+                break
+            with db:
+                choice_mesta = choices.select().where(Choice.mesto_group == i).get() # записывает в db номер полуфинала
                 choice_mesta.semi_final = stage
                 choice_mesta.sf_group = f"{n} группа" # номера группы полуфинала
                 choice_mesta.posev_sf = p # номер посева
@@ -6722,13 +6681,9 @@ def rank_mesto_out_in_group_or_semifinal_to_final(fin):
             del list_mest[:player_out_sf2]
         else:
             system_fin = System.select().where((System.title_id == title_id()) & (System.stage == etap)).get()
-            # system_fin = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
             etap_out_fin = system_fin.stage_exit # из какого этапа выходят в финал
             pl_out = system_fin.mesta_exit # сколько мест
             list_mest = etap_out_and_player[etap_out_fin]
-            # del list_mest[pl_out:]
-            # nums = list_mest
-            # break
             if fin != etap:
                 del list_mest[:pl_out]
                 player_in_stage[etap] = etap_out_and_player[etap_out_fin]
@@ -8523,7 +8478,7 @@ def etap_made(stage):
         stage = systems.stage
         total_game_table(exit_stage="", kpt=0, fin=stage, pv="") # сколько игр в финале или пф 
         kol_game = my_win.spinBox.text()
-        state_visible = my_win.checkBox_5.isChecked() # записывает в DB измененный статус видимости
+        state_visible = my_win.checkBox_visible_game.isChecked() # записывает в DB измененный статус видимости
         with db:
             systems.score_flag = kol_game
             systems.visible_game = state_visible
@@ -12490,7 +12445,7 @@ def score_in_table(td, num_gr):
         mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
         results = result.select().where((Result.system_stage_id == id_system) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
-    elif tab == 3:
+    elif tab == 3: # группы
         stage = "Предварительный"
         id_system = system_id(stage)   
         ta = System.select().where(System.id == id_system).get()  # находит system id последнего
@@ -12498,7 +12453,7 @@ def score_in_table(td, num_gr):
         ch = choice.select().where(Choice.group == num_gr)  # фильтрует по группе
         mp = ta.max_player
         stage = ta.stage
-    elif tab == 4:
+    elif tab == 4: # полуфиналы
         if sender == my_win.view_pf1_Action:
             stage = "1-й полуфинал"
         elif sender == my_win.view_pf2_Action:
@@ -12506,10 +12461,16 @@ def score_in_table(td, num_gr):
         else:
             stage = my_win.comboBox_filter_semifinal.currentText()
         id_system = system_id(stage) # получает id системы из комбобокса
-        mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
+        # вариант если в ПФ не полные группы
+        ta = System.select().where(System.id == id_system).get()  # находит system id последнего
+        max_pl = ta.max_player # общее кол-во игрков в ПФ
+        group_in_sf = ta.total_group # общее кол-во групп в ПФ
+        mp = max_pl // group_in_sf
+        # =======
+        # mp = len(gamelist.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr)))
         results = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))
         ch = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == num_gr))  # фильтрует по группе
-    elif tab == 5 or my_win.choice_fin_Action:
+    elif tab == 5 or my_win.choice_fin_Action: # финалы
         stage = num_gr
         id_system = system_id(stage)
         systems = System.select().where(System.id == id_system).get()
@@ -14252,8 +14213,13 @@ def load_playing_game_in_table_for_semifinal(stage):
                     family_city = players.full_name
                     player_exit.append(family_city)  
                     # номер ид в таблице -Result- встречи игроков, попавших в полуфинал идущих по расстоновке в таблице   
-                result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
-
+                # result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get() 
+                result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1]))
+                count = len(result_gr) # если была не полная группа и в ПФ вышел только один человек, то пропускает запись в таблицу Result
+                if count == 0:
+                    break
+                else:
+                    result_gr = result_pre.select().where((Result.player1 == player_exit[0]) & (Result.player2 == player_exit[1])).get()
                 result_pre_fin = results.select().where(Result.system_stage == stage)
                 result_semifin_player1 = result_pre_fin.select().where(Result.player1.in_(player_exit))
                 result_semifin = result_semifin_player1.select().where(Result.player2.in_(player_exit)).get()
@@ -15420,7 +15386,7 @@ my_win.checkBox_3.stateChanged.connect(button_system_made_enable)
 # при изменении чекбокса показывает поля для ввода счета
 my_win.checkBox_4.stateChanged.connect(change_status_visible_and_score_game)
 # при изменении чекбокса показывает поля для ввода счета финала)
-my_win.checkBox_5.stateChanged.connect(change_status_visible_and_score_game)
+my_win.checkBox_visible_game.stateChanged.connect(change_status_visible_and_score_game)
 # при изменении чекбокса показывает список удаленных игроков
 my_win.checkBox_6.stateChanged.connect(del_player_table)
 my_win.checkBox_7.stateChanged.connect(no_play)  # поражение по неявке игрок 1 группа
