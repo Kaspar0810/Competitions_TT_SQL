@@ -3417,7 +3417,7 @@ def exit_comp():
         pass
 
 
-def add_etap_after_choice(stage):
+def add_or_delete_etap_after_choice(stage, flag):
     """добавление этапа после жеребьевки"""
     etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
@@ -3456,7 +3456,8 @@ def add_etap_after_choice(stage):
     my_win.tabWidget.setTabEnabled(2, True)
     my_win.tabWidget.setCurrentIndex(2)
     my_win.comboBox_page_vid.setEnabled(True)
-    my_win.comboBox_etap.setCurrentText("Полуфиналы")
+    if flag == 0:
+        my_win.comboBox_etap.setCurrentText("Полуфиналы")
 
 
 def system_competition():
@@ -3530,10 +3531,28 @@ def system_competition():
                             break
                 stage, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите этап для добавления", add_system_etap_list, 0, False)
-                add_etap_after_choice(stage)
+                flag = 0 # флаг добавления этапа равен 0
+                add_or_delete_etap_after_choice(stage, flag)
                 return
             else:
-                return
+                stage, ok = QInputDialog.getItem(
+                    my_win, "Системные этапы", "Выберите этап для удаления", system_etap_list, 0, False)
+                id_system = system_id(stage)
+                system_exit = systems.select().where(System.stage_exit == stage)
+                msgBox.setIcon(QMessageBox.Question)
+                msgBox.setText("Изменение системы!")
+                msgBox.setInformativeText("Вы уверны, что хотите удалить выбранный этап?")
+                msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+                msgBox.setDefaultButton(QMessageBox.Cancel)
+                ret_1 = msgBox.exec()
+                if ret_1 == msgBox.Yes:
+                    flag = 1 # флаг удаления этапа равен 1
+                    add_or_delete_etap_after_choice(stage, flag)
+                    sys = System.delete().where(System.id == id_system)
+                    sys.execute()
+                else:
+                    return
+
             # =========
         elif sender == my_win.system_made_Action: # создание системы из меню
             sb = "Создание системы проведения соревнования."
