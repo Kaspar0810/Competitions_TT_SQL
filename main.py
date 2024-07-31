@@ -3,14 +3,16 @@ from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.lib import colors
 from reportlab.lib.colors import *
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Paragraph, TableStyle, SimpleDocTemplate, Frame
-from reportlab.lib.pagesizes import A4, landscape
+from reportlab.platypus import TableStyle
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import landscape
+from reportlab.platypus import Paragraph
+from reportlab.platypus import SimpleDocTemplate
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import cm
 from reportlab.lib.enums import TA_CENTER
-from reportlab.pdfgen.canvas import Canvas
+from reportlab.pdfgen.canvas import Canvas 
 from PyPDF2 import PdfMerger
 from main_window import Ui_MainWindow
 from start_form import Ui_Form
@@ -29,7 +31,6 @@ from itertools import *
 import os
 import openpyxl as op
 import pandas as pd
-# import numpy as np
 import contextlib
 import sys
 import sqlite3
