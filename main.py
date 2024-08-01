@@ -1,17 +1,14 @@
 # 
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.styles import ParagraphStyle as PS
 from reportlab.lib import colors
 from reportlab.lib.colors import *
-from reportlab.platypus import TableStyle
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.pagesizes import landscape
-from reportlab.platypus import Paragraph
-from reportlab.platypus import SimpleDocTemplate
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import cm
 from reportlab.lib.enums import TA_CENTER
+from reportlab.platypus import TableStyle, Paragraph, SimpleDocTemplate
 from reportlab.pdfgen.canvas import Canvas 
 from PyPDF2 import PdfMerger
 from main_window import Ui_MainWindow
@@ -3045,8 +3042,13 @@ def page():
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         # my_win.progressBar.hide()
-        # system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
-        system_stage = sf.select().where(System.stage == "1-й полуфинал").get()
+        system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
+
+        # stage = my_win.comboBox_filter_semifinal.currentText()
+        # id_system = system_id(stage)
+        # system_stage = sf.select().where(System.id == id_system).get()
+
+        # system_stage = sf.select().where(System.stage == "1-й полуфинал").get()
 
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
@@ -3068,9 +3070,15 @@ def page():
             my_win.tabWidget.setCurrentIndex(3)
         else:  # жеребьевка сделана
             my_win.Button_Ok_pf.setEnabled(False)
-            player_list = Result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
-            fill_table(player_list)
             load_combobox_filter_group_semifinal()
+            stage = my_win.comboBox_filter_semifinal.currentText()
+            id_system = system_id(stage)
+            system_stage = sf.select().where(System.id == id_system).get()
+            player_list = Result.select().where(Result.system_id == id_system)
+                                                
+            # player_list = Result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
+            fill_table(player_list)
+            # load_combobox_filter_group_semifinal()
             load_combo()
             visible_field()
             my_win.label_16.hide()
@@ -6290,8 +6298,10 @@ def filter_sf():
             pl2_query = fltr_id.select().where((Result.system_stage == semifinal) & (Result.player2 == name)) 
         fltr = pl1_query | pl2_query # объдиняет два запроса в один
     elif group == "все группы" and played == "все игры":
-        filter_sf = fltr_id.select().where((Result.system_stage == semifinal) & (Result.title_id == title_id()))
-        fltr = filter_sf.select().where(Result.system_stage.in_(sf))
+        # filter_sf = fltr_id.select().where((Result.system_id == id_system) & (Result.title_id == title_id()))
+        # filter_sf = fltr_id.select().where((Result.system_stage == semifinal) & (Result.title_id == title_id()))
+        # fltr = filter_sf.select().where(Result.system_stage.in_(sf))
+        fltr = Result.select().where(Result.system_id == id_system)
     elif group == "все группы" and played == "завершенные":
         if semifinal == "-все полуфиналы-":
             fltr = fltr_id.select().where(Result.system_stage.in_(sf) & (Result.points_win == 2))
@@ -12583,7 +12593,7 @@ def score_in_table(td, num_gr):
         # записывает каждому игроку сумму очков
         td[t * 2][mp + 2] = total_score[t + 1]
     # ===== если сыграны все игры группе то выставляет места =========
-    count_game = (count_player * (count_player - 1)) // 2
+    count_game = (count_player * (count_player - 1)) // 2 # сколько всего игр в группе
 
     results_playing = results.select().where((Result.points_win == 2) | (Result.points_win == 0))
     a = len(results_playing) # кол-во сыгранных игр
@@ -12813,8 +12823,15 @@ def rank_in_group(total_score, td, num_gr, stage):
             systems = System.get(System.id == id_system)
             max_person = systems.max_player
         elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-            game_list_group = game_list.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr))
-            max_person = len(game_list_group)
+            # ====
+            systems = System.get(System.id == id_system)
+            total_player = systems.max_player
+            total_group = systems.total_group
+            max_person = total_player // total_group
+
+            # =====
+            # game_list_group = game_list.select().where((Game_list.system_id == id_system) & (Game_list.number_group == num_gr))
+            # max_person = len(game_list_group)
         game_max = result.select().where((Result.system_id == id_system) & (Result.number_group == num_gr))  # сколько всего игр в группе
     # ======== проверка на неявку ======
     fio_no_player = []
