@@ -13409,17 +13409,17 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr, stage):
         flag_ratio = ratio(ratio_list, m)
         if flag_ratio is True:
             for x in ratio_list:
-                form = '{:.'f"{m}"'f}'
+                form = '{:.'f"{m + 1}"'f}'
                 x = float(form.format(x))
                 new_ratio_list.append(x)
-            return
+            n = 0
+            for l in new_ratio_list:
+                plr_ratio[n] = l
+                n += 1
+            return plr_ratio
         else:
-            continue
-    n = 0
-    for l in new_ratio_list:
-        plr_ratio[n] = l
-        n += 1
-    return plr_ratio
+            continue   
+    # return plr_ratio
 # =========
    
     #         # flag_ratio = ratio(ratio_list, m)   
