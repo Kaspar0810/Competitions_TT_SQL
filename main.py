@@ -13398,13 +13398,86 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr, stage):
                     plr_los[ki2].append(i)
                     plr_win[ki1].append(i)
                     plr_los[ki1].append(i + 2)
+    ratio_list = []
+    new_ratio_list = []
     for n in range(0, men_of_circle):
         plr_win[n] = sum(plr_win[n])
         plr_los[n] = sum(plr_los[n])
         x = plr_win[n] / plr_los[n]
-        x = float('{:.3f}'.format(x))
-        plr_ratio[n] = x
+        ratio_list.append(x)
+    for m in range(0, 6):
+        flag_ratio = ratio(ratio_list, m)
+        if flag_ratio is True:
+            for x in ratio_list:
+                form = '{:.'f"{m}"'f}'
+                x = float(form.format(x))
+                new_ratio_list.append(x)
+            return
+        else:
+            continue
+    n = 0
+    for l in new_ratio_list:
+        plr_ratio[n] = l
+        n += 1
     return plr_ratio
+# =========
+   
+    #         # flag_ratio = ratio(ratio_list, m)   
+    #     # вариант сравнения по знакам 
+    # # m = 0
+ 
+    # # for k in old_ratio_list:
+    # #     mark1 = str(k)[m]
+    # #     ratio_list.append(int(mark1))
+    # # flag_ratio = ratio(ratio_list)
+    # # m += 1
+    
+    #     # ========
+    # x = float('{:.3f}'.format(x))
+    # ratio_list.append(x)
+    #     # ===== получение двух одинаковых коэфицинетов в соотношении счета в партии и замена на большое количество знаков после запятой
+    # flag_ratio = ratio(ratio_list)
+    # n = 0
+    # if flag_ratio is True: # если соотношения разные
+    #     for l in ratio_list:
+    #         plr_ratio[n] = l
+    #         n += 1
+    # else: # 4 знака после запятой
+    #     ratio_list.clear()
+    #     for x in old_ratio_list:
+    #         x = float('{:.4f}'.format(x))
+    #         ratio_list.append(x)
+    #     flag_ratio = ratio(ratio_list)
+    #     if flag_ratio is True: # если соотношения разные
+    #         for l in ratio_list:
+    #             plr_ratio[n] = l
+    #             n += 1
+    #     else:  # 5 знаков после запятой
+    #         ratio_list.clear()
+    #         for x in old_ratio_list:
+    #             x = float('{:.5f}'.format(x))
+    #             ratio_list.append(x)
+    #         flag_ratio = ratio(ratio_list)
+    #         if flag_ratio is True: # если соотношения разные
+    #             for l in ratio_list:
+    #                 plr_ratio[n] = l
+    #                 n += 1
+    # return plr_ratio
+
+
+def ratio(ratio_list, m):
+    """проверяет на одинаковые коэфицинты при подсчете соотношения счета мячей"""
+    if m >= 1:
+        m += 1 
+    new_ratio_list = []
+    for k in ratio_list:
+        mark1 = str(k)[m]
+        new_ratio_list.append(int(mark1))
+
+    count_frequency = filter(lambda x: new_ratio_list.count(x) > 1, new_ratio_list)
+    count_frequency = list(set(count_frequency))
+    flag_ratio = True if len(count_frequency) == 0 else False
+    return flag_ratio
 
 
 def player_choice_in_group(num_gr):
