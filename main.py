@@ -13400,7 +13400,7 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr, stage):
                     plr_los[ki1].append(i + 2)
     ratio_list = []
     new_ratio_list = []
-    for n in range(0, men_of_circle):
+    for n in range(0, men_of_circle): # ставит колво знаков после запятой при подсчете соттнешения мячей
         plr_win[n] = sum(plr_win[n])
         plr_los[n] = sum(plr_los[n])
         x = plr_win[n] / plr_los[n]
