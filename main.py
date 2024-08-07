@@ -95,7 +95,6 @@ class MyTableModel(QAbstractTableModel):
 
     def data(self, index, role):
         coach_tmp_list = []
-        region_tmp_list = []
         tb = my_win.tabWidget.currentIndex()
         if role == QtCore.Qt.ItemDataRole.DisplayRole:
             return str(self._data[index.row()][index.column()])
@@ -294,6 +293,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
         help_Menu.addAction(self.copy_db_Action)
+        help_Menu.addSeparator()
         help_Menu.addAction(self.stat_Action)
         help_Menu.addAction(self.player_stat_Action)
     #  создание действий меню
@@ -309,7 +309,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.second_comp_Action = QAction("пусто")
         self.third_comp_Action = QAction("пусто")
         self.fourth_comp_Action = QAction("пусто")
-        # self.fifth_comp_Action = QAction("пусто")
         self.ed_one_table_Action = QAction("Редакитровать таблицу")
 
         self.print_list_nopay_R_Action = QAction("Список, неоплативших R")
@@ -3547,18 +3546,18 @@ def system_competition():
                 stage, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите этап для удаления", system_etap_list, 0, False)
                 id_system = system_id(stage)
-                system_exit = systems.select().where(System.stage_exit == stage)
+                # system_exit = systems.select().where(System.stage_exit == stage)
                 msgBox.setIcon(QMessageBox.Question)
                 msgBox.setText("Изменение системы!")
-                msgBox.setInformativeText("Вы уверны, что хотите удалить выбранный этап?")
+                msgBox.setInformativeText(f"Вы уверны, что хотите удалить\n {stage}?")
                 msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
                 msgBox.setDefaultButton(QMessageBox.Cancel)
                 ret_1 = msgBox.exec()
                 if ret_1 == msgBox.Yes:
                     flag = 1 # флаг удаления этапа равен 1
                     add_or_delete_etap_after_choice(stage, flag)
-                    sys = System.delete().where(System.id == id_system)
-                    sys.execute()
+                    # sys = System.delete().where(System.id == id_system)
+                    # sys.execute()
                 else:
                     return
 
@@ -13400,7 +13399,7 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr, stage):
                     plr_los[ki1].append(i + 2)
     ratio_list = []
     new_ratio_list = []
-    for n in range(0, men_of_circle): # ставит колво знаков после запятой при подсчете соттнешения мячей
+    for n in range(0, men_of_circle): # ставит колво знаков после запятой при подсчете соотнешения мячей
         plr_win[n] = sum(plr_win[n])
         plr_los[n] = sum(plr_los[n])
         x = plr_win[n] / plr_los[n]
@@ -13419,50 +13418,6 @@ def score_in_circle(tr_all, men_of_circle, num_gr, tr, stage):
             return plr_ratio
         else:
             continue   
-    # return plr_ratio
-# =========
-   
-    #         # flag_ratio = ratio(ratio_list, m)   
-    #     # вариант сравнения по знакам 
-    # # m = 0
- 
-    # # for k in old_ratio_list:
-    # #     mark1 = str(k)[m]
-    # #     ratio_list.append(int(mark1))
-    # # flag_ratio = ratio(ratio_list)
-    # # m += 1
-    
-    #     # ========
-    # x = float('{:.3f}'.format(x))
-    # ratio_list.append(x)
-    #     # ===== получение двух одинаковых коэфицинетов в соотношении счета в партии и замена на большое количество знаков после запятой
-    # flag_ratio = ratio(ratio_list)
-    # n = 0
-    # if flag_ratio is True: # если соотношения разные
-    #     for l in ratio_list:
-    #         plr_ratio[n] = l
-    #         n += 1
-    # else: # 4 знака после запятой
-    #     ratio_list.clear()
-    #     for x in old_ratio_list:
-    #         x = float('{:.4f}'.format(x))
-    #         ratio_list.append(x)
-    #     flag_ratio = ratio(ratio_list)
-    #     if flag_ratio is True: # если соотношения разные
-    #         for l in ratio_list:
-    #             plr_ratio[n] = l
-    #             n += 1
-    #     else:  # 5 знаков после запятой
-    #         ratio_list.clear()
-    #         for x in old_ratio_list:
-    #             x = float('{:.5f}'.format(x))
-    #             ratio_list.append(x)
-    #         flag_ratio = ratio(ratio_list)
-    #         if flag_ratio is True: # если соотношения разные
-    #             for l in ratio_list:
-    #                 plr_ratio[n] = l
-    #                 n += 1
-    # return plr_ratio
 
 
 def ratio(ratio_list, m):
