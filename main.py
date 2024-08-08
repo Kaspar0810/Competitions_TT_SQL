@@ -79,7 +79,8 @@ class MyTableModel(QAbstractTableModel):
     def setHorizontalHeaderLabels(self, horizontalHeaderLabels):
         self.horizontalHeaderLabels = horizontalHeaderLabels
  
-    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
+    # def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole.DisplayRole):
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole):
         if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole and len(self.horizontalHeaderLabels) == self.columnCount(None)):
             return self.horizontalHeaderLabels[section]
         return super().headerData(section, orientation, role)
@@ -3429,6 +3430,7 @@ def add_or_delete_etap_after_choice(stage, flag):
     """добавление этапа после жеребьевки"""
     etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
+    etap_word = ""
     p = 0
     for l in etap_list:
         p += 1
@@ -3464,8 +3466,24 @@ def add_or_delete_etap_after_choice(stage, flag):
     my_win.tabWidget.setTabEnabled(2, True)
     my_win.tabWidget.setCurrentIndex(2)
     my_win.comboBox_page_vid.setEnabled(True)
-    if flag == 0:
-        my_win.comboBox_etap.setCurrentText("Полуфиналы")
+
+    index = etap_list.index(stage)
+    if index == 0:
+        etap_word = "Предварительный"
+        real_list = ["-выбор этапа-", "Одна таблица", "Предварительный"] # который нужен в комбобокс
+    elif index > 0 or index < 3:
+        etap_word = "Полуфиналы"
+        real_list = ["-выбор этапа-", "Полуфиналы", "Финальный"]
+    elif index > 2 or index < 13:
+        etap_word = "Финальный"
+        real_list = ["-выбор этапа-", "Финальный", "Суперфинал"] 
+    else:
+        real_list = ["-выбор этапа-", "Суперфинал"] 
+        etap_word = "Суперфинал"
+    if flag == 0: # уточнить запись в комбобокс этап        
+        my_win.comboBox_etap.setCurrentText(etap_word)
+    elif flag == 1:
+        combobox_etap_compare(real_list)
 
 
 def system_competition():
@@ -3497,6 +3515,7 @@ def system_competition():
             ret = msgBox.exec()
             made_list = ["Изменить всю систему", "Отдельные этапы", "Добавить этап", "Удалить этап"]
             if ret == msgBox.Yes:
+               my_win.tabWidget.setCurrentIndex(0)
                item_selected, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите действия для редактирования", made_list, 0, False) 
             if item_selected == "Изменить всю систему":
@@ -3542,11 +3561,10 @@ def system_competition():
                 flag = 0 # флаг добавления этапа равен 0
                 add_or_delete_etap_after_choice(stage, flag)
                 return
-            else:
+            else: # удалить этап
                 stage, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите этап для удаления", system_etap_list, 0, False)
                 id_system = system_id(stage)
-                # system_exit = systems.select().where(System.stage_exit == stage)
                 msgBox.setIcon(QMessageBox.Question)
                 msgBox.setText("Изменение системы!")
                 msgBox.setInformativeText(f"Вы уверны, что хотите удалить\n {stage}?")
@@ -3556,8 +3574,7 @@ def system_competition():
                 if ret_1 == msgBox.Yes:
                     flag = 1 # флаг удаления этапа равен 1
                     add_or_delete_etap_after_choice(stage, flag)
-                    # sys = System.delete().where(System.id == id_system)
-                    # sys.execute()
+                    return
                 else:
                     return
 
