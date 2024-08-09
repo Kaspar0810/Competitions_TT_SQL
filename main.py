@@ -3452,6 +3452,8 @@ def add_or_delete_etap_after_choice(stage, flag):
         if l > ind[0]: # удаляет все что ниже вставляемого этапа
             s_d = System.delete().where(System.id == id_list[l])
             s_d.execute()
+            gl_d = Game_list.delete().where(Game_list.system_id == id_list[l])
+            gl_d.execute()
     system_upd = System.select().where(System.title_id == title_id())
     count_etap = len(system_upd)
     sb = "Выбор системы проведения соревнования."
@@ -8690,7 +8692,6 @@ def control_all_player_in_final(etap):
     system_stage = system.select().where(System.stage == "Предварительный").get()
     total_player = system_stage.total_athletes
     system_id = system.select().where(System.stage ** '% финал')
-    # tot_fin = len(system_id) # если 0, значит финалы еще не созданы или этап -одна таблица-
     sum_final = []
 
     for i in system_id:
@@ -8725,9 +8726,9 @@ def control_all_player_in_final(etap):
                     flag_checking = checking_before_the_draw()
                     if flag_checking is False:
                         return
+                    
                     choice_gr_automat()
                     add_open_tab(tab_page="Группы")
-                    # tab_enabled(gamer)
                     tab_enabled(id_title)
                     with db:
                         system_stage.choice_flag = True
