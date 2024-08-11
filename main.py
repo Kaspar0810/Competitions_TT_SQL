@@ -687,10 +687,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 stage = k.stage
                 if stage not in stage_list:
                     fin_list.append(stage)
-            # count_fin = len(fin_list) 
-            # if count_fin == 1:
-            #     title = Title.get(Title.id == title_id())
-            #     # tab_str = title.tab_enabled       
             stage = fin
             id_system = system_id(stage)
             sys = system.select().where(System.id == id_system).get()
@@ -831,7 +827,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 ['Breeze', 'Oxygen', 'QtCurve', 'Windows', 'Fusion']
 app = QApplication(sys.argv)
 my_win = MainWindow()
-# app.setStyle('Breeze')
+app.setStyle('Fusion')
 my_win.setWindowTitle("Соревнования по настольному теннису")
 my_win.setWindowIcon(QIcon("CTT.png"))
 my_win.resize(1390, 804)
@@ -893,14 +889,10 @@ class StartWindow(QMainWindow, Ui_Form):
     def last_comp(self):
         """открытие последних соревнований"""
         sex = ["Девочки", "Девушки", "Женщины"]
-        # gamer = db_select_title()
-        # tab_enabled(gamer)
-        # ======= new
         id_title = db_select_title()
         tab_enabled(id_title)
         title_new = Title.select().where(Title.id == id_title).get()
         gamer = title_new.gamer
-        #========
         self.close()
         if gamer in sex:
             my_win.setStyleSheet("#MainWindow{background-color:lightpink}")
@@ -936,7 +928,6 @@ class StartWindow(QMainWindow, Ui_Form):
                             page_vid="", label_string="", kol_game_string="", choice_flag=False, score_flag=5,
                             visible_game=False, stage_exit="", mesta_exit=0, no_game="").save()
             self.close()
-            # tab_enabled(gamer)
             tab_enabled(id_title)
             my_win.show()
         else:
@@ -1661,11 +1652,7 @@ def db_select_title():
         my_win.lineEdit_title_gamer.setText(title.gamer)
     else:
         load_comboBox_referee()
-    # ========
-    # tab_enabled(gamer)
     tab_enabled(id_title)
-
-    # return gamer
     return id_title
 
 
@@ -8736,10 +8723,14 @@ def control_all_player_in_final(etap):
                         flag = True
                 else:
                     my_win.choice_gr_Action.setEnabled(True)
-                    with db:
-                        system_stage.choice_flag = False
-                        system_stage.save()
-                        flag = True
+                    flag_ch = system_stage.choice_flag
+                    if flag_ch is True: # была уже сделана жеребьевка групп, и идет процесс добавления или удаления этапа при редактировании системы
+                        return
+                    else:
+                        with db:
+                            system_stage.choice_flag = False
+                            system_stage.save()
+                            flag = True
                     return    
     elif t >= 3: # продолжает создание системы
         flag = True
@@ -9075,12 +9066,10 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             else:
                 total_games= 80
         elif cur_index == 3:  # сетка с розыгрышем призовых мест
-            if player_in_final == 8:
-                total_games = 4
-            elif player_in_final == 16:
-                total_games = 8
-            elif player_in_final == 32:
-                total_games = 32
+            if player_in_final == 32:
+                total_games = 32    
+            elif player_in_final < 32:                
+                total_games = player_in_final
         elif cur_index == 4: # игры в круг
             if system_etap == "Одна таблица":
                 gr = 1 
