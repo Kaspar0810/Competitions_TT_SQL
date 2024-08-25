@@ -1,4 +1,4 @@
-# 
+
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -35,6 +35,7 @@ import pathlib
 from pathlib import Path
 from dateutil.relativedelta import relativedelta
 import random
+import math
 from sys import platform
 # import time
 os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
@@ -3068,7 +3069,7 @@ def page():
             # load_combobox_filter_group_semifinal()
             load_combo()
             visible_field()
-            my_win.label_16.hide()
+            my_win.label_17.hide()
             my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
     elif tb == 5: # вкладка -финалы-
         my_win.resize(1270, 825)
@@ -3099,7 +3100,7 @@ def page():
         fill_table(player_list)
         load_combo()
         visible_field()
-        my_win.label_16.hide()
+        my_win.label_18.hide()
         # === проверка есть ли 1-й финал и все ли места разыигрываются ===
         system = System.select().where(System.title_id == title_id())
         ng = ""
@@ -3419,30 +3420,32 @@ def add_or_delete_etap_after_choice(stage, flag):
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     etap_word = ""
     p = 0
-    for l in etap_list:
-        p += 1
-        if l == stage:
-            after_etap = etap_list[p - 2] # получение этапа после которого вставить новый этап
-            break
-    system = System.select().where(System.title_id == title_id())
-    m = 0
-    etap_dict = {}
-    id_list = []
-    for k in system: # получение словаря этапов и списка их id
-        stage_system = k.stage 
-        id_s = k.id
-        id_list.append(id_s)
-        etap_dict[m] = stage_system
-        m += 1
-    ind = [keys for keys, values in etap_dict.items() if values == after_etap] # список ключа по значению 
-    for l in range (len(id_list)):
-        if l > ind[0]: # удаляет все что ниже вставляемого этапа
-            s_d = System.delete().where(System.id == id_list[l])
-            s_d.execute()
-            gl_d = Game_list.delete().where(Game_list.system_id == id_list[l])
-            gl_d.execute()
+    if stage != "Суперфинал":
+        for l in etap_list:
+            p += 1
+            if l == stage:
+                after_etap = etap_list[p - 2] # получение этапа после которого вставить новый этап
+                break
+        system = System.select().where(System.title_id == title_id())
+        m = 0
+        etap_dict = {}
+        id_list = []
+        for k in system: # получение словаря этапов и списка их id
+            stage_system = k.stage 
+            id_s = k.id
+            id_list.append(id_s)
+            etap_dict[m] = stage_system
+            m += 1
+        ind = [keys for keys, values in etap_dict.items() if values == after_etap] # список ключа по значению 
+        for l in range (len(id_list)):
+            if l > ind[0]: # удаляет все что ниже вставляемого этапа
+                s_d = System.delete().where(System.id == id_list[l])
+                s_d.execute()
+                gl_d = Game_list.delete().where(Game_list.system_id == id_list[l])
+                gl_d.execute()
     system_upd = System.select().where(System.title_id == title_id())
     count_etap = len(system_upd)
+
     sb = "Выбор системы проведения соревнования."
     my_win.statusbar.showMessage(sb)
     my_win.spinBox_kol_group.hide()
@@ -3460,10 +3463,10 @@ def add_or_delete_etap_after_choice(stage, flag):
     if index == 0:
         etap_word = "Предварительный"
         real_list = ["-выбор этапа-", "Одна таблица", "Предварительный"] # который нужен в комбобокс
-    elif index > 0 or index < 3:
+    elif index > 0 and index < 3:
         etap_word = "Полуфиналы"
         real_list = ["-выбор этапа-", "Полуфиналы", "Финальный"]
-    elif index > 2 or index < 13:
+    elif index > 2 and index < 13:
         etap_word = "Финальный"
         real_list = ["-выбор этапа-", "Финальный", "Суперфинал"] 
     else:
@@ -3507,6 +3510,8 @@ def system_competition():
                my_win.tabWidget.setCurrentIndex(0)
                item_selected, ok = QInputDialog.getItem(
                     my_win, "Системные этапы", "Выберите действия для редактирования", made_list, 0, False) 
+            else:
+                return
             if item_selected == "Изменить всю систему":
                 # очищает таблицы перед новой системой соревнования (system, choice)
                 clear_db_before_edit()
@@ -5063,6 +5068,8 @@ def filter_rejting_list():
         player_list = r_data.select().where((rejting_date > after_date) & (rejting_city == city_txt))
     elif region_txt == "" and city_txt != "" and date_txt == "":
         player_list = r_data.select().where(rejting_city == city_txt)
+    elif region_txt != "" and city_txt == "" and date_txt == "":
+        player_list = r_data.select().where(rejting_region == region_txt)
     elif region_txt != "" and city_txt != "" and date_txt != "":
         player_list = r_data.select().where((rejting_date > after_date) & (rejting_region == region_txt) & (rejting_city == city_txt))
 
@@ -8603,12 +8610,72 @@ def total_game_table(exit_stage, kpt, fin, pv):
             if exit_stage == "1-й полуфинал" or exit_stage == "2-й полуфинал":
                 system_exit = system.select().where(System.stage == exit_stage).get()
                 total_gr = system_exit.total_group 
-            player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
-            player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
-            player_in_final = player_in_final_current if player_in_final_current <  player_in_final_full else player_in_final_full
 
+            # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
             if etap_text == "Суперфинал":
-                player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
+                player_in_final_current = kpt
+                player_in_final_full = full_net_player(kpt)
+                player_in_final = kpt
+            else:
+                player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
+                player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
+                if player_in_final_current <  player_in_final_full:
+                    player_in_final = player_in_final_current
+                else: 
+                    player_in_final = player_in_final_full
+
+
+            # ======
+            # if etap_text == "Суперфинал":
+            #     player_in_final_current = kpt
+            #     if cur_index == 4:
+            #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
+            #     else:
+            #         player_in_final_full = full_net_player(kpt)
+            # else:
+            #     player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
+
+            # if etap_text == "Суперфинал":
+            #     # player_in_final_current = kpt
+            #     if cur_index == 4:
+            #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
+            #     else:
+            #         player_in_final_full = full_net_player(kpt)
+            # # player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
+            # player_in_final = player_in_final_current if player_in_final_current <  player_in_final_full else player_in_final_full
+
+
+            # if etap_text == "Суперфинал":
+            #     player_in_final_current = kpt
+            # else:
+            #     player_in_final_current = total_athletes - sum_pl
+
+            # # if etap_text == "Суперфинал":
+            # #     if cur_index == 4:
+            # #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
+            # #     else:
+            # #         player_in_final_current = kpt
+            # #         player_in_final_full = full_net_player(kpt)
+
+            # # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
+            # if etap_text == "Суперфинал":
+            #     player_in_final_current = kpt
+            #     if cur_index == 4:
+            #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
+            #     else:
+            #         player_in_final_full = full_net_player(kpt)
+            # else:
+            #     player_in_final_current = total_athletes - sum_pl 
+            # # # player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
+            # player_in_final = player_in_final_current if player_in_final_current <  player_in_final_full else player_in_final_full
+
+            # # if etap_text == "Суперфинал":
+            # #     if cur_index == 4:
+            # #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
+            # #     else:
+            # #         player_in_final_full = full_net_player(kpt)
+            #     # player_in_final_full = kpt if cur_index == 4 else 
+            #     # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
 
         total_games = numbers_of_games(cur_index, player_in_final, kpt) # подсчет кол-во игр
 
@@ -8627,18 +8694,28 @@ def total_game_table(exit_stage, kpt, fin, pv):
         elif type_table == "группы": # если ПФ
             m_pl = player_in_final
         else: # если финал сетка
-            if player_in_final <= 8:
-                m_pl = 8
-            elif player_in_final > 8 and player_in_final <= 16:
-                m_pl = 16
-            elif player_in_final > 16 and player_in_final <= 32:
-                m_pl = 32 
+            m_pl = full_net_player(kpt=player_in_final)
+            # if player_in_final <= 8:
+            #     m_pl = 8
+            # elif player_in_final > 8 and player_in_final <= 16:
+            #     m_pl = 16
+            # elif player_in_final > 16 and player_in_final <= 32:
+            #     m_pl = 32 
         # ======
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=total_gr, kol_game_string=stroka_kol_game,
                         max_player=m_pl, stage=fin, type_table=type_table, page_vid=pv, label_string=str_setka,
                         choice_flag=0, score_flag=score_match, visible_game=flag_visible, stage_exit=exit_stage, mesta_exit=kpt, no_game=no_game3).save()    
         
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
+
+
+def full_net_player(kpt):
+    """максимальное количество игроков в сетке при не полном составе"""
+    n = 1
+    while 2** n <= kpt:
+        n += 1
+    player_in_final_full = 2 ** n
+    return player_in_final_full
 
 
 def current_index_combobox_table(sender):
@@ -8697,41 +8774,44 @@ def control_all_player_in_final(etap):
             msgBox.information(my_win, "Уведомление", txt)
                     # ====== вставить вопрос о суперфинале и игры за 3 место если финал сетка
         if etap != "Суперфинал":           
-            result = msgBox.question(my_win, "", "Будет ли суперфинал?",
-                                    msgBox.Yes, msgBox.No) 
-            if result == msgBox.Yes:
-                flag = True
-            else:        # ========= 
-                add_open_tab(tab_page="Система")
-                result = msgBox.question(my_win, "", "Система соревнований создана.\n"
-                                                            "Теперь необходимо сделать жеребъевку\n"
-                                                            "предварительного этапа.\n"
-                                                            "Хотите ее сделать сейчас?",
-                                            msgBox.Ok, msgBox.Cancel)
-                if result == msgBox.Ok:
-                    # проверка что все спортсмены подтвердились
-                    flag_checking = checking_before_the_draw()
-                    if flag_checking is False:
-                        return
+            # result = msgBox.question(my_win, "", "Будет ли суперфинал?",
+            #                         msgBox.Yes, msgBox.No) 
+            # if result == msgBox.Yes:
+            #     flag = True
+            # else:        # ========= 
+            add_open_tab(tab_page="Система")
+            result = msgBox.question(my_win, "", "Система соревнований создана.\n"
+                                                        "Теперь необходимо сделать жеребъевку\n"
+                                                        "предварительного этапа.\n"
+                                                        "Хотите ее сделать сейчас?",
+                                        msgBox.Ok, msgBox.Cancel)
+            if result == msgBox.Ok:
+                # проверка что все спортсмены подтвердились
+                flag_checking = checking_before_the_draw()
+                if flag_checking is False:
+                    return
                     
-                    choice_gr_automat()
-                    add_open_tab(tab_page="Группы")
-                    tab_enabled(id_title)
+                choice_gr_automat()
+                add_open_tab(tab_page="Группы")
+                tab_enabled(id_title)
+                with db:
+                    system_stage.choice_flag = True
+                    system_stage.save()
+                    flag = True
+            else:
+                my_win.choice_gr_Action.setEnabled(True)
+                flag_ch = system_stage.choice_flag
+                if flag_ch is True: # была уже сделана жеребьевка групп, и идет процесс добавления или удаления этапа при редактировании системы
+                    return
+                else:
                     with db:
-                        system_stage.choice_flag = True
+                        system_stage.choice_flag = False
                         system_stage.save()
                         flag = True
-                else:
-                    my_win.choice_gr_Action.setEnabled(True)
-                    flag_ch = system_stage.choice_flag
-                    if flag_ch is True: # была уже сделана жеребьевка групп, и идет процесс добавления или удаления этапа при редактировании системы
-                        return
-                    else:
-                        with db:
-                            system_stage.choice_flag = False
-                            system_stage.save()
-                            flag = True
-                    return    
+                return
+        else:
+            return
+        flag = False    
     elif t >= 3: # продолжает создание системы
         flag = True
     elif t == 0:
@@ -9041,30 +9121,50 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             elif player_in_final == 32:
                 total_games = 94
         elif cur_index == 2:  # прогрессивная сетка
-            if player_in_final <= 8:
-                total_games = 12
-            elif player_in_final == 16:
-                total_games = 32
-            elif player_in_final > 8 and player_in_final < 16:
-                tours = 4
-                free = 16 - player_in_final
-                if free == 1:
-                    total_games = 32 - free * tours
-                elif free == 2:
-                    total_games = 32 - (free * tours - 1)
-                else:
-                    total_games = 32 - (free * 2 + 4)
-            elif player_in_final == 32: 
-                 total_games = 80  
-            elif player_in_final > 16 and player_in_final < 32:
-                tours = 5
-                free = 32 - player_in_final
-                if free == 1:
-                    total_games = 80 - free * tours
-                elif free > 1:
-                    total_games = 80 - (free * tours - 1)
+            full_net = full_net_player(kpt)
+            # full_net = 0
+            # if player_in_final >= 4 and player_in_final <= 8:
+            #    full_net = 8
+            # elif player_in_final > 8 and player_in_final <= 16:
+            #    full_net = 16  
+            # elif player_in_final > 16 and player_in_final <= 32:
+            #    full_net = 32    
+
+            tours = int(math.log2(full_net))
+            all_game_net = full_net // 2 * tours
+            free = full_net - player_in_final
+            if free == 1:
+                total_games = all_game_net - free * tours
+            elif free == 2:
+                total_games = all_game_net - (free * tours - 1)
             else:
-                total_games= 80
+                total_games = all_game_net - (free * 2 + 4)
+            # ========
+            # if player_in_final <= 8:
+            #     free = 8 - player_in_final
+            #     total_games = 12
+            # elif player_in_final == 16:
+            #     total_games = 32
+            # elif player_in_final > 8 and player_in_final < 16:
+            #     tours = 4
+            #     free = 16 - player_in_final
+            #     if free == 1:
+            #         total_games = 32 - free * tours
+            #     elif free == 2:
+            #         total_games = 32 - (free * tours - 1)
+            #     else:
+            #         total_games = 32 - (free * 2 + 4)
+            # elif player_in_final == 32: 
+            #      total_games = 80  
+            # elif player_in_final > 16 and player_in_final < 32:
+            #     tours = 5
+            #     free = 32 - player_in_final
+            #     if free == 1:
+            #         total_games = 80 - free * tours
+            #     elif free > 1:
+            #         total_games = 80 - (free * tours - 1)
+            # else:
+            #     total_games= 80
         elif cur_index == 3:  # сетка с розыгрышем призовых мест
             if player_in_final == 32:
                 total_games = 32    
@@ -9766,6 +9866,17 @@ def func_zagolovok(canvas, doc):
     title = Title.get(Title.id == title_id())
 
     nz = title.name
+    # ======== если длинное название перенос на две строки
+    total_mark = len(nz)
+    if total_mark > 60 and pv == A4:
+        nz_list = nz.split()
+        word, ok = QInputDialog.getItem(my_win, "Название", "Выберите после какого слова\n"
+                                        "перенести на другую строку", nz_list)
+        s1 = nz.find(word) + len(word)
+        strline1 = nz[:s1]
+        strline2 = nz[s1 + 1:]
+        nz = f"{strline1}\n{strline2}"
+    # ====== 
     ms = title.mesto
     sr = f"среди {title.sredi} {title.vozrast}"
     data_comp = data_title_string()
@@ -9780,10 +9891,17 @@ def func_zagolovok(canvas, doc):
     canvas.saveState()
     canvas.setFont("DejaVuSerif-Italic", 14)
     # центральный текст титула
-    canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)
-    canvas.setFont("DejaVuSerif-Italic", 11)
+    if total_mark > 60:
+        canvas.drawCentredString(width / 2.0, height - 1.1 * cm, strline1)
+        canvas.drawCentredString(width / 2.0, height - 1.5 * cm, strline2)
+        canvas.drawCentredString(width / 2.0, height - 1.9 * cm, sr)
+        canvas.setFont("DejaVuSerif-Italic", 11)
+    else:
+        canvas.drawCentredString(width / 2.0, height - 1.1 * cm, nz)
+        canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
+        canvas.setFont("DejaVuSerif-Italic", 11)
     # текста титула по основным
-    canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
+    # canvas.drawCentredString(width / 2.0, height - 1.5 * cm, sr)
     canvas.drawRightString(width - 1 * cm, height - 1.9 * cm, f"г. {ms}")  # город
     canvas.drawString(0.8 * cm, height - 1.9 * cm, data_comp)  # дата начала
     # ==== текст судейская коллегия
