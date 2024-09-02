@@ -2989,9 +2989,23 @@ def page():
     elif tb == 3:  # вкладка -группы-
         stage = "Предварительный"
         Button_view_group = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
-        Button_view_group.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
-        Button_view_group.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        Button_view_group.setText("Просмотр\nгрупп")
+        # Button_view_group.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
+        # Button_view_group.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        #==========
+        # Label_view_group = QLabel(my_win.tabWidget)
+        # Label_view_group.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
+        # Label_view_group.move(860, 50) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        # Label_view_group.setText("Просмотр групп")
+        # Label_view_group.show()
+        Button_view_group.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
+        Button_view_group.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
+        Button_view_group.setIcon(QtGui.QIcon(joined_path))
+        Button_view_group.setIconSize(QtCore.QSize(48,64))
+        Button_view_group.setFlat(True)
+        # Button_view_group.setText("Просмотр")
+        # =========
+        #Button_view_group.setText("Просмотр\nгрупп")
         Button_view_group.show()
         Button_view_group.clicked.connect(view)
         my_win.widget.hide()
@@ -3018,9 +3032,17 @@ def page():
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
     elif tb == 4:  # вкладка -полуфиналы-
         Button_view_semifinal = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
-        Button_view_semifinal.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
-        Button_view_semifinal.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        Button_view_semifinal.setText("Просмотр\nполуфиналов")
+        # ==== новый вариант кнопки просмотра (иконка)
+        Button_view_semifinal.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
+        Button_view_semifinal.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
+        Button_view_semifinal.setIcon(QtGui.QIcon(joined_path))
+        Button_view_semifinal.setIconSize(QtCore.QSize(48,64))
+        Button_view_semifinal.setFlat(True)
+        # ===============================
+        # Button_view_semifinal.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
+        # Button_view_semifinal.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        # Button_view_semifinal.setText("Просмотр\nполуфиналов")
         Button_view_semifinal.show()
         Button_view_semifinal.clicked.connect(view)
         my_win.widget.hide()
@@ -3074,9 +3096,17 @@ def page():
     elif tb == 5: # вкладка -финалы-
         my_win.resize(1270, 825)
         Button_view_final = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
-        Button_view_final.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
-        Button_view_final.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        Button_view_final.setText("Просмотр\nфиналов")
+        # ==== новый вариант кнопки просмотра (иконка)
+        Button_view_final.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
+        Button_view_final.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
+        Button_view_final.setIcon(QtGui.QIcon(joined_path))
+        Button_view_final.setIconSize(QtCore.QSize(48,64))
+        Button_view_final.setFlat(True)
+        # ===============================
+        # Button_view_final.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
+        # Button_view_final.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+        # Button_view_final.setText("Просмотр\nфиналов")
         Button_view_final.show()
         my_win.widget.hide()
         my_win.tableWidget.hide()
@@ -9891,7 +9921,7 @@ def func_zagolovok(canvas, doc):
     canvas.saveState()
     canvas.setFont("DejaVuSerif-Italic", 14)
     # центральный текст титула
-    if total_mark > 60:
+    if total_mark > 60 and pv == A4:
         canvas.drawCentredString(width / 2.0, height - 1.1 * cm, strline1)
         canvas.drawCentredString(width / 2.0, height - 1.5 * cm, strline2)
         canvas.drawCentredString(width / 2.0, height - 1.9 * cm, sr)
