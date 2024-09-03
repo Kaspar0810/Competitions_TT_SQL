@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\Пользователь\Competitions_TT_SQL\UI\main_window.ui'
+# Form implementation generated from reading ui file 'c:\Users\Alex\Competitions_TT_SQL\UI\main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.11
 #
@@ -1057,7 +1057,7 @@ class Ui_MainWindow(object):
         self.Button_Ok_gr.setGeometry(QtCore.QRect(730, 36, 71, 61))
         self.Button_Ok_gr.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("c:\\Users\\Пользователь\\Competitions_TT_SQL\\UI\\../icons/a6no4gtd5gmn_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("c:\\Users\\Alex\\Competitions_TT_SQL\\UI\\../icons/Ok.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.Button_Ok_gr.setIcon(icon)
         self.Button_Ok_gr.setIconSize(QtCore.QSize(48, 48))
         self.Button_Ok_gr.setFlat(True)
@@ -1984,7 +1984,7 @@ class Ui_MainWindow(object):
         self.toolBox.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.toolBox.setObjectName("toolBox")
         self.page = QtWidgets.QWidget()
-        self.page.setGeometry(QtCore.QRect(0, 0, 241, 459))
+        self.page.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page.setObjectName("page")
         self.toolBox.addItem(self.page, "")
         self.page_2 = QtWidgets.QWidget()
@@ -2317,7 +2317,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.addLayout(self.horizontalLayout_28)
         self.toolBox.addItem(self.page_2, "")
         self.page_6 = QtWidgets.QWidget()
-        self.page_6.setGeometry(QtCore.QRect(0, 0, 241, 459))
+        self.page_6.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page_6.setObjectName("page_6")
         self.label_18 = QtWidgets.QLabel(self.page_6)
         self.label_18.setGeometry(QtCore.QRect(12, 0, 211, 16))
@@ -2608,7 +2608,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_57.addWidget(self.lineEdit_find_player_in_system)
         self.toolBox.addItem(self.page_6, "")
         self.page_3 = QtWidgets.QWidget()
-        self.page_3.setGeometry(QtCore.QRect(0, 0, 241, 459))
+        self.page_3.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page_3.setObjectName("page_3")
         self.groupBox_filter_group = QtWidgets.QGroupBox(self.page_3)
         self.groupBox_filter_group.setGeometry(QtCore.QRect(4, 120, 231, 191))
@@ -2791,7 +2791,7 @@ class Ui_MainWindow(object):
         self.checkBox_4.setObjectName("checkBox_4")
         self.toolBox.addItem(self.page_3, "")
         self.page_5 = QtWidgets.QWidget()
-        self.page_5.setGeometry(QtCore.QRect(0, 0, 241, 459))
+        self.page_5.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page_5.setObjectName("page_5")
         self.groupBox_filter_group_semifinal = QtWidgets.QGroupBox(self.page_5)
         self.groupBox_filter_group_semifinal.setGeometry(QtCore.QRect(4, 120, 231, 231))
@@ -2928,7 +2928,7 @@ class Ui_MainWindow(object):
         self.radioButton_match_11.setObjectName("radioButton_match_11")
         self.toolBox.addItem(self.page_5, "")
         self.page_4 = QtWidgets.QWidget()
-        self.page_4.setGeometry(QtCore.QRect(0, 0, 241, 459))
+        self.page_4.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page_4.setObjectName("page_4")
         self.groupBox_filter_group_2 = QtWidgets.QGroupBox(self.page_4)
         self.groupBox_filter_group_2.setGeometry(QtCore.QRect(4, 120, 231, 261))
@@ -3143,7 +3143,7 @@ class Ui_MainWindow(object):
         self.label_61.setObjectName("label_61")
         self.toolBox.addItem(self.page_4, "")
         self.page_8 = QtWidgets.QWidget()
-        self.page_8.setGeometry(QtCore.QRect(0, 0, 241, 459))
+        self.page_8.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page_8.setObjectName("page_8")
         self.groupBox_5 = QtWidgets.QGroupBox(self.page_8)
         self.groupBox_5.setGeometry(QtCore.QRect(5, 110, 230, 91))
@@ -3352,7 +3352,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_21.addLayout(self.horizontalLayout_14)
         self.toolBox.addItem(self.page_8, "")
         self.page_7 = QtWidgets.QWidget()
-        self.page_7.setGeometry(QtCore.QRect(0, 0, 241, 459))
+        self.page_7.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.page_7.setObjectName("page_7")
         self.groupBox_4 = QtWidgets.QGroupBox(self.page_7)
         self.groupBox_4.setGeometry(QtCore.QRect(5, 2, 231, 231))
@@ -3699,7 +3699,7 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(5)
         self.toolBox.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
