@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\Alex\Competitions_TT_SQL\UI\main_window.ui'
+# Form implementation generated from reading ui file 'c:\Users\Пользователь\Competitions_TT_SQL\UI\main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.11
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1111, 806)
+        MainWindow.resize(1109, 806)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -1057,7 +1057,7 @@ class Ui_MainWindow(object):
         self.Button_Ok_gr.setGeometry(QtCore.QRect(730, 36, 71, 61))
         self.Button_Ok_gr.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("c:\\Users\\Alex\\Competitions_TT_SQL\\UI\\../icons/a6no4gtd5gmn_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("c:\\Users\\Пользователь\\Competitions_TT_SQL\\UI\\../icons/a6no4gtd5gmn_64.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.Button_Ok_gr.setIcon(icon)
         self.Button_Ok_gr.setIconSize(QtCore.QSize(48, 48))
         self.Button_Ok_gr.setFlat(True)
@@ -3689,7 +3689,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1111, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1109, 21))
         font = QtGui.QFont()
         font.setFamily("Times New Roman")
         font.setItalic(True)

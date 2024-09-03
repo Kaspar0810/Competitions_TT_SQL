@@ -39,6 +39,8 @@ import math
 from sys import platform
 # import time
 os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
+# WindowsArguments = dpiawareness = 1
+
 # app = QtGui.QApplication(sys.argv)
 # screen_rect = app.desktop().screenGeometry()
 # width, height = screen_rect.width(), screen_rect.height()
