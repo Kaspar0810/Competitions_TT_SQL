@@ -5776,10 +5776,10 @@ def made_pdf_table_for_view(sender):
     """вызов функции заполнения таблицы pdf группы сыгранными играми"""
     group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     tab = my_win.tabWidget.currentIndex()
-    text_button = my_win.sender().text()
+    # text_button = my_win.sender().text()
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp
-    if text_button == "Просмотр\nфиналов":
+    if tab == 5:
         stage = my_win.tableView.model().index(0, 2).data() # данные ячейки tableView номер финала для просмотра в пдф пот нажатию кнопки
         if stage == "Одна таблица":
             view_file = f"{short_name}_one_table.pdf"
@@ -5787,12 +5787,27 @@ def made_pdf_table_for_view(sender):
             n_fin = stage[:1]
             view_file = f"{short_name}_{n_fin}-final.pdf"
         fin = stage
-    elif text_button == "Просмотр\nполуфиналов":
+    elif tab == 4:
         stage = my_win.comboBox_filter_semifinal.currentText()
         n_fin = stage[:1]
         view_file = f"{short_name}_{n_fin}-semifinal.pdf"
-    else:
-        view_file = f"{short_name}_table_group.pdf"
+    elif tab == 3:
+        view_file = f"{short_name}_table_group.pdf" 
+
+    # if text_button == "Просмотр\nфиналов":
+    #     stage = my_win.tableView.model().index(0, 2).data() # данные ячейки tableView номер финала для просмотра в пдф пот нажатию кнопки
+    #     if stage == "Одна таблица":
+    #         view_file = f"{short_name}_one_table.pdf"
+    #     else:
+    #         n_fin = stage[:1]
+    #         view_file = f"{short_name}_{n_fin}-final.pdf"
+    #     fin = stage
+    # elif text_button == "Просмотр\nполуфиналов":
+    #     stage = my_win.comboBox_filter_semifinal.currentText()
+    #     n_fin = stage[:1]
+    #     view_file = f"{short_name}_{n_fin}-semifinal.pdf"
+    # else:
+    #     view_file = f"{short_name}_table_group.pdf"
 
     if sender == my_win.view_gr_Action or tab == 3:  # вкладка группы
         stage = "Предварительный"
