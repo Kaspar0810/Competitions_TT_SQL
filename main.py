@@ -2749,6 +2749,8 @@ def page():
         my_win.tableWidget.hide()
         my_win.widget.hide()
     elif tb == 1:  # -список участников-
+        # my_win.tabWidget_2.show
+        #=========
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 225, 841, 552))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 221))
