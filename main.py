@@ -12153,7 +12153,16 @@ def mesto_in_final(fin):
     if fin == "Одна таблица" or fin == "1-й финал":
        mesto[fin] = 1 
     else:
-        for k in range(id_system, id_system + count):
+        id_list = []
+        fin_list = ["1-й финал", "2-й финал", "3-й финал", "4-й финал",
+                            "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал"]
+        for l in system:
+            sys_id = l.id
+            stage_fin = l.stage
+            if stage_fin in fin_list:
+                id_list.append(sys_id)
+        # for k in range(id_system, id_system + count):
+        for k in id_list:
             sys = system.select().where(System.id == k).get()
             max_player = sys.max_player
             stage = sys.stage
