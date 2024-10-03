@@ -8663,70 +8663,18 @@ def total_game_table(exit_stage, kpt, fin, pv):
 
             # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
             if etap_text == "Суперфинал":
-                player_in_final_current = kpt
+                # player_in_final_current = kpt
                 player_in_final_full = full_net_player(player_in_final)
-                player_in_final = kpt
+                # player_in_final = kpt
             else:
                 player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
                 player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
-                # player_in_final_full = full_net_player(player_in_final)
+                
                 if player_in_final_current <  player_in_final_full:
-                    player_in_final = player_in_final_current
+                   player_in_final = player_in_final_current
+                   player_in_final_full = full_net_player(player_in_final)
                 else: 
                     player_in_final = player_in_final_full
-
-
-            # ======
-            # if etap_text == "Суперфинал":
-            #     player_in_final_current = kpt
-            #     if cur_index == 4:
-            #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
-            #     else:
-            #         player_in_final_full = full_net_player(kpt)
-            # else:
-            #     player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
-
-            # if etap_text == "Суперфинал":
-            #     # player_in_final_current = kpt
-            #     if cur_index == 4:
-            #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
-            #     else:
-            #         player_in_final_full = full_net_player(kpt)
-            # # player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
-            # player_in_final = player_in_final_current if player_in_final_current <  player_in_final_full else player_in_final_full
-
-
-            # if etap_text == "Суперфинал":
-            #     player_in_final_current = kpt
-            # else:
-            #     player_in_final_current = total_athletes - sum_pl
-
-            # # if etap_text == "Суперфинал":
-            # #     if cur_index == 4:
-            # #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
-            # #     else:
-            # #         player_in_final_current = kpt
-            # #         player_in_final_full = full_net_player(kpt)
-
-            # # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
-            # if etap_text == "Суперфинал":
-            #     player_in_final_current = kpt
-            #     if cur_index == 4:
-            #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
-            #     else:
-            #         player_in_final_full = full_net_player(kpt)
-            # else:
-            #     player_in_final_current = total_athletes - sum_pl 
-            # # # player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
-            # player_in_final = player_in_final_current if player_in_final_current <  player_in_final_full else player_in_final_full
-
-            # # if etap_text == "Суперфинал":
-            # #     if cur_index == 4:
-            # #         player_in_final = kpt # колво участников в конкретном финале, если в группах полный состав
-            # #     else:
-            # #         player_in_final_full = full_net_player(kpt)
-            #     # player_in_final_full = kpt if cur_index == 4 else 
-            #     # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
 
         total_games = numbers_of_games(cur_index, player_in_final, kpt) # подсчет кол-во игр
 
