@@ -8584,14 +8584,15 @@ def etap_made(stage):
             player_in_final.append(pl_final)
         kol_game_str = k.kol_game_string
         zn = kol_game_str.find(" ")
-        number = int(kol_game_str[:zn])
+        number = int(kol_game_str[:zn]) # переводит строку кол-во игр в числа и записывает в списки
         sum_game.append(number)
-    all_sum_game = sum(sum_game)
-    all_sum_player_final = sum(player_in_final)
+    all_sum_game = sum(sum_game) # всего игр в турнире
+    all_sum_player_final = sum(player_in_final) # кол-во игроков в финалах
     my_win.label_33.setText(f"Всего:{all_sum_game} игр.")
     my_win.label_52.setText(f"Посеяно {all_sum_player_final} чел.")
     my_win.checkBox_visible_game.setChecked(True)
-    flag = control_all_player_in_final(etap) # проверяет все ли игроки распределены по финалам
+    # flag = control_all_player_in_final(etap) # проверяет все ли игроки распределены по финалам
+    flag = control_all_player_in_final(etap, all_sum_player_final) # проверяет все ли игроки распределены по финалам
     if flag is True: # продолжает выбор этапа
         made_system_load_combobox_etap()
     my_win.Button_etap_made.setEnabled(False)
@@ -8744,12 +8745,6 @@ def total_game_table(exit_stage, kpt, fin, pv):
             m_pl = player_in_final
         else: # если финал сетка
             m_pl = full_net_player(kpt=player_in_final)
-            # if player_in_final <= 8:
-            #     m_pl = 8
-            # elif player_in_final > 8 and player_in_final <= 16:
-            #     m_pl = 16
-            # elif player_in_final > 16 and player_in_final <= 32:
-            #     m_pl = 32 
         # ======
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=total_gr, kol_game_string=stroka_kol_game,
                         max_player=m_pl, stage=fin, type_table=type_table, page_vid=pv, label_string=str_setka,
@@ -8760,11 +8755,17 @@ def total_game_table(exit_stage, kpt, fin, pv):
 
 def full_net_player(kpt):
     """максимальное количество игроков в сетке при не полном составе"""
-    n = 1
-    while 2** n <= kpt:
-        n += 1
-    player_in_final_full = 2 ** n
+    # n = 1
+    for m in range(1, 6):
+        game = 2** m
+        if game >= kpt:
+            break
+    player_in_final_full = 2 ** m
     return player_in_final_full
+    # while 2** n <= kpt:
+    #     n += 1
+    # player_in_final_full = 2 ** (n - 1)
+    # return player_in_final_full
 
 
 def current_index_combobox_table(sender):
@@ -8794,27 +8795,28 @@ def current_index_combobox_table(sender):
     return cur_index
 
 
-def control_all_player_in_final(etap):
+def control_all_player_in_final(etap, all_sum_player_final):
     """проверка все ли игроки распределены по финалам и дает сигнал об окончании создании системы"""
      # титул id и стадия содержит слово финал (1 и 2 заменяет %)
     msgBox = QMessageBox
-    gamer = my_win.lineEdit_title_gamer.text()
+    # gamer = my_win.lineEdit_title_gamer.text()
     titles = Title.select().where(Title.id == title_id()).get()
     id_title = titles.id
     system = System.select().order_by(System.id).where(System.title_id == title_id())
     system_stage = system.select().where(System.stage == "Предварительный").get()
     total_player = system_stage.total_athletes
-    system_id = system.select().where(System.stage ** '% финал')
-    sum_final = []
+    # system_id = system.select().where(System.stage ** '% финал')
+    # sum_final = []
 
-    for i in system_id:
-        if i.stage != "Предварительный" and i.stage != "1-й полуфинал" and i.stage != "2-й полуфинал":
-            player_in_etap = i.max_player
-            sum_final.append(player_in_etap)
-    total_final = sum(sum_final)
-    t = total_player - total_final # оставшиеся не распределенные участники по финалам
+    # for i in system_id:
+    #     if i.stage != "Предварительный" and i.stage != "1-й полуфинал" and i.stage != "2-й полуфинал":
+    #         player_in_etap = i.max_player
+    #         sum_final.append(player_in_etap)
+    # total_final = sum(sum_final)
+    # total_final = all_sum_player_final
+    t = total_player - all_sum_player_final # оставшиеся не распределенные участники по финалам
     txt = ""
-    if total_final == total_player or t <= 2: # все игроки посеяны по финалам или остался 1 или 2 игрока окончание создание системы
+    if all_sum_player_final == total_player or t <= 2: # все игроки посеяны по финалам или остался 1 или 2 игрока окончание создание системы
         if t == 1 and etap != "Суперфинал":     
             txt = "Остался 1 участник, не вошедший в финальную часть"
             msgBox.information(my_win, "Уведомление", txt)
@@ -9170,19 +9172,13 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             elif player_in_final == 32:
                 total_games = 94
         elif cur_index == 2:  # прогрессивная сетка
-            full_net = full_net_player(kpt)
-            # full_net = 0
-            # if player_in_final >= 4 and player_in_final <= 8:
-            #    full_net = 8
-            # elif player_in_final > 8 and player_in_final <= 16:
-            #    full_net = 16  
-            # elif player_in_final > 16 and player_in_final <= 32:
-            #    full_net = 32    
-
+            full_net = full_net_player(kpt=player_in_final)
             tours = int(math.log2(full_net))
             all_game_net = full_net // 2 * tours
             free = full_net - player_in_final
-            if free == 1:
+            if free == 0:
+                total_games = all_game_net
+            elif free == 1:
                 total_games = all_game_net - free * tours
             elif free == 2:
                 total_games = all_game_net - (free * tours - 1)
@@ -12153,7 +12149,16 @@ def mesto_in_final(fin):
     if fin == "Одна таблица" or fin == "1-й финал":
        mesto[fin] = 1 
     else:
-        for k in range(id_system, id_system + count):
+        id_list = []
+        fin_list = ["1-й финал", "2-й финал", "3-й финал", "4-й финал",
+                            "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал"]
+        for l in system:
+            sys_id = l.id
+            stage_fin = l.stage
+            if stage_fin in fin_list:
+                id_list.append(sys_id)
+        # for k in range(id_system, id_system + count):
+        for k in id_list:
             sys = system.select().where(System.id == k).get()
             max_player = sys.max_player
             stage = sys.stage
@@ -13081,6 +13086,8 @@ def rank_in_group(total_score, td, num_gr, stage):
             # значения очков и список значения очков и у скольких спортсменов они есть
             z = u[1]  # список списков кол-во очков и у сколько игроков они есть
             points_person = z[0] # список [колво очко, у скольки игроков они есть]
+            # player_rank_tmp = circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
+            #         pg_win, pg_los, pp, pps, stage)
             player_rank_tmp = circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
                     pg_win, pg_los, pp, pps, stage)
         elif m_new > 3:  # если кол-во очков у более трех спортсменов (крутиловка)
@@ -13154,7 +13161,7 @@ def circle(tr, num_gr, td, max_person, mesto, stage, id_system):
                 tr.append(str(x))  # создает список (встречи игроков)
                 m_new += 1
             player_rank_tmp = circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point,
-                                               player_rank_tmp, tr_all, pp, pg_win, pg_los, x, pps, ps)
+                                               player_rank_tmp, tr_all, pp, pg_win, pg_los, x, pps, ps, stage)
         mesto = mesto + m_new
         tr.clear()
         # заменяет список (места еще не проставлены) на новый с правильными местами
@@ -13183,8 +13190,11 @@ def circle_in_circle(m_new, td, max_person, mesto, tr, num_gr, point, player_ran
         # значения очков и список значения очков и у скольких спортсменов они есть
         z = u[1]
         points_person = z[0]
-        player_rank_tmp = circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, ps,
-                                          tr_all, pg_win, pg_los, pp, pps, stage)
+        # player_rank_tmp = circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, ps,
+        #                                   tr_all, pg_win, pg_los, pp, pps, stage)
+        men_of_circle = m_new
+        player_rank_tmp = circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
+                                            pg_win, pg_los, pp, pps, stage)
     elif m_new > 3:
         dict_ratio = {}
         for k in range(1, m_new + 1):
@@ -13349,6 +13359,8 @@ def circle_2_player(tr, td, max_person, mesto, num_gr, id_system):
 
 def circle_3_player(men_of_circle, points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
                     pg_win, pg_los, pp, pps, stage):
+# def circle_3_player(points_person, tr, td, max_person, mesto, player_rank_tmp, num_gr, tr_all,
+#                     pg_win, pg_los, pp, pps, stage):
     """в крутиловке 3-и спортсмена
     -pp- словарь (номер игрока, очки)
     -ps- список коэфициентов
