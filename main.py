@@ -8667,13 +8667,13 @@ def total_game_table(exit_stage, kpt, fin, pv):
                 player_in_final_full = full_net_player(player_in_final)
                 player_in_final = kpt
             else:
-                # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
-                # player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
-                player_in_final_full = full_net_player(player_in_final)
-                # if player_in_final_current <  player_in_final_full:
-                #     player_in_final = player_in_final_current
-                # else: 
-                #     player_in_final = player_in_final_full
+                player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
+                player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
+                # player_in_final_full = full_net_player(player_in_final)
+                if player_in_final_current <  player_in_final_full:
+                    player_in_final = player_in_final_current
+                else: 
+                    player_in_final = player_in_final_full
 
 
             # ======
