@@ -8664,15 +8664,16 @@ def total_game_table(exit_stage, kpt, fin, pv):
             # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
             if etap_text == "Суперфинал":
                 player_in_final_current = kpt
-                player_in_final_full = full_net_player(kpt)
+                player_in_final_full = full_net_player(player_in_final)
                 player_in_final = kpt
             else:
-                player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
-                player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
-                if player_in_final_current <  player_in_final_full:
-                    player_in_final = player_in_final_current
-                else: 
-                    player_in_final = player_in_final_full
+                # player_in_final_full = total_gr * kpt # колво участников в конкретном финале, если в группах полный состав
+                # player_in_final_current = total_athletes - sum_pl # кол-во участников в последнем финале (разница всех игроков минус уже разведенных по финалам)
+                player_in_final_full = full_net_player(player_in_final)
+                # if player_in_final_current <  player_in_final_full:
+                #     player_in_final = player_in_final_current
+                # else: 
+                #     player_in_final = player_in_final_full
 
 
             # ======
@@ -8744,7 +8745,7 @@ def total_game_table(exit_stage, kpt, fin, pv):
         elif type_table == "группы": # если ПФ
             m_pl = player_in_final
         else: # если финал сетка
-            m_pl = full_net_player(kpt=player_in_final)
+            m_pl = full_net_player(player_in_final)
         # ======
         system = System(title_id=title_id(), total_athletes=total_athletes, total_group=total_gr, kol_game_string=stroka_kol_game,
                         max_player=m_pl, stage=fin, type_table=type_table, page_vid=pv, label_string=str_setka,
@@ -8753,19 +8754,14 @@ def total_game_table(exit_stage, kpt, fin, pv):
         return [str_setka, player_in_final, total_athletes, stroka_kol_game]
 
 
-def full_net_player(kpt):
+def full_net_player(player_in_final):
     """максимальное количество игроков в сетке при не полном составе"""
-    # n = 1
     for m in range(1, 6):
         game = 2** m
-        if game >= kpt:
+        if game >= player_in_final:
             break
     player_in_final_full = 2 ** m
     return player_in_final_full
-    # while 2** n <= kpt:
-    #     n += 1
-    # player_in_final_full = 2 ** (n - 1)
-    # return player_in_final_full
 
 
 def current_index_combobox_table(sender):
@@ -9172,18 +9168,21 @@ def numbers_of_games(cur_index, player_in_final, kpt):
             elif player_in_final == 32:
                 total_games = 94
         elif cur_index == 2:  # прогрессивная сетка
-            full_net = full_net_player(kpt=player_in_final)
+            # full_net = full_net_player(kpt=player_in_final)
+            full_net = full_net_player(player_in_final)
             tours = int(math.log2(full_net))
-            all_game_net = full_net // 2 * tours
+            all_game_net = full_net // 2 * tours # количество игр в сетке при полном составе
             free = full_net - player_in_final
             if free == 0:
                 total_games = all_game_net
-            elif free == 1:
-                total_games = all_game_net - free * tours
-            elif free == 2:
-                total_games = all_game_net - (free * tours - 1)
+            elif free == 1 or free == 2 or free == 3:
+                # total_games = all_game_net - free * tours
+                total_games = all_game_net - (free * tours - (free - 1))
+            elif free == 4:
+                 total_games = all_game_net - (free * (tours - 1))
             else:
-                total_games = all_game_net - (free * 2 + 4)
+                total_games = all_game_net - (free * tours - (free - 1))
+            #    total_games = all_game_net - (free * tours - (free - 1))
             # ========
             # if player_in_final <= 8:
             #     free = 8 - player_in_final
@@ -9222,7 +9221,6 @@ def numbers_of_games(cur_index, player_in_final, kpt):
                 system = systems.select().where(System.stage == "Предварительный").get()
                 gr = system.total_group
                 gr = gr // 2
-                # kpt = 0
             total_games = total_games_in_final_without_group_games(player_in_final, gr, kpt)
 
     return total_games
