@@ -8553,9 +8553,11 @@ def etap_made(stage):
     titles = Title.select().where(Title.id == title_id()).get()
     id_title = titles.id
     system = System.select().where(System.title_id == title_id())
+    for l in system:
+        total_athletes = l.total_athletes
+        break
     sum_game = []
     etap = my_win.comboBox_etap.currentText() if stage == "" or stage is False else stage
-    # etap = my_win.comboBox_etap.currentText()
     if etap == "Одна таблица":
         fin = my_win.comboBox_etap.currentText()
         one_table(fin, group=1)
@@ -8587,11 +8589,16 @@ def etap_made(stage):
         number = int(kol_game_str[:zn]) # переводит строку кол-во игр в числа и записывает в списки
         sum_game.append(number)
     all_sum_game = sum(sum_game) # всего игр в турнире
+    # встаивить число игроков в последнем финале (он может быть не полным) и заменить число в списке all_sum_player_final
+    lf = all_sum_player_final.pop(-1)
+    sum_pl_whithout_last_final = sum(all_sum_player_final)
+    player_last_final = total_athletes - sum_pl_whithout_last_final
+    player_in_final.append(player_last_final)
+    # =====================
     all_sum_player_final = sum(player_in_final) # кол-во игроков в финалах
     my_win.label_33.setText(f"Всего:{all_sum_game} игр.")
     my_win.label_52.setText(f"Посеяно {all_sum_player_final} чел.")
     my_win.checkBox_visible_game.setChecked(True)
-    # flag = control_all_player_in_final(etap) # проверяет все ли игроки распределены по финалам
     flag = control_all_player_in_final(etap, all_sum_player_final) # проверяет все ли игроки распределены по финалам
     if flag is True: # продолжает выбор этапа
         made_system_load_combobox_etap()
@@ -8743,21 +8750,11 @@ def control_all_player_in_final(etap, all_sum_player_final):
     """проверка все ли игроки распределены по финалам и дает сигнал об окончании создании системы"""
      # титул id и стадия содержит слово финал (1 и 2 заменяет %)
     msgBox = QMessageBox
-    # gamer = my_win.lineEdit_title_gamer.text()
     titles = Title.select().where(Title.id == title_id()).get()
     id_title = titles.id
     system = System.select().order_by(System.id).where(System.title_id == title_id())
     system_stage = system.select().where(System.stage == "Предварительный").get()
     total_player = system_stage.total_athletes
-    # system_id = system.select().where(System.stage ** '% финал')
-    # sum_final = []
-
-    # for i in system_id:
-    #     if i.stage != "Предварительный" and i.stage != "1-й полуфинал" and i.stage != "2-й полуфинал":
-    #         player_in_etap = i.max_player
-    #         sum_final.append(player_in_etap)
-    # total_final = sum(sum_final)
-    # total_final = all_sum_player_final
     t = total_player - all_sum_player_final # оставшиеся не распределенные участники по финалам
     txt = ""
     if all_sum_player_final == total_player or t <= 2: # все игроки посеяны по финалам или остался 1 или 2 игрока окончание создание системы
@@ -8769,11 +8766,6 @@ def control_all_player_in_final(etap, all_sum_player_final):
             msgBox.information(my_win, "Уведомление", txt)
                     # ====== вставить вопрос о суперфинале и игры за 3 место если финал сетка
         if etap != "Суперфинал":           
-            # result = msgBox.question(my_win, "", "Будет ли суперфинал?",
-            #                         msgBox.Yes, msgBox.No) 
-            # if result == msgBox.Yes:
-            #     flag = True
-            # else:        # ========= 
             add_open_tab(tab_page="Система")
             result = msgBox.question(my_win, "", "Система соревнований создана.\n"
                                                         "Теперь необходимо сделать жеребъевку\n"
@@ -9048,7 +9040,7 @@ def made_system_load_combobox_etap():
 
 def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
     """всего игр в финале без учета сыгранных игр в предварительном этапе"""
-    # остаток отделения, если 0, то участники равно делится на группы
+    # остаток от деления, если 0, то участники равно делится на группы
     remains = player_in_final % int(total_gr)
     if remains == 0:  # если в группах равное количество человек
         playing_game = (kpt * (kpt - 1)) // 2 * total_gr
@@ -9065,7 +9057,7 @@ def total_games_in_final_without_group_games(player_in_final, total_gr, kpt):
 
 def total_games_in_final_with_group_games(player_in_final, gr_pf, kpt):
     """всего игр в полуфинале с учетом сыгранных игр в предварительном этапе"""
-    # остаток отделения, если 0, то участники равно делится на группы
+    # остаток от деления, если 0, то участники равно делится на группы
     remains = player_in_final % int(gr_pf)
     if remains == 0:  # если в группах равное количество человек
         playing_game_in_group = (kpt * (kpt - 1)) # кол-во игр, сыгранных в группе
