@@ -6722,8 +6722,8 @@ def choice_setka_automat(fin, flag, count_exit):
 
     nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # получение списка номеров мест, выходящих в финал, суперфинал
     
-    # for n in range (0, count_exit): # начало основного посева
-    for n in range (0, 1): # начало основного посева
+    for n in range (0, count_exit): # начало основного посева
+    # for n in range (0, 1): # начало основного посева
         if system.stage == "Одна таблица":
             real_all_player_in_final.append(len(choice.select().where(Choice.basic == fin)))
         elif fin == "1-й финал":
