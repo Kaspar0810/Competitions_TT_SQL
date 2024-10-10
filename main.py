@@ -6722,8 +6722,9 @@ def choice_setka_automat(fin, flag, count_exit):
 
     nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # получение списка номеров мест, выходящих в финал, суперфинал
     
-    for n in range (0, count_exit): # начало основного посева
-    # for n in range (0, 1): # начало основного посева
+    # for n in range (0, count_exit): # начало основного посева
+    n = 0    
+    while n < count_exit:  # добавил n=0 и n+=1 стр 7098
         if system.stage == "Одна таблица":
             real_all_player_in_final.append(len(choice.select().where(Choice.basic == fin)))
         elif fin == "1-й финал":
@@ -7081,9 +7082,6 @@ def choice_setka_automat(fin, flag, count_exit):
                         choice_final = choice.select().where(Choice.player_choice_id == pl_id).get()
                         if fin == "Суперфинал":
                             choice_final.super_final = i
-                            # choice_final.posev_super_final = i
-                            # choice_final.super_final = fin
-                            # choice_final.posev_super_final = i
                         else:
                             choice_final.final = fin
                             choice_final.posev_final = i
@@ -7097,6 +7095,7 @@ def choice_setka_automat(fin, flag, count_exit):
             free_number.difference_update(key_set) # вычитаем из всех номеров те которые посеяны и остается номера -X-
             for h in free_number:
                 posev_data[h] = "X"
+        n += 1 # добавил в связи со сменой цикла
     return posev_data
 
 
