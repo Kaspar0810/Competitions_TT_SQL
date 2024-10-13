@@ -117,7 +117,9 @@ class MyTableModel(QAbstractTableModel):
                     ind = my_win.comboBox_filter_number_group_final.currentIndex()
                     if ind > 0: # значит выбран номер группы
                         n_gr = my_win.comboBox_filter_number_group_final.currentText()
-                        group_coach_list = dupl_coach(n_gr) # список всех тренеров группы                        
+                        group_coach_list = dupl_coach(n_gr) # список всех тренеров группы 
+                        count_frequency = filter(lambda x: group_coach_list.count(x) > 1, group_coach_list)
+                        double_coach_list = list(set(count_frequency))                       
                         znak = val.find(",")
                         if znak == -1: # один тренер
                             coach_tmp_list.append(val)
@@ -138,12 +140,11 @@ class MyTableModel(QAbstractTableModel):
                                     coach_tmp_list.append(coach_2)
                                     coach_3 = val[znak_1 + 2:]
                                     coach_tmp_list.append(coach_3)
-                        val_set = set(coach_tmp_list)
-                        group_set = set(group_coach_list)
-                        if val_set == group_set:    
-                            return QtGui.QBrush(QtCore.Qt.blue)
-                        else:
-                            return QtGui.QBrush(QtCore.Qt.black)
+                        for dc in coach_tmp_list:
+                            if dc in double_coach_list:    
+                                return QtGui.QBrush(QtCore.Qt.blue)
+                            else:
+                                return QtGui.QBrush(QtCore.Qt.black)
             elif index.column() == 2 and tb == 2: # выделяет совпадающие регионы
                 if my_win.checkBox_repeat_regions.isChecked(): # отмечен чекбокс проверки повтора регионов в группе
                     ind = my_win.comboBox_filter_number_group_final.currentIndex()
@@ -1954,11 +1955,34 @@ def find_city():
 def dupl_coach(n_gr):
     """получает список тренеров в группе"""
     coach_list = []
+    coach_tmp_list = []
     choices = Choice.select().where((Choice.title_id == title_id()) & (Choice.group == n_gr))
     for k in choices:
         coach = k.coach
         coach_list.append(coach)
-    return coach_list
+
+    for l in coach_list:
+        znak = l.find(",")
+        if znak == -1: # один тренер
+            coach_tmp_list.append(l)
+        else: # у игрока не один тренер и делает из них список тренеров
+            coach_1 = l[:znak]
+            coach_tmp_list.append(coach_1)
+            if l.find(",", znak) == -1:
+                znak_1 = l.find(",", znak + 1)
+                coach_2 = l[znak: znak_1]
+                coach_tmp_list.append(coach_2)
+            else:
+                coach_2 = l[znak + 2:]
+                znak_1 = l.find(",", znak + 1)
+                if l.find(",", znak_1) == -1:
+                    coach_tmp_list.append(coach_2)
+                else:
+                    coach_2 = l[znak + 2:znak_1]
+                    coach_tmp_list.append(coach_2)
+                    coach_3 = l[znak_1 + 2:]
+                    coach_tmp_list.append(coach_3)
+    return coach_tmp_list
 
 
 def dupl_regions(n_gr):
