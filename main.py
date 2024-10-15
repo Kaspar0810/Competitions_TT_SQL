@@ -9938,6 +9938,7 @@ def tbl(stage, kg, ts, zagolovok, cW, rH):
 def tbl_begunki(ts, stage, number_group, tours, list_tours):
     """данные таблицы и применение стиля и добавления заголовка столбцов
     tdt_new - [[[участник],[регион счет в партиях]]]"""
+    msgBox = QMessageBox
     stiker = []
     group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     final_type = "круг"
@@ -9980,6 +9981,9 @@ def tbl_begunki(ts, stage, number_group, tours, list_tours):
  
     shot_stage = ""
     count = len(result_group)
+    if count == 0:
+        msgBox.information(my_win, "Уведомление", "Нет не сыгранных встреч,\nв печати бегунков\nнет необходимости.")
+        return
     for res_id in result_group:
         tours = res_id.tours # номера игроков в туре
         pl1 = res_id.player1 # 1-й игроков и его город в туре
@@ -10117,6 +10121,8 @@ def begunki_made():
                         list_tours.append(r)
         
     stiker = tbl_begunki(ts, stage, number_group, tours, list_tours) # здесь надо менять данные бегунков
+    if stiker == None: # если все встречи сыграны нет смысла печать бегунков выход из функции
+        return
     dict_table = stiker[0]
     game = stiker[1]
 
@@ -15290,7 +15296,6 @@ def find_referee_in_db(text):
 
 def open_close_file(view_file):
     # Проверить, существует
-    # change_dir(catalog)
     if os.path.exists(view_file):
         flag = True
     else:
