@@ -3020,6 +3020,7 @@ def page():
             my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
     elif tb == 5: # вкладка -финалы-
         my_win.resize(1270, 825)
+        my_win.Button_check_net.setEnabled(False)
         Button_view_final = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
         # ==== новый вариант кнопки просмотра (иконка)
         Button_view_final.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
@@ -10702,7 +10703,6 @@ def protokol_pdf():
     """Судейский протокол для таблицы в круг"""
     from sys import platform
     from reportlab.platypus import Table
-    # msgBox = QMessageBox
     fin_list = []
     stage_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]
     systems = System.select().where(System.title_id == title_id())
@@ -13579,10 +13579,6 @@ def player_choice_in_setka(fin):
     count_exit = systems.mesta_exit # сколько игроков выходят в финал
  
     flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
-    # # вариант с супер финал ===
-    # if fin == "Суперфинал":
-    #     count_exit = 1
-    # # ====================
     posev = choice_setka_automat(fin, flag, count_exit)
 
     posev_data = []
@@ -14513,7 +14509,6 @@ def load_playing_game_in_table_for_final(fin):
                     result_fin.score_loser = result_gr.score_loser
                     result_fin.save()
     stage = fin
-    # pv = sys_fin.page_vid
     pv = systems.page_vid
     table_made(pv, stage)
 
@@ -14925,6 +14920,7 @@ def view_all_page_pdf():
                    "8-final.pdf": "8-й финал",
                    "9-final.pdf": "9-й финал",
                    "10-final.pdf": "10-й финал",
+                   "superfinal": "Суперфинал",
                    "one_table.pdf": "одна таблица"}
     short_name = title.short_name_comp
     count_mark = len(short_name)
@@ -15257,7 +15253,6 @@ def check_pay():
 
 def referee():
     """добавление судей в базу"""
-    msgBox = QMessageBox()
     sender = my_win.sender()
     if sender == my_win.comboBox_referee: # комбобокс глав судьи
         text = my_win.comboBox_referee.currentText()
@@ -15303,7 +15298,51 @@ def open_close_file(view_file):
     return flag
 
 
+def button_check_on():
+    """включает кнопку проверки сетки"""
+    if my_win.checkBox_check_net.isChecked():
+        my_win.Button_check_net.setEnabled(True)
+    else:
+        my_win.Button_check_net.setEnabled(False)
 
+
+def check_choice_net():
+    """Проверка после жеребьевки сетки на 1-ю встречи одних регионов или одинаковых тренеров"""
+    msgBox = QMessageBox
+    region_list = []
+    coach_list = []
+    coach_list_tmp = []
+    stage = my_win.tableView.model().index(0, 2).data() 
+    id_system = system_id(stage)
+    gamelist_fin = Game_list.select().where(Game_list.system_id == id_system)
+    c = 0
+    g = 2
+    for k in gamelist_fin:
+        pl = k.player_group_id
+        znak = pl.find("/")
+        id_pl = pl[znak + 1:]
+        players = Player.select().where(Player.id == id_pl).get()
+        region_pl = players.region
+        coaches = Coach.select().where(Coach.id == players.coach_id).get()
+        coach_str = coaches.coach
+        coach_list_tmp = coach_str.split(", ")
+        coach_list.append(coach_list_tmp.copy())
+        coach_list_tmp.clear()
+        region_list.append(region_pl)
+        c += 1
+        if c == 2:
+            region_set = set(region_list)
+            count = len(region_set)
+            if count == 1:
+                coach_union = set(coach_list[0]) & set(coach_list[1])    
+                if len(coach_union) != 0:
+                    msgBox.information(my_win, "Уведомление", f"Встреча № {g // 2},\nспортсмены одного тренера.\n{coach_union}")
+                else:
+                    msgBox.information(my_win, "Уведомление", f"Встреча № {g // 2},\nоба спортсмена из одного региона.")
+            region_list.clear()
+            coach_list.clear()
+            c = 0
+        g += 1
 # def proba_pdf():
     # """проба пдф"""
 
@@ -15547,7 +15586,7 @@ my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по не
 my_win.checkBox_11.stateChanged.connect(debitor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
-# my_win.checkBox_no_play_game.stateChanged.connect(game_no_play_for_mesto)
+my_win.checkBox_check_net.stateChanged.connect(button_check_on)
 # my_win.checkBox_GSK.stateChanged.connect(made_list_GSK)
 # my_win.checkBox_edit_etap.stateChanged.connect(change_player_in_etap )
 # =======  нажатие кнопок =========
@@ -15607,6 +15646,7 @@ my_win.Button_players_on_alf.clicked.connect(made_list_players_on_alf)
 my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 my_win.Button_view_page_pdf.clicked.connect(view_all_page_pdf)
 my_win.Button_randevy.clicked.connect(randevy_list)
+my_win.Button_check_net.clicked.connect(check_choice_net) # проверка жеребьевки сетки
 
 my_win.Button_pay.clicked.connect(check_pay)
 sys.exit(app.exec())
