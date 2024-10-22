@@ -3314,7 +3314,7 @@ def list_player_pdf(player_list):
         coach_id = l.coach_id
         t = coach_id.coach
         m = l.mesto
-        t = chop_line(t)
+        t = chop_line(t) # разбивает строку тренеров не две если строкка длинная
         data = [n, p, b, r, c, g, z, t, m]
 
         elements.append(data)
@@ -10655,6 +10655,7 @@ def list_winners_pdf():
         region = my_win.tableWidget.item(l, 5).text()
         razryad = my_win.tableWidget.item(l, 6).text()
         coach = my_win.tableWidget.item(l, 7).text()
+        coach = chop_line(t=coach)
         n += 1
 
         data = [mesto, player, bday, rank, city, region, razryad, coach]
@@ -15343,6 +15344,8 @@ def check_choice_net():
             coach_list.clear()
             c = 0
         g += 1
+
+
 # def proba_pdf():
     # """проба пдф"""
 
@@ -15405,6 +15408,8 @@ def check_choice_net():
     # f = Frame(5* cm, 3 * cm, 6 * cm, 25 * cm, showBoundary=1) # высота прямоугольника  6 Х 25, showBoundary = 1, рамка 0- нет
     # f.addFromList(story, c)
     # c.save()
+
+
 # =======        
 # def proba():
 #     # Game_list.update(player_group_id="СИЗОВ Андрей/2419").where(Game_list.id == 5325).execute()
