@@ -6725,15 +6725,31 @@ def choice_setka_automat(fin, flag, count_exit):
   
     posevs = setka_choice_number(fin, count_exit) # выбор номеров сетки для посева
     player_net = posevs[0]
-    z = len(posevs)
-    if z == 2:
+    # z = len(posevs)
+    # if z == 2:
+    #     posev_1 = posevs[1]
+    # elif z == 3:
+    #     posev_2 = posevs[2]
+    # elif z == 4:
+    #     posev_2 = posevs[2]
+    #     posev_3 = posevs[3]
+    # elif z == 5:
+    #     posev_2 = posevs[2]
+    #     posev_3 = posevs[3]
+    #     posev_4 = posevs[4]
+
+    # z = len(posevs)
+    if count_exit == 1:
         posev_1 = posevs[1]
-    elif z == 3:
+    elif count_exit == 2:
+        posev_1 = posevs[1]
         posev_2 = posevs[2]
-    elif z == 4:
+    elif count_exit == 3:
+        posev_1 = posevs[1]
         posev_2 = posevs[2]
         posev_3 = posevs[3]
-    elif z == 5:
+    elif count_exit == 4:
+        posev_1 = posevs[1]
         posev_2 = posevs[2]
         posev_3 = posevs[3]
         posev_4 = posevs[4]
@@ -7394,7 +7410,8 @@ def possible_draw_numbers(current_region_posev, reg_last, number_last, group_las
                 number_posev_old = number_setka_posev_last(cur_gr, group_last, number_last, n, player_net)
                 reg_tmp.clear()
                 # ======
-                if n > 1:
+                # if n > 1:# при выоде в сетку двоих не разводил регионы
+                if n >= 1:
                     for k in number_posev_old: # получаем список прошлых посеянных областей в той половине куда идет сев
                         d = number_last.index(k)
                         reg_tmp.append(reg_last[d]) # список регионов     
