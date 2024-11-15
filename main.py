@@ -1367,8 +1367,11 @@ def add_open_tab(tab_page):
             ind = tab_index.index(k)
             my_win.tabWidget.setTabEnabled(ind, True)
         tab_str = (' '.join(tab_list))
-        titles.tab_enabled = tab_str
-        titles.save()
+        #=====
+        Title.update(tab_enabled = tab_str).where(Title.id == title_id()).execute()
+        #======
+        # titles.tab_enabled = tab_str
+        # titles.save()
 
 
 def enabled_menu_after_choice():
@@ -8539,7 +8542,10 @@ def etap_made(stage):
         # суммирует все игры этапов  
     group_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал"]  
     player_in_final = []
-    for k in system:
+    # ====
+    systems = System.select().where(System.title_id == id_title)
+    # for k in system:
+    for k in systems:
         stage = k.stage
         pl_final = k.max_player
         if stage not in group_list:
@@ -8550,12 +8556,12 @@ def etap_made(stage):
         sum_game.append(number)
     all_sum_game = sum(sum_game) # всего игр в турнире
     # встаивить число игроков в последнем финале (он может быть не полным) и заменить число в списке all_sum_player_final
-    if stage == "Суперфинал":
-        player_in_final.pop()
-    player_in_final.pop()
-    sum_pl_whithout_last_final = sum(player_in_final)
-    player_last_final = total_athletes - sum_pl_whithout_last_final
-    player_in_final.append(player_last_final)
+    # if stage == "Суперфинал":
+    #     player_in_final.pop()
+    # player_in_final.pop()
+    # sum_pl_whithout_last_final = sum(player_in_final)
+    # player_last_final = total_athletes - sum_pl_whithout_last_final
+    # player_in_final.append(player_last_final)
     # =====================
     all_sum_player_final = sum(player_in_final) # кол-во игроков в финалах
     my_win.label_33.setText(f"Всего:{all_sum_game} игр.")
