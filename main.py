@@ -30,7 +30,10 @@ import openpyxl as op
 import pandas as pd
 import contextlib
 import sys
-import sqlite3
+# import sqlite3
+# import MySQLdb
+import pymysql
+
 import pathlib
 from pathlib import Path
 from dateutil.relativedelta import relativedelta
@@ -871,8 +874,12 @@ class StartWindow(QMainWindow, Ui_Form):
         self.Button_view_pdf.setEnabled(False)
         self.comboBox_arhive_year.setEnabled(False)
         self.comboBox_arhive_year.currentTextChanged.connect(self.choice_competition)
-
-        dbase()
+        # ==========
+        conn = pymysql.connect(host='localhost', user='root', password='db_pass')
+        # conn.cursor().execute("SHOW DATABASES LIKE 'mysql_db'")
+        # print(str(conn))
+        conn.close()
+        # dbase()
         count = len(Title.select())
         if count != 0:
             # получение последней записи в таблице
@@ -1085,8 +1092,12 @@ class ToolTip(): # создание всплывающих подсказок
 
 def dbase():
     """Создание DB и таблиц"""
-    with db:
-        db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
+    conn = pymysql.connect(host='localhost', user='root', password='db_pass')
+    conn.cursor().execute('CREATE DATABASE mysql_db')
+    conn.close()
+
+    db.connect()
+    db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
                           Result, Game_list, Choice, Delete_player, Referee])
 
 
@@ -1129,7 +1140,7 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     t = Title.select().order_by(Title.id.desc()).get()
     title = t.id
     if title == 1:
-        wb = op.load_workbook("регионы.xlsx")
+        wb = op.load_workbook("regions.xlsx")
         s = wb.sheetnames[0]
         sheet = wb[s]
         reg = []
@@ -1311,9 +1322,9 @@ def tab_enabled(id_title):
 
     count_title = len(Title.select())
     title_id_current = title_list[0] # текущие соревнования
-    title_id_last = title_list[1]# последний ид соревнования
- 
-    if count_title > 0: # если соревнования не первые
+    title_id_last = title_list[1] if count_title > 1 else title_id_current
+
+    if count_title > 1: # если соревнования не первые
         my_win.setWindowTitle(f"Соревнования по настольному теннису. {gamer} {vozrast}")
         # === new ===
         title_current = id_title
@@ -1370,8 +1381,6 @@ def add_open_tab(tab_page):
         #=====
         Title.update(tab_enabled = tab_str).where(Title.id == title_id()).execute()
         #======
-        # titles.tab_enabled = tab_str
-        # titles.save()
 
 
 def enabled_menu_after_choice():
@@ -1566,10 +1575,16 @@ def db_select_title():
                 if data == data_title:
                     break
     if name != "":
+        # ds = title.data_start
+        # ds = format_date_for_view(str_date=ds)
+        # de = title.data_end
+        # de = format_date_for_view(str_date=de)
         my_win.lineEdit_title_nazvanie.setText(title.name)
         my_win.lineEdit_title_vozrast.setText(title.vozrast)
         my_win.dateEdit_start.setDate(title.data_start)
+        # my_win.dateEdit_start.setDate(ds)
         my_win.dateEdit_end.setDate(title.data_end)
+        # my_win.dateEdit_end.setDate(de)
         my_win.lineEdit_city_title.setText(title.mesto)
         my_win.comboBox_sredi.setCurrentText(title.sredi)
         my_win.comboBox_referee.setCurrentText(title.referee)
@@ -2010,7 +2025,7 @@ def fill_table(player_list):
     row_count = len(player_selected)  # кол-во строк в таблице
     num_columns = [0, 1, 2, 3, 4, 5, 6]
     # кол-во наваний должно совпадать со списком столбцов
-    if tb == 1:
+    if tb == 1: # == списки участников
         if my_win.checkBox_6.isChecked():
             num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место', 'id_del'])
@@ -2068,6 +2083,7 @@ def fill_table(player_list):
             item_1 = str(list(player_selected[row].values())[num_columns[0]])
             item_2 = str(list(player_selected[row].values())[num_columns[1]])
             item_3 = str(list(player_selected[row].values())[num_columns[2]])
+            item_3 = format_date_for_view(str_date=item_3) # преобразует дату к виду для экрана
             item_4 = str(list(player_selected[row].values())[num_columns[3]])
             item_5 = str(list(player_selected[row].values())[num_columns[4]])
             item_6 = str(list(player_selected[row].values())[num_columns[5]])
@@ -2355,8 +2371,11 @@ def add_player():
                 plr.save()
         elif txt == "Добавить":
             debt = "долг" if txt_edit == "Спортсмену необходимо оплатить рейтинг!" else ""
+            # ==  перевод даты рождения в вид для db
+            bd_new = format_date_for_db(str_date=bd)
+            # =======
             with db:
-                player = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg, razryad=rz,
+                player = Player(player=pl, bday=bd_new, rank=rn, city=ct, region=rg, razryad=rz,
                                 coach_id=idc, mesto="", full_name=fn, title_id=title_id(), pay_rejting=debt, comment="", 
                                 coefficient_victories=0, total_game_player=0, total_win_game=0, application=zayavka).save()
             player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
@@ -2429,6 +2448,27 @@ def add_player():
     my_win.lineEdit_Family_name.setFocus()
 
 
+def format_date_for_db(str_date):
+    """первод даты к формату базы данных год-месяц-день"""
+    day = str_date[:2]
+    month = str_date[3:5]
+    year = str_date[6:]
+    new_str_date = f"{year}-{month}-{day}"
+    format_date = datetime.strptime(new_str_date,'%Y-%m-%d')
+    return  format_date
+
+
+def format_date_for_view(str_date):
+    """перевод даты к формату для отображения на экране"""
+    txt = str(str_date)
+    year = txt[:4]
+    month = txt[5:7]
+    day = txt[8:]  
+    format_date = f"{day}.{month}.{year}"
+    # format_date = datetime.strftime(new_str_date, '%d.%m.%Y')
+    return format_date
+
+
 def check_rejting_pay(pl):
     """Проверка игрока на оплату рейтинга и запись в базу данных"""
     txt_edit = my_win.textEdit.toPlainText()
@@ -2451,7 +2491,7 @@ def check_rejting_pay(pl):
 
 
 def check_age_player(znak, dr):
-    """Проеврка возраста участника"""
+    """Проверка возраста участника"""
     msgBox = QMessageBox()
     title = Title.get(Title.id == title_id())
     vozrast_text = title.vozrast
@@ -2513,8 +2553,7 @@ def dclick_in_listwidget():
         check_age_player(znak, bd)
         # ==== переводит строку с датой из базы даннных в строку к обычному виду
         if znak == -1:
-            date_object = datetime.strptime(bd,"%Y-%m-%d")
-            bd = date_object.strftime('%d.%m.%Y')
+            bd = format_date_for_view(str_date=bd)
         #=====
         ci = text[sz2 + 2:ds] # город
         my_win.lineEdit_Family_name.setText(f"{fam} {name}")

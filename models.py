@@ -1,8 +1,8 @@
 from peewee import *
 
 
-db = SqliteDatabase("comp_db.db")
-
+# db = SqliteDatabase("comp_db.db")
+db = MySQLDatabase("mysql_db", user="root", password="db_pass", host="localhost", port=3306)
 
 class BaseModel(Model):
     id = PrimaryKeyField()
@@ -23,7 +23,7 @@ class R_list_m(BaseModel):
     r_number = IntegerField()
     r_list = IntegerField()
     r_fname = CharField(50)
-    r_bithday = DateField()
+    r_bithday = DateField(20)
     r_city = CharField(30)
     r_region = CharField()
     r_district = CharField()
