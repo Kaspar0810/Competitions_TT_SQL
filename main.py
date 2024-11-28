@@ -30,10 +30,11 @@ import openpyxl as op
 import pandas as pd
 import contextlib
 import sys
+#=====
 # import sqlite3
-# import MySQLdb
+#=============
 import pymysql
-
+#=============
 import pathlib
 from pathlib import Path
 from dateutil.relativedelta import relativedelta
@@ -876,9 +877,8 @@ class StartWindow(QMainWindow, Ui_Form):
         self.comboBox_arhive_year.currentTextChanged.connect(self.choice_competition)
         # ==========
         conn = pymysql.connect(host='localhost', user='root', password='db_pass')
-        # conn.cursor().execute("SHOW DATABASES LIKE 'mysql_db'")
-        # print(str(conn))
         conn.close()
+        #=========
         # dbase()
         count = len(Title.select())
         if count != 0:
@@ -1092,12 +1092,13 @@ class ToolTip(): # создание всплывающих подсказок
 
 def dbase():
     """Создание DB и таблиц"""
-    conn = pymysql.connect(host='localhost', user='root', password='db_pass')
-    conn.cursor().execute('CREATE DATABASE mysql_db')
-    conn.close()
+    # conn = pymysql.connect(host='localhost', user='root', password='db_pass')
+    # conn.cursor().execute('CREATE DATABASE mysql_db')
+    # conn.close()
 
-    db.connect()
-    db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
+    # db.connect()
+    with db:
+        db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
                           Result, Game_list, Choice, Delete_player, Referee])
 
 
@@ -2083,7 +2084,8 @@ def fill_table(player_list):
             item_1 = str(list(player_selected[row].values())[num_columns[0]])
             item_2 = str(list(player_selected[row].values())[num_columns[1]])
             item_3 = str(list(player_selected[row].values())[num_columns[2]])
-            item_3 = format_date_for_view(str_date=item_3) # преобразует дату к виду для экрана
+            if tb == 1:
+                item_3 = format_date_for_view(str_date=item_3) # преобразует дату к виду для экрана
             item_4 = str(list(player_selected[row].values())[num_columns[3]])
             item_5 = str(list(player_selected[row].values())[num_columns[4]])
             item_6 = str(list(player_selected[row].values())[num_columns[5]])
@@ -2450,6 +2452,12 @@ def add_player():
 
 def format_date_for_db(str_date):
     """первод даты к формату базы данных год-месяц-день"""
+    # txt = str(str_date)
+    # year = txt[:4]
+    # month = txt[5:7]
+    # day = txt[8:]  
+    # format_date = f"{day}.{month}.{year}"
+    txt =str(str_date)
     day = str_date[:2]
     month = str_date[3:5]
     year = str_date[6:]
@@ -4206,20 +4214,26 @@ def player_in_table_group_and_write_Game_list_Result(stage):
     tdt_all = table_data(stage, kg)
     for p in range(0, kg):  # цикл заполнения db таблиц -game list- и  -Results-
         gr = tdt_all[0][p]
+        # ======
+        gr_id = tdt_all[2][p] # == вариант с id вмест фамилии для Game_list
+        # =====
         count_player = len(gr) // 2  # максимальное кол-во участников в группе
         number_group = str(p + 1) + ' группа'
         k = 0  # кол-во спортсменов в группе
         for i in range(0, count_player * 2 - 1, 2):
             family_player = gr[i][1]  # фамилия игрока
+            player_id = gr_id[i][1]  # id игрока
             posev = int(gr[i][0]) # посев (номер игрока в группе)
             fp = len(family_player) # кол-во знаков фамилии, если 0 значит игрока нет
                 # подсчет кол-во знаков в фамилия, если 0 значит игрока нет
             if fp > 0:  # если строка (фамилия игрока) не пустая идет запись в db
                 k += 1
+                # записывает в DB id игрока
+                player_id = int(gr_id[i][1])  # id игрока
                 with db:
                     game_list = Game_list(number_group=number_group, rank_num_player=posev, 
-                                            player_group=family_player,
-                                            system_id=system, title_id=title_id()).save()
+                                            player_group_id=player_id,
+                                            system_id=system_id, title_id=title_id()).save()
 
         # если 1-я строка (фамилия игрока) пустая выход из группы
         if fp == 0 and k != 0 or k == count_player:
@@ -12444,6 +12458,7 @@ def  table_data(stage, kg):
     tdt_all = []  # список списков [tdt_new] и [tdt_color]
     tdt_color = []
     tdt_new = []
+    tdt_new_id = []
     result = Result.select().where(Result.title_id == title_id())  # находит system id последнего
     id_system = system_id(stage)
     if kg == 1:  # система одна таблица круг или финалу по кругу
@@ -12473,32 +12488,51 @@ def  table_data(stage, kg):
             tdt_tmp = tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr)
             tdt_new.append(tdt_tmp[0])
             tdt_color.append(tdt_tmp[1])
+            tdt_new_id.append(tdt_tmp[2])
+
             tdt_all.append(tdt_new)
             tdt_all.append(tdt_color)
+            tdt_all.append(tdt_new_id)
     return tdt_all
 
 
 def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     tdt_tmp = []
     tbl_tmp = []  # временный список группы tbl
+    tbl_id_tmp = [] # временный список группы вместо фамилия id
     # цикл нумерации строк (по 2-е строки на каждого участника)
     for k in range(1, max_gamer * 2 + 1):
         st = ['']
         # получаем пустой список (номер, фамилия и регион, клетки (кол-во уч), оч, соот, место)
         s = (st * (max_gamer + 4))
         s.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
+        # === добавил вариант с id игрока ===
+        s1 = (st * (max_gamer + 4))
+        s1.insert(0, str((k + 1) // 2))  # получаем нумерацию строк по порядку
         tbl_tmp.append(s)
+        tbl_id_tmp.append(s1)
     for i in range(1, count_player_group * 2 + 1, 2):
         posev = posev_data[((i + 1) // 2) - 1]
         fam_id = posev["фамилия"]
         znak = fam_id.find("/")
+        #==== вариант вместо фамилия id игрока
+        # if znak != -1:
+        #     tbl_tmp[i - 1][1] = fam_id[znak + 1:]
+        # else:
+        #     tbl_tmp[i - 1][1] = posev["фамилия"]
+        #=====================================
+        fam = fam_id[:znak]
+        id_fam = fam_id[znak + 1:]
         if znak != -1:
-            tbl_tmp[i - 1][1] = fam_id[:znak]
+            tbl_tmp[i - 1][1] = fam
+            tbl_id_tmp[i - 1][1] = id_fam
         else:
             tbl_tmp[i - 1][1] = posev["фамилия"]
+        # =============================
         tbl_tmp[i][1] = posev["регион"]
  
     td = tbl_tmp.copy()  # cписок (номер, фамилия, город и пустые ячейки очков)
+    td_id = tbl_id_tmp.copy()
     td_color = []
 
     if tr != 0:  # если еще не была жеребьевка, то пропуск счета в группе
@@ -12508,6 +12542,7 @@ def tdt_news(max_gamer, posev_data, count_player_group, tr, num_gr):
     tdt_new = td
     tdt_tmp.append(tdt_new)
     tdt_tmp.append(td_color)
+    tdt_tmp.append(td_id)
 
     return tdt_tmp
 
@@ -15470,7 +15505,13 @@ def check_choice_net():
     # f = Frame(5* cm, 3 * cm, 6 * cm, 25 * cm, showBoundary=1) # высота прямоугольника  6 Х 25, showBoundary = 1, рамка 0- нет
     # f.addFromList(story, c)
     # c.save()
-
+def proba():
+    players = Player.select()
+    for p in players:
+        bd = p.bday
+        bd_new = format_date_for_db(str_date=bd)
+        txt = str(bd_new)
+        Player.update(bday=bd_new).execute()
 
 # =======        
 # def proba():
@@ -15683,7 +15724,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
