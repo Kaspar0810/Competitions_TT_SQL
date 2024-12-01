@@ -34,6 +34,7 @@ import sys
 # import sqlite3
 #=============
 import pymysql
+import subprocess
 #=============
 import pathlib
 from pathlib import Path
@@ -482,24 +483,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def import_db(self):
         """Импорт из бэкап в базу данных"""
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "comp_db_backup.db")
-        filepath = str(fname[1])
-        try:
-            db = sqlite3.connect('comp_db.db')
-            db_backup = sqlite3.connect(filepath)
-            with db_backup:
-                db_backup.backup(db, pages=3, progress=None)
-            # показывает статус бар на 5 секунд
-            my_win.statusbar.showMessage(
-                "Импорт базы данных завершен успешно", 5000)
-        except sqlite3.Error as error:
-            # показывает статус бар на 5 секунд
-            my_win.statusbar.showMessage(
-                "Ошибка при копировании базы данных", 5000)
-        finally:
-            if (db_backup):
-                db_backup.close()
-                my_win.activateWindow()
+        pass
+        # fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "comp_db_backup.db")
+        # filepath = str(fname[1])
+        # try:
+        #     db = sqlite3.connect('comp_db.db')
+        #     db_backup = sqlite3.connect(filepath)
+        #     with db_backup:
+        #         db_backup.backup(db, pages=3, progress=None)
+        #     # показывает статус бар на 5 секунд
+        #     my_win.statusbar.showMessage(
+        #         "Импорт базы данных завершен успешно", 5000)
+        # except sqlite3.Error as error:
+        #     # показывает статус бар на 5 секунд
+        #     my_win.statusbar.showMessage(
+        #         "Ошибка при копировании базы данных", 5000)
+        # finally:
+        #     if (db_backup):
+        #         db_backup.close()
+        #         my_win.activateWindow()
 
     def statistika(self):
         """статистика встреч для точного обсчета рейтинга"""
@@ -574,7 +576,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             type = sys.type_table
             group = sys.total_group
             fin = "Одна таблица"
-            check_flag = check_choice(fin)
+            check_flag = check_choice(fin) # проверка на жеребьевку True - значит сделана
             if check_flag  is True:
                 reply = msg.information(my_win, 'Уведомление', f"Жеребъевка {fin} была произведена,"
                                                                             f"\nесли хотите сделать "
@@ -584,7 +586,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                                 msg.Cancel)
                 if reply == msg.Ok:
                     if type == "круг":
-                        one_table(fin, group)
+                        id_system = system_id(stage=fin)
+                        clear_db_before_choice_final(fin)
+                        System.update(choice_flag=0).where(System.id == id_system).execute()
+                        # one_table(fin, group)
+                        player_in_one_table(fin)
+                        # player_in_table_group_and_write_Game_list_Result(stage=fin)
                     else:
                         clear_db_before_choice_final(fin)
                         posev_data = player_choice_in_setka(fin)
@@ -594,7 +601,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     return
             else:
                 if type == "круг":
-                    player_fin_on_circle(fin)
+                    player_fin_on_circle(fin) # создание жеребьевки по кругу
                 else:
                     posev_data = player_choice_in_setka(fin)
                     player_in_setka_and_write_Game_list_and_Result(fin, posev_data)
@@ -875,9 +882,22 @@ class StartWindow(QMainWindow, Ui_Form):
         self.Button_view_pdf.setEnabled(False)
         self.comboBox_arhive_year.setEnabled(False)
         self.comboBox_arhive_year.currentTextChanged.connect(self.choice_competition)
-        # ==========
+        # ========== проверяет создана ли база, если нет то создает
         conn = pymysql.connect(host='localhost', user='root', password='db_pass')
-        conn.close()
+        md = conn.cursor()
+        md.execute("SHOW DATABASES")
+        databases = md.fetchall()
+        database_exists = False
+        for database in databases:
+            if 'mysql_db' in database:
+                database_exists = True
+                break
+        if database_exists:
+            pass
+        else:
+            dbase()
+
+        # conn.close()
         #=========
         # dbase()
         count = len(Title.select())
@@ -1092,9 +1112,9 @@ class ToolTip(): # создание всплывающих подсказок
 
 def dbase():
     """Создание DB и таблиц"""
-    # conn = pymysql.connect(host='localhost', user='root', password='db_pass')
-    # conn.cursor().execute('CREATE DATABASE mysql_db')
-    # conn.close()
+    conn = pymysql.connect(host='localhost', user='root', password='db_pass')
+    conn.cursor().execute('CREATE DATABASE mysql_db')
+    conn.close()
 
     # db.connect()
     with db:
@@ -3669,7 +3689,9 @@ def one_table(fin, group):
     # в зависмости сетка или круг
     cur_index = my_win.comboBox_table_1.currentIndex()
     if fin == "Одна таблица":
-        if cur_index == 1:
+        if cur_index == 0:
+            type_table = "круг"
+        elif cur_index == 1:
             vt = "Сетка (-2) на"
             my_win.comboBox_page_vid.setCurrentText("книжная")
             type_table = "сетка"
@@ -3734,9 +3756,9 @@ def one_table(fin, group):
             else:
                 flag_choice = False
                 return
-        sys_m.stage = fin
-        sys_m.choice_flag = flag_choice # запись о том что сделана жеребьевка
-        sys_m.save()
+            sys_m.stage = fin
+            sys_m.choice_flag = flag_choice # запись о том что сделана жеребьевка
+            sys_m.save()
 
 
 def selection_of_the_draw_mode():
@@ -4002,7 +4024,7 @@ def player_in_one_table(fin):
         city = pl_city.city
         player_id = f"{player}/{pl_id}"
         one_table.append(f"{player}/{city}")
-        game_list = Game_list(number_group=fin, rank_num_player=k, player_group=player_id, system_id=id_system,
+        game_list = Game_list(number_group=fin, rank_num_player=k, player_group_id=pl_id, system_id=id_system,
                             title_id=title_id())
         game_list.save()
 
@@ -4035,9 +4057,10 @@ def player_fin_on_circle(fin):
     system = System.select().where(System.id == id_system).get()  # находит system id последнего
 
     stage_exit = system.stage_exit # откуда выходят в финал
-
-    nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
-    count_exit = len(nums) # количество игроков, выходящих в финал
+    # === если stage_exit == "", значит одна тблица в круг
+    if stage_exit != "":
+        nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
+        count_exit = len(nums) # количество игроков, выходящих в финал
     # ==== new variant ===
     player_in_final = system.max_player # количество игроков в финале
     cp = player_in_final - 3
@@ -4078,7 +4101,7 @@ def player_fin_on_circle(fin):
                 player_id = f"{player}/{pl_id}"
                 fin_dict[nt] = player_id
                 nt += 1
-    else: # если выход в финал по кругу из ПФ
+    elif stage_exit in ["1-й полуфинал", "2-й полуфинал"]: # если выход в финал по кругу из ПФ
         nt = 1
         for b in nums:
             choices_fin = choice.select().where((Choice.mesto_semi_final == b) & (Choice.semi_final == stage_exit))
@@ -4103,44 +4126,25 @@ def player_fin_on_circle(fin):
             nt += 1
         if count_exit > 1:
             fin_dict = dict(sorted(sorted_dict.items()))
-#     player_in_final = system.max_player # количество игроков в финале
-#     cp = player_in_final - 3
-#     tour = tours_list(cp)
-#     kol_tours = len(tour)  # кол-во туров
-#     game = len(tour[0])  # кол-во игр в туре
-#     # ===== получение списка номеров игроков в порядке 1-ого тура
-#     k = 0
-#     number_tours = []
-#     first_tour = tour[0].copy()
-#     first_tour.sort()
-#     # for n in first_tour:
-#     #     z = n.find("-")
-#     #     num = int(n[:z])
-#     #     number_tours.append(num)
-#     # for n in first_tour:
-#     #     z = n.find("-")
-#     #     num = int(n[z + 1:])
-#     #     number_tours.append(num)
-#  # ====== new пр выходе в финал 2 человека
-#     for n in first_tour:
-#         z = n.find("-")
-#         num = int(n[:z])
-#         number_tours.append(num)
-#         num = int(n[z + 1:])
-#         number_tours.append(num)
+    else:
+        nt = 1
+        choices_fin = Choice.select().where(Choice.title_id == title_id()).order_by(Choice.rank.desc()) # сортировка по рейтингу
+        for n in choices_fin:
+                player = n.family
+                pl_id = n.player_choice_id
+                player_id = f"{player}/{pl_id}"
+                fin_dict[nt] = player_id
+                nt += 1
 #========        
     for nt in range(1, player_in_final + 1):
         fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
-        # fin_list.append()
-        # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=id_system,
+        # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=pl_id, system_id=id_system,
         #                     title_id=title_id())
-        game_list = Game_list(number_group=fin, rank_num_player=nt, player_group=fin_dict[nt], system_id=id_system,
-                            title_id=title_id())
-        game_list.save()
-  
+        # # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=fin_dict[nt], system_id=id_system,
+        # #                     title_id=title_id())
+        # game_list.save()
     # === запись в db игроков которые попали в финал из группы
     ps_final = 1
-    # k = 1
     for l in fin_list:
         # ps_final = k if count_exit == 1 else number_tours[k - 1] # если выход 1 то по порядку, если более то из списка туров
         id_pl = int(l[l.find("/") + 1:])
@@ -4148,7 +4152,9 @@ def player_fin_on_circle(fin):
         choices.final = fin
         choices.posev_final = ps_final
         choices.save()
-        # k += 1
+        game_list = Game_list(number_group=fin, rank_num_player=ps_final, player_group_id=id_pl, system_id=id_system,
+                            title_id=title_id())
+        game_list.save()                    
         ps_final += 1
     # исправить если из группы выходят больше 2-ух игроков
     for r in range(0, kol_tours):
@@ -4266,7 +4272,7 @@ def player_in_table_group_and_write_Game_list_Result(stage):
 
 
 def player_in_setka_and_write_Game_list_Result(stage, posev_list, full_name_list):
-    """менят игроков в сетке на новые места в посеве"""
+    """меняет игроков в сетке на новые места в посеве"""
     gl_id_list = []
     res_id_list = []
     id_system = system_id(stage)
@@ -9816,25 +9822,59 @@ def no_play():
     enter_score(none_player)
 
 
+def backup_mysql_database(host, port, username, password, database, backup_path):
+
+    # Check if the backup directory exists
+    if not os.path.exists(backup_path):
+        print(f"Error: Backup directory '{backup_path}' does not exist.")
+        sys.exit(1)
+    # Create a filename for the backup with the current date and time
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    backup_file = f"{backup_path}/{database}_{timestamp}.sql"
+
+    # Command to create a database backup using mysqldump
+    dump_command = f"mysqldump --no-tablespaces --host={host} --port={port} --user={username} --password={password} {database} > {backup_file} 2>/dev/null"
+    # Execute the mysqldump command
+    subprocess.run(dump_command, shell=True)
+
+    return backup_file
+
+
 def backup():
     """резервное копирование базы данных"""
-    try:
-        db = sqlite3.connect('comp_db.db')
-        db_backup = sqlite3.connect(f'comp_db_backup.db')
-        with db_backup:
-            db.backup(db_backup, pages=3, progress=None)
-        # показывает статус бар на 5 секунд
-        my_win.statusbar.showMessage(
-            "Резервное копирование базы данных завершено успешно", 5000)
-    except sqlite3.Error as error:
-        # показывает статус бар на 5 секунд
-        my_win.statusbar.showMessage(
-            "Ошибка при копировании базы данных", 5000)
-    finally:
-        if (db_backup):
-            db_backup.close()
-            db.close()
-            my_win.close()
+    # === вариант с Mysql ====
+    # Define database connection details
+    host = "localhost"
+    user = "root"
+    password = "db_pass"
+    database = "mysql_db"
+    backup_file = "backup.sql"
+
+    # Establish connection with the MySQL database
+    connection = pymysql.connect(host=host, user=user, password=password, database=database)
+    # Execute the mysqldump command
+    command = f"mysqldump -h{host} -u{user} -p{password} {database} > {backup_file}"
+    subprocess.run(command, shell=True)
+    # Close the database connection
+    connection.close()
+    # ======
+    # try:
+    #     db = sqlite3.connect('comp_db.db')
+    #     db_backup = sqlite3.connect(f'comp_db_backup.db')
+    #     with db_backup:
+    #         db.backup(db_backup, pages=3, progress=None)
+    #     # показывает статус бар на 5 секунд
+    #     my_win.statusbar.showMessage(
+    #         "Резервное копирование базы данных завершено успешно", 5000)
+    # except sqlite3.Error as error:
+    #     # показывает статус бар на 5 секунд
+    #     my_win.statusbar.showMessage(
+    #         "Ошибка при копировании базы данных", 5000)
+    # finally:
+    #     if (db_backup):
+    #         db_backup.close()
+    #         db.close()
+    #         my_win.close()
 
 
 def title_id():
