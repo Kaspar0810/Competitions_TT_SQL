@@ -3983,12 +3983,15 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
             family = r[:znak]
             id_pl = all_list[2][family]
             family_id = f'{family}/{id_pl}'  # фамилия игрока и его id
+            player_id = int(id_pl)
         else:
             family_id = r
         k += 1
     # записывает в Game_List спортсменов участников сетки и присваивает встречи 1-ого тура и записывает в тбл Results
+
         with db:
-            game_list = Game_list(number_group=fin, rank_num_player=k, player_group=family_id,
+            game_list = Game_list(number_group=fin, rank_num_player=k, player_group_id=player_id,
+            # game_list = Game_list(number_group=fin, rank_num_player=k, player_group_id=family_id,
                                   system_id=id_system, title_id=title_id()).save()
 
     for i in range(1, mp // 2 + 1):  # присваивает встречи 1-ого тура и записывает в тбл Results
@@ -4143,6 +4146,17 @@ def player_fin_on_circle(fin):
         # # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=fin_dict[nt], system_id=id_system,
         # #                     title_id=title_id())
         # game_list.save()
+        # == получение id игрока
+        fam_id = fin_dict[nt]
+        znak = fam_id.find("/")
+        id_player = int(fam_id[znak + 1:])
+        game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=id_player, system_id=id_system,
+                            title_id=title_id())
+        # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=fin_dict[nt], system_id=id_system,
+        #                     title_id=title_id())
+        game_list.save()
+  
+
     # === запись в db игроков которые попали в финал из группы
     ps_final = 1
     for l in fin_list:
@@ -12599,8 +12613,10 @@ def setka_player_after_choice(stage):
         p_data['посев'] = i.rank_num_player
         txt = i.player_group_id
         if txt != "X":
-            line = txt.find("/")  # находит черту отделяющий имя от города
-            id_pl = int(txt[line + 1:])
+            # line = txt.find("/")  # находит черту отделяющий имя от города
+            # id_pl = int(txt[line + 1:])
+            # ==== вариант новый с id игрока
+            id_pl = i.player_group_id
             pl = player.select().where(Player.id == id_pl).get()
             p_data['фамилия'] = pl.full_name
         else:
