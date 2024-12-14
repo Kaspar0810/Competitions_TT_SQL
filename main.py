@@ -589,8 +589,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         id_system = system_id(stage=fin)
                         clear_db_before_choice_final(fin)
                         System.update(choice_flag=0).where(System.id == id_system).execute()
-                        # one_table(fin, group)
-                        player_in_one_table(fin)
+                        # player_fin_on_circle(fin) # создание жеребьевки по кругу
+                        one_table(fin, group)
+                        # player_in_one_table(fin)
                         # player_in_table_group_and_write_Game_list_Result(stage=fin)
                     else:
                         clear_db_before_choice_final(fin)
@@ -748,7 +749,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             load_name_net_after_choice_for_wiev(fin)
 
                             my_win.statusbar.showMessage(
-                f"Жеребъевка {fin} завершена успешно", 5000)
+                                            f"Жеребъевка {fin} завершена успешно", 5000)
                     else:
                         return
                 else:
@@ -4060,7 +4061,7 @@ def player_fin_on_circle(fin):
     system = System.select().where(System.id == id_system).get()  # находит system id последнего
 
     stage_exit = system.stage_exit # откуда выходят в финал
-    # === если stage_exit == "", значит одна тблица в круг
+    # === если stage_exit == "", значит одна таблица в круг
     if stage_exit != "":
         nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
         count_exit = len(nums) # количество игроков, выходящих в финал
@@ -4098,12 +4099,12 @@ def player_fin_on_circle(fin):
                 sortdict = dict(grouplist)
                 choices_fin_sort_by_group = sortdict.keys()
             # ========
-            for n in choices_fin_sort_by_group:
-                player = n.family
-                pl_id = n.player_choice_id
-                player_id = f"{player}/{pl_id}"
-                fin_dict[nt] = player_id
-                nt += 1
+        for n in choices_fin_sort_by_group:
+            player = n.family
+            pl_id = n.player_choice_id
+            player_id = f"{player}/{pl_id}"
+            fin_dict[nt] = player_id
+            nt += 1
     elif stage_exit in ["1-й полуфинал", "2-й полуфинал"]: # если выход в финал по кругу из ПФ
         nt = 1
         for b in nums:
@@ -4147,14 +4148,14 @@ def player_fin_on_circle(fin):
         # #                     title_id=title_id())
         # game_list.save()
         # == получение id игрока
-        fam_id = fin_dict[nt]
-        znak = fam_id.find("/")
-        id_player = int(fam_id[znak + 1:])
-        game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=id_player, system_id=id_system,
-                            title_id=title_id())
+        # fam_id = fin_dict[nt]
+        # znak = fam_id.find("/")
+        # id_player = int(fam_id[znak + 1:])
+        # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=id_player, system_id=id_system,
+        #                     title_id=title_id())
         # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=fin_dict[nt], system_id=id_system,
         #                     title_id=title_id())
-        game_list.save()
+        # game_list.save()
   
 
     # === запись в db игроков которые попали в финал из группы
@@ -4162,10 +4163,17 @@ def player_fin_on_circle(fin):
     for l in fin_list:
         # ps_final = k if count_exit == 1 else number_tours[k - 1] # если выход 1 то по порядку, если более то из списка туров
         id_pl = int(l[l.find("/") + 1:])
-        choices = choice.select().where(Choice.player_choice_id == id_pl).get()
-        choices.final = fin
-        choices.posev_final = ps_final
-        choices.save()
+        if fin == "Одна таблица":
+            Choice.update(basic=fin).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
+        else:
+            Choice.update(final=fin, posev_final = ps_final).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
+        # choices = choice.select().where(Choice.player_choice_id == id_pl).get()
+        # if fin == "Одна таблица":
+        #     choices.basic = fin
+        # else:
+        #     choices.final = fin
+        #     choices.posev_final = ps_final
+        # choices.save()
         game_list = Game_list(number_group=fin, rank_num_player=ps_final, player_group_id=id_pl, system_id=id_system,
                             title_id=title_id())
         game_list.save()                    
