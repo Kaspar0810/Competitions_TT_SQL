@@ -4099,12 +4099,24 @@ def player_fin_on_circle(fin):
                 sortdict = dict(grouplist)
                 choices_fin_sort_by_group = sortdict.keys()
             # ========
+        # for n in choices_fin_sort_by_group:
+        #     player = n.family
+        #     pl_id = n.player_choice_id
+        #     player_id = f"{player}/{pl_id}"
+        #     fin_dict[nt] = player_id # словарь игрок/id (порядок: места в группе затем группа)
+        #     nt += 1
+        # вариант с расстоновкой по 1-му туру
         for n in choices_fin_sort_by_group:
             player = n.family
             pl_id = n.player_choice_id
             player_id = f"{player}/{pl_id}"
-            fin_dict[nt] = player_id
+            if count_exit == 1:
+                fin_dict[nt] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
+            else:
+                fin_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
             nt += 1
+        # if count_exit > 1:
+        #     fin_dict = dict(sorted(fin_dict.items()))
     elif stage_exit in ["1-й полуфинал", "2-й полуфинал"]: # если выход в финал по кругу из ПФ
         nt = 1
         for b in nums:
@@ -4159,25 +4171,34 @@ def player_fin_on_circle(fin):
   
 
     # === запись в db игроков которые попали в финал из группы
-    ps_final = 1
-    for l in fin_list:
+    # k = 1 
+    # for l in fin_list:
+    #     ps_final = k if count_exit == 1 else number_tours[k - 1] # если выход 1 то по порядку, если более то из списка туров
+    #     id_pl = int(l[l.find("/") + 1:])
+    #     if fin == "Одна таблица":
+    #         Choice.update(basic=fin).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
+    #     else:
+    #         Choice.update(final=fin, posev_final = ps_final).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
+    #     game_list = Game_list(number_group=fin, rank_num_player=ps_final, player_group_id=id_pl, system_id=id_system,
+    #                         title_id=title_id())
+    #     game_list.save()
+    #     k += 1                    
+    # == вариант с циклом по словарю
+    k = 1
+    for l in fin_dict.keys():
         # ps_final = k if count_exit == 1 else number_tours[k - 1] # если выход 1 то по порядку, если более то из списка туров
-        id_pl = int(l[l.find("/") + 1:])
+        ps_final = k if count_exit == 1 else l # если выход 1 то по порядку, если более то из списка туров
+        fam = fin_dict[l]
+        id_pl = int(fam[fam.find("/") + 1:])
         if fin == "Одна таблица":
             Choice.update(basic=fin).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
         else:
             Choice.update(final=fin, posev_final = ps_final).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
-        # choices = choice.select().where(Choice.player_choice_id == id_pl).get()
-        # if fin == "Одна таблица":
-        #     choices.basic = fin
-        # else:
-        #     choices.final = fin
-        #     choices.posev_final = ps_final
-        # choices.save()
         game_list = Game_list(number_group=fin, rank_num_player=ps_final, player_group_id=id_pl, system_id=id_system,
                             title_id=title_id())
-        game_list.save()                    
-        ps_final += 1
+        game_list.save()
+        k += 1         
+    # ==========
     # исправить если из группы выходят больше 2-ух игроков
     for r in range(0, kol_tours):
         round = r + 1
@@ -4217,7 +4238,6 @@ def player_fin_on_circle(fin):
     with db:
         title.tab_enabled = page_title
         title.save()
-    # tab_enabled(gamer)
     tab_enabled(id_title)
     pv = system.page_vid
     stage = fin
@@ -14562,17 +14582,11 @@ def load_playing_game_in_table_for_final(fin):
     stage = systems.stage_exit
     kol_gr = systems.total_group
     sys = system.select().where(System.stage == stage).get()
-    # sys_fin = system.select().where(System.stage == fin).get()
     kol_gr = sys.total_group
-    # ========
-    # sys = system.select().where(System.stage == "Предварительный").get()
-    # sys_fin = system.select().where(System.stage == fin).get()
-    # kol_gr = sys.total_group
     if fin == "1-й финал":
         mesto_rank = 1
     else:
         sum_player = []
-        # etap_exit = sys_fin.stage_exit
         etap_exit = stage
         for m in system:
             if m.stage == fin:
@@ -14583,7 +14597,6 @@ def load_playing_game_in_table_for_final(fin):
                     sum_player.append(total_player_exit)
         sum_player_exit = sum(sum_player) # сумма игроков вышедших в финал   
         mesto_rank = sum_player_exit + 1
-    # how_many_mest_exit = sys_fin.mesta_exit # количество мест попадающих из предварительного этапа
     how_many_mest_exit = systems.mesta_exit # количество мест попадающих из предварительного этапа
     for i in range(1, kol_gr + 1): # цикл по группам
         posev_player_exit_out_gr.clear()
@@ -14594,7 +14607,6 @@ def load_playing_game_in_table_for_final(fin):
         else:
             choice_group = choice.select().where((Choice.semi_final == stage) & (Choice.sf_group == f"{i} группа"))
         # =====
-        # choice_group = choice.select().where(Choice.group == f"{i} группа")
         kol_player = len(choice_group) # число участников в группе
         if mesto_rank + how_many_mest_exit <= kol_player:
             mesto_rank_end = mesto_rank + how_many_mest_exit
@@ -14608,10 +14620,8 @@ def load_playing_game_in_table_for_final(fin):
             else:
                 ch_mesto_exit = choice_group.select().where(Choice.mesto_semi_final == k).get()
             #  =======
-            # ch_mesto_exit = choice_group.select().where(Choice.mesto_group == k).get()
             pl_id = ch_mesto_exit.player_choice_id # id игрока, занявшего данное место
             pl_posev = ch_mesto_exit.posev_group  if stage == "Предварительный" else ch_mesto_exit.posev_sf 
-            # pl_posev = ch_mesto_exit.posev_group
             id_player_exit_out_gr.append(pl_id)
             posev_player_exit_out_gr.append(pl_posev) # номера игроков в группе вышедших в финал
             n += 1
@@ -14634,7 +14644,6 @@ def load_playing_game_in_table_for_final(fin):
                 all_posev_id_pl.append(posev_id_pl)
 
             result_pre = results.select().where(Result.system_stage == stage) # изменить откуда выходят из группы или пф
-            # result_pre = results.select().where(Result.system_stage == "Предварительный") # изменить откуда выходят из группы или пф
             for d in range(0, len(posev_pl)):
                 posev_exit = posev_pl[d]
                 id_player_exit = all_posev_id_pl[d]
