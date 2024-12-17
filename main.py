@@ -35,6 +35,7 @@ import sys
 #=============
 import pymysql
 import subprocess
+import mysql.connector
 #=============
 import pathlib
 from pathlib import Path
@@ -483,7 +484,49 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def import_db(self):
         """Импорт из бэкап в базу данных"""
-        pass
+            # Connect to the MySQL database
+        cnx = mysql.connector.connect(user='root', password='db_pass', host='localhost')
+
+        # Create a cursor object
+        cursor = cnx.cursor()
+        database_name = "mysqldb"
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "comp_db_backup.db")
+        filepath = str(fname[1])
+        try:
+            # Create the database if it doesn't exist
+            cursor.execute("CREATE DATABASE IF NOT EXISTS {}".format(database_name))
+            cursor.execute("USE {}".format(database_name))
+
+            # Read the backup SQL file
+            # with open(backup_file, 'r') as f:
+            #     sql_script = f.read()
+            with open(filepath, 'r') as f:
+                sql_script = f.read()
+
+            # Split the script into individual SQL statements
+            sql_statements = sql_script.split(';')
+
+            # Execute each SQL statement
+            for statement in sql_statements:
+                cursor.execute(statement)
+
+            # Commit the changes
+            cnx.commit()
+
+            print("Database restored successfully!")
+
+        except mysql.connector.Error as err:
+            print("Error while restoring database: {}".format(err))
+
+        finally:
+            # Close the cursor and connection
+            cursor.close()
+            cnx.close()
+
+    # Restore the database with the given name and backup file
+    # restore_database('mydatabase', 'backup.sql')
+
+        # pass
         # fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "comp_db_backup.db")
         # filepath = str(fname[1])
         # try:
@@ -1117,7 +1160,6 @@ def dbase():
     conn.cursor().execute('CREATE DATABASE mysql_db')
     conn.close()
 
-    # db.connect()
     with db:
         db.create_tables([Title, R_list_m, R_list_d, Region, City, Player, R1_list_m, R1_list_d, Coach, System,
                           Result, Game_list, Choice, Delete_player, Referee])
@@ -3436,7 +3478,22 @@ def exit_comp():
                              msgBox.Ok, msgBox.Cancel)
     if result == msgBox.Ok:
         my_win.close()
-        backup()
+        # Database connection details
+        host = "localhost"
+        user = "root"
+        password = "db_pass"
+        database = "mysqldb"
+        backup_file = "C:/Users/Alex_SSHOR13/Desktop/backup.sql"
+
+        # Run mysqldump command
+        command = f"mysqldump −h{host} −u{user} −p{password} {database} > {backup_file}"
+        proc = subprocess.run(command, shell=True)
+
+        if proc.returncode == 0:
+            print("Database backup success")
+        else:
+            print(f"Database backup failed - return code {proc.returncode}.")
+                # backup()
     else:
         pass
 
