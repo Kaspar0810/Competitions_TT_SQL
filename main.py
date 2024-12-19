@@ -35,7 +35,7 @@ import sys
 #=============
 import pymysql
 import subprocess
-import mysql.connector
+# import mysql.connector
 #=============
 import pathlib
 from pathlib import Path
@@ -485,66 +485,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def import_db(self):
         """Импорт из бэкап в базу данных"""
             # Connect to the MySQL database
-        cnx = mysql.connector.connect(user='root', password='db_pass', host='localhost')
-
+        cnx = pymysql.connect(user='root', password='db_pass', host='localhost')
         # Create a cursor object
         cursor = cnx.cursor()
-        database_name = "mysqldb"
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "comp_db_backup.db")
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "backup.sql")
         filepath = str(fname[1])
-        try:
-            # Create the database if it doesn't exist
-            cursor.execute("CREATE DATABASE IF NOT EXISTS {}".format(database_name))
-            cursor.execute("USE {}".format(database_name))
+        subprocess.run(['mysql', '-e', f'source {filepath}'])
+        cnx.commit()
 
-            # Read the backup SQL file
-            # with open(backup_file, 'r') as f:
-            #     sql_script = f.read()
-            with open(filepath, 'r') as f:
-                sql_script = f.read()
+        print("Database restored successfully!")
+        my_win.statusbar.showMessage("Импорт базы данных завершен успешно", 5000)
+        cursor.close()
+        cnx.close()
 
-            # Split the script into individual SQL statements
-            sql_statements = sql_script.split(';')
-
-            # Execute each SQL statement
-            for statement in sql_statements:
-                cursor.execute(statement)
-
-            # Commit the changes
-            cnx.commit()
-
-            print("Database restored successfully!")
-
-        except mysql.connector.Error as err:
-            print("Error while restoring database: {}".format(err))
-
-        finally:
-            # Close the cursor and connection
-            cursor.close()
-            cnx.close()
-
-    # Restore the database with the given name and backup file
-    # restore_database('mydatabase', 'backup.sql')
-
-        # pass
-        # fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "comp_db_backup.db")
-        # filepath = str(fname[1])
-        # try:
-        #     db = sqlite3.connect('comp_db.db')
-        #     db_backup = sqlite3.connect(filepath)
-        #     with db_backup:
-        #         db_backup.backup(db, pages=3, progress=None)
-        #     # показывает статус бар на 5 секунд
-        #     my_win.statusbar.showMessage(
-        #         "Импорт базы данных завершен успешно", 5000)
-        # except sqlite3.Error as error:
-        #     # показывает статус бар на 5 секунд
-        #     my_win.statusbar.showMessage(
-        #         "Ошибка при копировании базы данных", 5000)
-        # finally:
-        #     if (db_backup):
-        #         db_backup.close()
-        #         my_win.activateWindow()
 
     def statistika(self):
         """статистика встреч для точного обсчета рейтинга"""
@@ -3473,29 +3426,24 @@ def list_player_pdf(player_list):
 
 def exit_comp():
     """нажата кнопка -выход-"""
+    import subprocess
     msgBox = QMessageBox
     result = msgBox.question(my_win, "Выход из программы", "Вы действительно хотите выйти из программы?",
                              msgBox.Ok, msgBox.Cancel)
     if result == msgBox.Ok:
         my_win.close()
-        # Database connection details
         host = "localhost"
         user = "root"
         password = "db_pass"
-        database = "mysqldb"
-        backup_file = "C:/Users/Alex_SSHOR13/Desktop/backup.sql"
-
-        # Run mysqldump command
-        command = f"mysqldump −h{host} −u{user} −p{password} {database} > {backup_file}"
-        proc = subprocess.run(command, shell=True)
-
-        if proc.returncode == 0:
-            print("Database backup success")
+        database = "mysql_db"
+        backup_file = "backup.sql"
+        command = f"mysqldump -h{host} -u{user} -p{password} {database} > {backup_file}"
+        process = subprocess.run(command, shell=True)
+        if process.returncode == 0:
+            my_win.statusbar.showMessage("Экспорт базы данных завершен успешно", 5000)
+            print("Database backup completed successfully.")
         else:
-            print(f"Database backup failed - return code {proc.returncode}.")
-                # backup()
-    else:
-        pass
+            print(f"Database backup failed with return code {process.returncode}.")
 
 
 def add_or_delete_etap_after_choice(stage, flag):
