@@ -486,17 +486,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """Импорт из бэкап в базу данных"""
             # Connect to the MySQL database
         cnx = pymysql.connect(user='root', password='db_pass', host='localhost')
-        # Create a cursor object
+        username='root'
+        database='mysql_db'
+        password='db_pass'
+        host='localhost'
+        # port='3306'
         cursor = cnx.cursor()
-        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "backup.sql")
-        filepath = str(fname[1])
-        subprocess.run(['mysql', '-e', f'source {filepath}'])
+        fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "*.sql")
+        filepath = str(fname[0])
+        backup_file = filepath.replace("/", "\\")
+        restore_command = f"mysql --host={host} --user={username} --password={password} {database} < {backup_file}"
+        subprocess.run(restore_command, shell=True)
         cnx.commit()
 
         print("Database restored successfully!")
         my_win.statusbar.showMessage("Импорт базы данных завершен успешно", 5000)
         cursor.close()
         cnx.close()
+        my_win.tabWidget.setCurrentIndex(1)
 
 
     def statistika(self):
@@ -3424,26 +3431,79 @@ def list_player_pdf(player_list):
     os.chdir("..")
 
 
-def exit_comp():
-    """нажата кнопка -выход-"""
-    import subprocess
+def ReturnCode():
+    pass
+
+def exit_comp():   
+    """нажата кнопка -выход- и резервное копирование db"""
     msgBox = QMessageBox
     result = msgBox.question(my_win, "Выход из программы", "Вы действительно хотите выйти из программы?",
                              msgBox.Ok, msgBox.Cancel)
     if result == msgBox.Ok:
         my_win.close()
-        host = "localhost"
+        # host = "localhost"
         user = "root"
         password = "db_pass"
         database = "mysql_db"
-        backup_file = "backup.sql"
-        command = f"mysqldump -h{host} -u{user} -p{password} {database} > {backup_file}"
-        process = subprocess.run(command, shell=True)
-        if process.returncode == 0:
+        current_date = str(datetime.now().strftime('%d_%m_%Y'))
+        try:
+            dump = f'dump_{database}_{current_date}.sql'
+            absolute_path = str(Path(f'backup_db/{dump}').resolve())
+            # return dump
+            p = subprocess.Popen('mysqldump -u' + user + ' -p' + password + ' --databases ' + database + ' > ' + absolute_path, shell=True)
+            # Wait for completion
+            p.communicate()
+            # Check for errors
+            if p.returncode != 0:
+                raise ReturnCode
+            print('Backup done for', db)
             my_win.statusbar.showMessage("Экспорт базы данных завершен успешно", 5000)
-            print("Database backup completed successfully.")
-        else:
-            print(f"Database backup failed with return code {process.returncode}.")
+            return dump
+        except:
+            print('Backup failed for ', db)
+    else:
+        return
+
+
+# def exit_comp():
+#     """нажата кнопка -выход-"""
+#     import subprocess
+#     msgBox = QMessageBox
+#     result = msgBox.question(my_win, "Выход из программы", "Вы действительно хотите выйти из программы?",
+#                              msgBox.Ok, msgBox.Cancel)
+#     if result == msgBox.Ok:
+#         my_win.close()
+#         host = "localhost"
+#         user = "root"
+#         password = "db_pass"
+#         database = "mysql_db"
+#         # =====
+#         # Open database connection
+#         conn = pymysql.connect(host=host, user=user, password=password, database=database)
+#         # db = pymysql.connect(host, user, password, database)
+#         absolute_path = str(Path('backup_db/mysql_db.sql').resolve())
+#         # txt = absolute_path.replace("/", "\\")
+#         # SQL query to get all tables in the database
+#             # cursor.execute(f'CREATE TABLE {table_name} SELECT * FROM {database}.{table_name}') 
+
+#         tables = cursor.fetchall() # fetching all tables
+#         for table in tables:
+#             table = table[0]
+#             # backup_query = f'CREATE TABLE {table} SELECT * FROM {database}.{table}'
+#             backup_query = "SELECT * INTO OUTFILE '/tmp/" + table + ".sql' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' FROM " + table
+#             cursor.execute(backup_query)
+
+#         # database.close()
+#         # # =====
+#         # absolute_path = Path('backup_db/mysql_db.sql').resolve()
+#         # # backup_file = "mysql_db.sql"
+#         command = f"mysqldump -h{host} -u{user} -p{password} {database} > {absolute_path}"
+#         process = subprocess.run(command, shell=True)
+#         if process.returncode == 0:
+#             my_win.statusbar.showMessage("Экспорт базы данных завершен успешно", 5000)
+#             print("Database backup completed successfully.")
+#         else:
+#             print(f"Database backup failed with return code {process.returncode}.")
 
 
 def add_or_delete_etap_after_choice(stage, flag):
@@ -9244,16 +9304,6 @@ def clear_db_before_edit():
     """очищает таблицы при повторном создании системы"""
     system = System.select().where(System.title_id == title_id())
     title = Title.select().where(Title.id == title_id()).get()
-    for i in system:  # удаляет все записи
-        i.delete_instance()
-    sys = System(title_id=title_id(), total_athletes=0, total_group=0, max_player=0, stage="", type_table="", page_vid="",
-                 label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True,
-                 stage_exit="", mesta_exit="", no_game="").save()
-    with db:
-        # записывает в таблицу -Title- новые открытые вкладки
-        title.tab_enabled = "Титул Участники"
-        title.save()
-
     gl = Game_list.select().where(Game_list.title_id == title_id())
     for i in gl:
         gl_d = Game_list.get(Game_list.id == i)
@@ -9266,6 +9316,15 @@ def clear_db_before_edit():
     for i in rs:
         r_d = Result.get(Result.id == i)
         r_d.delete_instance()
+    for i in system:  # удаляет все записи
+        i.delete_instance()
+    sys = System(title_id=title_id(), total_athletes=0, total_group=0, max_player=0, stage="", type_table="", page_vid="",
+                 label_string="", kol_game_string="", choice_flag=False, score_flag=5, visible_game=True,
+                 stage_exit="", mesta_exit="", no_game="").save()
+    with db:
+        # записывает в таблицу -Title- новые открытые вкладки
+        title.tab_enabled = "Титул Участники"
+        title.save() 
 
 
 def clear_db_before_choice(stage):
