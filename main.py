@@ -3102,10 +3102,6 @@ def page():
         Button_view_final.setIcon(QtGui.QIcon(joined_path))
         Button_view_final.setIconSize(QtCore.QSize(48,64))
         Button_view_final.setFlat(True)
-        # ===============================
-        # Button_view_final.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
-        # Button_view_final.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        # Button_view_final.setText("Просмотр\nфиналов")
         Button_view_final.show()
         my_win.widget.hide()
         my_win.tableWidget.hide()
@@ -3123,6 +3119,7 @@ def page():
         my_win.Button_Ok_fin.setEnabled(False)
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(False)
         load_combobox_filter_final()
+        stage_combo = my_win.comboBox_filter_final.currentText()
         count = len(sf)
         stage = "Одна таблица" if count == 1 else "Финальный"
         player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
@@ -3512,7 +3509,7 @@ def add_or_delete_etap_after_choice(stage, flag):
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     etap_word = ""
     ind = etap_list.index(stage)
-    after_etap = etap_list[ind - 3]
+    # after_etap = etap_list[ind - 3]
     system = System.select().where(System.title_id == title_id())
     m = 0
     etap_dict = {}
@@ -3523,6 +3520,7 @@ def add_or_delete_etap_after_choice(stage, flag):
         id_list.append(id_s)
         etap_dict[m] = stage_system
         m += 1
+    after_etap = stage_system if stage == "Суперфинал" else etap_list[ind - 1]
     ind = [keys for keys, values in etap_dict.items() if values == after_etap] # список ключа по значению 
     for l in range (len(id_list)):
         if l > ind[0]: # удаляет все что ниже вставляемого этапа
@@ -3531,8 +3529,8 @@ def add_or_delete_etap_after_choice(stage, flag):
             gl_d = Game_list.delete().where(Game_list.system_id == id_list[l])
             gl_d.execute()
     
-    system_upd = System.select().where(System.title_id == title_id())
-    count_etap = len(system_upd)
+    # system_upd = System.select().where(System.title_id == title_id())
+    # count_etap = len(system_upd)
 
     sb = "Выбор системы проведения соревнования."
     my_win.statusbar.showMessage(sb)
@@ -3540,7 +3538,8 @@ def add_or_delete_etap_after_choice(stage, flag):
     my_win.comboBox_etap.clear()
     my_win.comboBox_etap.show()
     my_win.label_10.show()
-    my_win.label_10.setText(f"{count_etap + 1}-й этап")
+    # my_win.label_10.setText(f"{count_etap + 1}-й этап")
+    my_win.label_10.setText(f"{m + 1}-й этап")
 
     my_win.Button_etap_made.setEnabled(True)
     my_win.tabWidget.setTabEnabled(2, True)
@@ -4040,7 +4039,6 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
     # создание сетки со спортсменами согласно жеребьевки
     all_list = setka_data(fin, posev_data)
     tds = all_list[0]
-    # tds = all_list[1]
     tds_full_name_city = all_list[3]
     k = 0
     for r in tds:
@@ -4048,16 +4046,15 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
             znak = r.find("/")
             family = r[:znak]
             id_pl = all_list[2][family]
-            family_id = f'{family}/{id_pl}'  # фамилия игрока и его id
+            # family_id = f'{family}/{id_pl}'  # фамилия игрока и его id
             player_id = int(id_pl)
         else:
-            family_id = r
+            player_id = ""
         k += 1
     # записывает в Game_List спортсменов участников сетки и присваивает встречи 1-ого тура и записывает в тбл Results
 
         with db:
             game_list = Game_list(number_group=fin, rank_num_player=k, player_group_id=player_id,
-            # game_list = Game_list(number_group=fin, rank_num_player=k, player_group_id=family_id,
                                   system_id=id_system, title_id=title_id()).save()
 
     for i in range(1, mp // 2 + 1):  # присваивает встречи 1-ого тура и записывает в тбл Results
@@ -6894,20 +6891,10 @@ def choice_setka_automat(fin, flag, count_exit):
   
     posevs = setka_choice_number(fin, count_exit) # выбор номеров сетки для посева
     player_net = posevs[0]
-    # z = len(posevs)
-    # if z == 2:
-    #     posev_1 = posevs[1]
-    # elif z == 3:
-    #     posev_2 = posevs[2]
-    # elif z == 4:
-    #     posev_2 = posevs[2]
-    #     posev_3 = posevs[3]
-    # elif z == 5:
-    #     posev_2 = posevs[2]
-    #     posev_3 = posevs[3]
-    #     posev_4 = posevs[4]
+ 
+    if fin == "Суперфинал":
+        count_exit = 1
 
-    # z = len(posevs)
     if count_exit == 1:
         posev_1 = posevs[1]
     elif count_exit == 2:
@@ -8845,11 +8832,14 @@ def total_game_table(exit_stage, kpt, fin, pv):
 
 def full_net_player(player_in_final):
     """максимальное количество игроков в сетке при не полном составе"""
-    for m in range(1, 6):
-        game = 2** m
-        if game >= player_in_final:
-            break
-    player_in_final_full = 2 ** m
+    if player_in_final == 4:
+       player_in_final_full = 8
+    else: 
+        for m in range(1, 6):
+            game = 2** m
+            if game >= player_in_final:
+                break
+        player_in_final_full = 2 ** m
     return player_in_final_full
 
 
@@ -12705,8 +12695,6 @@ def setka_player_after_choice(stage):
         p_data['посев'] = i.rank_num_player
         txt = i.player_group_id
         if txt != "X":
-            # line = txt.find("/")  # находит черту отделяющий имя от города
-            # id_pl = int(txt[line + 1:])
             # ==== вариант новый с id игрока
             id_pl = i.player_group_id
             pl = player.select().where(Player.id == id_pl).get()
@@ -15641,30 +15629,42 @@ def check_choice_net():
     # c  = Canvas('mydoc.pdf', pagesize = landscape)
     # f = Frame(5* cm, 3 * cm, 6 * cm, 25 * cm, showBoundary=1) # высота прямоугольника  6 Х 25, showBoundary = 1, рамка 0- нет
     # f.addFromList(story, c)
-    # c.save()
-def proba():
-    players = Player.select()
-    for p in players:
-        bd = p.bday
-        bd_new = format_date_for_db(str_date=bd)
-        txt = str(bd_new)
-        Player.update(bday=bd_new).execute()
+#     # c.save()
+# def proba():
+#     players = Player.select()
+#     for p in players:
+#         bd = p.bday
+#         bd_new = format_date_for_db(str_date=bd)
+#         txt = str(bd_new)
+#         Player.update(bday=bd_new).execute()
 
 # =======        
 # def proba():
-#     # Game_list.update(player_group_id="СИЗОВ Андрей/2419").where(Game_list.id == 5325).execute()
-# #     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
-#     my_db = SqliteDatabase('comp_db.db')
-#     migrator = SqliteMigrator(my_db)
-#     # no_game = TextField(default="")
-#     # mesto_super_final = IntegerField(null=True)  # новый столбец, его поле и значение по умолчанию
-#     # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
+#     myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
+ 
+# #creating the cursor object 
+#     cur = myconn.cursor() 
+#     try: 
+#         #adding a column branch name to the table Employee 
+#         cur.execute("ALTER TABLE Game_list MODIFY COLUMN player_group_id VARCHAR(30) NULL;") 
+#     except: 
+#         myconn.rollback() 
+    
+#     myconn.close() 
 
-#     with db:
-#         migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
-# #         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
-#         # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
-#         # migrate(migrator.add_column('Choices', 'mesto_super_final', mesto_super_final)) # Добавление столбца (таблица, столбец, повтор название столбца)
+    # Game_list.update(player_group_id="СИЗОВ Андрей/2419").where(Game_list.id == 5325).execute()
+#     """добавление столбца в существующую таблицу, затем его добавить в -models- соответсвующую таблицу этот столбец"""
+    # my_db = SqliteDatabase('comp_db.db')
+    # migrator = SqliteMigrator(my_db)
+    # no_game = TextField(default="")
+    # mesto_super_final = IntegerField(null=True)  # новый столбец, его поле и значение по умолчанию
+    # posev_super_final = ForeignKeyField(Choise, field=System.id, null=True)
+
+    # with db:
+    #     migrate(migrator.drop_column('choices', 'posev_super_final')) # удаление столбца
+#         # migrate(migrator.alter_column_type('system', 'mesta_exit', IntegerField()))
+        # migrate(migrator.rename_column('titles', 'kat_sek', 'kat_sec')) # Переименование столбца (таблица, старое название, новое название столбца)
+        # migrate(migrator.add_column('Choices', 'mesto_super_final', mesto_super_final)) # Добавление столбца (таблица, столбец, повтор название столбца)
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
@@ -15861,7 +15861,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
