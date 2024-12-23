@@ -4049,7 +4049,19 @@ def player_in_setka_and_write_Game_list_and_Result(fin, posev_data):
             # family_id = f'{family}/{id_pl}'  # фамилия игрока и его id
             player_id = int(id_pl)
         else:
-            player_id = ""
+            # === вариант с добавлением игрока вместо фамилии -Х- ====
+            pl = Player.select().where(Player.title_id == title_id())
+            count = len(pl)
+            pl_x = pl.select().where(Player.player == "X")
+            if len(pl_x) == 0:
+                players = Player.insert(player="X", bday='0000-00-00', city="", region="", razryad="",coach_id=1, 
+                                        mesto=0, full_name="X", title_id=title_id(), pay_rejting="", comment="",  coefficient_victories="", 
+                                        total_game_player=0, total_win_game=0, application="").execute()
+            else:
+                player_s = pl.select().where(Player.player == "X").get()
+                pl_id = player_s.id
+            player_id = players if len(pl_x) == 0 else pl_id
+            # ========
         k += 1
     # записывает в Game_List спортсменов участников сетки и присваивает встречи 1-ого тура и записывает в тбл Results
 
@@ -4971,16 +4983,18 @@ def load_comboBox_filter():
     my_win.comboBox_fltr_city.clear()
     reg = []
     gorod = []
-    player = Player.select().where(Player.title_id == title_id())
+    # player = Player.select().where(Player.title_id == title_id())
+    player = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
     if my_win.comboBox_fltr_region.count() > 0:  # проверка на заполненность комбобокса данными
         return
     else:
         for r in player:
             reg_n = r.region
+            reg_n = reg_n.strip() # удаляет лишние пробелы
             if reg_n not in reg:
                 reg.append(reg_n)
         reg.sort(key=sortByAlphabet)
-        reg.insert(0, "")
+        # reg.insert(0, "")
         my_win.comboBox_fltr_region.addItems(reg)
     
     if my_win.comboBox_fltr_city.count() < 0:  # проверка на заполненность комбобокса данными
