@@ -3787,17 +3787,15 @@ def one_table(fin, group):
         if type_table == "круг":
             total_athletes = count
         else: # на сколько участников таблица
-            if count <= 16:
-                total_athletes = 16
-            elif count > 16 and count <= 32:
-                total_athletes = 32
+            total_athletes = full_net_player(player_in_final=count)
+           
 
         flag_ready_system = ready_system()
         if flag_ready_system is False:
             sys_m = System.select().where(System.title_id == title_id()).get()
             total_game = numbers_of_games(cur_index, player_in_final=count, kpt=0)
 
-            sys_m.max_player = count
+            sys_m.max_player = total_athletes
             sys_m.total_athletes = total_athletes
             sys_m.total_group = group
             sys_m.stage = my_win.comboBox_etap.currentText()
@@ -6879,20 +6877,24 @@ def rank_mesto_out_in_group_or_semifinal_to_final(fin):
             del list_mest[:player_out_sf2]
         else:
             system_fin = System.select().where((System.title_id == title_id()) & (System.stage == etap)).get()
-            etap_out_fin = system_fin.stage_exit # из какого этапа выходят в финал
-            pl_out = system_fin.mesta_exit # сколько мест
-            if etap == "Суперфинал":
-                pl_out_list = [i for i in range(1, pl_out + 1)] # список мест из 1 финала, играющих в суперфинале
-                etap_out_and_player[etap_out_fin] = pl_out_list
-            list_mest = etap_out_and_player[etap_out_fin]
-
-            if fin != etap:
-                del list_mest[:pl_out]
-                player_in_stage[etap] = etap_out_and_player[etap_out_fin]
+            if etap == "Одна таблица":
+                end = system_fin.total_athletes
+                nums = [i for i in range(1, end + 1)] # генератор списка
             else:
-                del list_mest[pl_out:]
-                nums = list_mest
-                break
+                etap_out_fin = system_fin.stage_exit # из какого этапа выходят в финал
+                pl_out = system_fin.mesta_exit # сколько мест
+                if etap == "Суперфинал":
+                    pl_out_list = [i for i in range(1, pl_out + 1)] # список мест из 1 финала, играющих в суперфинале
+                    etap_out_and_player[etap_out_fin] = pl_out_list
+                list_mest = etap_out_and_player[etap_out_fin]
+
+                if fin != etap:
+                    del list_mest[:pl_out]
+                    player_in_stage[etap] = etap_out_and_player[etap_out_fin]
+                else:
+                    del list_mest[pl_out:]
+                    nums = list_mest
+                    break
     return nums
 
 
@@ -6921,7 +6923,7 @@ def choice_setka_automat(fin, flag, count_exit):
     posevs = setka_choice_number(fin, count_exit) # выбор номеров сетки для посева
     player_net = posevs[0]
  
-    if fin == "Суперфинал":
+    if fin == "Суперфинал" or fin == "Одна таблица":
         count_exit = 1
 
     if count_exit == 1:
@@ -6952,7 +6954,8 @@ def choice_setka_automat(fin, flag, count_exit):
     n = 0    
     while n < count_exit:  # добавил n=0 и n+=1 стр 7098
         if system.stage == "Одна таблица":
-            real_all_player_in_final.append(len(choice.select().where(Choice.basic == fin)))
+            real_all_player_in_final = len(choice.select().where(Choice.basic == fin))
+            choice_posev = choice.select().order_by(Choice.rank)
         elif fin == "1-й финал":
             if stage_exit == "Предварительный":
                 # == реальное число игроков в финале
@@ -7016,6 +7019,7 @@ def choice_setka_automat(fin, flag, count_exit):
             else:
                 group = ""
                 group_number = 1
+                mesto_group = ""
             pl_id = posev.player_choice_id # id игрока
             region = posev.region
             player = Player.get(Player.id == pl_id)
@@ -7395,8 +7399,6 @@ def setka_choice_number(fin, count_exit):
     posev_4 = []
     id_system = system_id(stage=fin)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
-    # if fin == "Одна таблица":
-    #     count_exit = 1
     type_setka = system.label_string
     if fin == "Суперфинал":
         count_exit = 1
@@ -7466,7 +7468,7 @@ def free_place_in_setka(max_player, real_all_player_in_final):
     free_number_16 = [2, 15, 7, 10, 6, 11, 3, 14]
     free_number_24 = [5, 20, 8, 17, 11, 14, 2, 23]
     free_number_32 = [2, 31, 15, 18, 10, 23, 7, 26, 6, 27, 11, 22, 14, 19, 3, 30]
-    count = max_player - real_all_player_in_final# кол-во свободных мест
+    count = max_player - real_all_player_in_final # кол-во свободных мест
 
 
     if max_player == 8:
@@ -9083,7 +9085,8 @@ def made_system_load_combobox_etap():
             my_win.spinBox_kol_group.hide()
             my_win.label_101.show()
             my_win.label_101.setText("Одна таблица")
-            my_win.label_11.show()
+            # my_win.label_11.show()
+            my_win.label_11.hide()
         elif ct == "Предварительный":
             my_win.spinBox_kol_group.show()
             my_win.comboBox_table_1.hide()
