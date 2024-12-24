@@ -1036,10 +1036,20 @@ class StartWindow(QMainWindow, Ui_Form):
  
         else:       
             print("нет соревнований")
-        my_win.first_comp_Action.setText(comp_list[0]) 
-        my_win.second_comp_Action.setText(comp_list[1])
-        my_win.third_comp_Action.setText(comp_list[2])
-        my_win.fourth_comp_Action.setText(comp_list[3])
+        if count > 3:
+            my_win.first_comp_Action.setText(comp_list[0]) 
+            my_win.second_comp_Action.setText(comp_list[1])
+            my_win.third_comp_Action.setText(comp_list[2])
+            my_win.fourth_comp_Action.setText(comp_list[3])
+        elif count == 3:
+            my_win.first_comp_Action.setText(comp_list[0]) 
+            my_win.second_comp_Action.setText(comp_list[1])
+            my_win.third_comp_Action.setText(comp_list[2])
+        elif count == 2:
+            my_win.first_comp_Action.setText(comp_list[0]) 
+            my_win.second_comp_Action.setText(comp_list[1])
+        elif count == 1:
+            my_win.first_comp_Action.setText(comp_list[0])
                
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
@@ -2759,7 +2769,8 @@ def page():
         my_win.Button_pay_R.setEnabled(False)
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
-        player_list = Player.select().where(Player.title_id == title_id())
+        player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
+        # player_list = Player.select().where(Player.title_id == title_id())
         player_debitor_R = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг"))
         player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
         count_debitor_R = len(player_debitor_R)
@@ -2799,7 +2810,8 @@ def page():
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
         count_result = len(result_played)
-        player_list = Player.select().where(Player.title_id == title_id())
+        # player_list = Player.select().where(Player.title_id == title_id())
+        player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
         my_win.label_52.setText(f"Всего сыграно: {count_result} игр.")
@@ -3324,14 +3336,13 @@ def sort():
     """сортировка таблицы QtableView (по рейтингу или по алфавиту)"""
     sender = my_win.sender()  # сигнал от кнопки
     signal_button_list = [my_win.Button_sort_R, my_win.Button_sort_Name, my_win.Button_sort_mesto]
-    id_title = Title.select().where(Title.id == title_id()).get()
-   
+    pl_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00")) # добавил отделить строки с "X"
     if sender == my_win.Button_sort_R:  # в зависимости от сигала кнопки идет сортировка
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
+        player_list = pl_list.select().where(Player.title_id == title_id()).order_by(Player.rank.desc())  # сортировка по рейтингу
     elif sender == my_win.Button_sort_Name:
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алфавиту
+        player_list = pl_list.select().where(Player.title_id == title_id()).order_by(Player.player)  # сортировка по алфавиту
     elif sender == my_win.Button_sort_mesto:
-        player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
+        player_list = pl_list.select().where(Player.title_id == title_id()).order_by(Player.mesto)  # сортировка по месту
 
     fill_table(player_list)
     if sender in signal_button_list:
@@ -4975,7 +4986,7 @@ def delete_player():
 def sortByAlphabet(inputStr):
     inputStr = inputStr.lower()
     return inputStr[0]
-
+  
 
 def load_comboBox_filter():
     """загрузка комбобокса регионами для фильтрации списка"""
@@ -4983,8 +4994,8 @@ def load_comboBox_filter():
     my_win.comboBox_fltr_city.clear()
     reg = []
     gorod = []
-    # player = Player.select().where(Player.title_id == title_id())
-    player = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
+    player = Player.select().where(Player.title_id == title_id())
+    # player = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
     if my_win.comboBox_fltr_region.count() > 0:  # проверка на заполненность комбобокса данными
         return
     else:
@@ -4993,8 +5004,10 @@ def load_comboBox_filter():
             reg_n = reg_n.strip() # удаляет лишние пробелы
             if reg_n not in reg:
                 reg.append(reg_n)
+        if "" in reg:
+            reg.remove("")
         reg.sort(key=sortByAlphabet)
-        # reg.insert(0, "")
+        reg.insert(0, "")
         my_win.comboBox_fltr_region.addItems(reg)
     
     if my_win.comboBox_fltr_city.count() < 0:  # проверка на заполненность комбобокса данными
@@ -5055,6 +5068,8 @@ def change_city_from_region():
     for pl_reg in player_region:
         if pl_reg.city not in gorod:
             gorod.append(pl_reg.city)
+    if "" in gorod:
+        gorod.remove("")
     gorod.sort(key=sortByAlphabet)
     gorod.insert(0, "")
     my_win.comboBox_fltr_city.addItems(gorod)
@@ -7380,15 +7395,15 @@ def setka_choice_number(fin, count_exit):
     posev_4 = []
     id_system = system_id(stage=fin)
     system = System.select().where((System.title_id == title_id()) & (System.id == id_system)).get()
- 
+    # if fin == "Одна таблица":
+    #     count_exit = 1
     type_setka = system.label_string
     if fin == "Суперфинал":
-        # if type_setka == "Сетка (с розыгрышем всех мест) на 8 участников" or type_setka == "Сетка (-2) на 8 участников":
         count_exit = 1
         posev_1 = [[1, 8], [4, 5], [2, 3, 6, 7]]
         player_net = 8
     else:
-        if count_exit == 1:
+        if count_exit == 1 or fin == "Одна таблица":
             if type_setka == "Сетка (с розыгрышем всех мест) на 8 участников" or type_setka == "Сетка (-2) на 8 участников":
                 posev_1 = [[1, 8], [4, 5], [2, 3, 6, 7]]
                 player_net = 8
@@ -9787,6 +9802,7 @@ def kol_player_in_final():
                 total_game = 0
                 if cur_index != 0:
                     player_in_final = count
+                    kpt = 1
                     total_game = numbers_of_games(cur_index, player_in_final, kpt)
                 my_win.label_etap_1.show()
                 my_win.label_19.show()
