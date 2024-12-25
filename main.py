@@ -4744,7 +4744,8 @@ def check_repeat_player(pl, bd):
     if count_family != 0:
         for l in repeat:
             b_day = l.bday
-            dr.append(b_day)
+            b_day_formated = b_day.strftime('%d.%m.%Y') # форматирование даты
+            dr.append(b_day_formated)
         if bd in dr:
             my_win.textEdit.setText("Такой игрок уже присутствует в списках!")   
             flag = True
