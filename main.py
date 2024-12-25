@@ -6991,12 +6991,6 @@ def choice_setka_automat(fin, flag, count_exit):
                 del_num = 1 # флаг, что есть свободные номера
             else:
                 del_num = 1
-        # ====================
-        # if real_all_player_in_final != max_player and count_exit == 1: # вычеркиваем определенные номера только если одно место выходит из группы
-        #     free_num = free_place_in_setka(max_player, real_all_player_in_final)
-        #     del_num = 1 # флаг, что есть свободные номера
-        # elif count_player_in_final != max_player // count_exit and count_exit > 1:
-        #     del_num = 1 # флаг, что есть свободные номера
         full_posev.clear()
         for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
