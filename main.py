@@ -6922,7 +6922,7 @@ def choice_setka_automat(fin, flag, count_exit):
     stage_exit = system.stage_exit
   
     posevs = setka_choice_number(fin, count_exit) # выбор номеров сетки для посева
-    player_net = posevs[0]
+    player_net = posevs[0] # максимальное число мгроков в сетке
  
     if fin == "Суперфинал" or fin == "Одна таблица":
         count_exit = 1
@@ -6973,30 +6973,34 @@ def choice_setka_automat(fin, flag, count_exit):
         elif fin == "Суперфинал":
             choice_posev = choice.select().where((Choice.final == stage_exit) & (Choice.mesto_final.in_(nums)))
             real_all_player_in_final = len(choice.select().where((Choice.final == stage_exit) & (Choice.mesto_final.in_(nums))))
-        else:
+        else: # финалы по сетке начиная со 2-ого и т.д.
             num = []
-            if stage_exit == "Предварительный":
-                for k in range(0, count_exit):
-                    num.append(nums[k])
-                nums = num.copy()
+            if stage_exit == "Предварительный": # откуда выход в финал
+                # for k in range(0, count_exit):
+                #     num.append(nums[k])
+                # nums = num.copy()
                 choice_posev = choice.select().where(Choice.mesto_group == nums[n])
                 real_all_player_in_final = len(choice.select().where(Choice.mesto_group.in_(nums))) # реальное число игроков в сетке
             elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
                 choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final == nums[n]))
                 real_all_player_in_final = len(choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final.in_(nums))))
-        count_player_in_final = len(choice_posev)
+        count_player_in_final = len(choice_posev) # количество игроков в отдельном посева
 
         if real_all_player_in_final != max_player:
-            if count_exit == 1 or fin == "Суперфинал": # вычеркиваем определенные номера только если одно место выходит из группы
-                free_num = free_place_in_setka(max_player, real_all_player_in_final)
-                del_num = 1 # флаг, что есть свободные номера
-            else:
-                del_num = 1
+            free_num = free_place_in_setka(max_player, real_all_player_in_final)
+            del_num = 1 # флаг, что есть свободные номера
+            # вариант который был
+            # if count_exit == 1 or fin == "Суперфинал": # вычеркиваем определенные номера только если одно место выходит из группы
+            #     free_num = free_place_in_setka(max_player, real_all_player_in_final)
+            #     del_num = 1 # флаг, что есть свободные номера
+            # else:
+            #     del_num = 1
         full_posev.clear()
-        for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
+        # for posev in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
+        for posevs in choice_posev: # отбор из базы данных согласно местам в группе для жеребьевки сетки
             psv = []
         
-            family = posev.family
+            family = posevs.family
             if fin == "Суперфинал":
                 count_exit = 1
                 group = ""
@@ -7004,8 +7008,10 @@ def choice_setka_automat(fin, flag, count_exit):
                 mesto_group = posev.mesto_final
             elif fin != "Одна таблица":
                 if stage_exit == "Предварительный":
-                    group = posev.group
-                    mesto_group = posev.mesto_group
+                    # group = posev.group
+                    # mesto_group = posev.mesto_group
+                    group = posevs.group
+                    mesto_group = posevs.mesto_group
                 elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал":
                     group = posev.sf_group
                     mesto_group = posev.mesto_semi_final
@@ -7015,14 +7021,17 @@ def choice_setka_automat(fin, flag, count_exit):
                 group = ""
                 group_number = 1
                 mesto_group = ""
-            pl_id = posev.player_choice_id # id игрока
-            region = posev.region
+            # pl_id = posev.player_choice_id # id игрока
+            # region = posev.region
+            pl_id = posevs.player_choice_id # id игрока
+            region = posevs.region
+            region = region.strip()
             player = Player.get(Player.id == pl_id)
             city = player.city
             rank = player.rank
 
             psv = [pl_id, family, region, group_number, group, city, rank, mesto_group]
-            full_posev.append(psv)
+            full_posev.append(psv) 
 
         if fin == "Суперфинал":
             full_posev.sort(key=lambda k: k[7]) # сортировка списка участников по месту в 1-ом финале
@@ -7059,7 +7068,9 @@ def choice_setka_automat(fin, flag, count_exit):
             sev = sev_tmp.copy()
             sev_tmp.clear()
             count = len(posev[i]) # всего количество номеров в посеве
-            if del_num == 1 and i == count_posev - 1:
+            # if del_num == 1 and i == count_posev - 1:
+
+            if del_num == 1 :
                 if count_exit > 1:
                     count = count_player_in_final
                 else:
@@ -7067,11 +7078,11 @@ def choice_setka_automat(fin, flag, count_exit):
                         sev.remove(h)
                     free_seats = len(free_num) # сколько свободных мест в сетке
                     count = len(posev[i]) - free_seats
-                del_num = 0
+                del_num = 0                
             for w in range(0, count): # внутренний цикл посева
                 l = number_posev[0] # общий список всего посева (порядковый номер посева)
                 if i == 0 and n == 0: #  ===== 1-й посев
-                    sev = posev[i]  # список номеров посева
+                    sev = posev[i]  # список номеров в сетке для посева
                     num_set = sev[w] # номер в сетке на который идет сев
                     count_sev = len(sev) # количество номеров в посеве
                 else:
@@ -7322,6 +7333,11 @@ def choice_setka_automat(fin, flag, count_exit):
                 posev_data[h] = "X"
         n += 1 # добавил в связи со сменой цикла
     return posev_data
+
+
+def posev_free():
+    """определяет в каком посеве убирать свободные номера"""
+    pass
 
 
 def sort_region(current_region_posev):
