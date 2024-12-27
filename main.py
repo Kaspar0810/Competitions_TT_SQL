@@ -19,7 +19,7 @@ from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtGui import QIcon, QBrush, QColor, QFont, QPalette
 from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem, QItemDelegate, QStyledItemDelegate
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem, QLineEdit, QLabel
-from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressDialog, QAction, QDesktopWidget, QTableView, QColorDialog
+from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressDialog, QAction, QDesktopWidget, QTableView, QColorDialog, QMessageBox
 from PyQt5 import QtGui, QtWidgets, QtCore
 
 from models import *
@@ -6942,7 +6942,7 @@ def choice_setka_automat(fin, flag, count_exit):
         posev_3 = posevs[3]
         posev_4 = posevs[4]
 
-    s = 0
+    # s = 0
     free_seats = 0 # кол-во свободных мест в сетке
     step = 0
     del_num = 0
@@ -6953,7 +6953,7 @@ def choice_setka_automat(fin, flag, count_exit):
     
     # for n in range (0, count_exit): # начало основного посева
     n = 0    
-    while n < count_exit:  # добавил n=0 и n+=1 стр 7098
+    while n < count_exit:  #  ======   НАЧАЛО ПОСЕВА   =========   добавил n=0 и n+=1 стр 7098
         if system.stage == "Одна таблица":
             real_all_player_in_final = len(choice.select().where(Choice.basic == fin))
             choice_posev = choice.select().order_by(Choice.rank)
@@ -7058,7 +7058,7 @@ def choice_setka_automat(fin, flag, count_exit):
         elif n == 3:
             posev = posev_4
 
-        count_posev = len(posev)
+        count_posev = len(posev) # количество подпосевов в посеве
 
         for i in range(0, count_posev):  # список посева, разделеный на отдельные посевы
             if flag_stop_manual_choice == 1: # выход из цикла если окончена ручная жеребьевка
@@ -7069,16 +7069,24 @@ def choice_setka_automat(fin, flag, count_exit):
             sev_tmp.clear()
             count = len(posev[i]) # всего количество номеров в посеве
             # if del_num == 1 and i == count_posev - 1:
+            if del_num == 1 and n == count_exit - 1:                    
+                for h in free_num:
+                    sev.remove(h)
+                free_seats = len(free_num) # сколько свободных мест в сетке
+                count = len(posev[i]) - free_seats
+            # else:
+            #     count = count_player_in_final
+            # del_num = 0   
 
-            if del_num == 1 :
-                if count_exit > 1:
-                    count = count_player_in_final
-                else:
-                    for h in free_num:
-                        sev.remove(h)
-                    free_seats = len(free_num) # сколько свободных мест в сетке
-                    count = len(posev[i]) - free_seats
-                del_num = 0                
+            # if del_num == 1 :
+            #     if count_exit > 1:
+            #         count = count_player_in_final
+            #     else:
+            #         for h in free_num:
+            #             sev.remove(h)
+            #         free_seats = len(free_num) # сколько свободных мест в сетке
+            #         count = len(posev[i]) - free_seats
+            #     del_num = 0                
             for w in range(0, count): # внутренний цикл посева
                 l = number_posev[0] # общий список всего посева (порядковый номер посева)
                 if i == 0 and n == 0: #  ===== 1-й посев
@@ -7125,10 +7133,10 @@ def choice_setka_automat(fin, flag, count_exit):
                             # === выбор ручная или автомат ====
                             if flag == 1: # автоматичекая
                                 if len(num_set) == 0:
-                                    result = msgBox.information(my_win, "Уведомление", "Автоматическая жеребьевка не получилась.\n"
+                                    result = msgBox.information(my_win,"Уведомление", "Автоматическая жеребьевка не получилась.\n"
                                     "Если хотите повторите снова.\nНажмите -RETRY-\n"
                                     "Если хотите изменить значение мультирегиональность\nНажмите -OK-\n"
-                                    "Если отменить жеребьевку\nНажмите -Cancel", msgBox.Retry, msgBox.Ok, msgBox.Cancel)
+                                    "Если отменить жеребьевку\nНажмите -Cancel-", msgBox.Retry| msgBox.Ok| msgBox.Cancel)
                                     if result == msgBox.Retry:
                                         flag = selection_of_the_draw_mode() # выбор ручная или автоматическая жеребьевка
                                         choice_setka_automat(fin, flag, count_exit)
