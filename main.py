@@ -6965,7 +6965,7 @@ def choice_setka_automat(fin, flag, count_exit):
                 real_all_player_in_final = len(choice.select().where(Choice.mesto_group.in_(nums)))
                 # == число игроков в конкретном посеве финала
                 if n == 0:
-                    choice_posev = choice.select().where(Choice.mesto_group == nums[n]).order_by(Choice.group) # если 1-й финал и 1-й посев тос ортирует по группам 
+                    choice_posev = choice.select().where(Choice.mesto_group == nums[n]) # если 1-й финал и 1-й посев то сортирует по группам 
                 else:
                     choice_posev = choice.select().where(Choice.mesto_group == nums[n])          
             elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
@@ -7026,10 +7026,12 @@ def choice_setka_automat(fin, flag, count_exit):
             full_posev.sort(key=lambda k: k[7]) # сортировка списка участников по месту в 1-ом финале
         elif count_exit == 1 or fin == "Одна таблица":
             full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
+        elif count_exit > 1 and fin == "1-й финал":
+            full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
         elif count_exit != 1 or fin != "1-й финал":
             full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
-        else:
-            full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
+        # else:
+        #     full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
 
         for k in full_posev:
             k.pop(3)
