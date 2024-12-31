@@ -3519,26 +3519,34 @@ def add_or_delete_etap_after_choice(stage, flag):
     etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     etap_word = ""
-    ind = etap_list.index(stage)
+    ind = etap_list.index(stage) # индекс вставляемого этапа
     # after_etap = etap_list[ind - 3]
     system = System.select().where(System.title_id == title_id())
     m = 0
     etap_dict = {}
     id_list = []
-    for k in system: # получение словаря этапов и списка их id
+    for k in system: # получение словаря текущих этапов и списка их id
         stage_system = k.stage 
         id_s = k.id
         id_list.append(id_s)
         etap_dict[m] = stage_system
         m += 1
-    after_etap = stage_system if stage == "Суперфинал" else etap_list[ind - 1]
-    ind = [keys for keys, values in etap_dict.items() if values == after_etap] # список ключа по значению 
-    for l in range (len(id_list)):
-        if l > ind[0]: # удаляет все что ниже вставляемого этапа
-            s_d = System.delete().where(System.id == id_list[l])
-            s_d.execute()
-            gl_d = Game_list.delete().where(Game_list.system_id == id_list[l])
-            gl_d.execute()
+    ind_next = etap_list.index(stage_system)
+    after_etap = stage_system
+    # if stage == "Суперфинал":
+    #     after_etap = stage_system
+    # elif stage == "Суперфинал":
+    #     after_etap = etap_list[ind - 1]
+
+    # after_etap = stage_system if stage == "Суперфинал" else etap_list[ind - 1]
+    # ind = [keys for keys, values in etap_dict.items() if values == after_etap] # список ключа по значению 
+    if ind < ind_next:
+        for l in range (len(id_list)):
+            if l > ind[0]: # удаляет все что ниже вставляемого этапа
+                s_d = System.delete().where(System.id == id_list[l])
+                s_d.execute()
+                gl_d = Game_list.delete().where(Game_list.system_id == id_list[l])
+                gl_d.execute()
     
     # system_upd = System.select().where(System.title_id == title_id())
     # count_etap = len(system_upd)
@@ -6978,8 +6986,10 @@ def choice_setka_automat(fin, flag, count_exit):
         else: # финалы по сетке начиная со 2-ого и т.д.
             # num = []
             if stage_exit == "Предварительный": # откуда выход в финал
-                # choice_posev = choice.select().where(Choice.mesto_group == nums[n])
-                choice_posev = choice.select().where(Choice.mesto_group.in_(nums))
+                if count_exit > 1:
+                    choice_posev = choice.select().where(Choice.mesto_group == nums[n])
+                else:
+                    choice_posev = choice.select().where(Choice.mesto_group.in_(nums))
                 real_all_player_in_final = len(choice.select().where(Choice.mesto_group.in_(nums))) # реальное число игроков в сетке
             elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал": # выходят из полуфинала
                 choice_posev = choice.select().where((Choice.semi_final == stage_exit) & (Choice.mesto_semi_final == nums[n]))
