@@ -211,6 +211,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(7, True)
 
 
+    def closeEvent(self, event):
+            # Создание бэкап DB при закрытии формы -main- по нажатию на крестик
+            reply = QMessageBox.question\
+            (self, 'Вы нажали на крестик',
+                "Вы уверены, что хотите уйти?\n"
+                "если сделать копию DB то нажмите -Yes-\n",              
+                QMessageBox.Yes,
+                QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                flag  = 1
+                exit_comp(flag)
+            # else:
+            #     event.ignore()
+    
+    
     # ====== создание строки меню ===========
     def _createMenuBar(self):
         menuBar = self.menuBar()
@@ -400,7 +415,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.player_stat_Action = QAction("Статистика игрока")
 
     def _connectActions(self):
-        # Connect File actions
         self.system_made_Action.triggered.connect(self.system_made)
         self.system_edit_Action.triggered.connect(self.system_made)
         self.vid_edit_Action.triggered.connect(self.vid_edit)
@@ -490,7 +504,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         database='mysql_db'
         password='db_pass'
         host='localhost'
-        # port='3306'
+
         cursor = cnx.cursor()
         fname = QFileDialog.getOpenFileName(my_win, "Выбрать файл базы данных", "", "*.sql")
         filepath = str(fname[0])
@@ -568,7 +582,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         my_win.tableView.show()
 
     def exit(self):
-        exit_comp()
+        flag = 0
+        exit_comp(flag)
 
     def choice(self):
         msg = QMessageBox
@@ -3442,14 +3457,17 @@ def list_player_pdf(player_list):
 def ReturnCode():
     pass
 
-def exit_comp():   
+def exit_comp(flag):   
     """нажата кнопка -выход- и резервное копирование db"""
     msgBox = QMessageBox
-    result = msgBox.question(my_win, "Выход из программы", "Вы действительно хотите выйти из программы?",
-                             msgBox.Ok, msgBox.Cancel)
+    if flag == 0:
+        result = msgBox.question(my_win, "Выход из программы", "Вы действительно хотите выйти из программы?",
+                                    msgBox.Ok, msgBox.Cancel)
+    else:
+        result = msgBox.Ok
+
     if result == msgBox.Ok:
         my_win.close()
-        # host = "localhost"
         user = "root"
         password = "db_pass"
         database = "mysql_db"
