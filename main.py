@@ -3519,8 +3519,7 @@ def add_or_delete_etap_after_choice(stage, flag):
     etap_list = ["Предварительный", "1-й полуфинал", "2-й полуфинал", "1-й финал", "2-й финал", "3-й финал", "4-й финал",
                             "5-й финал", "6-й финал", "7-й финал", "8-й финал", "9-й финал", "10-й финал", "Суперфинал"]
     etap_word = ""
-    ind = etap_list.index(stage) # индекс вставляемого этапа
-    # after_etap = etap_list[ind - 3]
+    ind = etap_list.index(stage) # индекс вставляемого этапа 
     system = System.select().where(System.title_id == title_id())
     m = 0
     etap_dict = {}
@@ -3531,25 +3530,23 @@ def add_or_delete_etap_after_choice(stage, flag):
         id_list.append(id_s)
         etap_dict[m] = stage_system
         m += 1
-    ind_next = etap_list.index(stage_system)
-    after_etap = stage_system
-    # if stage == "Суперфинал":
-    #     after_etap = stage_system
-    # elif stage == "Суперфинал":
-    #     after_etap = etap_list[ind - 1]
+    ind_next = etap_list.index(stage_system) # индекс последний в списке всех этапов системы
+    if flag == 1: # удаляем этап
+        ind = [keys for keys, values in etap_dict.items() if values == stage] # список ключа по значению 
+        id_del = id_list[ind[0]] # id удаляемого этапа
+        s_d = System.delete().where(System.id == id_del)
+        s_d.execute()
+        gl_d = Game_list.delete().where(Game_list.system_id == id_del)
+        gl_d.execute() 
+    else:   
+        if ind < ind_next:
+            for l in range (len(id_list)):
+                if l > ind[0]: # удаляет все что ниже вставляемого этапа
+                    s_d = System.delete().where(System.id == id_list[l])
+                    s_d.execute()
+                    gl_d = Game_list.delete().where(Game_list.system_id == id_list[l])
+                    gl_d.execute()
 
-    # after_etap = stage_system if stage == "Суперфинал" else etap_list[ind - 1]
-    # ind = [keys for keys, values in etap_dict.items() if values == after_etap] # список ключа по значению 
-    if ind < ind_next:
-        for l in range (len(id_list)):
-            if l > ind[0]: # удаляет все что ниже вставляемого этапа
-                s_d = System.delete().where(System.id == id_list[l])
-                s_d.execute()
-                gl_d = Game_list.delete().where(Game_list.system_id == id_list[l])
-                gl_d.execute()
-    
-    # system_upd = System.select().where(System.title_id == title_id())
-    # count_etap = len(system_upd)
 
     sb = "Выбор системы проведения соревнования."
     my_win.statusbar.showMessage(sb)
@@ -3557,7 +3554,6 @@ def add_or_delete_etap_after_choice(stage, flag):
     my_win.comboBox_etap.clear()
     my_win.comboBox_etap.show()
     my_win.label_10.show()
-    # my_win.label_10.setText(f"{count_etap + 1}-й этап")
     my_win.label_10.setText(f"{m + 1}-й этап")
 
     my_win.Button_etap_made.setEnabled(True)
@@ -4156,12 +4152,21 @@ def player_fin_on_circle(fin):
     if stage_exit != "":
         nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # список мест, выходящих из группы или пф
         count_exit = len(nums) # количество игроков, выходящих в финал
+   
     # ==== new variant ===
     player_in_final = system.max_player # количество игроков в финале
-    cp = player_in_final - 3
-    tour = tours_list(cp)
-    kol_tours = len(tour)  # кол-во туров
-    game = len(tour[0])  # кол-во игр в туре
+
+    # == вариант когда осталось 2 человека
+    if player_in_final == 2:
+        game = 1
+        tour = [['1-2']]
+        kol_tours = len(tour)  # кол-во туров
+    else:
+    # ======================
+        cp = player_in_final - 3
+        tour = tours_list(cp)
+        kol_tours = len(tour)  # кол-во туров
+        game = len(tour[0])  # кол-во игр в туре
     # ===== получение списка номеров игроков в порядке 1-ого тура
     k = 0
     number_tours = []
@@ -4189,13 +4194,6 @@ def player_fin_on_circle(fin):
                 grouplist = sorted(group_dict.items(), key=lambda x: x[1])
                 sortdict = dict(grouplist)
                 choices_fin_sort_by_group = sortdict.keys()
-            # ========
-        # for n in choices_fin_sort_by_group:
-        #     player = n.family
-        #     pl_id = n.player_choice_id
-        #     player_id = f"{player}/{pl_id}"
-        #     fin_dict[nt] = player_id # словарь игрок/id (порядок: места в группе затем группа)
-        #     nt += 1
         # вариант с расстоновкой по 1-му туру
         for n in choices_fin_sort_by_group:
             player = n.family
@@ -4206,8 +4204,6 @@ def player_fin_on_circle(fin):
             else:
                 fin_dict[number_tours[nt - 1]] = player_id # словарь (1-й номер наивысшее место в группе, затем место следующее в этой же группе)
             nt += 1
-        # if count_exit > 1:
-        #     fin_dict = dict(sorted(fin_dict.items()))
     elif stage_exit in ["1-й полуфинал", "2-й полуфинал"]: # если выход в финал по кругу из ПФ
         nt = 1
         for b in nums:
@@ -4245,39 +4241,9 @@ def player_fin_on_circle(fin):
 #========        
     for nt in range(1, player_in_final + 1):
         fin_list.append(fin_dict[nt]) # список игроков в порядке 1 ого тура
-        # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=pl_id, system_id=id_system,
-        #                     title_id=title_id())
-        # # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=fin_dict[nt], system_id=id_system,
-        # #                     title_id=title_id())
-        # game_list.save()
-        # == получение id игрока
-        # fam_id = fin_dict[nt]
-        # znak = fam_id.find("/")
-        # id_player = int(fam_id[znak + 1:])
-        # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=id_player, system_id=id_system,
-        #                     title_id=title_id())
-        # game_list = Game_list(number_group=fin, rank_num_player=nt, player_group_id=fin_dict[nt], system_id=id_system,
-        #                     title_id=title_id())
-        # game_list.save()
-  
-
-    # === запись в db игроков которые попали в финал из группы
-    # k = 1 
-    # for l in fin_list:
-    #     ps_final = k if count_exit == 1 else number_tours[k - 1] # если выход 1 то по порядку, если более то из списка туров
-    #     id_pl = int(l[l.find("/") + 1:])
-    #     if fin == "Одна таблица":
-    #         Choice.update(basic=fin).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
-    #     else:
-    #         Choice.update(final=fin, posev_final = ps_final).where((Choice.player_choice_id == id_pl) & (Choice.title_id == title_id())).execute()
-    #     game_list = Game_list(number_group=fin, rank_num_player=ps_final, player_group_id=id_pl, system_id=id_system,
-    #                         title_id=title_id())
-    #     game_list.save()
-    #     k += 1                    
     # == вариант с циклом по словарю
     k = 1
     for l in fin_dict.keys():
-        # ps_final = k if count_exit == 1 else number_tours[k - 1] # если выход 1 то по порядку, если более то из списка туров
         ps_final = k if count_exit == 1 else l # если выход 1 то по порядку, если более то из списка туров
         fam = fin_dict[l]
         id_pl = int(fam[fam.find("/") + 1:])
