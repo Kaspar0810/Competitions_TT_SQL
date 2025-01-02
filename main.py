@@ -6934,7 +6934,6 @@ def choice_setka_automat(fin, flag, count_exit):
         posev_3 = posevs[3]
         posev_4 = posevs[4]
 
-    # s = 0
     free_seats = 0 # кол-во свободных мест в сетке
     step = 0
     del_num = 0
@@ -6942,12 +6941,10 @@ def choice_setka_automat(fin, flag, count_exit):
     real_all_player_in_final = []
 
     nums = rank_mesto_out_in_group_or_semifinal_to_final(fin) # получение списка номеров мест, выходящих в финал, суперфинал
-    
-    # for n in range (0, count_exit): # начало основного посева
+
     n = 0  
     end_posev = count_exit if flag != 3 else 1
     while n < end_posev:  #  ======   НАЧАЛО ПОСЕВА   =========   добавил n=0 и n+=1 стр 7098
-    # while n < count_exit:  #  ======   НАЧАЛО ПОСЕВА   =========   добавил n=0 и n+=1 стр 7098
         if system.stage == "Одна таблица":
             real_all_player_in_final = len(choice.select().where(Choice.basic == fin))
             choice_posev = choice.select().order_by(Choice.rank)
@@ -6968,7 +6965,6 @@ def choice_setka_automat(fin, flag, count_exit):
             choice_posev = choice.select().where((Choice.final == stage_exit) & (Choice.mesto_final.in_(nums)))
             real_all_player_in_final = len(choice.select().where((Choice.final == stage_exit) & (Choice.mesto_final.in_(nums))))
         else: # финалы по сетке начиная со 2-ого и т.д.
-            # num = []
             if stage_exit == "Предварительный": # откуда выход в финал
                 if count_exit > 1:
                     choice_posev = choice.select().where(Choice.mesto_group == nums[n])
@@ -6992,14 +6988,14 @@ def choice_setka_automat(fin, flag, count_exit):
                 count_exit = 1
                 group = ""
                 group_number = 1
-                mesto_group = posev.mesto_final
+                mesto_group = posevs.mesto_final
             elif fin != "Одна таблица":
                 if stage_exit == "Предварительный":
                     group = posevs.group
                     mesto_group = posevs.mesto_group
                 elif stage_exit == "1-й полуфинал" or stage_exit == "2-й полуфинал":
-                    group = posev.sf_group
-                    mesto_group = posev.mesto_semi_final
+                    group = posevs.sf_group
+                    mesto_group = posevs.mesto_semi_final
                 ind = group.find(' ')
                 group_number = int(group[:ind]) # номер группы
             else:
@@ -7024,14 +7020,12 @@ def choice_setka_automat(fin, flag, count_exit):
             full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
         elif count_exit != 1 or fin != "1-й финал":
             full_posev.sort(key=lambda k: k[6], reverse=True) # сортировка списка участников по рейтингу
-        # else:
-        #     full_posev.sort(key=lambda k: k[3]) # сортировка списка участников по группам
+   
 
         for k in full_posev:
             k.pop(3)
             k.pop(6)
         # ======== начало жеребьевки =========
-        # end = player_net // count_exit
         end = player_net // count_exit if flag == 1 else count_player_in_final
         number_posev = [i for i in range(0, end)] # генератор списка
 
