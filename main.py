@@ -209,23 +209,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolBox.setItemEnabled(5, False)
         self.toolBox.setItemEnabled(6, False)
         self.toolBox.setItemEnabled(7, True)
-
+ 
 
     def closeEvent(self, event):
-            # Создание бэкап DB при закрытии формы -main- по нажатию на крестик
+        # Создание бэкап DB при закрытии формы -main- по нажатию на крестик
+        sender = my_win.sender()
+        if sender != self.exitAction:
             reply = QMessageBox.question\
-            (self, 'Вы нажали на крестик',
-                "Вы уверены, что хотите уйти?\n"
-                "если сделать копию DB то нажмите -Yes-\n",              
+                    (self, 'Вы нажали на крестик',
+                        "Вы уверены, что хотите уйти?\n"
+                        "если сделать копию DB то нажмите -Yes-\n",              
                 QMessageBox.Yes,
                 QMessageBox.No)
             if reply == QMessageBox.Yes:
                 flag  = 1
                 exit_comp(flag)
             # else:
-            #     event.ignore()
-    
-    
+            #     event.ignore()  
     # ====== создание строки меню ===========
     def _createMenuBar(self):
         menuBar = self.menuBar()
@@ -320,11 +320,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # меню помощь
         help_Menu = menuBar.addMenu("Помощь")  # основное
         help_Menu.addAction(self.copy_db_Action)
+        help_Menu.addAction(self.delete_copy_db_Action)
         help_Menu.addSeparator()
         help_Menu.addAction(self.stat_Action)
         help_Menu.addAction(self.player_stat_Action)
     #  создание действий меню
-
     def _createAction(self):
         self.helpAction = QAction(self)
         self.system_edit_Action = QAction("Редактировать")
@@ -408,9 +408,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # пункты меню редактирование жеребьевки
         self.ed_one_table_Action.setEnabled(False)  # делает пункт меню не видимым
         self.ed_etap_Action.setEnabled(False)  # делает пункт меню не видимым
-
+         # пункты меню помощь
         self.copy_db_Action = QAction("Импорт из базы данных")
-        self.stat_Action = QAction("Число встреч для R отчета")
+        self.delete_copy_db_Action = QAction("Удаление старых копий DB")
         self.stat_Action = QAction("Число встреч для R отчета")
         self.player_stat_Action = QAction("Статистика игрока")
 
@@ -468,6 +468,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.print_list_pay_R_Action.triggered.connect(self.check_debitor_R)
 
         self.copy_db_Action.triggered.connect(self.import_db)
+        # self.delete_copy_db_Action.triggered.connect(self.delete_db_copy)
         self.stat_Action.triggered.connect(self.statistika)
         self.player_stat_Action.triggered.connect(self.player_stat)
 
@@ -518,7 +519,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cursor.close()
         cnx.close()
         my_win.tabWidget.setCurrentIndex(1)
-
 
     def statistika(self):
         """статистика встреч для точного обсчета рейтинга"""
@@ -916,9 +916,6 @@ class StartWindow(QMainWindow, Ui_Form):
         else:
             dbase()
 
-        # conn.close()
-        #=========
-        # dbase()
         count = len(Title.select())
         if count != 0:
             # получение последней записи в таблице
@@ -932,6 +929,7 @@ class StartWindow(QMainWindow, Ui_Form):
             self.LinkButton.setEnabled(False)
             self.Button_open.setEnabled(False)
             self.Button_old.setEnabled(False)   
+    
 
     def last_comp(self):
         """открытие последних соревнований"""
@@ -945,9 +943,15 @@ class StartWindow(QMainWindow, Ui_Form):
             my_win.setStyleSheet("#MainWindow{background-color:lightpink}")
         else:
             my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
-        my_win.show()
+        # === вставить  проверку DB ======      
+        flag = check_delete_db()
+        if flag != 1:
+            delete_db_copy(del_files_list=flag)
 
     def open(self):
+        flag = check_delete_db()
+        if flag != 1:
+            delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
         my_win.show()
@@ -995,7 +999,6 @@ class StartWindow(QMainWindow, Ui_Form):
         data_list.insert(0, "-выберите дату-")
         fir_window.comboBox_arhive_year.addItems(data_list)
 
-
     def choice_competition(self):
         """выбор соревнования из архива"""
         full_name_list = []
@@ -1016,7 +1019,6 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def r_load(self):
         pass
-
 
     def load_old(self):
         """загружает в комбобокс архивные соревнования"""
@@ -1069,7 +1071,6 @@ class StartWindow(QMainWindow, Ui_Form):
         if fir_window.comboBox.currentText() != "":
             fir_window.Button_open.setEnabled(True)
 
-
     def view_competition_on_arhive(self):
         """Просмотр полного соревнования из архива"""
         msgBox = QMessageBox()
@@ -1092,7 +1093,6 @@ class StartWindow(QMainWindow, Ui_Form):
             elif platform == "win32":  # Windows...
                 os.system(f"{view_file}")
             os.chdir("..")
-
 
 class ToolTip(): # создание всплывающих подсказок
     my_win.Button_made_R_file.setToolTip("Создание файла Excel для обсчета рейтинга")
@@ -1137,6 +1137,61 @@ class ToolTip(): # создание всплывающих подсказок
 #         my_win.progress.setValue(i)
 #     my_win.progress.setAutoReset(True)
 #     my_win.progress.setAutoClose(True) 
+def check_delete_db():
+    """Проверка сроков на удаления бэкап DB"""
+    msgBox = QMessageBox
+    current_date = datetime.now().strftime('%Y-%m-%d') # текущая дата в формате 01_01_2000
+    del_files_list = []
+    cur_date = datetime.strptime(current_date, '%Y-%m-%d')
+    dir_path = pathlib.Path.cwd()
+    parent_dir = str(f"{dir_path}\\backup_db")
+    files = os.listdir(parent_dir)
+    for f in files:
+        znak = f.find("db")
+        date_file = f[znak + 3:znak + 13]
+        Year = date_file[6:]
+        mon = date_file[3:5]
+        day = date_file[:2]
+        date_str = f"{Year}-{mon}-{day}"
+        df = datetime.strptime(date_str, '%Y-%m-%d')
+        time_difference = cur_date - df
+        if time_difference > timedelta(days=3):
+            del_files_list.append(f) 
+    count = len(del_files_list)
+    my_win.show()
+    if count > 1:
+        result = msgBox.information(my_win, "", "Есть бэкап DB срок создания более 3-х дней назад.\n"
+                                                    "необходимо их удалить.",
+                                    msgBox.Ok, msgBox.Cancel)
+        if result == msgBox.Ok:
+            flag = del_files_list
+        else:
+            return
+    else:
+        flag = 1 # нет старых баз
+    return flag
+
+
+def delete_db_copy(del_files_list):
+    """Удаление копий базы данных старше 3-х дней"""
+    from datetime import timedelta
+    msgBox = QMessageBox
+    txt_tmp = []
+    for t in del_files_list:
+        txt_date = t[14:24]
+        db_txt = f"Бэкап DB от {txt_date}"
+        txt_tmp.append(db_txt)
+    text_str = (',\n'.join(txt_tmp)) # создание текстового файла по строчно из списка
+    result = msgBox.question(my_win, "Бэкап DB", f"Вы действительно хотите удалить копии базы данных,\nкоторые были созданы более 3-х дней назад?\n\n{text_str}",
+                                msgBox.Ok, msgBox.Cancel)
+    if result == msgBox.Ok:
+        dir_path = pathlib.Path.cwd()
+        parent_dir = str(f"{dir_path}\\backup_db")
+        for f in del_files_list:
+            del_file = f"{parent_dir}\\{f}"
+            os.remove(del_file)
+    else:
+        return
 
 
 def dbase():
@@ -2351,6 +2406,7 @@ def add_player():
     rn = my_win.lineEdit_R.text()
     ct = my_win.lineEdit_city_list.text()
     rg = my_win.comboBox_region.currentText()
+    rg = rg.strip() # удаляет лишние пробелы
     rz = my_win.comboBox_razryad.currentText()
     ch = my_win.lineEdit_coach.text()
     player_data_list = [pl, bd, rn, ct, rg, rz, ch]
@@ -2500,11 +2556,6 @@ def add_player():
 
 def format_date_for_db(str_date):
     """первод даты к формату базы данных год-месяц-день"""
-    # txt = str(str_date)
-    # year = txt[:4]
-    # month = txt[5:7]
-    # day = txt[8:]  
-    # format_date = f"{day}.{month}.{year}"
     txt =str(str_date)
     day = str_date[:2]
     month = str_date[3:5]
@@ -3467,7 +3518,7 @@ def exit_comp(flag):
         result = msgBox.Ok
 
     if result == msgBox.Ok:
-        my_win.close()
+        # my_win.close()
         user = "root"
         password = "db_pass"
         database = "mysql_db"
@@ -3482,8 +3533,8 @@ def exit_comp(flag):
             # Check for errors
             if p.returncode != 0:
                 raise ReturnCode
-            print('Backup done for', db)
-            my_win.statusbar.showMessage("Экспорт базы данных завершен успешно", 5000)
+            my_win.statusbar.showMessage("Экспорт базы данных завершен успешно", 5000)            
+            my_win.close()
             return dump
         except:
             print('Backup failed for ', db)
@@ -5075,8 +5126,8 @@ def filter_player_list(sender):
         city = my_win.comboBox_fltr_city.currentText()
         coach = my_win.comboBox_fltr_coach.currentText()
         if region != "" and city != "":
-            player_list = player.select().where(Player.region == region)
-            player_list = player.select().where(Player.city == city)
+            # player_list = player.select().where(Player.region == region)
+            player_list = player.select().where((Player.region == region)  & (Player.city == city))
         elif region == "" and city != "":
             player_list = player.select().where(Player.city == city)
         elif region != "" and city == "":
@@ -9954,7 +10005,7 @@ def backup_mysql_database(host, port, username, password, database, backup_path)
         print(f"Error: Backup directory '{backup_path}' does not exist.")
         sys.exit(1)
     # Create a filename for the backup with the current date and time
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d")
     backup_file = f"{backup_path}/{database}_{timestamp}.sql"
 
     # Command to create a database backup using mysqldump
