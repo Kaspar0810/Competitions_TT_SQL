@@ -253,7 +253,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         printMenu = menuBar.addMenu("Печать") # основное
      
         # ============ создание подменю
-
+        new_comp.addAction(self.new_comp_Action) # создание титула для повтора мальчики или девочки если одни уже созданы
         go_to.addAction(self.go_to_Action)  # подменю выбора соревнования
         system.addAction(self.system_made_Action)  # подменю создание системы
         system.addAction(self.system_edit_Action)  # подменю редактирование системы
@@ -362,6 +362,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.view_one_table_Action = QAction("Одна таблица")
         self.go_to_Action = QAction("пусто")
+        self.new_comp_Action = QAction("Клонирование титула")
         # подменю -печать-
         self.clear_s8_full_Action = QAction("Сетка 8")
         self.clear_s8_2_Action = QAction("Сетка 8 минус 2")
@@ -458,7 +459,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fourth_comp_Action.triggered.connect(self.last)
 
         self.ed_etap_Action.triggered.connect(self.edit_etap)
-
+        self.new_comp_Action.triggered.connect(self.clon_titul)
         self.go_to_Action.triggered.connect(self.open)
         # Connect Рейтинг actions
         self.rAction.triggered.connect(self.r_File)
@@ -471,6 +472,63 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.delete_copy_db_Action.triggered.connect(self.delete_db_copy)
         self.stat_Action.triggered.connect(self.statistika)
         self.player_stat_Action.triggered.connect(self.player_stat)
+
+    def clon_titul(self):
+        """Клонирование титула при создании новых соревновании если уже созданы мальчики или девочки"""
+        t_id = title_id()
+        titles = Title.select().where(Title.id == t_id).get()
+
+        pl_gamer = titles.gamer
+        full_name = titles.full_name_comp
+        short_name = titles.short_name_comp
+        count = len(short_name)
+        s_name = short_name[:count - 1]
+        if pl_gamer == 'Девочки':
+            gm = 'Мальчики'
+            pol = 'M'
+        elif pl_gamer == 'Девушки':
+            gm = 'Юноши'
+            pol = 'M'
+        elif pl_gamer == 'Женщины':
+            gm = 'Мужчины'
+            pol = 'M'
+        elif pl_gamer == 'Мальчики':
+            gm = 'Девочки'
+            pol = 'D'
+        elif pl_gamer == 'Юноши':
+            gm = 'Девушки' 
+            pol = 'D'
+        elif pl_gamer == 'Мужчины':
+            gm = 'Женщины' 
+            pol = 'D'     
+
+        full_name_comp = full_name.replace(pl_gamer, gm)
+        short_name_comp = s_name + pol
+
+        title = Title(name=titles.name,
+                    sredi=titles.sredi, 
+                    vozrast=titles.vozrast,
+                    data_start=titles.data_start,
+                    data_end=titles.data_end,
+                    mesto=titles.mesto, 
+                    referee=titles.referee,
+                    kat_ref=titles.kat_ref, 
+                    secretary=titles.secretary, 
+                    kat_sec=titles.kat_sec, 
+                    gamer=gm, 
+                    full_name_comp=full_name_comp, 
+                    pdf_comp="",
+                    short_name_comp=short_name_comp, 
+                    tab_enabled="Титул, Участники", 
+                    multiregion=titles.multiregion).save()
+
+            # получение последней записи в таблице
+        t_id_last = Title.select().order_by(Title.id.desc()).get()
+        system = System(title_id=t_id_last, total_athletes=0, total_group=0, max_player=0, stage="", type_table="",
+                            page_vid="", label_string="", kol_game_string="", choice_flag=False, score_flag=5,
+                            visible_game=False, stage_exit="", mesta_exit=0, no_game="").save()
+        my_win.tabWidget.setCurrentIndex(0)
+        db_select_title()
 
     def check_debitor_R(self):
         check_player_whitout_R()
@@ -1662,6 +1720,11 @@ def db_select_title():
         gamer = title.gamer
         # === вариант с ид титула =====
         id_title = title_id()
+    elif sender == my_win.new_comp_Action:
+        title = Title.select().order_by(Title.id.desc()).get()
+        name = title.name
+        gamer = title.gamer
+        id_title = title_id()
     # сигнал от кнопки с текстом -открыть- соревнования из архива (стартовое окно)
     else:
         txt = fir_window.comboBox.currentText()
@@ -1679,16 +1742,10 @@ def db_select_title():
                 if data == data_title:
                     break
     if name != "":
-        # ds = title.data_start
-        # ds = format_date_for_view(str_date=ds)
-        # de = title.data_end
-        # de = format_date_for_view(str_date=de)
         my_win.lineEdit_title_nazvanie.setText(title.name)
         my_win.lineEdit_title_vozrast.setText(title.vozrast)
         my_win.dateEdit_start.setDate(title.data_start)
-        # my_win.dateEdit_start.setDate(ds)
         my_win.dateEdit_end.setDate(title.data_end)
-        # my_win.dateEdit_end.setDate(de)
         my_win.lineEdit_city_title.setText(title.mesto)
         my_win.comboBox_sredi.setCurrentText(title.sredi)
         my_win.comboBox_referee.setCurrentText(title.referee)
