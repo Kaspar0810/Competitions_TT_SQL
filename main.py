@@ -15,12 +15,13 @@ from main_window import Ui_MainWindow
 from start_form import Ui_Form
 from datetime import *
 from PyQt5 import *
-from PyQt5.QtCore import QAbstractTableModel
+from PyQt5.QtCore import QAbstractTableModel, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon, QBrush, QColor, QFont, QPalette
 from PyQt5.QtWidgets import QPushButton, QRadioButton, QHeaderView, QComboBox, QListWidgetItem, QItemDelegate, QStyledItemDelegate
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QMenu, QInputDialog, QTableWidgetItem, QLineEdit, QLabel
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QProgressDialog, QAction, QDesktopWidget, QTableView, QColorDialog, QMessageBox
 from PyQt5 import QtGui, QtWidgets, QtCore
+
 
 from models import *
 from collections import Counter
@@ -528,6 +529,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             page_vid="", label_string="", kol_game_string="", choice_flag=False, score_flag=5,
                             visible_game=False, stage_exit="", mesta_exit=0, no_game="").save()
         my_win.tabWidget.setCurrentIndex(0)
+        db_r(gamer=gm)
         db_select_title()
 
     def check_debitor_R(self):
@@ -1160,41 +1162,17 @@ class ToolTip(): # создание всплывающих подсказок
 #     def __init__(self, fir_window, parent=None):
 #         super().__init__()
 #         countChanged = pyqtSignal(int)
-#         # self.fir_window = fir_window
-#         # self.ProgressBarThread_instance = ProgressBarThread(fir_window=self)
+#         self.fir_window = fir_window
+#         self.ProgressBarThread_instance = ProgressBarThread(fir_window=self)
 
 #     def run(value):
-#         # value = self.fir_window.progressBar.value()
+#         value = fir_window.progressBar.value()
 #         if value < 100:
-#             # value = value + 1
+#             value = value + 1
 #             fir_window.progressBar.setValue(value)
-#             # time.sleep(0.2)
-# class Actions(QDialog):
-#     def __init__(self):
-#         super().__init__()
-
-#     def run(value): 
-#         fir_window = fir_window
-#         calc = ProgressBarThread()
-#         calc.countChanged.connect(onCountChanged)
-#         calc.start()
-
-#     def ocCountChanged(self, value):
-#         self.fir_window.progressBar.setValue(value)
+#             time.sleep(0.2)
 
 
-# def progressbar(row_count):
-#     """Прогресс бар диаоговое окно"""
-#     text = "Загрузка текущего рейтинг листа"
-#     my_win.progress = QProgressDialog(text, None, 0, 100)
-#     my_win.progress.setCancelButton(None)  # Remove cancel button
-#     my_win.progress.setModal(True)
-#     my_win.progress.show() # Set as a modal dialog
-#     my_win.progress.setWindowTitle("Загрузка рейтинг листа")
-#     for i in range(0, row_count):
-#         my_win.progress.setValue(i)
-#     my_win.progress.setAutoReset(True)
-#     my_win.progress.setAutoClose(True) 
 def check_delete_db():
     """Проверка сроков на удаления бэкап DB"""
     msgBox = QMessageBox
