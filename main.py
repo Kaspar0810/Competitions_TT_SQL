@@ -44,7 +44,7 @@ from dateutil.relativedelta import relativedelta
 import random
 import math
 from sys import platform
-# import time
+import time
 os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = '1'
 # WindowsArguments = dpiawareness = 1
 
@@ -990,7 +990,6 @@ class StartWindow(QMainWindow, Ui_Form):
             self.Button_open.setEnabled(False)
             self.Button_old.setEnabled(False)   
     
-
     def last_comp(self):
         """открытие последних соревнований"""
         sex = ["Девочки", "Девушки", "Женщины"]
@@ -1166,11 +1165,12 @@ class ToolTip(): # создание всплывающих подсказок
 #         self.ProgressBarThread_instance = ProgressBarThread(fir_window=self)
 
 #     def run(value):
-#         value = fir_window.progressBar.value()
+#         # value = fir_window.progressBar.value()
 #         if value < 100:
-#             value = value + 1
 #             fir_window.progressBar.setValue(value)
 #             time.sleep(0.2)
+#         else:           
+#            fir_window.progressBar.setValue(0)
 
 
 def check_delete_db():
@@ -1273,6 +1273,7 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
         ext = "(*01_w.xlsx *01_w.xls)"
     fname = QFileDialog.getOpenFileName(
         my_win, "Выбрать файл R-листа", "", f"Excels files {ext}")
+
     load_listR_in_db(fname, table_db)
     my_win.statusbar.showMessage("Январский рейтинг загружен")
     # добавляет в таблицу регионы
@@ -1339,6 +1340,10 @@ def load_listR_in_db(fname, table_db):
         data_tmp = []
 
         rlist = table_db.delete().execute()
+        # ==== вариант создания файла excel в csv ====
+        # file_csv = excel_to_csv(filepatch)
+        # data_pandas = pd.DataFrame(file_csv)  # получает Dataframe
+        # =============================
 
         excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
         data_pandas = pd.DataFrame(excel_data)  # получает Dataframe
@@ -1355,10 +1360,13 @@ def load_listR_in_db(fname, table_db):
             data_pandas["Субъект РФ"] = data_list_new
             data_pandas["Федеральный округ"] = data_list_new
             column = data_pandas.columns.ravel().tolist()
-        count = len(data_pandas)  # кол-во строк в excel файле
+        # count = len(data_pandas)  # кол-во строк в excel файле
 
         for i in range(0, count):  # цикл по строкам
-            # ProgressBarThread.run(value=i)
+            # pr = 100 * i / count
+            # rpr = math.ceil(pr)
+            # # if pr >= rpr:
+            # ProgressBarThread.run(value=rpr)
             for col in column:  # цикл по столбцам
                 player_data = data_pandas.iloc[i][col]
                 # заменяет пустые строки рейтинга на ноль и преобразовывает в тип int
@@ -1370,6 +1378,14 @@ def load_listR_in_db(fname, table_db):
         with db.atomic():
             for idx in range(0, len(data), 100):
                 table_db.insert_many(data[idx:idx+100]).execute()
+
+# def excel_to_csv(excel_file, csv_file=None, sheet_name=0):
+#     """ конверитрует файл excel в csv"""
+#     df = pd.read_excel(excel_file, engine='openpyxl', sheet_name=sheet_name)
+#     if not csv_file:
+#         csv_file = excel_file.rsplit('.', 1)[0] + '.csv'
+#     df.to_csv(csv_file, index=False)
+#     return csv_file
 
 
 def region():
