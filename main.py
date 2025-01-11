@@ -1342,32 +1342,7 @@ def load_listR_in_db(fname, table_db):
         data_tmp = []
 
         rlist = table_db.delete().execute()
-        # ==== вариант создания файла excel в csv ====
-        # file_csv = excel_to_csv(filepatch)
-        # file_Data = pd.read_csv(file_csv, index_col=False)
-        # file_Data.head()
-        # import sqlalchemy
-        # from sqlalchemy import create_engine
-        # # create sqlalchemy engine
-        # engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}"  
-        #                         .format(user="root", pw="sql@123", 
-        #                         db="irisdb"))
-        #     # Insert whole DataFrame into MySQL
-        # file_Data.to_sql('iris', con = engine, if_exists = 'append', chunksize = 1000,index=False)
-
-
-        # conn = MySQLdb.connect(host="localhost", user="username", passwd="password", db="database_name")
-        # cursor = conn.cursor()
-        # import csv
-        # file_csv = excel_to_csv(filepatch)
-        # # data_pandas = pd.DataFrame(file_csv)  # получает Dataframe
-        # with open(file_csv, 'r') as file:
-        #     reader = csv.reader(file)
-        #     rows = [row for row in reader]
-
-        # cursor.executemany('INSERT INTO table_name VALUES (%s, %s, %s)', rows)
-        # =============================
-
+       
         excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
         data_pandas = pd.DataFrame(excel_data)  # получает Dataframe
         # создает список заголовков столбцов
@@ -1383,7 +1358,6 @@ def load_listR_in_db(fname, table_db):
             data_pandas["Субъект РФ"] = data_list_new
             data_pandas["Федеральный округ"] = data_list_new
             column = data_pandas.columns.ravel().tolist()
-        # count = len(data_pandas)  # кол-во строк в excel файле
 
         for i in range(0, count):  # цикл по строкам
             pr = 100 * i / count
@@ -1400,14 +1374,6 @@ def load_listR_in_db(fname, table_db):
         with db.atomic():
             for idx in range(0, len(data), 100):
                 table_db.insert_many(data[idx:idx+100]).execute()
-
-# def excel_to_csv(excel_file, csv_file=None, sheet_name=0):
-#     """ конверитрует файл excel в csv"""
-#     df = pd.read_excel(excel_file, engine='openpyxl', sheet_name=sheet_name)
-#     if not csv_file:
-#         csv_file = excel_file.rsplit('.', 1)[0] + '.csv'
-#     df.to_csv(csv_file, index=False)
-#     return csv_file
 
 
 def region():
@@ -2909,7 +2875,7 @@ def page():
         my_win.Button_add_edit_player.setText("Добавить")
         my_win.statusbar.showMessage("Список участников соревнований", 5000)
         player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
-        # player_list = Player.select().where(Player.title_id == title_id())
+
         player_debitor_R = Player.select().where((Player.title_id == title_id()) & (Player.pay_rejting == "долг"))
         player_predzayavka = Player.select().where((Player.title_id == title_id()) & (Player.application == "предварительная"))
         count_debitor_R = len(player_debitor_R)
@@ -2941,15 +2907,12 @@ def page():
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 841, 320))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
         my_win.checkBox_repeat_regions.setChecked(False)
-        
-        # progressBar = QProgressBar(my_win.tabWidget)
-        # my_win.progressBar.setGeometry(QtCore.QRect(260, 745, 841, 40))
-        # my_win.progressBar.show()
+    
         my_win.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers) # запрет редактирования таблицы
         result = Result.select().where(Result.title_id == title_id())
         result_played = result.select().where(Result.winner != "")
         count_result = len(result_played)
-        # player_list = Player.select().where(Player.title_id == title_id())
+
         player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != "0000-00-00"))
         count = len(player_list)
         my_win.label_8.setText(f"Всего участников: {str(count)} человек")
@@ -3737,6 +3700,10 @@ def system_competition():
         system_etap_list.append(etap)
     gamer = tit.gamer
     id_title = tit.id
+    # проверка что все спортсмены подтвердились
+    flag_checking = checking_before_the_draw()
+    if flag_checking is False:
+        return
     flag_system = ready_system() # False система еще не создана 
     if sender != my_win.comboBox_etap:
         if sender == my_win.system_edit_Action: # редактирование системы из меню
@@ -6908,10 +6875,6 @@ def choice_gr_automat():
             sv = add_delete_region_group(key_reg_current, current_region_group, posev_tmp, m, posev, start, end, step, player_current)
             current.clear()
             number_poseva = number_poseva + sv
-            # sp = int(100 / (total_player))
-            # step_bar += sp
-            # row_count = p
-            # progressbar(row_count)
         if number_poseva != total_player:  # выход из системы жеребьевки при достижении оканчания
             if number_poseva == group * m:  # смена направления посева
                 if m % 2 != 0:
