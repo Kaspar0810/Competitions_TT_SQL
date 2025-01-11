@@ -1346,7 +1346,28 @@ def load_listR_in_db(fname, table_db):
         rlist = table_db.delete().execute()
         # ==== вариант создания файла excel в csv ====
         # file_csv = excel_to_csv(filepatch)
-        # data_pandas = pd.DataFrame(file_csv)  # получает Dataframe
+        # file_Data = pd.read_csv(file_csv, index_col=False)
+        # file_Data.head()
+        # import sqlalchemy
+        # from sqlalchemy import create_engine
+        # # create sqlalchemy engine
+        # engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}"  
+        #                         .format(user="root", pw="sql@123", 
+        #                         db="irisdb"))
+        #     # Insert whole DataFrame into MySQL
+        # file_Data.to_sql('iris', con = engine, if_exists = 'append', chunksize = 1000,index=False)
+
+
+        # conn = MySQLdb.connect(host="localhost", user="username", passwd="password", db="database_name")
+        # cursor = conn.cursor()
+        # import csv
+        # file_csv = excel_to_csv(filepatch)
+        # # data_pandas = pd.DataFrame(file_csv)  # получает Dataframe
+        # with open(file_csv, 'r') as file:
+        #     reader = csv.reader(file)
+        #     rows = [row for row in reader]
+
+        # cursor.executemany('INSERT INTO table_name VALUES (%s, %s, %s)', rows)
         # =============================
 
         excel_data = pd.read_excel(filepatch)  # читает  excel файл Pandas
