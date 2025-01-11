@@ -1157,20 +1157,18 @@ class ToolTip(): # создание всплывающих подсказок
     my_win.Button_made_R_file.setToolTip("Создание файла Excel для обсчета рейтинга")
     my_win.Button_made_one_file_pdf.setToolTip("Перед созданием одного файла, передвиньте строки с названием этапаов в необходимом порядке")
 
-# class ProgressBarThread(QThread):
-#     def __init__(self, fir_window, parent=None):
-#         super().__init__()
-#         countChanged = pyqtSignal(int)
-#         self.fir_window = fir_window
-#         self.ProgressBarThread_instance = ProgressBarThread(fir_window=self)
+class ProgressBarThread(QThread):
+    def __init__(self, fir_window, parent=None):
+        super().__init__()
+        countChanged = pyqtSignal(int)
+        self.fir_window = fir_window
+        self.ProgressBarThread_instance = ProgressBarThread(fir_window=self)
 
-#     def run(value):
-#         # value = fir_window.progressBar.value()
-#         if value < 100:
-#             fir_window.progressBar.setValue(value)
-#             time.sleep(0.2)
-#         else:           
-#            fir_window.progressBar.setValue(0)
+    def run(value):
+        if value < 100:
+            fir_window.progressBar.setValue(value)
+        else:           
+           fir_window.progressBar.setValue(0)
 
 
 def check_delete_db():
@@ -1388,10 +1386,9 @@ def load_listR_in_db(fname, table_db):
         # count = len(data_pandas)  # кол-во строк в excel файле
 
         for i in range(0, count):  # цикл по строкам
-            # pr = 100 * i / count
-            # rpr = math.ceil(pr)
-            # # if pr >= rpr:
-            # ProgressBarThread.run(value=rpr)
+            pr = 100 * i / count
+            rpr = math.ceil(pr)
+            ProgressBarThread.run(value=rpr)
             for col in column:  # цикл по столбцам
                 player_data = data_pandas.iloc[i][col]
                 # заменяет пустые строки рейтинга на ноль и преобразовывает в тип int
