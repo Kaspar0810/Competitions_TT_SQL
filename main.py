@@ -1278,16 +1278,20 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     my_win.statusbar.showMessage("Январский рейтинг загружен")
     # добавляет в таблицу регионы
     # получение последней записи в таблице
-    t = Title.select().order_by(Title.id.desc()).get()
-    title = t.id
-    if title == 1:
+    # t = Title.select().order_by(Title.id.desc()).get()
+    # title = t.id
+    # === вариант если title id не номер один но соревнования первые
+    titles = Title.select()
+    count = len(titles)
+    if count == 1:
         wb = op.load_workbook("regions.xlsx")
         s = wb.sheetnames[0]
         sheet = wb[s]
         reg = []
         for i in range(1, 86):
             a = sheet['B%s' % i].value
-            reg.append([a])
+            region_mod = a.strip() # удаляет kbiybt пробелы в регионах из excel файла
+            reg.append([region_mod])
         with db:
             Region.insert_many(reg).execute()
     region()
