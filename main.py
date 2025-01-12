@@ -2279,7 +2279,6 @@ def fill_table(player_list):
         my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
         my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
 
- 
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
         my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
@@ -2488,14 +2487,10 @@ def add_player():
     if my_win.checkBox_6.isChecked():  # если отмечен флажок -удаленные-, то восстанавливает игрока и удаляет из
         # таблицы -удаленные-
         with db:
-            player_del = Delete_player.get(Delete_player.id == pl_id)
-            # player_id = player_del.player_del_id           
+            player_del = Delete_player.get(Delete_player.id == pl_id)         
             pay_R = player_del.pay_rejting # оплачен ли рейтинг
             comment = player_del.comment # коментарий
             player_del.delete_instance()
-            # plr = Player(player_id=player_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
-            #              razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
-            #              comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0).save()
             plr = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
                          comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0).save()
