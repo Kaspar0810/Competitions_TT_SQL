@@ -2489,13 +2489,17 @@ def add_player():
         # таблицы -удаленные-
         with db:
             player_del = Delete_player.get(Delete_player.id == pl_id)
-            player_id = player_del.player_del_id           
-            pay_R = player_del.pay_rejting
-            comment = player_del.comment
+            # player_id = player_del.player_del_id           
+            pay_R = player_del.pay_rejting # оплачен ли рейтинг
+            comment = player_del.comment # коментарий
             player_del.delete_instance()
-            plr = Player(player_id=player_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
+            # plr = Player(player_id=player_id, player=pl, bday=bd, rank=rn, city=ct, region=rg,
+            #              razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
+            #              comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0).save()
+            plr = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
                          comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0).save()
+                         
         my_win.checkBox_6.setChecked(False)  # сбрасывает флажок -удаленные-
     else:  # просто редактирует игрока
         if txt == "Редактировать":
