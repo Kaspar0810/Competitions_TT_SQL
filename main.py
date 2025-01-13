@@ -6808,9 +6808,10 @@ def choice_gr_automat():
     player_list = []
     for np in pl_choice:
         choice = np.get(Choice.id == np)
-        region = choice.region
+        regio_n = choice.region
+        region = regio_n.rstrip()
         pl_id = choice.player_choice_id
-        reg = Region.get(Region.region == region)
+        reg = Region.select().where(Region.region == region).get()
         region_id = reg.id 
         reg_list.append(region_id)
         player_list.append(pl_id)
@@ -15745,14 +15746,29 @@ def check_choice_net():
     # f = Frame(5* cm, 3 * cm, 6 * cm, 25 * cm, showBoundary=1) # высота прямоугольника  6 Х 25, showBoundary = 1, рамка 0- нет
     # f.addFromList(story, c)
 #     # c.save()
-# def proba():
-#     players = Player.select()
-#     for p in players:
-#         bd = p.bday
-#         bd_new = format_date_for_db(str_date=bd)
-#         txt = str(bd_new)
-#         Player.update(bday=bd_new).execute()
-
+def proba():
+    choices = Choice.select()
+    for ch in choices:
+        ch_id = ch.id
+        reg = ch.region       
+        region_mod = reg.rstrip()
+        Choice.update(region=region_mod).where(Choice.id == ch_id).execute()
+    regions = Region.select()
+    # count = len(regions)
+    for r in regions:
+        r_id = r.id
+        rg = r.region
+        reg_mod = rg.rstrip()      
+        Region.update(region=reg_mod).where(Region.id == r_id).execute()
+    #     reg = str(reg.rstrip())
+    # players = Player.select()
+    # for p in players:
+    #     reg = p.region
+    #     reg = str(reg.rstrip())
+    #     # bd_new = format_date_for_db(str_date=bd)
+    #     # txt = str(bd_new)
+    #     Player.update(region=reg).execute()
+    print("Все записи обновлены")
 # =======        
 # def proba():
 #     myconn = pymysql.connect(host = "localhost", user = "root", passwd = "db_pass", database = "mysql_db") 
@@ -15976,7 +15992,7 @@ my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
-# my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
+my_win.Button_proba.clicked.connect(proba) # запуск пробной функции
 
 my_win.Button_add_pl1.clicked.connect(list_player_in_group_after_draw)
 my_win.Button_add_pl2.clicked.connect(list_player_in_group_after_draw)
