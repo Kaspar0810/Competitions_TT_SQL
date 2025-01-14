@@ -1288,7 +1288,7 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
         reg = []
         for i in range(1, 86):
             a = sheet['B%s' % i].value
-            region_mod = a.strip() # удаляет kbiybt пробелы в регионах из excel файла
+            region_mod = a.strip() # удаляет лишние пробелы в регионах из excel файла
             reg.append([region_mod])
         with db:
             Region.insert_many(reg).execute()
@@ -2491,7 +2491,11 @@ def add_player():
             pay_R = player_del.pay_rejting # оплачен ли рейтинг
             comment = player_del.comment # коментарий
             player_del.delete_instance()
-            plr = Player(player=pl, bday=bd, rank=rn, city=ct, region=rg,
+            year = bd[6:]
+            monh = bd[3:5]
+            days = bd[:2]
+            bd_mod = f"{year}-{monh}-{days}"
+            plr = Player(player=pl, bday=bd_mod, rank=rn, city=ct, region=rg,
                          razryad=rz, coach_id=idc, full_name=fn, mesto=ms, title_id=title_id(), pay_rejting=pay_R,
                          comment=comment, coefficient_victories=0, total_game_player=0, total_win_game=0).save()
                          
@@ -5039,8 +5043,13 @@ def delete_player():
                     res = Result.update(tours=new_tour).where(Result.id == k)
                     res.execute()
         else: # записывает в таблицу -Удаленные-
+            year = birthday[6:] 
+            monh  = birthday[3:5]
+            days = birthday[:2]
+            birthday_mod = f"{year}-{monh}-{days}"
+            # birthday_mod = datetime.now().strftime('%Y-%m-%d') # текущая дата в формате 01_01_2000
             with db: 
-                del_player = Delete_player(player_del_id=player_id, bday=birthday, rank=rank, city=player_city_del,
+                del_player = Delete_player(player_del_id=player_id, bday=birthday_mod, rank=rank, city=player_city_del,
                                             region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
                                             player=player_del, title_id=title_id(), pay_rejting=pay_R, comment=comment).save()
 
