@@ -7154,7 +7154,8 @@ def choice_setka_automat(fin, flag, count_exit):
             sev = sev_tmp.copy()
             sev_tmp.clear()
             count = len(posev[i]) # всего количество номеров в посеве
-            if del_num == 1 and n == count_exit - 1:                    
+            # if del_num == 1 and n == count_exit - 1: 
+            if del_num == 1 and i == count_posev - 1:                    
                 for h in free_num:
                     sev.remove(h)
                 free_seats = len(free_num) # сколько свободных мест в сетке
