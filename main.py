@@ -15663,14 +15663,12 @@ def check_choice_net():
     coach_list_tmp = []
     stage = my_win.tableView.model().index(0, 2).data() 
     id_system = system_id(stage)
-    gamelist_fin = Game_list.select().where(Game_list.system_id == id_system)
+    gamelist_fin = Game_list.select().where(Game_list.system_id == id_system).order_by(Game_list.rank_num_player)
     c = 0
     g = 2
     for k in gamelist_fin:
         pl = k.player_group_id
-        znak = pl.find("/")
-        id_pl = pl[znak + 1:]
-        players = Player.select().where(Player.id == id_pl).get()
+        players = Player.select().where(Player.id == pl).get()
         region_pl = players.region
         coaches = Coach.select().where(Coach.id == players.coach_id).get()
         coach_str = coaches.coach
