@@ -166,6 +166,8 @@ class MyTableModel(QAbstractTableModel):
                             return QtGui.QBrush(QtCore.Qt.darkGreen)
                         else:
                             return QtGui.QBrush(QtCore.Qt.black)
+
+
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, parent=None, *args, **kwargs) -> object:
@@ -2162,11 +2164,18 @@ def fill_table(player_list):
     data_table_tmp = []
     data_table_list = []
     sender = my_win.sender()
+    start = time.time()
     model = MyTableModel(data)
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
+    finish = time.time()
+    res = finish - start
+    res_msec = res * 1000
+    print('Время работы в миллисекундах: ', res_msec)
     row_count = len(player_selected)  # кол-во строк в таблице
     num_columns = [0, 1, 2, 3, 4, 5, 6]
+
+    # start = time.time()
     # кол-во наваний должно совпадать со списком столбцов
     if tb == 1: # == списки участников
         if my_win.checkBox_6.isChecked():
@@ -2221,7 +2230,11 @@ def fill_table(player_list):
         else:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
     # создание  data (списка списков)
+    # == ВАРИАНТ ОТКЛЮЧЕНИЯ ВИЗУАЛЬНОГО ОБНОВЛЕНИЯ ДАННЫХ
+    # my_win.tableView.setUpdatesEnable(False)
+    # ================
     if row_count != 0:  # список удаленных игроков пуст если R = 0
+       
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             item_1 = str(list(player_selected[row].values())[num_columns[0]])
             item_2 = str(list(player_selected[row].values())[num_columns[1]])
@@ -2272,6 +2285,12 @@ def fill_table(player_list):
                     data_table_tmp = [item_8]
                 data_table_list.extend(data_table_tmp)
             data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
+        # == ВАРИАНТ ОТКЛЮЧЕНИЯ ВИЗУАЛЬНОГО ОБНОВЛЕНИЯ ДАННЫХ
+        # my_win.tableView.set        # ================
+        # finish = time.time()
+        # res = finish - start
+        # res_msec = res * 1000
+        # print('Время работы в миллисекундах: ', res_msec)
         my_win.tableView.setModel(model)
         font = my_win.tableView.font()
         font.setPointSize(11)
