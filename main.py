@@ -2633,7 +2633,6 @@ def format_date_for_view(str_date):
     month = txt[5:7]
     day = txt[8:]  
     format_date = f"{day}.{month}.{year}"
-    # format_date = datetime.strftime(new_str_date, '%d.%m.%Y')
     return format_date
 
 
@@ -3497,6 +3496,12 @@ def button_system_made_enable(state):
         my_win.Button_system_made.setEnabled(True)
 
 
+def date_formated_on_db_or_form(b_day):
+    """форматирование даты к виду для формы или базы данных"""
+    b_day_formated = b_day.strftime('%d.%m.%Y') # форматирование даты
+    return b_day_formated
+
+
 def list_player_pdf(player_list):
     """создание списка участников в pdf файл"""
     from reportlab.platypus import Table
@@ -3512,6 +3517,8 @@ def list_player_pdf(player_list):
         n += 1
         p = l.player
         b = l.bday
+        b = format_date_for_view(str_date=b)
+        # b = date_formated_on_db_or_form(b_day=b)
         r = l.rank
         c = l.city
         g = l.region
@@ -10919,10 +10926,6 @@ def table_made(pv, stage):
     catalog = 1
     change_dir(catalog)
     doc.topMargin = 1.8 * cm # высота отступа от верха листа pdf
-    # doc.leftPadding = 0
-    # doc.bottomMargin = 1.5 * cm
-    # doc.leftMargin = 0.5
-    # doc.righttMargin = 0
   
     elements.insert(0, (Paragraph(f"{title}. {sex}", h1)))
     doc.build(elements, onFirstPage=func_zagolovok, onLaterPages=func_zagolovok)
@@ -10937,7 +10940,7 @@ def list_regions_pdf():
     region_list = []
     tit = Title.get(Title.id == title_id())
     short_name = tit.short_name_comp
-    regions = Player.select().where(Player.title_id == title_id())
+    regions = Player.select().where((Player.title_id == title_id()) & (Player.player != "x"))
 
     for k in regions:
         reg = k.region
@@ -15407,7 +15410,7 @@ def view_all_page_pdf():
     title = Title.get(Title.id == title_id())
     pdf_files_list = []
     rus_name_list = []
-    pdf_file_canot_in_comp_list = ["player_list_payment.pdf", "player_list_debitor.pdf"]
+    pdf_file_canot_in_comp_list = ["player_list_payment.pdf", "player_list_debitor.pdf", "begunki"]
     stage_dict = {"table_group.pdf": "Предварительный",
                    "player_list.pdf": "Список участников",
                    "winners_list.pdf": "Список победителей и призеров",
@@ -15427,7 +15430,7 @@ def view_all_page_pdf():
                    "8-final.pdf": "8-й финал",
                    "9-final.pdf": "9-й финал",
                    "10-final.pdf": "10-й финал",
-                   "superfinal": "Суперфинал",
+                   "superfinal.pdf": "Суперфинал",
                    "one_table.pdf": "одна таблица"}
     short_name = title.short_name_comp
     count_mark = len(short_name)
@@ -15458,9 +15461,9 @@ def view_all_page_pdf():
     row_count = 0
     for item in pdf_files_list:
         item_name = rus_name_list[row_count]
-        my_win.tableWidget.setItem(row_count, 0, (QTableWidgetItem(str(row_count + 1))))
-        my_win.tableWidget.setItem(row_count, 1, (QTableWidgetItem(str(item))))
-        my_win.tableWidget.setItem(row_count, 2, (QTableWidgetItem(str(item_name))))
+        my_win.tableWidget.setItem(row_count, 0, (QTableWidgetItem(str(row_count + 1)))) # нумерация строк
+        my_win.tableWidget.setItem(row_count, 1, (QTableWidgetItem(str(item)))) # файл на латинице
+        my_win.tableWidget.setItem(row_count, 2, (QTableWidgetItem(str(item_name)))) # руское название файла
         row_count += 1
     my_win.Button_made_one_file_pdf.setEnabled(True)
     my_win.tableWidget.resizeColumnsToContents()
@@ -15472,12 +15475,13 @@ def made_list_regions():
     my_win.Button_made_page_pdf.setEnabled(True)
     my_win.tableWidget.clear()
     region_list = []
-    regions = Player.select().where(Player.title_id == title_id())
-
+    regions = Player.select().where(Player.title_id == title_id()) 
+    
     for k in regions:
         reg = k.region
-        if reg not in region_list:
-            region_list.append(reg)
+        if reg != "":
+            if reg not in region_list:
+                region_list.append(reg)
     count = len(region_list)
     region_list.sort()
     n = 0
@@ -15487,16 +15491,15 @@ def made_list_regions():
         my_win.tableWidget.setColumnCount(2) # устанавливает колво столбцов
         my_win.tableWidget.setRowCount(count)
         column_label = ["№", "Субъекты РФ"]
-        my_win.tableWidget.setColumnWidth(2, 10000)
-        for i in range(0, 2):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
-            my_win.tableWidget.showColumn(i)
-            item = QtWidgets.QTableWidgetItem()
-            brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
-            brush.setStyle(QtCore.Qt.SolidPattern)
-            item.setForeground(brush)
-            my_win.tableWidget.setHorizontalHeaderItem(i, item)
         n += 1
     my_win.tableWidget.setHorizontalHeaderLabels(column_label) # заголовки столбцов в tableWidget
+    for i in range(0, 2):  # закрашивает заголовки таблиц  рейтинга зеленым цветом
+        my_win.tableWidget.showColumn(i)
+        item = QtWidgets.QTableWidgetItem()
+        brush = QtGui.QBrush(QtGui.QColor(76, 100, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        item.setForeground(brush)
+        my_win.tableWidget.setHorizontalHeaderItem(i, item)
 
 
 def made_list_players_on_alf():
@@ -15505,7 +15508,8 @@ def made_list_players_on_alf():
     story = []  # Список данных таблицы участников
     elements = []  # Список Заголовки столбцов таблицы
     tit = Title.get(Title.id == title_id())
-    player_list = Player.select().where(Player.title_id == title_id()).order_by(Player.player)
+    player_list_x = Player.select().where(Player.title_id == title_id()).order_by(Player.player)
+    player_list = player_list_x.select().where(Player.player != "x")
     short_name = tit.short_name_comp
     gamer = tit.gamer
     count = len(player_list)  # количество записей в базе
@@ -15515,6 +15519,7 @@ def made_list_players_on_alf():
         n += 1
         p = l.player
         b = l.bday
+        b = format_date_for_view(str_date=b)
         r = l.rank
         c = l.city
         g = l.region
@@ -15583,9 +15588,11 @@ def made_list_winners():
         column_label = ["Место", "Фамилия, Имя", "Дата рождения", "Рейтинг", "Город", "Регион", "Разряд", "Тренеры"]
         coachs = Coach.select().where(Coach.id == l.coach_id).get()
         family_coach = coachs.coach
+        bd = l.bday
+        b_day = format_date_for_view(str_date=bd)
         my_win.tableWidget.setItem(n, 0, QTableWidgetItem(str(f"{l.mesto} место")))
         my_win.tableWidget.setItem(n, 1, QTableWidgetItem(str(l.player)))
-        my_win.tableWidget.setItem(n, 2, QTableWidgetItem(str(l.bday)))
+        my_win.tableWidget.setItem(n, 2, QTableWidgetItem(b_day))
         my_win.tableWidget.setItem(n, 3, QTableWidgetItem(str(l.rank)))
         my_win.tableWidget.setItem(n, 4, QTableWidgetItem(str(l.city)))
         my_win.tableWidget.setItem(n, 5, QTableWidgetItem(str(l.region)))
