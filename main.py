@@ -15044,10 +15044,12 @@ def made_file_excel_for_rejting():
         pl_los = l.loser
         id_win = players.select().where(Player.full_name == pl_win).get()
         pl_win = id_win.player
-        bd_win = id_win.bday
+        b_day_win = id_win.bday
+        bd_win = format_date_for_view(str_date=b_day_win)
         id_los =  players.select().where(Player.full_name == pl_los).get()
         pl_los = id_los.player
-        bd_los = id_los.bday
+        b_day_los = id_los.bday
+        bd_los = format_date_for_view(str_date=b_day_los)
         score = l.score_in_game
         c1 = worksheet.cell(row = k, column = 1)
         c1.value = pl_win
