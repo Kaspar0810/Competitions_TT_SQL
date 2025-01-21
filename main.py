@@ -2164,18 +2164,18 @@ def fill_table(player_list):
     data = []
     data_table_tmp = []
     data_table_list = []
-    
+    data_dict = {}
     sender = my_win.sender()
-    start = time.time()
+    # start = time.time()
     model = MyTableModel(data)
     
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
 
-    row_count = len(player_selected)  # кол-во строк в таблице
+    # row_count = len(player_selected)  # кол-во строк в таблице
     num_columns = [0, 1, 2, 3, 4, 5, 6]
 
-    start = time.time()
+    
     # кол-во наваний должно совпадать со списком столбцов
     if tb == 1: # == списки участников
         if my_win.checkBox_6.isChecked():
@@ -2236,80 +2236,104 @@ def fill_table(player_list):
     # == ВАРИАНТ ОТКЛЮЧЕНИЯ ВИЗУАЛЬНОГО ОБНОВЛЕНИЯ ДАННЫХ
     # my_win.tableView.setUpdatesEnable(False)
     # ================
-    # # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
-    # player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
-    #                                           Player.region, Player.coach_id, Player.mesto) # выборка конкретых столбцов
-    # player_selected = player_list_mod.dicts().execute()
+    # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
+    player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
+                                              Player.region, Player.razryad, Player.coach_id, Player.mesto) # выборка конкретых столбцов
+    player_selected = player_list_mod.dicts().execute()
+    row_count = len(player_selected)  # кол-во строк в таблице
     # # f = {value:key for key, value in player_selected.items()}
     # row_count = len(player_selected)  # кол-во строк в таблице
     if row_count != 0:  # список удаленных игроков пуст если R = 0
         # ==== вариант с оздание пандас
+        start = time.time()
         # for r in range(row_count):  # добавляет данные из базы в TableWidget
         #     item_id = player_selected[r].values()
-        #     data_dict[r] = item_id
-        # f = {value:key for key, value in data_dict.items()}    
-        # df = pd.DataFrame(player_selected)
+        #     data_dict[r] = item_id   
+        # df = pd.DataFrame(data_dict)
         # model = MyTableModel(df)
-        # ========
+        # =======
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             item_1 = str(list(player_selected[row].values())[num_columns[0]])
             item_2 = str(list(player_selected[row].values())[num_columns[1]])
-            item_3 = str(list(player_selected[row].values())[num_columns[2]])
-            if tb == 1:
-                item_3 = format_date_for_view(str_date=item_3) # преобразует дату к виду для экрана
+            item_3 = format_date_for_view(str_date=str(list(player_selected[row].values())[num_columns[2]])) # преобразует дату к виду для экрана
             item_4 = str(list(player_selected[row].values())[num_columns[3]])
             item_5 = str(list(player_selected[row].values())[num_columns[4]])
             item_6 = str(list(player_selected[row].values())[num_columns[5]])
             item_7 = str(list(player_selected[row].values())[num_columns[6]])
-            data_table_list = [item_1, item_2, item_3, item_4, item_5, item_6, item_7]
-            if tb == 1:
-                coach_id = str(list(player_selected[row].values())[num_columns[7]])
-                coach = Coach.get(Coach.id == coach_id)
-                item_8 = coach.coach
-                item_9 = str(list(player_selected[row].values())[num_columns[8]])
-                data_table_tmp = [item_8, item_9]
-                if my_win.checkBox_6.isChecked():
-                    item_10 = str(list(player_selected[row].values())[num_columns[9]])
-                    data_table_tmp = [item_8, item_9, item_10]
-                data_table_list.extend(data_table_tmp) 
-            elif tb == 2:
-                if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
-                    item_8 = str(list(player_selected[row].values())[num_columns[7]])
-                    item_9 = str(list(player_selected[row].values())[num_columns[8]])
-                    item_10 = str(list(player_selected[row].values())[num_columns[9]])
-                    item_11 = str(list(player_selected[row].values())[num_columns[10]])
-                    data_table_tmp = [item_8, item_9, item_10, item_11]
-                elif stage == "Предварительный":
-                    data_table_tmp = []
-                elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-                    item_8 = str(list(player_selected[row].values())[num_columns[7]])
-                    data_table_tmp = [item_8]
-                else:
-                    data_table_tmp = []
-                data_table_list.extend(data_table_tmp) 
-            elif tb == 3 or tb == 4 or tb == 5:
-                item_8 = str(list(player_selected[row].values())[num_columns[7]])
-                item_9 = str(list(player_selected[row].values())[num_columns[8]])
-                item_10 = str(list(player_selected[row].values())[num_columns[9]])
-                data_table_tmp = [item_8, item_9, item_10]
-                data_table_list.extend(data_table_tmp)
-            elif tb == 7:
-                if sender != my_win.lineEdit_find_player_stat:
-                    coach_id = str(list(player_selected[row].values())[num_columns[7]])
-                    coach = Coach.get(Coach.id == coach_id)
-                    item_8 = coach.coach
-                    data_table_tmp = [item_8]
-                data_table_list.extend(data_table_tmp)
-            data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
-            arr = np.array(data)
-            df_ = pd.DataFrame(arr, columns=['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'])
+            coach_id = str(list(player_selected[row].values())[num_columns[7]])
+            coach = Coach.get(Coach.id == coach_id)
+            item_8 = coach.coach
+            item_9 = str(list(player_selected[row].values())[num_columns[8]])
+            data_table_tmp = [item_1, item_2, item_3, item_4, item_5, item_6, item_7, item_8, item_9]
+        data.append(data_table_tmp.copy()) # данные, которые передаются в tableView (список списков)
+        arr = np.array(data)
+        df = pd.DataFrame(arr, columns=['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'])
+        my_win.tableView.setModel(df)
+        finish = time.time()
+        res = finish - start
+        res_msec = res * 1000
+        print('Время работы в миллисекундах: ', res_msec)
+        # ========
+        # for row in range(row_count):  # добавляет данные из базы в TableWidget
+        #     item_1 = str(list(player_selected[row].values())[num_columns[0]])
+        #     item_2 = str(list(player_selected[row].values())[num_columns[1]])
+        #     item_3 = str(list(player_selected[row].values())[num_columns[2]])
+        #     if tb == 1:
+        #         item_3 = format_date_for_view(str_date=item_3) # преобразует дату к виду для экрана
+        #     item_4 = str(list(player_selected[row].values())[num_columns[3]])
+        #     item_5 = str(list(player_selected[row].values())[num_columns[4]])
+        #     item_6 = str(list(player_selected[row].values())[num_columns[5]])
+        #     item_7 = str(list(player_selected[row].values())[num_columns[6]])
+        #     data_table_list = [item_1, item_2, item_3, item_4, item_5, item_6, item_7]
+        #     if tb == 1:
+        #         coach_id = str(list(player_selected[row].values())[num_columns[7]])
+        #         coach = Coach.get(Coach.id == coach_id)
+        #         item_8 = coach.coach
+        #         item_9 = str(list(player_selected[row].values())[num_columns[8]])
+        #         data_table_tmp = [item_8, item_9]
+        #         if my_win.checkBox_6.isChecked():
+        #             item_10 = str(list(player_selected[row].values())[num_columns[9]])
+        #             data_table_tmp = [item_8, item_9, item_10]
+        #         data_table_list.extend(data_table_tmp) 
+        #     elif tb == 2:
+        #         if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
+        #             item_8 = str(list(player_selected[row].values())[num_columns[7]])
+        #             item_9 = str(list(player_selected[row].values())[num_columns[8]])
+        #             item_10 = str(list(player_selected[row].values())[num_columns[9]])
+        #             item_11 = str(list(player_selected[row].values())[num_columns[10]])
+        #             data_table_tmp = [item_8, item_9, item_10, item_11]
+        #         elif stage == "Предварительный":
+        #             data_table_tmp = []
+        #         elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+        #             item_8 = str(list(player_selected[row].values())[num_columns[7]])
+        #             data_table_tmp = [item_8]
+        #         else:
+        #             data_table_tmp = []
+        #         data_table_list.extend(data_table_tmp) 
+        #     elif tb == 3 or tb == 4 or tb == 5:
+        #         item_8 = str(list(player_selected[row].values())[num_columns[7]])
+        #         item_9 = str(list(player_selected[row].values())[num_columns[8]])
+        #         item_10 = str(list(player_selected[row].values())[num_columns[9]])
+        #         data_table_tmp = [item_8, item_9, item_10]
+        #         data_table_list.extend(data_table_tmp)
+        #     elif tb == 7:
+        #         if sender != my_win.lineEdit_find_player_stat:
+        #             coach_id = str(list(player_selected[row].values())[num_columns[7]])
+        #             coach = Coach.get(Coach.id == coach_id)
+        #             item_8 = coach.coach
+        #             data_table_tmp = [item_8]
+        #         data_table_list.extend(data_table_tmp)
+        #     data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
+            # arr = np.array(data)
+            # df = pd.DataFrame(arr, columns=['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'])
+
         # == ВАРИАНТ ОТКЛЮЧЕНИЯ ВИЗУАЛЬНОГО ОБНОВЛЕНИЯ ДАННЫХ
         # my_win.tableView.set        # ================
         # finish = time.time()
         # res = finish - start
         # res_msec = res * 1000
         # print('Время работы в миллисекундах: ', res_msec)
-        my_win.tableView.setModel(model)
+        # my_win.tableView.setModel(model)
         font = my_win.tableView.font()
         font.setPointSize(11)
         my_win.tableView.setFont(font)
