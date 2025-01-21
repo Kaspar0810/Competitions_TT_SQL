@@ -29,6 +29,7 @@ from itertools import *
 import os
 import openpyxl as op
 import pandas as pd
+import numpy as np
 import contextlib
 import sys
 #=====
@@ -2163,19 +2164,18 @@ def fill_table(player_list):
     data = []
     data_table_tmp = []
     data_table_list = []
+    
     sender = my_win.sender()
     start = time.time()
     model = MyTableModel(data)
+    
     tb = my_win.tabWidget.currentIndex()
     player_selected = player_list.dicts().execute()
-    finish = time.time()
-    res = finish - start
-    res_msec = res * 1000
-    print('Время работы в миллисекундах: ', res_msec)
+
     row_count = len(player_selected)  # кол-во строк в таблице
     num_columns = [0, 1, 2, 3, 4, 5, 6]
 
-    # start = time.time()
+    start = time.time()
     # кол-во наваний должно совпадать со списком столбцов
     if tb == 1: # == списки участников
         if my_win.checkBox_6.isChecked():
@@ -2184,6 +2184,9 @@ def fill_table(player_list):
         else:
             num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
+        player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
+                                              Player.region, Player.coach_id, Player.mesto) # выборка конкретых столбцов
+
     elif tb == 2:
         stage = my_win.comboBox_filter_choice_stage.currentText()
         if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
@@ -2211,7 +2214,7 @@ def fill_table(player_list):
         else:
             num_columns = [0, 1, 4, 5, 6, 7, 8]
             model.setHorizontalHeaderLabels(['id','Этап', 'Игрок-1', 'Игрок-2', 'Победитель', 'Тренер', ''])
-
+    # выделение строк
     if tb == 1:
         if my_win.checkBox_15.isChecked():
             my_win.tableView.setSelectionMode(QAbstractItemView.MultiSelection) # выделение несколких строк по клику мышью
@@ -2233,8 +2236,21 @@ def fill_table(player_list):
     # == ВАРИАНТ ОТКЛЮЧЕНИЯ ВИЗУАЛЬНОГО ОБНОВЛЕНИЯ ДАННЫХ
     # my_win.tableView.setUpdatesEnable(False)
     # ================
+    # # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
+    # player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
+    #                                           Player.region, Player.coach_id, Player.mesto) # выборка конкретых столбцов
+    # player_selected = player_list_mod.dicts().execute()
+    # # f = {value:key for key, value in player_selected.items()}
+    # row_count = len(player_selected)  # кол-во строк в таблице
     if row_count != 0:  # список удаленных игроков пуст если R = 0
-       
+        # ==== вариант с оздание пандас
+        # for r in range(row_count):  # добавляет данные из базы в TableWidget
+        #     item_id = player_selected[r].values()
+        #     data_dict[r] = item_id
+        # f = {value:key for key, value in data_dict.items()}    
+        # df = pd.DataFrame(player_selected)
+        # model = MyTableModel(df)
+        # ========
         for row in range(row_count):  # добавляет данные из базы в TableWidget
             item_1 = str(list(player_selected[row].values())[num_columns[0]])
             item_2 = str(list(player_selected[row].values())[num_columns[1]])
@@ -2285,6 +2301,8 @@ def fill_table(player_list):
                     data_table_tmp = [item_8]
                 data_table_list.extend(data_table_tmp)
             data.append(data_table_list.copy()) # данные, которые передаются в tableView (список списков)
+            arr = np.array(data)
+            df_ = pd.DataFrame(arr, columns=['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'])
         # == ВАРИАНТ ОТКЛЮЧЕНИЯ ВИЗУАЛЬНОГО ОБНОВЛЕНИЯ ДАННЫХ
         # my_win.tableView.set        # ================
         # finish = time.time()
@@ -15030,8 +15048,8 @@ def made_file_excel_for_rejting():
     player_result = result.select().where((Result.points_loser != 0) | (Result.score_in_game != "В : П")).order_by(Result.winner)
     book = op.Workbook()
     worksheet = book.active
-    names_headers = ["Победитель", "День рождения", "Проигравший", "День рождения", "Счет"]
-    for m in range(1, 6):
+    names_headers = ["Этап","Группа", "Победитель", "День рождения", "Проигравший", "День рождения", "Счет"]
+    for m in range(1, 8):
         c =  worksheet.cell(row = 1, column = m)
         c.value = names_headers[m - 1]
     k = 2
@@ -15040,6 +15058,8 @@ def made_file_excel_for_rejting():
         point_winner = l.points_win
         if point_winner == "":
             continue
+        stage = l.system_stage
+        group = l.number_group
         pl_win = l.winner       
         pl_los = l.loser
         id_win = players.select().where(Player.full_name == pl_win).get()
@@ -15051,24 +15071,32 @@ def made_file_excel_for_rejting():
         b_day_los = id_los.bday
         bd_los = format_date_for_view(str_date=b_day_los)
         score = l.score_in_game
+
         c1 = worksheet.cell(row = k, column = 1)
-        c1.value = pl_win
+        c1.value = stage
         c2 = worksheet.cell(row = k, column = 2)
-        c2.value = bd_win
+        c2.value = group
         c3 = worksheet.cell(row = k, column = 3)
-        c3.value = pl_los
+        c3.value = pl_win
         c4 = worksheet.cell(row = k, column = 4)
-        c4.value = bd_los
+        c4.value = bd_win
         c5 = worksheet.cell(row = k, column = 5)
-        c5.value = score
+        c5.value = pl_los
+        c6 = worksheet.cell(row = k, column = 6)
+        c6.value = bd_los
+        c7 = worksheet.cell(row = k, column = 7)
+        c7.value = score
         k += 1
 
     t_id = Title.get(Title.id == title_id())
     short_name = t_id.short_name_comp 
-    worksheet.column_dimensions['A'].width = 30
+    worksheet.column_dimensions['A'].width = 20
     worksheet.column_dimensions['b'].width = 15
     worksheet.column_dimensions['c'].width = 30
     worksheet.column_dimensions['d'].width = 15
+    worksheet.column_dimensions['e'].width = 30
+    worksheet.column_dimensions['g'].width = 15
+    worksheet.column_dimensions['f'].width = 15
     f_name = f"{short_name}_report.xlsx"
     filename, filter = QtWidgets.QFileDialog.getSaveFileName(my_win, 'Save file', f'{f_name}','Excel files (*.xlsx)')
     book.save(filename)
