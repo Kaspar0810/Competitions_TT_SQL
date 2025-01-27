@@ -81,7 +81,7 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif', os.path.join(outpath, 'DejaVuSerif
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', os.path.join(outpath, 'DejaVuSerif-Bold.ttf')))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', os.path.join(outpath, 'DejaVuSerif-Italic.ttf')))
 # ============== рабочий вариант
-class MyTableModel(QAbstractTableModel):
+class _MyTableModel(QAbstractTableModel):
     def __init__(self, data):
         super().__init__()
         self._data = data
@@ -173,7 +173,7 @@ class MyTableModel(QAbstractTableModel):
 
 
 
-class _MyTableModel(QAbstractTableModel): # === вариант эксперементальный ============
+class MyTableModel(QAbstractTableModel): # === вариант эксперементальный ============
     def __init__(self, data):
         super().__init__()
         self._data = data
@@ -183,19 +183,19 @@ class _MyTableModel(QAbstractTableModel): # === вариант эксперем�
         self.horizontalHeaderLabels = horizontalHeaderLabels
  
     def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: QtCore.Qt.ItemDataRole):
-        # if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole and len(self.horizontalHeaderLabels) == self.columnCount(None)):
-        if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole  and len(self.horizontalHeaderLabels) == 10):
+        if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole and len(self.horizontalHeaderLabels) == self.columnCount(None)):
+        # if (orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole  and len(self.horizontalHeaderLabels) == 10):
             return self.horizontalHeaderLabels[section]
             # return self._data.columns[section]
         return super().headerData(section, orientation, role)
     
     def rowCount(self, parent):
-        return len(self._data.index)
+        return len(self._data)
     
     def columnCount(self, parent):
         if len(self._data) > 0:
-            return len(self._data[0])
-            # return len(self._data.index)
+            # return len(self._data[0])
+            return len(self._data.columns)
         else:
             return 0
 
@@ -1113,7 +1113,9 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         flag = check_delete_db()
-        if flag != 1:
+        if flag is None:
+            return
+        else:
             delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
@@ -2260,7 +2262,7 @@ def dupl_regions(n_gr):
     return region_list
 
 
-def fill_table(player_list):
+def _fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     data = []
     data_table_tmp = []
@@ -2417,12 +2419,13 @@ def fill_table(player_list):
     print('Время работы в миллисекундах: ', res_msec)
 
 
-def _fill_table(player_list): # ============== вариант эксперемнетальный =============
+def fill_table(player_list): # ============== вариант эксперемнетальный =============
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     data = []
+    header_list = []
     data_table_tmp = []
     data_table_list = []
-    data_dict = {}
+    dict_sample = {}
     sender = my_win.sender()
     # start = time.time()
     # model = MyTableModel(data)
@@ -2432,18 +2435,19 @@ def _fill_table(player_list): # ============== вариант эксперемн
 
     # row_count = len(player_selected)  # кол-во строк в таблице
     # num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-
+    player_list_mod = player_list.select() # выборка конкретых столбцов
     
     # # кол-во наваний должно совпадать со списком столбцов
     # if tb == 1: # == списки участников
     #     if my_win.checkBox_6.isChecked():
     #         num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    #         model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место', 'id_del'])
+    #         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место', 'id_del'])
     #     else:
-    #         # num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    #         model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
-        # player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
-        #                                       Player.region, Player.razrayd, Player.coach_id, Player.mesto) # выборка конкретых столбцов
+    #         num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    #         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
+    #     # player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
+    #     #                                       Player.region, Player.razryad, Player.coach_id, Player.mesto) # выборка конкретых столбцов
+    #     player_list_mod = player_list.select() # выборка конкретых столбцов
 
     # elif tb == 2:
     #     stage = my_win.comboBox_filter_choice_stage.currentText()
@@ -2493,10 +2497,9 @@ def _fill_table(player_list): # ============== вариант эксперемн
     # ================
     # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
     start = time.time()
-    player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
-                                              Player.region, Player.razryad, Player.coach_id, Player.mesto, Player.full_name) # выборка конкретых столбцов
+    # player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
+    #                                           Player.region, Player.razryad, Player.coach_id, Player.mesto, Player.full_name) # выборка конкретых столбцов
     player_selected = player_list_mod.dicts().execute()
-
     row_count = len(player_selected)  # кол-во строк в таблице
     # dictkeys = player_selected.keys()
     item_1_list = []
@@ -2509,8 +2512,14 @@ def _fill_table(player_list): # ============== вариант эксперемн
     item_8_list = []
     item_9_list = []
     item_10_list = []
+    item_11_list = []
+    item_12_list = []
+    item_13_list = []
+    item_14_list = []
+    item_15_list = []
+    item_16_list = []
     for n in player_selected:
-        dictkey = list(n.keys())
+        # dictkey = list(n.keys())
         val_list = list(n.values())
 
         item_1_list.append(val_list[0])
@@ -2522,16 +2531,45 @@ def _fill_table(player_list): # ============== вариант эксперемн
         item_7_list.append(val_list[6])
         item_8_list.append(Coach.get(Coach.id == val_list[7]))
         item_9_list.append(val_list[8])
-        # =================================
         item_10_list.append(val_list[9])
-    dict_sample = {dictkey[0]:item_1_list, dictkey[1]:item_2_list, dictkey[2]:item_3_list, dictkey[3]:item_4_list, dictkey[4]:item_5_list, 
-                    dictkey[5]:item_6_list, dictkey[6]:item_7_list, dictkey[7]:item_8_list, dictkey[8]:item_9_list, dictkey[9]:item_10_list}
-    # list_sample = [item_1_list,item_2_list,item_3_list,item_4_list,item_5_list,item_6_list,item_7_list,item_8_list,item_9_list]
-    # data = pd.DataFrame(dict_sample, columns=['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место'])
-   
+        item_11_list.append(val_list[10])
+        # =================================
+    item_list = [item_1_list, item_2_list, item_2_list, item_4_list, item_5_list, item_6_list, item_7_list, item_8_list,
+                item_9_list, item_10_list, item_11_list, item_12_list, item_13_list, item_14_list, item_15_list, item_16_list]
+    # название заголовков столбцов для каждой вкладки
+    if tb == 1:
+        num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        header_list = ['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']
+    elif tb == 2:
+        stage = my_win.comboBox_filter_choice_stage.currentText()
+        if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
+            num_columns = [0, 2, 3, 4, 7, 9, 10, 11, 13, 14, 16]
+            header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'Группа', 'Место гр',
+                                              'ПФ', "Группа ПФ", 'Место ПФ', 'Финал', 'Место']
+        elif stage == "Предварительный":
+            num_columns = [0, 2, 3, 4, 5, 7, 9]
+            header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'Группа', 'Место в гр']
+        elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
+            num_columns = [0, 2, 3, 4, 5, 10, 11, 13]
+            header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'ПФ', 'Группа ПФ', 'Место ПФ']
+        else: 
+            num_columns = [0, 2, 3, 4, 5, 14, 16]
+            header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'Финал', 'Место в финале']
+
+    # dict_sample = {dictkey[0]:item_1_list, dictkey[1]:item_2_list, dictkey[2]:item_3_list, dictkey[3]:item_4_list, dictkey[4]:item_5_list, 
+    #                 dictkey[5]:item_6_list, dictkey[6]:item_7_list, dictkey[7]:item_8_list, dictkey[8]:item_9_list}
+    for k in num_columns:
+        dict_sample[k] = item_list[k]
+
+    # dict_sample = {0:item_1_list, 1:item_2_list, 2:item_3_list, 3:item_4_list, 4:item_5_list, 
+    #                 5:item_6_list, 6:item_7_list, 7:item_8_list, 8:item_9_list, 10:item_11_list}
+    # list_sample = [item_1_list, item_2_list, item_3_list, item_4_list, item_5_list, 
+                    # item_6_list, item_7_list, item_8_list, item_9_list]
+
     data = pd.DataFrame(dict_sample) # данные которые передаются в модель
+    # data = pd.DataFrame(list_sample) # данные которые передаются в модель
     model = MyTableModel(data)
-    model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место', 'Полное имя']) 
+    model.setHorizontalHeaderLabels(header_list) # список заголовков
     print(data)
     
         # f = {key:value for key, value in n.items()}
