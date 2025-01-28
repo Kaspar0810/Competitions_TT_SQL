@@ -2517,7 +2517,7 @@ def fill_table(player_list): # ============== вариант эксперемн�
             while p < column_count:
                 value = val_list[l]
                 header = header_list[p]
-                if header == "Тренер":
+                if header == "Тренер" and isinstance(value, int):
                     coach = Coach.get(Coach.id == value)
                     value = coach.coach 
                 if isinstance(value, date): # узнать тип данных
@@ -2541,9 +2541,15 @@ def fill_table(player_list): # ============== вариант эксперемн�
         my_win.tableView.setFont(font)
         my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
         my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
-
+        # Установка размеров столбцов
+        # header = table_view.horizontalHeader()
+        # header.setSectionResizeMode(QHeaderView.Stretch)
+        # # Установка размеров строкh
+        # eader = table_view.verticalHeader()
+        # header.setSectionResizeMode(QHeaderView.ResizeToContents)
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
         # my_win.tableView.setSortingEnabled(True)
+        # my_win.tableView.setSectionResizeMode(QHeaderView.ResizeToContents)
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
         my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
