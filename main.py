@@ -2427,8 +2427,8 @@ def fill_table(player_list): # ============== вариант эксперемн�
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     data = []
     header_list = []
-    data_table_tmp = []
-    data_table_list = []
+    # data_table_tmp = []
+    # data_table_list = []
     dict_sample = {}
     sender = my_win.sender()
 
@@ -2453,55 +2453,9 @@ def fill_table(player_list): # ============== вариант эксперемн�
                     item_9_list, item_10_list, item_11_list, item_12_list,
                     item_13_list, item_14_list, item_15_list, item_16_list 
                     ]
-    # start = time.time()
-    # model = MyTableModel(data)
-    
+
     tb = my_win.tabWidget.currentIndex()
-    # player_selected = player_list.dicts().execute()
-
-    # row_count = len(player_selected)  # кол-во строк в таблице
-    # num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
     player_list_mod = player_list.select() # выборка конкретых столбцов
-    
-    # # кол-во наваний должно совпадать со списком столбцов
-    # if tb == 1: # == списки участников
-    #     if my_win.checkBox_6.isChecked():
-    #         num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    #         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место', 'id_del'])
-    #     else:
-    #         num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    #         # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
-    #     # player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
-    #     #                                       Player.region, Player.razryad, Player.coach_id, Player.mesto) # выборка конкретых столбцов
-    #     player_list_mod = player_list.select() # выборка конкретых столбцов
-
-    # elif tb == 2:
-    #     stage = my_win.comboBox_filter_choice_stage.currentText()
-    #     if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
-    #         num_columns = [0, 2, 3, 4, 7, 9, 10, 11, 13, 14, 16]
-    #         model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Тренер', 'Группа', 'Место гр',
-    #                                           'ПФ', "Группа ПФ", 'Место ПФ', 'Финал', 'Место'])
-    #     elif stage == "Предварительный":
-    #         num_columns = [0, 2, 3, 4, 5, 7, 9]
-    #         model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'Группа', 'Место в гр'])
-    #     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-    #         num_columns = [0, 2, 3, 4, 5, 10, 11, 13]
-    #         model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'ПФ', 'Группа ПФ', 'Место ПФ']) 
-    #     else: 
-    #         num_columns = [0, 2, 3, 4, 5, 14, 16]
-    #         model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'Финал', 'Место в финале']) 
-    # elif tb == 3 or tb == 4 or tb == 5:
-    #     num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    #     model.setHorizontalHeaderLabels(['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']) 
-    # elif tb == 6:
-    #     model.setHorizontalHeaderLabels(['id',' Место', 'R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']) 
-    # elif tb == 7:
-    #     if sender == my_win.lineEdit_find_player_stat:
-    #         num_columns = [0, 1, 2, 3, 4, 5, 6, 7]
-    #         model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']) 
-    #     else:
-    #         num_columns = [0, 1, 4, 5, 6, 7, 8]
-    #         model.setHorizontalHeaderLabels(['id','Этап', 'Игрок-1', 'Игрок-2', 'Победитель', 'Тренер', ''])
     # выделение строк
     if tb == 1:
         if my_win.checkBox_15.isChecked():
@@ -2520,11 +2474,8 @@ def fill_table(player_list): # ============== вариант эксперемн�
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: найдено всего {row_count} записей(и).")
         else:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
-    # ================
-    # model.setHorizontalHeaderLabels(['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']) 
+
     start = time.time()
-    # player_list_mod = player_list.select(Player.id, Player.player, Player.bday, Player.rank, Player.city,
-    #                                           Player.region, Player.razryad, Player.coach_id, Player.mesto, Player.full_name) # выборка конкретых столбцов
     player_selected = player_list_mod.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
     if tb == 1:
@@ -2545,7 +2496,18 @@ def fill_table(player_list): # ============== вариант эксперемн�
         else: 
             num_columns = [0, 2, 3, 4, 5, 14, 16]
             header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'Финал', 'Место в финале']
-
+    elif tb == 3 or tb == 4 or tb == 5:
+        num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        header_list = ['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']
+    elif tb == 6:
+         header_list = ['id',' Место', 'R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']
+    elif tb == 7:
+        if sender == my_win.lineEdit_find_player_stat:
+            num_columns = [0, 1, 2, 3, 4, 5, 6, 7]
+            header_list = ['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер']
+        else:
+            num_columns = [0, 1, 4, 5, 6, 7, 8]
+            header_list = ['id','Этап', 'Игрок-1', 'Игрок-2', 'Победитель', 'Тренер', '']
     column_count = len(num_columns)
 
     for n in player_selected:
@@ -2553,111 +2515,63 @@ def fill_table(player_list): # ============== вариант эксперемн�
         p = 0
         for l in num_columns:
             while p < column_count:
-                list_sample[p].append(val_list[l])
+                value = val_list[l]
+                header = header_list[p]
+                if header == "Тренер":
+                    coach = Coach.get(Coach.id == value)
+                    value = coach.coach 
+                if isinstance(value, date): # узнать тип данных
+                    value = format_date_for_view(str_date=value) # преобразует дату к виду для экрана
+                list_sample[p].append(value)
                 p += 1
                 break
-
-        # item_1_list.append(val_list[0])
-        # item_2_list.append(val_list[1])
-        # item_3_list.append(format_date_for_view(str_date=val_list[2]))
-        # item_4_list.append(val_list[3])
-        # item_5_list.append(val_list[4])
-        # item_6_list.append(val_list[5])
-        # item_7_list.append(val_list[6])
-        # item_8_list.append(Coach.get(Coach.id == val_list[7]))
-        # item_9_list.append(val_list[8])
-        # item_10_list.append(val_list[9])
-        # item_11_list.append(val_list[10])
-
-    # for n in player_selected:
-    #     # dictkey = list(n.keys())
-    #     val_list = list(n.values())
-
-    #     item_1_list.append(val_list[0])
-    #     item_2_list.append(val_list[1])
-    #     item_3_list.append(format_date_for_view(str_date=val_list[2]))
-    #     item_4_list.append(val_list[3])
-    #     item_5_list.append(val_list[4])
-    #     item_6_list.append(val_list[5])
-    #     item_7_list.append(val_list[6])
-    #     item_8_list.append(Coach.get(Coach.id == val_list[7]))
-    #     item_9_list.append(val_list[8])
-    #     item_10_list.append(val_list[9])
-    #     item_11_list.append(val_list[10])
-    #     # =================================
-    # item_list = [item_1_list, item_2_list, item_2_list, item_4_list, item_5_list, item_6_list, item_7_list, item_8_list,
-    #             item_9_list, item_10_list, item_11_list, item_12_list, item_13_list, item_14_list, item_15_list, item_16_list]
-    # название заголовков столбцов для каждой вкладки
-    # if tb == 1:
-    #     num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    #     header_list = ['id','Фамилия Имя', 'ДР', 'R', 'Город', 'Регион', 'Разряд', 'Тренер', 'Место']
-    # elif tb == 2:
-    #     stage = my_win.comboBox_filter_choice_stage.currentText()
-    #     if my_win.comboBox_filter_choice_stage.currentIndex() == 0:
-    #         num_columns = [0, 2, 3, 4, 7, 9, 10, 11, 13, 14, 16]
-    #         header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'Группа', 'Место гр',
-    #                                           'ПФ', "Группа ПФ", 'Место ПФ', 'Финал', 'Место']
-    #     elif stage == "Предварительный":
-    #         num_columns = [0, 2, 3, 4, 5, 7, 9]
-    #         header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'Группа', 'Место в гр']
-    #     elif stage == "1-й полуфинал" or stage == "2-й полуфинал":
-    #         num_columns = [0, 2, 3, 4, 5, 10, 11, 13]
-    #         header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'ПФ', 'Группа ПФ', 'Место ПФ']
-    #     else: 
-    #         num_columns = [0, 2, 3, 4, 5, 14, 16]
-    #         header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'Финал', 'Место в финале']
-
-    # dict_sample = {dictkey[0]:item_1_list, dictkey[1]:item_2_list, dictkey[2]:item_3_list, dictkey[3]:item_4_list, dictkey[4]:item_5_list, 
-    #                 dictkey[5]:item_6_list, dictkey[6]:item_7_list, dictkey[7]:item_8_list, dictkey[8]:item_9_list}
     g = 0
     for k in num_columns:
         while g < column_count:
             dict_sample[g] = list_sample[g]
             g += 1
-            break
-
-    # dict_sample = {0:item_1_list, 1:item_2_list, 2:item_3_list, 3:item_4_list, 4:item_5_list, 
-    #                 5:item_6_list, 6:item_7_list, 7:item_8_list, 8:item_9_list, 10:item_11_list}
-    # list_sample = [item_1_list, item_2_list, item_3_list, item_4_list, item_5_list, 
-                    # item_6_list, item_7_list, item_8_list, item_9_list]
 
     data = pd.DataFrame(dict_sample) # данные которые передаются в модель
-    # data = pd.DataFrame(list_sample) # данные которые передаются в модель
     model = MyTableModel(data)
     model.setHorizontalHeaderLabels(header_list) # список заголовков
-    print(data)
-    
-        # f = {key:value for key, value in n.items()}
-    # row_count = len(player_selected)  # кол-во строк в таблице
-    # if row_count != 0:  # список удаленных игроков пуст если R = 0
-    #     font = my_win.tableView.font()
-    #     font.setPointSize(11)
-    #     my_win.tableView.setFont(font)
-    #     my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
-    #     my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
+    row_count = len(player_selected)  # кол-во строк в таблице
+    if row_count != 0:  # список удаленных игроков пуст если R = 0
+        font = my_win.tableView.font()
+        font.setPointSize(11)
+        my_win.tableView.setFont(font)
+        my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
+        my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
 
-    #     my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
-    #     my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
-    #     my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
-    #     my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
-    # else:
-    #     if tb == 1:
-    #         if my_win.checkBox_15.isChecked() and row_count == 0:
-    #             my_win.statusbar.showMessage(
-    #             "Нет спортсменов из предварительной заявки", 10000)
-    #             my_win.textEdit.setText("Нет спортсменов из предварительной заявки")
-    #         else:
-    #             row = 0
-    #             my_win.statusbar.showMessage(
-    #                 "Нет спортсменов удаленных из списка", 10000)
-    #             my_win.textEdit.setText("Нет спортсменов удаленных из списка")
-    #             my_win.checkBox_6.setChecked(False)
-    #     elif tb == 6:
-    #         row = 0
-    #         my_win.statusbar.showMessage(
-    #             "Такого спортсмена в рейтинг листе нет нет", 10000)
-    my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
-    # my_win.tableView.setSortingtEnabled(True)
+        my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
+        # my_win.tableView.setSortingEnabled(True)
+        my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
+        my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
+        my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+    else:
+        if tb == 1:
+            if my_win.checkBox_15.isChecked() and row_count == 0:
+                my_win.statusbar.showMessage(
+                "Нет спортсменов из предварительной заявки", 10000)
+                my_win.textEdit.setText("Нет спортсменов из предварительной заявки")
+            else:
+                my_win.statusbar.showMessage(
+                    "Нет спортсменов удаленных из списка", 10000)
+                my_win.textEdit.setText("Нет спортсменов удаленных из списка")
+                my_win.checkBox_6.setChecked(False)
+        elif tb == 6:
+            my_win.statusbar.showMessage(
+                "Такого спортсмена в рейтинг листе нет нет", 10000)
+    # font = my_win.tableView.font()
+    # font.setPointSize(11)
+    # my_win.tableView.setFont(font)
+    # my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
+    # my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
+    # my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
+    # my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
+    # my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
+    # my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+    # my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
+   
     my_win.tableView.show()
     my_win.tableView.setModel(model)               
     finish = time.time()
