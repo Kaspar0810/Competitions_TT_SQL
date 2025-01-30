@@ -1117,9 +1117,7 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         flag = check_delete_db()
-        if flag is None:
-            return
-        else:
+        if flag is not None:
             delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
