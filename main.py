@@ -2425,8 +2425,6 @@ def fill_table(player_list): # ============== вариант эксперемн�
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     data = []
     header_list = []
-    # data_table_tmp = []
-    # data_table_list = []
     dict_sample = {}
     sender = my_win.sender()
 
@@ -2520,6 +2518,8 @@ def fill_table(player_list): # ============== вариант эксперемн�
                     value = coach.coach 
                 if isinstance(value, date): # узнать тип данных
                     value = format_date_for_view(str_date=value) # преобразует дату к виду для экрана
+                elif value is None:
+                    value = ''
                 list_sample[p].append(value)
                 p += 1
                 break
