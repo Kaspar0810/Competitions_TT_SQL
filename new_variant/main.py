@@ -595,6 +595,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif pl_gamer == 'Девушки':
             gm = 'Юноши'
             pol = 'M'
+        elif pl_gamer == 'Юниорки':
+            gm = 'Юниоры'
+            pol = 'M'
         elif pl_gamer == 'Женщины':
             gm = 'Мужчины'
             pol = 'M'
@@ -603,6 +606,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pol = 'D'
         elif pl_gamer == 'Юноши':
             gm = 'Девушки' 
+            pol = 'D'
+        elif pl_gamer == 'Юниоры':
+            gm = 'Юниорки' 
             pol = 'D'
         elif pl_gamer == 'Мужчины':
             gm = 'Женщины' 
@@ -625,7 +631,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     full_name_comp=full_name_comp, 
                     pdf_comp="",
                     short_name_comp=short_name_comp, 
-                    tab_enabled="Титул Участники", 
+                    tab_enabled="Титул, Участники", 
                     multiregion=titles.multiregion).save()
 
             # получение последней записи в таблице
@@ -1097,7 +1103,7 @@ class StartWindow(QMainWindow, Ui_Form):
     
     def last_comp(self):
         """открытие последних соревнований"""
-        sex = ["Девочки", "Девушки", "Женщины"]
+        sex = ["Девочки", "Девушки", "Юниорки", "Женщины"]
         id_title = db_select_title()
         tab_enabled(id_title)
         title_new = Title.select().where(Title.id == id_title).get()
@@ -1130,7 +1136,7 @@ class StartWindow(QMainWindow, Ui_Form):
                                  msgBox.Ok, msgBox.Cancel)
         if result == msgBox.Ok:
             gamer = ("Мальчики", "Девочки", "Юноши",
-                     "Девушки", "Мужчины", "Женщины")
+                     "Девушки", "Юниоры", "Юниорки", "Мужчины", "Женщины")
             gamer, ok = QInputDialog.getItem(
                 my_win, "Участники", "Выберите категорию спортсменов", gamer, 0, False)
 
@@ -1351,7 +1357,7 @@ def db_r(gamer):  # table_db присваивает по умолчанию зн
     """переходит на функцию выбора файла рейтинга в зависимости от текущего или январского,
      а потом загружает список регионов базу данных"""
     msgbox = QMessageBox
-    gamer_list = ["Мальчики", "Юноши", "Мужчины"]
+    gamer_list = ["Мальчики", "Юноши", "Юниоры", "Мужчины"]
     if gamer in gamer_list:
         table_db = R_list_m
     else:
@@ -1731,7 +1737,7 @@ def db_insert_title(title_str):
 def go_to():
     """переход на предыдущие соревнования и обратно при нажатии меню -перейти к- или из меню -последние-"""
     sender = my_win.sender()
-    sex = ["Девочки", "Девушки", "Женщины"]
+    sex = ["Девочки", "Девушки", "Юниорки", "Женщины"]
 
     if sender == fir_window.Button_open:
         full_name_with_age = fir_window.comboBox.currentText()
@@ -2081,7 +2087,7 @@ def find_in_rlist():
                 txt = f"{family} {name}"
         else:
             txt = txt.capitalize()  # Переводит первую букву в заглавную
-        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Юниорки"or gamer == "Женщины":
             if tb == 6 and cur_index == 0:
                 r_data = r_data_w[0] # текущий рейтинг
             elif tb == 6 and cur_index == 1:
@@ -2142,7 +2148,7 @@ def input_player():
     # повторная проверка игрока в январском рейтинге если два однофамильца и одинаковые имена 
     titles = Title.select().where(Title.id == title_id()).get()
     sex = titles.gamer
-    woman_list = ["Девочки", "Девушки", "Женщины"]
+    woman_list = ["Девочки", "Девушки", "Юниорки", "Женщины"]
     r_data = R1_list_d if sex in woman_list else R1_list_m
     p = r_data.select().where(r_data.r1_fname == f_name)  # like поиск в январском рейтинге
     if len(p) > 0:
@@ -2427,7 +2433,7 @@ def fill_table(player_list): # ============== вариант эксперемн�
     header_list = []
     dict_sample = {}
     sender = my_win.sender()
-    start = time.time()
+
     item_1_list = []
     item_2_list = []
     item_3_list = []
@@ -2459,7 +2465,7 @@ def fill_table(player_list): # ============== вариант эксперемн�
         else:
             my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) 
-    elif tb == 3 or tb == 4 or tb == 5 or tb == 7:
+    elif tb == 3 or tb == 7:
         my_win.tableView.setSelectionMode(QAbstractItemView.SingleSelection) # выделение одной строки по клику мышью
         my_win.tableView.setSelectionBehavior(QAbstractItemView.SelectRows) # 
     else:
@@ -2471,7 +2477,7 @@ def fill_table(player_list): # ============== вариант эксперемн�
         else:
             my_win.label_78.setText(f"Поиск спортсмена в рейтинге: не найдено ни одной записи.")
 
-    
+    start = time.time()
     player_selected = player_list_mod.dicts().execute()
     row_count = len(player_selected)  # кол-во строк в таблице
     if tb == 1:
@@ -2493,10 +2499,8 @@ def fill_table(player_list): # ============== вариант эксперемн�
             num_columns = [0, 2, 3, 4, 5, 14, 16]
             header_list = ['id','Фамилия Имя', 'Регион', 'Тренер', 'R', 'Финал', 'Место в финале']
     elif tb == 3 or tb == 4 or tb == 5:
-        # num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        # header_list = ['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']
-        num_columns = [0, 1, 3, 4, 5, 6, 7, 8, 9]
-        header_list = ['id',' Стадия', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']
+        num_columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        header_list = ['id',' Стадия', 'Группа', 'Встреча', '1-й игрок', '2-й игрок', 'Победитель', 'Очки','Общ. счет', 'Счет в партиях']
     elif tb == 6:
          header_list = ['id',' Место', 'R', 'Фамилия Имя', 'Дата рождения', 'Город', 'Регион']
     elif tb == 7:
@@ -2541,8 +2545,15 @@ def fill_table(player_list): # ============== вариант эксперемн�
         my_win.tableView.setFont(font)
         my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
         my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
+        # Установка размеров столбцов
+        # header = table_view.horizontalHeader()
+        # header.setSectionResizeMode(QHeaderView.Stretch)
+        # # Установка размеров строкh
+        # eader = table_view.verticalHeader()
+        # header.setSectionResizeMode(QHeaderView.ResizeToContents)
         my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
         # my_win.tableView.setSortingEnabled(True)
+        # my_win.tableView.setSectionResizeMode(QHeaderView.ResizeToContents)
         my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
         my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
         my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
@@ -2560,6 +2571,16 @@ def fill_table(player_list): # ============== вариант эксперемн�
         elif tb == 6:
             my_win.statusbar.showMessage(
                 "Такого спортсмена в рейтинг листе нет нет", 10000)
+    # font = my_win.tableView.font()
+    # font.setPointSize(11)
+    # my_win.tableView.setFont(font)
+    # my_win.tableView.horizontalHeader().setFont(QFont("Times", 12, QFont.Bold)) # делает заголовки жирный и размер 13
+    # my_win.tableView.horizontalHeader().setStyleSheet("background-color:yellow;") # делает фон заголовков светлоголубой
+    # my_win.tableView.verticalHeader().setDefaultSectionSize(16) # высота строки 20 пикселей
+    # my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
+    # my_win.tableView.horizontalHeader().setStretchLastSection(True) # растягивает последнюю колонку до конца
+    # my_win.tableView.setGridStyle(QtCore.Qt.SolidLine) # вид линии сетки 
+    # my_win.tableView.resizeColumnsToContents() # растягивает по содержимому
    
     my_win.tableView.show()
     my_win.tableView.setModel(model)               
@@ -2567,15 +2588,13 @@ def fill_table(player_list): # ============== вариант эксперемн�
     res = finish - start
     res_msec = res * 1000
     print('Время работы в миллисекундах: ', res_msec)
-    if tb == 5:
-        fin = my_win.comboBox_filter_final.currentText()
-        my_win.label_final.setText(fin)
+
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
     title = Title.select().where(Title.id == title_id()).get()
     gamer = title.gamer
-    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Юниорки" or gamer == "Женщины":
         player_list = R_list_d.select().order_by(R_list_d.r_fname)
     else:
         player_list = R_list_m.select().order_by(R_list_m.r_fname)
@@ -2590,7 +2609,7 @@ def fill_table_R1_list():
     """заполняет таблицу списком из январского рейтинг листа"""
     title = Title.select().where(Title.id == title_id()).get()
     gamer = title.gamer
-    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+    if gamer == "Девочки" or gamer == "Девушки" or gamer == "Юниорки" or gamer == "Женщины":
         player_list = R1_list_d.select().order_by(R1_list_d.r1_fname)
     else:
         player_list = R1_list_m.select().order_by(R1_list_m.r1_fname)
@@ -3072,12 +3091,12 @@ def load_comboBox_filter_rejting():
     gamer = id_title.gamer
     cur_index = my_win.comboBox_choice_R.currentIndex() # комбобокс выбора рейтинга
     if cur_index == 0: # если выбран текущий рейтинг
-        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Юниорки" or gamer == "Женщины":
             r_data = r_data_w[0]
         else:
             r_data = r_data_m[0] 
     elif cur_index == 1: # если рейтинг за январь
-        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Женщины":
+        if gamer == "Девочки" or gamer == "Девушки" or gamer == "Юниорки" or gamer == "Женщины":
             r_data = r_data_w[1]
         else:
            r_data = r_data_m[1]
@@ -3113,6 +3132,7 @@ def tool_page():
 def page():
     """Изменяет вкладку toolBox в зависимости от вкладки tabWidget"""
     msgBox = QMessageBox()
+    sender = my_win.groupBox_result.sender()
     tb = my_win.toolBox.currentIndex()
     sf = System.select().where(System.title_id == title_id())
     if tb == 0: # -титул-    
@@ -3368,17 +3388,19 @@ def page():
         fill_table(player_list)
         my_win.widget.hide()
         my_win.tableWidget.hide()
-    elif tb == 3:  # вкладка -группы-
-        stage = "Предварительный"
+    elif tb == 3:  # вкладка -результаты-
+        for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                if i.isChecked():
+                    stage_current = i.text()
+                    break
+                    # state_visible = my_win.checkBox_4.isChecked()
+                elif (sender == my_win.radioButton_group or 
+                    sender == my_win.radioButton_semifinal or sender == my_win.radioButton_final):
+                    for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                        if i.isChecked():
+                            stage_current = i.text()
+                            break
         Button_view_group = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
-        # Button_view_group.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
-        # Button_view_group.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        #==========
-        # Label_view_group = QLabel(my_win.tabWidget)
-        # Label_view_group.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
-        # Label_view_group.move(860, 50) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        # Label_view_group.setText("Просмотр групп")
-        # Label_view_group.show()
         Button_view_group.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
         Button_view_group.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
         joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
@@ -3396,7 +3418,14 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        system_stage = sf.select().where(System.stage == "Предварительный").get()
+        if stage_current == "Полуфинальный":
+            system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
+            stage = my_win.comboBox_filter_semifinal.currentText()
+            id_system = system_id(stage)
+            system_stage = sf.select().where(System.id == id_system).get()
+            system_stage = sf.select().where(System.stage == "1-й полуфинал").get()
+        else: 
+            system_stage = sf.select().where(System.stage == stage_current).get()
         game_visible = system_stage.visible_game
         my_win.checkBox_4.setChecked(game_visible)
         my_win.checkBox_7.setEnabled(False)
@@ -3404,125 +3433,125 @@ def page():
         my_win.checkBox_7.setChecked(False)
         my_win.checkBox_8.setChecked(False)
 
-        my_win.Button_Ok_gr.setEnabled(False)
-        player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == "Предварительный"))
+        my_win.Button_Ok.setEnabled(False)
+        player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage_current))
         load_combobox_filter_group()
         load_combo()
         visible_field()
         fill_table(player_list)
         my_win.label_16.hide()
         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
-    elif tb == 4:  # вкладка -полуфиналы-
-        Button_view_semifinal = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
-        # ==== новый вариант кнопки просмотра (иконка)
-        Button_view_semifinal.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
-        Button_view_semifinal.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
-        Button_view_semifinal.setIcon(QtGui.QIcon(joined_path))
-        Button_view_semifinal.setIconSize(QtCore.QSize(48,64))
-        Button_view_semifinal.setFlat(True)
-        # ===============================
-        # Button_view_semifinal.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
-        # Button_view_semifinal.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        # Button_view_semifinal.setText("Просмотр\nполуфиналов")
-        Button_view_semifinal.show()
-        Button_view_semifinal.clicked.connect(view)
-        my_win.widget.hide()
-        my_win.tableWidget.hide()
-        my_win.resize(1270, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        # my_win.progressBar.hide()
-        system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
+    # elif tb == 4:  # вкладка -полуфиналы-
+    #     Button_view_semifinal = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
+    #     # ==== новый вариант кнопки просмотра (иконка)
+    #     Button_view_semifinal.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
+    #     Button_view_semifinal.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+    #     joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
+    #     Button_view_semifinal.setIcon(QtGui.QIcon(joined_path))
+    #     Button_view_semifinal.setIconSize(QtCore.QSize(48,64))
+    #     Button_view_semifinal.setFlat(True)
+    #     # ===============================
+    #     # Button_view_semifinal.resize(120, 50) # размеры кнопки (длина 120, ширина 50)
+    #     # Button_view_semifinal.move(850, 60) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+    #     # Button_view_semifinal.setText("Просмотр\nполуфиналов")
+    #     Button_view_semifinal.show()
+    #     Button_view_semifinal.clicked.connect(view)
+    #     my_win.widget.hide()
+    #     my_win.tableWidget.hide()
+    #     my_win.resize(1270, 825)
+    #     my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
+    #     my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
+    #     my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+    #     # my_win.progressBar.hide()
+    #     system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
 
-        # stage = my_win.comboBox_filter_semifinal.currentText()
-        # id_system = system_id(stage)
-        # system_stage = sf.select().where(System.id == id_system).get()
+    #     # stage = my_win.comboBox_filter_semifinal.currentText()
+    #     # id_system = system_id(stage)
+    #     # system_stage = sf.select().where(System.id == id_system).get()
 
-        # system_stage = sf.select().where(System.stage == "1-й полуфинал").get()
+    #     # system_stage = sf.select().where(System.stage == "1-й полуфинал").get()
 
-        game_visible = system_stage.visible_game
-        my_win.checkBox_4.setChecked(game_visible)
-        my_win.checkBox_7.setEnabled(False)
-        my_win.checkBox_8.setEnabled(False)
-        my_win.checkBox_7.setChecked(False)
-        my_win.checkBox_8.setChecked(False)
-        flag = ready_choice(stage="1-й полуфинал")
-        if flag is False:
-            result = msgBox.information(my_win, "", "Необходимо сделать жеребьевку\nполуфинального этапа.",
-                                        msgBox.Ok, msgBox.Cancel)
-            if result != msgBox.Ok:
-                return
-            else:
-                my_win.tabWidget.setCurrentIndex(2)
-                choice_gr_automat()
-                sf.choice_flag = True
-                sf.save()
-            my_win.tabWidget.setCurrentIndex(3)
-        else:  # жеребьевка сделана
-            my_win.Button_Ok_pf.setEnabled(False)
-            load_combobox_filter_group_semifinal()
-            stage = my_win.comboBox_filter_semifinal.currentText()
-            id_system = system_id(stage)
-            system_stage = sf.select().where(System.id == id_system).get()
-            player_list = Result.select().where(Result.system_id == id_system)
+    #     game_visible = system_stage.visible_game
+    #     my_win.checkBox_4.setChecked(game_visible)
+    #     my_win.checkBox_7.setEnabled(False)
+    #     my_win.checkBox_8.setEnabled(False)
+    #     my_win.checkBox_7.setChecked(False)
+    #     my_win.checkBox_8.setChecked(False)
+    #     flag = ready_choice(stage="1-й полуфинал")
+    #     if flag is False:
+    #         result = msgBox.information(my_win, "", "Необходимо сделать жеребьевку\nполуфинального этапа.",
+    #                                     msgBox.Ok, msgBox.Cancel)
+    #         if result != msgBox.Ok:
+    #             return
+    #         else:
+    #             my_win.tabWidget.setCurrentIndex(2)
+    #             choice_gr_automat()
+    #             sf.choice_flag = True
+    #             sf.save()
+    #         my_win.tabWidget.setCurrentIndex(3)
+    #     else:  # жеребьевка сделана
+    #         my_win.Button_Ok_pf.setEnabled(False)
+    #         load_combobox_filter_group_semifinal()
+    #         stage = my_win.comboBox_filter_semifinal.currentText()
+    #         id_system = system_id(stage)
+    #         system_stage = sf.select().where(System.id == id_system).get()
+    #         player_list = Result.select().where(Result.system_id == id_system)
                                                 
-            # player_list = Result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
-            fill_table(player_list)
-            # load_combobox_filter_group_semifinal()
-            load_combo()
-            visible_field()
-            my_win.label_17.hide()
-            my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
-    elif tb == 5: # вкладка -финалы-
-        my_win.resize(1270, 825)
-        my_win.Button_check_net.setEnabled(False)
-        Button_view_final = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
-        # ==== новый вариант кнопки просмотра (иконка)
-        Button_view_final.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
-        Button_view_final.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
-        joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
-        Button_view_final.setIcon(QtGui.QIcon(joined_path))
-        Button_view_final.setIconSize(QtCore.QSize(48,64))
-        Button_view_final.setFlat(True)
-        Button_view_final.show()
-        my_win.widget.hide()
-        my_win.tableWidget.hide()
-        Button_view_final.clicked.connect(view)
-        my_win.resize(1270, 825)
-        my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
-        my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
-        my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        my_win.checkBox_visible_game.setEnabled(False)
-        my_win.checkBox_9.setChecked(False)
-        my_win.checkBox_10.setChecked(False)
-        my_win.checkBox_9.setEnabled(False)
-        my_win.checkBox_10.setEnabled(False)
-        my_win.tableView.show()
-        my_win.Button_Ok_fin.setEnabled(False)
-        my_win.groupBox_kolvo_vstrech_fin.setEnabled(False)
-        load_combobox_filter_final()
-        stage_combo = my_win.comboBox_filter_final.currentText()
-        count = len(sf)
-        stage = "Одна таблица" if count == 1 else "Финальный"
-        player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
-        fill_table(player_list)
-        load_combo()
-        visible_field()
-        my_win.label_18.hide()
-        # === проверка есть ли 1-й финал и все ли места разыигрываются ===
-        system = System.select().where(System.title_id == title_id())
-        ng = ""
-        for i in system:
-            fin = i.stage
-            if fin == "1-й финал":
-                system_fin = system.select().where(System.stage == "1-й финал").get()
-                ng = system_fin.no_game
-                break
-        znak = ng.find("3")
-        my_win.checkBox_no_play_3.setChecked(True) if znak != -1 else my_win.checkBox_no_play_3.setChecked(False)
-        my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
+    #         # player_list = Result.select().where((Result.system_stage == "1-й полуфинал") | (Result.system_stage == "2-й полуфинал"))
+    #         fill_table(player_list)
+    #         # load_combobox_filter_group_semifinal()
+    #         load_combo()
+    #         visible_field()
+    #         my_win.label_17.hide()
+    #         my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
+    # elif tb == 5: # вкладка -финалы-
+    #     my_win.resize(1270, 825)
+    #     my_win.Button_check_net.setEnabled(False)
+    #     Button_view_final = QPushButton(my_win.tabWidget) # (в каком виджете размещена)
+    #     # ==== новый вариант кнопки просмотра (иконка)
+    #     Button_view_final.resize(120, 64) # размеры кнопки (длина 120, ширина 50)
+    #     Button_view_final.move(850, 80) # разммещение кнопки (от левого края 850, от верхнего 60) от виджета в котором размещен
+    #     joined_path = os.path.join(pathlib.Path.cwd(), 'icons', 'view_pdf.png')
+    #     Button_view_final.setIcon(QtGui.QIcon(joined_path))
+    #     Button_view_final.setIconSize(QtCore.QSize(48,64))
+    #     Button_view_final.setFlat(True)
+    #     Button_view_final.show()
+    #     my_win.widget.hide()
+    #     my_win.tableWidget.hide()
+    #     Button_view_final.clicked.connect(view)
+    #     my_win.resize(1270, 825)
+    #     my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
+    #     my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
+    #     my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
+    #     my_win.checkBox_visible_game.setEnabled(False)
+    #     my_win.checkBox_9.setChecked(False)
+    #     my_win.checkBox_10.setChecked(False)
+    #     my_win.checkBox_9.setEnabled(False)
+    #     my_win.checkBox_10.setEnabled(False)
+    #     my_win.tableView.show()
+    #     my_win.Button_Ok_fin.setEnabled(False)
+    #     my_win.groupBox_kolvo_vstrech_fin.setEnabled(False)
+    #     load_combobox_filter_final()
+    #     stage_combo = my_win.comboBox_filter_final.currentText()
+    #     count = len(sf)
+    #     stage = "Одна таблица" if count == 1 else "Финальный"
+    #     player_list = Result.select().where((Result.title_id == title_id()) & (Result.system_stage == stage))
+    #     fill_table(player_list)
+    #     load_combo()
+    #     visible_field()
+    #     my_win.label_18.hide()
+    #     # === проверка есть ли 1-й финал и все ли места разыигрываются ===
+    #     system = System.select().where(System.title_id == title_id())
+    #     ng = ""
+    #     for i in system:
+    #         fin = i.stage
+    #         if fin == "1-й финал":
+    #             system_fin = system.select().where(System.stage == "1-й финал").get()
+    #             ng = system_fin.no_game
+    #             break
+    #     znak = ng.find("3")
+    #     my_win.checkBox_no_play_3.setChecked(True) if znak != -1 else my_win.checkBox_no_play_3.setChecked(False)
+    #     my_win.tableView_net.hide() # сетка ручной жеребьевки на 32
     elif tb == 6: # вкладка -рейтинг-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 75, 841, 702))
@@ -3552,6 +3581,8 @@ def page():
         my_win.comboBox_first_group.setEnabled(False)
         my_win.comboBox_second_group.setEnabled(False)
         load_combo_etap_begunki()
+    elif tb == 8: # парный разряд
+        pass
         # ======
     hide_show_columns(tb)
 
@@ -5024,27 +5055,52 @@ def visible_field():
             match_db = system_stage.score_flag
             state_visible = system_stage.visible_game  # флаг, показывающий записывать счет в партиях или нет
         # ======= записывает изменение в базу данных
-    if sender == my_win.checkBox_4 or sender == my_win.checkBox_14 or sender == my_win.checkBox_visible_game: # изменяет состояние чекбокса игра со счетом или нет
+   
+    if sender == my_win.checkBox_4: # изменяет состояние чекбокса игра со счетом или нет
         if tab == 3:
             state_visible = my_win.checkBox_4.isChecked()
             if state_visible is True:
-                my_win.lineEdit_pl1_s1_gr.setFocus()
+                my_win.lineEdit_pl1_s1.setFocus()
             else:
-                my_win.lineEdit_pl1_gr_score_total.setFocus()
-        elif tab == 4:
-            state_visible = my_win.checkBox_14.isChecked()
-            if state_visible is True:
-                my_win.lineEdit_pl1_s1_pf.setFocus()
-            else:
-                my_win.lineEdit_pl1_pf_score_total.setFocus()
-        else:
-            state_visible = my_win.checkBox_visible_game.isChecked()
-            if state_visible is True:
-                my_win.lineEdit_pl1_s1_fin.setFocus()
-            else:
-                my_win.lineEdit_pl1_score_total_fin.setFocus()
+                my_win.lineEdit_pl1_score_total.setFocus()
+        # elif tab == 4:
+        #     state_visible = my_win.checkBox_14.isChecked()
+        #     if state_visible is True:
+        #         my_win.lineEdit_pl1_s1_pf.setFocus()
+        #     else:
+        #         my_win.lineEdit_pl1_pf_score_total.setFocus()
+        # else:
+        #     state_visible = my_win.checkBox_visible_game.isChecked()
+        #     if state_visible is True:
+        #         my_win.lineEdit_pl1_s1_fin.setFocus()
+        #     else:
+        #         my_win.lineEdit_pl1_score_total_fin.setFocus()
     change_status_visible_and_score_game() 
     return state_visible
+
+
+def change_tab_filter():
+    """Меняет вкладку фильтров страницы результаты ы зависимости от этапа"""
+    sender = my_win.groupBox_result.sender()
+    for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                if i.isChecked():
+                    stage_current = i.text()
+                    break
+                elif (sender == my_win.radioButton_group or 
+                    sender == my_win.radioButton_semifinal or sender == my_win.radioButton_final):
+                    for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
+                        if i.isChecked():
+                            stage_current = i.text()
+                            break
+    if stage_current == "Предварительный":
+         my_win.tabWidget_2.setCurrentIndex(0)
+    elif stage_current == "Полуфинальный":
+        my_win.tabWidget_2.setCurrentIndex(1)
+        page()
+        # my_win.tabWidget_2.setTabVisible(1, False)
+    else:
+        my_win.tabWidget_2.setCurrentIndex(2)
+
 
 
 def select_player_in_list():
@@ -5393,7 +5449,7 @@ def change_city_from_region_in_R():
     region = my_win.comboBox_filter_region_in_R.currentText()
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
-    gamer_w = ["Девочки", "Девушки", "Женщины"]
+    gamer_w = ["Девочки", "Девушки", "Юниорки", "Женщины"]
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
     cur_index = my_win.comboBox_choice_R.currentIndex()
@@ -5513,7 +5569,7 @@ def find_in_player_rejting_list():
     """поиск спортсмена в рейтинг листе"""
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
-    gamer_w = ["Девочки", "Девушки", "Женщины"]
+    gamer_w = ["Девочки", "Девушки", "Юниорки", "Женщины"]
     id_title = Title.select().where(Title.id == title_id()).get()
 
     gamer = id_title.gamer
@@ -5543,7 +5599,7 @@ def filter_rejting_list():
     r_data_m = [R_list_m, R1_list_m]
     r_data_w = [R_list_d, R1_list_d]
 
-    gamer_w = ["Девочки", "Девушки", "Женщины"]
+    gamer_w = ["Девочки", "Девушки", "Юниорки","Женщины"]
     id_title = Title.select().where(Title.id == title_id()).get()
     gamer = id_title.gamer
     cur_index = my_win.comboBox_choice_R.currentIndex()
@@ -16233,61 +16289,61 @@ def proba():
 
 
 # ===== переводит фокус на поле ввода счета в партии вкладки -группа-
-my_win.lineEdit_pl1_s1_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s1_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s2_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s2_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s3_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s3_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s4_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s4_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s5_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s5_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s6_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s6_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s7_gr.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s7_gr.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s1.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s1.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s2.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s2.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s3.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s3.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s4.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s4.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s5.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s5.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s6.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s6.returnPressed.connect(focus)
+my_win.lineEdit_pl1_s7.returnPressed.connect(focus)
+my_win.lineEdit_pl2_s7.returnPressed.connect(focus)
 # ===== проверка правильность ввода цифр
 # ===== переводит фокус на поле ввода счета в партии вкладки -полуфиналы-
-my_win.lineEdit_pl1_s1_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s1_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s2_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s2_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s3_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s3_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s4_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s4_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s5_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s5_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s6_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s6_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s7_pf.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s7_pf.returnPressed.connect(focus)
-# ===== переводит фокус на полее ввода счета в партии вкладки -финалы-
-my_win.lineEdit_pl1_s1_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s1_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s2_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s2_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s3_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s3_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s4_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s6_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s6_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl1_s7_fin.returnPressed.connect(focus)
-my_win.lineEdit_pl2_s7_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s1_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s1_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s2_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s2_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s3_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s3_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s4_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s4_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s5_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s5_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s6_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s6_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s7_pf.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s7_pf.returnPressed.connect(focus)
+# # ===== переводит фокус на полее ввода счета в партии вкладки -финалы-
+# my_win.lineEdit_pl1_s1_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s1_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s2_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s2_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s3_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s3_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s4_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s4_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s5_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s5_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s6_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s6_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl1_s7_fin.returnPressed.connect(focus)
+# my_win.lineEdit_pl2_s7_fin.returnPressed.connect(focus)
 
 my_win.lineEdit_range_tours.returnPressed.connect(enter_print_begunki)
 my_win.lineEdit_num_game_fin.returnPressed.connect(filter_fin)
 
-my_win.lineEdit_pl1_score_total_gr.returnPressed.connect(enter_total_score)
-my_win.lineEdit_pl2_score_total_gr.returnPressed.connect(enter_total_score)
-my_win.lineEdit_pl1_score_total_pf.returnPressed.connect(enter_total_score)
-my_win.lineEdit_pl2_score_total_pf.returnPressed.connect(enter_total_score)
-my_win.lineEdit_pl1_score_total_fin.returnPressed.connect(enter_total_score)
-my_win.lineEdit_pl2_score_total_fin.returnPressed.connect(enter_total_score)
+my_win.lineEdit_pl1_score_total.returnPressed.connect(enter_total_score)
+my_win.lineEdit_pl2_score_total.returnPressed.connect(enter_total_score)
+# my_win.lineEdit_pl1_score_total_pf.returnPressed.connect(enter_total_score)
+# my_win.lineEdit_pl2_score_total_pf.returnPressed.connect(enter_total_score)
+# my_win.lineEdit_pl1_score_total_fin.returnPressed.connect(enter_total_score)
+# my_win.lineEdit_pl2_score_total_fin.returnPressed.connect(enter_total_score)
 
 my_win.lineEdit_Family_name.returnPressed.connect(input_player)
 my_win.lineEdit_bday.returnPressed.connect(next_field)
@@ -16370,9 +16426,14 @@ my_win.comboBox_kategor_sec.currentTextChanged.connect(add_referee_to_db)
 my_win.radioButton_match_3.toggled.connect(change_status_visible_and_score_game)
 my_win.radioButton_match_5.toggled.connect(change_status_visible_and_score_game)
 my_win.radioButton_match_7.toggled.connect(change_status_visible_and_score_game)
-my_win.radioButton_match_4.toggled.connect(change_status_visible_and_score_game)
-my_win.radioButton_match_6.toggled.connect(change_status_visible_and_score_game)
-my_win.radioButton_match_8.toggled.connect(change_status_visible_and_score_game)
+
+my_win.radioButton_final.toggled.connect(change_tab_filter)
+my_win.radioButton_semifinal.toggled.connect(change_tab_filter)
+my_win.radioButton_group.toggled.connect(change_tab_filter)
+
+# my_win.radioButton_match_4.toggled.connect(change_status_visible_and_score_game)
+# my_win.radioButton_match_6.toggled.connect(change_status_visible_and_score_game)
+# my_win.radioButton_match_8.toggled.connect(change_status_visible_and_score_game)
 
 my_win.checkBox_repeat_regions.stateChanged.connect(change_choice_group) 
 
@@ -16389,22 +16450,22 @@ my_win.checkBox_visible_game.stateChanged.connect(change_status_visible_and_scor
 my_win.checkBox_6.stateChanged.connect(del_player_table)
 my_win.checkBox_7.stateChanged.connect(no_play)  # поражение по неявке игрок 1 группа
 my_win.checkBox_8.stateChanged.connect(no_play)  # поражение по неявке игрок 2 группа
-my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке игрок 1 пф
-my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке игрок 2 пф
-my_win.checkBox_12.stateChanged.connect(no_play)  # поражение по неявке игрок 1 финал
-my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по неявке игрок 2 финал
+# my_win.checkBox_9.stateChanged.connect(no_play)  # поражение по неявке игрок 1 пф
+# my_win.checkBox_10.stateChanged.connect(no_play)  # поражение по неявке игрок 2 пф
+# my_win.checkBox_12.stateChanged.connect(no_play)  # поражение по неявке игрок 1 финал
+# my_win.checkBox_13.stateChanged.connect(no_play)  # поражение по неявке игрок 2 финал
 my_win.checkBox_11.stateChanged.connect(debitor_R) # должники рейтинга оплаты
 my_win.checkBox_15.stateChanged.connect(filter_player_list)
 my_win.checkBox_find_player.stateChanged.connect(find_player)
-my_win.checkBox_check_net.stateChanged.connect(button_check_on)
+# my_win.checkBox_check_net.stateChanged.connect(button_check_on)
 # my_win.checkBox_GSK.stateChanged.connect(made_list_GSK)
 # my_win.checkBox_edit_etap.stateChanged.connect(change_player_in_etap )
 # =======  нажатие кнопок =========
 
 
-my_win.Button_Ok_gr.setAutoDefault(True)  # click on <Enter>
-my_win.Button_Ok_pf.setAutoDefault(True)  # click on <Enter>
-my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
+my_win.Button_Ok.setAutoDefault(True)  # click on <Enter>
+# my_win.Button_Ok_pf.setAutoDefault(True)  # click on <Enter>
+# my_win.Button_Ok_fin.setAutoDefault(True)  # click on <Enter>
 my_win.Button_pay_R.clicked.connect(save_in_db_pay_R)
 my_win.Button_clear_del.clicked.connect(clear_del_player)
 my_win.Button_reset_filter_gr.clicked.connect(reset_filter)
@@ -16420,9 +16481,9 @@ my_win.Button_add_edit_player.clicked.connect(add_player)  # добавляет 
 # записывает в базу или редактирует титул
 my_win.Button_title_made.clicked.connect(title_made) # создание титула
 # записывает в базу счет в партии встречи
-my_win.Button_Ok_gr.clicked.connect(enter_score)
-my_win.Button_Ok_pf.clicked.connect(enter_score)
-my_win.Button_Ok_fin.clicked.connect(enter_score)
+my_win.Button_Ok.clicked.connect(enter_score)
+# my_win.Button_Ok_pf.clicked.connect(enter_score)
+# my_win.Button_Ok_fin.clicked.connect(enter_score)
 my_win.Button_del_player.clicked.connect(delete_player) # удаляет игроков
 my_win.Button_print_begunki.clicked.connect(begunki_made)
 
@@ -16456,7 +16517,7 @@ my_win.Button_players_on_alf.clicked.connect(made_list_players_on_alf)
 my_win.Button_made_page_pdf.clicked.connect(made_pdf_list)
 my_win.Button_view_page_pdf.clicked.connect(view_all_page_pdf)
 my_win.Button_randevy.clicked.connect(randevy_list)
-my_win.Button_check_net.clicked.connect(check_choice_net) # проверка жеребьевки сетки
+# my_win.Button_check_net.clicked.connect(check_choice_net) # проверка жеребьевки сетки
 
 my_win.Button_pay.clicked.connect(check_pay)
 sys.exit(app.exec())
