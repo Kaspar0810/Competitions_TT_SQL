@@ -1548,7 +1548,7 @@ def tab_enabled(id_title):
     my_win.system_made_Action.setEnabled(True) # делает меню  -редактировать- видиммым
 
     sender = my_win.sender()
-    tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
+    tab_index = ["Титул", "Участники", "Система", "Результаты"]
     titles = Title.select().order_by(Title.id.desc())  # получает все title.id по убыванию
     title_new = Title.select().where(Title.id == id_title).get()
     vozrast = title_new.vozrast
@@ -1622,7 +1622,7 @@ def tab_enabled(id_title):
 
 def add_open_tab(tab_page):
     """добавляет в таблицу -Title- список открытых вкладок"""
-    tab_index = ["Титул", "Участники", "Система", "Группы", "Полуфиналы", "Финалы"]
+    tab_index = ["Титул", "Участники", "Система", "Результаты"]
     titles = Title.select().where(Title.id == title_id()).get()
 
     if tab_page != "":
@@ -5093,13 +5093,13 @@ def change_tab_filter():
                             stage_current = i.text()
                             break
     if stage_current == "Предварительный":
-         my_win.tabWidget_2.setCurrentIndex(0)
+         my_win.stackedWidget.setCurrentIndex(0)
     elif stage_current == "Полуфинальный":
-        my_win.tabWidget_2.setCurrentIndex(1)
+        my_win.stackedWidget.setCurrentIndex(1)
         page()
-        # my_win.tabWidget_2.setTabVisible(1, False)
+        # my_win.stackedWidget.setTabVisible(1, False)
     else:
-        my_win.tabWidget_2.setCurrentIndex(2)
+        my_win.stackedWidget.setCurrentIndex(2)
 
 
 
