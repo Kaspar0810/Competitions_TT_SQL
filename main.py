@@ -2070,7 +2070,10 @@ def find_in_rlist():
         else:
             my_win.textEdit.clear()
             txt = my_win.lineEdit_Family_name.text()
-
+        # ====
+        if txt == "":
+            return
+        # =========
         zn = txt.find(" ")
         if zn != -1:
             family = txt[:zn]
@@ -2108,7 +2111,7 @@ def find_in_rlist():
                 if r == 0 :
                     my_win.label_63.setText("Поиск в текущем рейтинг листе.")
                     p = p.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
-                    if r == 0  and len(p) != 0:
+                    if r == 0 and len(p) != 0:
                         for pl in p:
                             full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
                             my_win.listWidget.addItem(full_stroka) # заполняет лист виджет спортсменами
