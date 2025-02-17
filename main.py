@@ -1109,7 +1109,7 @@ class StartWindow(QMainWindow, Ui_Form):
             my_win.setStyleSheet("#MainWindow{background-color:lightblue}")
         # === вставить  проверку DB ======      
         flag = check_delete_db()
-        if flag is None:
+        if flag is None or flag == 1:
             return
         else:
             delete_db_copy(del_files_list=flag)
@@ -1117,7 +1117,8 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         flag = check_delete_db()
-        if flag is not None:
+        # if flag is not None or flag != 1:
+        if flag != 1:
             delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
@@ -2055,6 +2056,11 @@ def clear_filter_rejting_list():
 
 def find_in_rlist():
     """при создании списка участников ищет спортсмена в текущем R-листе"""
+    text_id = my_win.lineEdit_id.text() # если поле заполнено значит редактирование или удаление игрока
+    text_Button = my_win.Button_add_edit_player.text()
+    text_fam = my_win.lineEdit_Family_name.text()
+    if text_id != "" or text_Button == "Редактировать" or text_fam == '':
+        return
     tb = my_win.tabWidget.currentIndex()
     if my_win.checkBox_find_player.isChecked():
         find_in_player_list()
@@ -2103,11 +2109,12 @@ def find_in_rlist():
             else:
                 player_list = r_data.select().where(r_data.r1_fname ** f'{txt}%')  # like поиск в январском рейтинге
         else:
-            for r_list in r_data:
-                p = r_list.select()
-                if r == 0 :
+            for r_list in r_data:                
+                if r == 0 :                    
                     my_win.label_63.setText("Поиск в текущем рейтинг листе.")
-                    p = p.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+                    pf = r_list.select()
+                    p = pf.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+                    # p = pf.where r_list.r_fname like f'{txt}%'  # like поиск в текущем рейтинге
                     if r == 0  and len(p) != 0:
                         for pl in p:
                             full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
@@ -2118,7 +2125,8 @@ def find_in_rlist():
                         continue
                 else:
                     my_win.label_63.setText("Поиск в январском рейтинге.")
-                    p = p.where(r_list.r1_fname ** f'{txt}%')  # like поиск в январском рейтинге
+                    pf = r_list.select()
+                    p = pf.where(r_list.r1_fname ** f'{txt}%')  # like поиск в январском рейтинге
                     if len(p) > 0:
                         for pl in p:
                             full_stroka = f"{pl.r1_fname}, {str(pl.r1_list)}, {pl.r1_bithday}, {pl.r1_city}"
@@ -2570,6 +2578,7 @@ def fill_table(player_list): # ============== вариант эксперемн�
     if tb == 5:
         fin = my_win.comboBox_filter_final.currentText()
         my_win.label_final.setText(fin)
+
 
 def fill_table_R_list():
     """заполняет таблицу списком из текущего рейтинг листа"""
@@ -5319,11 +5328,7 @@ def delete_player():
                     res = Result.update(tours=new_tour).where(Result.id == k)
                     res.execute()
         else: # записывает в таблицу -Удаленные-
-            year = birthday[6:] 
-            monh  = birthday[3:5]
-            days = birthday[:2]
-            birthday_mod = f"{year}-{monh}-{days}"
-            # birthday_mod = datetime.now().strftime('%Y-%m-%d') # текущая дата в формате 01_01_2000
+            birthday_mod = format_date_for_db(str_date=birthday)
             with db: 
                 del_player = Delete_player(player_del_id=player_id, bday=birthday_mod, rank=rank, city=player_city_del,
                                             region=region, razryad=razryad, coach_id=coach_id, full_name=full_name,
