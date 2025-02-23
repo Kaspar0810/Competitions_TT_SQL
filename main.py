@@ -81,7 +81,7 @@ pdfmetrics.registerFont(TTFont('DejaVuSerif', os.path.join(outpath, 'DejaVuSerif
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', os.path.join(outpath, 'DejaVuSerif-Bold.ttf')))
 pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', os.path.join(outpath, 'DejaVuSerif-Italic.ttf')))
 # ============== рабочий вариант
-class _MyTableModel(QAbstractTableModel):
+class MyTableModel(QAbstractTableModel):
     def __init__(self, data):
         super().__init__()
         self._data = data
@@ -173,7 +173,7 @@ class _MyTableModel(QAbstractTableModel):
 
 
 
-class MyTableModel(QAbstractTableModel): # === вариант эксперементальный ============
+class _MyTableModel(QAbstractTableModel): # === вариант эксперементальный ============
     def __init__(self, data):
         super().__init__()
         self._data = data
@@ -1117,8 +1117,7 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         flag = check_delete_db()
-        # if flag is not None or flag != 1:
-        if flag != 1:
+        if flag is not None:
             delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
@@ -1307,7 +1306,7 @@ def check_delete_db():
                                                     "необходимо их удалить.",
                                     msgBox.Ok, msgBox.Cancel)
         if result == msgBox.Ok:
-            flag = del_files_list
+            flag = delete_db_copy(del_files_list)
         else:
             return
     else:
@@ -2115,7 +2114,8 @@ def find_in_rlist():
             for r_list in r_data:                
                 if r == 0 :                    
                     my_win.label_63.setText("Поиск в текущем рейтинг листе.")
-                    p = p.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
+                    pf = r_list.select()
+                    p = pf.where(r_list.r_fname ** f'{txt}%')  # like поиск в текущем рейтинге
                     if r == 0  and len(p) != 0:
                         for pl in p:
                             full_stroka = f"{pl.r_fname}, {str(pl.r_list)}, {pl.r_bithday}, {pl.r_city}"
@@ -2194,6 +2194,7 @@ def find_city():
     city_list = []
     sender = my_win.sender()
     my_win.listWidget.clear()
+    my_win.label_63.setText("Список городов")
     txt = my_win.label_63.text()
     city_field = my_win.lineEdit_city_list.text()
     if txt == "Список городов.":
@@ -2273,7 +2274,7 @@ def dupl_regions(n_gr):
     return region_list
 
 
-def _fill_table(player_list):
+def fill_table(player_list):
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     data = []
     data_table_tmp = []
@@ -2430,7 +2431,7 @@ def _fill_table(player_list):
     print('Время работы в миллисекундах: ', res_msec)
 
 
-def fill_table(player_list): # ============== вариант эксперемнетальный =============
+def _fill_table(player_list): # ============== вариант эксперемнетальный =============
     """заполняет таблицу со списком участников QtableView спортсменами из db"""
     data = []
     header_list = []
@@ -2713,7 +2714,7 @@ def add_player():
     """добавляет игрока в список и базу данных"""
     msgBox = QMessageBox()    
     flag = False
-    player_list = Player.select().where(Player.title_id == title_id())
+    player_list = Player.select().where(Player.title_id == title_id() & (Player.bday != 0000-00-00))
     txt = my_win.Button_add_edit_player.text()
     count = len(player_list)
     pl_id = my_win.lineEdit_id.text()
@@ -2954,7 +2955,7 @@ def dclick_in_listwidget():
     txt_tmp = my_win.label_63.text()
     text = my_win.listWidget.currentItem().text()
     coach_field = my_win.lineEdit_coach.text()
-    if txt_tmp == "Список городов.": # если в listwidget список городов которые есть в базе
+    if txt_tmp == "Список городов": # если в listwidget список городов которые есть в базе
         my_win.label_63.setText("")
         my_win.lineEdit_city_list.setText(text)    
         cr = City.get(City.city == text)
@@ -5155,7 +5156,7 @@ def select_player_in_game():
         my_win.checkBox_10.setChecked(False)
         my_win.groupBox_match_2.setTitle(f"Встреча №{numer_game}")
     elif tab == 7:
-        player_id = my_win.tableView.model().index(row_num, 0).data()
+        player_id = my_win.tableView.model().index(row_num, 3).data()
         players = Player.select().where(Player.id == player_id).get()
         player = players.full_name
 
@@ -5164,6 +5165,13 @@ def select_player_in_game():
         fill_table(player_list)
     if tab == 3 or tab == 4 or tab == 5:
         my_win.groupBox_kolvo_vstrech_fin.setEnabled(True)
+        # state_visible = change_status_visible_and_score_game()
+        # pl1 = my_win.tableView.model().index(row_num, 4).data()
+        # pl2 = my_win.tableView.model().index(row_num, 5).data()
+        # pl_win = my_win.tableView.model().index(row_num, 6).data()
+        # win_pole = my_win.tableView.model().index(row_num, 7).data()
+        # sc = my_win.tableView.model().index(row_num, 8).data()
+
         state_visible = change_status_visible_and_score_game()
         pl1 = my_win.tableView.model().index(row_num, 4).data()
         pl2 = my_win.tableView.model().index(row_num, 5).data()
@@ -5286,7 +5294,7 @@ def delete_player():
                 
                 choices = Choice.delete().where(Choice.player_choice_id == player_id)
                 choices.execute()
-                game_lists = game_list.select().where(Game_list.player_group_id == player_del).get()
+                game_lists = game_list.select().where(Game_list.player_group_id == player_id).get()
                 posev = game_lists.rank_num_player
                 number_group = game_lists.number_group
                 # === изменяет номера посева, если удаляемый игрок не в последний посев ==
@@ -15843,7 +15851,8 @@ def made_list_winners():
     my_win.radioButton_winner.setChecked(True)
     my_win.Button_made_page_pdf.setEnabled(True)
     my_win.tableWidget.clear()
-    players = Player.select().where(Player.title_id == title_id())
+    # players = Player.select().where(Player.title_id == title_id())
+    players = Player.select().where((Player.title_id == title_id()) & (Player.player != "X"))
     winners = players.select().where(Player.mesto < 4).order_by(Player.mesto)
     count = len(winners)
     if count == 0:
