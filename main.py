@@ -1117,7 +1117,8 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         flag = check_delete_db()
-        if flag is not None:
+        # if flag is not None:
+        if flag == 0:
             delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
@@ -2714,7 +2715,7 @@ def add_player():
     """добавляет игрока в список и базу данных"""
     msgBox = QMessageBox()    
     flag = False
-    player_list = Player.select().where(Player.title_id == title_id() & (Player.bday != 0000-00-00))
+    player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
     txt = my_win.Button_add_edit_player.text()
     count = len(player_list)
     pl_id = my_win.lineEdit_id.text()
@@ -3182,6 +3183,7 @@ def page():
         list_player_pdf(player_list)
         my_win.widget.hide()
         my_win.tableWidget.hide()
+        my_win.checkBox_15.setChecked(False) # сбрасывает флажок -предзаявка-
     elif tb == 2:  # -система-
         my_win.resize(1110, 825)
         my_win.tableView.setGeometry(QtCore.QRect(260, 318, 841, 452))
