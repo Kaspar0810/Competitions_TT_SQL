@@ -2715,7 +2715,7 @@ def add_player():
     """добавляет игрока в список и базу данных"""
     msgBox = QMessageBox()    
     flag = False
-    player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00'))
+    player_list = Player.select().where((Player.title_id == title_id()) & (Player.bday != '0000-00-00')) # обязательно скобки до и после &
     txt = my_win.Button_add_edit_player.text()
     count = len(player_list)
     pl_id = my_win.lineEdit_id.text()
