@@ -2788,7 +2788,8 @@ def add_player():
             with db:
                 plr =  player_list.select().where(Player.id == pl_id).get()
                 plr.player = pl
-                plr.bday = bd
+                bd_mod = format_date_for_db(str_date=bd)
+                plr.bday = bd_mod
                 plr.rank = rn
                 plr.city = ct
                 plr.region = rg
