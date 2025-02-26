@@ -1123,8 +1123,7 @@ class StartWindow(QMainWindow, Ui_Form):
 
     def open(self):
         flag = check_delete_db()
-        # if flag is not None:
-        if flag > 1:
+        if flag is not None:
             delete_db_copy(del_files_list=flag)
         go_to()
         self.close()
@@ -3390,35 +3389,11 @@ def page():
         my_win.widget.hide()
         my_win.tableWidget.hide()
     elif tb == 3:  # вкладка -результаты-
-        semi_final = ["1-й полуфинал", "2-й полуфинал"]
-        stage_choice = []
-        for s in sf:
-            flag_choice = s.choice_flag
-            if flag_choice == 1:
-                stage_comp = s.stage
-                if stage_comp =="Предварительный":
-                    stage_choice.append(stage_comp)
-                elif stage_comp in semi_final:
-                    stage_choice.append("Полуфинальный")
-                else:
-                    stage_choice.append("Финальный")
-        stage_choice_set = set(stage_choice)
-        
-        for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
-            stage_current = i.text()
-            if stage_current in stage_choice_set:
-                i.setEnabled(True)
-            else:
-                i.setEnabled(False)
-
         for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
                 if i.isChecked():
                     stage_current = i.text()
-                    if stage_current in stage_choice_set:
-                        i.setEnabled(True)
-                    else:
-                        i.setEnabled(False)
                     break
+                    # state_visible = my_win.checkBox_4.isChecked()
                 elif (sender == my_win.radioButton_group or 
                     sender == my_win.radioButton_semifinal or sender == my_win.radioButton_final):
                     for i in my_win.groupBox_result.findChildren(QRadioButton): # перебирает радиокнопки и определяет какая отмечена
@@ -3443,9 +3418,7 @@ def page():
         my_win.tableView.setGeometry(QtCore.QRect(260, 150, 1000, 620))
         my_win.tabWidget.setGeometry(QtCore.QRect(260, 0, 1000, 147))
         my_win.toolBox.setGeometry(QtCore.QRect(10, 10, 243, 762))
-        if stage_current == "Предварительный":
-            system_stage = sf.select().where(System.stage == stage_current).get()
-        elif stage_current == "Полуфинальный":
+        if stage_current == "Полуфинальный":
             system_stage = sf.select().where((System.stage == "1-й полуфинал") | (System.stage == "2-й полуфинал")).get()
             stage = my_win.comboBox_filter_semifinal.currentText()
             id_system = system_id(stage)
